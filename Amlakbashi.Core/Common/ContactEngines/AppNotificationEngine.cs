@@ -40,7 +40,7 @@ namespace Amlakbashi.Core.Common.ContactEngines
             {
                 FirebaseMessaging.DefaultInstance.SendAsync(message);
             }
-            catch (Exception exc)
+            catch
             {
                 // TODO logger
             }

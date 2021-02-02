@@ -76,7 +76,7 @@ namespace Amlakbashi.Core.Common.ContactEngines
             {
                 FirebaseMessaging.DefaultInstance.SendAsync(message);
             }
-            catch (Exception exc)
+            catch
             {
                 // TODO Logger
             }
@@ -137,7 +137,7 @@ namespace Amlakbashi.Core.Common.ContactEngines
             {
                 FirebaseMessaging.DefaultInstance.SendAsync(message);
             }
-            catch (Exception exc)
+            catch
             {
                 //LogHelper.LogError(exc);
             }
