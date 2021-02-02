@@ -1,5 +1,5 @@
-﻿using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Amlakbashi.Core.Common.Repository
 {
@@ -7,6 +7,6 @@ namespace Amlakbashi.Core.Common.Repository
     {
         int SaveChanges();
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
-        DbEntityEntry Entry(object entity);
+        EntityEntry Entry(object entity);
     }
 }

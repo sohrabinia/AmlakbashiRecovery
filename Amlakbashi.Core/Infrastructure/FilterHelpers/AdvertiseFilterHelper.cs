@@ -3,7 +3,6 @@ using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.FilterHelpers.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using static Amlakbashi.Core.Entities.Advertise;
 
@@ -14,8 +13,8 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
         public IQueryable<Advertise> FilterEmptyInRange(IQueryable<Advertise> input, List<DateTime> range)
         {
             input = input.Where(w => w.OccupiedTables.Any(a =>
-                range.Select(s => DbFunctions.TruncateTime(s)).Contains(
-                    DbFunctions.TruncateTime(a.Date))) == false);
+                range.Select(s => s).Contains(
+                    a.Date)) == false);
             return input;
         }
 

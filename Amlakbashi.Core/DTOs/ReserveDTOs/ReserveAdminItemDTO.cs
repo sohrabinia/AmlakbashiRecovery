@@ -34,7 +34,6 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public string guestComment { get; set; }
         public bool systemCalledToHost { get; set; }
         public bool systemCalledToGuest { get; set; }
-        public bool instantReserve { get; set; }
         public bool disableAutoCancel { get; set; }
         public bool accVisitedByGuest { get; set; }
 
