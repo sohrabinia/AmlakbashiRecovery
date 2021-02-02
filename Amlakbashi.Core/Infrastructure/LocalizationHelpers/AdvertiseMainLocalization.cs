@@ -1,0 +1,654 @@
+﻿using Amlakbashi.Core.Entities;
+using static Amlakbashi.Core.Entities.Advertise;
+
+namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
+{
+    public static class AdvertiseMainLocalization
+    {
+        public static string GetPositionTypeString(int position_type)
+        {
+            switch ((PositionType)position_type)
+            {
+                case PositionType.sahel:
+                    return "ساحلی";
+                case PositionType.jungle:
+                    return "جنگلی";
+                case PositionType.koohestani:
+                    return "کوهستانی";
+                case PositionType.biaban:
+                    return "بیابانی";
+                case PositionType.shahri:
+                    return "شهری";
+                case PositionType.hoome:
+                    return "حومه‌ی شهر";
+                case PositionType.roostaee:
+                    return "روستایی";
+                case PositionType.dakhele_shahrak:
+                    return "داخل شهرک";
+                case PositionType.ashayeri:
+                    return "عشایری";
+                case PositionType.SummerQuarter:
+                    return "ییلاقی";
+                default:
+                    return "انتخاب کنید";
+            }
+        }
+
+        public static string GetAdvertiseTypeUserString(AdvertiseType advertiseType)
+        {
+            switch ((AdvertiseType)advertiseType)
+            {
+                case AdvertiseType.All:
+                    return "اجاره روزانه";
+                case AdvertiseType.Apartment:
+                    return "آپارتمان مبله";
+                case AdvertiseType.Villa:
+                    return "ویلا";
+                case AdvertiseType.Hotel:
+                    return "هتل";
+                case AdvertiseType.HotelApartment:
+                    return "هتل آپارتمان";
+                case AdvertiseType.Camp:
+                    return "کمپ";
+                case AdvertiseType.TourismAccommodation:
+                    return "اقامتگاه بومگردی";
+                case AdvertiseType.House:
+                    return "خانه ویلایی مبله";
+                case AdvertiseType.SuitAndRoom:
+                    return "اتاق و سوئیت مبله";
+                case AdvertiseType.Inn:
+                    return "مسافرخانه";
+                case AdvertiseType.Pansion:
+                    return "پانسیون";
+                case AdvertiseType.Complex:
+                    return "مجتمع";
+                case AdvertiseType.Hut:
+                    return "کلبه";
+                default:
+                    return "انتخاب کنید";
+            }
+        }
+
+        public static string GetAdvertiseStatusString(int status, bool shortened = false)
+        {
+            switch ((AdvertiseStatus)status)
+            {
+                case AdvertiseStatus.ReadyToPublish:
+                    return "در انتظار تایید" + (shortened ? "" : " کارشناس");
+                case AdvertiseStatus.Published:
+                    return "تایید شده";
+                case AdvertiseStatus.Archived:
+                    return "غیر فعال";
+                case AdvertiseStatus.Deleted:
+                    return "پاک شده";
+                case AdvertiseStatus.NotVerified:
+                    return "تایید نشده";
+                case AdvertiseStatus.NotCompleted:
+                    return shortened ? "تکمیل نشده" : "اطلاعات آگهی را تکمیل کنید";
+                case AdvertiseStatus.FirstReady:
+                    return "در انتظار تایید" + (shortened ? "" : " کارشناس");
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetInstantReserveStatusString(InstantReserveStatusEnum status)
+        {
+            switch (status)
+            {
+                case InstantReserveStatusEnum.None:
+                    return "غیرفعال";
+                case InstantReserveStatusEnum.Requested:
+                    return "در انتظار تایید";
+                case InstantReserveStatusEnum.Confirmed:
+                    return "فعال";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetInstantReserveButtonTitle(InstantReserveStatusEnum status, bool isBanned)
+        {
+            if (isBanned)
+                return "مشاهده دلیل ممنوعیت";
+            switch (status)
+            {
+                case InstantReserveStatusEnum.None:
+                    return "درخواست امکان رزرو آنی";
+                case InstantReserveStatusEnum.Requested:
+                    return "لغو رزرو آنی";
+                case InstantReserveStatusEnum.Confirmed:
+                    return "غیرفعال سازی";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetLocationString(string province, string city, string area,
+            string country_direction_string)
+        {
+            var location_string = "";
+            if (!string.IsNullOrEmpty(country_direction_string))
+            {
+                location_string = country_direction_string;
+            }
+            else if (!string.IsNullOrEmpty(area))
+            {
+                location_string = area;
+            }
+            else if (!string.IsNullOrEmpty(city))
+            {
+                location_string = city;
+            }
+            else
+            {
+                //if (province.Trim() == "گیلان" || province == "مازندران")
+                //{
+                //    location_string = "شمال " + province;
+                //}
+                //else
+                //{
+                location_string = "استان " + province;
+                //}
+            }
+            return location_string;
+        }
+
+        public static string GetAdvertiseTypePersianString(int advertiseType)
+        {
+            switch ((AdvertiseType)advertiseType)
+            {
+                case AdvertiseType.All:
+                    return "اجاره روزانه";
+                case AdvertiseType.Apartment:
+                    return "آپارتمان";
+                case AdvertiseType.Villa:
+                    return "ویلا";
+                case AdvertiseType.Hotel:
+                    return "رزرو هتل";
+                case AdvertiseType.HotelApartment:
+                    return "رزرو هتل آپارتمان";
+                case AdvertiseType.Camp:
+                    return "کمپ";
+                case AdvertiseType.TourismAccommodation:
+                    return "رزرو اقامتگاه بومگردی";
+                case AdvertiseType.House:
+                    return "خانه ویلایی";
+                case AdvertiseType.SuitAndRoom:
+                    return "اتاق و سوئیت";
+                case AdvertiseType.Inn:
+                    return "مسافرخانه";
+                case AdvertiseType.Pansion:
+                    return "پانسیون";
+                case AdvertiseType.Complex:
+                    return "مجتمع";
+                case AdvertiseType.Hut:
+                    return "کلبه";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetPropertyTitle(Property property)
+        {
+            switch (property)
+            {
+                case Property.TypeID:
+                    return "نوع اقامتگاه";
+                case Property.Region:
+                    return "موقعیت اقامتگاه";
+                case Property.Title:
+                    return "عنوان";
+                case Property.Description:
+                    return "توضیحات";
+                case Property.Count:
+                    return "تعداد اتاق";
+                case Property.Province:
+                    return "استان";
+                case Property.City:
+                    return "شهر";
+                case Property.Area:
+                    return "منطقه";
+                case Property.Address:
+                    return "آدرس";
+                case Property.DailyPrice:
+                    return "قیمت پایه برای روزهای عادی";
+                case Property.HolidayPrice:
+                    return "قیمت روزهای تعطیل";
+                case Property.HolidayPikePrice:
+                    return "قیمت روزهای پیک تعطیلات";
+                case Property.NorouzPrice:
+                    return "قیمت روزهای نوروز";
+                case Property.RentPrice:
+                    return "قیمت ماهیانه";
+                case Property.MoreThanCapacityPrice:
+                    return "قیمت به ازای هر مهمان بیشتر از ظرفیت";
+                case Property.Metrazh:
+                    return "متراژ بنا";
+                case Property.LandArea:
+                    return "متراژ زمین";
+                case Property.Capacity:
+                    return "ظرفیت اقامتگاه";
+                case Property.MoreThanCapacity:
+                    return "حداکثر مهمان اضافه";
+                case Property.Room:
+                    return "تعداد اتاق خواب";
+                case Property.Parking:
+                    return "تعداد پارکینگ اقامتگاه";
+                case Property.SingleBed:
+                    return "تعداد تخت یک نفره";
+                case Property.DoublesBed:
+                    return "تعداد تخت دو نفره";
+                case Property.Floor:
+                    return "طبقه ملک";
+                case Property.BuildingDirection:
+                    return "جهت ملک";
+                case Property.Elevator:
+                    return "آسانسور";
+                case Property.Pool:
+                    return "استخر";
+                case Property.Sauna:
+                    return "سونا";
+                case Property.Jacuzzi:
+                    return "جکوزی";
+                case Property.Bathroom:
+                    return "حمام";
+                case Property.Wifi:
+                    return "وای فای";
+                case Property.WashingMachine:
+                    return "ماشین لباسشویی";
+                case Property.MicrowaveOven:
+                    return "مایکروویو";
+                case Property.SoundSystem:
+                    return "ضبط و باند";
+                case Property.Golf:
+                    return "گلف";
+                case Property.PoolTable:
+                    return "بیلیارد";
+                case Property.Foosball:
+                    return "فوتبال دستی";
+                case Property.Hairdryer:
+                    return "سشوار";
+                case Property.TV:
+                    return "تلویزیون";
+                case Property.Oven:
+                    return "اجاق گاز";
+                case Property.Refrigerator:
+                    return "یخچال";
+                case Property.KitchenHood:
+                    return "هود آشپرخانه";
+                case Property.KitchenUtensils:
+                    return "ظروف آشپرخانه";
+                case Property.TeaMaker:
+                    return "چای ساز";
+                case Property.ExtraBlanketCount:
+                    return "تعداد پتو اضافه";
+                case Property.HeatingSystem:
+                    return "سیستم گرمایشی";
+                case Property.CoolingSystem:
+                    return "سیستم سرمایشی";
+                case Property.WC:
+                    return "سرویس بهداشتی";
+                case Property.BlanketsAndMattresses:
+                    return "تعداد تشک و پتو";
+                case Property.AllowSmoking:
+                    return "استعمال دخانیات در داخل اقامتگاه";
+                case Property.AllowPets:
+                    return "آوردن حیوانات خانگی";
+                case Property.AllowParty:
+                    return "گرفتن مهمانی در این اقامتگاه";
+                case Property.EvidenceRequired:
+                    return "مدارک مورد نیاز";
+                case Property.OtherRules:
+                    return "سایر شرایط و قوانین اقامتگاه";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetHotelUnitTitle(AdvertiseType type)
+        {
+            switch (type)
+            {
+                case AdvertiseType.Hotel:
+                case AdvertiseType.Inn:
+                case AdvertiseType.Pansion:
+                    return "اتاق";
+                case AdvertiseType.Camp:
+                    return "چادر";
+                case AdvertiseType.TourismAccommodation:
+                    return "واحد";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetPropertyValueTitle(object item)
+        {
+            if (item.GetType() == typeof(AdvertiseType))
+            {
+                return GetAdvertiseTypeUserString((AdvertiseType)item);
+            }
+            if (item.GetType() == typeof(PositionType))
+            {
+                return GetPositionTypeString((int)(PositionType)item);
+            }
+            if (item.GetType() == typeof(ParkingItems))
+            {
+                switch ((ParkingItems)item)
+                {
+                    case ParkingItems.Unset:
+                        return "انتخاب تعداد پارکینگ";
+                    case ParkingItems.One:
+                        return "1 پارکینگ";
+                    case ParkingItems.Two:
+                        return "2 پارکینگ";
+                    case ParkingItems.Three:
+                        return "3 پارکینگ";
+                    case ParkingItems.MoreThanThree:
+                        return "بیشتر از 3";
+                    case ParkingItems.Jointly:
+                        return "مشاع";
+                    case ParkingItems.NoParking:
+                        return "بدون پارکینگ";
+                    default:
+                        return "";
+                }
+            }
+            if (item.GetType() == typeof(BuildingDirectionItems))
+            {
+                switch ((BuildingDirectionItems)item)
+                {
+                    case BuildingDirectionItems.Unset:
+                        return "انتخاب جهت ملک";
+                    case BuildingDirectionItems.Western:
+                        return "غربی";
+                    case BuildingDirectionItems.Eastern:
+                        return "شرقی";
+                    case BuildingDirectionItems.Northern:
+                        return "شمالی";
+                    case BuildingDirectionItems.Southern:
+                        return "جنوبی";
+                    case BuildingDirectionItems.TwoSided:
+                        return "دوبر";
+                    default:
+                        break;
+                }
+            }
+            if (item.GetType() == typeof(ExtraBlanketCountItems))
+            {
+                switch ((ExtraBlanketCountItems)item)
+                {
+                    case ExtraBlanketCountItems.Unset:
+                        return "انتخاب کنید";
+                    case ExtraBlanketCountItems.One:
+                        return "یک عدد";
+                    case ExtraBlanketCountItems.Two:
+                        return "دو عدد";
+                    case ExtraBlanketCountItems.Three:
+                        return "سه عدد";
+                    case ExtraBlanketCountItems.Four:
+                        return "چهار عدد";
+                    case ExtraBlanketCountItems.Five:
+                        return "پنج عدد";
+                    case ExtraBlanketCountItems.MoreThanFive:
+                        return "بیشتر از پنج عدد";
+                    default:
+                        return "";
+                }
+            }
+            if (item.GetType() == typeof(HeatingSystemItems))
+            {
+                switch ((HeatingSystemItems)item)
+                {
+                    case HeatingSystemItems.Unset:
+                        return "انتخاب کنید";
+                    case HeatingSystemItems.Heater:
+                        return "بخاری";
+                    case HeatingSystemItems.Package:
+                        return "پکیج";
+                    case HeatingSystemItems.Radiator:
+                        return "شوفاژ";
+                    case HeatingSystemItems.AirConditioner:
+                        return "هواساز";
+                    case HeatingSystemItems.FirePlace:
+                        return "شومینه";
+                    case HeatingSystemItems.Other:
+                        return "غیره";
+                    case HeatingSystemItems.None:
+                        return "ندارد";
+                    default:
+                        return "";
+                }
+            }
+            if (item.GetType() == typeof(CoolingSystemItems))
+            {
+                switch ((CoolingSystemItems)item)
+                {
+                    case CoolingSystemItems.Unset:
+                        return "انتخاب کنید";
+                    case CoolingSystemItems.Chiller:
+                        return "چیلر";
+                    case CoolingSystemItems.Fancoel:
+                        return "فنکوئل";
+                    case CoolingSystemItems.WaterCooler:
+                        return "کولر آبی";
+                    case CoolingSystemItems.Splitter:
+                        return "کولر گازی";
+                    case CoolingSystemItems.AirConditioner:
+                        return "هواساز";
+                    case CoolingSystemItems.SplitterAndWaterCooler:
+                        return "کولر آبی و گازی";
+                    case CoolingSystemItems.Fan:
+                        return "پنکه";
+                    case CoolingSystemItems.Other:
+                        return "غیره";
+                    case CoolingSystemItems.None:
+                        return "ندارد";
+                    default:
+                        return "";
+                }
+            }
+            if (item.GetType() == typeof(WCItems))
+            {
+                switch ((WCItems)item)
+                {
+                    case WCItems.Unset:
+                        return "انتخاب کنید";
+                    case WCItems.Persian:
+                        return "ایرانی";
+                    case WCItems.Europian:
+                        return "فرنگی";
+                    case WCItems.EuropianAndPersian:
+                        return "ایرانی و فرنگی";
+                    default:
+                        return "";
+                }
+            }
+            if (item.GetType() == typeof(FloorItems))
+            {
+                switch ((FloorItems)item)
+                {
+                    case FloorItems.Unset:
+                        return "انتخاب کنید";
+                    case FloorItems.Underground:
+                        return "زیرزمین";
+                    case FloorItems.Ground:
+                        return "همکف";
+                    case FloorItems.MoreThan10th:
+                        return "بالاتر از 10";
+                    default:
+                        return ((int)((FloorItems)item)).ToString();
+                }
+            }
+            return "";
+        }
+
+        public static string CategoryTitle { get { return "اجاره-روزانه"; } }
+
+        public static string GetNotVerifyReasonTitle(int reason)
+        {
+            switch ((NotVerifyReasonsEnum)reason)
+            {
+                case NotVerifyReasonsEnum.Reason_1:
+                    return "قیمت وارد شده مورد تایید نمی باشد";
+                case NotVerifyReasonsEnum.Reason_2:
+                    return "آگهی تکراری مورد تایید نیست , لطفا اگهی قبلی را ویرایش کنید";
+                case NotVerifyReasonsEnum.Reason_3:
+                    return "آگهی های فاقد عکس مورد تایید نمی باشد";
+                case NotVerifyReasonsEnum.Reason_4:
+                    return "لطفا وضعیت مالکیت خود را صحیح وارد کنید";
+                case NotVerifyReasonsEnum.Reason_5:
+                    return "عکس آپلود شده مورد تایید نمی باشد";
+                case NotVerifyReasonsEnum.Reason_6:
+                    return "لطفا اطلاعات اقامتگاه تکمیل کنید";
+                case NotVerifyReasonsEnum.Reason_7:
+                    return "قیمت پایه برای روزهای عادی (به تومان) را وارد کنید";
+                case NotVerifyReasonsEnum.Reason_8:
+                    return "عنوان آگهی مورد تایید نمی باشد";
+                case NotVerifyReasonsEnum.Reason_9:
+                    return "لطفا جهت بازخورد بهتر در هر اگهی عکس و اطلاعات *یک* اقامتگاه را کامل ثبت کنید";
+                case NotVerifyReasonsEnum.Reason_10:
+                    return "لطفا فقط عکس اقامتگاه مربوط به اگهی را اپلود کنید";
+                case NotVerifyReasonsEnum.Reason_11:
+                    return "لطفا عنوانی متناسب با اگهی انتخاب کنید";
+                case NotVerifyReasonsEnum.Reason_12:
+                    return "لطفا عکس ها را جداگانه آپلود کنید";
+                case NotVerifyReasonsEnum.Reason_13:
+                    return "کاربر گرامی عکسهای لوگو دار مورد تایید نمیباشند";
+                case NotVerifyReasonsEnum.Reason_14:
+                    return "عکس  با کادر مشکی مورد تایید نمیباشد";
+                case NotVerifyReasonsEnum.Reason_15:
+                    return "درج لینک در اگهی مجاز نمیباشد اگر مایل به تبلیغ وبسایت خود هستید میتوانید از طریق خرید بنر اقدام نماید. در صورت نیاز به اطلاعات بیشتر با 02632565304 تماس بگیرید";
+                case NotVerifyReasonsEnum.Reason_16:
+                    return "جهت راهنمایی و یا اطلاعات بیشتر با شماره 02632565304 تماس حاصل فرمایید و یا به تلگرام 09360263804 پیام ارسال کنید";
+                case NotVerifyReasonsEnum.Reason_17:
+                    return "اقامتگاه ثبت شده مورد تایید نمیباشد";
+                case NotVerifyReasonsEnum.Reason_18:
+                    return "درج لینک سایت ، کانال و... در اگهی امکان پذیر نمیباشد";
+                case NotVerifyReasonsEnum.Reason_19:
+                    return "شماره تماس شما در اگهی نیست لطفا با ما تماس بگیرید 02632565304";
+                case NotVerifyReasonsEnum.Reason_20:
+                    return "لطفا شهر و منطقه اقامتگاه را به درستی وارد کنید";
+                case NotVerifyReasonsEnum.Reason_21:
+                    return "آگهی تکراری مورد تایید نیست ، میتوانید از پنل ویژه یا بروزرسانی جهت بازدید بیشتر اگهی استفاده کنید";
+                case NotVerifyReasonsEnum.Reason_22:
+                    return "لطفا اطلاعات پروفایل خود را صحیح وارد کنید";
+                case NotVerifyReasonsEnum.Reason_23:
+                    return "لطفا اطلاعات پروفایل خود را کامل کنید ،برای تکمیل اطلاعات پروفایل وارد حساب من شوید از منو پروفایل را انتخاب کنید";
+                case NotVerifyReasonsEnum.Reason_24:
+                    return "این اقامتگاه توسط مالک قبلا ثبت گردیده";
+                case NotVerifyReasonsEnum.Reason_25:
+                    return "لطفا از همه ی فضاهای اقامتگاه عکس اپلود کنید";
+                case NotVerifyReasonsEnum.Reason_26:
+                    return "این اقامتگاه قبلا در سایت ثبت گردیده، اگر مالک اقامتگاه هستید لطفا مدرکی دال بر مالکیت ارسال نمایید ، تا اگهی به حساب شما انتقال یابد";
+                case NotVerifyReasonsEnum.Reason_27:
+                    return "لطفا ادرس را به درستی وارد کنید";
+                case NotVerifyReasonsEnum.Reason_28:
+                    return "اگهی شما به دلیل عدم پاسخگویی شما به تلفنتان تایید نشد";
+                case NotVerifyReasonsEnum.Reason_29:
+                    return "لطفا قیمت واحد را به روز کنید";
+                case NotVerifyReasonsEnum.Reason_30:
+                    return "درج آپارتمان غیر مبله امکان پذیر نیست";
+                case NotVerifyReasonsEnum.Reason_31:
+                    return "لطفا مدرک مالکیت واحد را ارسال نمایید";
+                case NotVerifyReasonsEnum.Reason_32:
+                    return "عدم همکاری شما در پاسخگویی به درخواست رزرو";
+                case NotVerifyReasonsEnum.Reason_33:
+                    return "لطفا دسته بندی (نوع اقامتگاه) آگهی را به درستی وارد کنید";
+                default:
+                    return "";
+            }
+        }
+
+        public static string FilteredAddress(string address)
+        {
+            if (address == null)
+                return "";
+            if (address.Contains("پلاک"))
+            {
+                int indexOfExp = address.IndexOf("پلاک");
+                if (indexOfExp >= 0)
+                    address = address.Remove(indexOfExp);
+            }
+            else if (address.Contains(" پ "))
+            {
+                int indexOfExp = address.IndexOf(" پ ");
+                if (indexOfExp >= 0)
+                    address = address.Remove(indexOfExp);
+            }
+            return address;
+        }
+
+        public static string PhotoTitle(Advertise.AdvertiseType type, Advertise.AdvertiseMode mode)
+        {
+            switch (mode)
+            {
+                case AdvertiseMode.Single:
+                    switch (type)
+                    {
+                        case AdvertiseType.Apartment:
+                            return "آپارتمان";
+                        case AdvertiseType.Villa:
+                            return "ویلا";
+                        case AdvertiseType.SuitAndRoom:
+                            return "سوییت";
+                        case AdvertiseType.House:
+                            return "خانه ویلایی";
+                        case AdvertiseType.Hut:
+                            return "کلبه";
+                        default:
+                            return null;
+                    }
+                case AdvertiseMode.Parent:
+                    switch (type)
+                    {
+                        case AdvertiseType.Hotel:
+                            return "هتل";
+                        case AdvertiseType.Camp:
+                            return "کمپ";
+                        case AdvertiseType.TourismAccommodation:
+                            return "اقامتگاه بومگردی";
+                        case AdvertiseType.HotelApartment:
+                            return "هتل آپارتمان";
+                        case AdvertiseType.Inn:
+                            return "مسافرخانه";
+                        case AdvertiseType.Pansion:
+                            return "پانسیون";
+                        case AdvertiseType.Complex:
+                            return "مجتمع";
+                        default:
+                            return null;
+                    }
+                case AdvertiseMode.Child:
+                    switch (type)
+                    {
+                        case AdvertiseType.Apartment:
+                            return "آپارتمان";
+                        case AdvertiseType.Villa:
+                            return "ویلا";
+                        case AdvertiseType.SuitAndRoom:
+                            return "سوییت";
+                        case AdvertiseType.House:
+                            return "خانه ویلایی";
+                        case AdvertiseType.Hut:
+                            return "کلبه";
+                        default:
+                            return null;
+                    }
+                default:
+                    return null;
+            }
+        }
+
+        public static string GetRulesText(out string[] paragraphs)
+        {
+            paragraphs = new string[4];
+            paragraphs[0] = "کنسل نمودن رزرو توسط مهمان تا ۷۲ ساعت مانده به شروع اقامت: کسر ۱۰٪ از مبلغ کل رزرو و بازگشت باقی‌مانده مبلغ.";
+            paragraphs[1] = "کنسل نمودن رزرو توسط مهمان کمتر از ۷۲ ساعت مانده به شروع اقامت: کسر مبلغ اولین شب رزرو و بازگشت باقی‌مانده مبلغ.";
+            paragraphs[2] = "کنسل نمودن رزرو توسط مهمان در روز شروع اقامت: کسر مبلغ ۲ شب اول رزرو و بازگشت باقی‌مانده مبلغ";
+            paragraphs[3] = "در ایام پیک تعطیلات، بازه‌ی ۷۲ ساعت، ۱ هفته محاسبه می‌شود و امکان کنسلی وجود ندارد";
+            return "قوانین کنسلی توسط مهمان:";
+        }
+    }
+}
