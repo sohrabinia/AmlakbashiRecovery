@@ -34,7 +34,7 @@ namespace Amlakbashi.Core.Common.Caching
                 redisClient.DeleteById(id);
                 return true;
             }
-            catch(Exception exc)
+            catch
             {
                 return false;
             }

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.Entity.Core.Metadata.Edm;
+//using System.Data.Entity.Core.Metadata.Edm;
 using System.Linq;
 
 namespace Amlakbashi.Core.Common.Entity
@@ -12,14 +12,14 @@ namespace Amlakbashi.Core.Common.Entity
         }
 
         public string ColumnName { get; set; }
+        //TODO: uncomment this
+        //public static string GetSoftDeleteColumnName(EdmType type)
+        //{
+        //    MetadataProperty annotation = type.MetadataProperties
+        //        .Where(p => p.Name.EndsWith("customannotation:SoftDeleteColumnName"))
+        //        .SingleOrDefault();
 
-        public static string GetSoftDeleteColumnName(EdmType type)
-        {
-            MetadataProperty annotation = type.MetadataProperties
-                .Where(p => p.Name.EndsWith("customannotation:SoftDeleteColumnName"))
-                .SingleOrDefault();
-
-            return annotation == null ? null : (string)annotation.Value;
-        }
+        //    return annotation == null ? null : (string)annotation.Value;
+        //}
     }
 }
