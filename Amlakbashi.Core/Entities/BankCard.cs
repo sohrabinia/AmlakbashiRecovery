@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 
 namespace Amlakbashi.Core.Entities
 {
-    [SoftDelete(EntityDefaults.IsDeleted)]
     public class BankCard : Entity<int>, ISoftDelete
     {
         [Column("BankCardID")]

@@ -1,16 +1,15 @@
 ﻿using Amlakbashi.Core.Common.Entity;
+using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 using System.Linq;
 
 namespace Amlakbashi.Data
 {
     public class AmlakbashiDB : DbContext, IDbContext
     {
-        public AmlakbashiDB() : base(/*"AmlakbashiDB"*/)
-        {
-        }
         public DbSet<BlogPost> BlogPosts { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Post> Posts { get; set; }
@@ -47,13 +46,21 @@ namespace Amlakbashi.Data
         public DbSet<InstantReserveAutoCancel> InstantReserveAutoCancels{ get; set; }
         public DbSet<ReserveSendSms> ReserveSendSms{ get; set; }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var conv = new AttributeToTableAnnotationConvention<SoftDeleteAttribute, string>(
-               "SoftDeleteColumnName",
-               (type, attributes) => attributes.Single().ColumnName);
+            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["AmlakbashiDB"].ConnectionString);
+        }
 
-            modelBuilder.Conventions.Add(conv);
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                //other automated configurations left out
+                if (typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))
+                {
+                    entityType.AddSoftDeleteQueryFilter();
+                }
+            }
         }
     }
 }

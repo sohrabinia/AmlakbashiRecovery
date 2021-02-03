@@ -11,7 +11,6 @@ using static Amlakbashi.Core.Entities.Region;
 
 namespace Amlakbashi.Core.Entities
 {
-    [SoftDelete(EntityDefaults.IsDeleted)]
     public class DynamicCategory : Entity<int>, ISoftDelete
     {
         [Column("CategoryID")]

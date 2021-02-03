@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Amlakbashi.Core.Entities
 {
-    [SoftDelete(EntityDefaults.IsDeleted)]
     public class BlogPost : Entity<int>, ISoftDelete
     {
         public int UserID { get; set; }

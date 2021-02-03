@@ -8,7 +8,6 @@ using System.Linq;
 
 namespace Amlakbashi.Core.Entities
 {
-    [SoftDelete(EntityDefaults.IsDeleted)]
     public class User : Entity<int>, ISoftDelete
     {
         [Column("UserID")]
