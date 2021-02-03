@@ -1,0 +1,115 @@
+﻿using Amlakbashi.Accounting.Services.Interfaces;
+using Amlakbashi.Core.Common.AppService;
+using Amlakbashi.Core.Common.Caching;
+using Amlakbashi.Core.Common.Repository;
+using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Amlakbashi.Accounting.Services
+{
+    internal class PaymentAppService : AppServiceBase<Payment, int>, IPaymentAppService
+    {
+        public PaymentAppService(IRepository<Payment, int> repository, ICacheManager<Payment> cache) : base(repository, cache)
+        {
+        }
+
+        public IList<Payment> Filter(long refid, int status, int uid, DateTime fromDate, DateTime toDate)
+        {
+            var model = Repository.Query(q => q.Where(p => p.Date <= toDate && p.Date >= fromDate));
+            if (uid != -1)
+                model = model.Where(c => c.UserID == uid);
+            if (status != -1)
+            {
+                if (status == 0)
+                    model = model.Where(p => p.Status == 0);
+                else
+                    model = model.Where(p => p.Status == 1);
+            }
+            if (refid > 0)
+                model = model.Where(p => p.RefID == refid);
+            return model.OrderByDescending(p => p.Id).ToList();
+        }
+
+        public IQueryable<Payment> Filter(int status, DateTime fromDate, DateTime toDate)
+        {
+            var model = Repository.Query(q => q.Where(
+                p => p.Date <= toDate && p.Date >= fromDate));
+            if (status != -1)
+            {
+                if (status == 0)
+                    model = model.Where(p => p.Status == 0);
+                else
+                    model = model.Where(p => p.Status == 1);
+            }
+            return model;
+        }
+
+        public IList<Payment> GetRange(DateTime fromDate, DateTime toDate, int status, IList<int> userIds = null,
+            bool byTotalPrice = false)
+        {
+            var data = Repository.Query(q => q.Where(w => w.Date >= fromDate && w.Date <= toDate && w.Status == status));
+            if (userIds != null && userIds.Count == 0)
+            {
+                data = data.Where(w => userIds.Contains(w.UserID));
+            }
+            if (byTotalPrice)
+            {
+                data = data.Where(w => w.TotalPrice > 0);
+            }
+            return data.ToList();
+        }
+
+        public int GetPaymentTriesCount(long reserveId, out string lastTryDateStr)
+        {
+            var payments = Repository.Query(q=>q.Where(x => x.ReserveID == reserveId && x.Status != 1));
+            if (payments.Any())
+            {
+                var paymentsList = payments.OrderByDescending(x => x.Date).ToList();
+                var lastDate = paymentsList.Last().Date;
+                lastTryDateStr = DateTimeUtility.GregorianToPersianDate(lastDate);
+                lastTryDateStr += ("_" + lastDate.ToString("HH:mm"));
+                return paymentsList.Count;
+            }
+            else
+            {
+                lastTryDateStr = "";
+                return 0;
+            }
+        }
+
+        public Payment Find(int id)
+        {
+            return Repository.Find(id);
+        }
+
+        public int Insert(Payment newPayment)
+        {
+            Repository.Insert(newPayment);
+            Repository.Save();
+            return newPayment.Id;
+        }
+
+        public void Update(Payment editedPayment)
+        {
+            var data = Repository.Find(editedPayment.Id);
+            data.Authority = editedPayment.Authority;
+            data.BankId = editedPayment.BankId;
+            data.Date = editedPayment.Date;
+            data.RefID = editedPayment.RefID;
+            data.Status = editedPayment.Status;
+            data.PayDate = DateTime.Now;
+            Repository.Update(data);
+            Repository.Save();
+        }
+
+        public IQueryable<Payment> GetAllAsIQueryable()
+        {
+            return Repository.Query(q => q);
+        }
+    }
+}

@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# CS0162: Unreachable code detected
+dotnet_diagnostic.CS0162.severity = silent
+
+# CS0649: Field 'CacheManager<T>.redisClient' is never assigned to, and will always have its default value null
+dotnet_diagnostic.CS0649.severity = silent

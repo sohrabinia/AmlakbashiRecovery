@@ -3,9 +3,39 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amlakbashi.Host", "Amlakbashi.Host\Amlakbashi.Host.csproj", "{024C9EB5-25F9-4B33-9B2D-0D2ED58D9D35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Amlakbashi.Host", "Amlakbashi.Host\Amlakbashi.Host.csproj", "{024C9EB5-25F9-4B33-9B2D-0D2ED58D9D35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amlakbashi.Core", "Amlakbashi.Core\Amlakbashi.Core.csproj", "{760AD01E-C636-41F9-9967-B57656E1EBB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Amlakbashi.Core", "Amlakbashi.Core\Amlakbashi.Core.csproj", "{760AD01E-C636-41F9-9967-B57656E1EBB3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Amlakbashi.Data", "Amlakbashi.Data\Amlakbashi.Data.csproj", "{1F0A278E-A16C-42B4-A29D-DC3A6D1F01AE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{760AD01E-C636-41F9-9967-B57656E1EBB3} = {760AD01E-C636-41F9-9967-B57656E1EBB3}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{03011045-54E4-41E4-8A15-E8083CA61B29}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amlakbashi.Mediator", "Amlakbashi.Mediator\Amlakbashi.Mediator.csproj", "{2816A9F7-7776-4A74-8132-715598991C24}"
+	ProjectSection(ProjectDependencies) = postProject
+		{760AD01E-C636-41F9-9967-B57656E1EBB3} = {760AD01E-C636-41F9-9967-B57656E1EBB3}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amlakbashi.Accounting", "Amlakbashi.Accounting\Amlakbashi.Accounting.csproj", "{8BE6396E-FFB9-43C2-81F0-10947D4598F7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{760AD01E-C636-41F9-9967-B57656E1EBB3} = {760AD01E-C636-41F9-9967-B57656E1EBB3}
+		{1F0A278E-A16C-42B4-A29D-DC3A6D1F01AE} = {1F0A278E-A16C-42B4-A29D-DC3A6D1F01AE}
+		{2816A9F7-7776-4A74-8132-715598991C24} = {2816A9F7-7776-4A74-8132-715598991C24}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amlakbashi.Application", "Amlakbashi.Application\Amlakbashi.Application.csproj", "{A7CC25CA-5BBE-41BB-BDC4-D7AD3E5710E4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{760AD01E-C636-41F9-9967-B57656E1EBB3} = {760AD01E-C636-41F9-9967-B57656E1EBB3}
+		{8BE6396E-FFB9-43C2-81F0-10947D4598F7} = {8BE6396E-FFB9-43C2-81F0-10947D4598F7}
+		{1F0A278E-A16C-42B4-A29D-DC3A6D1F01AE} = {1F0A278E-A16C-42B4-A29D-DC3A6D1F01AE}
+		{2816A9F7-7776-4A74-8132-715598991C24} = {2816A9F7-7776-4A74-8132-715598991C24}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +51,22 @@ Global
 		{760AD01E-C636-41F9-9967-B57656E1EBB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{760AD01E-C636-41F9-9967-B57656E1EBB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{760AD01E-C636-41F9-9967-B57656E1EBB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F0A278E-A16C-42B4-A29D-DC3A6D1F01AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F0A278E-A16C-42B4-A29D-DC3A6D1F01AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F0A278E-A16C-42B4-A29D-DC3A6D1F01AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F0A278E-A16C-42B4-A29D-DC3A6D1F01AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2816A9F7-7776-4A74-8132-715598991C24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2816A9F7-7776-4A74-8132-715598991C24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2816A9F7-7776-4A74-8132-715598991C24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2816A9F7-7776-4A74-8132-715598991C24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BE6396E-FFB9-43C2-81F0-10947D4598F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BE6396E-FFB9-43C2-81F0-10947D4598F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BE6396E-FFB9-43C2-81F0-10947D4598F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BE6396E-FFB9-43C2-81F0-10947D4598F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7CC25CA-5BBE-41BB-BDC4-D7AD3E5710E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7CC25CA-5BBE-41BB-BDC4-D7AD3E5710E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7CC25CA-5BBE-41BB-BDC4-D7AD3E5710E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7CC25CA-5BBE-41BB-BDC4-D7AD3E5710E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

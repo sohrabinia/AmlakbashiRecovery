@@ -32,7 +32,7 @@ namespace Amlakbashi.Core.Common.ContactEngines
                 var sg = new Kavenegar.KavenegarApi(api);
                 sg.VerifyLookup(to, code, "verification");
             }
-            catch (Exception ex)
+            catch
             {
 
             }
@@ -45,7 +45,7 @@ namespace Amlakbashi.Core.Common.ContactEngines
                 var sg = new Kavenegar.KavenegarApi(api);
                 sg.VerifyLookup(to, "", template);
             }
-            catch (Exception ex)
+            catch
             {
 
             }
@@ -78,7 +78,7 @@ namespace Amlakbashi.Core.Common.ContactEngines
                 var sg = new Kavenegar.KavenegarApi(api);
                 sg.VerifyLookup(mobile, token, name, type);
             }
-            catch (Exception ex)
+            catch
             {
                 //LogHelper.LogError(ex);
             }
@@ -96,7 +96,7 @@ namespace Amlakbashi.Core.Common.ContactEngines
                 var sg = new Kavenegar.KavenegarApi(api);
                 sg.VerifyLookup(mobile, token, token2, token3, name);
             }
-            catch (Exception ex)
+            catch
             {
 
             }
@@ -114,7 +114,7 @@ namespace Amlakbashi.Core.Common.ContactEngines
                 var sg = new Kavenegar.KavenegarApi(api);
                 sg.VerifyLookup(mobile, token, token2, token3, token4, token5, name, VerifyLookupType.Sms);
             }
-            catch (Exception ex)
+            catch
             {
 
             }

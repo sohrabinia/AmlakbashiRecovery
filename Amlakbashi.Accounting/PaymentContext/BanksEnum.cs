@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Amlakbashi.Core.Common.Entity
+namespace Amlakbashi.Accounting.PaymentContext
 {
-    public static class EntityDefaults
+    public enum BanksEnum
     {
-        public const string IsDeleted = "IsDeleted";
+        Unset = 0,
+        Pasargad = 2
     }
 }

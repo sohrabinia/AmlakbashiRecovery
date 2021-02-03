@@ -1,0 +1,376 @@
+﻿using Amlakbashi.Core.Common.Repository;
+using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+using MediatR;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using static Amlakbashi.Core.Entities.Advertise;
+using static Amlakbashi.Core.Entities.Region;
+using Amlakbashi.Application.Services.SettingServices.SettingManager;
+using Amlakbashi.Mediator.Commands.AdvertiseCommands;
+using Amlakbashi.Mediator.Events.AdvertiseEvents;
+using Microsoft.EntityFrameworkCore;
+
+namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
+{
+    public class AdvertiseEventHandler :
+        INotificationHandler<ChangeAdvertiseStatusEvent>,
+        INotificationHandler<ChangeAdvertiseTypeEvent>,
+        INotificationHandler<ChangeAdvertisePositionEvent>,
+        INotificationHandler<ChangeAdvertiseAddressEvent>,
+        INotificationHandler<ChangeAdvertiseRulesEvent>,
+        INotificationHandler<ChangeAdvertisePriceEvent>,
+        INotificationHandler<ChangeInstantReserveStatusEvent>,
+        INotificationHandler<ChangeStayDurationEvent>,
+        INotificationHandler<ChangeNorouzPriceEvent>,
+        INotificationHandler<ChangeMaxInstantReserveStartEvent>,
+        INotificationHandler<CreateAdvertiseBasicEvent>,
+        INotificationHandler<CreateAdvertiseGeneralEvent>,
+        INotificationHandler<AddHotelChildEvent>,
+        INotificationHandler<AddComplexChildEvent>
+    {
+        private readonly IMediator mediator;
+        private readonly IRepository<Advertise, long> advertiseRepository;
+        private readonly ISettingManager setting;
+        public AdvertiseEventHandler(
+            IMediator mediator,
+            IRepository<Advertise, long> advertiseRepository,
+            ISettingManager setting)
+        {
+            this.mediator = mediator;
+            this.advertiseRepository = advertiseRepository;
+            this.setting = setting;
+        }
+        public Task Handle(ChangeAdvertiseStatusEvent notification, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            if (acc.Childs != null)
+            {
+                foreach (var item in acc.Childs)
+                {
+                    item.Status = acc.Status;
+                }
+            }
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(ChangeAdvertiseTypeEvent notification, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            switch ((AdvertiseType)acc.TypeID)
+            {
+                case AdvertiseType.Hotel:
+                case AdvertiseType.Camp:
+                case AdvertiseType.TourismAccommodation:
+                case AdvertiseType.Inn:
+                case AdvertiseType.Pansion:
+                    if (acc.Childs != null)
+                    {
+                        foreach (var item in acc.Childs)
+                        {
+                            item.TypeID = acc.TypeID;
+                        }
+                    }
+                    advertiseRepository.Update(acc);
+                    advertiseRepository.Save();
+                    break;
+            }
+            mediator.Send(new UpdateAdvertiseCategoriesCommand(notification.advertiseId));
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(ChangeAdvertisePositionEvent notification, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            foreach (var item in acc.Childs)
+            {
+                item.Position = acc.Position;
+            }
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(ChangeAdvertiseAddressEvent notification, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Query(q =>
+            q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            //update geographical properties
+            acc.CountryDirection = (acc.Province == 1029 ||
+                acc.Province == 1393 || acc.Province == 1555) ? CountryDirection.North : CountryDirection.Unset;
+            acc.LocationString = RegionLocalization.GetLocationString(acc.RegionProvince.PersianName,
+                acc.RegionCity.PersianName, acc.RegionArea == null ? "" : acc.RegionArea.PersianName, Region.GetCountryDirectionString((CountryDirection)acc.CountryDirection));
+            foreach (var child in acc.Childs)
+            {
+                child.Address = acc.Address;
+                child.CountryDirection = acc.CountryDirection;
+                child.Province = acc.Province;
+                child.City = acc.City;
+                child.Area = acc.Area;
+                child.LocationString = acc.LocationString;
+                child.Latitude = acc.Latitude;
+                child.Longitude = acc.Longitude;
+            }
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(ChangeAdvertiseRulesEvent notification, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            foreach (var child in acc.Childs)
+            {
+                child.AllowParty = acc.AllowParty;
+                child.AllowPets = acc.AllowPets;
+                child.AllowSmoking = acc.AllowSmoking;
+                child.EvidenceRequired = acc.EvidenceRequired;
+                child.OtherRules = acc.OtherRules;
+            }
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(ChangeAdvertisePriceEvent notification, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            acc.BasePrice = acc.DailyPrice;
+            if (acc.Mode == AdvertiseMode.Child)
+            {
+                var parent = acc.Parent;
+                parent.BasePrice = parent.Childs.Min(m => m.DailyPrice);
+                advertiseRepository.Update(parent);
+            }
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            if (acc.Categories != null)
+            {
+                foreach (var cat in acc.Categories)
+                {
+                    mediator.Send(new UpdateCategoryPriceCommand(cat.Id));
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(ChangeInstantReserveStatusEvent notification, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            foreach (var item in acc.Childs)
+            {
+                item.InstantReserveStatus = acc.InstantReserveStatus;
+            }
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(ChangeStayDurationEvent notification, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            foreach (var item in acc.Childs)
+            {
+                item.MinReserveDays = acc.MinReserveDays;
+                item.MaxReserveDays = acc.MaxReserveDays;
+            }
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(ChangeNorouzPriceEvent notification, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            foreach (var item in acc.Childs)
+            {
+                item.NorouzPrice = acc.NorouzPrice;
+                item.NorouzOverCapacityPrice = acc.NorouzOverCapacityPrice;
+            }
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(ChangeMaxInstantReserveStartEvent notification, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            foreach (var item in acc.Childs)
+            {
+                item.MaxInstantReserveStart = acc.MaxInstantReserveStart;
+            }
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(CreateAdvertiseBasicEvent notification, CancellationToken cancellationToken)
+        {
+            //initialize amlakbashi score
+            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            acc.AmlakbashiScore = 1000;
+
+            //initialize acc score
+            var max_score = setting.MaxScore;
+            long max_value = 10000;
+            if (max_score > 0)
+            {
+                acc.AdvertiseScore = max_score + Convert.ToInt64(max_value / 5);
+            }
+            else
+            {
+                acc.AdvertiseScore = 12000;
+            }
+
+            //save changes
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(CreateAdvertiseGeneralEvent notification, CancellationToken cancellationToken)
+        {
+            //Initialize title and description
+            var acc = advertiseRepository.Query(q => q.Include(i => i.RegionCity)
+                .Include(i => i.RegionProvince).FirstOrDefault(f => f.Id == notification.advertiseId));
+            var cityTitle = acc.RegionCity.PersianName;
+            var areaTitle = acc.Area == null ? null : acc.RegionArea.PersianName;
+            acc.OldSlug = AdvertiseUrlLocalization.GetOldSlug(acc.Title, (int)acc.TypeID);
+            acc.Slug = acc.Id.ToString() + "-" + acc.OldSlug;
+            acc.MetaTitle = acc.Title + " - املاک باشی";
+            acc.MetaDescription = AdvertiseSeoLocalization.GetMetaDescription(acc, cityTitle, areaTitle);
+
+            //initialize geographical properties
+            acc.CountryDirection = (acc.Province == 1029 ||
+                acc.Province == 1393 || acc.Province == 1555) ? CountryDirection.North : CountryDirection.Unset;
+            acc.LocationString = RegionLocalization.GetLocationString(acc.RegionProvince.PersianName, acc.RegionCity.PersianName,
+                acc.RegionArea == null ? "" : acc.RegionArea.PersianName, Region.GetCountryDirectionString((CountryDirection)acc.CountryDirection));
+
+            //initialize acc type
+            acc.ParentAccType = (AdvertiseType)AdvertiseTypeToHeadType((int)acc.TypeID);
+
+            //save changes
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(AddHotelChildEvent notification, CancellationToken cancellationToken)
+        {
+            var parent = advertiseRepository.Query(
+                q => q.FirstOrDefault(f => f.Id == notification.parentId));
+            var child = advertiseRepository.Query(
+                q => q.FirstOrDefault(f => f.Id == notification.childId));
+
+            //set amlakbashi score
+            child.AmlakbashiScore = parent.AmlakbashiScore;
+            //set advertise score
+            child.AdvertiseScore = parent.AdvertiseScore;
+            //set address part
+            child.Address = parent.Address;
+            child.CountryDirection = parent.CountryDirection;
+            child.Province = parent.Province;
+            child.City = parent.City;
+            child.Area = parent.Area;
+            child.LocationString = parent.LocationString;
+            child.Latitude = parent.Latitude;
+            child.Longitude = parent.Longitude;
+            //set acc type part
+            child.TypeID = parent.TypeID;
+            child.ParentAccType = parent.ParentAccType;
+            //set user id and ownership part
+            child.UserID = parent.UserID;
+            child.OwnerFullName = parent.OwnerFullName;
+            child.OwnerMobile = parent.OwnerMobile;
+            child.OwnerID = parent.OwnerID;
+            child.OwnershipType = parent.OwnershipType;
+            //set status
+            child.Status = parent.Status;
+            //set position part
+            child.Position = parent.Position;
+            //set rules part
+            child.AllowParty = parent.AllowParty;
+            child.AllowPets = parent.AllowPets;
+            child.AllowSmoking = parent.AllowSmoking;
+            child.EvidenceRequired = parent.EvidenceRequired;
+            child.OtherRules = parent.OtherRules;
+            //set as child mode
+            child.Mode = AdvertiseMode.Child;
+            //set availablity as true by default
+            child.Available = true;
+            //set base price
+            child.BasePrice = child.DailyPrice;
+            //set parent's base price
+            parent.BasePrice = parent.BasePrice < 1 ? child.BasePrice :
+                Math.Min(parent.BasePrice, child.BasePrice);
+
+            //save changes
+            advertiseRepository.Update(child);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(AddComplexChildEvent notification, CancellationToken cancellationToken)
+        {
+            var parent = advertiseRepository.Find(notification.parentId);
+            var child = advertiseRepository.Find(notification.childId);
+
+            //set amlakbashi score
+            child.AmlakbashiScore = parent.AmlakbashiScore;
+            //set advertise score
+            child.AdvertiseScore = parent.AdvertiseScore;
+            //set address part
+            child.Address = parent.Address;
+            child.CountryDirection = parent.CountryDirection;
+            child.RegionProvince = parent.RegionProvince;
+            child.RegionCity = parent.RegionCity;
+            child.RegionArea = parent.RegionArea;
+            child.LocationString = parent.LocationString;
+            child.Latitude = parent.Latitude;
+            child.Longitude = parent.Longitude;
+            //set acc type part
+            child.ParentAccType = (AdvertiseType)Advertise.AdvertiseTypeToHeadType((int)child.TypeID);
+            //set user id and ownership part
+            child.User = parent.User;
+            child.OwnerFullName = parent.OwnerFullName;
+            child.OwnerMobile = parent.OwnerMobile;
+            child.OwnerID = parent.OwnerID;
+            child.OwnershipType = parent.OwnershipType;
+            //set status
+            child.Status = parent.Status;
+            //set position part
+            child.Position = parent.Position;
+            //set rules part
+            child.AllowParty = parent.AllowParty;
+            child.AllowPets = parent.AllowPets;
+            child.AllowSmoking = parent.AllowSmoking;
+            child.EvidenceRequired = parent.EvidenceRequired;
+            child.OtherRules = parent.OtherRules;
+            //set as child mode
+            child.Mode = Advertise.AdvertiseMode.Child;
+            //set availablity as true by default
+            child.Available = true;
+            //set base price
+            child.BasePrice = child.DailyPrice;
+            //set parent's base price
+            parent.BasePrice = parent.BasePrice < 1 ? child.BasePrice :
+                Math.Min(parent.BasePrice, child.BasePrice);
+            //initialize slug, title and description
+            var cityTitle = child.RegionCity.PersianName;
+            var areaTitle = child.RegionArea != null ? child.RegionArea.PersianName : null;
+            child.OldSlug = AdvertiseUrlLocalization.GetOldSlug(child.Title, (int)child.TypeID);
+            child.Slug = child.Id.ToString() + "-" + child.OldSlug;
+            child.MetaTitle = child.Title + " - املاک باشی";
+            child.MetaDescription = AdvertiseSeoLocalization.GetMetaDescription(child, cityTitle, areaTitle);
+
+            //save changes
+            advertiseRepository.Update(child);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+    }
+}

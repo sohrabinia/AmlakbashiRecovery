@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 
 namespace Amlakbashi.Core.Entities
 {
-    [SoftDelete(EntityDefaults.IsDeleted)]
     public class DiscountTable : Entity<int>, ISoftDelete
     {
         [Column("DiscountTableID")]

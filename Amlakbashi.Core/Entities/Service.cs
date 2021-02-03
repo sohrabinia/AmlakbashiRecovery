@@ -4,7 +4,6 @@ using System;
 
 namespace Amlakbashi.Core.Entities
 {
-    [SoftDelete(EntityDefaults.IsDeleted)]
     public class Service : Entity<int>, ISoftDelete
     {
         [Column("ServiceID")]

@@ -10,7 +10,6 @@ using static Amlakbashi.Core.Entities.ReservePayment;
 
 namespace Amlakbashi.Core.Entities
 {
-    [SoftDelete(EntityDefaults.IsDeleted)]
     public class Reserve : Entity<long>, IReserve,ISoftDelete
     {
         #region Properties

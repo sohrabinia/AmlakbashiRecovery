@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Amlakbashi.Core\Amlakbashi.Core.csproj" />
+    <ProjectReference Include="..\Amlakbashi.Data\Amlakbashi.Data.csproj" />
+    <ProjectReference Include="..\Amlakbashi.Mediator\Amlakbashi.Mediator.csproj" />
+  </ItemGroup>
+
+</Project>

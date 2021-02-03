@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
-    [SoftDelete(EntityDefaults.IsDeleted)]
     public class Chat : Entity<long>, ISoftDelete
     {
         [Column("ChatID")]

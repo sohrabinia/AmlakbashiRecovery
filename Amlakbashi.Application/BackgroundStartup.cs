@@ -1,0 +1,53 @@
+﻿using Amlakbashi.Core.Common.Extensions;
+using Amlakbashi.Mediator.Commands.AdvertiseCommands;
+using Amlakbashi.Mediator.Commands.ReserveCommands;
+using Hangfire;
+using MediatR;
+using Microsoft.Win32.SafeHandles;
+using System;
+using System.Runtime.InteropServices;
+
+namespace Amlakbashi.Application
+{
+    public class BackgroundStartup : IDisposable
+    {        
+        bool disposed = false;
+        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
+        private readonly IMediator mediator;
+        public BackgroundStartup(IMediator mediator)
+        {
+            this.mediator = mediator;
+        }
+
+        public void Startup()
+        {
+            mediator.AddOrUpdate("UpdateAdvertiseScore3", new UpdateUserScoreCommand(0), "0 8 * * *");
+            mediator.AddOrUpdate("UpdateUserScore", new UpdateUserScoreCommand(0), "40 8 * * *");
+            mediator.AddOrUpdate("UpdateReserveSupportExpiration", new UpdateReserveSupportExpirationCommand(), "0 23 * * *");
+            mediator.AddOrUpdate("UnsetAllTodayIsEmptyRecords", new UpdateTodayIsEmptyRecordsCommand(), "0 4 * * *");
+            mediator.AddOrUpdate("UpdateAllArchives", new UpdateReserveArchivesCommand(), "0 5 * * *");
+            mediator.AddOrUpdate("RefreshEveryTwentyMinutes", new RefreshReserveAutoCancelCommand(), Cron.MinuteInterval(20));
+
+            RecurringJob.RemoveIfExists("RefreshEveryOneMinute");
+            mediator.AddOrUpdate("RefreshSendSms", new RefreshReserveSendSmsCommand(), Cron.MinuteInterval(1));
+            mediator.AddOrUpdate("RefreshInstantReserveAutoCancel", new RefreshInstantReserveAutoCancelCommand(), Cron.MinuteInterval(1));
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+            if (disposing)
+            {
+                handle.Dispose();
+            }
+            disposed = true;
+        }
+    }
+}
