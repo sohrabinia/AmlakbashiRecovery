@@ -1,0 +1,187 @@
+﻿using Amlakbashi.Accounting;
+using Amlakbashi.Application.Services.ReserveServices.ReserveSupportManager;
+using Amlakbashi.Core.Common.Extensions;
+using Amlakbashi.Core.Common.Repository;
+using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Infrastructure.UserContact;
+using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
+using Amlakbashi.Mediator.Commands.AdvertiseCommands;
+using Amlakbashi.Mediator.Commands.ReserveCommands;
+using Amlakbashi.Mediator.Commands.UserCommands;
+using MediatR;
+using System;
+using static Amlakbashi.Core.Entities.Reserve;
+
+namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveStates
+{
+    public class ReservedState : ReserveState
+    {
+        private readonly IAccountingFacade accounting;
+        private readonly IReserveSupportManager reserveSupportManager;
+        private readonly IMediator mediator;
+        public ReservedState(
+            IAccountingFacade accounting,
+            IReserveSupportManager reserveSupportManager,
+            IMediator mediator,
+            IRepository<Reserve, long> Repository) : base(Repository)
+        {
+            this.accounting = accounting;
+            this.reserveSupportManager = reserveSupportManager;
+            this.mediator = mediator;
+        }
+
+        public override bool CanTransitTo(Reserve.ReserveStatus status)
+        {
+            switch (status)
+            {
+                case ReserveStatus.CashPay:
+                case ReserveStatus.Started:
+                case ReserveStatus.Completed:
+                case ReserveStatus.CancelRequestByGuest:
+                case ReserveStatus.CanceledByGuest:
+                case ReserveStatus.CanceledByHost:
+                case ReserveStatus.CancelRequestByHost:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public override void OnTransition(Reserve.ReserveStatus prevStatus, bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId)
+        {
+            var reserve = Repository.Find(ReserveId);
+            reserve.Status = ReserveStatus.Reserved;
+            Repository.Update(reserve);
+            Repository.Save();
+            var paidPrice = accounting.GetReservePaidAmount(ReserveId, Reserve.StatusStringType.Guest);
+            var isPaidCompletely = accounting.IsReservePaidCompletely(ReserveId);
+            var remainedAmount = accounting.GetReserveRemainedAmount(ReserveId);
+            var advertise = reserve.Advertise;
+            var hostlerUser = Repository.Find<User, int>(advertise.UserID);
+            var guestUser = reserve.GuestUser;
+            if (isPaidCompletely)
+            {
+                if (sendSms)
+                {
+                    var guestContact = new UserContactDTO()
+                    {
+                        UserLoginPriority = guestUser.LoginPriority,
+                        UserMainMobile = guestUser.MainMobile,
+                        UserAppNotificationToken = guestUser.AppNotificationToken,
+                        UserEmail = guestUser.Email,
+                        UserFcmAppNotificationToken = guestUser.FcmAppNotificationToken,
+                        Type = UserContactType.GuestReservedTotalPayed,
+                        AdvertiseId = reserve.AdvertiseID.ToString(),
+                        ReserveId = reserve.Id.ToString(),
+                        AudienceMobile = PhoneUtility.IsNumberForIran(hostlerUser.GetPhoneNumber(User.PhoneType.OtherMobile1)) ?
+                            hostlerUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
+                            hostlerUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1)
+                    };
+                    mediator.Enqueue(new SendMessageCommand(guestContact));
+
+                    var hostContact = new UserContactDTO()
+                    {
+                        UserLoginPriority = hostlerUser.LoginPriority,
+                        UserMainMobile = hostlerUser.MainMobile,
+                        UserAppNotificationToken = hostlerUser.AppNotificationToken,
+                        UserEmail = hostlerUser.Email,
+                        UserFcmAppNotificationToken = hostlerUser.FcmAppNotificationToken,
+                        UserNotificationToken = hostlerUser.NotificationToken,
+                        Type = UserContactType.HostReservedTotalPayed,
+                        AdvertiseId = reserve.AdvertiseID.ToString(),
+                        ReserveId = reserve.Id.ToString(),
+                        AudienceMobile = PhoneUtility.IsNumberForIran(guestUser.GetPhoneNumber(User.PhoneType.OtherMobile1)) ?
+                        guestUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
+                        guestUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1)
+                    };
+                    mediator.Enqueue(new SendMessageCommand(hostContact));
+                }
+
+            }
+            else
+            {
+                if (sendSms)
+                {
+                    var guestContact = new UserContactDTO()
+                    {
+                        UserLoginPriority = guestUser.LoginPriority,
+                        UserMainMobile = guestUser.MainMobile,
+                        UserAppNotificationToken = guestUser.AppNotificationToken,
+                        UserEmail = guestUser.Email,
+                        UserFcmAppNotificationToken = guestUser.FcmAppNotificationToken,
+                        Type = UserContactType.GuestReservedDepositePayed,
+                        AdvertiseId = reserve.AdvertiseID.ToString(),
+                        ReserveId = reserve.Id.ToString(),
+                        AudienceMobile = PhoneUtility.IsNumberForIran(hostlerUser.GetPhoneNumber(
+                            User.PhoneType.MainMobile)) ?
+                            hostlerUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
+                            hostlerUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1),
+                        Price = paidPrice.ToString(),
+                        RemainPrice = remainedAmount.ToString()
+                    };
+                    mediator.Enqueue(new SendMessageCommand(guestContact));
+
+                    var hostContact = new UserContactDTO()
+                    {
+                        UserLoginPriority = hostlerUser.LoginPriority,
+                        UserMainMobile = hostlerUser.MainMobile,
+                        UserAppNotificationToken = hostlerUser.AppNotificationToken,
+                        UserEmail = hostlerUser.Email,
+                        UserFcmAppNotificationToken = hostlerUser.FcmAppNotificationToken,
+                        UserNotificationToken = hostlerUser.NotificationToken,
+                        Type = UserContactType.HostReservedDepositePayed,
+                        AdvertiseId = reserve.AdvertiseID.ToString(),
+                        ReserveId = reserve.Id.ToString(),
+                        AudienceMobile = PhoneUtility.IsNumberForIran(guestUser.GetPhoneNumber(
+                            User.PhoneType.MainMobile)) ?
+                            guestUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
+                            guestUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1),
+                        Price = paidPrice.ToString(),
+                        RemainPrice = remainedAmount.ToString()
+                    };
+                    mediator.Enqueue(new SendMessageCommand(hostContact));
+                }
+            }
+            if (advertise.Count <= 1)
+            {
+                mediator.Send(new RejectRequestsInTimeCommand(reserve.AdvertiseID,
+                    reserve.StartDate, reserve.EndDate, actionSource, doerUserId,
+                    false, reserve.Id));
+                mediator.Send(new RejectGuestRequestsInTimeCommand(reserve.UserID,
+                    reserve.StartDate, actionSource, doerUserId, false, reserve.Id));
+            }
+            if (DateTimeUtility.DateRangesHaveOverlap(DateTime.Now.Date, DateTime.Now.Date.AddDays(1), reserve.StartDate, reserve.EndDate))
+            {
+                advertise.TodayIsEmpty = false;
+            }
+            var finishDelay = new DateTime(
+                reserve.EndDate.Year,
+                reserve.EndDate.Month,
+                reserve.EndDate.Day,
+                12, 0, 0) - DateTime.Now;
+            mediator.Schedule(new SetReserveStatusCommand(reserve.Id,
+                ReserveStatus.Completed, sendSms, actionSource, doerUserId), finishDelay);
+            mediator.Schedule(new FinishStayMessageCommand(reserve.Id), finishDelay);
+
+            var beforeStart = new DateTime(
+                reserve.StartDate.Year,
+                reserve.StartDate.Month,
+                reserve.StartDate.Day,
+                12, 0, 0) - DateTime.Now;
+            if (beforeStart.TotalMilliseconds <= 0)
+            {
+                mediator.Send(new SetReserveStatusCommand(ReserveId, ReserveStatus.Started,
+                    sendSms, actionSource, doerUserId));
+            }
+            else
+            {
+                var onStart = beforeStart.Add(new TimeSpan(2, 0, 0));
+                mediator.Schedule(new SetReserveStatusCommand(reserve.Id,
+                    ReserveStatus.Started, sendSms, actionSource, doerUserId), onStart);
+            }
+            mediator.Enqueue(new UpdateAdvertiseScoreCommand(reserve.AdvertiseID));
+            reserveSupportManager.ReserveDoneHandle(reserve.Id);
+        }
+    }
+}
