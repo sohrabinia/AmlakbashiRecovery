@@ -83,7 +83,7 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
             {
                 IQueryable<User> all_user = repository.Query(q => q
                     .Include(i => i.HostReserves)
-                    .Where(x => (request.UserId < 1 ?true : x.Id == request.UserId) &&
+                    .Where(x => (request.UserId < 1 ? true : x.Id == request.UserId) &&
                     x.State != 3 && x.UserGeneralType > 0));
                 all_user = all_user.Where(w => w.Advertises.Any());
                 long score_item;
@@ -198,7 +198,7 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
                 }
                 repository.Save();
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 logger.Error("UserCommandHandler.UpdateUserScoreCommand", exc);
             }

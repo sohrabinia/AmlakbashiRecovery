@@ -10,6 +10,5 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
 {
     public interface IReserveSendSmsAppService : IAppService<ReserveSendSms, long>
     {
-        void Insert(ReserveSendSms newItem);
     }
 }

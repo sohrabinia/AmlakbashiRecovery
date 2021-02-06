@@ -10,9 +10,7 @@ namespace Amlakbashi.Application.Services.CommentServices.Interfaces
 {
     public interface ICommentAppService : IAppService<Comment, long>
     {
-        IList<Comment> GetAll();
         IQueryable<Comment> GetAllAsIQueryable();
-        IList<Comment> GetListByAccId(long accId);
         IList<Comment> GetListBySenderUserId(int userId);
         IList<Comment> Filter(int status = (int)Comment.CommentStatus.ready,
             int comment_type = -1, int comment_id = -1, int sender_user_id = -1, long advertise_id = -1);
@@ -20,9 +18,7 @@ namespace Amlakbashi.Application.Services.CommentServices.Interfaces
         void Delete(long id);
         Comment GetParent(int id);
         Comment GetByAccSenderUser(long advertiseId, long senderUserId);
-        Comment GetByAccSenderUser(long accId, long senderUserId, Comment.CommentType type, bool onlyPublished);
         Comment GetHostReply(long accId, long senderUserId);
-        Comment GetSuspendedComment(long accId, int userId);
         void Insert(Comment newComment);
         void Update(Comment editedComment);
         void UpdateStatus(long id, Comment.CommentStatus status, string suspendReason = "");

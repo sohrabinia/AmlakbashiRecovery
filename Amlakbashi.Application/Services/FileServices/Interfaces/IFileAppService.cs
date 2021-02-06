@@ -10,18 +10,16 @@ namespace Amlakbashi.Application.Services.FileServices.Interfaces
 {
     public interface IFileAppService : IAppService<File, long>
     {
-        IList<File> GetAll();
-        IQueryable<File> GetAllAsQueryable();
         IList<File> GetAllDescendingByLastModifyDate(int count = 0);
         IList<File> GetAllAdvertiseFile();
         List<string> GetAllFilePath();
         File Find(long id);
         long Insert(File newFile);
-        void Update(File editedFile);
-        void UpdateFilePath(long id, string newFilePath);
-        void Delete(int fileId);
+        void Update(File editedFile, string serverPath);
+        void Delete(int fileId, string serverPath);
         void DeleteExtraFiles(List<long> existFile);
         void MinifyImage(long fileId, string filePath);
         void StopQueuedJob();
+        void SetWatermark(long fileId, string serverPath);
     }
 }

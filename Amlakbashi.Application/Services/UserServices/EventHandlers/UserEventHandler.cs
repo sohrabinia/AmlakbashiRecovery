@@ -64,7 +64,7 @@ namespace Amlakbashi.Application.Services.UserServices.EventHandlers
                     .FirstOrDefault().RemainedPrice;
                 repository.Update(user);
                 repository.Save();
-                
+
                 if (notification.ActionSource != ActionLog.ActionSourceEnum.Undefined)
                 {
                     mediator.Publish(new UserUpdateEvent(oldUser, user,

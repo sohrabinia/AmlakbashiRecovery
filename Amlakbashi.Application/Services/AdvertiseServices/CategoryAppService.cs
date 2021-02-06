@@ -3,14 +3,11 @@ using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.Category.Interfaces;
 using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
-using Amlakbashi.Data;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Amlakbashi.Core.Entities.Advertise;
-using static Amlakbashi.Core.Entities.DynamicCategory;
 using static Amlakbashi.Core.Entities.Region;
 using Amlakbashi.Core.Infrastructure.FilterHelpers.Interfaces;
 using Amlakbashi.Core.Common.Utilities;
@@ -171,7 +168,7 @@ namespace Amlakbashi.Application.Services.Category
             //        advertises = category.Advertises.AsQueryable();
             //    }
             //}
-            
+
             //filter by phrase or area
             advertises = advertiseFilter.FilterPhrase(advertises, phrase);
             if (string.IsNullOrEmpty(phrase) && area > 0)
@@ -471,7 +468,7 @@ namespace Amlakbashi.Application.Services.Category
             return model_output;
         }
 
-    public IList<DynamicCategory> GetProvincesForXML(bool old)
+        public IList<DynamicCategory> GetProvincesForXML(bool old)
         {
             if (old)
             {
@@ -513,41 +510,6 @@ namespace Amlakbashi.Application.Services.Category
                 .OrderByDescending(cd => cd.CountAdvertise).ToList());
         }
 
-        public IList<DynamicCategory> GetBySearchRegion(string search_string)
-        {
-            IQueryable<DynamicCategory> result = Repository.Query(q => q);
-            if (string.IsNullOrEmpty(search_string))
-            {
-                return new List<DynamicCategory>();
-            }
-            //var search_list = search_string.Split(' ').ToList();
-            result = result.Where(x => x.CountAdvertise > 0);
-            result = result.Where(x => x.Type == Advertise.AdvertiseType.All);
-            //foreach (var str in search_list)
-            //{
-            //var str_to_search = str;
-            search_string = search_string.Replace("ي", "ی");
-            var first_is_alef = search_string.First() == 'ا';
-            if (first_is_alef)
-            {
-                var kolah = "آ" + search_string.Remove(0, 1);
-                result = result.Where(x => x.RegionString.Contains(search_string) ||
-                    x.RegionString.Contains(kolah));
-            }
-            else
-            {
-                result = result.Where(x => x.RegionString.Contains(search_string));
-            }
-            //}
-            result = result
-                .OrderByDescending(x => x.RegionString == search_string)
-                .ThenByDescending(x => x.CountryDirection > 0)
-                .ThenByDescending(x => x.City != null)
-                .ThenByDescending(x => x.CountAdvertise)
-                .ThenByDescending(x => x.CountView).Take(5);
-            return result.ToList();
-        }
-
         public DynamicCategory GetByUrl(string url)
         {
             return Repository.Query(q => q.FirstOrDefault(w => w.URL == url));
@@ -558,43 +520,6 @@ namespace Amlakbashi.Application.Services.Category
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
         }
 
-        public void GetAccRelatedCategories(Advertise acc,
-            out DynamicCategory countryDirectionCat,
-            out DynamicCategory provinceCat, out DynamicCategory cityCat,
-            out DynamicCategory areaCat, out string countryDirectionName,
-            out string provinceName, out string cityName, out string areaName)
-        {
-            IQueryable<DynamicCategory> categories = Repository.Query(q => q);
-            categories = categories.Where(x => x.Type == AdvertiseType.All);
-
-            if (acc.CountryDirection > 0)
-            {
-                countryDirectionCat = categories.FirstOrDefault(x =>
-                    x.CountryDirection == acc.CountryDirection && x.Province == null);
-                countryDirectionName = countryDirectionCat.RegionString;
-            }
-            else
-            {
-                countryDirectionCat = null;
-                countryDirectionName = "";
-            }
-            categories = categories.Where(x => x.Province != null);
-            provinceCat = categories.FirstOrDefault(x => x.Province == acc.Province && x.City == null);
-            provinceName = provinceCat.RegionString.Replace("استان ", "").Trim();
-            categories = categories.Where(x => x.City != null);
-            cityCat = categories.FirstOrDefault(x => x.City == acc.City && x.Area == null);
-            cityName = cityCat.RegionString;
-            if (acc.Area != null)
-            {
-                areaCat = categories.FirstOrDefault(x => x.Area == acc.Area);
-                areaName = areaCat.RegionString;
-            }
-            else
-            {
-                areaCat = null;
-                areaName = "";
-            }
-        }
         public DynamicCategory Find(AdvertiseType type, CountryDirection countryDirection, int province, int city, int area)
         {
             if (type == AdvertiseType.None)
@@ -613,42 +538,6 @@ namespace Amlakbashi.Application.Services.Category
                 return categories.FirstOrDefault(f => f.CountryDirection == countryDirection && f.Province == null);
             }
             return categories.FirstOrDefault(f => f.CountryDirection == CountryDirection.Unset && f.Province == null);
-        }
-
-        public DynamicCategory Find(string url, string areaString)
-        {
-            if (!string.IsNullOrEmpty(areaString))
-                return Repository.Query(q => q.Where(
-                    c => c.URL == url && c.AreaStr == areaString)
-                    .OrderByDescending(c => c.CountView).FirstOrDefault());
-            else
-                return Repository.Query(q => q.Where(
-                    c => c.URL == url && (c.AreaStr == null || c.AreaStr == ""))
-                    .OrderByDescending(c => c.CountView).FirstOrDefault());
-        }
-
-        public DynamicCategory GetForAjaxItem(int area, int city, int province, AdvertiseType type)
-        {
-            var categories = Repository.Query(q => q);
-
-            if (area > 0)
-            {
-                categories = categories.Where(dc => dc.Area == area);
-            }
-            else if (city > 0)
-            {
-                categories = categories.Where(dc => dc.City == city && dc.Area == 0);
-            }
-            else if (province > 0)
-            {
-                categories = categories.Where(dc => dc.Province == province && dc.City == 0 && dc.Area == 0);
-            }
-            if (type != AdvertiseType.None)
-            {
-                categories = categories.Where(dc => dc.Type == type);
-            }
-            return categories.OrderByDescending(x => x.Province == province)
-                        .ThenByDescending(dc => dc.CountAdvertise).FirstOrDefault();
         }
 
         public DynamicCategory GetByProvinceCity(AdvertiseType type, int province, int city)
@@ -715,84 +604,15 @@ namespace Amlakbashi.Application.Services.Category
             }
         }
 
-        public List<DynamicCategory> GetAccItemLinks(AdvertiseType Type = AdvertiseType.None, int City = -1, int Area = -1, int count = 20, IList<int> regionIds = null)
-        {
-            IQueryable<DynamicCategory> model = Repository.Query(q => q);
-            if (Type > 0)
-                model = model.Where(dc => dc.Type == Type && dc.CountAdvertise > 0);
-            else
-                model = model.Where(dc => dc.Type != AdvertiseType.None && dc.CountAdvertise > 0);
-
-            if (City > 0 && Area != 0)
-                model = model.Where(c => c.City == City);
-
-            if (Area > 0)
-                model = model.Where(c => c.Area == Area);
-
-            if (Type == 0)
-                model = model.Where(c => c.Type > 0);
-
-            if (City == 0)
-                model = model.Where(c => c.City != null);
-
-            if (City > 0 && Area == 0)
-            {
-                if (regionIds.Count > 0)
-                    model = model.Where(c => regionIds.Contains(c.Area == null ? 0 : (int)c.Area));
-                else
-                    model = model.Where(c => c.City == City);
-            }
-            else if (Area == 0)
-                model = model.Where(c => c.Area != null);
-
-            var returnedModel = model.OrderByDescending(c => c.CountAdvertise).Take(count).ToList();
-            return returnedModel;
-        }
-
         public List<DynamicCategory> GetAccItemLinks(int? province,
             int? city, int? area, AdvertiseType Type = AdvertiseType.None)
         {
             return mediator.Send(new GetCategoriesFilterCommand(Type, CountryDirection.Unset, province, city, area, false)).Result;
         }
 
-        public bool CheckMissedCategory(int switchValue, AdvertiseType type,
-            CountryDirection countryDirection = CountryDirection.Unset,
-            int province = 0, int city = 0, int area = 0)
-        {
-            switch (switchValue)
-            {
-                case 1:
-                    return Repository.Query(q => q.Any(x => x.Type == type &&
-                              x.Province == 0 && x.CountryDirection == countryDirection));
-                case 2:
-                    return Repository.Query(q => q.Any(x => x.Type == type &&
-                              x.Province == 0 && x.CountryDirection == 0));
-                case 3:
-                    return Repository.Query(q => q.Any(x => x.Type == type &&
-                            x.Province == province && x.City == null));
-                case 4:
-                    return Repository.Query(q => q.Any(x => x.Type == type &&
-                                x.City == city && x.Area == null));
-                case 5:
-                    return Repository.Query(q => q.Any(x => x.Type == type &&
-                                    x.Area == area));
-                default:
-                    return false;
-            }
-        }
-
         public void Insert(DynamicCategory newCategory)
         {
             Repository.Insert(newCategory);
-            Repository.Save();
-        }
-
-        public void InsertRange(IList<DynamicCategory> list)
-        {
-            foreach (var item in list)
-            {
-                Repository.Insert(item);
-            }
             Repository.Save();
         }
 
@@ -828,7 +648,7 @@ namespace Amlakbashi.Application.Services.Category
             Repository.Save();
         }
 
-        public IList<DynamicCategory> GetLinks(AdvertiseType Type = AdvertiseType.None, 
+        public IList<DynamicCategory> GetLinks(AdvertiseType Type = AdvertiseType.None,
            int City = -1, int Area = -1, int count = 20)
         {
             IQueryable<DynamicCategory> categories;
@@ -980,22 +800,11 @@ namespace Amlakbashi.Application.Services.Category
                 }
                 return new List<DynamicCategory>();
             }
-            catch
+            catch (Exception exc)
             {
                 // TODO logger
                 return new List<DynamicCategory>();
             }
-        }
-
-        public string GetCategoryH1Title(int id, string provinceString,
-            string cityString, string areaString, string countryDirectionString,
-            bool includingMostAccCount = false)
-        {
-            var category = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            return AdvertiseSeoLocalization.GetTitle(
-                includingMostAccCount ? category.MostAccType : 0,
-                (int)category.Type, provinceString, cityString, areaString,
-                countryDirectionString);
         }
 
         public IList<DynamicCategory> GetListByIds(IList<int> ids)

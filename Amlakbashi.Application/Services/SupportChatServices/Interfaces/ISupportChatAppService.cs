@@ -14,7 +14,6 @@ namespace Amlakbashi.Application.Services.SupportChatServices.Interfaces
         SupportChat Find(long id);
         SupportChat GetByUserId(int userId);
         SupportChat Insert(int userId);
-        void UpdateLastMessageTime(long supportId);
         void ScheduleSendSupporterNewMsgNotif(int delay, long messageId, long supportChatId);
     }
 }

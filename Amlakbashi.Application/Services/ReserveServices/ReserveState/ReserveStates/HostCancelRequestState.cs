@@ -28,7 +28,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
         {
             switch (status)
             {
-                case ReserveStatus.Completed:
                 case ReserveStatus.Started:
                 case ReserveStatus.Reserved:
                 case ReserveStatus.CashPay:

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 using Amlakbashi.Application.Services.SupportChatServices.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Mediator.Commands.SupportChatCommands;
@@ -16,7 +17,7 @@ namespace Amlakbashi.Application.Services.SupportChatServices
     internal class SupportChatAppService : AppServiceBase<SupportChat, long>, ISupportChatAppService
     {
         private readonly IMediator mediator;
-        public SupportChatAppService(IRepository<SupportChat, long> repository, 
+        public SupportChatAppService(IRepository<SupportChat, long> repository,
             ICacheManager<SupportChat> cache, IMediator mediator) : base(repository, cache)
         {
             this.mediator = mediator;
@@ -49,14 +50,6 @@ namespace Amlakbashi.Application.Services.SupportChatServices
             Repository.Insert(supportChat);
             Repository.Save();
             return supportChat;
-        }
-
-        public void UpdateLastMessageTime(long supportId)
-        {
-            var supportChat = Repository.Query(q => q.FirstOrDefault(f => f.Id == supportId));
-            supportChat.LastMessageTime = DateTime.Now;
-            Repository.Update(supportChat);
-            Repository.Save();
         }
 
         public void ScheduleSendSupporterNewMsgNotif(int delay, long messageId, long supportChatId)

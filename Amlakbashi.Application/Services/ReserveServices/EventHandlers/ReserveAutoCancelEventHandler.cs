@@ -24,7 +24,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.EventHandlers
         public Task Handle(ReserveRequestEvent notification, CancellationToken cancellationToken)
         {
             var reserve = repository.Find<Reserve, long>(notification.reserveId);
-            
+
             if (reserve.InstantReserve == false)
             {
                 var hostUser = reserve.HostUser;

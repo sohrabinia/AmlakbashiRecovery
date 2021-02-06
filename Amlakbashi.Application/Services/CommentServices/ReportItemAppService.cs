@@ -23,11 +23,6 @@ namespace Amlakbashi.Application.Services.CommentServices
             this.mediator = mediator;
         }
 
-        public IList<ReportItem> GetAll()
-        {
-            return Repository.Query(q => q).ToList();
-        }
-
         //TODO: Remove
         public IQueryable<ReportItem> GetAllAsIQueriable()
         {
@@ -50,25 +45,6 @@ namespace Amlakbashi.Application.Services.CommentServices
             return Repository.Query(q => q.Where(w => w.UserID == userId).ToList());
         }
 
-        public Dictionary<int, List<ReportItem>> GetByAccId(long advertiseId)
-        {
-            IQueryable<ReportItem> data = Repository.Query(q =>
-                q.Where(w => w.AdvertiseID == advertiseId));
-            var dict = new Dictionary<int, List<ReportItem>>();
-            foreach (var rp in data)
-            {
-                if (dict.ContainsKey(rp.UserID))
-                {
-                    dict[rp.UserID].Add(rp);
-                }
-                else
-                {
-                    dict.Add(rp.UserID, new List<ReportItem>() { rp });
-                }
-            }
-            return dict;
-        }
-
         public int GetCountByAccId(long accId, IQueryable<ReportItem> reportItems = null)
         {
             if (reportItems == null)
@@ -78,29 +54,6 @@ namespace Amlakbashi.Application.Services.CommentServices
             return reportItems.GroupBy(g => g.UserID).Count();
         }
 
-        public float GetOverallRatingDecimal(long accId, int reportId = -1)
-        {
-            var reportItems = Repository.Query(q => q);
-            if (reportId == -1)
-            {
-                reportItems = reportItems.Where(x => x.AdvertiseID == accId);
-            }
-            else
-            {
-                reportItems = reportItems.Where(
-                    x => x.AdvertiseID == accId && x.ReportID == reportId);
-            }
-            if (reportItems.Count() > 0)
-            {
-                var overall_rating = reportItems.Average(x => x.Score);
-                return (float)overall_rating;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
         public int GetAdvertiseRatingOfUser(int userId, long advertiseId, int reportId)
         {
             var report_item = Repository.Query(q => q.FirstOrDefault(x =>
@@ -108,24 +61,6 @@ namespace Amlakbashi.Application.Services.CommentServices
                   x.AdvertiseID == advertiseId &&
                   x.ReportID == reportId));
             return report_item != null ? report_item.Score : 0;
-        }
-
-        public int GetAdvertiseRating(long advertise_id, out int count)
-        {
-            var reportItems = Repository.Query(q => q);
-            reportItems = reportItems.Where(x => x.AdvertiseID == advertise_id);
-            count = reportItems.GroupBy(x => x.UserID).Count();
-            return count > 0 ? (int)reportItems.Average(x => x.Score) : 0;
-        }
-
-        public float GetAverageRatingForAdvertise(long advertise_id, int user_id = 0)
-        {
-            var reportItems = Repository.Query(q => q.Where(x => x.AdvertiseID == advertise_id));
-            if (user_id > 0)
-            {
-                reportItems = reportItems.Where(x => x.UserID == user_id);
-            }
-            return reportItems.Count() == 0 ? 0 : reportItems.Average(x => (float)x.Score);
         }
 
         public void SubmitAdvertiseScore(int userId, long advertiseId, int reportId,

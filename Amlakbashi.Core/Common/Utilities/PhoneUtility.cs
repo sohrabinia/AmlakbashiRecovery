@@ -88,5 +88,13 @@ namespace Amlakbashi.Core.Common.Utilities
                 return null;
             return number.Replace(" ", "").Replace("+", "00");
         }
+
+        public static string NormalizePhoneNumber(string phone_number)
+        {
+            return string.IsNullOrEmpty(phone_number) ? null :
+                (IsNumberForIran(phone_number) ?
+                InternationalNumberToLocal(phone_number) :
+                InternationalNumberToCallable(phone_number));
+        }
     }
 }

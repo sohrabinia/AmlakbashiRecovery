@@ -10,10 +10,10 @@ using static Amlakbashi.Core.Entities.BankCard;
 
 namespace Amlakbashi.Application.Services.UserServices.Interfaces
 {
-    public interface IBankCardAppService : IAppService<BankCard,int>
+    public interface IBankCardAppService : IAppService<BankCard, int>
     {
         IQueryable<BankCard> GetAll();
-        IList<BankCard> Filter(int user_id, string bank_card_number,string shaba_number,
+        IList<BankCard> Filter(int user_id, string bank_card_number, string shaba_number,
             int bank_card_status, int shaba_status);
         BankCard Find(int id);
         BankCard GetByUserId(int userId);
@@ -21,6 +21,5 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         BankCardStatusEnum ToggleBankCardStatus(int id);
         BankCardStatusEnum ToggleShabaStatus(int id);
         void Update(BankCard editedBankCard, int currentUserId, ActionLog.ActionSourceEnum source);
-        void UpdateDirectly(BankCard bankCard, int currentUserId, ActionLog.ActionSourceEnum source);
     }
 }

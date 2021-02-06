@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Amlakbashi.Core.Entities;
+using DocumentFormat.OpenXml.Bibliography;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,8 +45,17 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             {
                 return city + " - " + area;
             }
-            return ( !string.IsNullOrEmpty(countryDirection) ? countryDirection + " - " : "")
+            return (!string.IsNullOrEmpty(countryDirection) ? countryDirection + " - " : "")
                 + province + " - " + city;
+        }
+
+        public static string GetLocationUrl(Region region)
+        {
+            var locationString = region.Type == 0 ? "استان-" +
+                region.PersianName.Trim().Replace(" ", "-") :
+                    region.PersianName.Trim().Replace(" ", "-");
+            var url = "/s/" + region.Id + "/" + locationString;
+            return url;
         }
     }
 }

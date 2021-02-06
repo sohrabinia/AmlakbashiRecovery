@@ -26,6 +26,7 @@ namespace Amlakbashi.Application
             mediator.AddOrUpdate("UpdateReserveSupportExpiration", new UpdateReserveSupportExpirationCommand(), "0 23 * * *");
             mediator.AddOrUpdate("UnsetAllTodayIsEmptyRecords", new UpdateTodayIsEmptyRecordsCommand(), "0 4 * * *");
             mediator.AddOrUpdate("UpdateAllArchives", new UpdateReserveArchivesCommand(), "0 5 * * *");
+            mediator.AddOrUpdate("RemoveOldExtrinsicReserve", new RemoveOldExtrinsicReserveCommand(), "0 3 * * *");
             mediator.AddOrUpdate("RefreshEveryTwentyMinutes", new RefreshReserveAutoCancelCommand(), Cron.MinuteInterval(20));
 
             RecurringJob.RemoveIfExists("RefreshEveryOneMinute");

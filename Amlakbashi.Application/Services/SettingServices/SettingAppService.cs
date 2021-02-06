@@ -14,11 +14,6 @@ namespace Amlakbashi.Application.Services.SettingServices
         {
         }
 
-        public Setting Find(int id)
-        {
-            return Repository.Find(id);
-        }
-
         public Setting Find(string name)
         {
             return Repository.Query(q => q.SingleOrDefault(s => s.Name == name));

@@ -1,11 +1,12 @@
 ﻿
+using Amlakbashi.Core.Common.Entity;
 using Amlakbashi.Core.Entities.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Amlakbashi.Core.Entities
 {
-    public class ExtrinsicReserve : Entity<long>, IReserve
+    public class ExtrinsicReserve : Entity<long>, IReserve, ISoftDelete
     {
         public int NotifierUserID { get; set; }
         public long AdvertiseID { get; set; }
@@ -21,5 +22,6 @@ namespace Amlakbashi.Core.Entities
 
         [ForeignKey("HostUserID")]
         public User HostUser { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

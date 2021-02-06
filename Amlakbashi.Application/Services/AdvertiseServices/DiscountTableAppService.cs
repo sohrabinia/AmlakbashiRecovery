@@ -3,7 +3,6 @@ using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
 using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +15,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public DiscountTableAppService(IRepository<DiscountTable, int> repository, ICacheManager<DiscountTable> cache) : base(repository, cache)
         {
         }
+
         public DiscountTable Find(int id)
         {
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
         }
+
         public bool Insert(long accId, DateTime from, DateTime to, int percent, out List<string> msg)
         {
             var item = new DiscountTable()
@@ -37,21 +38,18 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             return false;
         }
+
         public IList<DiscountTable> GetDiscountsOfAccommodation(long accId)
         {
             return Repository.Query(q => q.Where(w => w.AdvertiseID == accId)).ToList();
         }
-        public bool AccommodationAnyDiscount(long accId)
-        {
-            var today = DateTime.Now.Date;
-            return Repository.Query(q => q.Any(a => a.AdvertiseID == accId &&
-                a.Percent > 2 && a.To >= today));
-        }
+
         public void Delete(int id)
         {
             Repository.Delete(id);
             Repository.Save();
         }
+
         public bool Update(long accId, IEnumerable<DiscountTable> items, out List<string> msg)
         {
             var accDiscounts = Repository.Query(q => q.Where(w => w.AdvertiseID == accId));

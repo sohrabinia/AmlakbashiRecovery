@@ -12,7 +12,6 @@ using static Amlakbashi.Core.Entities.Reserve;
 using MediatR;
 using static Amlakbashi.Core.Entities.ActionLog;
 using Amlakbashi.Accounting;
-using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Mediator.Commands.ReserveCommands;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using Microsoft.EntityFrameworkCore;
@@ -34,11 +33,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
         {
             this.mediator = mediator;
             this.accounting = accounting;
-        }
-
-        public IQueryable<Reserve> GetAllAsIQueriable()
-        {
-            return Repository.Query(q => q);
         }
 
         public IList<Reserve> Filter(long reserve_id = -1, long advertise_id = -1,
@@ -260,11 +254,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return model.ToList();
         }
 
-        public IList<Reserve> GetListByIds(List<long> ids)
-        {
-            return Repository.Query(q => q.Where(w => ids.Contains(w.Id)).ToList());
-        }
-
         public IList<Reserve> GetListByUserId(int userId,
             Reserve.ReserveManagerSelectType selectType = Reserve.ReserveManagerSelectType.All)
         {
@@ -356,38 +345,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return data.OrderByDescending(x => x.CreateDate).ToList();
         }
 
-        public IList<Reserve> GetListByAccId(long accId, DateTime startDate, bool getByStatusList = false)
-        {
-            IQueryable<Reserve> reserves = Repository.Query(q => q);
-            reserves = reserves.Where(x => x.AdvertiseID == accId);
-            reserves = reserves.Where(x => x.EndDate >= startDate);
-            if (getByStatusList)
-            {
-                var afterReserveStatusList = new List<int>()
-                    {
-                        (int)Reserve.ReserveStatus.CancelRequestByGuest,
-                        (int)Reserve.ReserveStatus.CancelRequestByHost,
-                        (int)Reserve.ReserveStatus.CashPay,
-                        (int)Reserve.ReserveStatus.Completed,
-                        (int)Reserve.ReserveStatus.Reserved,
-                        (int)Reserve.ReserveStatus.Started
-                    };
-                reserves = reserves.Where(x => afterReserveStatusList.Contains((int)x.Status));
-            }
-            else
-            {
-                reserves = reserves.Where(x =>
-                ((int)x.Status > 4 && (int)x.Status < 10) || (int)x.Status == 13);
-            }
-            return reserves.ToList();
-        }
-
-        public IList<long> GetHostReserveIdsOfUser(int userId)
-        {
-            return Repository.Query(q => q.Where(w => w.Advertise.UserID == userId).
-                Select(s => s.Id).ToList());
-        }
-
         public Reserve Find(long id)
         {
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
@@ -419,8 +376,8 @@ namespace Amlakbashi.Application.Services.ReserveServices
         {
             isHost = false;
             var minDate = DateTime.Now.AddDays(-5).Date;
-            var hostReserves = Repository.Query(q=>q.Where(w => w.HostUserID == userId && w.EndDate >= minDate));
-            var guestReserves = Repository.Query(q=>q.Where(w => w.UserID == userId && w.EndDate >= minDate));
+            var hostReserves = Repository.Query(q => q.Where(w => w.HostUserID == userId && w.EndDate >= minDate));
+            var guestReserves = Repository.Query(q => q.Where(w => w.UserID == userId && w.EndDate >= minDate));
             Reserve relatedReserve = null;
             if (hostReserves.Any())
             {
@@ -493,7 +450,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                     accounting.DecreaseCredit(hostUser.Id, penaltyPrice, 0, 0, out newCredit, User.CreditTransactionCause.Other, "جریمه لغو رزرو آنی کد " + reserve.Id, 0, doerUserId, ActionLog.ActionSourceEnum.AdminPanel);
                 }
                 objReserve.InstantReserveCancelHost = true;
-                
+
                 mediator.Send(new IncreaseInstantReserveCancelCommand(acc.Id));
                 if (hostCancelCount > hostUser.CancelInstantReserveLimit - 1)
                 {
@@ -511,17 +468,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             Repository.Save();
             msg = "";
             return true;
-        }
-
-        public void UpdateAllHostUserIds()
-        {
-            var data = Repository.Query(q => q);
-            foreach (var item in data)
-            {
-                item.HostUserID = item.Advertise.UserID;
-                Repository.Update(item);
-            }
-            Repository.Save();
         }
 
         public void UpdateShouldFollow(long id, string text, User user)
@@ -736,7 +682,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public bool CashPay(long reserveId, out string msg,
             ActionSourceEnum actionSource, int doerUserId)
-        {            
+        {
             var reserve = Repository.Find(reserveId);
             if (reserve.UserID != doerUserId ||
                 reserve.Status != ReserveStatus.Reserved)
@@ -760,7 +706,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public bool ConfirmCashPay(long reserveId, bool paid, out string msg,
             ActionSourceEnum actionSource, int doerUserId)
-        {            
+        {
             var reserve = Repository.Find(reserveId);
             var advertise = reserve.Advertise;
             if (advertise.UserID != doerUserId || reserve.Status != ReserveStatus.CashPay)
@@ -854,15 +800,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 reserve.CancelState, true, actionSource, doerUserId));
             msg = is_host ? "رزرو مورد نظر از حالت لغو خارج شد" :
                 "درخواست رزرو شما با موفقیت از حالت لغو خارج شد";
-        }
-
-        public long GetFirstReserveByAccIdAndUserId(long accId, int userId)
-        {
-            IQueryable<Reserve> reserves = Repository.Query(q => q);
-            reserves = reserves.Where(x => x.UserID == userId);
-            reserves = reserves.Where(x => x.AdvertiseID == accId);
-            var reserve = reserves.FirstOrDefault(x => x.Status == Reserve.ReserveStatus.Completed);
-            return reserve != null ? reserve.Id : 0;
         }
 
         public bool UserHasSimilarReserve(int userId, long advertiseId, DateTime startDate, DateTime endDate)

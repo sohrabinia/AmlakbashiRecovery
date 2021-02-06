@@ -127,7 +127,7 @@ namespace Amlakbashi.Application.Services.UserServices
                 mediator.Publish(new UserUpdateEvent(null, user, source, currentUserId));
             }
         }
-        
+
         public bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
             ActionLog.ActionSourceEnum source, out List<string> errors, int? cancelInstantReserveLimit = null)
         {
@@ -330,7 +330,7 @@ namespace Amlakbashi.Application.Services.UserServices
             user.PhotoStatus = (int)state;
             Repository.Update(user);
             Repository.Save();
-            if (currentUserId>0)
+            if (currentUserId > 0)
             {
                 mediator.Publish(new UserUpdateEvent(shallowUser, user, source, currentUserId));
             }
@@ -348,14 +348,6 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
             user.AdminLoginCode = code;
-            Repository.Update(user);
-            Repository.Save();
-        }
-
-        public void UpdateMainMobile(int userId, string mobile)
-        {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.MainMobile = mobile;
             Repository.Update(user);
             Repository.Save();
         }
@@ -578,7 +570,7 @@ namespace Amlakbashi.Application.Services.UserServices
 
         public bool VerifyLogin(string mobile, string code, out int user_id, string presentorCode, out string errorMsg)
         {
-            var user = Repository.Query(q=>q.FirstOrDefault(u => u.MainMobile == mobile && u.State == (int)User.UserState.Acticved));
+            var user = Repository.Query(q => q.FirstOrDefault(u => u.MainMobile == mobile && u.State == (int)User.UserState.Acticved));
             if (user == null)
                 user = Repository.Query(q => q.OrderBy(u => u.Id).FirstOrDefault(u => u.MainMobile == mobile));
 

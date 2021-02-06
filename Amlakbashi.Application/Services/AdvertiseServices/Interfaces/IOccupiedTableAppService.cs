@@ -10,6 +10,5 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
 {
     public interface IOccupiedTableAppService : IAppService<OccupiedTable, long>
     {
-        IList<OccupiedTable> GetByAccId(long accId, DateTime fromDate);
     }
 }

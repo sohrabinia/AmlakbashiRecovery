@@ -12,7 +12,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         bool Insert(long accId, DateTime from, DateTime to, int percent, out List<string> msg);
         bool Update(long accId, IEnumerable<DiscountTable> items, out List<string> msg);
         IList<DiscountTable> GetDiscountsOfAccommodation(long accId);
-        bool AccommodationAnyDiscount(long accId);
         void Delete(int id);
         IList<Advertise> GetMostDiscountAdvertises(int count);
     }
