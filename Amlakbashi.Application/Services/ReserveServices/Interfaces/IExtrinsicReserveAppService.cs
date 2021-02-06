@@ -7,7 +7,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
 {
     public interface IExtrinsicReserveAppService : IAppService<ExtrinsicReserve, long>
     {
-        void Insert(long advertiseId, DateTime date, ActionSourceEnum actionSource, int doerUserID);
-        void Insert(long advertiseId, string from_date, string to_date, ActionSourceEnum actionSource, int doerUserId);
+        void Insert(long advertiseId, DateTime date, ActionSourceEnum actionSource, int doerUserID, int count = 1);
+        void Insert(long advertiseId, string from_date, string to_date, ActionSourceEnum actionSource, int doerUserId, int count = 1);
     }
 }
