@@ -11,9 +11,8 @@ using Amlakbashi.Mediator.Commands.ReserveCommands;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using log4net;
 using MediatR;
-using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -194,7 +193,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                         mediator.Send(new InsertExtrinsicReserveCommand(reserve.AdvertiseID,
                             DateTimeUtility.GregorianToPersianDate(reserve.StartDate),
                             DateTimeUtility.GregorianToPersianDate(reserve.EndDate),
-                            request.actionSource, request.doerUserId));
+                            request.actionSource, request.doerUserId, reserve.Advertise.Count));
                     }
                     break;
                 default:

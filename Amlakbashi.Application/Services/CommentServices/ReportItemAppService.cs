@@ -72,7 +72,7 @@ namespace Amlakbashi.Application.Services.CommentServices
             {
                 return;
             }
-            ReportItem report = acc.ReportItems.SingleOrDefault(s =>
+            ReportItem report = acc.ReportItems.FirstOrDefault(s =>
                 s.UserID == userId && s.ReportID == reportId);
             if (report == null)
             {

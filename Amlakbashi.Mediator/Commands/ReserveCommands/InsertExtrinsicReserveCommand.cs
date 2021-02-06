@@ -10,14 +10,16 @@ namespace Amlakbashi.Mediator.Commands.AdvertiseCommands
         public string toDate { get; set; }
         public ActionSourceEnum actionSource { get; set; }
         public int doerUserId { get; set; }
+        public int count { get; set; }
         public InsertExtrinsicReserveCommand(long advertiseId, string fromDate,
-            string toDate, ActionSourceEnum actionSource, int doerUserId)
+            string toDate, ActionSourceEnum actionSource, int doerUserId, int count = 1)
         {
             this.advertiseId = advertiseId;
             this.fromDate = fromDate;
             this.toDate = toDate;
             this.actionSource = actionSource;
             this.doerUserId = doerUserId;
+            this.count = count;
         }
     }
 }

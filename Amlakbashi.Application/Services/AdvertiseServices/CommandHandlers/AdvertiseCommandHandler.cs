@@ -107,9 +107,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                 }
                 acc.LastModifyDate = DateTime.Now;
                 acc.Categories.Clear();
-                advertiseRepository.Update(acc);                
+                advertiseRepository.Update(acc);
             }
- 
+
             advertiseRepository.Save();
             foreach (var catId in catIds)
             {
@@ -228,7 +228,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             }
             advertiseRepository.Save();
             IQueryable<Advertise> notInstantReserveAdvertises =
-                advertiseRepository.Query(q => q.Where(w => 
+                advertiseRepository.Query(q => q.Where(w =>
                 w.Status == AdvertiseStatus.Published &&
                 w.TodayIsEmpty == true &&
                 w.InstantReserveStatus !=
@@ -255,7 +255,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                         advertiseRepository.Update(advertise);
                     }
                 }
-                else 
+                else
                 {
                     if (advertise.TodayIsEmpty == false)
                     {
@@ -323,9 +323,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                     }
                 }
             }
+            var accCount = Math.Max(acc.Count, 1);
             foreach (var date in extrinsicReservedDates)
             {
-                if (acc.OccupiedTables.Any(a => a.Date == date.Value) == false)
+                if (acc.OccupiedTables.Count(a => a.Date == date.Value) < accCount)
                 {
                     acc.OccupiedTables.Add(new OccupiedTable() { ExtrinsicReserve = date.Key, Date = date.Value });
                 }
@@ -345,24 +346,27 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             DateTime gregorian_date;
             var occupiedDatesPersian = acc.OccupiedDates.Select(
                 s => DateTimeUtility.GregorianToPersianDate(s));
-            for (int i = 0; i < range_list.Count; i++)
+            for (int i = 0; i < request.count; i++)
             {
-                var persian_date = range_list[i];
-                var exist = occupiedDatesPersian.Contains(persian_date);
-                if (!exist)
+                for (int j = 0; j < range_list.Count; j++)
                 {
-                    gregorian_date = DateTimeUtility.PersianDateToGregorian(persian_date);
-                    var item = new ExtrinsicReserve()
+                    var persian_date = range_list[j];
+                    var exist = occupiedDatesPersian.Contains(persian_date);
+                    if (!exist)
                     {
-                        HostUser = hostUser,
-                        NotifierUserID = request.doerUserId,
-                        StartDate = gregorian_date,
-                        CreateDate = DateTime.Now
-                    };
-                    acc.ExtrinsicReserves.Add(item);
-                    mediator.Send(new RejectRequestsInTimeCommand(request.advertiseId,
-                        gregorian_date, gregorian_date.AddDays(1), request.actionSource,
-                        request.doerUserId));
+                        gregorian_date = DateTimeUtility.PersianDateToGregorian(persian_date);
+                        var item = new ExtrinsicReserve()
+                        {
+                            HostUser = hostUser,
+                            NotifierUserID = request.doerUserId,
+                            StartDate = gregorian_date,
+                            CreateDate = DateTime.Now
+                        };
+                        acc.ExtrinsicReserves.Add(item);
+                        mediator.Send(new RejectRequestsInTimeCommand(request.advertiseId,
+                            gregorian_date, gregorian_date.AddDays(1), request.actionSource,
+                            request.doerUserId));
+                    }
                 }
             }
             advertiseRepository.Update(acc);

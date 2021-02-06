@@ -23,19 +23,21 @@ namespace Amlakbashi.Application.Services.ReserveServices
         }
 
         public void Insert(long advertiseId, DateTime date,
-            ActionSourceEnum actionSource, int doerUserID)
+            ActionSourceEnum actionSource, int doerUserID, int count = 1)
         {
             mediator.Send(new InsertExtrinsicReserveCommand(advertiseId,
                 DateTimeUtility.GregorianToPersianDate(date),
                  DateTimeUtility.GregorianToPersianDate(date.AddDays(1)),
-                 actionSource, doerUserID));
+                 actionSource, doerUserID, count));
         }
 
+
+
         public void Insert(long advertiseId, string from_date,
-            string to_date, ActionSourceEnum actionSource, int doerUserId)
+            string to_date, ActionSourceEnum actionSource, int doerUserId, int count = 1)
         {
             mediator.Send(new InsertExtrinsicReserveCommand(advertiseId,
-                from_date, to_date, actionSource, doerUserId));
+                from_date, to_date, actionSource, doerUserId, count));
         }
     }
 }
