@@ -800,7 +800,7 @@ namespace Amlakbashi.Application.Services.Category
                 }
                 return new List<DynamicCategory>();
             }
-            catch (Exception exc)
+            catch
             {
                 // TODO logger
                 return new List<DynamicCategory>();
