@@ -1,4 +1,6 @@
-﻿using Amlakbashi.Host.Models;
+﻿using Amlakbashi.Application.Services;
+using Amlakbashi.Application.Services.UserServices.Interfaces;
+using Amlakbashi.Host.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -20,7 +22,7 @@ namespace Amlakbashi.Host.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View("Index", "test");
         }
 
         public IActionResult Privacy()

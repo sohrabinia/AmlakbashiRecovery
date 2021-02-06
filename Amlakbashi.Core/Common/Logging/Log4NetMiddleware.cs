@@ -9,7 +9,7 @@ using log4net.Core;
 
 namespace Amlakbashi.Core.Common.Logging
 {
-    public class Log4NetMiddleware : IResolveMiddleware
+    public class Log4NetMiddleware : ILog4NetMiddleware
     {
         public PipelinePhase Phase => PipelinePhase.ParameterSelection;
 
