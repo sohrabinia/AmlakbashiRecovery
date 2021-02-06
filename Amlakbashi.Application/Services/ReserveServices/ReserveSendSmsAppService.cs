@@ -17,11 +17,5 @@ namespace Amlakbashi.Application.Services.ReserveServices
         {
 
         }
-
-        public void Insert(ReserveSendSms newItem)
-        {
-            Repository.Insert(newItem);
-            Repository.Save();
-        }
     }
 }

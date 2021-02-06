@@ -13,7 +13,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
 {
     public interface IReserveAppService : IAppService<Reserve, long>
     {
-        IQueryable<Reserve> GetAllAsIQueriable();
         IList<Reserve> Filter(long reserve_id = -1, long advertise_id = -1,
             int host_user_id = -1, int guest_user_id = -1, int reserve_status = -1,
             int host_response_status = -1, int general_status = -1,
@@ -24,16 +23,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
             int supporter_id = -1, int host_card_status = -1,
             int mainFilter = 0, int instantReserveFilter = 2,
             bool disableAutoCancel = false, bool accVisited = false);
-        IList<Reserve> GetListByIds(List<long> ids);
         IList<Reserve> GetListByUserId(int userId, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, int category, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, Reserve.ReserveStatus status, bool RatingShownToGuest,
             bool isHost = false);
         IList<Reserve> GetListByUserId(int userId,
             Reserve.ReserveManagerSelectType selectType = Reserve.ReserveManagerSelectType.All);
-        IList<Reserve> GetListByAccId(long accId, DateTime startDate, bool getByStatusList = false);
-        IList<long> GetHostReserveIdsOfUser(int userId);
-        long GetFirstReserveByAccIdAndUserId(long accId, int userId);
         Reserve Find(long id);
         Reserve GetReserveIncludingSupport(long id);
         IQueryable<Reserve> GetReservesIncludingSupport(List<long> ids);
@@ -57,7 +52,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
             out bool isPending, ActionSourceEnum actionSource, int doerUserId);
         void RefuseCancelReserve(User user, long reserve_id, bool is_host, out string msg,
             ActionSourceEnum actionLog, int doerUserId);
-        void UpdateAllHostUserIds();
         void UpdateShouldFollow(long id, string text, User user);
         void UpdateSupporterInfo(long id, string text, User user);
         void UpdateRatingShownToGuest(long id, bool showRate);

@@ -4,7 +4,6 @@ using System.Linq;
 using Amlakbashi.Core.Base.Builder;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts;
 
 namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Base
 {
@@ -37,6 +36,12 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Base
             {
                 Dictionary<string, string> newErrors;
                 validator.Validate(out newErrors, out msg);
+                if (validator.GetType().Name == "FloorPart" &&
+                    !(data.TypeID == Advertise.AdvertiseType.Apartment ||
+                    data.TypeID == Advertise.AdvertiseType.SuitAndRoom))
+                {
+                    continue;
+                }
                 foreach (var item in newErrors)
                 {
                     errors.Add(item.Key, item.Value);
@@ -53,7 +58,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Base
             return errors.Any() == false;
         }
 
-        protected void BuildAdvertisePart<T>() where T : class,IPart, new ()
+        protected void BuildAdvertisePart<T>() where T : class, IPart, new()
         {
             T part = new T();
             PropertyCopier<Advertise, T>.Copy(data, part);

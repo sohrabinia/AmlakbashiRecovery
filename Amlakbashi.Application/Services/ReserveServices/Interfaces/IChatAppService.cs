@@ -12,7 +12,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
     {
         IList<Chat> Filter(long chat_id = -1, long reserve_id = -1,
             int user_id = -1, int chat_status = -1);
-        IQueryable<Chat> GetAllAsIqueriable();
         IList<Chat> GetReserveChats(long reserveId);
         IList<Chat> GetListAgainstUserId(int userId, Chat.ChatStatusEnum status, Chat.ReadStatusEnum read,
             IList<long> reserveIds = null);

@@ -12,10 +12,11 @@ using Amlakbashi.Mediator.Commands.UserCommands;
 using log4net;
 using MediatR;
 using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using static Amlakbashi.Core.Entities.Reserve;
 using static Amlakbashi.Core.Entities.ReservePayment;
 
@@ -33,7 +34,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         IRequestHandler<ScheduleReservePaymentCommand>,
         IRequestHandler<ScheduleSendReserveRequestCallCommand, TimeSpan>,
         IRequestHandler<SendReserveRequestCallCommand>,
-        IRequestHandler<SendPayReserveCallCommand>, 
+        IRequestHandler<SendPayReserveCallCommand>,
         IRequestHandler<UpdateReserveArchivesCommand>
     {
         private readonly IRepository<Reserve, long> reserveRepository;
@@ -129,7 +130,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                 };
                 mediator.Enqueue(new SendMessageCommand(contact));
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 logger.Error("ReserveCommandHandler.FinishStayMessageCommand", exc);
             }
@@ -143,7 +144,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                 reserveState.UseReserve(request.reserveId).SetStatus(request.status,
                     request.sendSms, request.actionSource, request.doerUserId, request.force);
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 logger.Error("ReserveCommandHandler.SetReserveStatusCommand", exc);
             }

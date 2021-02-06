@@ -14,7 +14,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 {
     internal class ReserveSupportAppService : AppServiceBase<ReserveSupport, int>, IReserveSupportAppService
     {
-        public ReserveSupportAppService(IRepository<ReserveSupport,int> repository, ICacheManager<ReserveSupport> cache): base(repository, cache)
+        public ReserveSupportAppService(IRepository<ReserveSupport, int> repository, ICacheManager<ReserveSupport> cache) : base(repository, cache)
         {
         }
 

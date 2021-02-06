@@ -26,7 +26,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         Advertise FindIncludingDeleted(long id);
         void Delete(long id);
         List<long> GetAdvertisesPhotoIds();
-        List<Advertise> GetAdvertisesThatHaveAlbumPhoto();
         void AddSupporterInfo(long id, string text, User supporter);
         IList<Advertise> Filter(AdvertiseStatus status, int adtype, int userid, string sort, long id, int instantReserveStatus,
             long unixDate, int imageCountMin, int imageCountMax, int province, int city, int area);
@@ -48,12 +47,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         AdvertiseDirector GetComplexForm(long id, long parentId, out AdvertiseType parentType, out bool isEdit);
         AdvertiseDirector SubmitComplexForm(Advertise data, int userId, out Dictionary<string, string> errors,
             out List<string> groupErrors, bool save, out AdvertiseType parentType, string rootPath);
-        AdvertiseDirector GetAdminForm(long id, DirectorType type, out AdvertiseType parentType);
+        AdvertiseDirector GetAdminForm(long id, DirectorType type, out AdvertiseType parentType, out AdvertiseStatus status);
         AdvertiseDirector SubmitAdminBasicForm(Advertise data, out Dictionary<string, string> errors,
             out List<string> groupErrors, int currentUserId);
         AdvertiseDirector SubmitAdminForm(Advertise data, out Dictionary<string, string> errors,
             out List<string> groupErrors, bool forceSave, DirectorType type, int currentUserId,
-            out AdvertiseType parentType, string rootPath = null);
+            out AdvertiseType parentType, out AdvertiseStatus status, string rootPath = null);
         Dictionary<AdvertiseType, Dictionary<long, string>> GetAccChilds(long parentId);
         PriceInputDTO GetPrices(long id);
         IDictionary<string, DatePriceDTO> GetAccPriceDatesInfo(long id);

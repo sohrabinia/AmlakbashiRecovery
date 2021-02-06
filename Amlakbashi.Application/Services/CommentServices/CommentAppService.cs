@@ -16,23 +16,10 @@ namespace Amlakbashi.Application.Services.CommentServices
 
         }
 
-        public IList<Comment> GetAll()
-        {
-            return Repository.Query(q => q).ToList();
-        }
-
         //TODO: Delete this
         public IQueryable<Comment> GetAllAsIQueryable()
         {
             return Repository.Query(q => q);
-        }
-
-        public IList<Comment> GetListByAccId(long accId)
-        {
-            return Repository.Query(q => q.Where(x => x.AdvertiseID == accId &&
-                      x.type == (int)Comment.CommentType.advertise &&
-                      x.Status == Comment.CommentStatus.publish).
-                      OrderByDescending(x => x.Id).ToList());
         }
 
         public IList<Comment> GetListBySenderUserId(int userId)
@@ -116,32 +103,11 @@ namespace Amlakbashi.Application.Services.CommentServices
                 f.SenderUserID == senderUserId));
         }
 
-        public Comment GetByAccSenderUser(long accId, long senderUserId, Comment.CommentType type, bool onlyPublished)
-        {
-            var comments = Repository.Query(q => q.Where(f => f.AdvertiseID == accId &&
-                f.SenderUserID == senderUserId && f.type == type));
-            if (onlyPublished)
-            {
-                comments = comments.Where(x => x.Status == Comment.CommentStatus.publish);
-            }
-            return comments.FirstOrDefault();
-        }
-
         public Comment GetHostReply(long accId, long senderUserId)
         {
             return Repository.Query(q => q.FirstOrDefault(x => x.AdvertiseID == accId &&
                 x.SenderUserID == senderUserId &&
                 x.type == Comment.CommentType.advertiseHostReply));
-        }
-
-        public Comment GetSuspendedComment(long accId, int userId)
-        {
-            IQueryable<Comment> comments = Repository.Query(q => q);
-            comments = comments.Where(x => x.AdvertiseID == accId);
-            comments = comments.Where(x => x.SenderUserID == userId);
-            comments = comments.Where(x => x.Status == Comment.CommentStatus.suspend);
-            comments = comments.Where(x => x.type == (int)Comment.CommentType.advertise);
-            return comments.FirstOrDefault();
         }
 
         public void Update(Comment editedComment)

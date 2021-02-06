@@ -28,7 +28,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public IList<Chat> Filter(long chatId, long reserveId, int userId, int chatStatus)
         {
-            IQueryable<Chat> model = Repository.Query(q=>q);
+            IQueryable<Chat> model = Repository.Query(q => q);
             if (chatId > 0)
             {
                 model = model.Where(x => x.Id == chatId);
@@ -48,14 +48,9 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return model.OrderByDescending(x => x.Id).ToList();
         }
 
-        public IQueryable<Chat> GetAllAsIqueriable()
-        {
-            return Repository.Query(q => q);
-        }
-
         public IList<Chat> GetReserveChats(long reserveId)
         {
-            IQueryable<Chat> allChats = Repository.Query(q=>q);
+            IQueryable<Chat> allChats = Repository.Query(q => q);
             allChats = allChats.Where(x => x.ReserveID == reserveId).OrderBy(x => x.CreateTime);
             return allChats.ToList();
         }
@@ -82,7 +77,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public int GetCountByReserveId(long reserveId)
         {
-            return Repository.Query(q=>q.Count(x => x.ReserveID == reserveId));
+            return Repository.Query(q => q.Count(x => x.ReserveID == reserveId));
         }
 
         public int GetNotReadCountByReserveId(long reserveId, int userId)

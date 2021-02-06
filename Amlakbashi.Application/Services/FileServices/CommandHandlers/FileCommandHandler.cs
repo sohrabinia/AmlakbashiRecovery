@@ -5,27 +5,32 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Common.Repository;
-using Amlakbashi.Core.Entities;
 using Hangfire;
 using System.Collections.Generic;
 using Amlakbashi.Mediator.Commands.FileCommands;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
-using static Amlakbashi.Core.Entities.Advertise;
+using Entities = Amlakbashi.Core.Entities;
 using System.Linq;
 using Amlakbashi.Core.DTOs.FileDTOs;
+using System.IO;
+using System;
+using log4net;
 
 namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
 {
     public class FileCommandHandler : IRequestHandler<MinifyImageCommand>,
         IRequestHandler<StopQueuedJobCommand>,
-        IRequestHandler<GenerateThumbImageCommand, bool>
+        IRequestHandler<GenerateThumbImageCommand, bool>,
+        IRequestHandler<SetWatermarkCommand>
     {
         private static readonly object objlock = new object();
-        private readonly IRepository<File, long> fileRepository;
-        public FileCommandHandler(
-            IRepository<File, long> fileRepository)
+        private readonly IRepository<Entities.File, long> fileRepository;
+        private readonly ILog logger;
+        public FileCommandHandler(ILog logger,
+            IRepository<Entities.File, long> fileRepository)
         {
             this.fileRepository = fileRepository;
+            this.logger = logger;
         }
 
         public Task<Unit> Handle(MinifyImageCommand request, CancellationToken cancellationToken)
@@ -42,7 +47,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
             catch
             {
                 var excFile = fileRepository.Find(request.FileId);
-                excFile.MinifyStatus = File.MinifyStatusEnum.Failed;
+                excFile.MinifyStatus = Entities.File.MinifyStatusEnum.Failed;
                 fileRepository.Update(excFile);
                 fileRepository.Save();
                 return Task.FromResult(Unit.Value);
@@ -81,7 +86,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 catch
                 {
                     var excFile = fileRepository.Find(request.FileId);
-                    excFile.MinifyStatus = File.MinifyStatusEnum.Failed;
+                    excFile.MinifyStatus = Entities.File.MinifyStatusEnum.Failed;
                     fileRepository.Update(excFile);
                     fileRepository.Save();
                     if (System.IO.File.Exists(NewPath))
@@ -96,14 +101,14 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                     var excFile = fileRepository.Find(request.FileId);
                     excFile.MinifyMaxWidth = request.MaxWidth;
                     excFile.MinifyQualityPercent = request.QualityPercent;
-                    excFile.MinifyStatus = File.MinifyStatusEnum.Done;
+                    excFile.MinifyStatus = Entities.File.MinifyStatusEnum.Done;
                     fileRepository.Update(excFile);
                     fileRepository.Save();
                 }
                 catch
                 {
                     var excFile = fileRepository.Find(request.FileId);
-                    excFile.MinifyStatus = File.MinifyStatusEnum.Failed;
+                    excFile.MinifyStatus = Entities.File.MinifyStatusEnum.Failed;
                     fileRepository.Update(excFile);
                     fileRepository.Save();
                     System.IO.File.Delete(NewPath);
@@ -145,7 +150,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 }
             }
 
-            var files = new List<File>();
+            var files = new List<Entities.File>();
             if (request.PhotoAlbumIds.Count > 0)
             {
                 files.AddRange(fileRepository.Query(q => q.Where(w => request.PhotoAlbumIds.Contains(w.Id))));
@@ -252,13 +257,127 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 if (System.IO.File.Exists(thumb.OrigPath))
                 {
                     new System.IO.FileInfo(thumb.thumbPath).Directory.Create();
-                    var origImage = Image.FromFile(thumb.OrigPath);
-                    var thumbImage = ImageUtility.ResizeImageKeepAspectRatio(origImage, thumb.w, thumb.h);
-                    ImageUtility.SaveThumb(thumbImage, thumb.thumbPath, thumb.OrigPath);
+                    using (FileStream stream = new FileStream(thumb.OrigPath, FileMode.Open, FileAccess.Read))
+                    {
+                        var origImage = Image.FromStream(stream);
+                        var thumbImage = ImageUtility.ResizeImageKeepAspectRatio(origImage, thumb.w, thumb.h);
+                        ImageUtility.SaveThumb(thumbImage, thumb.thumbPath, thumb.OrigPath);
+                        stream.Close();
+                        stream.Dispose();
+                    }
                 }
             }
-
             return Task.FromResult(true);
+        }
+
+        public Task<Unit> Handle(SetWatermarkCommand request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var file = fileRepository.Find(request.FileId);
+                var filePath = request.ServerPath + file.FilePath.Replace("~", "").Substring(1);
+                if (file != null)
+                {
+                    lock (objlock)
+                    {
+                        double ratio = 4.5;
+                        if (!File.Exists(filePath))
+                            return Task.FromResult(Unit.Value);
+                        using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                        using (Image watermarkImage = Image.FromFile(request.ServerPath + "resource/img/water_logo.png"))
+                        {
+                            Image image = Image.FromStream(stream);
+                            int water_width = Convert.ToInt16((double)image.Width / ratio);
+                            double water_rate = (double)watermarkImage.Width / (double)water_width;
+                            int water_height = Convert.ToInt16((double)watermarkImage.Height / water_rate);
+                            string logo_path = "";
+
+                            using (Bitmap thumbnailBitmap = new Bitmap(water_width, water_height))
+                            {
+                                thumbnailBitmap.SetResolution(watermarkImage.HorizontalResolution, watermarkImage.VerticalResolution);
+                                using (Graphics new_watermark = Graphics.FromImage(thumbnailBitmap))
+                                {
+                                    new_watermark.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                                    new_watermark.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                                    new_watermark.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                                    Rectangle imageRectangle = new Rectangle(0, 0, water_width, water_height);
+                                    new_watermark.DrawImage(watermarkImage, imageRectangle);
+                                    logo_path = "content/logo/" + string.Format("logo_{0}.png", Guid.NewGuid());
+                                    var extension = System.IO.Path.GetExtension(request.ServerPath + logo_path);
+                                    ImageCodecInfo format;
+                                    EncoderParameters encoderParameters;
+                                    switch (extension)
+                                    {
+                                        case ".png":
+                                            format = ImageUtility.GetEncoder(ImageFormat.Png);
+                                            encoderParameters = new EncoderParameters(1);
+                                            encoderParameters.Param[0] = new EncoderParameter(Encoder.Compression, (long)EncoderValue.CompressionLZW);
+                                            break;
+                                        case ".gif":
+                                            format = ImageUtility.GetEncoder(ImageFormat.Gif);
+                                            encoderParameters = new EncoderParameters(0);
+                                            break;
+                                        default:
+                                            format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
+                                            encoderParameters = new EncoderParameters(1);
+                                            encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
+                                            break;
+                                    }
+                                    thumbnailBitmap.Save(request.ServerPath + logo_path, format, encoderParameters);
+                                }
+                            }
+
+                            using (Image NewWatermarkImage = Image.FromFile(request.ServerPath + logo_path))
+                            using (Graphics imageGraphics = Graphics.FromImage(image))
+                            using (TextureBrush watermarkBrush = new TextureBrush(NewWatermarkImage))
+                            {
+                                int x = image.Width - Convert.ToInt16((double)water_width + ((double)water_width / 10));
+                                int y = image.Height - Convert.ToInt16((double)water_height + ((double)water_height / 10));
+                                watermarkBrush.TranslateTransform(x, y);
+                                imageGraphics.FillRectangle(watermarkBrush, new Rectangle(new Point(x, y), new Size(water_width + 1, water_height)));
+                                string water_path = "~/content/advertise/" + "watermark_" +
+                                    file.FilePath.Substring(file.FilePath.LastIndexOf('/') + 1);
+                                var extension = System.IO.Path.GetExtension(request.ServerPath + water_path.Replace("~/", ""));
+                                ImageCodecInfo format;
+                                EncoderParameters encoderParameters;
+                                switch (extension)
+                                {
+                                    case ".png":
+                                        format = ImageUtility.GetEncoder(ImageFormat.Png);
+                                        encoderParameters = new EncoderParameters(1);
+                                        encoderParameters.Param[0] = new EncoderParameter(Encoder.Compression, (long)EncoderValue.CompressionLZW);
+                                        break;
+                                    case ".gif":
+                                        format = ImageUtility.GetEncoder(ImageFormat.Gif);
+                                        encoderParameters = new EncoderParameters(0);
+                                        break;
+                                    default:
+                                        format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
+                                        encoderParameters = new EncoderParameters(1);
+                                        encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
+                                        break;
+                                }
+                                image.Save(request.ServerPath + water_path.Replace("~/", ""), format, encoderParameters);
+                                file.FilePath = water_path;
+                                fileRepository.Update(file);
+                                fileRepository.Save();
+                            }
+                            stream.Close();
+                            stream.Dispose();
+                        }
+                    }
+                }
+                if (File.Exists(filePath))
+                    lock (objlock)
+                    {
+                        File.Delete(filePath);
+                    }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("File.SetWatermarkForFile", exc);
+            }
+            return Task.FromResult(Unit.Value);
         }
     }
 }

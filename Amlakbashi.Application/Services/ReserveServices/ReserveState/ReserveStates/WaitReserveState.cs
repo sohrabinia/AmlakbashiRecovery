@@ -22,7 +22,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
         public override bool CanTransitTo(Reserve.ReserveStatus status)
         {
             switch (status)
-            {   
+            {
                 case Reserve.ReserveStatus.Reserved:
                 case Reserve.ReserveStatus.CashPay:
                 case Reserve.ReserveStatus.Started:

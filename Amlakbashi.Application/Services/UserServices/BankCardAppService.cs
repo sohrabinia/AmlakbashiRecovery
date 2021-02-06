@@ -98,13 +98,5 @@ namespace Amlakbashi.Application.Services.UserServices
             Repository.Save();
             mediator.Publish(new BankCardUpdateEvent(shallowBankCard, bankCard, source, currentUserId));
         }
-
-        public void UpdateDirectly(BankCard bankCard, int currentUserId, ActionLog.ActionSourceEnum source)
-        {
-            var shallowBankCard = Repository.Query(q => q.FirstOrDefault(f => f.UserID == bankCard.Id));
-            Repository.Update(bankCard);
-            Repository.Save();
-            mediator.Publish(new BankCardUpdateEvent(shallowBankCard, bankCard, source, currentUserId));
-        }
     }
 }

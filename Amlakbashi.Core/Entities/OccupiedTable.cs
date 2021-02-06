@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Amlakbashi.Core.Common.Entity;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Amlakbashi.Core.Entities
 {
-    public class OccupiedTable : Entity<long>
+    public class OccupiedTable : Entity<long>, ISoftDelete
     {
         [Column("OccupiedTableID")]
         public override long Id { get; set; }
@@ -17,5 +18,6 @@ namespace Amlakbashi.Core.Entities
         [ForeignKey("ExtrinsicReserveID")]
         public ExtrinsicReserve ExtrinsicReserve { get; set; }
         public DateTime Date { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

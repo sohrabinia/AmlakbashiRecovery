@@ -5,7 +5,6 @@ using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using ServiceStack;
 using MediatR;
 using Amlakbashi.Core.Common.Extensions;
@@ -20,16 +19,6 @@ namespace Amlakbashi.Application.Services.FileServices
         public FileAppService(IRepository<File, long> repository, ICacheManager<File> cache, IMediator mediator) : base(repository, cache)
         {
             this.mediator = mediator;
-        }
-
-        public IList<File> GetAll()
-        {
-            return Repository.Query(q => q).ToList();
-        }
-
-        public IQueryable<File> GetAllAsQueryable()
-        {
-            return Repository.Query(q => q);
         }
 
         public IList<File> GetAllDescendingByLastModifyDate(int count = 0)
@@ -63,15 +52,15 @@ namespace Amlakbashi.Application.Services.FileServices
             return newFile.Id;
         }
 
-        public void Update(File editedFile)
+        public void Update(File editedFile, string serverPath)
         {
             var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedFile.Id));
             if (!editedFile.FilePath.IsNullOrEmpty() && editedFile.FilePath != data.FilePath)
             {
-                if (System.IO.File.Exists(HttpContext.Current.Server.MapPath(data.FilePath)))
+                if (System.IO.File.Exists(serverPath + data.FilePath.Replace("~/", "")))
                     lock (objlock)
                     {
-                        System.IO.File.Delete(HttpContext.Current.Server.MapPath(data.FilePath));
+                        System.IO.File.Delete(serverPath + data.FilePath.Replace("~/", ""));
                     }
                 data.FilePath = editedFile.FilePath;
             }
@@ -85,21 +74,13 @@ namespace Amlakbashi.Application.Services.FileServices
             Repository.Save();
         }
 
-        public void UpdateFilePath(long id, string newFilePath)
-        {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            data.FilePath = newFilePath;
-            Repository.Update(data);
-            Repository.Save();
-        }
-
-        public void Delete(int fileId)
+        public void Delete(int fileId, string serverPath)
         {
             var file = Repository.Query(q => q.FirstOrDefault(f => f.Id == fileId));
-            if (System.IO.File.Exists(HttpContext.Current.Server.MapPath(file.FilePath)))
+            if (System.IO.File.Exists(serverPath + file.FilePath.Replace("~/", "")))
                 lock (objlock)
                 {
-                    System.IO.File.Delete(HttpContext.Current.Server.MapPath(file.FilePath));
+                    System.IO.File.Delete(serverPath + file.FilePath.Replace("~/", ""));
                 }
             Repository.Delete(fileId);
             Repository.Save();
@@ -126,6 +107,11 @@ namespace Amlakbashi.Application.Services.FileServices
         public void StopQueuedJob()
         {
             mediator.Send(new StopQueuedJobCommand());
+        }
+
+        public void SetWatermark(long fileId, string serverPath)
+        {
+            mediator.Send(new SetWatermarkCommand(fileId, serverPath));
         }
     }
 }

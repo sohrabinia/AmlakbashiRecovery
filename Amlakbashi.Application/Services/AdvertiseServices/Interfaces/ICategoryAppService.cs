@@ -45,39 +45,23 @@ namespace Amlakbashi.Application.Services.Category.Interfaces
         IList<DynamicCategory> GetProvincesForXML(bool old);
         IList<DynamicCategory> GetCitiesForXML(bool old);
         IList<DynamicCategory> GetAreasForXML(bool old);
-        IList<DynamicCategory> GetBySearchRegion(string search_string);
         DynamicCategory GetByUrl(string url);
         DynamicCategory Find(int id);
-        void GetAccRelatedCategories(Advertise acc,
-            out DynamicCategory countryDirectionCat,
-            out DynamicCategory provinceCat, out DynamicCategory cityCat,
-            out DynamicCategory areaCat, out string countryDirectionName,
-            out string provinceName, out string cityName, out string areaName);
         DynamicCategory Find(AdvertiseType type, CountryDirection countryDirection, int province, int city, int area);
-        DynamicCategory Find(string url, string areaStr);
-        DynamicCategory GetForAjaxItem(int area, int city, int province, AdvertiseType type);
         DynamicCategory GetByProvinceCity(AdvertiseType type, int province, int city);
-        DynamicCategory GetForItemAction(int regionType, AdvertiseType type, 
+        DynamicCategory GetForItemAction(int regionType, AdvertiseType type,
             CountryDirection countryDirection = CountryDirection.Unset,
             int province = 0, int city = 0, int area = 0);
         DynamicCategory GetCategoryByCountryDirectionOrRegion(AdvertiseType type, CountryDirection countryDirection,
             int regionId, Region.AdvertiseRegion regionType);
-        List<DynamicCategory> GetAccItemLinks(AdvertiseType Type = AdvertiseType.None,
-            int City = -1, int Area = -1,
-            int count = 20, IList<int> regionIds = null);
         List<DynamicCategory> GetAccItemLinks(int? province,
             int? city, int? area, AdvertiseType Type = AdvertiseType.None);
-        bool CheckMissedCategory(int switchValue, AdvertiseType type,
-            CountryDirection countryDirection = CountryDirection.Unset,
-            int province = 0, int city = 0, int area = 0);
         void Insert(DynamicCategory newCategory);
-        void InsertRange(IList<DynamicCategory> list);
         void Update(DynamicCategory editedCategory);
         void UpdateVisited(int id);
         void Delete(int id);
         IList<DynamicCategory> GetLinks(AdvertiseType Type = AdvertiseType.None, int City = -1, int Area = -1, int count = 20);
         IList<DynamicCategory> GetRelatedCategories(int id, int[] relatedRegionIds, int found_count, int count = 6);
-        string GetCategoryH1Title(int id, string provinceString, string cityString, string areaString, string countryDirectionString, bool includingMostAccCount = false);
         IList<DynamicCategory> GetListByIds(IList<int> ids);
     }
 }

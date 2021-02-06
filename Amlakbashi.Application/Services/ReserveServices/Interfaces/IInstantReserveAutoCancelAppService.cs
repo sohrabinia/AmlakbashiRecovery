@@ -10,6 +10,5 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
 {
     public interface IInstantReserveAutoCancelAppService : IAppService<InstantReserveAutoCancel, long>
     {
-        void Insert(InstantReserveAutoCancel newItem);
     }
 }

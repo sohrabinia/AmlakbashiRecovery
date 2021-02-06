@@ -317,11 +317,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return photoIds;
         }
 
-        public List<Advertise> GetAdvertisesThatHaveAlbumPhoto()
-        {
-            return Repository.Query(q => q.Where(x => x.Status == AdvertiseStatus.Published && x.Photos.Any()).ToList());
-        }
-
         public void Edit(Advertise editedAd)
         {
             var advertise = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedAd.Id));
@@ -492,6 +487,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             data.TypeID = acc.TypeID;
             data.MetaDescription = acc.MetaDescription;
             data.MetaTitle = acc.MetaTitle;
+            data.Slug = acc.Slug;
             data.Mode = acc.Mode;
             level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : (acc.OwnershipType < 1 ? 3 : 4));
             var director = new AdvertiseDirector(data, DirectorType.General);
@@ -868,9 +864,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return director;
         }
 
-        public AdvertiseDirector GetAdminForm(long id, DirectorType type, out AdvertiseType parentType)
+        public AdvertiseDirector GetAdminForm(long id, DirectorType type, out AdvertiseType parentType, out AdvertiseStatus status)
         {
             var acc = Repository.Find(id);
+            status = acc.Status;
             parentType = acc.Mode == AdvertiseMode.Child ? acc.Parent.TypeID : acc.TypeID;
             var director = new AdvertiseDirector(acc, type);
             return director;
@@ -920,9 +917,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
         public AdvertiseDirector SubmitAdminForm(Advertise data, out Dictionary<string, string> errors,
             out List<string> groupErrors, bool forceSave, DirectorType type, int currentUserId,
-            out AdvertiseType parentType, string rootPath = null)
+            out AdvertiseType parentType, out AdvertiseStatus status, string rootPath = null)
         {
             var acc = Repository.Find(data.Id);
+            status = acc.Status;
             var shallowData = acc.ShallowCopy();
             data.Mode = acc.Mode;
             if (acc.Mode != AdvertiseMode.Child)

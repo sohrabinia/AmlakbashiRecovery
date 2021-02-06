@@ -17,10 +17,5 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public OccupiedTableAppService(IRepository<OccupiedTable, long> repository, ICacheManager<OccupiedTable> cache) : base(repository, cache)
         {
         }
-
-        public IList<OccupiedTable> GetByAccId(long accId, DateTime fromDate)
-        {
-            return Repository.Query(q => q.Where(w => w.AdvertiseID == accId && w.Date >= fromDate).ToList());
-        }
     }
 }
