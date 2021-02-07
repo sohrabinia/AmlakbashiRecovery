@@ -19,10 +19,13 @@ namespace Amlakbashi.Host
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                })
-            .UseServiceProviderFactory(new AutofacServiceProviderFactory());
+                }).ConfigureLogging(logging =>
+                {
+                    logging.AddLog4Net("log4net.config");
+                });
     }
 }

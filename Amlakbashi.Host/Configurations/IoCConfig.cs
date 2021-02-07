@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Application.Services;
 using Autofac;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,8 @@ namespace Amlakbashi.Host.Configurations
             //    typeof(AutoMapperModule).Assembly));
             //builder.RegisterType<MediatorHangfireBridge>()
             //    .As<IMediatorHangfireBridge>();
+
+            builder.Register(c => LogManager.GetLogger("Default"));
         }
     }
 }
