@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using System;
 using static Amlakbashi.Core.Entities.ActionLog;
 
 namespace Amlakbashi.Mediator.Commands.AdvertiseCommands
@@ -19,7 +20,7 @@ namespace Amlakbashi.Mediator.Commands.AdvertiseCommands
             this.toDate = toDate;
             this.actionSource = actionSource;
             this.doerUserId = doerUserId;
-            this.count = count;
+            this.count = Math.Max(count, 1);
         }
     }
 }
