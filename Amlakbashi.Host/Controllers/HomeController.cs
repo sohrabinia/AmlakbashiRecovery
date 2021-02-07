@@ -1,4 +1,7 @@
-﻿using Amlakbashi.Host.Models;
+﻿using Amlakbashi.Application.Services;
+using Amlakbashi.Application.Services.UserServices.Interfaces;
+using Amlakbashi.Host.Models;
+using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,16 +14,18 @@ namespace Amlakbashi.Host.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        //private readonly ILogger<HomeController> _logger;
+        private readonly ILog logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILog logger)
         {
-            _logger = logger;
+            this.logger = logger;
         }
 
         public IActionResult Index()
         {
-            return View();
+            logger.Info("log4net config test");
+            return View("Index", "test");
         }
 
         public IActionResult Privacy()

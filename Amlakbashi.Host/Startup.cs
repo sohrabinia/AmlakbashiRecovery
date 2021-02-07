@@ -1,3 +1,6 @@
+
+using Amlakbashi.Host.Configurations;
+using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -36,6 +39,7 @@ namespace Amlakbashi.Host
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -48,6 +52,11 @@ namespace Amlakbashi.Host
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            IoCConfig.Config(builder);
         }
     }
 }
