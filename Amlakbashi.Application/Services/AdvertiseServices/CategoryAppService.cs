@@ -312,7 +312,7 @@ namespace Amlakbashi.Application.Services.Category
                 }
                 var today = DateTime.Now.Date;
                 advertises = advertises.Where(w => w.DiscountTables.Any(
-                    a => a.To >= today && a.Percent > 2));
+                    a => a.To > today && a.Percent > 2));
             }
             //filter by empty accommodation in date range
             if ((!string.IsNullOrEmpty(empty_range_from) &&

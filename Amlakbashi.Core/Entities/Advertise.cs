@@ -323,7 +323,7 @@ namespace Amlakbashi.Core.Entities
         {
             var today = DateTime.Now.Date;
             var discounts = DiscountTables.Where(w => w.Percent > 2 &&
-                w.To >= today);
+                w.To > today);
             if (discounts.Any() == false)
             {
                 return new DiscountDTO()
