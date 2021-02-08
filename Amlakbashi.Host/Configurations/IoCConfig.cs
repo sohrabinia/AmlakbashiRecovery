@@ -1,4 +1,8 @@
 ﻿using Amlakbashi.Application.Services;
+using Amlakbashi.Host.Hubs.Admin;
+using Amlakbashi.Host.Hubs.Admin.HubServers;
+using Amlakbashi.Host.Hubs.Dashboard.HubServers;
+using Amlakbashi.Host.Hubs.Portal.HubServers;
 using Autofac;
 using log4net;
 using System;
@@ -26,6 +30,12 @@ namespace Amlakbashi.Host.Configurations
             //    typeof(AutoMapperModule).Assembly));
             //builder.RegisterType<MediatorHangfireBridge>()
             //    .As<IMediatorHangfireBridge>();
+
+            //hub servers registration
+            builder.RegisterType<ReserveAdminHubServer>().As<IReserveAdminHubServer>();
+            builder.RegisterType<SupportChatAdminHubServer>().As<IReserveAdminHubServer>();
+            builder.RegisterType<ReserveDashboardHubServer>().As<IReserveDashboardHubServer>();
+            builder.RegisterType<PortalHubServer>().As<IPortalHubServer>();
 
             builder.Register(c => LogManager.GetLogger("Default"));
         }
