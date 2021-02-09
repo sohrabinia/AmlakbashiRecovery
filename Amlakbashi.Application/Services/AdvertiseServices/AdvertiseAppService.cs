@@ -37,22 +37,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
     internal class AdvertiseAppService : AppServiceBase<Advertise, long>, IAdvertiseAppService
     {
         private readonly IPriceCalculator priceCalculator;
-        private readonly ISettingManager settings;
         private readonly IMediator mediator;
-        private readonly IMapper mapper;
-        private readonly IUserContactFacade userContact;
-        private readonly ILog logger;
         public AdvertiseAppService(IRepository<Advertise, long> repository,
-            IMediator mediator, IMapper mapper, ISettingManager settings,
-            ICacheManager<Advertise> cache, IPriceCalculator priceCalculator,
-            IUserContactFacade userContact, ILog logger) : base(repository, cache)
+            IMediator mediator, ICacheManager<Advertise> cache,
+            IPriceCalculator priceCalculator) : base(repository, cache)
         {
             this.mediator = mediator;
             this.priceCalculator = priceCalculator;
-            this.mapper = mapper;
-            this.settings = settings;
-            this.userContact = userContact;
-            this.logger = logger;
         }
 
         public IQueryable<Advertise> GetAllAsIQueriable()
@@ -453,6 +444,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 }
                 else if (data.TypeID == acc.TypeID || ((int)acc.Status > 4 && !acc.Childs.Any()))
                 {
+                    if (acc.Status == AdvertiseStatus.NotVerified)
+                    {
+                        acc.Status = AdvertiseStatus.ReadyToPublish;
+                    }
                     director.Submit(ref acc);
                     Repository.Update(acc);
                     Repository.Save();
@@ -532,7 +527,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     case AdvertiseStatus.NotCompleted:
                         break;
                     default:
-                        if (hasImportantChange)
+                        if (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified)
                         {
                             acc.Status = AdvertiseStatus.ReadyToPublish;
                             mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, prevStatus));
@@ -601,7 +596,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         }
                         break;
                     default:
-                        if (hasImportantChange)
+                        if (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified)
                         {
                             acc.Status = AdvertiseStatus.ReadyToPublish;
                             mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, prevStatus));
@@ -678,7 +673,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     else
                     {
                         var parentPrevStatus = parent.Status;
-                        parent.Status = director.HasImpotantChange(oldChild) ? AdvertiseStatus.ReadyToPublish : parent.Status;
+                        parent.Status = director.HasImpotantChange(oldChild) || oldChild.Status == AdvertiseStatus.NotVerified ?
+                            AdvertiseStatus.ReadyToPublish : parent.Status;
                         Repository.Update(parent);
                         mediator.Publish(new ChangeAdvertiseStatusEvent(parent.Id, parentPrevStatus));
                         mediator.Publish(new ChangeAdvertiseActiveEvent(oldParent, parent));
@@ -798,7 +794,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     else
                     {
                         var parentPrevStatus = parent.Status;
-                        parent.Status = director.HasImpotantChange(oldChild) ? AdvertiseStatus.ReadyToPublish : parent.Status;
+                        parent.Status = director.HasImpotantChange(oldChild) || oldChild.Status == AdvertiseStatus.NotVerified ?
+                            AdvertiseStatus.ReadyToPublish : parent.Status;
                         Repository.Update(parent);
                         mediator.Publish(new ChangeAdvertiseStatusEvent(parent.Id, parentPrevStatus));
                         mediator.Publish(new ChangeAdvertiseActiveEvent(oldParent, parent));
@@ -1027,7 +1024,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 child.unixNorouzMinRequestDate = dateUnix;
             }
-            if (dateUnix > 0)
+            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady && dateUnix > 0)
                 acc.Status = (int)AdvertiseStatus.ReadyToPublish;
             Repository.Update(acc);
             Repository.Save();
@@ -1057,7 +1054,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Save();
             mediator.Publish(new ChangeAdvertiseStatusEvent(id, (AdvertiseStatus)prevAcc.Status));
             mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
-            mediator.Publish(new AdvertiseUpdateEvent(prevAcc, acc, actionSource, doerUserId));           
+            mediator.Publish(new AdvertiseUpdateEvent(prevAcc, acc, actionSource, doerUserId));
         }
 
         public void Suspend(long id)
@@ -1356,7 +1353,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.LastModifyDate = DateTime.Now;
             var director = new AdvertiseDirector(acc, DirectorType.Extra);
             var hasImportantChange = director.HasImpotantChange(shallowAcc);
-            if (hasImportantChange)
+            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
+                (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified))
             {
                 acc.Status = AdvertiseStatus.ReadyToPublish;
             }
@@ -1432,7 +1430,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             var director = new AdvertiseDirector(acc, DirectorType.General);
             var hasImportantChange = director.HasImpotantChange(shallowAcc);
-            if (hasImportantChange)
+            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
+                (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified))
             {
                 acc.Status = AdvertiseStatus.ReadyToPublish;
             }
@@ -1487,7 +1486,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             PropertyCopier<AddressPart, Advertise>.Copy(addressPart, acc);
             var director = new AdvertiseDirector(acc, DirectorType.General);
             var hasImportantChange = director.HasImpotantChange(shallowAcc);
-            if (hasImportantChange)
+            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
+                (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified))
             {
                 acc.Status = AdvertiseStatus.ReadyToPublish;
             }
@@ -1528,7 +1528,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             PropertyCopier<RulesPart, Advertise>.Copy(part, acc);
             var director = new AdvertiseDirector(acc, DirectorType.Extra);
             var hasImportantChange = director.HasImpotantChange(shallowAcc);
-            if (hasImportantChange)
+            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
+                (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified))
             {
                 acc.Status = AdvertiseStatus.ReadyToPublish;
             }
@@ -1577,7 +1578,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             ApiSpecificDTO.CopyToAdvertise(editedData, acc);
             var director = new AdvertiseDirector(acc, DirectorType.General);
             var hasImportantChange = director.HasImpotantChange(shallowAcc);
-            if (hasImportantChange)
+            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
+                (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified))
             {
                 acc.Status = AdvertiseStatus.ReadyToPublish;
             }
@@ -1676,7 +1678,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var advertises = Repository.Query(q => q);
             advertises = advertises.Where(x => x.TypeID == (AdvertiseType)type_id &&
-            x.Status == AdvertiseStatus.Published && x.Available && x.Count == 0 && !x.HideInCategory);
+                x.Status == AdvertiseStatus.Published && x.Available && x.Count == 0 && !x.HideInCategory);
             return advertises.OrderByDescending(x => x.AdvertiseScore).Take(count).ToList();
         }
 
@@ -2054,6 +2056,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             string endDate, int guestCount, bool instantReserve, out string msg,
             out long reserveId)
         {
+            if (guestCount < 1)
+            {
+                msg = "لطفا تعداد مهمان را وارد کنید";
+                reserveId = 0;
+                return false;
+            }
             if (startDate == endDate)
             {
                 msg = "تاریخ ورود و خروج نمیتوانند یکی باشند";

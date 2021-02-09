@@ -109,7 +109,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var today = DateTime.Now.Date;
             IQueryable<DiscountTable> discounts = Repository.Query(q => q.Include(i => i.Advertise));
             discounts = discounts.Where(x => x.Percent > 4 &&
-                x.To >= today && x.Advertise.Available &&
+                x.To > today && x.Advertise.Available &&
                 x.Advertise.Status ==
                 Advertise.AdvertiseStatus.Published &&
                 x.Advertise.HideInCategory == false &&

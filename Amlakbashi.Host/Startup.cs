@@ -42,6 +42,14 @@ namespace Amlakbashi.Host
         // called by the runtime before the ConfigureContainer method, below.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Added for session state
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(2);
+            });
+
             services.AddHangfire(configuration => configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
             .UseSimpleAssemblyNameTypeSerializer()
             .UseRecommendedSerializerSettings()
@@ -87,6 +95,8 @@ namespace Amlakbashi.Host
 
             app.UseRouting();
 
+            app.UseSession();
+
             app.UseAuthorization();
 
             backgroundStartup.Startup();
@@ -96,17 +106,8 @@ namespace Amlakbashi.Host
                 Credential = GoogleCredential.FromFile(env.ContentRootPath + "/amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json")
             });
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-                endpoints.MapHub<PortalHub>("/PortalHub");
-                endpoints.MapHub<ReserveAdminHub>("/ReserveAdminHub");
-                endpoints.MapHub<SupportChatAdminHub>("/SupportChatAdminHub");
-                endpoints.MapHub<ReserveDashboardHub>("/ReserveDashboardHub");
-            });
+            UrlRewriteConfig.Config(app);
+            app.UseEndpoints(endpoints => RouteConfig.Config(endpoints));
 
             // If, for some reason, you need a reference to the built container, you
             // can use the convenience extension method GetAutofacRoot.
