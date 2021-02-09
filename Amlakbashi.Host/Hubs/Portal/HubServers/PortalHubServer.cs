@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Hubs.Portal.HubServers
 {
-    public class PortalHubServer
+    public class PortalHubServer : IPortalHubServer
     {
         private readonly IHubContext<PortalHub> hubContext;
         public PortalHubServer(IHubContext<PortalHub> hubContext)

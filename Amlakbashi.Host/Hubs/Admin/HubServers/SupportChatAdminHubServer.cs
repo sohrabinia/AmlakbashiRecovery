@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Portal.Hubs.Admin;
 
 namespace Amlakbashi.Host.Hubs.Admin.HubServers
 {
-    public class SupportChatAdminHubServer
+    public class SupportChatAdminHubServer : ISupportChatAdminHubServer
     {
         private readonly IHubContext<SupportChatAdminHub> hubContext;
         public SupportChatAdminHubServer(IHubContext<SupportChatAdminHub> hubContext)

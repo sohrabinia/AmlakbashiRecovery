@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Hubs.Portal.HubServers
 {
-    interface IPortalHubServer
+    public interface IPortalHubServer
     {
-        void ReloadSupportChat(long supportChatId, int newCount, int userId);
+        void ReloadSupportChatFromServer(long supportChatId, int newCount, int userId);
     }
 }

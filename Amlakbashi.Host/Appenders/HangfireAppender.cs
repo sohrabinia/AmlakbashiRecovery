@@ -11,7 +11,7 @@ namespace Amlakbashi.Host.Appenders
     {
         private const string filePrefix = "Logs/HangfireLogs/HangfireLog-";
         private readonly string fileName;
-        public HangfireAppender(IWebHostEnvironment host)
+        public HangfireAppender()
         {
             var rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location.Substring(0, Assembly.GetEntryAssembly().Location.IndexOf("bin\\")));
             var now = DateTime.Now;
