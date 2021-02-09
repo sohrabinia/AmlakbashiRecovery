@@ -1,6 +1,14 @@
-
+using Amlakbashi.Application;
 using Amlakbashi.Host.Configurations;
+using Amlakbashi.Host.Hubs.Admin;
+using Amlakbashi.Host.Hubs.Dashboard;
+using Amlakbashi.Host.Hubs.Portal;
 using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,21 +23,56 @@ namespace Amlakbashi.Host
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IWebHostEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+               .SetBasePath(env.ContentRootPath)
+               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+               .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+               .AddEnvironmentVariables();
+                Configuration = builder.Build();
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfigurationRoot Configuration { get; private set; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        public ILifetimeScope AutofacContainer { get; private set; }
+
+
+        // ConfigureServices is where you register dependencies. This gets
+        // called by the runtime before the ConfigureContainer method, below.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHangfire(configuration => configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseSqlServerStorage(Configuration.GetConnectionString("JobDb"), new SqlServerStorageOptions
+            {
+                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                QueuePollInterval = TimeSpan.Zero,
+                UseRecommendedIsolationLevel = true,
+                DisableGlobalLocks = true
+            }));
+            services.AddHangfireServer();
+
             services.AddControllersWithViews();
+            services.AddSignalR();
+        }
+
+        // ConfigureContainer is where you can register things directly
+        // with Autofac. This runs after ConfigureServices so the things
+        // here will override registrations made in ConfigureServices.
+        // Don't build the container; that gets done for you by the factory.
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            // Register your own things directly with Autofac here. Don't
+            // call builder.Populate(), that happens in AutofacServiceProviderFactory
+            // for you.
+            IoCConfig.Config(builder);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, BackgroundStartup backgroundStartup)
         {
             if (env.IsDevelopment())
             {
@@ -46,17 +89,35 @@ namespace Amlakbashi.Host
 
             app.UseAuthorization();
 
+            backgroundStartup.Startup();
+
+            FirebaseApp.Create(new AppOptions()
+            {
+                Credential = GoogleCredential.FromFile(env.ContentRootPath + "/amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json")
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-            });
-        }
 
-        public void ConfigureContainer(ContainerBuilder builder)
-        {
-            IoCConfig.Config(builder);
+                endpoints.MapHub<PortalHub>("/PortalHub");
+                endpoints.MapHub<ReserveAdminHub>("/ReserveAdminHub");
+                endpoints.MapHub<SupportChatAdminHub>("/SupportChatAdminHub");
+                endpoints.MapHub<ReserveDashboardHub>("/ReserveDashboardHub");
+            });
+
+            // If, for some reason, you need a reference to the built container, you
+            // can use the convenience extension method GetAutofacRoot.
+            AutofacContainer = app.ApplicationServices.GetAutofacRoot();
+
+            // hangfire
+            GlobalConfiguration.Configuration.UseAutofacActivator(AutofacContainer)
+                .UseSerializerSettings(new Newtonsoft.Json.JsonSerializerSettings
+                {
+                    TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects
+                });
         }
     }
 }

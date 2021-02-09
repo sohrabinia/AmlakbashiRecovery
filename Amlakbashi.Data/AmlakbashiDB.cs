@@ -3,7 +3,7 @@ using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Configuration;
+using Microsoft.Extensions.Configuration;
 using System.Linq;
 
 namespace Amlakbashi.Data
@@ -46,9 +46,16 @@ namespace Amlakbashi.Data
         public DbSet<InstantReserveAutoCancel> InstantReserveAutoCancels{ get; set; }
         public DbSet<ReserveSendSms> ReserveSendSms{ get; set; }
 
+        private readonly IConfiguration configuration;
+
+        public AmlakbashiDB(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["AmlakbashiDB"].ConnectionString);
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("AmlakbashiDB"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -12,7 +12,7 @@ namespace Amlakbashi.Data
         {
             builder.RegisterType<AmlakbashiDB>()
                 .As<IDbContext>()
-                .InstancePerBackgroundJob(MatchingScopeLifetimeTags.RequestLifetimeScopeTag);
+                .InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(GenericRepository<,>))
                 .As(typeof(IRepository<,>))
                 .InstancePerLifetimeScope();
