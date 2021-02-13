@@ -33,7 +33,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using Amlakbashi.Host.Extensions;
 
-namespace Portal.Controllers
+namespace Amlakbashi.Host.Controllers
 {
     public class PostController : BaseController
     {

@@ -29,7 +29,7 @@ using Microsoft.AspNetCore.Mvc;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Hosting;
 
-namespace Portal.Controllers
+namespace Amlakbashi.Host.Controllers
 {
     public class AccomodationController : BaseController
     {
