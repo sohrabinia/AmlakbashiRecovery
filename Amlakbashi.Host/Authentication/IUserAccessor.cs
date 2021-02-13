@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Authentication
 {
-    interface IUserAccessor
+    public interface IUserAccessor
     {
         User CurrentUser { get; }
         User DoerUser { get; }

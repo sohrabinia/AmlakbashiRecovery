@@ -11,6 +11,7 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -63,6 +64,7 @@ namespace Amlakbashi.Host
             }));
             services.AddHangfireServer();
 
+            services.AddResponseCaching();
             services.AddControllersWithViews();
             services.AddSignalR();
         }
@@ -92,19 +94,10 @@ namespace Amlakbashi.Host
             }
 
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseSession();
-
             app.UseAuthorization();
-
-            backgroundStartup.Startup();
-
-            FirebaseApp.Create(new AppOptions()
-            {
-                Credential = GoogleCredential.FromFile(env.ContentRootPath + "/amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json")
-            });
+            app.UseResponseCaching();
 
             UrlRewriteConfig.Config(app);
             app.UseEndpoints(endpoints => RouteConfig.Config(endpoints));
@@ -119,6 +112,13 @@ namespace Amlakbashi.Host
                 {
                     TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects
                 });
+
+            backgroundStartup.Startup();
+
+            FirebaseApp.Create(new AppOptions()
+            {
+                Credential = GoogleCredential.FromFile(env.ContentRootPath + "/amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json")
+            });
         }
     }
 }

@@ -286,12 +286,13 @@ namespace Amlakbashi.Application.Services.Category
             //filter by price
             int frompaypernight_int = 0;
             int topaypernight_int = 0;
-            if ((!string.IsNullOrEmpty(frompaypernight) &&
+            var hasFromPrice = (!string.IsNullOrEmpty(frompaypernight) &&
                 int.TryParse(frompaypernight, out frompaypernight_int) &&
-                frompaypernight_int > 0) ||
-                (!string.IsNullOrEmpty(topaypernight) &&
+                frompaypernight_int > 0);
+            var hasToPrice = !string.IsNullOrEmpty(topaypernight) &&
                 int.TryParse(topaypernight, out topaypernight_int) &&
-                topaypernight_int > 0))
+                topaypernight_int > 0;
+            if (hasFromPrice || hasToPrice)
             {
                 if (!Childrenincluded)
                 {
