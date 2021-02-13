@@ -22,10 +22,11 @@ namespace Amlakbashi.Host.Controllers
             this.logger = logger;
         }
 
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
         public IActionResult Index()
         {
             logger.Info("log4net config test");
-            return View("Index", "test");
+            return View("Index", DateTime.Now.ToString());
         }
 
         public IActionResult Privacy()
