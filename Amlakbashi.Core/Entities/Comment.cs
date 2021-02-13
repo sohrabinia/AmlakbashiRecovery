@@ -27,8 +27,6 @@ namespace Amlakbashi.Core.Entities
         public int Likes { get; set; }
         public int Dislikes { get; set; }
         public long? HostReplyId { get; set; }
-        [ForeignKey("HostReplyId")]
-        public Comment HostReply { get; set; }
         public int? OperatorID { get; set; }
         public bool IsDeleted { get; set; }
 
@@ -46,6 +44,9 @@ namespace Amlakbashi.Core.Entities
 
         [ForeignKey("ParentID")]
         public virtual Comment Parent { get; set; }
+
+        [ForeignKey("HostReplyId")]
+        public virtual Comment HostReply { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<Comment> Childs { get; set; }

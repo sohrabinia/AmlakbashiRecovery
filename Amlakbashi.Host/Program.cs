@@ -25,11 +25,11 @@ namespace Amlakbashi.Host
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddLog4Net("log4net.config");
                 });
-                //.ConfigureLogging(logging =>
-                //{
-                //    logging.AddLog4Net("log4net.config");
-                //});
         }
     }
 }
