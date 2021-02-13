@@ -5,6 +5,7 @@ using Amlakbashi.Core.Common.Localization;
 using Amlakbashi.Core.Common.Mapping;
 using Amlakbashi.Core.Infrastructure.PriceHelpers;
 using Amlakbashi.Core.Infrastructure.PriceHelpers.Interfaces;
+using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Amlakbashi.Host.Hubs.Dashboard.HubServers;
 using Amlakbashi.Host.Hubs.Portal.HubServers;
@@ -12,6 +13,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Hangfire;
 using log4net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,9 @@ namespace Amlakbashi.Host.Configurations
     {
         public static void Config(ContainerBuilder builder)
         {
+            // log4net
+            builder.Register(c => LogManager.GetLogger("Default"));
+
             builder.RegisterGeneric(typeof(CacheManager<>)).
                 As(typeof(ICacheManager<>));
             builder.RegisterType(typeof(Localization)).
@@ -45,8 +50,14 @@ namespace Amlakbashi.Host.Configurations
             builder.RegisterType<ReserveDashboardHubServer>().As<IReserveDashboardHubServer>();
             builder.RegisterType<PortalHubServer>().As<IPortalHubServer>();
 
-            // log4net
-            builder.Register(c => LogManager.GetLogger("Default"));
+            //http context accessor
+            builder.RegisterType<HttpContextAccessor>()
+                .As<IHttpContextAccessor>()
+                .SingleInstance();
+
+            //user accessor
+            builder.RegisterType<UserAccessor>()
+                .As<IUserAccessor>();
         }
     }
 }
