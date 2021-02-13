@@ -68,6 +68,13 @@ namespace Amlakbashi.Data
                     entityType.AddSoftDeleteQueryFilter();
                 }
             }
+
+            modelBuilder.Entity<Comment>(entity =>
+            {
+                entity.HasOne(x => x.Parent)
+                    .WithMany(x => x.Childs)
+                    .HasForeignKey(x => x.ParentID);
+            });
         }
     }
 }
