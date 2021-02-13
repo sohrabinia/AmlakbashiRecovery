@@ -10,9 +10,13 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations
         public static void Config(IEndpointRouteBuilder endpointRouteBuilder)
         {
             DefaultControllerRoutes.Config(endpointRouteBuilder);
-            FileControllerRoutes.Config(endpointRouteBuilder);
+            AccomodationControllerRoutes.Config(endpointRouteBuilder);
             AdminControllerRoutes.Config(endpointRouteBuilder);
+            AdvertiseControllerRoutes.Config(endpointRouteBuilder);
+            CategoryControllerRoutes.Config(endpointRouteBuilder);
+            FileControllerRoutes.Config(endpointRouteBuilder);
             PostControllerRoutes.Config(endpointRouteBuilder);
+            XmlControllerRoutes.Config(endpointRouteBuilder);
         }
     }
 }
