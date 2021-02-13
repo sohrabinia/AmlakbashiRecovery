@@ -1,5 +1,4 @@
-﻿using Amlakbashi.Core.Common.Entity;
-using Amlakbashi.Core.Common.Utilities;
+﻿using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
 using Newtonsoft.Json;
 using System;
@@ -193,6 +192,7 @@ namespace Amlakbashi.Core.Entities
             return (Advertise)this.MemberwiseClone();
         }
 
+        [NotMapped]
         [JsonIgnore]
         public bool IsActive
         {
@@ -203,6 +203,7 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
+        [NotMapped]
         [JsonIgnore]
         public Advertise ParentOrSelf
         {
@@ -212,6 +213,7 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
+        [NotMapped]
         [JsonIgnore]
         public bool AnyChildrenOrSelfIsEmpty
         {
@@ -235,6 +237,7 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
+        [NotMapped]
         [JsonIgnore]
         public IEnumerable<Reserve> SuccessfullReserves
         {
@@ -262,6 +265,7 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
+        [NotMapped]
         [JsonIgnore]
         public IEnumerable<Reserve> AcceptedReserveRequests
         {
@@ -285,6 +289,7 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
+        [NotMapped]
         [JsonIgnore]
         public IEnumerable<Comment> PublishedComments
         {
@@ -296,6 +301,7 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
+        [NotMapped]
         [JsonIgnore]
         public Dictionary<int, List<ReportItem>> UserRatingDict
         {

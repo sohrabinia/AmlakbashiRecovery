@@ -25,6 +25,10 @@ namespace Amlakbashi.Core.Entities
         [InverseProperty("Photos")]
         public virtual ICollection<Advertise> Advertises { get; set; }
 
+        [JsonIgnore]
+        [InverseProperty(nameof(Advertise.MainPhoto))]
+        public virtual ICollection<Advertise> MainPhotos { get; set; }
+
         public MinifyStatusEnum MinifyStatus
         {
             get
