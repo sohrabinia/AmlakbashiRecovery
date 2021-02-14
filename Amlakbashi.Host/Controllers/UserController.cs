@@ -1,0 +1,1528 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Net;
+using System.Net.Mail;
+using Amlakbashi.Application.Services.UserServices.Interfaces;
+using Amlakbashi.Core.Entities;
+using Entities = Amlakbashi.Core.Entities;
+using log4net;
+using Amlakbashi.Core.Common.Utilities;
+using static Amlakbashi.Core.Entities.Advertise;
+using Amlakbashi.Accounting;
+using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
+using Amlakbashi.Core.Infrastructure.UserContact;
+using Amlakbashi.Core.DTOs.UserDTOs;
+using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
+using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Host.Controllers.Base;
+using Amlakbashi.Host.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using Amlakbashi.Host.Extensions;
+using X.PagedList;
+using Microsoft.AspNetCore.Http;
+
+namespace Amlakbashi.Host.Controllers
+{
+    public class UserController : BaseController
+    {
+        private readonly ILog logger;
+        private readonly IBankCardAppService bankCardService;
+        private readonly IUserAppService userService;
+        private readonly IAccountingFacade accounting;
+        private readonly IUserContactFacade userContact;
+        private readonly IAdvertiseAppService advertiseService;
+        private readonly IUserAccessor userAccessor;
+        public UserController(IUserAppService userService,
+            IBankCardAppService bankCardService,
+            IAccountingFacade accounting,
+            IUserContactFacade userContact,
+            IAdvertiseAppService advertiseService,
+            IUserAccessor userAccessor,
+            ILog logger)
+        {
+            this.userService = userService;
+            this.bankCardService = bankCardService;
+            this.accounting = accounting;
+            this.userContact = userContact;
+            this.advertiseService = advertiseService;
+            this.logger = logger;
+            this.userAccessor = userAccessor;
+        }
+
+        [Auth(UserRoles.Admin)]
+        public ActionResult Impersonate(int userId, string url)
+        {
+            if (HttpContext.Session.GetObjectFromJson<User>("impersonateUser") != null)
+            {
+                return Redirect("/errors/accessdenied");
+            }
+            var user = userService.Find(userId, true);
+            if (user.AccessType == 2)
+            {
+                return Redirect("/errors/accessdenied");
+            }
+            var admin = userAccessor.CurrentUser;
+            if (TempRoles.AdminMobiles.Contains(PhoneUtility.InternationalNumberToLocal(user.MainMobile)))
+            {
+                return Redirect("/errors/accessdenied");
+            }
+            HttpContext.Session.SetObjectAsJson("impersonateUser", user);
+            HttpContext.Session.SetObjectAsJson("impersonateAdmin", admin);
+            logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
+                user.FullName + "(" + user.Id + ").");
+
+            if (!string.IsNullOrEmpty(url))
+            {
+                return Redirect(url);
+            }
+            return Redirect("/dashboard");
+        }
+
+        public ActionResult ImpersonateLogout()
+        {
+            HttpContext.Session.Clear();
+            return Redirect("/user/index");
+        }
+
+        #region [ admin ]
+
+        [Auth(UserRoles.Admin)]
+        public ActionResult Admin()
+        {
+            return View();
+        }
+
+        [Auth(UserRoles.Admin)]
+        public ActionResult Index(int? page, string uname = "", int photo = -1,
+            string username = "", string mobile = "", int code = -1, int ownership = -1, int sort_order = -1,
+            int mobile_status = -1, int status = -1, int advertise_count = -1,
+            int complete_profile_status = -1, int complete_profile_contact_status = -1,
+            int user_general_type = -1, int access_type = -1,
+            int userFilterType = -1, int card_status = -1, string minReserveNorouzFromDate = "",
+            string Province = "-1", string City = "-1", string Area = "-1",
+            string advertiseId = "-1")
+        {
+            try
+            {
+                IQueryable<User> model = userService.GetAllAsIQueryable();
+                if (code > 0)
+                    model = model.Where(u => u.Id == code);
+
+                if (photo > -1)
+                    model = model.Where(u => u.PhotoStatus == photo);
+
+                if (ownership > -1)
+                    model = model.Where(u => u.OwnerShip == ownership);
+
+                if (!string.IsNullOrEmpty(username))
+                {
+                    if (username.Substring(0, 1) == "0")
+                    {
+                        username = username.Remove(0, 1);
+                        username = username.Insert(0, "+98 ");
+                    }
+                }
+                if (!string.IsNullOrEmpty(mobile))
+                {
+                    if (mobile.Substring(0, 1) == "0")
+                    {
+                        mobile = mobile.Remove(0, 1);
+                        mobile = mobile.Insert(0, "+98 ");
+                    }
+                }
+                if (!string.IsNullOrEmpty(uname))
+                    model = model.Where(u => (u.FName + " " + u.LName).Contains(uname));
+
+                if (!string.IsNullOrEmpty(username))
+                    model = model.Where(u => u.MainMobile.Contains(username));
+
+                if (!string.IsNullOrEmpty(mobile))
+                    model = model.Where(u => u.Mobile != null && u.Mobile.Contains(mobile));
+                if (mobile_status == 0)
+                {
+                    var regex = new Regex(@"\d{10}");
+                    var filtered_user_ids = new List<int>();
+                    foreach (var item in model)
+                    {
+                        //if (String.IsNullOrEmpty(item.Mobile) || item.Mobile.Length != 11 ||
+                        //    !regex.IsMatch(item.Mobile) || !item.Mobile.StartsWith("09"))
+                        if (!PhoneUtility.ValidateInternationalNumber(item.GetPhoneNumber(Amlakbashi.Core.Entities.User.PhoneType.MainMobile))
+                            || !PhoneUtility.ValidateInternationalNumber(item.GetPhoneNumber(Amlakbashi.Core.Entities.User.PhoneType.OtherMobile1)))
+                        {
+                            filtered_user_ids.Add(item.Id);
+                        }
+                    }
+
+                    model = model.Where(u => filtered_user_ids.Contains(u.Id));
+
+                }
+                if (status != -1)
+                {
+                    model = model.Where(x => x.State == status);
+                }
+                if (userFilterType > -1)
+                {
+                    switch ((Entities.User.UserFilterType)userFilterType)
+                    {
+                        case Entities.User.UserFilterType.Guest:
+                            model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest);
+                            break;
+                        case Entities.User.UserFilterType.ActiveHost:
+                            model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Host);
+                            IQueryable<Advertise> allAdvertises = advertiseService.GetAllAsIQueriable();
+                            var userIds = allAdvertises.Where(x => x.Status == AdvertiseStatus.Published).Select(x => x.UserID).Distinct().ToList();
+                            model = model.Where(x => userIds.Contains(x.Id));
+                            break;
+                        case Entities.User.UserFilterType.Host:
+                            model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Host);
+                            break;
+                        case Entities.User.UserFilterType.Staff:
+                            var staffMobiles = TempRoles.AdminMobiles.Select(
+                                s => PhoneUtility.LocalNumberToInternational(s, 98)).ToList();
+                            model = model.Where(x => staffMobiles.Contains(x.MainMobile));
+                            break;
+                        case Entities.User.UserFilterType.InstantReserveRequest:
+                            model = model.Where(x => x.InstantReserveAccess == Amlakbashi.Core.Entities.User.InstantReserveAccessEnum.Requested);
+                            break;
+                        case Entities.User.UserFilterType.InstantReserveAllow:
+                            model = model.Where(x => x.InstantReserveAccess == Amlakbashi.Core.Entities.User.InstantReserveAccessEnum.Verified);
+                            break;
+                        case Entities.User.UserFilterType.PhotoChangeRequest:
+                            model = model.Where(x => x.PhotoStatus == (int)Entities.User.UserPhotoState.ready_publish);
+                            break;
+                    }
+                }
+                if (access_type != -1)
+                {
+                    model = model.Where(x => x.AccessType == access_type);
+                }
+                if (user_general_type != -1)
+                {
+                    model = model.Where(x => x.UserGeneralType == user_general_type);
+                }
+                if (complete_profile_contact_status != -1)
+                {
+                    if (complete_profile_contact_status == 0)
+                    {
+                        model = model.Where(x => string.IsNullOrEmpty(x.ContactPhone) || x.ContactPhone == "0");
+                    }
+                    else
+                    {
+                        model = model.Where(x => !string.IsNullOrEmpty(x.ContactPhone) && x.ContactPhone == complete_profile_contact_status.ToString());
+                    }
+                }
+                if (complete_profile_status != -1)
+                {
+                    if (complete_profile_status == 0)
+                    {
+                        model = model.Where(x => string.IsNullOrEmpty(x.FName) ||
+                                                 string.IsNullOrEmpty(x.LName) ||
+                                                 string.IsNullOrEmpty(x.ThirdPersonTell));
+                    }
+                    else if (complete_profile_status == 1)
+                    {
+                        model = model.Where(x => !string.IsNullOrEmpty(x.FName) &&
+                         !string.IsNullOrEmpty(x.LName) &&
+                         !string.IsNullOrEmpty(x.ThirdPersonTell));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(minReserveNorouzFromDate))
+                {
+                    var gregorianDate = DateTimeUtility.PersianDateToGregorian(
+                        StringUtility.PersianNumberToEnglish(minReserveNorouzFromDate).Replace('/', ','));
+                    var unixDate = DateTimeUtility.DateValueOfJS(gregorianDate);
+                    IQueryable<Advertise> advertises = advertiseService.GetAllAsIQueriable();
+                    advertises = advertises.Where(x => x.Status != AdvertiseStatus.Deleted);
+                    advertises = advertises.Where(x => x.unixNorouzMinRequestDate >= unixDate);
+                    var userIds = advertises.Select(x => x.UserID).Distinct().ToList();
+                    model = model.Where(x => userIds.Contains(x.Id));
+                }
+
+                var province = int.Parse(Province);
+                var city = int.Parse(City);
+                var area = int.Parse(Area);
+
+                if (area > -1 || city > -1 || province > -1)
+                {
+                    model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Host);
+                    var adminMobiles = TempRoles.AdminMobiles.Select(s => PhoneUtility.LocalNumberToInternational(s, 98)).ToList();
+                    model = model.Where(x => !adminMobiles.Contains(x.MainMobile));
+                    if (area > -1)
+                    {
+                        model = model.Where(w => w.Advertises.Any(
+                            wa => wa.Status != AdvertiseStatus.Deleted &&
+                            wa.Area == area));
+                    }
+                    else if (city > -1)
+                    {
+                        model = model.Where(w => w.Advertises.Any(
+                            wa => wa.Status != AdvertiseStatus.Deleted &&
+                            wa.City == city));
+                    }
+                    else if (province > -1)
+                    {
+                        model = model.Where(w => w.Advertises.Any(
+                            wa => wa.Status != AdvertiseStatus.Deleted &&
+                            wa.Province == province));
+                    }
+                }
+
+                if (card_status > -1)
+                {
+                    IQueryable<BankCard> bankCards = bankCardService.GetAll();
+
+                    if (card_status == 0) //shaba
+                    {
+                        var userIds = bankCards.Where(w => w.ShabaNumber != null && w.ShabaNumber != "")
+                            .Select(s => s.UserID).ToList();
+                        model = model.Where(w => userIds.Contains(w.Id));
+                    }
+                    else if (card_status == 1) // bank card
+                    {
+                        var userIds = bankCards.Where(w => (w.ShabaNumber == null || w.ShabaNumber == "") &&
+                            (w.BankCardNumber != null && w.BankCardNumber != ""))
+                            .Select(s => s.UserID).ToList();
+                        model = model.Where(w => userIds.Contains(w.Id));
+                    }
+                    else if (card_status == 2) // none
+                    {
+                        var userIds = bankCards.Where(w => (w.ShabaNumber != null && w.ShabaNumber != "") ||
+                            (w.BankCardNumber != null && w.BankCardNumber != ""))
+                            .Select(s => s.UserID).ToList();
+                        model = model.Where(w => !userIds.Contains(w.Id));
+                    }
+                }
+
+                var accId = long.Parse(advertiseId);
+
+                if (accId > 0)
+                {
+                    var advertise = advertiseService.Find(accId);
+                    model = model.Where(x => x.Id == advertise.UserID);
+                }
+
+                if (advertise_count > 2)
+                {
+                    model = model.Where(w => w.Advertises.Count > 2);
+                }
+                else if (advertise_count > -1)
+                {
+                    model = model.Where(w => w.Advertises.Count == advertise_count);
+                }
+
+                model = model.OrderByDescending(u => u.UserScore);
+                if (sort_order == 0)//By Advertise Count
+                {                    
+                    model = model.OrderByDescending(u => u.Advertises.Count);
+                }
+                else if (sort_order == 1)//By User Credit
+                {
+                    model = model.OrderByDescending(u => u.Credit);
+                }
+                else if (sort_order == 2)//By No Response Reserves
+                {
+                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
+                        r.HostResponse == 0));
+                }
+                else if (sort_order == 3)//By Rejected Reserves
+                {
+                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
+                        r.Status == 0));
+                }
+                else if (sort_order == 4)//By Rejected For Home Full
+                {
+                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
+                        (int)r.HostResponse == 4));
+                }
+                else if (sort_order == 5)//By Reserved
+                {
+                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
+                        (int)r.Status >= 5 && (int)r.Status <= 8));
+                }
+                else if (sort_order == 6)//By Canceled Reserves
+                {
+                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
+                        (int)r.Status >= 10 && (int)r.Status <= 12));
+                }
+
+                if (mobile_status == 1)
+                {
+                    var user_list = userService.GetAll();
+                    List<int> filtered_user_ids = new List<int>();
+                    foreach (var item in model)
+                    {
+                        if (user_list.Any(u => u.Mobile == item.Mobile && u.Id != item.Id))
+                            filtered_user_ids.Add(item.Id);
+                    }
+                    model = model.Where(x => filtered_user_ids.Contains(x.Id)).
+                        OrderBy(u => u.Mobile);
+                }
+
+                var PageNumber = page ?? 1;
+                var onePageOfModel = model.ToPagedList(PageNumber, 10);
+
+                UserIndexDTO userListDTO = new UserIndexDTO()
+                {
+                    Code = code,
+                    Mobile = mobile,
+                    Uname = uname,
+                    Photo = photo,
+                    Username = username,
+                    Ownership = ownership,
+                    SortOrder = sort_order,
+                    MobileStatus = mobile_status,
+                    Status = status,
+                    AdvertiseCount = advertise_count,
+                    CompleteProfileStatus = complete_profile_status,
+                    CompleteProfileContactStatus = complete_profile_contact_status,
+                    AccessType = access_type,
+                    UserGeneralType = user_general_type,
+                    Province = province,
+                    City = city,
+                    Area = area,
+                    AdvertiseId = accId,
+                    UserFilterType = (Entities.User.UserFilterType)userFilterType,
+                    CardStatus = card_status,
+                    MinReserveNorouzFromDate = minReserveNorouzFromDate,
+                    RowIndexStart = (PageNumber * 10) - 10,
+                    UserItems = new List<UserIndexItemDTO>()
+                };
+
+                foreach (var item in onePageOfModel)
+                {
+                    UserIndexItemDTO itemDTO = new UserIndexItemDTO()
+                    {
+                        User = item,
+                        BankCard = bankCardService.GetByUserId(item.Id),
+                        InstantReserveCancel = advertiseService.GetInstantReserveCancelCount(item.Id)
+                    };
+                    userListDTO.UserItems.Add(itemDTO);
+                }
+                ViewBag.dto = userListDTO;
+                return View(onePageOfModel);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.Index", exc);
+                return Redirect(Request.Headers["referer"].ToString());
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        [HttpGet]
+        public ActionResult Edit(int uid = -1)
+        {
+            try
+            {
+                ViewBag.msg = TempData["msg"];
+                if (uid == -1)
+                {
+                    User objUser = new User();
+                    objUser.Id = -1;
+                    return View(objUser);
+                }
+                else
+                {
+                    var model = userService.Find(uid);
+                    return View(model);
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return Redirect(Request.Headers["referer"].ToString());
+            }
+        }
+
+        [Auth]
+        [HttpPost]
+        public ActionResult Edit(User user)
+        {
+            try
+            {
+                if (
+                    (!string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.MainMobile)) && !PhoneUtility.ValidateInternationalNumber(user.GetPhoneNumber(Entities.User.PhoneType.MainMobile))) ||
+                    (!string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile1)) && !PhoneUtility.ValidateInternationalNumber(user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile1))) ||
+                    (!string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile2)) && !PhoneUtility.ValidateInternationalNumber(user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile2))) ||
+                    (!string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.LandLine)) && !PhoneUtility.ValidateInternationalNumber(user.GetPhoneNumber(Entities.User.PhoneType.LandLine))) ||
+                    (!string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.ThirdPerson)) && !PhoneUtility.ValidateInternationalNumber(user.GetPhoneNumber(Entities.User.PhoneType.ThirdPerson)))
+                    )
+                {
+                    TempData["msg"] = "شماره تلفن باید با کد کشوری باشد. مثال: +98 9102222222 .";
+                    return Redirect(Request.Headers["referer"].ToString());
+                }
+                if (user.Id == -1)
+                {
+                    if (string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.MainMobile)))
+                    {
+                        TempData["msg"] = "لطفا نام کاربری را وارد کنید .";
+                        return RedirectToAction("Edit");
+                    }
+                    var userdb = userService.GetByMainMobile(user.MainMobile);
+                    if (userdb != null)
+                    {
+                        TempData["msg"] = "این نام کاربری قبلا انتخاب شده است، لطفا نام کاربری دیگری انتخاب کنید .";
+                        return RedirectToAction("Edit");
+                    }
+                }
+                if (user.Id == -1)
+                {
+                    user.CreateDate = DateTime.Now;
+                    user.State = (int)Entities.User.UserState.InActived;
+                    userService.Insert(user, userAccessor.DoerUser.Id);
+                }
+                else
+                {
+                    List<string> errors;
+                    userService.Update((UserDTO)user, userAccessor.DoerUser.Id, false, ActionLog.ActionSourceEnum.AdminPanel, out errors, user.CancelInstantReserveLimit);
+                }
+                return RedirectToAction("Index");
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.Edit(post)", exc);
+                return Redirect(Request.Headers["referer"].ToString());
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult Delete(int uid)
+        {
+            try
+            {
+                userService.Delete(uid, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new { status = 1, val = "" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.Delete", exc);
+                return GenerateJsonResult(new { status = 0, val = "" });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult ChangeUserStatus(int uid, bool status)
+        {
+            try
+            {
+                userService.UpdateState(uid, status, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new { status = 1, val = "" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0, val = "" });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult changeCompleteProfileContactStatus(int uid, bool status)
+        {
+            try
+            {
+                userService.UpdateContactPhone(uid, status);
+                return GenerateJsonResult(new { status = 1, val = "" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0, val = "" });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult PhotoPublish(int uid)
+        {
+            try
+            {
+                userService.UpdatePhotoStatus(uid, Entities.User.UserPhotoState.publish, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new { status = 1, val = "" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0, val = "" });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult PhotoDisapprove(int uid)
+        {
+            try
+            {
+                userService.UpdatePhotoStatus(uid, Entities.User.UserPhotoState.not_verified, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new { status = 1, val = "" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0, val = "" });
+            }
+        }
+
+        #endregion
+
+        #region [ Login ]
+
+        [HttpGet]
+        public ActionResult MobileLogin(string returnUrl = "/dashboard",
+            string presentorCode = "")
+        {
+            if (!string.IsNullOrEmpty(presentorCode))
+            {
+                try
+                {
+                    var presentor = userService.Find(int.Parse(presentorCode));
+                    ViewBag.presentorCode = presentorCode;
+                    ViewBag.presentor = presentor;
+                }
+                catch { }
+            }
+            ViewBag.returnUrl = returnUrl;
+            ViewBag.msg = TempData["msg"];
+            return View();
+        }
+
+        public ActionResult P(string c)
+        {
+            return Redirect("/user/mobilelogin?returnrl=/&presentorcode=" + c);
+        }
+
+        public JsonResult PopupLogin(string mobile = null, string email = null,
+            string step = "mobile", bool send_verification = true)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(mobile))
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "شماره موبایل اجباری میباشد" });
+                }
+                var international_mobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                var number_is_for_iran = PhoneUtility.IsNumberForIran(international_mobile);
+                if (!number_is_for_iran)
+                {
+                    if (step == "mobile")
+                    {
+                        return GenerateJsonResult(new { status = 4 });
+                    }
+                    if (string.IsNullOrEmpty(email))
+                    {
+                        return GenerateJsonResult(new { status = 0, msg = "ایمیل اجباری میباشد" });
+                    }
+                }
+                var isEmail = !number_is_for_iran;
+                User user;
+                bool banned = false;
+                if (isEmail)
+                {
+                    if (!EmailUtility.ValidateEmail(email))
+                    {
+                        return GenerateJsonResult(new { status = 0, msg = "آدرس ایمیل نامعتبر است" });
+                    }
+
+                    banned = false;
+                    user = userService.GetActivatedUserByEmail(email);
+                    if (user == null)
+                    {
+                        user = userService.GetByEmail(email);
+                        if (user == null)
+                        {
+                            user = new User();
+                            user.Mobile = mobile;
+                            if (!string.IsNullOrEmpty(email))
+                            {
+                                user.Email = email;
+                            }
+                            user.MainMobile = mobile;
+                            user.CreateDate = DateTime.Now;
+                            user.ResponseFrom = 2;
+                            user.ResponseTo = 2;
+                            user.AmlakbashiScore = 1000;
+                            userService.Insert(user);
+                        }
+                        user.State = (int)Entities.User.UserState.InActived;
+                        userService.UpdateState(user.Id, false);
+                    }
+
+                    if (user.CreateDate == null)
+                    {
+                        user.CreateDate = DateTime.Now;
+                        userService.UpdateCreateDate(user.Id, DateTime.Now);
+                    }
+
+                    if (user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
+                    {
+                        banned = true;
+                    }
+                    if (!banned)
+                    {
+                        if (send_verification)
+                        {
+                            user = userService.GetByEmail(email);
+                            user.ForgetCode = HashUtility.GetMd5Hash(email + "@li#$%S0hR@b!");
+                            string strbody = "<div style='direction:rtl;text-align:right;'><div>برای تایید ایمیل خود و ورود به سایت املاک باشی روی لینک زیر کلیک کیند .</div><a style='display:block;' href='activation'>activation</a></div>";
+                            string strlink = GeneralData.WebsiteUrl + "/user/verifyemail/?activactioncode=" + user.Id + "_" + user.ForgetCode;
+                            strbody = strbody.Replace("activation", strlink);
+
+                            try
+                            {
+                                EmailUtility.SendEmail(EmailSenderDepartment.Verification,
+                                new List<string>() { email },
+                                "تایید ایمیل ثبت نام",
+                                strbody
+                                );
+                            }
+                            catch (Exception exc)
+                            {
+                                logger.Error("", exc);
+                                return GenerateJsonResult(new { status = 0,
+                                    msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message });
+                            }
+                            user.SendVerification = DateTime.Now;
+                            userService.UpdateForgetCode(user.Id, user.ForgetCode);
+                            userService.UpdateSendVerification(user.Id, DateTime.Now);
+                        }
+                    }
+                    user = userService.GetByEmail(email);
+                }
+                else
+                {
+                    if (!PhoneUtility.ValidateInternationalNumber(international_mobile))
+                    {
+                        return GenerateJsonResult(new { status = 0,
+                            msg = "شماره موبایل اشتباه است" });
+                    }
+                    string failReason;
+                    bool loginDone = false;
+
+                    banned = false;
+                    user = userService.GetActivatedUserByMainMobile(international_mobile);
+                    if (user == null)
+                    {
+                        user = userService.GetByMainMobile(international_mobile);
+                        if (user == null)
+                        {
+                            user = new User();
+                            user.Mobile = international_mobile;
+                            if (!string.IsNullOrEmpty(email))
+                            {
+                                user.Email = email;
+                            }
+                            user.MainMobile = international_mobile;
+                            user.CreateDate = DateTime.Now;
+                            user.ResponseFrom = 2;
+                            user.ResponseTo = 2;
+                            user.FName = null;
+                            user.LName = null;
+                            user.AmlakbashiScore = 1000;
+                            userService.Insert(user);
+                            failReason = null;
+                            user = userService.GetByMainMobile(international_mobile);
+                        }
+                        userService.UpdateState(user.Id, false);
+                    }
+
+                    if (user.CreateDate == null)
+                    {
+                        userService.UpdateCreateDate(user.Id, DateTime.Now);
+                    }
+
+                    if (user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
+                    {
+                        banned = true;
+                        failReason = null;
+                        loginDone = true;
+                    }
+
+                    if (send_verification)
+                    {
+                        var code = new Random().Next(1111, 9999).ToString();
+                        userService.SendVerificationSms(PhoneUtility.InternationalNumberToLocal(international_mobile), code);
+                        user.Code = code;
+                        user.SendVerification = DateTime.Now;
+                        userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                        loginDone = true;
+                    }
+                    failReason = null;
+
+                    if (!loginDone)
+                    {
+                        return GenerateJsonResult(new { status = 0, msg = failReason });
+                    }
+                }
+                if (banned)
+                {
+                    return GenerateJsonResult(new { status = 2 });
+                }
+                var user_fname = "";
+                var user_lname = "";
+                if (user != null)
+                {
+                    if (!string.IsNullOrEmpty(user.FName))
+                    {
+                        user_fname = user.FName;
+                    }
+                    if (!string.IsNullOrEmpty(user.LName))
+                    {
+                        user_lname = user.LName;
+                    }
+                }
+                ViewBag.mobile = mobile;
+                if (!TempData.ContainsKey("mobile"))
+                    TempData.Add("mobile", mobile);
+
+                if (string.IsNullOrEmpty(HttpContext.Session.GetString("mobile")))
+                    HttpContext.Session.SetString("mobile", mobile);
+
+                ViewBag.msg = TempData["msg"];
+                ViewBag.mobile = HttpContext.Session.GetString("mobile");
+                if (isEmail)
+                {
+                    return GenerateJsonResult(new { status = 3, email = email });
+                }
+                else
+                {
+                    return GenerateJsonResult(new { status = 1, fname = user_fname,
+                        lname = user_lname, mobile = mobile,
+                        isNew = user.State == (int)Entities.User.UserState.InActived });
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message });
+            }
+        }
+
+        public ActionResult ResendSms(string returnUrl)
+        {
+            HttpContext.Session.Remove("mobile");
+            return RedirectToAction("MobileLogin", new { returnUrl = returnUrl });
+        }
+
+        public JsonResult PopupResendSms()
+        {
+            HttpContext.Session.Remove("mobile");
+            ViewBag.msg = TempData["msg"];
+            return GenerateJsonResult(new { status = 1 });
+        }
+
+        public JsonResult PopupResendEmail(string email)
+        {
+            var user = userService.GetByEmail(email);
+            user.ForgetCode = HashUtility.GetMd5Hash(email + "@li#$%S0hR@b!");
+            string strbody = "<div style='direction:rtl;text-align:right;'><div>برای تایید ایمیل خود و ورود به سایت املاک باشی روی لینک زیر کلیک کیند .</div><a style='display:block;' href='activation'>activation</a></div>";
+            string strlink = GeneralData.WebsiteUrl + "/user/verifyemail/?activactioncode=" + user.Id + "_" + user.ForgetCode;
+            strbody = strbody.Replace("activation", strlink);
+
+            try
+            {
+                EmailUtility.SendEmail(EmailSenderDepartment.Verification,
+                new List<string>() { email },
+                "تایید ایمیل ثبت نام",
+                strbody
+                );
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message });
+            }
+
+            user.SendVerification = DateTime.Now;
+            userService.UpdateForgetCode(user.Id, user.ForgetCode);
+            userService.UpdateSendVerification(user.Id, DateTime.Now);
+            ViewBag.msg = TempData["msg"];
+            return GenerateJsonResult(new { status = 1 });
+        }
+
+        public JsonResult PopupSendSmsAgain(string mobile)
+        {
+            try
+            {
+                var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                if (!PhoneUtility.ValidateInternationalNumber(mobile_international))
+                {
+                    return GenerateJsonResult(new { status = 0,
+                        msg = "شماره موبایل وارد شده صحیح نمی باشد" });
+                }
+                if (!PhoneUtility.IsNumberForIran(mobile_international))
+                {
+                    return GenerateJsonResult(new { status = 0,
+                        msg = "ارسال پیامک فقط برای کاربران داخل ایران امکان پذیر است" });
+                }
+                var user = userService.GetActivatedUserByMainMobile(mobile_international);
+                if (user == null)
+                    user = userService.GetByMainMobile(mobile_international);
+                var local_number = PhoneUtility.InternationalNumberToLocal(mobile_international);
+                userService.SendVerificationSms(local_number, user.Code);
+                ViewBag.msg = TempData["msg"];
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
+            }
+        }
+
+        public JsonResult PopupVerifyCode(string mobile, string code)
+        {
+            try
+            {
+                var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                var user = userService.GetActivatedUserByMainMobile(mobile_international);
+                if (user == null)
+                {
+                    user = userService.GetByMainMobile(mobile_international);
+                }
+                var correct = user != null && code == user.Code;
+                return GenerateJsonResult(new { status = 1, correct = correct });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        public JsonResult PopupLoginVerification(string mobile, string code, string fname = null, string lname = null, string presentorCode = "")
+        {
+            try
+            {
+                var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                int user_id;
+                string errorMsg;
+                bool verify = userService.VerifyLogin(mobile_international, code, out user_id, presentorCode, out errorMsg);
+                if (verify)
+                {
+                    var user = userService.GetByMainMobile(mobile_international);
+                    if (user != null)
+                    {
+                        user.SetLoginPriority(Entities.User.LoginPriorites.Mobile);
+                        userService.UpdateLoginPriority(user.Id, Entities.User.LoginPriorites.Mobile);
+                        if (!string.IsNullOrEmpty(fname))
+                        {
+                            if (user.State != (int)Entities.User.UserState.Acticved &&
+                                StringUtility.ContainsNumber(fname))
+                            {
+                                return GenerateJsonResult(new { status = 0,
+                                    msg = "نام نمیتواند شامل عدد باشد" });
+                            }
+                            userService.UpdateFName(user_id, fname);
+                        }
+                        else
+                        {
+                            return GenerateJsonResult(new { status = 0,
+                                msg = "لطفا نام خود را وارد کنید" });
+                        }
+                        if (!string.IsNullOrEmpty(lname))
+                        {
+                            if (user.State != (int)Entities.User.UserState.Acticved &&
+                                StringUtility.ContainsNumber(lname))
+                            {
+                                return GenerateJsonResult(new { status = 0,
+                                    msg = "نام خانوادگی نمیتواند شامل عدد باشد" });
+                            }
+                            userService.UpdateLName(user_id, lname);
+                        }
+                        else
+                        {
+                            return GenerateJsonResult(new { status = 0,
+                                msg = "لطفا نام خانوادگی خود را وارد کنید" });
+                        }
+                    }
+                }
+                else
+                {
+                    return GenerateJsonResult(new { status = 0, msg = errorMsg });
+                }
+                string str = PhoneUtility.InternationalNumberToLocal(mobile_international);
+                FormsAuthentication.SetAuthCookie(str, true);
+                //Session["SGUID"] = Guid.NewGuid();
+                //Session["UID"] = user_id;
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        public ActionResult VerifyEmail(string activactioncode)
+        {
+            int user_id = 0;
+            bool verify = false;
+            try
+            {
+                if (string.IsNullOrEmpty(activactioncode))
+                {
+                    verify = false;
+                }
+                else
+                {
+                    int id = int.Parse(activactioncode.Substring(0, activactioncode.IndexOf('_')));
+                    string ac = activactioncode.Substring(activactioncode.IndexOf('_') + 1);
+                    var user = userService.Find(id);
+                    if (user == null || user.ForgetCode != ac)
+                    {
+                        user_id = 0;
+                    }
+                    if (user.State != (int)Entities.User.UserState.Acticved)
+                        user.AmlakbashiScore = 1000;
+                    user.State = (int)Entities.User.UserState.Acticved;
+                    userService.UpdateState(user.Id, true);
+                    user_id = user.Id;
+                    verify = true;
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                user_id = 0;
+            }
+            if (verify)
+            {
+                var user = userService.Find(user_id);
+                userService.UpdateLoginPriority(user_id, Entities.User.LoginPriorites.Email);
+                FormsAuthentication.SetAuthCookie(user.Email, true);
+                TempData["MessageShowOnReady"] = "ثبت نام شما با موفقیت انجام شد";
+                return Redirect("/");
+            }
+            else
+            {
+                return Redirect("/errors/http404");
+            }
+        }
+
+        [HttpGet]
+        public ActionResult PublicLogin(string returnUrl = "/dashboard")
+        {
+            ViewBag.returnUrl = returnUrl;
+            ViewBag.msg = TempData["msg"];
+            return RedirectToAction("MobileLogin", new { returnUrl = returnUrl });
+        }
+
+        public ActionResult Signout()
+        {
+            HttpContext.Session.SetString("mobile", null);
+            FormsAuthentication.SignOut();
+            HttpContext.Session.Clear();
+            return Redirect("/");
+        }
+
+        public ActionResult LogOff()
+        {
+            HttpContext.Session.SetString("mobile", null);
+            FormsAuthentication.SignOut();
+            HttpContext.Session.Clear();
+            return Redirect("/");
+        }
+
+        // ???
+        public JsonResult EditProfileMessageShown()
+        {
+            HttpContext.Session.SetBool("EditProfileMessageConfirmed", true);
+            return GenerateJsonResult(new { status = 1 });
+        }
+
+        [HttpGet]
+        [Auth]
+        public ActionResult UserCreditManager()
+        {
+            var user = userAccessor.CurrentUser;
+            ViewBag.Credit = user.Credit;
+            ViewBag.UserID = user.Id;
+            var model = accounting.GetCreditListByUserId(user.Id);
+            return View(model);
+        }
+
+        public ActionResult ContactUserPopup(int user_id)
+        {
+            return PartialView("_UserContact", userService.Find(user_id));
+        }
+
+        #endregion
+
+        [Auth]
+        public JsonResult IncreaseCredit(long price, long? reserveId = null,
+            long couponId = 0, long prizePrice = 0, long reservePrice = 0)
+        {
+            try
+            {
+                var payment = new Payment()
+                {
+                    UserID = userAccessor.CurrentUser.Id,
+                    Date = DateTime.Now,
+                    TotalPrice = price * 10,
+                    ReserveID = reserveId,
+                    CouponID = couponId,
+                    PrizePrice = prizePrice,
+                    ReservePrice = reservePrice,
+                    ProductType = reserveId != null ? Entities.User.CreditTransactionType.Credit_Inc_Then_Res.ToString() :
+                        Entities.User.CreditTransactionType.Credit_Increase.ToString()
+                };
+                accounting.InsertPayment(payment);
+                return GenerateJsonResult(new { status = 1, pid = payment.Id });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0, pid = 0 });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult AdminIncreaseCredit(int user_id, long amount, string transaction_cause, long transaction_id, bool send_sms = false)
+        {
+            try
+            {
+                if (userAccessor.CurrentUser.Id != 1667 &&
+                    userAccessor.CurrentUser.Id != 3 &&
+                    userAccessor.CurrentUser.Id != 12 &&
+                    userAccessor.CurrentUser.Id != 2122 &&
+                    userAccessor.CurrentUser.Id != 19076)
+                {
+                    return GenerateJsonResult(new { status = 0,
+                        msg = "شما مجوز انجام این کار را ندارید" );
+                }
+                if (user_id < 1)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "نام کاربری اشتباه است" });
+                }
+                if (amount < 1)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "لطفا مبلغ را وارد کنید" );
+                }
+                if (transaction_id < 1 && string.IsNullOrEmpty(transaction_cause))
+                {
+                    return GenerateJsonResult(new {
+                        status = 0,
+                        msg = "لطفا یکی از فیلدهای دلیل افزودن مبلغ و شماره تراکنش را پر کنید" });
+                }
+                var cause = string.IsNullOrEmpty(transaction_cause) ? Entities.User.CreditTransactionCause.Charge : Entities.User.CreditTransactionCause.Other;
+                long newCredit;
+                var creditTransactionId = accounting.IncreaseCredit(user_id, amount, transaction_id, 0,
+                    cause, out newCredit, transaction_cause, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
+
+                var price_string = string.Format("{0:n0}", amount) + " تومان";
+                var new_credit_string = string.Format("{0:n0}", newCredit) + " تومان";
+                if (send_sms)
+                {                   
+                    var user = userService.Find(user_id);
+                    userService.SendMessage(new UserContactDTO()
+                    {
+                        UserLoginPriority = user.LoginPriority,
+                        UserMainMobile = user.MainMobile,
+                        UserAppNotificationToken = user.AppNotificationToken,
+                        UserEmail = user.Email,
+                        UserFcmAppNotificationToken = user.FcmAppNotificationToken,
+                        UserNotificationToken = user.NotificationToken,
+                        Type = UserContactType.UserCreditIncrease,
+                        TransactionId = creditTransactionId.ToString(),
+                        Price = amount.ToString(),
+                        CauseString = Entities.User.GetCreditTransactionCauseString((int)cause, transaction_cause)
+                    });
+                }
+                return GenerateJsonResult(new {
+                    status = 1,
+                    msg = "مبلغ " + price_string + " اضافه شد",
+                    new_credit = new_credit_string });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.AdminIncreaseCredit", exc);
+                return GenerateJsonResult(new { status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد" });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult AdminDecreaseCredit(int user_id, long amount, string transaction_cause, long transaction_id, bool send_sms = false)
+        {
+            try
+            {
+                if (userAccessor.CurrentUser.Id != 1667 &&
+                    userAccessor.CurrentUser.Id != 3 &&
+                    userAccessor.CurrentUser.Id != 12 &&
+                    userAccessor.CurrentUser.Id != 2122 &&
+                    userAccessor.CurrentUser.Id != 19076)
+                {
+                    return GenerateJsonResult(new { status = 0,
+                        msg = "شما مجوز انجام این کار را ندارید" });
+                }
+                if (user_id < 1)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "نام کاربری اشتباه است" });
+                }
+                if (amount < 1)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "لطفا مبلغ را وارد کنید" });
+                }
+                if (string.IsNullOrEmpty(transaction_cause))
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "لطفا دلیل کسر مبلغ را وارد کنید" });
+                }
+                var cause = Entities.User.CreditTransactionCause.Other;
+                long newCredit;
+                var creditTransactionId = accounting.DecreaseCredit(user_id,
+                    amount, transaction_id, 0, out newCredit, cause, transaction_cause, 0,
+                    userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
+                var price_string = string.Format("{0:n0}", amount) + " تومان";
+                var new_credit_string = string.Format("{0:n0}", newCredit) + " تومان";
+                if (send_sms)
+                {
+                    var user = userService.Find(user_id);
+                    userService.SendMessage(new UserContactDTO()
+                    {
+                        UserLoginPriority = user.LoginPriority,
+                        UserMainMobile = user.MainMobile,
+                        UserAppNotificationToken = user.AppNotificationToken,
+                        UserEmail = user.Email,
+                        UserFcmAppNotificationToken = user.FcmAppNotificationToken,
+                        UserNotificationToken = user.NotificationToken,
+                        Type = UserContactType.UserCreditDecrease,
+                        TransactionId = creditTransactionId.ToString(),
+                        Price = Math.Abs(amount).ToString(),
+                        CauseString = Entities.User.GetCreditTransactionCauseString(
+                            (int)cause, transaction_cause)
+                    });
+                }
+                return GenerateJsonResult(new { status = 1,
+                    msg = "مبلغ " + price_string + " کسر شد", new_credit = new_credit_string });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" });
+            }
+        }
+
+        [Auth]
+        public JsonResult GetCurrentCredit()
+        {
+            try
+            {
+                var current_credit = userAccessor.CurrentUser.Credit;
+                return GenerateJsonResult(new { status = 1, current_credit = current_credit });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0, current_credit = 0 });
+            }
+        }
+
+        public void SetFirstVisit()
+        {
+            HttpContext.Session.SetBool("first_visit", true);
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult GetAllPhoneNumbers(int user_id)
+        {
+            var user = userService.Find(user_id);
+            var main_mobile = PhoneUtility.NormalizePhoneNumber(
+                user.GetPhoneNumber(Entities.User.PhoneType.MainMobile));
+            var mobile_1 = PhoneUtility.NormalizePhoneNumber(
+                user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile1));
+            var mobile_2 = PhoneUtility.NormalizePhoneNumber(
+                user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile2));
+            var land_line = PhoneUtility.NormalizePhoneNumber(
+                user.GetPhoneNumber(Entities.User.PhoneType.LandLine));
+            var third_person = PhoneUtility.NormalizePhoneNumber(
+                user.GetPhoneNumber(Entities.User.PhoneType.ThirdPerson));
+            var full_name = user.FullName;
+            if (string.IsNullOrEmpty(full_name))
+            {
+                full_name = "ثبت نشده";
+            }
+            return GenerateJsonResult(new {
+                status = 1,
+                main_mobile = main_mobile,
+                mobile_1 = mobile_1,
+                mobile_2 = mobile_2,
+                land_line = land_line,
+                third_person = third_person,
+                full_name = full_name
+            });
+        }
+
+        [Auth(UserRoles.Admin)]
+        public void SendTestEmail()
+        {
+            try
+            {
+                var message = new MailMessage();
+                message.To.Add(new MailAddress("rasoul.shahhoseini@gmail.com"));
+                message.From = new MailAddress("verification@amlakbashi.com");
+                message.Subject = "Amlakbashi Email Verification";
+                message.Body = "Please verify the Email you've entered.";
+                message.IsBodyHtml = false;
+
+                using (var smtp = new SmtpClient())
+                {
+                    var credential = new NetworkCredential
+                    {
+                        UserName = "administrator",  // replace with valid value
+                        Password = "@li#$%S0hR@b!@N98(8(0(*"  // replace with valid value
+                    };
+                    smtp.Credentials = credential;
+                    smtp.Host = "mail.amlakbashi.com";
+                    smtp.Port = 25;
+                    smtp.EnableSsl = false;
+                    smtp.Send(message);
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+            }
+        }
+
+        public JsonResult IsUserAuthenticated()
+        {
+            var impersonatedUser = HttpContext.Session.GetObjectFromJson<User>("impersonateUser");
+            return GenerateJsonResult(new {
+                val = User.Identity.IsAuthenticated,
+                impersonateData = new { state = impersonatedUser != null,
+                    fullName = impersonatedUser != null ? impersonatedUser.FullName : "" }
+            });
+        }
+
+        public JsonResult IsUserLoginBanned()
+        {
+            return GenerateJsonResult(
+                new {
+                    val = userAccessor.CurrentUser.AccessType ==
+                        (int)Entities.User.AccessTypeEnum.LoginBanned,
+                    user_id = userAccessor.CurrentUser.Id
+                });
+        }
+
+        public JsonResult LogoutAjax()
+        {
+            try
+            {
+                HttpContext.Session.SetString("mobile", null);
+                FormsAuthentication.SignOut();
+                HttpContext.Session.Clear();
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Auth]
+        public JsonResult UpdateUserNotificationToken(string token)
+        {
+            try
+            {
+                userService.UpdateUserNotificationToken(userAccessor.CurrentUser.Id, token);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Auth]
+        public JsonResult SetPermissionRequestDate(long ticks)
+        {
+            try
+            {
+                userService.UpdateLastNotifPermetionTicks(userAccessor.CurrentUser.Id, ticks);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Auth]
+        public JsonResult GetPermissionRequestDate()
+        {
+            try
+            {
+                long ticks = userAccessor.CurrentUser.LastNotifPermitionTicks;
+                return GenerateJsonResult(new { status = 1, ticks = ticks });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public void TestAppNotification(string target_action = "", string target_id = "0")
+        {
+            try
+            {
+                var user = userService.Find(1667);
+                userService.SendNotificationApplication(user.FcmAppNotificationToken, "Test Title", "Test Body",
+                    target_action, target_id);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+            }
+        }
+
+        [Auth]
+        public JsonResult FetchUserId()
+        {
+            return GenerateJsonResult(new { status = 1, userId = userAccessor.CurrentUser.Id });
+        }
+
+        public ActionResult GetLoginPopup()
+        {
+            return PartialView("_LoginPopup");
+        }
+
+        [Auth(UserRoles.Admin)]
+        public ActionResult GetInstantReserveAccs(int userid)
+        {
+            var model = advertiseService.GetInstantReserveAdvertisesByUserId(userid, InstantReserveStatusEnum.Requested);
+            var childrenIds = new List<long>();
+
+            var allParents = model.Where(x => x.Childs.Any());
+            foreach (var parent in allParents)
+            {
+                childrenIds.AddRange(parent.Childs.Select(x => x.Id));
+            }
+            model = model.Where(x => !childrenIds.Contains(x.Id)).ToList();
+            ViewBag.userid = userid;
+            return PartialView("_InstantReserveConfirm", model);
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult ConfirmInstantReserve(long id)
+        {
+            try
+            {
+                var advertise = advertiseService.Find(id);
+                advertiseService.UpdateInstantReserveStatus(advertise.UserID, InstantReserveStatusEnum.None, true);
+                advertiseService.UpdateInstantReserveStatus(id, InstantReserveStatusEnum.Confirmed, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
+                userService.UpdateInstantReserveAccess(advertise.UserID, Entities.User.InstantReserveAccessEnum.Verified, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.ConfirmInstantReserve", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult ConfirmAllInstantReserves(long userid)
+        {
+            try
+            {
+                var user = userService.Find((int)userid);
+                advertiseService.UpdateInstantReserveStatus((int)userid, InstantReserveStatusEnum.Confirmed, true);
+                userService.UpdateInstantReserveAccess(user.Id, Entities.User.InstantReserveAccessEnum.Verified, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.ConfirmAllInstantReserves", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult CancellAllInstantReserves(long userid)
+        {
+            try
+            {
+                var user = userService.Find((int)userid);
+                advertiseService.UpdateInstantReserveStatus((int)userid, InstantReserveStatusEnum.None, true);
+                userService.UpdateInstantReserveAccess(user.Id, Entities.User.InstantReserveAccessEnum.None, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.CancellAllInstantReserves", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult IncreasePrizeCreditCustom(int id, long amount, string title)
+        {
+            try
+            {
+                if (id < 1)
+                {
+                    return GenerateJsonResult(new { status = 0,
+                        msg = "کد کاربر انتخاب نشده است" });
+                }
+                if (amount < 1)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "لطفا مبلغ را وارد کنید" });
+                }
+                if (string.IsNullOrEmpty(title))
+                {
+                    return GenerateJsonResult(new { status = 0,
+                        msg = "لطفا دلیل شارژ کیف هدیه را وارد کنید" });
+                }
+                accounting.IncreasePrizeCredit(id, amount,
+                    PrizeCreditTransaction.PrizeTransactionType.Custom,
+                    0, title, userAccessor.CurrentUser.Id,
+                    ActionLog.ActionSourceEnum.AdminPanel);
+                return GenerateJsonResult(new { status = 1,
+                    msg = "کیف هدیه کد کاربر " + id + " مبلغ " + amount +
+                    " به دلیل " + title + " شارژ شد." });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد" });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult LoginUserDirectly(int id)
+        {
+            try
+            {
+                var targetUser = userService.Find(id);
+                if (TempRoles.AdminMobiles.Select(s => PhoneUtility.LocalNumberToInternational(s, 98)).Contains(targetUser.MainMobile))
+                {
+                    return GenerateJsonResult(new { status = 0,
+                        msg = "کاربر مورد نظر جزو کارکنان است و امکان ورود از طرف کارکنان وجود ندارد" });
+                }
+                var token = HashUtility.GetMd5Hash(id + "#li#$%S0hR@b!@ml@kb@$h!");
+                userService.UpdateLoginCode(id, token);
+                return GenerateJsonResult(new { status = 1, token = token });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد" });
+            }
+        }
+
+    }
+}
+

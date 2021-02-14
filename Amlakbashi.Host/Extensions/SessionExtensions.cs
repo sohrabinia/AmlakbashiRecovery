@@ -15,5 +15,16 @@ namespace Amlakbashi.Host.Extensions
             var value = session.GetString(key);
             return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value);
         }
+
+        public static void SetBool(this ISession session, string key, bool value)
+        {
+            session.SetInt32(key, value ? 1 : 0);
+        }
+
+        public static bool GetBool(this ISession session, string key)
+        {
+            var value = session.GetInt32(key);
+            return value != null && value == 1; 
+        }
     }
 }
