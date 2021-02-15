@@ -2266,7 +2266,7 @@ namespace Amlakbashi.Host.Controllers
             }
             bool needMsg;
             advertiseService.RequestInstantReserve(id, ignoreMsg, userId,
-                userAccessor.DoerUser.Id, ActionLogController.ActionSourceEnum.WebsiteDashboard,
+                userAccessor.DoerUser.Id, ActionLog.ActionSourceEnum.WebsiteDashboard,
                 userAccessor.CurrentUser.InstantReserveAccess, out needMsg);
             acc = advertiseService.Find(id);
             InstantReserveRequestResultDTO result;
@@ -2321,7 +2321,7 @@ namespace Amlakbashi.Host.Controllers
                 });
             }
             advertiseService.CancelInstantReserve(id, userId, userAccessor.DoerUser.Id,
-                ActionLogController.ActionSourceEnum.WebsiteDashboard);
+                ActionLog.ActionSourceEnum.WebsiteDashboard);
             var result = new InstantReserveRequestResultDTO()
             {
                 status = 1,

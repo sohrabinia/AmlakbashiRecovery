@@ -7,9 +7,11 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.RouteConstraints
     {
         public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
         {
-            var w = values["w"].ToString();
-            var h = values["h"].ToString();
-            return int.TryParse(w, out _) && int.TryParse(h, out _);
+            var w = values["w"];
+            var h = values["h"];
+            if (w == null || h == null)
+                return false;
+            return int.TryParse(w.ToString(), out _) && int.TryParse(h.ToString(), out _);
         }
     }
 }

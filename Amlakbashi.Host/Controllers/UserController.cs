@@ -22,6 +22,9 @@ using Microsoft.AspNetCore.Mvc;
 using Amlakbashi.Host.Extensions;
 using X.PagedList;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -947,7 +950,15 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new { status = 0, msg = errorMsg });
                 }
                 string str = PhoneUtility.InternationalNumberToLocal(mobile_international);
-                FormsAuthentication.SetAuthCookie(str, true);
+                //FormsAuthentication.SetAuthCookie(str, true);
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, str)
+                };
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
                 //Session["SGUID"] = Guid.NewGuid();
                 //Session["UID"] = user_id;
                 return GenerateJsonResult(new { status = 1 });
@@ -995,7 +1006,15 @@ namespace Amlakbashi.Host.Controllers
             {
                 var user = userService.Find(user_id);
                 userService.UpdateLoginPriority(user_id, Entities.User.LoginPriorites.Email);
-                FormsAuthentication.SetAuthCookie(user.Email, true);
+                //FormsAuthentication.SetAuthCookie(user.Email, true);
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.Email)
+                };
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
                 TempData["MessageShowOnReady"] = "ثبت نام شما با موفقیت انجام شد";
                 return Redirect("/");
             }
@@ -1016,7 +1035,9 @@ namespace Amlakbashi.Host.Controllers
         public ActionResult Signout()
         {
             HttpContext.Session.SetString("mobile", null);
-            FormsAuthentication.SignOut();
+            //FormsAuthentication.SignOut();
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             HttpContext.Session.Clear();
             return Redirect("/");
         }
@@ -1024,7 +1045,9 @@ namespace Amlakbashi.Host.Controllers
         public ActionResult LogOff()
         {
             HttpContext.Session.SetString("mobile", null);
-            FormsAuthentication.SignOut();
+            //FormsAuthentication.SignOut();
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             HttpContext.Session.Clear();
             return Redirect("/");
         }
@@ -1093,8 +1116,11 @@ namespace Amlakbashi.Host.Controllers
                     userAccessor.CurrentUser.Id != 2122 &&
                     userAccessor.CurrentUser.Id != 19076)
                 {
-                    return GenerateJsonResult(new { status = 0,
-                        msg = "شما مجوز انجام این کار را ندارید" );
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "شما مجوز انجام این کار را ندارید"
+                    });
                 }
                 if (user_id < 1)
                 {
@@ -1102,7 +1128,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (amount < 1)
                 {
-                    return GenerateJsonResult(new { status = 0, msg = "لطفا مبلغ را وارد کنید" );
+                    return GenerateJsonResult(new { status = 0, msg = "لطفا مبلغ را وارد کنید" });
                 }
                 if (transaction_id < 1 && string.IsNullOrEmpty(transaction_cause))
                 {
@@ -1315,7 +1341,9 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 HttpContext.Session.SetString("mobile", null);
-                FormsAuthentication.SignOut();
+                //FormsAuthentication.SignOut();
+                HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
                 HttpContext.Session.Clear();
                 return GenerateJsonResult(new { status = 1 });
             }
