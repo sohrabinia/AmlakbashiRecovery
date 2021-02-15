@@ -10,10 +10,8 @@ using Amlakbashi.Core.DTOs.ReserveDTOs;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Entities = Amlakbashi.Core.Entities;
 using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
-using static Amlakbashi.Core.Entities.Advertise;
 using Amlakbashi.Core.DTOs.UserDTOs;
 using Amlakbashi.Core.Infrastructure.StyleHelpers;
-using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Accounting;
 using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Core.Infrastructure.UserContact;
@@ -887,11 +885,11 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.Finish", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { val = 0, msg = "متاسفانه عملیات با خطا مواجه شد. مجددا تلاش کنید" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    val = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد. مجددا تلاش کنید"
+                });
             }
         }
 
@@ -916,7 +914,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 logger.Error("Reserve.GuestPayReserve", exc);
                 TempData["msg"] = "خطایی رخ داده است، لطفا دوباره امتحان کنید .";
-                return Redirect(Request.Headers["referer"].ToString());
+                return Redirect(Request.Headers["Referer"].ToString());
             }
         }
 
@@ -950,7 +948,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 logger.Error("Reserve.GuestPayReserveWithCredit", exc);
                 TempData["msg"] = "خطایی رخ داده است، لطفا دوباره امتحان کنید .";
-                return Redirect(Request.Headers["referer"].ToString());
+                return Redirect(Request.Headers["Referer"].ToString());
             }
         }
 
@@ -998,46 +996,48 @@ namespace Amlakbashi.Host.Controllers
                                     current_reserve_status = (int)Reserve.ReserveStatus.Started;
                                 }
                             }
-                            return new JsonResult()
+                            return GenerateJsonResult(new
                             {
-                                Data = new { status = 1, msg = "پرداخت قبلا انجام شده است", new_reserve_status = current_reserve_status },
-                                JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                            };
+                                status = 1,
+                                msg = "پرداخت قبلا انجام شده است",
+                                new_reserve_status = current_reserve_status
+                            });
                         }
                         else
                         {
                             current_reserve_status = (int)reserveService.FinalizeReserve(reserve_id, payment_id, price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit, ActionLog.ActionSourceEnum.AdminPanel, userAccessor.DoerUser.Id, advertise.UserID, 0, 0, false);
                             var msg = " پرداخت شما با موفقیت انجام شد . شماره تراکنش پرداخت شما " + payment_id + "می باشد .";
-                            return new JsonResult()
+                            return GenerateJsonResult(new
                             {
-                                Data = new { status = 1, msg = msg, new_reserve_status = current_reserve_status },
-                                JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                            };
+                                status = 1,
+                                msg = msg,
+                                new_reserve_status = current_reserve_status
+                            });
                         }
                     case ReservePayment.ReservePaymentType.SiteDepositeToHost:
                     case ReservePayment.ReservePaymentType.SiteClearingToHost:
                     case ReservePayment.ReservePaymentType.SiteRefundToGuest:
-                        return new JsonResult()
+                        return GenerateJsonResult(new
                         {
-                            Data = new { status = 0, msg = "در حال حاضر امکان انجام این عملیات وجود ندارد" },
-                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                        };
+                            status = 0,
+                            msg = "در حال حاضر امکان انجام این عملیات وجود ندارد"
+                        });
                     default:
-                        return new JsonResult()
+                        return GenerateJsonResult(new
                         {
-                            Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                        };
+                            status = 0,
+                            msg = "متاسفانه عملیات با خطا مواجه شد"
+                        });
                 }
             }
             catch (Exception exc)
             {
                 logger.Error("Reserve.PayReserveWithCreditHost", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1057,11 +1057,10 @@ namespace Amlakbashi.Host.Controllers
                     }
                     sent = true;
                 }
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = sent ? 1 : 2 },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = sent ? 1 : 2
+                });
             }
             catch (Exception exc)
             {
@@ -1086,11 +1085,10 @@ namespace Amlakbashi.Host.Controllers
                     }
                     sent = true;
                 }
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = sent ? 1 : 2 },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = sent ? 1 : 2
+                });
             }
             catch (Exception exc)
             {
@@ -1105,11 +1103,10 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var done = reserveService.SystemCancelReserve(reserve_id);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = done ? 1 : 2 },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = done ? 1 : 2
+                });
             }
             catch (Exception exc)
             {
@@ -1145,88 +1142,71 @@ namespace Amlakbashi.Host.Controllers
                     var bank_card_name = host_bank_card != null ?
                         ((host_bank_card.FName != null ? host_bank_card.FName + " " : "") +
                         (host_bank_card.LName != null ? host_bank_card.LName : "")) : "";
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 2,
-                            days = days,
-                            total_price = string.Format("{0:n0}", reserve.TotalPrice) + " تومان",
-                            guest_payed_price = string.Format("{0:n0}", guestPaidAmount) + " تومان",
-                            site_portion = string.Format("{0:n0}", guestPaidAmount - payable_price) + " تومان",
-                            payable_price = string.Format("{0:n0}", payable_price) + " تومان",
-                            payable_price_raw = payable_price * 10,
-                            bank_card_number = host_bank_card != null &&
+                        status = 2,
+                        days = days,
+                        total_price = string.Format("{0:n0}", reserve.TotalPrice) + " تومان",
+                        guest_payed_price = string.Format("{0:n0}", guestPaidAmount) + " تومان",
+                        site_portion = string.Format("{0:n0}", guestPaidAmount - payable_price) + " تومان",
+                        payable_price = string.Format("{0:n0}", payable_price) + " تومان",
+                        payable_price_raw = payable_price * 10,
+                        bank_card_number = host_bank_card != null &&
                                 !string.IsNullOrEmpty(host_bank_card.BankCardNumber) ?
                                 host_bank_card.BankCardNumber : "ثبت نشده",
-                            bank_card_name = !string.IsNullOrEmpty(bank_card_name) ?
+                        bank_card_name = !string.IsNullOrEmpty(bank_card_name) ?
                                 bank_card_name : "بدون نام",
-                            bank_card_verified = host_bank_card != null &&
+                        bank_card_verified = host_bank_card != null &&
                                 host_bank_card.BankCardStatus == (int)BankCard.BankCardStatusEnum.Verified,
-                            shaba_verified = host_bank_card != null &&
+                        shaba_verified = host_bank_card != null &&
                                 host_bank_card.ShabaStatus == (int)BankCard.BankCardStatusEnum.Verified,
-                            host_credit = host_user.Credit,
-                            shaba_number = host_bank_card != null &&
+                        host_credit = host_user.Credit,
+                        shaba_number = host_bank_card != null &&
                                 !string.IsNullOrEmpty(host_bank_card.ShabaNumber) ?
                                 host_bank_card.ShabaNumber : "ثبت نشده",
-                            host_name = host_name
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        host_name = host_name
+                    });
                 }
                 if (user_id == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 3,
-                            error = "",
-                            default_user_id = userAccessor.CurrentUser.Id,
-                            default_transaction_id = "",
-                            default_price = payable_price
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 3,
+                        error = "",
+                        default_user_id = userAccessor.CurrentUser.Id,
+                        default_transaction_id = "",
+                        default_price = payable_price
+                    });
                 }
                 var user = userService.Find(user_id);
                 if (user == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 3,
-                            error = "کاربری با این کد کاربری وجود ندارد",
-                            default_user_id = userAccessor.CurrentUser.Id,
-                            default_transaction_id = transaction_id <= 0 ? "" : transaction_id.ToString(),
-                            default_price = payable_price
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 3,
+                        error = "کاربری با این کد کاربری وجود ندارد",
+                        default_user_id = userAccessor.CurrentUser.Id,
+                        default_transaction_id = transaction_id <= 0 ? "" : transaction_id.ToString(),
+                        default_price = payable_price
+                    });
                 }
                 if (transaction_id <= 0)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 3,
-                            error = "لطفا شماره تراکنش را وارد کنید",
-                            default_user_id = user_id,
-                            default_transaction_id = "",
-                            default_price = payable_price
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 3,
+                        error = "لطفا شماره تراکنش را وارد کنید",
+                        default_user_id = user_id,
+                        default_transaction_id = "",
+                        default_price = payable_price
+                    });
                 }
                 if (send_sms == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 4 },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 4
+                    });
                 }
                 if ((bool)send_sms)
                 {
@@ -1252,26 +1232,26 @@ namespace Amlakbashi.Host.Controllers
                     userAccessor.CurrentUser.Id
                     ) == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شماره تراکنش تکراری است" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شماره تراکنش تکراری است"
+                    });
                 }
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, msg = "تسویه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    msg = "تسویه شد"
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Reserve.SiteClearingHost", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1302,15 +1282,11 @@ namespace Amlakbashi.Host.Controllers
                             if (string.IsNullOrEmpty(new_bank_card_fname) ||
                                 string.IsNullOrEmpty(new_bank_card_lname))
                             {
-                                return new JsonResult()
+                                return GenerateJsonResult(new
                                 {
-                                    Data = new
-                                    {
-                                        status = 2,
-                                        msg = "لطفا نام و نام خانوادگی صاحب کارت را وارد کنید"
-                                    },
-                                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                                };
+                                    status = 2,
+                                    msg = "لطفا نام و نام خانوادگی صاحب کارت را وارد کنید"
+                                });
                             }
                             if (guest_user_card != null)
                             {
@@ -1337,28 +1313,20 @@ namespace Amlakbashi.Host.Controllers
                         }
                         else
                         {
-                            return new JsonResult()
+                            return GenerateJsonResult(new
                             {
-                                Data = new
-                                {
-                                    status = 2,
-                                    msg = "شماره کارت وارد شده نامعتبر میباشد"
-                                },
-                                JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                            };
+                                status = 2,
+                                msg = "شماره کارت وارد شده نامعتبر میباشد"
+                            });
                         }
                     }
                     else
                     {
-                        return new JsonResult()
+                        return GenerateJsonResult(new
                         {
-                            Data = new
-                            {
-                                status = 2,
-                                msg = ""
-                            },
-                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                        };
+                            status = 2,
+                            msg = ""
+                        });
                     }
                 }
                 if (!confirmed)
@@ -1369,79 +1337,62 @@ namespace Amlakbashi.Host.Controllers
                     var bank_card_name = guest_user_card != null ?
                         ((guest_user_card.FName != null ? guest_user_card.FName + " " : "") +
                         (guest_user_card.LName != null ? guest_user_card.LName : "")) : "";
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 3,
-                            total_price = string.Format("{0:n0}", reserve.TotalPrice) + " تومان",
-                            guest_payed_price = string.Format("{0:n0}", guest_payed_price) + " تومان",
-                            guest_payed_price_raw = guest_payed_price * 10,
-                            bank_card_number = guest_user_card != null &&
+                        status = 3,
+                        total_price = string.Format("{0:n0}", reserve.TotalPrice) + " تومان",
+                        guest_payed_price = string.Format("{0:n0}", guest_payed_price) + " تومان",
+                        guest_payed_price_raw = guest_payed_price * 10,
+                        bank_card_number = guest_user_card != null &&
                                 !string.IsNullOrEmpty(guest_user_card.BankCardNumber) ?
                                 guest_user_card.BankCardNumber : "ثبت نشده",
-                            bank_card_name = !string.IsNullOrEmpty(bank_card_name) ?
+                        bank_card_name = !string.IsNullOrEmpty(bank_card_name) ?
                                 bank_card_name : "بدون نام",
-                            bank_card_verified = guest_user_card != null &&
+                        bank_card_verified = guest_user_card != null &&
                                 guest_user_card.BankCardStatus == (int)BankCard.BankCardStatusEnum.Verified,
-                            guest_name = guest_name
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        guest_name = guest_name
+                    });
                 }
                 if (user_id == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 4,
-                            error = "",
-                            default_user_id = userAccessor.CurrentUser.Id,
-                            default_transaction_id = "",
-                            default_price = guest_payed_price
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 4,
+                        error = "",
+                        default_user_id = userAccessor.CurrentUser.Id,
+                        default_transaction_id = "",
+                        default_price = guest_payed_price
+                    });
                 }
                 var user = userService.Find(user_id);
                 if (user == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 4,
-                            error = "کاربری با این کد کاربری وجود ندارد",
-                            default_user_id = userAccessor.CurrentUser.Id,
-                            default_transaction_id = transaction_id <= 0 ? "" : transaction_id.ToString(),
-                            default_price = guest_payed_price
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 4,
+                        error = "کاربری با این کد کاربری وجود ندارد",
+                        default_user_id = userAccessor.CurrentUser.Id,
+                        default_transaction_id = transaction_id <= 0 ? "" : transaction_id.ToString(),
+                        default_price = guest_payed_price
+                    });
                 }
                 if (transaction_id <= 0)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 4,
-                            error = "لطفا شماره تراکنش را وارد کنید",
-                            default_user_id = user_id,
-                            default_transaction_id = "",
-                            default_price = guest_payed_price
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 4,
+                        error = "لطفا شماره تراکنش را وارد کنید",
+                        default_user_id = user_id,
+                        default_transaction_id = "",
+                        default_price = guest_payed_price
+                    });
                 }
                 if (send_sms == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 5 },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 5
+                    });
                 }
                 if ((bool)send_sms)
                 {
@@ -1466,26 +1417,26 @@ namespace Amlakbashi.Host.Controllers
                     price, (ReservePayment.ReservePaymentMethod)method_id,
                     userAccessor.CurrentUser.Id) == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شماره تراکنش تکراری است" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شماره تراکنش تکراری است"
+                    });
                 }
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, msg = "عودت شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    msg = "عودت شد"
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Reserve.SiteRefundGuest", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1513,26 +1464,28 @@ namespace Amlakbashi.Host.Controllers
                     payable_price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit,
                     userAccessor.CurrentUser.Id) == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شماره تراکنش تکراری است" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شماره تراکنش تکراری است"
+                    });
                 }
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, msg = "تسویه شد", payable_price = payable_price, transaction_id = transaction_id },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    msg = "تسویه شد",
+                    payable_price = payable_price,
+                    transaction_id = transaction_id
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Reserve.SiteClearingWithCredit", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1567,7 +1520,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Auth]
         public ActionResult ReserveManager(int user_id = -1, string msg = "",
             ReserveManagerSelectType selectType = ReserveManagerSelectType.All)
         {
@@ -1604,26 +1557,26 @@ namespace Amlakbashi.Host.Controllers
                     guest_payed_price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit,
                     userAccessor.CurrentUser.Id) == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شماره تراکنش تکراری است" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شماره تراکنش تکراری است"
+                    });
                 }
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, msg = "عودت داده شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    msg = "عودت داده شد"
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Reserve.SiteRefundGuestWithCredit", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1832,16 +1785,12 @@ namespace Amlakbashi.Host.Controllers
                 rules_string += "<br/>" + item.Key + ": " + item.Value;
             }
             var priceDict = advertiseService.GetAccPriceDatesInfo(accommodation_id);
-            return new JsonResult()
+            return GenerateJsonResult(new
             {
-                Data = new
-                {
-                    occupiedList = occDatesFrom,
-                    rules_string = rules_string,
-                    priceDict = priceDict
-                },
-                JsonRequestBehavior = JsonRequestBehavior.AllowGet
-            };
+                occupiedList = occDatesFrom,
+                rules_string = rules_string,
+                priceDict = priceDict
+            });
         }
 
         [Auth(UserRoles.Admin)]
@@ -1867,11 +1816,11 @@ namespace Amlakbashi.Host.Controllers
                 var reserve = reserveService.Find(reserve_id);
                 if (!reserve.shouldFollow && string.IsNullOrEmpty(text))
                 {
-                    return new JsonResult
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "لطفا متن دلیل پیگیری را وارد کنید" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "لطفا متن دلیل پیگیری را وارد کنید"
+                    });
                 }
                 if (reserve.shouldFollow)
                 {
@@ -1881,28 +1830,28 @@ namespace Amlakbashi.Host.Controllers
                         userAccessor.CurrentUser.Id != 1667 &&
                         userAccessor.CurrentUser.Id != 2122)
                     {
-                        return new JsonResult
+                        return GenerateJsonResult(new
                         {
-                            Data = new { status = 0, msg = "شما دسترسی حذف از پیگیری را ندارید" },
-                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                        };
+                            status = 0,
+                            msg = "شما دسترسی حذف از پیگیری را ندارید"
+                        });
                     }
                 }
                 reserveService.UpdateShouldFollow(reserve_id, text, userAccessor.CurrentUser);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, new_status = reserve.shouldFollow },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    new_status = reserve.shouldFollow
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1912,20 +1861,20 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, shouldFollow = reserve.shouldFollow },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    shouldFollow = reserve.shouldFollow
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Reserve.GetShouldFollowState", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1936,25 +1885,21 @@ namespace Amlakbashi.Host.Controllers
             {
                 var new_state = reserveService.UpdateCallState(reserve_id, hostOrGuest);
                 var new_state_color = ReserveStyleHelper.GetCallStateColor(new_state);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        status = 1,
-                        new_state = new_state,
-                        new_state_color = new_state_color
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    new_state = new_state,
+                    new_state_color = new_state_color
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Rreserve.NextCallState", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1984,11 +1929,11 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.ToggleDisableAutoCancel", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -2003,11 +1948,11 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.ToggleAccVisited", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -2080,29 +2025,21 @@ namespace Amlakbashi.Host.Controllers
                             if (currentReserveSupport.SupporterID == userAccessor.CurrentUser.Id &&
                                 analyzeResult != SupporterStatus.Expired)
                             {
-                                return new JsonResult
+                                return GenerateJsonResult(new
                                 {
-                                    Data = new
-                                    {
-                                        status = 0,
-                                        msg = "شما هم اکنون در حال پیگیری این رزرو هستید."
-                                    },
-                                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                                };
+                                    status = 0,
+                                    msg = "شما هم اکنون در حال پیگیری این رزرو هستید."
+                                });
                             }
                             if (analyzeResult == SupporterStatus.Done)
                             {
                                 if ((int)reserve.Status > 4 && (int)reserve.Status < 9)
                                 {
-                                    return new JsonResult
+                                    return GenerateJsonResult(new
                                     {
-                                        Data = new
-                                        {
-                                            status = 0,
-                                            msg = "این رزرو انجام شده است و نیازی به پشتیبانی ندارد"
-                                        },
-                                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                                    };
+                                        status = 0,
+                                        msg = "این رزرو انجام شده است و نیازی به پشتیبانی ندارد"
+                                    });
                                 }
                             }
                             var current_supporter_name =
@@ -2114,15 +2051,11 @@ namespace Amlakbashi.Host.Controllers
                             if (!(analyzeResult == SupporterStatus.Expired &&
                                 currentReserveSupport.SupporterID == userAccessor.CurrentUser.Id))
                             {
-                                return new JsonResult
+                                return GenerateJsonResult(new
                                 {
-                                    Data = new
-                                    {
-                                        status = 2,
-                                        msg = current_supporter_name + " در حال پشتیبانی رزرو های این مهمان است. فقط در صورت عدم حضور این پشتیبان و یا این که خود شخص از شما خواسته روی دکمه بله کلیک کنید"
-                                    },
-                                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                                };
+                                    status = 2,
+                                    msg = current_supporter_name + " در حال پشتیبانی رزرو های این مهمان است. فقط در صورت عدم حضور این پشتیبان و یا این که خود شخص از شما خواسته روی دکمه بله کلیک کنید"
+                                });
                             }
                             break;
                     }
@@ -2141,25 +2074,21 @@ namespace Amlakbashi.Host.Controllers
                     supporterPhoto = string.Format("/file/imgThumb?FileID={0}&w=200&h=200",
                         userAccessor.CurrentUser.PhotoID);
                 }
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        status = 1,
-                        supporterName = supporterName,
-                        supporterPhoto = supporterPhoto
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    supporterName = supporterName,
+                    supporterPhoto = supporterPhoto
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Reserve.DoSupport", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطای فنی مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطای فنی مواجه شد"
+                });
             }
         }
 
@@ -2211,11 +2140,11 @@ namespace Amlakbashi.Host.Controllers
                 {
                     return GenerateJsonResult(new { status = 0 });
                 }
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet,
-                    Data = new { status = 1, reserveToRate = reserveToRate.Id }
-                };
+                    status = 1,
+                    reserveToRate = reserveToRate.Id
+                });
             }
             catch (Exception exc)
             {
@@ -2384,11 +2313,11 @@ namespace Amlakbashi.Host.Controllers
                         0, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
                     if (creditTransactionId < 1)
                     {
-                        return new JsonResult()
+                        return GenerateJsonResult(new
                         {
-                            Data = new { status = 0, msg = "موجودی کیف پول مهمان کافی نیست" },
-                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                        };
+                            status = 0,
+                            msg = "موجودی کیف پول مهمان کافی نیست"
+                        });
                     }
                     transactionId = creditTransactionId;
                 }
@@ -2422,11 +2351,11 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (invalidData)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = errorMessage },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = errorMessage
+                    });
                 }
                 accounting.InsertReservePayment(reservePayment);
                 if (reservePayment.PaymentType == (int)ReservePayment.ReservePaymentType.GuestDeposite
@@ -2440,20 +2369,20 @@ namespace Amlakbashi.Host.Controllers
                                 ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id);
                     }
                 }
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, msg = "پرداخت مورد نظر با موفقیت اضافه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    msg = "پرداخت مورد نظر با موفقیت اضافه شد"
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Reserve.AddGuestPayment", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "عملیات با خطای فنی مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد"
+                });
             }
         }
     }
