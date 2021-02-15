@@ -1,0 +1,337 @@
+﻿/*#form-step-button-children .tab-item {
+    border-right: 1px solid #e6e7e9;
+    background-color: #fbfbfb;
+    box-shadow: 0 0px 4px 0 rgb(0 0 0 / 16%), 0 2px 5px 0 rgb(0 0 0 / 6%);
+    border-radius: 5px;
+    padding: 8px;
+    margin: 5px;
+    height: 35px !important;
+    width: 120px;
+    display: inline-block;
+    color: #242424;
+    text-align: center;
+    font: 11px Miransans;
+}
+#form-step-button-children .tab-item:first-child{
+    border-right:none;
+}*/
+.form-step-button-container.static-advertise.advetise-form__part {
+    text-align: right;
+    justify-content: space-between;
+    font: 14px Miransans;
+}
+.static-advertise__btn-next{
+    margin-right:10px;
+}
+.form-step-button-container.static-advertise.advetise-form__part .rooms-box.div-unset {
+    position: relative;
+}
+.form-step-button-container.static-advertise.advetise-form__part .btn-view-rooms {
+    background: #ffffff;
+    border: 1px solid #dadada;
+    height: 40px;
+    width: 200px;
+    font: 13px Miransans;
+    box-shadow: 1px 2px 3px 0 rgba(0,0,0,.1);
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding:0 5px;
+}
+.form-step-button-container.static-advertise.advetise-form__part .btn-view-rooms>i{
+    margin-left:0;
+    color: #242424;
+    font-size: 18px;
+}
+.form-step-button-container.static-advertise.advetise-form__part .box-view-rooms p {
+    border-bottom: 1px solid #efefef;
+    padding: 8px 6px 8px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+    font-size: 13px;
+}
+.form-step-button-container.static-advertise.advetise-form__part .box-view-rooms p i {
+    font-size:12px !important;
+}
+.form-step-button-container.static-advertise.advetise-form__part .box-view-rooms {
+    position: absolute;
+    width: 197px;
+    height: auto;
+    border-radius: 0 0 5px 5px;
+    z-index: 331;
+    background: white;
+    top: 40px;
+    left: 2px;
+    padding: 0;
+    overflow-y: auto;
+    max-height: 220px;
+    display: none;
+    box-shadow:0px 4px 9px 0 rgb(0 0 0 / 17%), 0 1px 9px 0 rgb(0 0 0 / 1%);
+}
+.form-step-button-container.static-advertise.advetise-form__part .box-view-rooms a {
+    display: block;
+    color: #242424;
+    padding: 10px 10px 10px 5px;
+    font-size: 13px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e0e0e0;
+    text-decoration: none
+}
+.form-step-button-container.static-advertise.advetise-form__part .box-view-rooms a i, .form-step-button-container.static-advertise.advetise-form__part .box-view-rooms a {
+    transition: 0.3s;
+}
+.form-step-button-container.static-advertise.advetise-form__part .box-view-rooms a:hover , .form-step-button-container.static-advertise.advetise-form__part .box-view-rooms a:hover i {
+    color: #dea500;
+}
+
+.form-step-button-container.static-advertise.advetise-form__part .box-view-rooms p i{
+    color:#242424;
+}
+.form-step-button-container.static-advertise.advetise-form__part i {
+    margin-left: 10px;
+    color: #999;
+    transition: all ease-in .5s;
+    font-size: 20px;
+    vertical-align: middle;
+}
+.form-step-button-container.static-advertise.advetise-form__part>p:hover i {
+    transform: rotate(360deg);
+    color: #424242;
+}
+
+a:hover{
+    text-decoration:none;
+}
+.acc-hotel__title-box {
+    DISPLAY: FLEX;
+    JUSTIFY-CONTENT: SPACE-BETWEEN;
+}
+.advetise-form__part h2 {
+    font: 18px Biransans;
+    margin:0;
+}
+.advetise-form__part h2 i{
+    margin-left: 10px;
+    color: #999;
+    transition: all ease-in .5s;
+    font-size: 24px;
+    vertical-align: middle;
+}
+.static-advertise.advetise-form__part.advetise-form__part1 .static-advertise__label, .static-advertise.advetise-form__part.advetise-form__part1 .static-advertise__property {
+    text-align: right;
+}
+.static-advertise.advetise-form__part.advetise-form__part1 p{
+    margin-left:15px;
+}
+.static-advertise.advetise-form__part.advetise-form__part1 .static-advertise__item.full-col.static-advertise__title-room {
+    flex-flow: row wrap;
+    justify-content: start;
+    margin-top:40px;
+}
+.static-advertise.advetise-form__part.advetise-form__part1 .set_off-button.div-unset.style-min-max-input {
+    width: 100%;
+    justify-content: start;
+    align-items: start;
+    text-align: right;
+    flex-flow: row wrap;
+    margin-top:40px;
+    margin-right:1%;
+}
+.static-advertise.advetise-form__part.advetise-form__part1 .set_off-button.div-unset.style-min-max-input label{
+    width:auto;
+    color:#6b6b6b;
+    margin-left:15px;
+}
+.advetise-form__part h2:hover i {
+    transform: rotate(360deg);
+    color: #424242;
+}
+.form-step-child-button.static-advertise__btn-add i {
+    vertical-align: baseline;
+    font-size: 10px;
+    margin-right: 2px;
+}
+.acc-hotel__title-box .acc-amenities__box-button {
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+}
+.acc-hotel__title-box .acc-amenities__box-button label{
+    color: rgb(51, 51, 51);
+}
+.static-advertise__item.full-col.static-advertise__title-room {
+    text-align: right;
+    align-items: start;
+}
+.static-advertise__item.static-advertise__title-room  input{
+    width:310px;
+    margin-bottom:3px;
+}
+.static-advertise__item.full-col.static-advertise__title-room .static-advertise__extra-footer {
+    font: 11px Liransans;
+    color: #424242;
+    margin-top: 0px;
+    margin-right:5px;
+}
+
+.static-advertise__item.full-col.static-advertise__title-room .static-advertise__label {
+    font: 15px Miransans;
+}
+.static-advertise.advetise-form__part input {
+    padding: 0 8px !important;
+    border: 1px solid #e2e2e2;
+    border-radius: 5px;
+    height: 45px;
+    font: 13px Miransans;
+    box-shadow: 0 1px 0px 0 rgb(0 0 0 / 8%), 0 7px 2px 0 rgb(204 204 204 / 10%);
+}
+.set_off-button.div-unset.style-min-max-input input{
+    padding:0 !important;
+}
+.static-advertise.advetise-form__part.advertise-form_part-details input, .static-advertise.advetise-form__part.advetise-form__part1 .set_off-button.div-unset.style-min-max-input input {
+    border: none;
+    box-shadow: none;
+}
+i.fas.fa-info-circle.js-help {
+    vertical-align: middle;
+    margin-left: 10px;
+    color: #4485F2;
+    font-size: 22px;
+}
+.static-advertise__extra-footer {
+    width: 93%;
+    text-align: right;
+}
+a.acc-list-child-room {
+    color: #676767 !important;
+    font-size: 12px !important;
+}
+a.acc-list-child-room i {
+    margin-right: 10px !important;
+    color: #999 !important;
+    font-size: 16px !important;
+    vertical-align: sub !important;
+}
+.acc-box-child-room{
+    display:none;
+}
+/*child-type-rooms*/
+    .child-step-by-step {
+    width: 95%;
+    margin: 0 auto;
+    height: 70px;
+    overflow: hidden;
+}
+div#form-step-button-children {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: right;
+    width: 96%;
+    margin: 30px auto;
+}
+.form-step-child-button {
+    background-color: #dfdfdf;
+    border-radius: 5px;
+    padding: 8px;
+    margin: 5px;
+    height: 35px !important;
+    width: 118px;
+    display: inline-block;
+    color: #242424;
+    text-align: center;
+    font: 11px Miransans;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.form-step-child-button:active{
+    text-decoration: none;
+}
+.form-step-child-button:hover{
+    outline:none;
+    background-color:#f9b905;
+    color:#242424;
+}
+p.form-step-child-button i {
+    font-size: 11px;
+    vertical-align: baseline;
+    color: #242424;
+}
+
+
+/*responsive */
+@media screen and (max-width: 1120px) {
+    .set_off-button.div-unset.style-min-max-input label {
+        font-size: 12px;
+        height: 40px;
+    }
+}
+@media screen and (max-width : 800px) {
+    .set_off-button.div-unset.style-min-max-input label {
+        height: 15px;
+    }
+
+    .advertise-form_part-details .static-advertise_details-item p {
+        height: 20px;
+    }
+}
+@media screen and (max-width: 500px) {
+    .advetise-form__part h2 {
+        font: 13px Biransans;
+        margin: 0;
+    }
+
+    .acc-hotel__title-box .acc-amenities__box-button label {
+        margin-bottom: 10px;
+    }
+
+    .acc-hotel__title-box {
+        margin-bottom: 20px;
+        flex-flow: column wrap;
+        JUSTIFY-CONTENT: space-between;
+    }
+
+    .acc-hotel__title-box .acc-amenities__box-button {
+        margin: 25px 0 20px 0;
+        justify-content: space-between;
+    }
+    .static-advertise__item.full-col.static-advertise__title-room .static-advertise__label {
+        font: 13px Miransans;
+        width: 100%;
+    }
+    .set_off-button.div-unset.style-min-max-input label, .advertise-form_part-details .static-advertise_details-item p {
+        height: 20px;
+    }
+
+    .static-advertise.advetise-form__part.advertise-form_part-details .static-advertise__item.static-advertise_details-item p {
+        margin-top: 30px;
+    }
+
+    .static-advertise.advetise-form__part.advetise-form__part1 .set_off-button.div-unset.style-min-max-input label {
+        width: 88%;
+    }
+
+    i.fas.fa-info-circle.js-help {
+        margin-left: 0px;
+        font-size: 20px;
+    }
+}
+@media screen and (max-width: 350px){
+    .static-advertise.advetise-form__part.advetise-form__part1 .set_off-button.div-unset.style-min-max-input label {
+        width: 86%;
+    }
+    .static-advertise__item.static-advertise__title-room input {
+        width: 230px;
+    }
+    i.fas.fa-info-circle.js-help {
+        margin-left: 0px;
+        font-size: 18px;
+    }
+    .form-step-child-button {
+        width:90px;
+    }
+}

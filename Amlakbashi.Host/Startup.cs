@@ -54,7 +54,9 @@ namespace Amlakbashi.Host
             });
 
             // TODO: match authentication with previous system
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options=> {
+                options.Cookie.MaxAge = new TimeSpan(60, 0, 0, 0);
+            });
 
             services.AddHangfire(configuration => configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
             .UseSimpleAssemblyNameTypeSerializer()

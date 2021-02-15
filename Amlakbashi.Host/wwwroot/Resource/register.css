@@ -1,0 +1,267 @@
+﻿@font-face {
+  font-family: bnassim;
+  src: url('fonts/nassim-bold.eot?#') format('eot'),  
+       url('fonts/nassim-bold.woff') format('woff'),  
+       url('fonts/nassim-bold.ttf') format('truetype'); 
+}
+@font-face {
+  font-family: rnassim;
+  src: url('fonts/nassim-regular.eot?#') format('eot'),  
+       url('fonts/nassim-regular.woff') format('woff'),  
+       url('fonts/nassim-regular.ttf') format('truetype'); 
+}
+@font-face {
+    font-family: "yekan";
+    font-style: normal;
+    font-weight: normal;
+    src: local("☺"), local("yekan"), url("fonts/B Yekan.woff") format("woff"), url("fonts/B Yekan.ttf") format("truetype"), url("fonts/B Yekan.svg") format("svg");
+}
+
+* {
+    border:none ;
+    padding:0px;
+    margin:0px ;
+}
+
+.loginarea {
+    background-color: #dedede;
+    direction: rtl;
+    margin: 10px;
+    padding: 10px;
+}
+.loginarea .enter {
+    border-bottom: 1px solid #aaa;
+    cursor: pointer;
+    font: 16px Miransans;
+    padding: 8px 30px 8px 30px;
+    text-align: center;
+    vertical-align: middle;
+    width: 70px;
+}
+.loginarea .regist {
+    border-bottom: 1px solid #aaa;
+    cursor: pointer;
+    font: 15px Miransans;
+    padding: 8px 20px 8px 13px;
+    text-align: center;
+    vertical-align: middle;
+    width: 70px;
+    white-space:nowrap;
+}
+.loginarea .content {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #fffdfe;
+    border-bottom: 1px solid #aaa;
+    border-image: none;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    border-top: medium none !important;
+    padding: 10px 15px;
+}
+.loginarea .title2 {
+    display: block;
+    font: 13px Liransans;
+    margin-bottom: 8px;
+    margin-left: 18px;
+}
+.active {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #fffdfe;
+    border-bottom: medium none !important;
+    border-image: none;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    border-top: 1px solid #aaa;
+}
+.loginform {
+    display: none;
+    padding-bottom: 20px;
+}
+.registerform {
+    display: none;
+    padding-bottom: 20px;
+}
+.registerform input[type="text"] {
+    background-color: #faffbd;
+    border: 1px solid #e4e1d7;
+    border-radius: 4px;
+    direction: rtl;
+    height: 35px;
+    padding: 5px;
+    text-align: right;
+    width: 300px;
+}
+#prv{
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    color: #000;
+    direction: rtl;
+    font: 12px ULiransans;
+    height: 37px;
+    text-align: right;
+    width: 73%;
+}
+#usertype{
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    color: #000;
+    direction: rtl;
+    font: 12px ULiransans;
+    height: 37px;
+    text-align: right;
+    width: 73%;
+}
+.registerform tr {
+    height:47px ;
+}
+.registerform td {
+    height: 35px;
+}
+.registerform .captcha {
+    height: 35px;
+    margin: 0 auto;
+    width: 110px;
+}
+.registerform .adduser {
+    background: url("img/adduser.png") no-repeat scroll right 5px center #019ACE;
+    border: medium none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font: 14px yekan;
+    margin-top: 25px;
+    margin-right:25px;
+    padding: 5px 25px 5px 5px;
+    width: 140px;
+}
+.registerform .captcha img {
+    width: 110px;
+}
+.registerform .refresh {
+    background: url("img/refresh.png") no-repeat scroll 0 3px rgba(0, 0, 0, 0);
+    cursor: pointer;
+    height: 25px;
+    width: 16px;
+}
+.loginbg {
+    background: url("img/loginbg2.png") no-repeat scroll right 5px center #ededed;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    color: #444;
+    cursor: pointer;
+    display: block;
+    float: right;
+    font: 13px yekan;
+    height: 30px;
+    margin-right: 70px;
+    padding-bottom: 2px;
+    padding-right: 22px;
+    text-align: right;
+    text-decoration: none;
+    width: 60px;
+}
+.input{
+    background-color: #faffbd;
+    border: 1px solid #e4e1d7;
+    border-radius: 4px;
+    direction: rtl;
+    height: 35px;
+    padding: 5px;
+    text-align: right;
+    width: 300px;
+}
+.input1{
+    background-color: #faffbd;
+    border: 1px solid #e4e1d7;
+    border-radius: 4px;
+    direction: rtl;
+    height: 35px;
+    padding: 5px;
+    text-align: right;
+    width: 300px;
+}
+.loginbg:hover {
+    background-color: #ccc;
+    color: #000;
+}
+.recoverbg {
+    background: url("img/recoverbg2.png") no-repeat scroll right 5px center #ededed;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    color: #444;
+    cursor: pointer;
+    display: block;
+    float: right;
+    font: 13px yekan;
+    height: 31px;
+    margin-right: 50px;
+    padding-right: 30px;
+    padding-top: 3px;
+    text-align: right;
+    text-decoration: none;
+    width: 122px;
+}
+.recoverbg:hover {
+    background-color: #ccc;
+    color: #000;
+}
+.commercialbtn {
+    background-color: #f2ac3d;
+    border-radius: 4px;
+    color: #fff;
+    display: block;
+    font: 16px bnassim;
+    margin: 10px auto 0;
+    padding: 7px 0;
+    text-align: center;
+    width: 150px;
+}
+.frg{
+    margin-top: 10px;
+    padding-right: 70px;
+}
+@media (max-width: 450px){
+    .registerform input[type="text"]{
+        display:inline-block;
+        background-color: #faffbd;
+        border: 1px solid #e4e1d7;
+        border-radius: 4px;
+        direction: ltr;
+        height: 35px;
+        padding: 5px;
+        text-align: left;
+        width: 48%;
+
+    }
+    .registerform td{
+        display:inline-block;
+        font: 13px yekan;
+    }
+    #prv{
+        width:48%;
+    }
+    #usertype{
+        width:48%;
+    }
+    .input1{
+        width:100%;
+    }
+    .input{
+        width:48%;
+    }
+    .frg{
+        padding-right:0px;
+    }
+    .recoverbg{
+        margin-right: 35px;
+        margin-top: 20px;
+    }
+}

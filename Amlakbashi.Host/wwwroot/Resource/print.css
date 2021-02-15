@@ -1,0 +1,276 @@
+﻿@font-face {
+    font-family: bnassim;
+    src: url('fonts/nassim-bold.eot?#') format('eot'), url('fonts/nassim-bold.woff') format('woff'), url('fonts/nassim-bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: rnassim;
+    src: url('fonts/nassim-regular.eot?#') format('eot'), url('fonts/nassim-regular.woff') format('woff'), url('fonts/nassim-regular.ttf') format('truetype');
+}
+
+* {
+    border: none;
+    padding: 0px;
+    margin: 0px;
+}
+.printlogo {
+    background-image:URL(/resource/img/logoh.png) ;
+    background-repeat:no-repeat ;
+    background-size:300px auto ;
+    background-position:right 10px top 10px ;
+    height:150px;
+}
+#CompanyName, #FName {
+    text-align: right;
+    width: 290px;
+    direction: rtl;
+    font:16px bnassim ;
+    color:#555 ;
+}
+
+.page {
+    width:980px;
+    margin:0 auto ;
+    min-height:600px;
+    font-family:rnassim ;
+}
+
+.body {
+    direction:rtl ;
+}
+.top {
+    height:50px;
+    background-color:#323232 ;
+    font:22px bnassim ;
+    text-align:right ;
+    padding-right:20px;
+    color:#fff ;
+    padding-top:15px;
+    position:relative ;
+}
+.datasadra {
+    background:url('img/data.png') no-repeat center center ;
+    width:123px;
+    height:30px;
+    display:block ;
+    float:right ;
+    margin-left:25px;
+}
+.logoff {
+    position:absolute ;
+    left:15px;
+    font:16px bnassim; 
+    color:#fff ;
+    top:18px;
+    text-decoration:none ;
+}
+.top .menuitem {
+    font:16px bnassim ;
+    color:#fff ;
+    margin-right:5px;
+    float:right ;
+    text-decoration:none ;
+}
+.zonr {
+    width:170px;
+    float:right ;
+    min-height:600px;
+    background-color:#f2f2f2 ;
+}
+.zonl {
+    width:750px;
+    float:right ;
+    min-height:600px;
+    padding:30px; 
+}
+.zonr .item {
+    font:16px bnassim ;
+    color:#999 ;
+    padding:15px 50px 15px 0px ;
+    border-bottom:1px solid #bbb ;
+    text-decoration:none ;
+    display:block ;
+    background-repeat: no-repeat ;
+    background-position: center right 7px ; 
+    background-size:40px 40px; 
+}
+
+.zonr .item:hover {
+    color:#000 ;
+    background-color:#fff ;
+}
+
+table {
+    width:100% ;
+}
+
+th {
+    font:15px bnassim ;
+    text-align:center ;
+    vertical-align:middle ;
+    background-color:#ccc ;
+    padding:5px;
+}
+
+td {
+    text-align:center ;
+    vertical-align:top ;
+    padding:5px;
+}
+
+.imgstatus
+{
+    width:20px;
+    height:20px;
+    overflow:hidden;
+    display:inline-block;
+    cursor:pointer ;
+}
+.imgstatus.enable
+{
+    background:url(img/enable20.png) no-repeat ;
+}
+.imgstatus.disable
+{
+    background:url(img/disable20.png) no-repeat ;
+}
+.editicon {
+    width:20px;
+    height:20px;
+    background:url(img/edit20.png) no-repeat ;
+    cursor:pointer ;
+    display:inline-block ;
+}
+.printicon {
+    width:20px;
+    height:20px;
+    background:url(img/print20.png) no-repeat ;
+    cursor:pointer ;
+    display:inline-block ;
+}
+.deleteicon {
+    width:20px;
+    height:20px;
+    background:url(img/delete20.png) no-repeat ;
+    cursor:pointer ;
+    display:inline-block ;
+}
+.publishicon {
+    width:20px;
+    height:20px;
+    background:url(img/publish20.png) no-repeat ;
+    cursor:pointer ;
+    display:inline-block ;
+}
+.suspendicon {
+    width:20px;
+    height:20px;
+    background:url(img/suspend20.png) no-repeat ;
+    cursor:pointer ;
+    display:inline-block ;
+}
+.title {
+    color: #999;
+    display: inline-block;
+    font: 25px bnassim;
+    margin: 7px 0;
+    padding: 0 10px;
+    text-align: right;
+    text-shadow: 1px 1px 2px #ddd ;
+}
+
+.title:hover {
+    color:#666 ;
+}
+.add {
+    background: url("img/add.png") no-repeat scroll right 5px top -117px rgba(0, 0, 0, 0);
+    border: 1px solid #ccc;
+    border-radius: 27px;
+    color: #999;
+    direction: rtl;
+    display: block;
+    font: 21px bnassim;
+    margin-bottom: 8px;
+    padding: 7px 40px 7px 7px;
+    text-align: right;
+    text-decoration: none;
+    text-shadow: 1px 2px 1px #d6d6d6;
+    width: 120px;
+    box-shadow:0px 1px 2px 2px #ddd ;
+}
+.add:hover {
+    color:#333 ;
+    background-position: right 5px top 2px !important; 
+}
+
+
+form input[type="text"], input[type="password"]  {
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font: 15px rnassim;
+    height: 25px;
+    padding: 5px;
+    width: 270px;
+    background:none;
+}
+ select {
+    padding-right: 10px;
+    width: 280px;
+    border: 1px solid #ccc;
+    background:none ;
+    border-radius: 7px;
+    font: 15px rnassim;
+    height: 37px;
+    width: 280px;
+    direction:rtl ;
+    text-align:right ;
+}
+ option {
+    padding-right: 15px;
+    font: 14px rnassim;
+    text-align:right ;
+}
+optgroup {
+    padding-right: 2px;
+    font: 16px bnassim;
+    text-align:right ;
+}
+ .label {
+    text-align:right ;
+    color: #333;
+    font: 15px bnassim;
+    text-align: right;
+    vertical-align:top ;
+    width:1% ;
+    white-space:nowrap ;
+}
+.filter {
+    border: 1px solid #ccc;
+    border-radius: 13px;
+    color: #222;
+    font: 17px bnassim;
+    padding:5px; 
+    width:70px;
+    text-align: center;
+    cursor:pointer ;    
+    display:block ;
+}
+.filter:hover {
+    background-color:#ddd ;
+}
+.tablesplit {
+    height:10px;
+}
+#Address {
+    height:50px;
+    font:13px bnassim; 
+    color:#666 ;
+    text-align:right ;
+    width:300px;
+}
+#Tell{
+    width:100px;
+}
+#Email {
+    width:230px;
+}
