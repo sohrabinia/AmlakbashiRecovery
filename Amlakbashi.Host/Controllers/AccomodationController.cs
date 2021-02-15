@@ -1307,12 +1307,12 @@ namespace Amlakbashi.Host.Controllers
                     advertise_id, from_date, to_date, price, out msg);
                 var priceDict = done ?
                     advertiseService.GetAccPriceDatesInfo(advertise_id) : null;
-                GenerateJsonResult(new { status = done ? 1 : 0, msg = msg, priceDict = priceDict });
+                return GenerateJsonResult(new { status = done ? 1 : 0, msg = msg, priceDict = priceDict });
             }
             catch (Exception exc)
             {
                 logger.Error("SetPriceForDateRange", exc);
-                GenerateJsonResult(new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" });
+                return GenerateJsonResult(new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" });
             }
         }
 
@@ -1321,16 +1321,12 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var priceDict = advertiseService.GetAccPriceDatesInfo(id);
-                GenerateJsonResult(new { status = 1, priceDict = priceDict });
+                return GenerateJsonResult(new { status = 1, priceDict = priceDict });
             }
             catch (Exception exc)
             {
                 logger.Error("GetPriceDict", exc);
-                return new JsonResult()
-                {
-                    Data = new { status = 0 },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                return GenerateJsonResult(new { status = 0 });
             }
         }
 
@@ -1343,46 +1339,34 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(advertise_id);
                 if (acc.UserID != userAccessor.CurrentUser.Id)
                 {
-                    return new JsonResult()
-                    {
-                        Data = new { status = 0, msg = "شما مجوز این کار را ندارید" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
                 }
                 if (forRemove)
                 {
                     var result = advertiseService.CheckUnsetOccupiedDateRange(
                         advertise_id, from_date, to_date);
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = result.Result == CheckUnsetOccupiedResult.OK ? 1 : 0, msg = result.ToString() },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = result.Result == CheckUnsetOccupiedResult.OK ? 1 : 0,
+                        msg = result.ToString()
+                    });
                 }
                 else
                 {
                     var result = advertiseService.CheckSetAsOccupiedDateRange(
                         advertise_id, from_date, to_date);
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = result.Result == CheckSetOccupiedResult.OK ||
+                        status = result.Result == CheckSetOccupiedResult.OK ||
                         result.Result == CheckSetOccupiedResult.ContainsReserveRequest ? 1 : 0,
-                            msg = result.ToString()
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        msg = result.ToString()
+                    });
                 }
             }
             catch (Exception exc)
             {
                 logger.Error("CheckSetAsOccupiedForDateRange", exc);
-                return new JsonResult()
-                {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                return GenerateJsonResult(new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" });
             }
         }
 
@@ -1393,20 +1377,12 @@ namespace Amlakbashi.Host.Controllers
             {
                 var acc = advertiseService.Find(id);
                 var occupiedList = acc.OccupiedDates.Select(s => DateTimeUtility.DateValueOfJS(s));
-                return new JsonResult()
-                {
-                    Data = new { status = 1, occupiedList = occupiedList },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                return GenerateJsonResult(new { status = 1, occupiedList = occupiedList });
             }
             catch (Exception exc)
             {
                 logger.Error("GetOccupiedDates", exc);
-                return new JsonResult()
-                {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                return GenerateJsonResult(new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" });
             }
         }
 
@@ -1419,11 +1395,7 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(advertise_id);
                 if (acc.UserID != userAccessor.CurrentUser.Id)
                 {
-                    return new JsonResult()
-                    {
-                        Data = new { status = 0, msg = "شما مجوز این کار را ندارید" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
                 }
                 var checkResult = advertiseService.CheckSetAsOccupiedDateRange(advertise_id,
                     from_date, to_date);
@@ -1435,39 +1407,26 @@ namespace Amlakbashi.Host.Controllers
                     acc = advertiseService.Find(acc.Id, true);
                     occupiedList = acc.OccupiedDates.Select(s =>
                         DateTimeUtility.DateValueOfJS(s)).ToList();
-                    return new JsonResult()
-                    {
-                        Data = new
-                        {
-                            status = 1,
-                            msg = "محدوده انتخاب شده به عنوان روز های پر ثبت شد",
-                            occupiedList = occupiedList
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                    return GenerateJsonResult(new { status = 0, msg = "محدوده انتخاب شده به عنوان روز های پر ثبت شد" });
                 }
                 else
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 0,
-                            msg = checkResult.ToString(),
-                            occupiedList = new List<long>()
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = checkResult.ToString(),
+                        occupiedList = new List<long>()
+                    });
                 }
             }
             catch (Exception exc)
             {
                 logger.Error("SetAsOccupiedForDateRange", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1480,11 +1439,11 @@ namespace Amlakbashi.Host.Controllers
                 var advertise = advertiseService.Find(advertise_id);
                 if (advertise.UserID != userAccessor.CurrentUser.Id)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شما مجوز این کار را ندارید" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شما مجوز این کار را ندارید"
+                    });
                 }
                 var checkResult = advertiseService.CheckUnsetOccupiedDateRange(
                     advertise_id, from_date, to_date);
@@ -1493,29 +1452,31 @@ namespace Amlakbashi.Host.Controllers
                     advertiseService.DeleteExtrinsicReserves(advertise_id, from_date, to_date);
                     advertise = advertiseService.Find(advertise_id, true);
                     var occupiedList = advertise.OccupiedDates.Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 1, msg = checkResult.ToString(), occupiedList = occupiedList },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 1,
+                        msg = checkResult.ToString(),
+                        occupiedList = occupiedList
+                    });
                 }
                 else
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = checkResult.ToString(), occupiedList = new List<long>() },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = checkResult.ToString(),
+                        occupiedList = new List<long>()
+                    });
                 }
             }
             catch (Exception exc)
             {
                 logger.Error("RemoveFromOccupiedForDateRange", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1528,27 +1489,26 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(id);
                 if (acc.UserID != userAccessor.CurrentUser.Id)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شما مجوز این کار را ندارید" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شما مجوز این کار را ندارید"
+                    });
                 }
                 advertiseService.SetNorouzMinReserveDate(id, dateUnix);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1 },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("SetNorouzMinReserveDate", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1559,20 +1519,20 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 advertiseService.SetAvailable(id, isAvailable);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, val = "" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    msg = ""
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Available", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, val = "" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = ""
+                });
             }
         }
 
@@ -1582,20 +1542,20 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 advertiseService.Publish(id, userAccessor.CurrentUser.Id, ActionSourceEnum.AdminPanel);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, val = "" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    msg = ""
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Publish", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, val = "" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = ""
+                });
             }
         }
 
@@ -1605,20 +1565,20 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 advertiseService.Suspend(id);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, val = "" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    msg = ""
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Suspend", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, val = "" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = ""
+                });
             }
         }
 
@@ -1630,11 +1590,11 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(id);
                 if (acc.UserID != userAccessor.CurrentUser.Id)
                 {
-                    return new JsonResult
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شما مجوز انجام این کار را ندارید" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شما مجوز انجام این کار را ندارید"
+                    });
                 }
                 var allowedStates = new List<int>() {
                     (int)AdvertiseStatus.Published,
@@ -1642,34 +1602,32 @@ namespace Amlakbashi.Host.Controllers
                 };
                 if (!allowedStates.Contains((int)acc.Status))
                 {
-                    return new JsonResult
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "آگهی شما هنوز منتشر نشده است" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "آگهی شما هنوز منتشر نشده است"
+                    });
                 }
                 var newStatus = 0;
                 if (active != null)
                 {
                     if ((bool)active && acc.Status != AdvertiseStatus.Archived)
                     {
-                        return new JsonResult
+                        return GenerateJsonResult(new
                         {
-                            Data = new { status = -1 },
-                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                        };
+                            status = -1
+                        });
                     }
                     if ((bool)!active && acc.Status != AdvertiseStatus.Published)
                     {
-                        return new JsonResult
+                        return GenerateJsonResult(new
                         {
-                            Data = new { status = -1 },
-                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                        };
+                            status = -1
+                        });
                     }
                     if ((bool)active)
                     {
-                        advertiseService.Publish(id,  userAccessor.CurrentUser.Id, ActionSourceEnum.WebsiteDashboard);
+                        advertiseService.Publish(id, userAccessor.CurrentUser.Id, ActionSourceEnum.WebsiteDashboard);
                         newStatus = (int)AdvertiseStatus.Published;
                     }
                     else
@@ -1682,26 +1640,22 @@ namespace Amlakbashi.Host.Controllers
                 {
                     newStatus = (int)advertiseService.ToggleSuspension(id);
                 }
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        status = 1,
-                        newValue = newStatus == (int)AdvertiseStatus.Published ? 1 : 0,
-                        statusString = AdvertiseMainLocalization.GetAdvertiseStatusString((int)newStatus),
-                        statusColor = AdvertiseStyleHelper.GetAdvertiseStatusColor((int)newStatus)
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    newValue = newStatus == (int)AdvertiseStatus.Published ? 1 : 0,
+                    statusString = AdvertiseMainLocalization.GetAdvertiseStatusString((int)newStatus),
+                    statusColor = AdvertiseStyleHelper.GetAdvertiseStatusColor((int)newStatus)
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("ToggleActive", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, val = "" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    val = ""
+                });
             }
         }
 
@@ -1713,11 +1667,11 @@ namespace Amlakbashi.Host.Controllers
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != userAccessor.CurrentUser.Id)
                 {
-                    return new JsonResult
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شما مجوز این کار را ندارید" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شما مجوز این کار را ندارید"
+                    });
                 }
                 from = StringUtility.PersianNumberToEnglish(from).Replace("/", ",");
                 to = StringUtility.PersianNumberToEnglish(to).Replace("/", ",");
@@ -1726,38 +1680,39 @@ namespace Amlakbashi.Host.Controllers
                 List<string> errorList;
                 var done = discountTableService.Insert(id, from_gregorian, to_gregorian, discount, out errorList);
                 var priceDict = advertiseService.GetAccPriceDatesInfo(id);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = done ? 1 : 0, msg = done ? "تخفیف مورد نظر با موفقیت اعمال شد" : string.Join("\n", errorList), priceDict = priceDict },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = done ? 1 : 0,
+                    msg = done ? "تخفیف مورد نظر با موفقیت اعمال شد" : string.Join("\n", errorList),
+                    priceDict = priceDict
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("AddDiscount", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
-        [OutputCache(Duration = 60 * 60, VaryByParam = "*", Location = System.Web.UI.OutputCacheLocation.Server)]
+        [ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult Item(string slug, string capacity = null,
             string empty_range_from = null, string empty_range_to = null)
         {
             try
             {
-                if (HttpContext.Request.RawUrl.Last() == '/')
+                if (HttpContext.Request.Path.Value.Last() == '/')
                 {
-                    return RedirectPermanent(HttpContext.Request.RawUrl.Remove(HttpContext.Request.RawUrl.Length - 1));
+                    return RedirectPermanent(HttpContext.Request.Path.Value.Remove(HttpContext.Request.Path.Value.Length - 1));
                 }
                 var id = long.Parse(slug.Split('-')[0]);
                 var model = advertiseService.FindIncludingDeleted(id);
                 if (model.Slug.ToLower() != slug.ToLower())
                 {
-                    return new HttpNotFoundResult("صفحه ی مورد نظر موجود نمی باشد .");
+                    return NotFound("صفحه ی مورد نظر موجود نمی باشد .");
                 }
                 advertiseService.UpdateAccView(id);
 
@@ -1768,7 +1723,7 @@ namespace Amlakbashi.Host.Controllers
                 var director = advertiseService.GetAdvertisePageData(id, out childDirectors);
                 var accDTO = AccommodationItemDTO.Generate(userAccessor.CurrentUser, model,
                     director, childDirectors, allUserReportItems);
-                accDTO.RawUrl = HttpContext.Request.RawUrl.Split('?')[0];
+                accDTO.RawUrl = HttpContext.Request.Path.Value.Split('?')[0];
                 accDTO.EmptyRangeFrom = empty_range_from;
                 accDTO.EmptyRangeTo = empty_range_to;
                 accDTO.RelatedLinkCapacity = capacity;
@@ -1790,7 +1745,7 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Accommodation.Item", exc);
-                return new HttpNotFoundResult("صفحه ی مورد نظر موجود نمی باشد .");
+                return NotFound("صفحه ی مورد نظر موجود نمی باشد .");
             }
         }
 
@@ -1803,7 +1758,7 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.FindIncludingDeleted(id);
                 if (userAccessor.CurrentUser.Id != acc.UserID)
                 {
-                    return new HttpNotFoundResult("صفحه ی مورد نظر موجود نمی باشد .");
+                    return NotFound("صفحه ی مورد نظر موجود نمی باشد .");
                 }
                 advertiseService.UpdateAccView(id);
                 ViewBag.amp_version = false;
@@ -1815,7 +1770,7 @@ namespace Amlakbashi.Host.Controllers
                 var director = advertiseService.GetAdvertisePageData(id, out childDirectors);
                 var accDTO = AccommodationItemDTO.Generate(userAccessor.CurrentUser, acc,
                     director, childDirectors, allUserReportItems);
-                accDTO.RawUrl = HttpContext.Request.RawUrl.Split('?')[0];
+                accDTO.RawUrl = HttpContext.Request.Path.Value.Split('?')[0];
                 accDTO.EmptyRangeFrom = empty_range_from;
                 accDTO.EmptyRangeTo = empty_range_to;
                 accDTO.RelatedLinkCapacity = capacity;
@@ -1828,7 +1783,7 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Accommodation.Preview", exc);
-                return new HttpNotFoundResult("صفحه ی مورد نظر موجود نمی باشد .");
+                return NotFound("صفحه ی مورد نظر موجود نمی باشد .");
             }
         }
 
@@ -1849,7 +1804,7 @@ namespace Amlakbashi.Host.Controllers
                 var director = advertiseService.GetAdvertisePageData(id, out childDirectors);
                 var accDTO = AccommodationItemDTO.Generate(userAccessor.CurrentUser,
                     acc, director, childDirectors, allUserReportItems);
-                accDTO.RawUrl = HttpContext.Request.RawUrl.Split('?')[0];
+                accDTO.RawUrl = HttpContext.Request.Path.Value.Split('?')[0];
                 accDTO.EmptyRangeFrom = empty_range_from;
                 accDTO.EmptyRangeTo = empty_range_to;
                 accDTO.RelatedLinkCapacity = capacity;
@@ -1862,7 +1817,7 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Accomodation.AdminPreview", exc);
-                return new HttpNotFoundResult("صفحه ی مورد نظر موجود نمی باشد .");
+                return NotFound("صفحه ی مورد نظر موجود نمی باشد .");
             }
         }
 
@@ -1874,27 +1829,27 @@ namespace Amlakbashi.Host.Controllers
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != userAccessor.CurrentUser.Id)
                 {
-                    return new JsonResult
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شما مجوز این کار را ندارید" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شما مجوز این کار را ندارید"
+                    });
                 }
                 var model = discountTableService.GetDiscountsOfAccommodation(id);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = model.Any() ? 1 : 2, discounts = model.Select(s => (AccDashboardDTOs.DiscountDTO)s) },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = model.Any() ? 1 : 2,
+                    discounts = model.Select(s => (AccDashboardDTOs.DiscountDTO)s)
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("GetDiscounts", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1907,28 +1862,28 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(discount.AdvertiseID);
                 if (acc.UserID != userAccessor.CurrentUser.Id)
                 {
-                    return new JsonResult
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شما مجوز این کار را ندارید" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شما مجوز این کار را ندارید"
+                    });
                 }
                 discountTableService.Delete(discount_id);
                 var priceDict = advertiseService.GetAccPriceDatesInfo(acc.Id);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, priceDict = priceDict },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    priceDict = priceDict
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("RemoveDiscount", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1940,11 +1895,11 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(id);
                 if (acc.UserID != userAccessor.CurrentUser.Id)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, msg = "شما مجوز این کار را ندارید" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شما مجوز این کار را ندارید"
+                    });
                 }
                 var todayPersian = DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date);
                 var tommorowPersian = DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date.AddDays(1));
@@ -1957,28 +1912,27 @@ namespace Amlakbashi.Host.Controllers
                     }
                     else
                     {
-                        return new JsonResult()
+                        return GenerateJsonResult(new
                         {
-                            Data = new { status = 0, msg = "واحد شما برای امروز رزرو شده است" },
-                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                        };
+                            status = 0,
+                            msg = "واحد شما برای امروز رزرو شده است"
+                        });
                     }
                 }
                 advertiseService.SetAsTodayEmpty(id);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1 },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("SetAsTodayEmpty", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1988,11 +1942,11 @@ namespace Amlakbashi.Host.Controllers
             var acc = advertiseService.Find(id);
             if (acc.UserID != userAccessor.CurrentUser.Id)
             {
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = "شما مجوز این کار را ندارید" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "شما مجوز این کار را ندارید"
+                });
             }
             var today = DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date);
             var tomorrow = DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date.AddDays(1).Date);
@@ -2005,18 +1959,17 @@ namespace Amlakbashi.Host.Controllers
             }
             else
             {
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, msg = checkResult.ToString() },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = checkResult.ToString()
+                });
             }
             advertiseService.UnsetTodayEmpty(id);
-            return new JsonResult()
+            return GenerateJsonResult(new
             {
-                Data = new { status = 1 },
-                JsonRequestBehavior = JsonRequestBehavior.AllowGet
-            };
+                status = 1
+            });
         }
 
         public JsonResult GetAccomodationUrl(long id)
@@ -2026,28 +1979,26 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(id);
                 if (acc == null)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = -1 },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = -1
+                    });
                 }
                 var url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(acc.Slug);
                 url = GeneralData.WebsiteUrl + url;
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, url },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    url
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("GetAccomodationUrl", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0 },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0
+                });
             }
         }
 
@@ -2061,7 +2012,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_Reserve", dto);
         }
 
-        [OutputCache(Duration = 60 * 15, VaryByParam = "*")]
+        [ResponseCache(Duration = 60 * 15, VaryByQueryKeys = new string[] { "*" })]
         public JsonResult GetRegionChildrenItems(int region_type, int? parent_id, int status = -1)
         {
             try
@@ -2077,21 +2028,21 @@ namespace Amlakbashi.Host.Controllers
                     {
                         ret += "<option value='" + item.Id + "'>" + item.PersianName + "</option>";
                     }
-                    return new JsonResult
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 1, val = ret },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 1,
+                        val = ret
+                    });
                 }
                 else if (Items.Count() == 1)
                 {
                     var item = Items[0];
                     var ret = "<option value='" + item.Id + "'>" + item.PersianName + "</option>";
-                    return new JsonResult
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 1, val = ret },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 1,
+                        val = ret
+                    });
                 }
                 else
                 {
@@ -2108,98 +2059,77 @@ namespace Amlakbashi.Host.Controllers
                             ret = "<option value='-1' style='color:#ccc;'>گزینه ای وجود ندارد.</option>";
                             break;
                     }
-                    return new JsonResult
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 1, val = ret },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 1,
+                        val = ret
+                    });
                 }
             }
             catch (Exception exc)
             {
                 logger.Error("GetRegionChildrenItems", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, val = "" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    val = ""
+                });
             }
         }
 
-        [OutputCache(Duration = 60 * 15, VaryByParam = "*")]
+        [ResponseCache(Duration = 60 * 15, VaryByQueryKeys = new string[] { "*" })]
         public JsonResult GetProvinces(int status = -1)
         {
-            if (ValidateRequestOrigin())
-            {
-                Response.Headers.Remove("Access-Control-Allow-Origin");
-                Response.AddHeader("Access-Control-Allow-Origin", Request.UrlReferrer.GetLeftPart(UriPartial.Authority));
-            }
             var provinces = regionService.Filter(AdvertiseRegion.Province, 0, (RegionStatus)status);
-            return new JsonResult()
+            return GenerateJsonResult(new
             {
-                Data = new { provinces = provinces },
-                JsonRequestBehavior = JsonRequestBehavior.AllowGet
-            };
+                provinces = provinces
+            });
         }
 
-        [OutputCache(Duration = 60 * 15, VaryByParam = "*")]
+        [ResponseCache(Duration = 60 * 15, VaryByQueryKeys = new string[] { "*" })]
         public JsonResult GetCities(int province_id, int status = -1)
         {
-            if (ValidateRequestOrigin())
-            {
-                Response.Headers.Remove("Access-Control-Allow-Origin");
-                Response.AddHeader("Access-Control-Allow-Origin",
-                    Request.UrlReferrer.GetLeftPart(UriPartial.Authority));
-            }
             if (province_id > 0)
             {
                 var cities = regionService.Filter(AdvertiseRegion.City,
                     province_id, (RegionStatus)status);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { cities = cities },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    cities = cities
+                });
             }
             else
             {
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { cities = new List<Region>() },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    cities = new List<Region>()
+                });
             }
         }
 
-        [OutputCache(Duration = 60 * 15, VaryByParam = "*")]
+        [ResponseCache(Duration = 60 * 15, VaryByQueryKeys = new string[] { "*" })]
         public JsonResult GetAreas(int city_id, int status = -1)
         {
-            if (ValidateRequestOrigin())
-            {
-                Response.Headers.Remove("Access-Control-Allow-Origin");
-                Response.AddHeader("Access-Control-Allow-Origin", Request.UrlReferrer.GetLeftPart(UriPartial.Authority));
-            }
             if (city_id > 0)
             {
                 var areas = regionService.Filter(
                     AdvertiseRegion.Area, city_id, (RegionStatus)status);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { areas = areas },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    areas = areas
+                });
             }
             else
             {
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { areas = new List<Region>() },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    areas = new List<Region>()
+                });
             }
         }
 
-        [OutputCache(Duration = 60 * 60, VaryByParam = "*")]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetRelatedAccommodations(long id, string capacity = null,
             string empty_range_from = null, string empty_range_to = null)
         {
@@ -2272,7 +2202,7 @@ namespace Amlakbashi.Host.Controllers
                 rules_string += "<br/>" + item.Key + ": " + item.Value;
                 ii++;
             }
-            var currentUser =  userAccessor.CurrentUser;
+            var currentUser = userAccessor.CurrentUser;
             var is_favourited = currentUser.Id > 0 &&
                 currentUser.Favorite != null &&
                 currentUser.Favorite.Any(f => f.AdvertiseID == id);
@@ -2296,11 +2226,10 @@ namespace Amlakbashi.Host.Controllers
                 occupiedList = occupiedList,
                 priceDict = priceDict
             };
-            return new JsonResult()
+            return GenerateJsonResult(new
             {
-                JsonRequestBehavior = JsonRequestBehavior.AllowGet,
                 Data = data
-            };
+            });
         }
 
         public JsonResult GetAccListDynamicViewBag(string ids)
@@ -2308,11 +2237,10 @@ namespace Amlakbashi.Host.Controllers
             var idList = string.IsNullOrEmpty(ids) || ids == "," ? new List<long>() :
                 Array.ConvertAll(ids.Split(','), x => long.Parse(x)).ToList();
             var price_dict = advertiseService.GetAdvertiseListPrices(idList);
-            return new JsonResult()
+            return GenerateJsonResult(new
             {
-                JsonRequestBehavior = JsonRequestBehavior.AllowGet,
-                Data = new { price_dict = price_dict }
-            };
+                price_dict = price_dict
+            });
         }
 
         [Auth]
@@ -2322,31 +2250,23 @@ namespace Amlakbashi.Host.Controllers
             var acc = advertiseService.Find(id);
             if (acc.UserID != userId)
             {
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet,
-                    Data = new InstantReserveRequestResultDTO()
-                    {
-                        status = 0,
-                        msg = "شما مجوز این کار را ندارید"
-                    } as dynamic
-                };
+                    status = 0,
+                    msg = "شما مجوز این کار را ندارید"
+                });
             }
             if (userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
             {
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet,
-                    Data = new InstantReserveRequestResultDTO()
-                    {
-                        status = 0,
-                        msg = "این امکان برای شما غیر فعال شده است"
-                    }
-                };
+                    status = 0,
+                    msg = "این امکان برای شما غیر فعال شده است"
+                });
             }
             bool needMsg;
             advertiseService.RequestInstantReserve(id, ignoreMsg, userId,
-                userAccessor.DoerUser.Id, ActionLog.ActionSourceEnum.WebsiteDashboard,
+                userAccessor.DoerUser.Id, ActionLogController.ActionSourceEnum.WebsiteDashboard,
                 userAccessor.CurrentUser.InstantReserveAccess, out needMsg);
             acc = advertiseService.Find(id);
             InstantReserveRequestResultDTO result;
@@ -2401,7 +2321,7 @@ namespace Amlakbashi.Host.Controllers
                 });
             }
             advertiseService.CancelInstantReserve(id, userId, userAccessor.DoerUser.Id,
-                ActionLog.ActionSourceEnum.WebsiteDashboard);
+                ActionLogController.ActionSourceEnum.WebsiteDashboard);
             var result = new InstantReserveRequestResultDTO()
             {
                 status = 1,
@@ -2475,15 +2395,11 @@ namespace Amlakbashi.Host.Controllers
                 if (!int.TryParse(minStr, out min) ||
                     !int.TryParse(maxStr, out max))
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 0,
-                            msg = "لطفا عدد وارد کنید"
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "لطفا عدد وارد کنید"
+                    });
                 }
                 if (min == 1)
                 {
@@ -2491,15 +2407,11 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (max > 0 && max < min)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 0,
-                            msg = "حداکثر مدت رزرو نباید از حداقل کمتر باشد. لطفا بررسی کنید."
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "حداکثر مدت رزرو نباید از حداقل کمتر باشد. لطفا بررسی کنید."
+                    });
                 }
                 advertiseService.SetStayDuration(id, min, max);
                 var data = new StayDurationDTO()
@@ -2508,33 +2420,25 @@ namespace Amlakbashi.Host.Controllers
                     min = min,
                     max = max
                 };
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        msg = "حداقل اقامت " +
+                    msg = "حداقل اقامت " +
                         (min == 0 ? "بدون محدودیت" : min + " شب") +
                         " و حداکثر اقامت " +
                         (max == 0 ? "بدون محدودیت" : max + " شب") +
                         " تعیین شد.",
-                        status = 1,
-                        data = data
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    data = data
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("SetStayDuration", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        status = 0,
-                        msg = "متاسفانه عملیات با خطا مواجه شد"
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -2547,40 +2451,28 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(id);
                 if (userAccessor.CurrentUser.Id != acc.UserID)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 0,
-                            msg = "شما مجوز انجام این کار را ندارید"
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شما مجوز انجام این کار را ندارید"
+                    });
                 }
                 advertiseService.SetNorouzPrice(id, price, overCapacityPrice);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        status = 1,
-                        norouzPrice = price,
-                        overCapacityPrice = overCapacityPrice
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    norouzPrice = price,
+                    overCapacityPrice = overCapacityPrice
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("SetNorouzPrice", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        status = 0,
-                        msg = "متاسفانه عملیات با خطا مواجه شد"
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -2592,42 +2484,30 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(id);
                 if (userAccessor.CurrentUser.Id != acc.UserID)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 0,
-                            msg = "شما مجوز انجام این کار را ندارید"
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شما مجوز انجام این کار را ندارید"
+                    });
                 }
                 var data = new InstantReserveMaxStartDTO()
                 {
                     id = acc.Id,
                     maxStart = acc.MaxInstantReserveStart
                 };
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        status = 1,
-                        data = data
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    data = data
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("GetInstantReserveStart", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        status = 0
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0
+                });
             }
         }
 
@@ -2639,15 +2519,11 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(id);
                 if (userAccessor.CurrentUser.Id != acc.UserID)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new
-                        {
-                            status = 0,
-                            msg = "شما مجوز انجام این کار را ندارید"
-                        },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        msg = "شما مجوز انجام این کار را ندارید"
+                    });
                 }
                 advertiseService.SetMaxInstantReserveStart(id, maxStart);
                 var data = new InstantReserveMaxStartDTO()
@@ -2655,31 +2531,23 @@ namespace Amlakbashi.Host.Controllers
                     id = id,
                     maxStart = maxStart
                 };
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        msg = "حداکثر شروع سفر تا " +
+                    msg = "حداکثر شروع سفر تا " +
                         maxStart + " روز" +
                         " تعیین شد.",
-                        status = 1,
-                        data = data
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    data = data
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("SetInstantReserveStart", exc);
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new
-                    {
-                        status = 0,
-                        msg = "متاسفانه عملیات با خطا مواجه شد"
-                    },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -2733,25 +2601,23 @@ namespace Amlakbashi.Host.Controllers
                 if (acc.Status != AdvertiseStatus.Published ||
                     acc.Count > 0 || !acc.Available)
                 {
-                    return new JsonResult()
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0 },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0
+                    });
                 }
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(acc.Slug) },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 1,
+                    url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(acc.Slug)
+                });
             }
             catch
             {
-                return new JsonResult()
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0 },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0
+                });
             }
         }
 
@@ -2763,27 +2629,27 @@ namespace Amlakbashi.Host.Controllers
                 Advertise acc = advertiseService.Find(id);
                 if (acc.UserID != userAccessor.CurrentUser.Id)
                 {
-                    return new JsonResult
+                    return GenerateJsonResult(new
                     {
-                        Data = new { status = 0, val = "" },
-                        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                    };
+                        status = 0,
+                        val = ""
+                    });
                 }
                 advertiseService.Delete(id);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 1, val = "" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    val = ""
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("Delete", exc);
-                return new JsonResult
+                return GenerateJsonResult(new
                 {
-                    Data = new { status = 0, val = "" },
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                };
+                    status = 0,
+                    val = ""
+                });
             }
         }
 
@@ -2794,49 +2660,6 @@ namespace Amlakbashi.Host.Controllers
                 acc.City == null ? 0 : (int)acc.City, acc.Area == null ? 0 : (int)acc.Area, (int)acc.TypeID,
                 (int)acc.Position, acc.Pool == null ? false : (bool)acc.Pool, 2);
             return PartialView("_AccBlogNews", model);
-        }
-
-        [ChildActionOnly]
-        public ActionResult RegionSelector(
-            int province = -1, int city = -1, int area = -1,
-            RegionStatus region_filter_status = RegionStatus.All,
-            string region_filter_item_class = "dynamic-filter__item",
-            string region_filter_label_class = "dynamic-filter__label",
-            string region_filter_property_class = "dynamic-filter__property",
-            string provinceName = "Province",
-            string cityName = "City",
-            string areaName = "Area",
-            bool selectEnabled = true,
-            bool mandatory = true,
-            bool provinceError = false, bool cityError = false
-            )
-        {
-            ViewBag.province = province;
-            ViewBag.city = city;
-            ViewBag.area = area;
-            ViewBag.region_filter_status = region_filter_status;
-            ViewBag.region_filter_item_class = region_filter_item_class;
-            ViewBag.region_filter_label_class = region_filter_label_class;
-            ViewBag.region_filter_property_class = region_filter_property_class;
-            ViewBag.provinceName = provinceName;
-            ViewBag.cityName = cityName;
-            ViewBag.areaName = areaName;
-            ViewBag.selectEnabled = selectEnabled;
-            ViewBag.mandatory = mandatory;
-            ViewBag.provinces = regionService.Filter(AdvertiseRegion.Province, 0,
-                region_filter_status, RegionSortOrder.PersianName);
-            ViewBag.cities = province > 0 ?
-                regionService.Filter(AdvertiseRegion.City, province,
-                region_filter_status, RegionSortOrder.PersianName) :
-                new List<Region>();
-            ViewBag.areas = city > 0 ?
-                regionService.Filter(AdvertiseRegion.Area, city,
-                region_filter_status, RegionSortOrder.PersianName) :
-                new List<Region>();
-            ViewBag.guid = Guid.NewGuid();
-            ViewBag.provinceError = provinceError;
-            ViewBag.cityError = cityError;
-            return PartialView("_AdvertiseRegionSelector");
         }
     }
 }

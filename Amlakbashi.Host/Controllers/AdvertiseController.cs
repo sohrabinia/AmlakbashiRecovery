@@ -1,0 +1,542 @@
+﻿using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
+using Amlakbashi.Application.Services.Category.Interfaces;
+using Amlakbashi.Application.Services.CommentServices.Interfaces;
+using Amlakbashi.Application.Services.ReserveServices.Interfaces;
+using Amlakbashi.Application.Services.UserServices.Interfaces;
+using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.DTOs.AccommodationDTOs;
+using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
+using Amlakbashi.Host.Authentication;
+using Amlakbashi.Host.Controllers.Base;
+using log4net;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using X.PagedList;
+using static Amlakbashi.Core.Entities.Advertise;
+using static Amlakbashi.Core.Entities.Region;
+using Entities = Amlakbashi.Core.Entities;
+
+namespace Amlakbashi.Host.Controllers
+{
+    public class AdvertiseController : BaseController
+    {
+        private readonly IAdvertiseAppService advertiseService;
+        private readonly IReportItemAppService reportItemService;
+        private readonly IUserAppService userService;
+        private readonly IRegionAppService regionService;
+        private readonly ICategoryAppService categoryService;
+        private readonly IDiscountTableAppService discountTableService;
+        private readonly IReserveAppService reserveService;
+        private readonly IUserContactFacade userContact;
+        private readonly IUserAccessor userAccessor;
+        private readonly ILog logger;
+        public AdvertiseController(ILog logger,
+            IAdvertiseAppService advertiseService,
+            IReportItemAppService reportItemService,
+            IUserAppService userService,
+            IRegionAppService regionService,
+            ICategoryAppService dynamicCategoryService,
+            IDiscountTableAppService discountTableService,
+            IReserveAppService reserveService,
+            IUserContactFacade userContact,
+            IUserAccessor userAccessor
+            )
+        {
+            this.advertiseService = advertiseService;
+            this.reportItemService = reportItemService;
+            this.regionService = regionService;
+            this.userService = userService;
+            this.categoryService = dynamicCategoryService;
+            this.discountTableService = discountTableService;
+            this.reserveService = reserveService;
+            this.userContact = userContact;
+            this.logger = logger;
+            this.userAccessor = userAccessor;
+        }
+
+        [Auth(UserRoles.Admin)]
+        public ActionResult Admin()
+        {
+            return View();
+        }
+
+        [Auth(UserRoles.Admin)]
+        public ActionResult Index(int? page, int status = -1,
+            int adtype = -1, int userid = -1, string sort = "score",
+            long id = -1, int instantReserveStatus = -1, string minReserveNorouzFromDate = "",
+            int imageCountMin = 0, int imageCountMax = 0)
+        {
+            try
+            {
+                long unixDate = 0;
+                if (!string.IsNullOrEmpty(minReserveNorouzFromDate))
+                {
+                    var gregorianDate = DateTimeUtility.PersianDateToGregorian(
+                        StringUtility.PersianNumberToEnglish(minReserveNorouzFromDate).Replace('/', ','));
+                    unixDate = DateTimeUtility.DateValueOfJS(gregorianDate);
+                }
+
+                var province = string.IsNullOrEmpty(Request.Form["Province"]) ? -1 :
+                    int.Parse(Request.Form["Province"]);
+                var city = string.IsNullOrEmpty(Request.Form["City"]) ? -1 :
+                    int.Parse(Request.Form["City"]);
+                var area = string.IsNullOrEmpty(Request.Form["Area"]) ? -1 :
+                    int.Parse(Request.Form["Area"]);
+
+                var model = advertiseService.Filter((AdvertiseStatus)status, adtype, userid, sort, id, instantReserveStatus,
+                    unixDate, imageCountMin, imageCountMax, province, city, area);
+
+                ViewBag.status = status;
+                ViewBag.adtype = adtype;
+                ViewBag.userid = userid;
+                ViewBag.province = province;
+                ViewBag.city = city;
+                ViewBag.area = area;
+                ViewBag.sort = sort;
+                ViewBag.id = id;
+                ViewBag.instantReserveStatus = instantReserveStatus;
+                ViewBag.minReserveNorouzFromDate = minReserveNorouzFromDate;
+                ViewBag.imageCountMin = imageCountMin;
+                ViewBag.imageCountMax = imageCountMax;
+
+                var PageNumber = page ?? 1;
+                var onePageOfModel = model.ToPagedList(PageNumber, 20);
+                ViewBag.RowIndexStart = (PageNumber * 20) - 20;
+
+                List<AdvertiseIndexDTO> advertiseDTOs = new List<AdvertiseIndexDTO>();
+                foreach (var item in onePageOfModel)
+                {
+                    var user = userService.Find(item.UserID);
+                    var dto = new AdvertiseIndexDTO()
+                    {
+                        Advertise = item,
+                        UserPhoneNumber = user != null ? user.GetPhoneNumber(Entities.User.PhoneType.MainMobile) : "کاربر حذف شده",
+                        UserScore = user != null ? user.UserScore : 0,
+                        CityPersianName = regionService.GetRegionName(item.City == null ? 0 : (int)item.City)
+                    };
+                    advertiseDTOs.Add(dto);
+                }
+                ViewBag.dto = advertiseDTOs;
+                return View(onePageOfModel);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.Index", exc);
+                return Redirect(Request.Headers["Referrer"].ToString());
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        [HttpGet]
+        public ActionResult Edit(long id)
+        {
+            try
+            {
+                ViewBag.msg = TempData["msg"];
+                var model = advertiseService.FindIncludingDeleted(id);
+                return View(model);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.Edit", exc);
+                return Redirect(Request.Headers["Referrer"].ToString());
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        [HttpPost]
+        public ActionResult Edit(Advertise ad)
+        {
+            try
+            {
+                var objad = advertiseService.FindIncludingDeleted(ad.Id);
+                if (objad.UserID != ad.UserID)
+                {
+                    var host_user = userService.Find(ad.UserID);
+                    if (host_user.UserGeneralType < 1)
+                    {
+                        userService.UpdateUserGeneralType(host_user.Id, Entities.User.UserGeneralTypeEnum.Host);
+                    }
+                }
+                advertiseService.Edit(ad);
+                return RedirectToAction("Index");
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.Edit", exc);
+                return Redirect(Request.Headers["Referrer"].ToString());
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult Delete(long id)
+        {
+            try
+            {
+                advertiseService.Delete(id);
+                return GenerateJsonResult(new { status = 1, val = "" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.Delete", exc);
+                return GenerateJsonResult(new { status = 0, val = "" });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult NotVerify(long id)
+        {
+            try
+            {
+                advertiseService.NotVerify(id);
+                return GenerateJsonResult(new { status = 1, val = "" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("NotVerify", exc);
+                return GenerateJsonResult(new { status = 0, val = "" });
+            }
+        }
+
+        public ActionResult AdvertisePage(string url, string area_str = null, bool amp_version = false,
+            int page = 1, string discount_homes = null, string today_empty_homes = null,
+            string frompaypernight = null, string topaypernight = null,
+            string fromMetrazh = null, string toMetrazh = null,
+            string parking = null, string region = null, string capacity = null,
+            string room = null, string elevator = null, string pool = null,
+            string empty_range_from = null, string empty_range_to = null,
+            string norouz_special = null, string instant_reserve = null
+        )
+        {
+            try
+            {
+                if (HttpContext.Request.Path.Value.Last() == '/')
+                {
+                    return RedirectPermanent(HttpContext.Request.Path.Value.Remove(HttpContext.Request.Path.Value.Length - 1));
+                }
+                if (amp_version)
+                {
+                    ViewBag.raw_url = HttpContext.Request.Path.Value.Replace("/amp", "");
+                }
+                else
+                {
+                    ViewBag.raw_url = HttpContext.Request.Path.Value;
+                }
+                ViewBag.amp_version = amp_version;
+                var category = categoryService.GetByUrl(url);
+                if (category != null)
+                {
+                    if (category.Province > 0)
+                    {
+                        var targetUrl = CategoryUrlLocalization.CategoryToUrl(category);
+                        return RedirectPermanent(targetUrl);
+                    }
+                    else
+                    {
+                        if (category.CountryDirection == CountryDirection.North)
+                        {
+                            return RedirectPermanent("/شمال");
+                        }
+                        else
+                        {
+                            return RedirectPermanent("/");
+                        }
+                    }
+                }
+                else
+                {
+                    return NotFound("صفحه ی مورد نظر موجود نمی باشد .");
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.AdvertisePage", exc);
+                return Redirect(Request.Headers["Referrer"].ToString());
+            }
+        }
+
+        public JsonResult TggleFavorite(long id, bool flag)
+        {
+            try
+            {
+                if (!User.Identity.IsAuthenticated)
+                {
+                    TempData["msg"] = "برای افزودن آگهی به علاقه مندی ها ابتدا عضو شوید و در صورتی که عضو هستید وارد شوید .";
+                    return GenerateJsonResult(new { status = 2, val = "" });
+                }
+                var objUser = userAccessor.CurrentUser;
+                if (objUser.Favorite == null || objUser.Favorite.Count == 0)
+                {
+                    objUser.Favorite = new List<UserFavorite>();
+                }
+
+                if (flag)
+                {
+                    userService.DeleteFavorite(objUser.Id, id);
+                }
+                else
+                {
+                    userService.AddFavorite(objUser.Id, id);
+                }
+                return GenerateJsonResult(new { status = 1, val = "" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.ToggleFavourite", exc);
+                return GenerateJsonResult(new { status = 0, val = "" });
+            }
+        }
+
+        public JsonResult ContactUser(long id)
+        {
+            try
+            {
+                var acc = advertiseService.Find(id);
+
+                if (!acc.IsContactAvailable)
+                {
+                    return GenerateJsonResult(new { status = 0, val = "" });
+                }
+
+                string contact_result = "";
+                string mobile2 = "";
+                int response_from = 0;
+                int response_to = 0;
+                if (acc.UserID > 0)
+                {
+                    var objuser = userService.Find(acc.UserID);
+                    response_from = objuser.ResponseFrom;
+                    response_to = objuser.ResponseTo;
+                    if (string.IsNullOrEmpty(objuser.GetLocalPhoneNumber(Entities.User.PhoneType.OtherMobile1)))
+                        contact_result = objuser.GetLocalPhoneNumber(Entities.User.PhoneType.MainMobile);
+                    else
+                        contact_result = objuser.GetLocalPhoneNumber(Entities.User.PhoneType.OtherMobile1);
+                    mobile2 = objuser.GetLocalPhoneNumber(Entities.User.PhoneType.OtherMobile2);
+                }
+                return GenerateJsonResult(new {
+                    status = 1,
+                    mobile = contact_result,
+                    mobile2 = mobile2,
+                    response_from = response_from,
+                    response_to = response_to
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("ContactUser", exc);
+                return GenerateJsonResult(new { status = 0, val = "" });
+            }
+        }
+
+        public ActionResult Add()
+        {
+            return RedirectPermanent("/accomodation/accbasicform");
+        }
+
+        public ActionResult Item()
+        {
+            Response.StatusCode = 404;
+            return View("/views/errors/http404.cshtml");
+        }
+
+        public ActionResult DailyRentPage(bool amp_version = false)
+        {
+            return AdvertisePage("اجاره-ویلا-سوئیت-آپارتمان", "", amp_version);
+        }
+
+        [Auth]
+        [HttpPost]
+        public JsonResult AddComment(long advertiseID, string text, int user_id = 0, long parentID = 0)
+        {
+            try
+            {
+                if (user_id == 0)
+                    user_id = userAccessor.CurrentUser.Id;
+                string cannotAddReason;
+                var canAdd = advertiseService.AddAdvertiseComment(user_id,
+                    advertiseID, text, out cannotAddReason,
+                    userAccessor.CurrentUser.Id == user_id ? (int?)null : userAccessor.CurrentUser.Id);
+                if (canAdd)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 1
+                    });
+                }
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    val = cannotAddReason
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.AddComment", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    val = "خطایی در سیستم رخ داده است.لطفا بعدا امتحان کنید."
+                });
+            }
+        }
+
+        [Auth]
+        public JsonResult AddHostReplyComment(long advertiseID, string text, int user_id, long parentID = 0)
+        {
+            try
+            {
+                var acc = advertiseService.Find(advertiseID);
+                if (acc.UserID != userAccessor.CurrentUser.Id)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        val = "شما مجوز انجام این کار را ندارید."
+                    });
+                }
+                advertiseService.AddAdvertiseHostReplyComment(
+                    user_id, advertiseID, text);
+                return GenerateJsonResult(new
+                {
+                    status = 1,
+                    val = ""
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.AddHostReplyComment", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    val = "خطایی در سیستم رخ داده است.لطفا بعدا امتحان کنید."
+                });
+            }
+        }
+
+        [Auth]
+        public JsonResult AddScore(long advertiseID, int ReportID, int value, int user_id = 0)
+        {
+            try
+            {
+                if (user_id > 0 && user_id != userAccessor.CurrentUser.Id)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        val = "شما مجوز انجام این کار را ندارید."
+                    });
+                }
+                reportItemService.SubmitAdvertiseScore(userAccessor.CurrentUser.Id,
+                    advertiseID, ReportID, value, 0);
+                return GenerateJsonResult(new
+                {
+                    status = 1,
+                    val = ""
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.AddScore", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    val = "خطایی در سیتمم  اتفاق افتاده است.لطفا بعدا امتحان کنید."
+                });
+            }
+        }
+        [Auth(UserRoles.Admin)]
+        public JsonResult AddScoreAdmin(long advertiseID, int ReportID, int value, int user_id = 0)
+        {
+            try
+            {
+                if (user_id < 1 || userService.Find(user_id) == null)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        val = "کد کاربری نامعتبر"
+                    });
+                }
+                reportItemService.SubmitAdvertiseScore(user_id,
+                    advertiseID, ReportID, value, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new
+                {
+                    status = 1,
+                    val = ""
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.AddScoreAdmin", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    val = "خطایی در سیتمم  اتفاق افتاده است.لطفا بعدا امتحان کنید."
+                });
+            }
+        }
+
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
+        public ActionResult MostViewAdvertiseByCity(int city_id, int province_id, int type_id, int count)
+        {
+            try
+            {
+                var model = advertiseService.GetMostViewedAdvertisesInCity(city_id, province_id, type_id, count).ToList();
+                var user = userAccessor.CurrentUser;
+                List<AccommodationCardDTO> advertiseItemDTOs = new List<AccommodationCardDTO>();
+                foreach (var item in model)
+                {
+                    var dto = (AccommodationCardDTO)item;
+                    dto.Favourited = user.Id > 0 && user.Favorite.Any(x => x.AdvertiseID == item.Id);
+                    advertiseItemDTOs.Add(dto);
+                }
+                return PartialView("_AdvertiseList", advertiseItemDTOs);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.MostViewAdvertiseByCity", exc);
+                return PartialView("_AdvertiseList", null);
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult AddSupporterInfoToAdvertise(long advertise_id, string text)
+        {
+            try
+            {
+                advertiseService.AddSupporterInfo(advertise_id, text, userAccessor.CurrentUser);
+                return GenerateJsonResult(new
+                {
+                    status = 1
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AddSupporterInfoToAdvertise", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0
+                });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public ActionResult GetAdvertiseSupporterInfo(long advertise_id)
+        {
+            try
+            {
+                var advertise = advertiseService.Find(advertise_id);
+                return PartialView("_AdvertiseSupporterInfo", advertise);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("GetAdvertiseSupporterInfo", exc);
+                return Content("");
+            }
+        }
+    }
+}
