@@ -1,0 +1,53 @@
+﻿@{
+    ViewBag.Title = "جواب نظر";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+@model Comment
+@section StyleLink
+{
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/dashboard.css">
+}
+@Html.Partial("_CommentItem", Model)
+<div class="reply-comment">
+    <div class="reply-comment__container" style="@(!ViewBag.ReplySent ? "display:none;" : "")">
+        <div class="reply-comment__title-container">
+            <span class="reply-comment__title-label">@ViewBag.ReplyTitle</span>
+        </div>
+        <div class="reply-comment__message-container">
+            <p class="reply-comment__message-paragraph">@ViewBag.ReplyMessage</p>
+        </div>
+    </div>
+    <div class="reply-comment__reply-container" style="@(ViewBag.ReplySent ? "display:none;" : "")">
+        <span class="reply-comment__reply-caption">متن پاسخ</span>
+        <textarea class="reply-comment__reply-message-textarea"></textarea>
+        <input onclick="sendReply()" type="button" class="reply-comment__send-button" value="ارسال پاسخ" />
+    </div>
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        function sendReply()
+        {
+            var comment = $(".reply-comment__reply-message-textarea").val();
+            myajax("Post/AddReplyComment", "commentID=" + @Model.Id + "&replyComment=" + comment + "&currentFilterType=" + @ViewBag.CurrentFilterType, function (ret) {
+                if (ret.status == 2)
+                {
+                    alert("لطفا متن مورد نظر خود را بنویسید");
+                }
+                else if (ret.status == 1)
+                {
+                    $(".reply-comment__reply-container").remove();
+                    $(".reply-comment__container").prop("style", "display:inherit;");
+                    $(".reply-comment__title-label").text(ret.replyTitle);
+                    $(".reply-comment__message-paragraph").text(ret.replyMessage);
+                    alert("جواب نظر ارسال شد");
+                }
+                else
+                {
+                    alert("ارسال ناموفق");
+                }
+            });
+        }
+    </script>
+}

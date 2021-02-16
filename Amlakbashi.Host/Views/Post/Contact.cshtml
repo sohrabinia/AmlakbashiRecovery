@@ -1,0 +1,215 @@
+﻿@using Amlakbashi.Core.Entities;
+@using Amlakbashi.Core.Infrastructure.LocalizationHelpers; 
+@{
+    ViewBag.Title = "تماس با ما - املاک باشی";
+    Layout = "~/Views/Shared/_Master.cshtml";
+    ViewBag.Description = "تماس با املاک باشی";
+}
+@section HeaderAddition
+  {
+    <link rel="canonical" href="https://www.amlakbashi.com/contact" />
+
+    <meta property="og:url" content="https://www.amlakbashi.com/contact" />
+}
+@section StyleLink {
+    @*<link rel="stylesheet" type="text/css" href="~/Resource/css/portal/post/contact.css">*@
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css_output/minifypostlistcss_v1_2.css" />
+    @*@MvcHtmlString.Create(
+        Bundle.Css()
+            .Add("/resource/css/portal/post-list.css")
+            .Add("/resource/css/portal/post/contact.css")
+            .ForceRelease()
+            .Render("/resource/css_output/minifypostlistcss_v1_2.css"))*@
+}
+<div class="container">
+    <div class="row" style="font: 25px Biransans; text-align: right; padding: 10px;margin:10px;border-radius:5px;color: #242424;"><h1>تماس با ما</h1></div>
+    <p style="padding:10px;">کاربر گرامی سوال شما یکی از موارد زیر است؟</p>
+    <div @*class="row"*@>
+        <div style="padding:10px 30px;font:14px Liransans;color:#333;align-content:center;min-height:300px;max-width:100%;">
+            <p class="public__header-text">
+                <strong>@SupportChatLocalization.GetQuestionTitle(SupportChat.AutoQuestion.questionHowToReserve)</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            @*<pre class="public__content-text" style="position:relative;">@SupportChatLocalization.GetQuestionText(SupportChat.AutoQuestion.questionHowToReserve)</pre>*@
+            <div class="public__content-text ">
+                <h3>مراحل رزرو از سایت املاک باشی</h3>
+                <pre class="public_content-text">
+1- از طریق کادر جستجو مقصد سفر خود را سرچ کنید
+2- از فیلتر بالای سایت میتوانید تعداد نفرات و تاریخ سفر را فیلتر کنید و از بخش فیلترهای بیشتر ، محدوده قیمت ، استخر ، تعداد اتاق خواب و سایر موارد مد نظر را انتخاب کنید سپس بر روی دکمه اعمال فیلتر کلیک نمایید تا اقامتگاه های مناسب شما نمایش داده شود
+3- موارد یافت شده را چک کنید و اقامتگاه مورد پسندتان را با کلیک بر روی آگهی باز کنید
+4- اطلاعات اقامتگاه را مطالعه کنید و در صورت تمایل درخواست رزرو را ثبت کنید و منتظر پیامک یا تماس از طریق سایت باشید
+                </pre>
+                <div class="video-style"><iframe class="video-aparat" src="https://www.aparat.com/video/video/embed/videohash/vS7Oe/vt/frame" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe></div>
+                <p class="pointer-style">👇</p>
+                <p class="public_content-text"><a href="https://www.amlakbashi.com/post/downloadapp">دانلود اپلیکیشن املاک باشی</a></pclass="public_content-text">
+            </div>
+            <p class="public__header-text">
+                <strong>@SupportChatLocalization.GetQuestionTitle(SupportChat.AutoQuestion.questionHowToContactHost)</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <pre class="public__content-text">@SupportChatLocalization.GetQuestionText(SupportChat.AutoQuestion.questionHowToContactHost)</pre>
+            <p class="public__header-text">
+                <strong>@SupportChatLocalization.GetQuestionTitle(SupportChat.AutoQuestion.questionCheckInCheckout)</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <pre class="public__content-text">@SupportChatLocalization.GetQuestionText(SupportChat.AutoQuestion.questionCheckInCheckout)</pre>
+            <p class="public__header-text">
+                <strong>@SupportChatLocalization.GetQuestionTitle(SupportChat.AutoQuestion.questionEvidence)</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <pre class="public__content-text">@SupportChatLocalization.GetQuestionText(SupportChat.AutoQuestion.questionEvidence)</pre>
+
+            <p class="public__header-text">
+                <strong>@SupportChatLocalization.GetQuestionTitle(SupportChat.AutoQuestion.questionCancelReserveRules)</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <pre class="public__content-text">@SupportChatLocalization.GetQuestionText(SupportChat.AutoQuestion.questionCancelReserveRules)</pre>
+
+            <p class="public__header-text">
+                <strong>@SupportChatLocalization.GetQuestionTitle(SupportChat.AutoQuestion.questionPaymentGuest)</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <pre class="public__content-text">@SupportChatLocalization.GetQuestionText(SupportChat.AutoQuestion.questionPaymentGuest)</pre>
+
+            <p class="public__header-text">
+                <strong>@SupportChatLocalization.GetQuestionTitle(SupportChat.AutoQuestion.questionPaymentHost)</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <pre class="public__content-text">@SupportChatLocalization.GetQuestionText(SupportChat.AutoQuestion.questionPaymentHost)</pre>
+
+            <div style="text-align: right;font-size:16px;">
+                <br>
+                <p>در صورتیکه سوالی غیر از موارد مطرح شده دارید از طریق راه های ارتباطی با ما در میان بگذارید:</p>
+            </div>
+            <p class="public__header-text contact-button-header">
+                <i class="fa fa-chevron-left"></i>
+                <strong>تماس با املاک باشی</strong>
+                <img src="/file/resourceimagepng?file_name=support-icon-35w" width="35" height="35" />
+            </p>
+            <div class="public__content-text contact-parent">
+                <div>شماره های تماس:</div>
+                <div class="contact-container">
+                    <a class="contact-button" href="tel:02632565304">
+                        <span>02632565304</span>
+                        <i class="fa fa-phone fa-rotate-90"></i>
+                    </a>
+                    <a class="contact-button" href="tel:02632565357">
+                        <span>02632565357</span>
+                        <i class="fa fa-phone fa-rotate-90"></i>
+                    </a>
+                    <a class="contact-button" href="tel:02632565296">
+                        <span>02632565296</span>
+                        <i class="fa fa-phone fa-rotate-90"></i>
+                    </a>
+                    <a class="contact-button" href="tel:09360263804">
+                        <span>09360263804</span>
+                        <i class="fa fa-phone fa-rotate-90"></i>
+                    </a>
+                </div>
+                <div>راه های ارتباطی:</div>
+                <div class="contact-container">
+                    <a rel="nofollow noopener" class="contact-button contact-button-large" target="_blank" href="https://wa.me/989360263804">
+                        <span>واتساپ پشتیبانی</span>
+                        <img style="background-color:#24CD63" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp" width="40" height="40" />
+                    </a>
+                    <a rel="nofollow noopener" class="contact-button contact-button-large" target="_blank" href="http://t.me/ad_m_i_n">
+                        <span>تلگرام پشتیبانی</span>
+                        <img style="background-color:#0084C6" src="/file/resourceimagepng?file_name=socialnetwork/telegram" width="40" height="40" />
+                    </a>
+                    <a rel="nofollow noopener" class="contact-button contact-button-large" target="_blank" href="mailto:amlakbashi@gmail.com">
+                        <span>ایمیل پشتیبانی</span>
+                        <img style="background-color:#0797F8" src="/file/resourceimagepng?file_name=socialnetwork/email" width="40" height="40" />
+                    </a>
+                </div>
+                <div>شبکه های اجتماعی:</div>
+                <div class="contact-container">
+                    <a rel="nofollow noopener" class="contact-button contact-button-large" target="_blank" href="https://www.instagram.com/amlakbashi_com/">
+                        <span>صفحه اینستاگرام</span>
+                        <img style="background-color:#3D6F97" src="/file/resourceimagepng?file_name=socialnetwork/instagram" width="40" height="40" />
+                    </a>
+                    <a rel="nofollow noopener" class="contact-button contact-button-large" target="_blank" href="https://twitter.com/amlakbashi">
+                        <span>صفحه توییتر</span>
+                        <img style="background-color:#1C9DEC" src="/file/resourceimagepng?file_name=socialnetwork/twitter" width="40" height="40" />
+                    </a>
+                    <a rel="nofollow noopener" class="contact-button contact-button-large" target="_blank" href="https://telegram.me/amlakbashi">
+                        <span>کانال تلگرام</span>
+                        <img style="background-color:#0084C6" src="/file/resourceimagepng?file_name=socialnetwork/telegram" width="40" height="40" />
+                    </a>
+                    <a rel="nofollow noopener" class="contact-button contact-button-large" target="_blank" href="https://www.facebook.com/%D8%A7%D9%85%D9%84%D8%A7%DA%A9-%D8%A8%D8%A7%D8%B4%DB%8C-483230121839503/">
+                        <span>صفحه فیسبوک</span>
+                        <img style="background-color:#395693" src="/file/resourceimagepng?file_name=socialnetwork/facebook" width="40" height="40" />
+                    </a>
+                    <a rel="nofollow noopener" class="contact-button contact-button-large" target="_blank" href="http://www.aparat.com/amlakbashi">
+                        <span>صفحه آپارات</span>
+                        <img style="background-color:#EA1D5D" src="/file/resourceimagepng?file_name=socialnetwork/aparat" width="40" height="40" />
+                    </a>
+                </div>
+                <div>تلفن پاسخگوی میزبانان (ثبت اقامتگاه):</div>
+                <div class="contact-container">
+                    <a class="contact-button" href="tel:09196218216">
+                        <span>09196218216 </span>
+                        <i class="fa fa-phone fa-rotate-90"></i>
+                    </a>
+                    <a class="contact-button" href="tel:02632554756">
+                        <span>02632554756</span>
+                        <i class="fa fa-phone fa-rotate-90"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        $(".public__header-text").click(function () {
+
+            $header = $(this);
+            //getting the next element
+            $content = $header.next();
+            //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
+            $content.slideToggle(400);
+            $icon = $header.find("i");
+            var curr_icon = $icon.attr("class");
+            if (curr_icon == "fa fa-chevron-left")
+                curr_icon = "fa fa-chevron-down";
+            else
+                curr_icon = "fa fa-chevron-left";
+            $icon.fadeTo(200, 0).promise().done(function () {
+                
+                $icon.attr("class", curr_icon).fadeTo(200, 1);
+            });
+        });
+    </script>
+@{ var url_splitted = ("/contact").Substring(1).Split('/'); }
+<script type="application/ld+json">
+    {
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [{
+    "@@type": "ListItem",
+    "position": 1,
+    "name": "املاک باشی",
+    "item": "https://www.amlakbashi.com/"
+    }
+
+    @for (int i = 0; i < url_splitted.Length; i++)
+    {
+        var url = "https://www.amlakbashi.com/";
+        for (int j = 0; j < i; j++)
+        {
+            url += (url_splitted[j] + "/");
+        }
+        url += url_splitted[i];
+        var pos = i + 2;
+        @:,{
+        @:"@@type": "ListItem",
+        @:"position": @(pos),
+        @:"name": "@(url_splitted[i].Replace("-", " "))",
+        @:"item": "@(url)"}
+            }
+    ]
+    }
+</script>
+}

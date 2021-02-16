@@ -1,0 +1,179 @@
+﻿@using PagedList;
+@using PagedList.Mvc;
+@using Amlakbashi.Core.DTOs.PostDTOs;
+
+@{
+    ViewBag.Title = "مدیریت پست ها";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+@model IEnumerable<Post>
+
+@{ 
+    var data = ViewBag.dto as IEnumerable<PostIndexDTO>;
+}
+
+@helper isChecked(bool stat)
+{
+    if (stat)
+    {
+        @:checked="checked"
+    }
+    else
+    {
+        @:""
+    }
+}
+
+@helper IsSelected(bool stat)
+{
+    if (stat)
+    {
+        @:selected="selected"
+    }
+    else
+    {
+        @:""
+    }
+}
+
+@using (Html.BeginForm("Index", "Post", FormMethod.Post))
+{
+    <a href="/Post/Edit" class="add">افزودن پست</a>
+    <div>
+        <table>
+            <tr>
+                <td class="label">نوع پست</td>
+                <td class="minw">
+                    <select name="status" style="width:120px;">
+                        <option @IsSelected(1 == (int)ViewBag.status) value="1">انتشار یافته</option>
+                        <option @IsSelected(0 == (int)ViewBag.status) value="0">تعلیق شده</option>
+                        <option @IsSelected(2 == (int)ViewBag.status) value="2">حذف شده</option>
+                        <option @IsSelected(3 == (int)ViewBag.status) value="3">آماده انتشار</option>
+                    </select>
+                </td>
+                <td class="label">سرویس</td>
+                <td class="minw">
+                    <select name="service" style="width:150px;">
+                        <option value="-1">همه سرویس ها</option>
+                        @foreach (var item in ViewBag.Services)
+                        {
+                            <optgroup label="@item.Title">
+                                @foreach (var child in item.children)
+                                {
+                                    <option @IsSelected(child.Id == (int)ViewBag.service) value="@child.Id">@child.Title</option>
+                                }
+                            </optgroup>
+                        }
+                    </select>
+                </td>
+                <td><input type="submit" class="filter" value="فیلتر" /></td>
+                <td style="width:100%;"></td>
+            </tr>
+        </table>
+    </div>
+
+    <table>
+        <tr>
+            <th class="minw">
+                ردیف
+            </th>
+            <th>
+                کد پست
+            </th>
+            <th>
+                عنوان پست
+            </th>
+            <th>
+                نویسنده
+            </th>
+            <th>
+                تاریخ ثبت
+            </th>
+            <th>
+                عملیات
+            </th>
+        </tr>
+        @{
+            int Idx = (int)ViewBag.RowIndexStart;
+        }
+        @foreach (var item in data)
+        {
+            Idx++;
+            <tr>
+                <td>
+                    @Idx
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Post.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Post.Title)
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.UserPhoneNumber))
+                    {
+                        @item.UserPhoneNumber
+                    }
+                    else
+                    {
+                        @: بدون کاربر
+                    }
+                </td>
+                <td>
+                    @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(item.Post.PostDate).ToString()
+                </td>
+                <td>
+                    <a href="@Url.Action("Edit",new {id = item.Post.Id})"><span class="editicon" title="ویرایش"></span></a>
+                    @if (item.Post.Status == (int)Post.PostStatus.ReadyToPublish || item.Post.Status == (int)Post.PostStatus.Suspend)
+                    {
+                        <span class="publishicon" onclick="PublishPost(@item.Post.Id,this)" title="انتشار"></span>
+                    }
+                    @if (item.Post.Status == (int)Post.PostStatus.Published)
+                    {
+                        <span class="suspendicon" onclick="SuspenPost(@item.Post.Id,this)" title="تعلیق"></span>
+                    }
+                    <span class="deleteicon" onclick="deleteItem(@item.Post.Id,this)" title="حذف"></span>
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Post", new { page, status = (int)ViewBag.status, service = (int)ViewBag.service }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        function deleteItem($id, obj) {
+            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟")) {
+                myajax("Post/Delete", "id=" + $id, function (ret) {
+                    if (ret.status == 1) {
+                        $(obj).parent().parent().remove();
+                    }
+                });
+            }
+        }
+
+        function PublishPost($id, obj) {
+            myajax("Post/Publish", "id=" + $id, function (ret) {
+                if (ret.status == 1) {
+                    $(obj).parent().parent().remove();
+                    alert("پست مورد نظر انتشار یافت .");
+                }
+            });
+        }
+
+        function SuspenPost($id, obj) {
+            myajax("Post/Suspend", "id=" + $id, function (ret) {
+                if (ret.status == 1) {
+                    $(obj).parent().parent().remove();
+                    alert("پست مورد نظر تعلیق شد .");
+                }
+            });
+        }
+    </script>
+}
