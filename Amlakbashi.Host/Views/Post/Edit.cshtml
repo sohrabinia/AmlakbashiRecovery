@@ -6,26 +6,6 @@
     List<int> CurrentServices = (List<int>)ViewBag.CurrentServices;
 }
 
-@helper isChecked(bool stat){
-    if(stat){
-        @:checked="checked"
-    }else{
-        @:""
-    }
-}
-
-@helper isSelected(bool stat)
-{
-    if (stat)
-    {
-        @:selected="selected"
-    }
-    else
-    {
-        @:""
-    }
-}
-
 @section StyleLink
 {
     @*<link rel="stylesheet" type="text/css" href="/resource/ckeditor/ckeditor.css">*@
@@ -36,7 +16,6 @@
 }
 
 <div class="title">ثبت و ویرایش  پست</div>
-
 
 @using (Html.BeginForm("Edit", "Post", FormMethod.Post, new { id="ManageForm"}))
 {
@@ -152,7 +131,7 @@
                                                 @foreach (var grandchild in grandchildren)
                                                 {
                                                     <li>
-                                                        <input type="checkbox" value="@grandchild.Id" @isChecked(CurrentServices.Contains(grandchild.Id)) />
+                                                        <input type="checkbox" value="@grandchild.Id" is-checked="@(CurrentServices.Contains(grandchild.Id))" />
                                                         @grandchild.Title
                                                     </li>
                                                 }
@@ -163,7 +142,7 @@
                             }
                             else
                             {
-                                <input type="checkbox" value="@child.Id" @isChecked(CurrentServices.Contains(child.Id)) />
+                                <input type="checkbox" value="@child.Id" is-checked="@(CurrentServices.Contains(child.Id))" />
                                 <span style=" margin-left:18px; color: #444; font: 13px bnassim; padding-right: 5px;">@child.Title</span>
                             }
                         }

@@ -6,30 +6,6 @@
     ViewBag.Description = Model.Title + " - اخبار و مقالات سایت املاک باشی";
 }
 
-@helper isChecked(bool stat)
-{
-    if (stat)
-    {
-        @:checked="checked"
-    }
-    else
-    {
-        @:""
-    }
-}
-
-@helper isSelected(bool stat)
-{
-    if (stat)
-    {
-        @:selected="selected"
-    }
-    else
-    {
-        @:""
-    }
-}
-
 <div class="container" style="direction:rtl;">
     <div class="col-xs-12 col-md-9" style="margin:30px 0px ;">
         @Html.HiddenFor(model => model.Id)

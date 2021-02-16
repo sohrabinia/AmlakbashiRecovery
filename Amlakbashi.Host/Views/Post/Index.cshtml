@@ -1,6 +1,4 @@
-﻿@using PagedList;
-@using PagedList.Mvc;
-@using Amlakbashi.Core.DTOs.PostDTOs;
+﻿@using Amlakbashi.Core.DTOs.PostDTOs;
 
 @{
     ViewBag.Title = "مدیریت پست ها";
@@ -13,30 +11,6 @@
     var data = ViewBag.dto as IEnumerable<PostIndexDTO>;
 }
 
-@helper isChecked(bool stat)
-{
-    if (stat)
-    {
-        @:checked="checked"
-    }
-    else
-    {
-        @:""
-    }
-}
-
-@helper IsSelected(bool stat)
-{
-    if (stat)
-    {
-        @:selected="selected"
-    }
-    else
-    {
-        @:""
-    }
-}
-
 @using (Html.BeginForm("Index", "Post", FormMethod.Post))
 {
     <a href="/Post/Edit" class="add">افزودن پست</a>
@@ -46,10 +20,10 @@
                 <td class="label">نوع پست</td>
                 <td class="minw">
                     <select name="status" style="width:120px;">
-                        <option @IsSelected(1 == (int)ViewBag.status) value="1">انتشار یافته</option>
-                        <option @IsSelected(0 == (int)ViewBag.status) value="0">تعلیق شده</option>
-                        <option @IsSelected(2 == (int)ViewBag.status) value="2">حذف شده</option>
-                        <option @IsSelected(3 == (int)ViewBag.status) value="3">آماده انتشار</option>
+                        <option is-selected="@(1 == (int)ViewBag.status)" value="1">انتشار یافته</option>
+                        <option is-selected="@(0 == (int)ViewBag.status)" value="0">تعلیق شده</option>
+                        <option is-selected="@(2 == (int)ViewBag.status)") value="2">حذف شده</option>
+                        <option is-selected="@(3 == (int)ViewBag.status)" value="3">آماده انتشار</option>
                     </select>
                 </td>
                 <td class="label">سرویس</td>
@@ -61,7 +35,7 @@
                             <optgroup label="@item.Title">
                                 @foreach (var child in item.children)
                                 {
-                                    <option @IsSelected(child.Id == (int)ViewBag.service) value="@child.Id">@child.Title</option>
+                                    <option is-selected="@(child.Id == (int)ViewBag.service)" value="@child.Id">@child.Title</option>
                                 }
                             </optgroup>
                         }
