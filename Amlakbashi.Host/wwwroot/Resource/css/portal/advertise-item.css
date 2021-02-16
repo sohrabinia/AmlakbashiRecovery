@@ -582,6 +582,7 @@ p.advertise-page__rule-title {
     /*width: 340px;*/
     margin: 5px auto;
     border-radius: 5px;
+    text-align: center;
     background-color: white;
     color: #242424;
 }
@@ -1348,7 +1349,6 @@ input[type=number] {
     .advertise-page__contact-box {
         width: 35%;
         margin-top: 2px;
-        overflow:hidden;
     }
 
     .advertise-page__contact-box-no-sticky {

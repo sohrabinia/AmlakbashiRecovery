@@ -79,7 +79,7 @@
     position: fixed;
     left: 1px;
     top: 70px;
-    z-index: 3;
+    z-index: 900;
     min-width: 150px;
     border: 1px solid lightgray;
     background-color: white;
