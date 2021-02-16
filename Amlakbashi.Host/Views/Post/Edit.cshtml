@@ -1,0 +1,338 @@
+﻿@model Post
+
+@{
+    ViewBag.Title = "مدیریت پست";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";  
+    List<int> CurrentServices = (List<int>)ViewBag.CurrentServices;
+}
+
+@helper isChecked(bool stat){
+    if(stat){
+        @:checked="checked"
+    }else{
+        @:""
+    }
+}
+
+@helper isSelected(bool stat)
+{
+    if (stat)
+    {
+        @:selected="selected"
+    }
+    else
+    {
+        @:""
+    }
+}
+
+@section StyleLink
+{
+    @*<link rel="stylesheet" type="text/css" href="/resource/ckeditor/ckeditor.css">*@
+}
+@section ScriptLink
+{
+    <script type="text/javascript" src="/file/getjs?src=/resource/ckeditor/ckeditor.js"></script>
+}
+
+<div class="title">ثبت و ویرایش  پست</div>
+
+
+@using (Html.BeginForm("Edit", "Post", FormMethod.Post, new { id="ManageForm"}))
+{
+
+@Html.HiddenFor(model => model.Id)
+<input type="hidden" name="Services" id="Services" value="" />
+<table>
+    @if (Model.Id == -1)
+    {
+
+    }
+    else
+    {
+    }
+    <tr>
+        <td class="label">
+             لینک پست :
+        </td>
+        <td style="width:300px;">
+            @Html.EditorFor(model => model.Link)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="label">
+            عنوان پست :
+        </td>
+        <td style="width:300px;">
+            @Html.EditorFor(model => model.Title)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="label">
+            خلاصه پست :
+        </td>
+        <td style="width:300px;">
+            @Html.EditorFor(model => model.Abstract)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="label" style="vertical-align:top;">
+             متن پست :
+        </td>
+        <td colspan="2">
+            @Html.TextAreaFor(model => model.Description)
+        </td>
+    </tr>
+    <tr>
+        <td class="label">
+            کلید واژه :
+        </td>
+        <td >
+            <input type="hidden" name="oldtags" value="@ViewBag.strTag" />
+            <input type="text" name="strtags" value="@ViewBag.strTag" />
+        </td>
+        <td style="vertical-align:top;text-align:right;padding-right:5px;">جداسازی با +</td>
+    </tr>
+    <tr>
+        <td class="label">
+             عکس اصلی پست :
+        </td>
+        <td class="postimg">
+            <input type="hidden" id="photoid" name="PhotoID" value="@Model.PhotoID" />
+            <table>
+                <tr>
+                    <td style="width:30px;vertical-align:top;">
+                        <span class="addpop" onclick="AddMainPhoto()"></span>
+                        <span style="width:20px;height:20px ;display:inline-block;cursor:pointer; background:url(/resource/img/close16_2.png) no-repeat center center ;" onclick="Removeimg()"></span>
+                    </td>
+                    <td>
+                        @if (Model.PhotoID != 0)
+                        {
+                            <img src='@string.Format("/file/imgThumb?FileID={0}&w=200&h=150",Model.PhotoID)' />
+                        }
+                        else
+                        {
+                            <img src="" style="display:none;" />
+                        }
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td></td>
+    </tr>
+    <tr><td colspan="3" class="tablesplit"></td></tr>
+    <tr>
+        <td class="label">
+             سرویس ها :
+        </td>
+        <td colspan="2" class="ServiceContainer">
+            @foreach (var item in ViewBag.Services)
+            {
+                <div class="serviceitem" style="margin-bottom:10px;">
+                    <div style="font:18px bnasim; color:#333 ; text-align:right;">@item.Title</div>
+                    <div style="padding-right: 40px; padding-top: 5px; text-align: right;">
+                        @foreach (var child in item.children)
+                        {
+                            var grandchildren = child.children;
+                            if (grandchildren != null && grandchildren.Count > 0)
+                            {
+                                <dl class="dropdown">
+                                    <dt>
+                                        <a>
+                                            <span class="hida">@child.Title</span>
+                                            <p class="multiSel"></p>
+                                        </a>
+                                    </dt>
+                                    <dd>
+                                        <div class="mutliSelect">
+                                            <ul>
+                                                @foreach (var grandchild in grandchildren)
+                                                {
+                                                    <li>
+                                                        <input type="checkbox" value="@grandchild.Id" @isChecked(CurrentServices.Contains(grandchild.Id)) />
+                                                        @grandchild.Title
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </dd>
+                                </dl>
+                            }
+                            else
+                            {
+                                <input type="checkbox" value="@child.Id" @isChecked(CurrentServices.Contains(child.Id)) />
+                                <span style=" margin-left:18px; color: #444; font: 13px bnassim; padding-right: 5px;">@child.Title</span>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </td>
+    </tr>
+</table>
+
+<div style="margin-top:20px;">
+    <input class="apply" type="submit" value="ثبت" />
+    <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
+</div>
+}
+
+<div class="popup">
+    <div class="popupclose" onclick="ClosePopup()"></div>
+    <div style="clear:both;"></div>
+    <div  style="overflow-x:hidden ;overflow-y:scroll ; width:616px;height:385px;padding:0 50px 0 10px;">
+        @foreach (var item in (IEnumerable<Amlakbashi.Core.Entities.File>)ViewBag.Images)
+        {
+            <div class="popitem">
+                <div><img src='@string.Format("/file/imgThumb?FileID={0}&w=100&h=80",item.Id)' /></div>
+                <div>
+                    <input type="checkbox" value="@item.Id" />
+                    <span style=" margin-left:18px; color: #efefef; font: 13px bnassim; padding-right: 5px;">@item.Id</span>
+                </div>
+            </div>
+        }
+    </div>
+    <div style="width:100% ;height:30px;" ></div>
+    <button class="apply" onclick="AddFile()">ثبت</button>
+    <button class="cancel" onclick="ClosePopup()">انصراف</button>
+</div>
+
+<div class="adminmsg">@ViewBag.msg</div>
+
+<style>
+    .dropdown {
+        display:inline-block ;
+        margin:0 10px;
+        border:1px solid #ccc ;
+        padding:10px;
+        border-radius:7px;
+    }
+
+    .dropdown dd, .dropdown dt {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .dropdown ul {
+        margin: -1px 0 0 0;
+    }
+
+    .dropdown dd {
+        position: relative;
+    }
+
+    .dropdown a,
+    .dropdown a:visited {
+        color: #000;
+        text-decoration: none;
+        outline: none;
+        font: 14px bnassim; 
+    }
+
+    .dropdown dt a span, .multiSel span {
+        cursor: pointer;
+        display: inline-block;
+        padding: 0 3px 2px 0;
+    }
+
+    .dropdown dd ul {
+        background-color: #626262;
+        border: 0;
+        color: #fff;
+        display: none;
+        right: 0px;
+        padding: 2px 15px 2px 5px;
+        position: absolute;
+        top: 12px;
+        width:200px;
+        overflow: auto;
+    }
+
+    .dropdown span.value {
+        display: none;
+    }
+
+    .dropdown dd ul li a {
+        padding: 5px;
+        display: block;
+    }
+
+    .dropdown dd ul li{
+        list-style:none ;
+    }
+
+    .dropdown dd ul li a:hover {
+        background-color: #fff;
+    }
+
+</style>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+        $("#imgcontainer").niceScroll({ railalign: "left" });
+
+        $(".dropdown dt a").on('click', function () {
+            $(this).parent().next().find("ul").slideToggle('slow');
+        });
+
+
+        //$('textarea').jqte();
+        CKEDITOR.replace('Description');
+        var PopType = 0;
+
+        function ClosePopup()
+        {
+            $('.popup input:checkbox').prop('checked', false);
+            $(".popup").hide();
+        }   
+
+        function AddMainPhoto()
+        {
+            PopType = 0;
+            $(".popup").show();
+        }
+
+        function Removeimg()
+        {
+            $(".postimg").find("img").attr("src", "");
+            $(".postimg").find("img").hide();
+            $("#photoid").val("0");
+        }
+
+        function AddFile()
+        {
+            if (PopType == 0)
+            {
+                if ($(".popup input:checkbox:checked").length > 1)
+                {
+                    alert("لطفا فقط یک عکس برای عکس اصلی پست انتخاب کنید.");
+                    return;
+                }
+
+                if ($(".popup input:checkbox:checked").length > 0) {
+                    var strsrc = $(".popup input:checkbox:checked").first().parent().parent().find("img").attr("src");
+                    var fid = $(".popup input:checkbox:checked").first().parent().find("span").text();
+                    $(".postimg").find("img").attr("src", strsrc);
+                    $(".postimg").find("img").show();
+                    $("#photoid").val(fid);
+                }
+            }
+            $('.popup input:checkbox').prop('checked', false);
+            $(".popup").hide();
+        }
+
+        $("form#ManageForm").submit(function () {
+            var $services = [];
+            $(".ServiceContainer input:checkbox:checked").each(function () {
+                $services.push($(this).val());
+            });
+            $("#Services").val(JSON.stringify($services));
+        });
+
+    </script>
+}

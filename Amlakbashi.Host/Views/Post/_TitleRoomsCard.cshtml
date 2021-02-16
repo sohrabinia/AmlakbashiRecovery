@@ -1,0 +1,31 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs.DashboardAccDTO
+
+@Html.Partial("_TitleBanner", new ViewDataDictionary() { { "title", Model.title }, { "id", Model.id }, {"avatar", Model.photoUrl }, { "closeClass", "exit1" } })
+<!-- start form -->
+<!-- ----------active-banner------ -->
+<div class="style_title-list general-style-banner">
+    @Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", " تنظیمات کلی " + Model.typeString } })
+    <div class="parent-box">
+        @if (Model.isVerified)
+        {
+            <form class="setting-list">
+                <div class="status-banner">
+                    @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", "نمایش آگهی " }, { "Active", Model.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "true") } })
+                    @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", "عدم نمایش آگهی " }, { "Active", !Model.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "false") } })
+                </div>
+            </form>
+        }
+        else if (!Model.isVerified && Model.notVerifyReasons.Any())
+        {
+            <div class="button_reason_not_verified" onclick="showReasons(@Model.id)">دلیل عدم تایید<div></div></div>
+        }
+        <p class="title-box">تعیین مدت رزرو </p>
+        <div class="day-set-quick ">
+            @Html.Partial("_MinAndMaxDay", new ViewDataDictionary() { { "js-min-input", "js-min-input-" + Model.id }, { "js-max-input", "js-max-input-" + Model.id }, { "minReserve", Model.minReserveDays }, { "maxReserve", Model.maxReserveDays }, { "id", Model.id } })
+        </div>
+        <p class="title-box"> رزروآنی</p>
+        <div class="instantReserve style-instant-reserve">
+            @Html.Partial("_InstantReserve", Model, new ViewDataDictionary() { { "instantReserveAccess", ViewData["ReserveAccess"] }, { "UserID", ViewBag.UserID } })
+        </div>
+    </div>
+</div>

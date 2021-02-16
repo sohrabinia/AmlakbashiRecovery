@@ -1,0 +1,84 @@
+﻿@model Service
+@{
+    ViewBag.Title = Model.Title + " - املاک باشی";
+    Layout = "~/Views/Shared/_Master.cshtml";
+    ViewBag.Description = Model.Title + " - سایت املاک باشی";
+}
+@section StyleLink {
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css_output/minifypostlistcss_v1_2.css" />
+
+    @*@MvcHtmlString.Create(
+        Bundle.Css()
+            .Add("/resource/css/portal/post-list.css")
+            .ForceRelease()
+            .Render("/resource/css_output/minifypostlistcss_v1_0.css"))*@
+}
+<div class="container">
+    <div class="row" style="font: 25px Biransans; text-align: right; padding: 10px;margin:10px;border-radius:5px; color: #fdd835;background:#242424; "><h1>@Model.Title</h1></div>
+    <div>
+        <div style="padding:30px;font:14px Liransans;color:#333;align-content:center;min-height:300px;max-width:100%;">
+            @Html.Raw(ViewBag.FirstPost.Description)
+        </div>
+    </div>
+</div>
+
+@section HeaderAddition
+{
+    <link rel="canonical" href="https://www.amlakbashi.com@(ViewBag.raw_url)" />
+    <meta property="og:url" content="https://www.amlakbashi.com@(ViewBag.raw_url)" />
+}
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        $(".public__header-text").click(function () {
+
+            $header = $(this);
+            //getting the next element
+            $content = $header.next();
+            //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
+            $content.slideToggle(400);
+            $icon = $header.find("i");
+            var curr_icon = $icon.attr("class");
+            if (curr_icon == "fa fa-chevron-left")
+                curr_icon = "fa fa-chevron-down";
+            else
+                curr_icon = "fa fa-chevron-left";
+            $icon.fadeTo(200, 0).promise().done(function () {
+                
+                $icon.attr("class", curr_icon).fadeTo(200, 1);
+            });
+        });
+    </script>
+@{ var url_splitted = ((string)ViewBag.raw_url).Substring(1).Split('/'); }
+    <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org",
+        "@@type": "BreadcrumbList",
+        "itemListElement": [{
+        "@@type": "ListItem",
+        "position": 1,
+        "name": "املاک باشی",
+        "item": "https://www.amlakbashi.com/"
+        }
+
+        @for (int i = 0; i < url_splitted.Length; i++)
+        {
+            var url = "https://www.amlakbashi.com/";
+            for (int j = 0; j < i; j++)
+            {
+                url += (url_splitted[j] + "/");
+            }
+            url += url_splitted[i];
+            var pos = i + 2;
+            @:,{
+            @:"@@type": "ListItem",
+            @:"position": @(pos),
+            @:"name": "@(url_splitted[i].Replace("-", " "))",
+            @:"item": "@(url)"}
+            }
+        ]
+        }
+    </script>
+
+}

@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "املاک باشی - اجاره ویلا در شمال ، اجاره سوئیت و آپارتمان مبله در تهران و سراسر ایران";
+    Layout = "~/Views/Shared/_Master.cshtml";
+}
+<div style="height:40px;"></div>
+<div style="font:13px Miransans;padding:10px;margin:10px;">کد آگهی را بنویسید و روی دکمه جستجو کلیک کنید:</div>
+<div style="display:flex;flex-flow:row;width:100%;max-width:320px;justify-content:space-around;">
+    <input onpaste="onSearchAdvertiseIdChange(event, this)"
+           onkeyup="onSearchAdvertiseIdChange(event, this)"
+           onchange="onSearchAdvertiseIdChange(event, this)"
+           style="width: 65%;max-width: 170px;padding: 5px;"
+           autofocus placeholder="کد آگهی را وارد کنید">
+    <div onclick="doSearchByAdvertiseId(this.previousSibling)"
+         style="background-color:#fdd835;border-radius:5px;
+                padding:5px 10px;cursor:pointer;">جستجو</div>
+</div>

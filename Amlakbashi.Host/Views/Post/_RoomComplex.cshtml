@@ -1,0 +1,61 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs;
+@using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+@model DashboardComplexUnitDTO
+
+
+        <!-- start-room-card  -->
+        <div class="banner-main room-card">
+            <!-- Start-wrapper-right-banner -->
+            <div class="wrapper-top">
+                <div class="avatar-room">
+                    <a target="_blank" href="@Model.photoUrl"><img src="@Model.photoUrl" /></a>
+                    @if (Model.userRating <= 0)
+                    {
+                        <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
+                    }
+                    @Html.Partial("_StarRating", new ViewDataDictionary { { "score", Model.userRating } })
+                    <a style="display:@( Model.newCommentCount == 0 ? "none" : "block");"  href="/comment/advertisecommentdetail?id=@Model.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="backgorund:@( Model.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@Model.newCommentCount</span></i></a>
+                </div>
+                <div class="details-room-complex">
+                    <span> @Model.title </span>
+                    <span class="idBanner"> کد آگهی : @Model.id</span>
+                    @if (Model.floor != Advertise.FloorItems.Unset)
+                    {
+                        <div>طبقه: @AdvertiseMainLocalization.GetPropertyValueTitle(Model.floor)</div>
+                    }
+                    @if(Model.roomCount <= 0)
+                    {
+                        <span>  بدون اتاق</span>
+                    }
+                    else
+                    {
+                        <span>@Model.roomCount خوابه </span>
+                    }
+                </div>
+            </div>
+            <!-- End-wrapper-right-banner -->
+            <!-- Start-wrapper-left-banner div-unset-->
+            <div class="banner-room">
+                <form>
+                    <span>  امشب :</span>
+                    @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " خالی" }, { "Active", Model.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", Model.id) } })
+                    @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " پر " }, { "Active", Model.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", Model.id) } })
+                </form>
+                <div class="div-unset ">
+                    @*<a style="display:@( Model.newCommentCount == 0 ? "none" : "inline-block");" href="/comment/advertisecommentdetail?id=@Model.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@Model.newCommentCount</span></i></a>*@
+                    <button title="تنظیمات " class="icons-item setting-icon-complex"><i class="fa fa-cog"></i></button>
+                </div>
+            </div>
+            <!-- End-wrapper-left-banner div-unset-->
+        </div>
+        <!-- Start-edit-fast  -->
+        <div class="fast-edit-details">
+            @Html.Partial("_TitleBanner", new ViewDataDictionary() { { "title", Model.title }, { "id", Model.id }, {"avatar", Model.photoUrl }, { "closeClass", "exit" } })
+            <!-- start form -->
+            <form action="" class="setting-list">
+                @Html.Partial("_EditFast", Model)
+            </form>
+        </div>
+        <!-- End-edit-fast -->
+
+
