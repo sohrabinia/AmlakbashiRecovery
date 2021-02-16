@@ -1,0 +1,24 @@
+﻿@using System.Globalization;
+@{ 
+    var score = (float)(ViewData["score"] as float?);
+    var onclick = ViewData["onclick"] == null ? null : (string)ViewData["onclick"];
+    var fontSize = ViewData["fontSize"] == null ? 0 : (int)ViewData["fontSize"];
+    var iconSize = ViewData["iconSize"] == null ? 0 : (int)ViewData["iconSize"];
+    var labelWidth = ViewData["labelWidth"] == null ? 0 : (int)ViewData["labelWidth"];
+}
+@if (score > 0)
+{
+<div style="@(onclick != null ? "cursor:pointer" : "")" @(onclick != null ? ("onclick=" + onclick) : "") class="star-rating__parent">
+    @for (int i = 0; i < 5; i++)
+    {
+        <div @(iconSize > 0 ? ("style=font-size:" + iconSize + "px;") : "") class="star-rating__container">
+            <P class="star-rating__star star-rating__star-under fa fa-star"></P>
+            <P style="width:@(score >= (i + 1) ? "100%" : (score - i).ToString("P", CultureInfo.InvariantCulture).Replace(" ", ""))" class="star-rating__star star-rating__star-over fa fa-star"></P>
+        </div>
+    }
+    <p style="@(fontSize > 0 ? ("font-size:" + fontSize + "px;" ) : "")@(labelWidth > 0 ? ("width:" + labelWidth + "px;") : "")"
+       class="star-rating__label">(@Amlakbashi.Core.Common.Utilities.StringUtility.EnglishNumberToPersian(score.ToString("#.#")))</p>
+</div>
+}
+
+

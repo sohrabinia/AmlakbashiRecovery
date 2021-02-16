@@ -1,0 +1,11 @@
+﻿@model Reserve
+@{
+    var informations = Model.GetSupportInfoList().Reverse();
+ }
+<div style="display:flex;flex-flow:column;">
+    @foreach (var item in informations)
+    {
+        <div style="direction:rtl; text-align: right;margin:10px;">@item</div>
+    }
+</div>
+

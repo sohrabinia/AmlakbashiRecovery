@@ -1,0 +1,15 @@
+﻿<div class="general__region-filter-parent">
+    <div class="general__region-filter-label">لیست شهر ها:</div>
+    <div class="general__region-filter-container">
+        @Html.Action("RegionSelector", "Accomodation", new {
+           mandatory = false,
+           provinceName = "generalSearchProvince",
+           cityName = "generalSearchCity",
+           areaName = "generalSearchArea",
+           province = ViewBag.Province == null ? -1 : ViewBag.Province,
+           city = ViewBag.City == null ? -1 : ViewBag.City,
+           area = ViewBag.Area == null ? -1 : ViewBag.Area,
+           region_filter_status = Region.RegionStatus.HasAdvertise
+       })
+    </div>
+</div>

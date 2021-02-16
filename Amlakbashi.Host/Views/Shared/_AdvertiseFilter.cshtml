@@ -1,0 +1,50 @@
+﻿@{
+    DynamicCategory category = ViewBag.dcategory != null ? (DynamicCategory)ViewBag.dcategory :
+        (ViewData["dcategory"] != null ? (DynamicCategory)ViewData["dcategory"] : null);
+    var passedViewBag = (dynamic)ViewData["ViewBag"];
+    var norouz_special = ViewData["norouz_special"] == null ? false : bool.Parse(ViewData["norouz_special"].ToString());
+    var discount_homes = ViewData["discount_homes"] == null ? false : bool.Parse(ViewData["discount_homes"].ToString());
+    var instant_reserve = ViewData["instant_reserve"] == null ? false : bool.Parse(ViewData["instant_reserve"].ToString());
+    var today_empty_homes = ViewData["today_empty_homes"] == null ? false : bool.Parse(ViewData["today_empty_homes"].ToString());
+}
+
+<form style="display:none;" id="advertise-filter-form" class="advertise-filter__form" target="_top" action="/category/category">
+    <input type="hidden" name="a_m_p_version" value="false" />
+    <input type="hidden" name="page" value="1" />
+    <input type="hidden" name="norouz_special" value="@(norouz_special.ToString())" />
+    <input type="hidden" name="discount_homes" value="@(discount_homes.ToString())" />
+    <input type="hidden" name="instant_reserve" value="@(instant_reserve.ToString())" />
+    <input type="hidden" name="today_empty_homes" value="@(today_empty_homes.ToString())" />
+    <input type="hidden" name="country_direction" value="@(category != null ? (int)category.CountryDirection : 0)" />
+    <input type="hidden" name="Province" value="@category.Province" />
+    <input type="hidden" name="City" value="@category.City" />
+    <input type="hidden" name="Area" value="@passedViewBag.area" />
+    <input type="hidden" name="capacity" id="js-capacity-input-filter" value="@(passedViewBag.capacity == null ? -1 : passedViewBag.capacity)" />
+    <input type="hidden" name="empty_range_from" id="from_date_date_picker-filter" value="@(!string.IsNullOrEmpty(passedViewBag.empty_range_from) ? passedViewBag.empty_range_from : "")" />
+    <input type="hidden" name="empty_range_to" id="to_date_date_picker-filter" value="@(!string.IsNullOrEmpty(passedViewBag.empty_range_to) ? passedViewBag.empty_range_to : "")" />
+    <input type="hidden" name="Type" id="js-acctype-input-filter" value="@passedViewBag.type" />
+    <input type="hidden" name="t" id="js-t-input-filter" value="@passedViewBag.t" />
+    <input type="hidden" name="region" id="js-position-input-filter" value="@(passedViewBag.region == null ? "-1" : passedViewBag.region)" />
+    <input type="hidden" name="frompaypernight" id="js-pricemin-input-filter" value="@(passedViewBag.frompaypernight == null ? "-1" : passedViewBag.frompaypernight)" />
+    <input type="hidden" name="topaypernight" id="js-pricemax-input-filter" value="@(passedViewBag.topaypernight == null ? "-1" : passedViewBag.topaypernight)" />
+    <input type="hidden" name="room" id="js-room-input-filter" value="@(passedViewBag.room == null ? "-1" : passedViewBag.room)" />
+    <input type="hidden" name="roomList" id="js-roomlist-input-filter" value="@(string.IsNullOrEmpty(passedViewBag.roomList) ? "" : passedViewBag.roomList)" />
+    <input type="hidden" name="parking" id="js-parking-input-filter" value="@(passedViewBag.parking < 1 ? "-1" : passedViewBag.parking)" />
+    <input type="hidden" name="pool" id="js-pool-input-filter" value="@(passedViewBag.pool == null ? "-1" : passedViewBag.pool)" />
+    <input type="hidden" name="elevator" id="js-elevator-input-filter" value="@(passedViewBag.elevator == null ? "-1" : passedViewBag.elevator)" />
+    <input type="hidden" name="priceRangeType" id="js-pricetype-input-filter" value="@(passedViewBag.priceRangeType)" />
+    <input type="hidden" name="perWC" id="js-perwc-input-filter" value="@(passedViewBag.wcType == 127 || passedViewBag.wcType == 128 ? "1" : "0")" />
+    <input type="hidden" name="euWC" id="js-euwc-input-filter" value="@(passedViewBag.wcType == 129 || passedViewBag.wcType == 128 ? "1" : "0")" />
+    <input type="hidden" name="wifi" id="js-wifi-input-filter" value="@(passedViewBag.wifi)" />
+    <input type="hidden" name="washingMachine" id="js-washingmachine-input-filter" value="@(passedViewBag.washingMachine)" />
+    <input type="hidden" name="jacuzzi" id="js-jacuzzi-input-filter" value="@(passedViewBag.jacuzzi)" />
+    <input type="hidden" name="poolTable" id="js-pooltable-input-filter" value="@(passedViewBag.poolTable)" />
+    <input type="hidden" name="foosball" id="js-foosball-input-filter" value="@(passedViewBag.foosball)" />
+    <input type="hidden" name="teaMaker" id="js-teamaker-input-filter" value="@(passedViewBag.teaMaker)" />
+    <input type="hidden" name="rules_pets" id="js-pets-input-filter" value="@(passedViewBag.rules_pets)" />
+    <input type="hidden" name="rules_party" id="js-party-input-filter" value="@(passedViewBag.rules_party)" />
+    <input type="hidden" name="rules_smoking" id="js-smoking-input-filter" value="@(passedViewBag.rules_smoking)" />
+    <input type="hidden" name="sort" id="js-sort-order-input-filter" value="@(passedViewBag.sort)" />
+    <input type="hidden" name="phrase" id="js-phrase-input-filter" value="@(passedViewBag.phrase != null ? passedViewBag.phrase : "")" />
+    <input type="hidden" name="ajax" id="js-ajax-filter" value="true" />
+</form>

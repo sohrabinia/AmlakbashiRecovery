@@ -1,0 +1,75 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.UserRatingDTO
+@{
+    var user_is_authenticated = User.Identity.IsAuthenticated;
+    int user_id = ViewBag.user_id == null ? User.GetUser().Id :
+        ViewBag.user_id;
+}
+@helper IsSelected(bool state)
+{
+if (state)
+{
+        @:selected
+    }
+else
+{
+        @:
+    }
+}
+<div class="comment__new">
+    <input type="hidden" id="AdvertiseID" value="@Model.advertiseId" />
+    <div id="write_comment_root" style="@(user_is_authenticated ? "" : "display: none;")">
+        <input class="js-cm-mobile" type="hidden" value="@User.GetUser().Mobile" />
+        <input id="UserId" value="@user_id" type="hidden" />
+        <div>
+            <div>لطفا با امتیاز دهی و نظر درباره اقامتگاه دیگران را راهنمایی کنید</div>
+            <div>سفر به @(Model.cityName) - @Model.advertiseTitle</div>
+            <div class="comment__title">به این اقامتگاه امتیاز دهید</div>
+            <div class="comment__score">
+                @foreach (var userRating in Model.items)
+                {
+                    <div class="comment__score-item">
+                        <div class="comment__score-label">@userRating.typeString</div>
+                        <div class="comment__score-value">
+                            <select class="score-rating" report_id="@((int)userRating.type)" title="@userRating.typeString">
+                                <option @IsSelected(userRating.rating == 0) value=""></option>
+                                <option @IsSelected(userRating.rating == 1) value="1">خیلی ضعیف</option>
+                                <option @IsSelected(userRating.rating == 2) value="2">ضعیف</option>
+                                <option @IsSelected(userRating.rating == 3) value="3">متوسط</option>
+                                <option @IsSelected(userRating.rating == 4) value="4">خوب</option>
+                                <option @IsSelected(userRating.rating == 5) value="5">خیلی خوب</option>
+                            </select>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        @{
+            var comment = ViewBag.comment;
+        }
+        @using (Ajax.BeginForm("AddComment", "Advertise",new { }, new AjaxOptions() {OnSuccess="onAddComment" }, new { id = "addCommentForm", method = "post", enctype = "multipart/form-data"}))
+        {
+            <input type="hidden" name="advertiseID" value="@Model.advertiseId" />
+            <input type="hidden" name="user_id" value="@user_id" />
+                <div class="comment__new-item">
+                    <div class="comment__new-label">متن نظر خود را @(comment == null || string.IsNullOrEmpty(comment.Text) ? "وارد" : "ویرایش") کنید</div>
+                    <div class="comment__new-value">
+                        <textarea name="text" class="js-cm-text">@(comment != null ? comment.Text : "")</textarea>
+                    </div>
+                </div>
+
+                <div class="comment__new-submit">
+                    <div style="background-color:#fdd835;border-radius:4px;width: 100px;padding: 5px;text-align:center;cursor: pointer;" onclick="add_comment(@(user_id))">@(comment == null || string.IsNullOrEmpty(comment.Text) ? "ثبت" : "ویرایش") نظر</div>
+                </div>
+        }
+    </div>
+    <div class="comment__login" style="@(user_is_authenticated ? "display: none;" : "")">
+        <input id="UserId" value="0" type="hidden" />
+        <div class="comment__login-item">
+            <div class="comment__login-label">برای ثبت نظر ابتدا باید وارد پروفایل خود شوید:</div>
+            <div class="comment__login-value">
+                <button onclick="toggle_login()">ورود</button>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,111 @@
+﻿@{
+    string t_ = "", u_ = "";
+    string presentorCode = ViewBag.presentorCode == null ? "" : ViewBag.presentorCode;
+    if (presentorCode == "")
+    {
+        presentorCode = ViewData["presentorCode"] == null ? "" : ViewData["presentorCode"].ToString();
+    }
+    if (!string.IsNullOrEmpty(presentorCode))
+    {
+        t_ = "روی لینک کلیک کنید. ویلا و سوئیت رزرو کنید و هدیه بگیرید ";
+        u_ = "https://www.amlakbashi.com/user/p?c=" + presentorCode;
+    }
+}
+<style>
+    .peresent_style {
+        margin: 25px auto;
+        padding: 12px;
+        background-color: #f4f4f4;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,.2), 0 2px 8px 0 rgba(0,0,0,.1);
+        width: 90%;
+    }
+</style>
+<div class="peresent_style">
+    <img src="/file/resourceimagepng?file_name=gift" width="30" height="30" />
+    <div style="font:13px Miransans;text-align:right;padding:5px;">با معرفی املاک باشی کیف هدیه خود را تا بی نهایت شارژ کنید</div>
+    <div style="font:13px Liransans;">هر کدوم از دوستاتون که با کد معرف شما از املاک باشی خونه رزرو کنند، کیف هدیه شما به میزان 5 درصد از مبلغ اولین شب رزروشون شارژ میشه. دوست شما هم به همین اندازه دراولین سفرش تخفیف میگیره</div>
+    @if (!string.IsNullOrEmpty(presentorCode))
+    {
+        <div style="font:13px Liransans;margin-top:20px;width: unset;">ارسال لینک و یا کد معرف:</div>
+        <div style="display:flex;flex-flow:row;flex-wrap:wrap;justify-content:flex-start;align-items:center;">
+            <div onclick="copyPresentationCode()" style="cursor:pointer;font:14px Miransans;background-color:#fdd835;width: unset;height:38px;padding:5px;border-radius:5px;margin:10px 3px;text-align:center;">کدمعرف: @presentorCode</div>
+            <div onclick="copyStringToClipboard('@u_', 'لینک کد معرف')" style="cursor:pointer;background-color:#fdd835;width:100px;margin:10px 3px;height:38px;border-radius:5px;text-align:center; font:14px Miransans;padding: 5px;">کپی لینک</div>
+        </div>
+        <div class="share-post__container">
+            <div class="share-post__item" href="#" onclick="window.open('https://t.me/share/url?url=@(u_)&text=@(t_)', 'telegramShare', 'width=626,height=436'); return false;" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;">
+                <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram">
+            </div>
+            <a class="share-post__item" href="whatsapp://send?text=@(t_) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(t_) @(u_)')" title="اشتراک گذاری در واتس اپ" style="background-color: #1BD741;">
+                <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp">
+            </a>
+            <div class="share-post__item" href="#" onclick="window.open('http://twitter.com/share?text=@(t_);url=@(u_)', 'twitterShare', 'width=626,height=436'); return false;" title="توئیت کردن کد معرف" style="background-color: #55ACEE;">
+                <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter">
+            </div>
+            <div class="share-post__item" href="#" onclick="window.open('http://www.facebook.com/sharer.php?u=@(u_);t=@(t_)', 'facebookShare', 'width=626,height=436'); return false;" title="اشتراک گذاری در فیسبوک" style="background-color: #3b5998;">
+                <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook">
+            </div>
+            <div class="share-post__item" href="#" onclick="window.open('http://pinterest.com/pin/create/button/?url=@(u_)&description=@(t_)', 'pinterestShare', 'width=750,height=350'); return false;" title="پین کردن در پینترست" style="background-color: #BD081C;">
+                <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest">
+            </div>
+            <a class="share-post__item" href="mailto:?subject=@(t_);BODY=@(t_): @(u_)" title="اشتراک گذاری با ایمیل">
+                <i class="fa fa-envelope share-post__icon" style="font-size:24px;padding:8px;color:white;background-color:#3d3d3d;"></i>
+            </a>
+        </div>
+    }
+    else
+    {
+        <div style="display:flex;flex-wrap:wrap;align-items:center;margin-bottom:10px;flex-flow:row;">
+            <div style="margin-left:10px;font:13px Liransans;width:unset;">ابتدا عضو سایت شوید:</div>
+            <div onclick="loginAndPresent()" style="font:15px Miransans;cursor:pointer;background-color:#fdd835;padding:5px 7px;border-radius:5px;width:unset;">ثبت نام</div>
+        </div>
+    }
+</div>
+<script type="text/javascript">
+    function copyPresentationCode() {
+        copyStringToClipboard('@presentorCode', 'کد معرف');
+    }
+
+    function copyStringToClipboard(str, name) {
+        // Create new element
+        var el = document.createElement('textarea');
+        // Set value (string to be copied)
+        el.value = str;
+        // Set non-editable to avoid focus and move outside of view
+        el.setAttribute('readonly', '');
+        el.style = { position: 'absolute', left: '-9999px' };
+        document.body.appendChild(el);
+        // Select text inside element
+        el.select();
+        // Copy text to clipboard
+        document.execCommand('copy');
+        // Remove temporary element
+        document.body.removeChild(el);
+        alertify.success(name + " کپی شد");
+    }
+
+    function loginAndPresent() {
+        presentPopupAfterLogin = true;
+        toggle_login();
+        hidePresentPopup();
+    }
+    @if (ViewBag.containOnLogin != null && ViewBag.containOnLogin == true)
+    {
+        @:function on_login() {
+            @:if (presentPopupAfterLogin)
+            @:{
+                @:showPresentPopup();
+            @:}
+        @:}
+    }
+    @if (ViewData["refreshOnLogin"] != null && bool.Parse(ViewData["refreshOnLogin"].ToString()) == true)
+    {
+        @:function on_login() {
+            @:if (presentPopupAfterLogin)
+            @:{
+                @:window.location.href = window.location.href;
+            @:}
+        @:}
+    }
+</script>
+<link rel="stylesheet" href="/file/getcss?src=/resource/css/general/share-post.css&v=1" />

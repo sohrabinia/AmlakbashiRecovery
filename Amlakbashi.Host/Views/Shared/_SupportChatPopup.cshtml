@@ -1,0 +1,98 @@
+﻿@using Amlakbashi.Core.Infrastructure.HtmlHelpers;
+@using Amlakbashi.Core.DTOs.SupportChatDTOs;
+
+@model SupportChatPopupDTO
+
+@helper StyleHelper(string style)
+{
+    if (string.IsNullOrEmpty(style))
+    {
+        @:
+    }
+    else
+    {
+        @:style="@style"
+    }
+}
+<div class="chat-popup__container">
+    @{
+        var is_user = Model == null || Model.SupportChat == null || Model.SupportChat.UserID == 0 || Model.SupportChat.UserID == User.GetUser().Id;
+        var user_id = User.GetUser().Id;
+        if (Model == null || Model.SupportChat == null || !Model.SupportChat.Messages.Any())
+        {
+            <div style="font:11px Miransans;min-width: 294px;">سلام چطور میتونم کمکتون کنم؟</div>
+        }
+        var messages = Model != null && Model.SupportChat != null ? Model.SupportChat.Messages.ToList() : new List<SupportChatMessage>();
+        if (ViewBag.onlineSupport)
+        {
+            var sentences = ChatHtmlHelper.GenerateMultilineChat(SupportChatHtmlHelper.GenerateQuestionButtonList(0, null));
+            <div style="min-height: 90px" class="chat-popup__msg-left">
+                <div style="width:100%;margin:0;" class="speech-bubble-left">
+                    @for (int i = 0; i < sentences.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            @:<br />
+                        }
+                        @Html.Raw(sentences[i])
+                    }
+                    <div onclick="openChatInput()" style="width:fit-content;font:12px Liransans;cursor:pointer;box-shadow:1px 2px 3px 0 rgba(0,0,0,.1);border: 1px solid #ccc;background-color: #fff; border-radius:5px;padding:5px;margin:5px;">چت آنلاین با پشتیبان</div>
+                </div>
+            </div>
+        }
+        foreach (var item in messages)
+        {
+            var is_self = item.UserID == user_id;
+            var is_from_user = (is_user && item.UserID == user_id) || (!is_user && item.UserID != user_id);
+            //var words = item.Text.Split(' ');
+            var chatSentences = ChatHtmlHelper.GenerateMultilineChat(item.Text);
+            <div style="min-height: 90px" class="@(is_self ? "chat-popup__msg-right" : "chat-popup__msg-left")">
+                @if (item.UserID >= 0)
+                {
+                <div class="chat-popup__sender-name">
+                    @if (item.UserID > 0)
+                    {
+                        <img width="40" height="40" style="border-radius:60px" src="@(is_from_user ? "/عکس-پروفایل_کوچک-" + item.UserID : "/file/resourceimagewebp?file_name=siteicons/icon-40x40_round")" />
+                    }
+                    else
+                    {
+                        <i style="font-size:40px" class="fa fa-user-circle"></i>
+                    }
+                    <span>@(is_self ? "شما" : (is_user ? "پشتیبان" : user_id == 0 ? "ناشناس" : Model.UserFullName))</span>
+                </div>
+                }
+                <div @StyleHelper(item.UserID >= 0 ? "" : "width:100%;margin:0;") class="@(is_self ? "speech-bubble-right" : "speech-bubble-left")">
+                    @for (int i = 0; i < chatSentences.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            @:<br />
+                        }
+                        if (chatSentences[i].Trim() == "OPENCHATBUTTON")
+                        {
+                            <div onclick="openChatInput()" style="width:fit-content;font:12px Liransans;cursor:pointer;box-shadow:1px 2px 3px 0 rgba(0,0,0,.1);border: 1px solid #ccc;background-color: #fff; border-radius:5px;padding:5px;margin:5px;">چت آنلاین با پشتیبان</div>
+                        }
+                        else
+                        {
+                            @Html.Raw(chatSentences[i])
+                        }
+                    }
+                    <br /><br />
+                    @if (is_self)
+                    {
+                        if (item.ReadStatus == SupportChatMessage.ReadStatusEnum.Read)
+                        {
+                            <i style="color:#34A853;font-size:15px;margin-left:-5px;" class="fas fa-check"></i>
+                            <i style="color:#34A853;font-size:15px;margin-right:-5px;" class="fas fa-check"></i>
+                        }
+                        else
+                        {
+                            <i style="color:#34A853;font-size:15px" class="fas fa-check"></i>
+                        }
+                    }
+                    <span>@(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.CreateTime).Replace(',' , '/')) @(item.CreateTime.ToString("HH:mm"))</span>
+                </div>
+            </div>
+        }
+    }
+</div>

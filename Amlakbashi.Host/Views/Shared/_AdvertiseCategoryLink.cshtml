@@ -1,0 +1,12 @@
+﻿@model DynamicCategory
+@{ 
+    var link = CategoryUrlLocalization.CategoryToUrl(Model);
+    if (ViewData["queryString"] != null)
+    {
+        link += ViewData["queryString"];
+    }
+}
+<a href="@link" class="advertise-category-link__link">
+    <span>@(!string.IsNullOrEmpty(Model.CustomUrlTitle) ? Model.CustomUrlTitle : Model.Title) (@Model.CountAdvertise)</span>
+    <i class="fa fa-search" style="float: left;margin: 3px;font-size: 16px;"></i>
+</a>

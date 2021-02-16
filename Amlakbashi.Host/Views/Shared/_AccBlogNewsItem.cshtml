@@ -1,0 +1,42 @@
+﻿@{
+    var photo_id = long.Parse(ViewData["photoId"].ToString());
+    var img_xxxsmall = photo_id > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", photo_id, 110, 62) : string.Format("/عکس-یافت-نشد-{0}-{1}", 110, 62);
+    var img_xxsmall = photo_id > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", photo_id, 130, 73) : string.Format("/عکس-یافت-نشد-{0}-{1}", 130, 73);
+    var img_xsmall = photo_id > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", photo_id, 155, 87) : string.Format("/عکس-یافت-نشد-{0}-{1}", 155, 87);
+    var img_small = photo_id > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", photo_id, 213, 120) : string.Format("/عکس-یافت-نشد-{0}-{1}", 213, 120);
+
+    var lazy_xxxsmall = "/file/resourceimagepng?file_name=lazy/lazy-16_9_110w";
+    var lazy_xxsmall = "/file/resourceimagepng?file_name=lazy/lazy-16_9_130w";
+    var lazy_xsmall = "/file/resourceimagepng?file_name=lazy/lazy-16_9_155w";
+    var lazy_small = "/file/resourceimagepng?file_name=lazy/lazy-16_9_213w";
+}
+<div class="acc__blog-news-item-root">
+    <div class="acc__blog-news-item">
+        <a rel="nofollow" target="_blank" href="@ViewData["href"]">
+            <img class="lazy"
+                 srcset="@lazy_xxxsmall 110w,
+                     @lazy_xxsmall 130w,
+                     @lazy_xsmall 155w,
+                     @lazy_small 213w"
+                 data-srcset="@img_xxxsmall 110w,
+                     @img_xxsmall 130w,
+                     @img_xsmall 155w,
+                     @img_small 213w"
+                 sizes="(max-width: 380px) 110px,
+                    (max-width: 500px) 130px,
+                    (max-width: 680px) 155px,
+                    213px"
+                 src="@lazy_small"
+                 data-src="@img_small" alt="@ViewData["title"]" title="@ViewData["title"]" />
+        </a>
+        <div class="acc__blog-news-item-content">
+            <a target="_blank" href="@ViewData["href"]">
+                <h4 class="acc__blog-news-item-title">@ViewData["title"]</h4>
+            </a>
+            <div class="acc__blog-news-item-text">
+                 @Html.Raw(ViewData["text"])
+            </div>
+        </div>
+        <a target="_blank" href="@ViewData["href"]" class="acc__blog-news-item-content acc__blog-news-read-button">ادامه مطلب</a>
+    </div>
+</div>

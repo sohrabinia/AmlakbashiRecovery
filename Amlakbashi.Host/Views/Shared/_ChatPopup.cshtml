@@ -1,0 +1,50 @@
+﻿@model Amlakbashi.Core.DTOs.ReserveChatDTOs.ReserveChatPopupDTO
+<div id="js-chat-popup__container" class="chat-popup__container">
+    @{
+        if (Model.items.Any() == false)
+        {
+            <div style="font:11px Miransans;min-width: 294px;">هنوز هیچ پیامی ارسال نشده</div>
+        }
+        foreach (var item in Model.items)
+        {
+            <div class="@(item.isOwnText ? "chat-popup__msg-right" : "chat-popup__msg-left")">
+                @*<div class="chat-popup__sender-name">
+                        <img width="40" height="40" style="border-radius:60px" src="/عکس-پروفایل_کوچک-@(user.PhotoID)" />
+                        <span>@(is_own_text ? "شما " : (is_guest ? "میزبان " : "مهمان "))</span>
+                    </div>*@
+                <div class="@(item.isOwnText ? "speech-bubble-right" : "speech-bubble-left")">
+                    <span>
+                        @{
+                            for (int i = 0; i < item.words.Count; i++)
+                            {
+                                var word = item.words[i];
+                                if (word.isAdvertiseId)
+                                {
+                                    <a target="_blank" style="color:#242424;text-shadow: 1px 1px 0.5px white;" href="~/اجاره-روزانه/@word.advertiseSlug">@word.advertiseSlug</a>
+                                }
+                                else
+                                {
+                                    @(i == 0 ? word.word + " " : " " + word.word + " " )
+                                }
+                            }
+                        }
+                    </span>
+                    <br /><br />
+                    @if (item.isOwnText)
+                    {
+                        if (item.readStatus == Chat.ReadStatusEnum.Read)
+                        {
+                            <i style="color:#34A853;font-size:15px;margin-left:-5px;" class="fas fa-check"></i>
+                            <i style="color:#34A853;font-size:15px;margin-right:-5px;" class="fas fa-check"></i>
+                        }
+                        else
+                        {
+                            <i style="color:#34A853;font-size:15px" class="fas fa-check"></i>
+                        }
+                    }
+                    <span>@item.createTimeString</span>
+                </div>
+            </div>
+        }
+    }
+</div>

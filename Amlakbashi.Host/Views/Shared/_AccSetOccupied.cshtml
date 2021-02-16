@@ -1,0 +1,149 @@
+﻿@model Advertise
+@await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" }, { "noImageLazy", true } })
+<div class="acc-set-date__input-container">
+    <div onclick="setAsOccupied(this)" class="acc-set-date__button acc-set-date__occ-btn acc-set-date__disabled-button">پر است</div>
+    <div onclick="removeFromOccupied(this)" class="acc-set-date__button acc-set-date__empty-btn acc-set-date__disabled-button">خالی است</div>
+</div>
+<div class="acc-set-date__date-string"></div>
+<script type="text/javascript">
+    var occupiedListStr = '@ViewBag.occupiedList';
+    occupiedListStr = occupiedListStr.replaceAll('&quot;', '"');
+    var occupiedList = JSON.parse(occupiedListStr);
+    firstSelectedDay = undefined;
+    secondSelectedDay = undefined;
+    updateDatePicker([$('#main-date-picker')[0]], jalaliCurrentMonth,
+    {
+        priceDict: {},
+        occupiedList: occupiedList,
+        monthOffset: 0,
+        selectionType: 'multi',
+        occupiedSelectEnabled: true,
+        onUpdateDate: onUpdateDate
+    });
+
+    function onUpdateDate () {
+        if (firstSelectedDay != undefined &&
+            secondSelectedDay != undefined) {
+            var fromDayString = firstSelectedDay.date.substring(2);
+            var toDayString = secondSelectedDay.date.substring(2);
+            $('.acc-set-date__date-string').html('از شب ' + fromDayString + ' تا شب ' + toDayString);
+        }
+        else {
+            $('.acc-set-date__date-string').html('');
+        }
+        updateInput();
+    }
+
+    function updateInput() {
+        if (firstSelectedDay == undefined) {
+            if (!($('.acc-set-date__button').hasClass('acc-set-date__disabled-button'))) {
+                $('.acc-set-date__button').addClass('acc-set-date__disabled-button');
+            }
+        }
+        else {
+            $('.acc-set-date__button').removeClass('acc-set-date__disabled-button');
+        }
+    }
+
+    var currentMonth;
+    var from_date;
+    var to_date;
+
+    function calculateSelectedRange() {
+        from_date = firstSelectedDay.date.replaceAll('/', ',');
+        if (secondSelectedDay != undefined) {
+            currentMonth = gregorianToJalaliDate(new Date(secondSelectedDay.value));
+            var nextDay = new Date(secondSelectedDay.value);
+            nextDay.setDate(nextDay.getDate() + 1);
+            nextDay = gregorianToJalaliDate(nextDay);
+            to_date = nextDay.dateString.replaceAll('/', ',');
+        }
+        else {
+            currentMonth = gregorianToJalaliDate(new Date(firstSelectedDay.value));
+            var nextDay = new Date(firstSelectedDay.value);
+            nextDay.setDate(nextDay.getDate() + 1);
+            nextDay = gregorianToJalaliDate(nextDay);
+            to_date = nextDay.dateString.replaceAll('/', ',');
+        }
+    }
+
+    function setAsOccupied(btn) {
+        if ($(btn).hasClass('acc-set-date__disabled-button')) {
+            return;
+        }
+        calculateSelectedRange();
+        jalaliShowLoading();
+        myajax("accomodation/checksetasoccupiedfordaterange",
+         "advertise_id=@Model.Id" +
+         "&from_date=" + from_date + "&to_date=" + to_date, function (ret) {
+             //jalaliHideLoading();
+             if (ret.status == 0) {
+                 showErrorMessage('خطا', ret.msg);
+                 return;
+             }
+             showNoYesMessage('افزودن به روز های پر', ret.msg,
+                 function () {
+                     $('.message-popup__message-container').css('display', 'none');
+                     jalaliShowLoading();
+                     myajax("accomodation/setasoccupiedfordaterange", "advertise_id=" + @Model.Id +
+                        "&from_date=" + from_date + "&to_date=" + to_date, function (ret) {
+                            jalaliHideLoading();
+                            $('.message-popup__message-container').css('display', 'flex');
+                            if (ret.status == 0) {
+                                showErrorMessage('خطا', ret.msg);
+                                return;
+                            }
+                            showSuccessMessage('انجام شد', 'محدوده انتخاب شده به روز های پر اضافه شد');
+                            firstSelectedDay = undefined;
+                            secondSelectedDay = undefined;
+                            updateInput();
+                            updateDatePicker([$('#main-date-picker')[0]], currentMonth,
+                            {
+                                priceDict: {},
+                                occupiedList: ret.occupiedList,
+                                monthOffset: 0,
+                                selectionType: 'multi',
+                                occupiedSelectEnabled: true,
+                                onUpdateDate: onUpdateDate
+                            });
+                        });
+                 }, function () {
+                     jalaliHideLoading();
+                 });
+         });
+    }
+    function removeFromOccupied(btn) {
+        if ($(btn).hasClass('acc-set-date__disabled-button')) {
+            return;
+        }
+        calculateSelectedRange();
+        showNoYesMessage('حذف از روز های پر', 'آیا این اقامتگاه از تاریخ ' + from_date + ' تا ' + to_date + ' خالی است؟',
+            function () {
+                jalaliShowLoading();
+                $('.message-popup__message-container').css('display', 'none');
+                myajax("accomodation/removefromoccupiedfordaterange", "advertise_id=" + @Model.Id +
+                    "&from_date=" + from_date + "&to_date=" + to_date, function (ret) {
+                        jalaliHideLoading();
+                        $('.message-popup__message-container').css('display', 'flex');
+                        if (ret.status == 0) {
+                            showErrorMessage('خطا', ret.msg);
+                            return;
+                        }
+                        showSuccessMessage('انجام شد', 'محدوده انتخاب شده از روز های پر حذف شد');
+                        firstSelectedDay = undefined;
+                        secondSelectedDay = undefined;
+                        updateInput();
+                        updateDatePicker([$('#main-date-picker')[0]], currentMonth,
+                        {
+                            priceDict: {},
+                            occupiedList: ret.occupiedList,
+                            monthOffset: 0,
+                            selectionType: 'multi',
+                            occupiedSelectEnabled: true,
+                            onUpdateDate: onUpdateDate
+                        });
+                    });
+            });
+    }
+
+</script>

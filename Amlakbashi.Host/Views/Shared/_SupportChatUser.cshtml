@@ -1,0 +1,44 @@
+﻿@helper StyleHelper(string style)
+{
+    if (string.IsNullOrEmpty(style))
+    {
+        @:
+    }
+    else
+    {
+        @:style="@style"
+    }
+}
+<div class="support-chat__user-inform">
+    <i class="fa fa-times" onclick="hideSupportChatInform()"></i>
+    <span style="padding:10px 5px" onclick="showSupportChat()">سلام چطور میتونم کمکتون کنم؟</span>
+</div>
+<div class="support-chat__button" style="" onclick="showSupportChat()">
+    <i class="fa fa-circle support-chat__light-icon"></i>
+    <img style="display:@(ViewBag.onlineSupport ? "unset" : "none")"
+         class="support-chat__green-light"
+         srcset="/file/resourceimagegif?file_name=blink-green-light-7w 7w,
+                /file/resourceimagegif?file_name=blink-green-light-10w 10w"
+         sizes="(max-width: 680px) 7px,
+                10px"
+         src="/file/resourceimagegif?file_name=blink-green-light-7w" alt="green_light"/>
+    <img srcset="/file/resourceimagepng?file_name=support-icon-35w 35w,
+                /file/resourceimagepng?file_name=support-icon-45w 45w"
+         sizes="(max-width: 680px) 35px,
+                45px"
+         src="/file/resourceimagepng?file_name=support-icon-35w" alt="support_icon"/>
+    <div style="display:none" class="support-chat__new-count">0</div>
+</div>
+<div class="support-chat__container" style="display:none;">
+    <div class="support-chat__header" onclick="hideSupportChat()">
+        <i class="fa fa-chevron-down support-chat__icon"></i>
+        <span id="js-supporter-label" style="padding:0 5px">پشتیبانی آنلاین</span>
+        <i class="fa fa-comment fa-flip-horizontal support-chat__icon"></i>
+    </div>
+    <div class="support-chat__chat-box">
+    </div>
+    <div @StyleHelper(ViewBag.onlineSupport ? "display:none" : "") class="support-chat__input-container">
+        <i class="fa fa-play support-chat__send-button" onclick="sendSupportChatMessage()"></i>
+        <textarea onkeyup="chat_box_inputkeyup()" type="text" class="support-chat__text-input" placeholder="متن خود را اینجا بنویسید"></textarea>
+    </div>
+</div>

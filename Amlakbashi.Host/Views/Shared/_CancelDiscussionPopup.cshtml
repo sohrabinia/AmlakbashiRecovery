@@ -1,0 +1,11 @@
+﻿@model IEnumerable<string>
+<div class="chat-popup__container">
+    @{
+        foreach (var text in Model)
+        {
+            <div class="chat-popup__msg-right">
+                <span class="speech-bubble-center">@text</span>
+            </div>
+        }
+    }
+</div>
