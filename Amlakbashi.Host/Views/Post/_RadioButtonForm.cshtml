@@ -1,17 +1,6 @@
-﻿@helper isChecked(bool stat)
-{
-if (stat)
-{
-        @:checked="checked"
-    }
-    else
-    {
-        @:""
-    }
-}
-    <div onclick="@ViewData["onclick"]" class="div-unset topcoat-radio-button__label">
-        @ViewData["title"]
-        <input @isChecked(bool.Parse(ViewData["Active"].ToString())) class="@ViewData["classActive"]" type="radio" name="topcpat" value="@ViewData["statusToDay"]">
-        <label ><span></span></label>
-        @*<div class="topcoat-radio-button" ></div>*@
-    </div>
+﻿<div onclick="@ViewData["onclick"]" class="div-unset topcoat-radio-button__label">
+    @ViewData["title"]
+    <input is-checked="@(bool.Parse(ViewData["Active"].ToString()))" class="@ViewData["classActive"]" type="radio" name="topcpat" value="@ViewData["statusToDay"]">
+    <label ><span></span></label>
+    @*<div class="topcoat-radio-button" ></div>*@
+</div>

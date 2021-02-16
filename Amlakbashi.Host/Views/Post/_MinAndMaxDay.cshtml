@@ -1,11 +1,13 @@
 ﻿@*< !--item 4-- >*@
     <div class="set-days-reserve">
         <div class="div-unset">
-            @Html.Partial("_NumberInput", new ViewDataDictionary() { { "name", " حداقل " }, { "placeholder", "1" }, { "class", " set_min-max-day js-input" }, { "id", ViewData["js-min-input"] }, { "inputValue", ViewData["minReserve"] }, { "onclick", "" }, { "text", "روز" } })
+            @Html.PartialAsync("_NumberInput", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                new ModelStateDictionary()) { { "name", " حداقل " }, { "placeholder", "1" }, { "class", " set_min-max-day js-input" }, { "id", ViewData["js-min-input"] }, { "inputValue", ViewData["minReserve"] }, { "onclick", "" }, { "text", "روز" } })
             <span class="str-min-max-day">رزرو می دهم</span>
         </div>
         <div class="div-unset">
-            @Html.Partial("_NumberInput", new ViewDataDictionary() { { "name", "حداکثر " }, { "placeholder", "720" }, { "class", " set_min-max-day js-input" }, { "id", ViewData["js-max-input"] }, { "inputValue", ViewData["maxReserve"] }, { "onclick", "" }, { "text", "روز" } })
+            @Html.PartialAsync("_NumberInput", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                new ModelStateDictionary()) { { "name", "حداکثر " }, { "placeholder", "720" }, { "class", " set_min-max-day js-input" }, { "id", ViewData["js-max-input"] }, { "inputValue", ViewData["maxReserve"] }, { "onclick", "" }, { "text", "روز" } })
             <span class="str-min-max-day">رزرو می دهم</span>
         </div>
         <div class="wrapper-left-banner div-unset">
