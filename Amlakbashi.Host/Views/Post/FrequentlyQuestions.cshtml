@@ -1,0 +1,223 @@
+﻿@using PagedList;
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "سوالات متداول - املاک باشی";
+    Layout = "~/Views/Shared/_Master.cshtml";
+    ViewBag.Description = "سوالات متداول سایت املاک باشی";
+}
+<div class="container">
+    <div class="row" style="font: 25px Biransans; text-align: right; padding:0 10px;margin:0 10px;border-radius:5px; color: #242424;"><h1>سوالات متداول</h1></div>
+    <div @*class="row"*@>
+        <div style="padding:30px;font:14px Liransans;color:#333;align-content:center;min-height:300px;max-width:100%;">
+
+            <p class="public__header-text">
+                <strong>چگونه عضو سایت شوم؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                مرحله ۱: از بالای سایت گزینه <strong class="public__content-highlight">&nbsp;ورود&nbsp;</strong> را انتخاب کنید<br />
+                مرحله ۲: شماره موبایل خود را وارد کنید<br />
+                مرحله ۳: اس ام اسی برای شما ارسال میشود که حاوی کد تایید شماست، کد را در کادر مشخص وارد کنید<br />
+            </p>
+
+            <p class="public__header-text">
+                <strong>چگونه درخواست رزرو بدهم؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                مرحله ۱: طبق توضیحات بالا عضو سایت شوید<br />
+                مرحله ۲: آگهی مورد نظر خود را انتخاب کنید<br />
+                مرحله ۳: روی عکس یا عنوان آن کلیک کنید<br />
+                مرحله ۴: در قسمت تقویم تاریخ شروع و پایان سفر خود و تعداد نفرات را وارد کنید<br />
+                مرحله ۵: روی کادر زرد رنگ <strong class="public__content-highlight">&nbsp;درخواست رزرو&nbsp;</strong> کلیک کنید<br />
+                مرحله ۶: قوانین و مقررات سایت و اقامتگاه را مطالعه و تیک آن را فعال کنید<br />
+                مرحله ۷: ثبت را انتخاب کنید<br />
+                مرحله ۸: منتظر پیامک تایید یا رد درخواست خود توسط میزبان باشید(در این مرحله میتوانید با میزبان از طریق چت سایت در تماس باشید)<br />
+                مرحله ۹: پس از تایید میزبان لینک پرداخت برای شما پیامک میشود<br />
+                مرحله ۱۰: با پرداخت مبلغ درخواست رزرو شما تکمیل شده و پیامکی حاوی شماره تماس میزبان دریافت خواهید کرد
+            </p>
+
+            <p class="public__header-text">
+                <strong>من میزبان هستم چگونه متوجه بشم که درخواست رزرو دارم؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                بعد از درخواست رزرو پیامکی حاوی اطلاعات رزرو دریافت می کنید<br /><br />
+                با ارسال عدد ۱ به شماره 10008412 درخواست را قبول می کنید<br />
+                با ارسال عدد ۲ به شماره 10008412 درخواست را رد می کنید<br />
+                با ارسال عدد ۳ به شماره 10008412 درخواست را بدلیل قیمت کم است رد می کنید<br />
+                با ارسال عدد ۴ به شماره 10008412 درخواست را بدلیل پر بودن رد می کنید<br /><br />
+                نکته :  حتما با همان شماره ای که برای شما پیامک آمده است ، به شماره 10008412 پاسخ دهید در غیر این صورت پاسخ شما در سیستم وارد نمیشود<br /><br />
+                همچنین میتوانید از طریق بخش <strong class="public__content-highlight">&nbsp;حساب من&nbsp;</strong> و در قسمت رزرو ها درخواست های رزرو را مدیریت کنید
+            </p>
+
+            <p class="public__header-text">
+                <strong>چطور از وضعیت درخواست هایم مطلع شوم؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                با ورود به <strong class="public__content-highlight">&nbsp;حساب من&nbsp;</strong> گزینه رزرو ها را از منو سمت راست انتخاب کنید
+            </p>
+
+            <p class="public__header-text">
+                <strong>چگونه می توانم شماره میزبان و آدرس را داشته باشم؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                پس از انجام مراحل رزرو و پرداخت، شماره تماس میزبان برای شما در بخش رزروها نمایان می شود شما میتوانید با میزبان ارتباط بگیرید 
+            </p>
+
+            <p class="public__header-text">
+                <strong>چطور کد آگهی را در سایت جستجو کنم؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                در صفحه اول سایت در کادر جستجو کد آگهی را وارد کنید
+            </p>
+
+            <p class="public__header-text">
+                <strong>طریقه پرداخت هزینه اقامتگاه چگونه است؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                پرداخت هزیته بصورت اینترنتی و از طریق درگاه امن سایت بصورت پیش پرداخت و الباقی مبلغ در زمان تحویل کلید و مطابقت اطلاعات اقامتگاه با اطلاعات درج شده در سایت ،شما به میزبان پرداخت می کنید<br /><br />
+                نکته : دقت فرمایید که مبلغ پیش پرداخت برای یک و دو شب معادل هزینه یک شب و برای بیشتر از دو شب معادل 30درصد مبلغ کل تعیین گردیده است
+            </p>
+
+            <p class="public__header-text">
+                <strong>من مهمان هستم درخواست رزرو داده ام چطور میتوانم درخواست رزرو را لغو کنم؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                درصورتیکه پیش پرداخت انجام نشده باشد با رفتن به گزینه رزرو ها گزینه لغو درخواست رزرو را انتخاب کنید
+            </p>
+
+            <p class="public__header-text">
+                <strong>درصورت مغایرت اطلاعات ثبت شده در سایت با شرایط موجود اقامتگاه مغایرت داشته باشد چکار باید بکنم؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                در صورت مطابقت نداشتن محل اقامت با توضیحات ارائه شده توسط میزبان از قیبل متراژ و تعداد خواب و ... کل مبلغ به مهمان مسترد میشود
+            </p>
+
+            <p class="public__header-text">
+                <strong>چگونه ملک خود را در سایت املاک باشی ثبت کنم؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                بعد از ثبت نام و عضویت در سایت روی گرینه <strong class="public__content-highlight">&nbsp;ثبت آگهی&nbsp;</strong> کلیک کنید و مراحل ثبت را طی کنید<br /><br />
+                نکته: میزبان محترم دقت داشته باشید در هر آگهی فقط می توانید عکس و اطلاعات مربوط به یک اقامتگاه را ثبت کنید
+            </p>
+
+            <p class="public__header-text">
+                <strong>قیمت های ثبت شده برای چند شب و چند نفر است؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                بری یک شب و تعداد نفراتی که در آگهی قید شده ، توجه داشته باشید که نفرات اضافه هزینه جداگانه محاسبه میگردد
+            </p>
+
+            <p class="public__header-text">
+                <strong>در زمان تحویل واحد چه مدارکی مورد نیاز هست؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                کارت ملی و در صورت زوج بودن ارائه اصل شناسنامه 
+            </p>
+
+            <p class="public__header-text">
+                <strong>آیا پس از رزرو می توانم تغییراتی در در آن اعمال کنم؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                با هماهنگی میزبان و مهمان تغییرات را به پشتیبان سایت اعلام کنید تا اعمال گردد
+            </p>
+
+            <p class="public__header-text">
+                <strong>پیامک های ارسالی به میزبان و مهمان تا چند ساعت اعتبار دارد؟</strong>
+                <i class="fa fa-chevron-left"></i>
+            </p>
+            <p class="public__content-text">
+                میزبان و مهمان محترم توجه داشته باشید که پیامک های ارسالی تا سه ساعت در ساعات کاری معتبر میباشد مگر اینکه طرفین با یکدیگر هماهنگ کرده باشند
+                نکته: سرعت عمل در پاسخگویی شما به بالا بردن امتیاز آگهی شما و در نتیجه به نمایش بیشتر آن کمک می کند
+            </p>
+
+            <div style="text-align: right;font-size:16px;">
+                <br>
+                <p>در صورتیکه سوالی غیر از موارد مطرح شده دارید از طریق راه های ارتباطی با ما در میان بگذارید:</p>
+                <a href="https://www.amlakbashi.com/post/public?sid=6" target="_blank">جهت ورود به صفحه تماس با ما اینجا را کلیک کنید</a>
+                <br>
+                <a href="https://www.amlakbashi.com/user/mobilelogin" target="_blank">جهت ورود به سایت اینجا را کلیک کنید</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section HeaderAddition
+{
+    <link rel="canonical" href="https://www.amlakbashi.com/سوالات-متداول" />
+
+    <meta property="og:url" content="https://www.amlakbashi.com/سوالات-متداول" />
+}
+@section StyleLink {
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css_output/minifypostlistcss_v1_2.css" />
+
+    @*@MvcHtmlString.Create(
+        Bundle.Css()
+            .Add("/resource/css/portal/post-list.css")
+            .ForceRelease()
+            .Render("/resource/css_output/minifypostlistcss_v1_1.css"))*@
+}
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        $(".public__header-text").click(function () {
+
+            $header = $(this);
+            //getting the next element
+            $content = $header.next();
+            //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
+            $content.slideToggle(400);
+            $icon = $header.find("i");
+            var curr_icon = $icon.attr("class");
+            if (curr_icon == "fa fa-chevron-left")
+                curr_icon = "fa fa-chevron-down";
+            else
+                curr_icon = "fa fa-chevron-left";
+            $icon.fadeTo(200, 0).promise().done(function () {
+                
+                $icon.attr("class", curr_icon).fadeTo(200, 1);
+            });
+        });
+    </script>
+@{ var url_splitted = ("/سوالات-متداول").Substring(1).Split('/'); }
+<script type="application/ld+json">
+    {
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [{
+    "@@type": "ListItem",
+    "position": 1,
+    "name": "املاک باشی",
+    "item": "https://www.amlakbashi.com/"
+    }
+
+    @for (int i = 0; i < url_splitted.Length; i++)
+    {
+        var url = "https://www.amlakbashi.com/";
+        for (int j = 0; j < i; j++)
+        {
+            url += (url_splitted[j] + "/");
+        }
+        url += url_splitted[i];
+        var pos = i + 2;
+        @:,{
+        @:"@@type": "ListItem",
+        @:"position": @(pos),
+        @:"name": "@(url_splitted[i].Replace("-", " "))",
+        @:"item": "@(url)"}
+            }
+    ]
+    }
+</script>
+}

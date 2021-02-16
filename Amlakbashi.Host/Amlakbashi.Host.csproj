@@ -5,7 +5,42 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\Content\**" />
+    <Content Remove="wwwroot\Content\**" />
+    <EmbeddedResource Remove="wwwroot\Content\**" />
+    <None Remove="wwwroot\Content\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="Views\Post\AccomodationManager.cshtml" />
+    <None Include="Views\Post\Contact.cshtml" />
+    <None Include="Views\Post\dashboard.cshtml" />
+    <None Include="Views\Post\DownloadApp.cshtml" />
+    <None Include="Views\Post\Edit.cshtml" />
+    <None Include="Views\Post\EnamadRedirect.cshtml" />
+    <None Include="Views\Post\FavoriteManager.cshtml" />
+    <None Include="Views\Post\FrequentlyQuestions.cshtml" />
+    <None Include="Views\Post\Index.cshtml" />
+    <None Include="Views\Post\News.cshtml" />
+    <None Include="Views\Post\NewsItem.cshtml" />
+    <None Include="Views\Post\Page.cshtml" />
+    <None Include="Views\Post\PresentAndPrize.cshtml" />
+    <None Include="Views\Post\ProfileManager.cshtml" />
+    <None Include="Views\Post\Public.cshtml" />
+    <None Include="Views\Post\ReplyComment.cshtml" />
+    <None Include="Views\Post\SamandehiRedirect.cshtml" />
+    <None Include="Views\Post\Search.cshtml" />
+    <None Include="Views\Post\SearchAccID.cshtml" />
+    <None Include="Views\Post\_EditFast.cshtml" />
+    <None Include="Views\Post\_InstantReserve.cshtml" />
+    <None Include="Views\Post\_MinAndMaxDay.cshtml" />
+    <None Include="Views\Post\_News.cshtml" />
+    <None Include="Views\Post\_RadioButtonForm.cshtml" />
+    <None Include="Views\Post\_RoomComplex.cshtml" />
+    <None Include="Views\Post\_TitleBanner.cshtml" />
+    <None Include="Views\Post\_TitleList.cshtml" />
+    <None Include="Views\Post\_TitleRoomsCard.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,7 +78,6 @@
   <ItemGroup>
     <Folder Include="Logs\Logs\" />
     <Folder Include="Logs\HangfireLogs\" />
-    <Folder Include="wwwroot\Content\" />
     <Folder Include="wwwroot\Resource\packages\jquery-mobile\images\" />
   </ItemGroup>
 

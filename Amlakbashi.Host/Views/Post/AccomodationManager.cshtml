@@ -1,0 +1,388 @@
+﻿@using PagedList;
+@using PagedList.Mvc;
+@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs;
+@{
+    ViewBag.Title = "آگهی های من";
+    ViewBag.personal = true;
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+@model AccommodationManagerDTO
+@section StyleLink{
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/dashboard/host-panel.css&v=10">
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/dashboard/numberinput.css&v=1">
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/popup-calendar.css">
+}
+@section ScriptLink{
+    <script src="/file/getjs?src=/resource/Scripts/dashboard/host-panel.js&v=3"></script>
+    <script src="/file/getjs?src=/resource/Scripts/dashboard/accDatePicker.js&v=2"></script>
+    <script src="/file/getjs?src=/resource/Scripts/dashboard/ajax-accomodation.js&v=4"></script>
+    <script src="/file/getjs?src=/resource/Scripts/dashboard/numberInput.js&v=1"></script>
+}
+@helper IsChecked(bool stat)
+{
+    if (stat)
+    {
+        @:checked="checked"
+    }
+    else
+    {
+        @:""
+    }
+}
+@helper IsSelected(bool stat)
+{
+    if (stat)
+    {
+        @:selected="selected"
+    }
+    else
+    {
+        @:""
+    }
+}
+<form id="filter-banner" action="/post/accomodationmanager" method="get" class="form-filter-banner">
+    <input type="hidden" value=@ViewBag.UserID>
+    <span class="filter-banner__item">
+        <span class="select-name">نوع آگهی </span>
+        <span class="select-button">
+            <select class="selectStyle" name="type">
+                <option value="all" @IsSelected((string)ViewBag.type == "all")>همه ی آگهی ها</option>
+                <option value="enable" @IsSelected((string)ViewBag.type == "enable")>آگهی های فعال</option>
+                <option value="expire" @IsSelected((string)ViewBag.type == "expire")>آگهی های منقضی شده</option>
+                <option value="special" @IsSelected((string)ViewBag.type == "special")>آگهی های ویژه</option>
+                <option value="disable" @IsSelected((string)ViewBag.type == "disable")>غیر فعال</option>
+                <option value="ready" @IsSelected((string)ViewBag.type == "ready")>در انتظار تایید</option>
+            </select>
+        </span>
+    </span>
+    <span class="filter-banner__item">
+        <span>کد آگهی</span>
+        <span><input placeholder="" type="tel" name="id" value="@((int)ViewBag.id>0 ? ViewBag.id : "")"></span>
+    </span>
+    <span class="filter-banner__item button-filter">
+        <input class="bg-yellow" type="submit" value="فیلتر">
+    </span>
+</form>
+@foreach (var item in Model.accList)
+{
+    <!-- Start acclist -->
+
+    <div class="container-host-panel-css" data-id="@item.id">
+        <!-- Start-banner-single -->
+        <section class="banner-main card-banner single-card">
+            <!-- Start-wrapper-right-banner -->
+            <div class="wrapper-right-banner div-unset">
+                <div class="avatar-item">
+                    <a target="_blank" href="@item.previewUrl"><img src="@item.photoUrl" alt="عکس اتاق" /></a>
+                    @if (item.userRating <= 0)
+                    {
+                        <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
+                    }
+                 <div> @Html.Partial("_StarRating", new ViewDataDictionary { { "score", item.userRating } })</div>
+                    <a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="backgorund:@( item.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>
+                </div>
+            </div>
+            <!-- End-wrapper-right-banner -->
+            <!-- Start-wrapper-left-banner d-->
+            <div id="banner-status-@item.id" class="wrapper-left-banner div-unset">
+                <div class="flex-style">
+                    <div class="number-ticket">
+                        <span>کد آگهی :‌</span>
+                        <span>@item.id</span>
+                    </div>
+                    <div class="location-banner" style="max-height:23px;">
+                        <span class="location-icon"><i class="fa fa-map-marker-alt"></i></span>
+                        <span>@item.locationString </span>
+                    </div>
+                    <div class="status-reserved">
+                        <span>وضعیت :</span>
+                        <span class="js-status-color circle-status" style="background-color:@item.statusColor;"></span>
+                        <span class="js-status-string">@item.statusString</span>
+                    </div>
+                </div>
+                <div class="flex-style quick-access-desktop" style="justify-content:@(item.mainType == AccMainType.Single ? "space-between" : item.status == Advertise.AdvertiseStatus.NotCompleted?"flex-start": "flex-end");">
+                    @*<button type="button" data-type='@item.mainType.ToString().ToLower()' class="button_fast-reserve" > رزرو آنی</button>*@
+                    <a  href="@item.editUrl" target="_blank" class="completed-advertise-button" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"flex":"none")">
+                        <p>اطلاعات را تکمیل کنید</p>
+                    </a>
+                    <form style="display:@(item.mainType == AccMainType.Single && item.status != Advertise.AdvertiseStatus.NotCompleted ?  "block" : "none" );">
+                        <span> امشب واحد : </span>
+                        @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " خالی" }, { "Active", item.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", item.id) } })
+                        @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " پر " }, { "Active", item.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", item.id) } })
+                    </form>
+                    <div class="icons-style quick-access-desktop" style="text-align:left;display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
+                        @*<a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>*@
+                        <a style="opacity:@(item.mainType == AccMainType.Single ?  "1" : "0" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
+                        <a title="حذف" onclick="deleteButton(@item.id ,this)" class="icons-item trash-icon icons-desktop"><i class="fa fa-trash"></i></a>
+                        <a href="@item.editUrl" class="icons-item edit-icon-banner icons-desktop" target="_blank"><i class="fas fa-pencil-alt"></i></a>
+                        <a title="تنظیمات " data-type='@item.mainType.ToString().ToLower()' class="icons-item setting-icon icons-desktop"><i class="fa fa-cog"></i></a>
+                    </div>
+                </div>
+            </div>
+            <!-- End-wrapper-left-banner -->
+            <!-- Start-quick-access -->
+            <div class="quick-access">
+                <a href="@item.editUrl" target="_blank" class="completed-advertise-button" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"flex":"none")">
+                    <p>اطلاعات را تکمیل کنید</p>
+                </a>
+                <form style="display:@(item.mainType == AccMainType.Single && item.status != Advertise.AdvertiseStatus.NotCompleted ?  "block" : "none" );">
+                    <span> امشب:</span>
+                    @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " خالی" }, { "Active", item.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", item.id) } })
+                    @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " پر " }, { "Active", item.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", item.id) } })
+                </form>
+                <div class="icons div-unset" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
+                    <div>
+                        <a style="opacity:@(item.mainType == AccMainType.Single ?  "1" : "0" )" title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
+                        <a title="حذف " class="icons-item trash-icon" onclick="deleteButton(@item.id , this)"><i class="fa fa-trash"></i></a>
+                        <a href="@item.editUrl" class="icons-item edit-icon-banner" target="_blank"><i class="fas fa-pencil-alt"></i></a>
+                        <a title="تنظیمات " data-type='@item.mainType.ToString().ToLower()' class="icons-item setting-icon"><i class="fa fa-cog"></i></a>
+                    </div>
+                </div>
+            </div>
+            <!-- End-quick-access -->
+        </section>
+        <!-- End-banner-single -->
+        <!--start-banner-details- -->
+        <section data-id="@item.id" id="banner-details-@item.id" class="banner-details">
+            <!-- Start-edit-fast  -->
+            @if (item.mainType == AccMainType.Single)
+            {
+                <div class="fast-edit single-unit">
+                    <!-- Start-edit-fast  -->
+                    @Html.Partial("_TitleBanner", new ViewDataDictionary() { { "title", item.title }, { "id", item.id }, { "avatar", item.photoUrl }, { "closeClass", "exit1" } })
+                    <!-- start form -->
+                    <form action="" class="setting-list">
+                        <div class="status-banner">
+                            @if (item.isVerified)
+                            {
+                                @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", "نمایش آگهی " }, { "Active", item.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", item.id, "true") } })
+                                @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", "عدم نمایش آگهی " }, { "Active", !item.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", item.id, "false") } })
+                            }
+                            else if (!item.isVerified && item.notVerifyReasons.Count > 0)
+                            {
+                                <div class="button_reason_not_verified" onclick="showReasons(@item.id)">دلیل عدم تایید<div></div></div>
+                            }
+                        </div>
+                        @Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", " رزرو آنی" } })
+                        <div class="instantReserve container-item">
+                            @Html.Partial("_InstantReserve", item, new ViewDataDictionary() { { "instantReserveAccess", (int)Model.instantReserveAccess }, { "UserID", ViewBag.UserID } })
+                        </div>
+                        @Html.Partial("_EditFast", item)
+                        <div class="day-set-@item.id">
+                            @Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "تعیین مدت رزرو " } })
+                            <div class="day-set-quick container-item">
+                                @Html.Partial("_MinAndMaxDay", new ViewDataDictionary() { { "js-min-input", "js-min-input-" + item.id }, { "js-max-input", "js-max-input-" + item.id }, { "minReserve", item.minReserveDays }, { "maxReserve", item.maxReserveDays }, { "id", item.id } })
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            }
+            else if (item.mainType == AccMainType.Complex)
+            {
+                <!-- Start-room-type-list -->
+                <div class="room-type-list">
+                    @Html.Partial("_TitleRoomsCard", item, new ViewDataDictionary() { { "UserID", ViewBag.UserID }, { "ReserveAccess", (int)Model.instantReserveAccess } })
+                    <div class="style_title-list">
+                        @Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", " تنظیم واحد ها " } })
+                        <div class="parent-box">
+                            <div class="room-type">
+                                <!-- apartmentunits -->
+                                @if (item.apartmentUnits.Count > 0)
+                                {
+                                    <div class="type-name-unit-complex">
+                                        @*@Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "آپارتمان ها" } })*@
+                                        @*class show-container  for none roomcard*@
+                                        <p class="name-unit-complex"> آپارتمان ها </p>
+                                        <div class="roomCard">
+                                            @foreach (var apartmentUnit in item.apartmentUnits)
+                                            {
+                                                @Html.Partial("_RoomComplex", apartmentUnit)
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                <!-- suitUnits -->
+                                @if (item.suitUnits.Count > 0)
+                                {
+                                    <div class="type-name-unit-complex">
+                                        @*@Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "سوئیت ها" } })*@
+                                        <p class="name-unit-complex"> سوئیت ها </p>
+                                        <div class="roomCard">
+                                            @foreach (var suitUnit in item.suitUnits)
+                                            {
+                                                @Html.Partial("_RoomComplex", suitUnit)
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                <!-- villaUnits -->
+                                @if (item.villaUnits.Count > 0)
+                                {
+                                    <div class="type-name-unit-complex">
+                                        @*@Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "ویلا ها " } })*@
+                                        <p class="name-unit-complex"> ویلا ها </p>
+                                        <div class="roomCard">
+                                            @foreach (var villaUnit in item.villaUnits)
+                                            {
+                                                @Html.Partial("_RoomComplex", villaUnit)
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                <!-- houseUnits -->
+                                @if (item.houseUnits.Count > 0)
+                                {
+                                    <div class="type-name-unit-complex">
+                                        @*@Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "خانه های ویلایی" } })*@
+                                        <p class="name-unit-complex"> خانه های ویلایی </p>
+                                        <div class="roomCard">
+                                            @foreach (var houseUnit in item.houseUnits)
+                                            {
+                                                @Html.Partial("_RoomComplex", houseUnit)
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                <!-- hutUnits -->
+                                @if (item.hutUnits.Count > 0)
+                                {
+                                    <div class="type-name-unit-complex">
+                                        @*@Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "کلبه ها" } })*@
+                                        <p class="name-unit-complex"> کلبه ها </p>
+                                        <div class="roomCard">
+                                            @foreach (var hutUnit in item.hutUnits)
+                                            {
+                                                @Html.Partial("_RoomComplex", hutUnit)
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End-room-type-list -->
+            }
+            else if (item.mainType == AccMainType.Hotel)
+            {
+                <!-- Start-list-room-card  -->
+                <div class="list-room-card">
+                    @Html.Partial("_TitleRoomsCard", item, new ViewDataDictionary() { { "UserID", ViewBag.UserID }, { "ReserveAccess", (int)Model.instantReserveAccess } })
+                    <div class="style_title-list">
+                        @Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", " تنظیم واحد ها " } })
+                        <div class="parent-box">
+                            @foreach (var hotelRoom in item.hotelRooms)
+                            {
+                                <div class="banner-main room-card">
+                                    <!-- Start-wrapper-right-banner -->
+                                    <div class="wrapper-top">
+                                        <div class="avatar-room">
+                                            <img src="@hotelRoom.photoUrl" />
+                                        </div>
+                                        <span class="details-room-complex">@hotelRoom.roomUnitString @hotelRoom.title  </span>
+                                    </div>
+                                    <!-- End-wrapper-right-banner -->
+                                    <!-- Start-wrapper-left-banner div-unset-->
+                                    <div class="banner-room">
+                                        <form>
+                                            <span>  امشب :</span>
+                                            @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " خالی" }, { "Active", hotelRoom.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", hotelRoom.id) } })
+                                            @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", "پر " }, { "Active", hotelRoom.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", hotelRoom.id) } })
+                                        </form>
+                                        <div class="div-unset ">
+                                            <a style="display:@( hotelRoom.newCommentCount == 0 ? "none" : "inline-block");" href="/comment/advertisecommentdetail?id=@hotelRoom.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@hotelRoom.newCommentCount</span></i></a>
+                                            <button title="تنظیمات " class="icons-item setting-icon-room"><i class="fa fa-cog"></i></button>
+                                        </div>
+                                    </div>
+                                    <!-- End-wrapper-left-banner div-unset-->
+                                </div>
+                                <!-- end-room-card -->
+                                <!-- Start-edit-fast  -->
+                                <div class="fast-edit-details">
+                                    @Html.Partial("_TitleBanner", new ViewDataDictionary() { { "title", hotelRoom.title }, { "id", @hotelRoom.id }, { "avatar", hotelRoom.photoUrl }, { "closeClass", "exit" } })
+                                    <!-- start form -->
+                                    <form action="" class="setting-list">
+                                        @Html.Partial("_EditFast", hotelRoom)
+                                    </form>
+                                </div>
+                                <!-- End-edit-fast -->
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!-- End-list-room-card -->
+            }
+        </section>
+        <!--End-banner-details- -->
+    </div>
+    <!-- END acclist -->
+}
+<div id="pagenation-stylee" class="row">
+    <div class="adpagelist">
+        @Html.PagedListPager((IPagedList)Model.accList, page => Url.Action("accomodationmanager", "post", new { page, type = (string)ViewBag.type }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5 })
+    </div>
+</div>
+@section ScriptBlock{
+    <script type="text/javascript">
+        function DeserializeOccupiedList(str) {
+            var occupiedListStr = str;
+            occupiedListStr = occupiedListStr.replaceAll('&quot;', '"');
+            var occupiedList = JSON.parse(occupiedListStr);
+            return occupiedList;
+        }
+        var showReasonsDic = {};
+        @foreach( var item in Model.accList)
+        {
+            @:var reasonList = [];
+                         foreach (var reason in item.notVerifyReasons) { @: reasonList.push('@reason');
+                         } @*@:var showReasonsStr = DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(item.notVerifyReasons)');*@   @: showReasonsDic[@item.id]=reasonList;
+                         } var occupiedDictionary = { }; @foreach(var occupiued in Model.accList) { @: var occupiedListString=DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(occupiued.unavailableDates)');
+                         @:occupiedDictionary['@occupiued.id']=occupiedListString;
+                         foreach ( var Hotel in occupiued.hotelRooms)
+                         {
+                         @:var occupiedListStringHotel=DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(Hotel.unavailableDates)');
+                         @:occupiedDictionary['@Hotel.id']=occupiedListStringHotel;
+                         }
+                         foreach ( var apartment in occupiued.apartmentUnits)
+                         {
+                         @:var occupiedListStringApartment=DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(apartment.unavailableDates)');
+                         @:occupiedDictionary['@apartment.id']=occupiedListStringApartment;
+                         }
+                         foreach ( var suitUnits in occupiued.suitUnits)
+                         {
+                         @:var occupiedListStringSuitUnits=DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(suitUnits.unavailableDates)');
+                         @:occupiedDictionary['@suitUnits.id']=occupiedListStringSuitUnits;
+                         }
+                         foreach ( var villaUnits in occupiued.villaUnits)
+                         {
+                         @:var occupiedListStringVillaUnits=DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(villaUnits.unavailableDates)');
+                         @:occupiedDictionary['@villaUnits.id '] = occupiedListStringVillaUnits;
+                         }
+                        foreach ( var houseUnits in occupiued.houseUnits)
+                        {
+                                @:var occupiedListStringHouseUnits = DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(houseUnits.unavailableDates)');
+                                @:occupiedDictionary['@houseUnits.id'] = occupiedListStringHouseUnits;
+                            }
+                            foreach ( var hutUnits in occupiued.hutUnits)
+                            {
+                                @:var occupiedListStringhutUnits = DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(hutUnits.unavailableDates)');
+                                @:occupiedDictionary['@hutUnits.id'] = occupiedListStringhutUnits;
+                            }
+                        }
+
+                         function showReasons(id) {
+                         debugger;
+                         var reasonsStr;
+                         Object.keys(showReasonsDic).forEach(function (key) {
+                         if (key == id) {
+                         showReasonsDic[key].forEach(function (item) {
+                         reasonsStr=$(".button_reason_not_verified div").append(`${item}<br>`);
+                    });
+                }
+            });
+            showInfoMessage('موارد زیر را اصلاح کنید', reasonsStr);
+        }
+
+
+    </script>
+}

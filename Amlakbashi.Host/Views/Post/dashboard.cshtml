@@ -1,0 +1,56 @@
+﻿@{
+    ViewBag.Title = "داشبورد";
+    ViewBag.dashboard = true;
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+@model IEnumerable<Advertise>
+
+<div class="acc-container">
+    <div class="dashboard-container">
+        @*<a class="dashboard__item" href=@string.Format("/post/accomodationmanager?userid={0}&type=enable", UserDepend.CurrentUser.UserID)>
+                <span class="dashboard__label">
+                    آگهی های فعال
+                </span>
+                <span class="dashboard__value">
+                    @Model.Where(a => a.Status == (int)AdvertiseDepend.AdvertiseStauts.Published).Count()
+                </span>
+            </a>
+            <a class="dashboard__item" href=@string.Format("/post/accomodationmanager?userid={0}&type=ready", UserDepend.CurrentUser.UserID)>
+                <span class="dashboard__label">
+                    آگهی های در انتظار تایید
+                </span>
+                <span class="dashboard__value">
+                    @Model.Where(a => a.Status == (int)AdvertiseDepend.AdvertiseStauts.ReadyToPublish || a.Status == (int)AdvertiseDepend.AdvertiseStauts.FirstReady || a.Status == (int)AdvertiseDepend.AdvertiseStauts.NotCompleted).Count()
+                </span>
+            </a>*@
+        @{
+            var userId = User.GetUser().Id;
+            var PostAcc = string.Format("/post/personal?userid={0}", userId);
+            var Wallet = string.Format("/user/usercreditmanager?user_id={0}", userId);
+            var Reserve = string.Format("/reserve/reserveitemmanager?user_id={0}", userId);
+            var profile = string.Format("/post/profilemanager?userid={0}", userId);
+            var gifTtravel = string.Format("/post/presentandprize?userid={0}", userId);
+            var favorite = string.Format("/post/favoritemanager?userid={0}", userId);
+        }
+        @if (User.GetUser().UserGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
+        {
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", "رزرو های من  " }, { "href", Reserve + string.Format("&selecttype={0}&category={1}", 1, 1) }, { "class", "fa-book" } })
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", "پروفایل من " }, { "href", profile }, { "class", "fa-user" } })
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", "هدیه سفر " }, { "href", gifTtravel }, { "class", "fa-gift" } })
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", "علاقه مندی های من" }, { "href", favorite }, { "class", "fa-heart" } })
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", "کیف پول " }, { "href", Wallet }, { "class", "fa-money-bill-alt" } })
+
+        }
+        else
+        {
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", "رزرو های من  " }, { "href", Reserve + string.Format("&selecttype={0}&category={1}", 2, 0) }, { "class", "fa-book" } })
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", " آگهی های من" }, { "href", PostAcc }, { "class", "fa-th-list" } })
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", "پروفایل من " }, { "href", profile }, { "class", "fa-user" } })
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", " ثبت آگهی جدید" }, { "href", "/accomodation/accbasicform" }, { "class", "fa-plus" } })
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", "صورت حساب رزرو ها " }, { "href", "/reserve/invoice" }, { "class", "fa-list" } })
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", "کیف پول " }, { "href", Wallet }, { "class", "fa-money-bill-alt" } })
+            @Html.Partial("_DashboardAccount", new ViewDataDictionary() { { "title", "هدیه سفر " }, { "href", gifTtravel }, { "class", "fa-gift" } })
+        }
+    </div>
+</div>

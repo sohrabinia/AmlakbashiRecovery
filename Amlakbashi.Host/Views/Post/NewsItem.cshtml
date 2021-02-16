@@ -1,0 +1,155 @@
+﻿@model Post
+
+@{
+    ViewBag.Title = Model.Title + " - املاک باشی";
+    Layout = "~/Views/Shared/_Master.cshtml";
+    ViewBag.Description = Model.Title + " - اخبار و مقالات سایت املاک باشی";
+}
+
+@helper isChecked(bool stat)
+{
+    if (stat)
+    {
+        @:checked="checked"
+    }
+    else
+    {
+        @:""
+    }
+}
+
+@helper isSelected(bool stat)
+{
+    if (stat)
+    {
+        @:selected="selected"
+    }
+    else
+    {
+        @:""
+    }
+}
+
+<div class="container" style="direction:rtl;">
+    <div class="col-xs-12 col-md-9" style="margin:30px 0px ;">
+        @Html.HiddenFor(model => model.Id)
+        <div class="row">
+            <div class="col-xs-12 col-md-6">
+                <div class="time"> تاریخ : @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(Model.LastModifyDate)</div>
+                <div class="titr">
+                    <h1>@Model.Title</h1>
+                </div>
+                <div class="lead">
+                    <p>@Model.Abstract</p>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <img width="350" height="240" alt="@Model.Title" title="@Model.Title" src='@string.Format("/عکس-پست/{0}-{1}-{2}-{3}", Model.Title.Replace("+", "-").Replace(" ", "-"), Model.Id, 350, 240 )' />
+                @*@if (Model.PhotoID != 0)
+                {
+                    <img width="303" height="227" src='@string.Format("/file/imgThumb?FileID={0}&w=600", Model.PhotoID)' />
+                }
+                else
+                {
+                    <img width="303" height="227" src='@string.Format("/file/imgThumb?FileID={0}&w=600", 202)' />
+                }*@
+            </div>
+        </div>
+        <div class="row">
+            <div class="description">
+                @Html.Raw(Model.Description)
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    .maininfo .col-xs-6 {
+        min-height: 50px;
+        text-align:center ;
+    }
+
+    .titr {
+        font:20px Biransans ;
+        color:#222 ;
+        margin-top:50px;
+        padding:10px;
+    }
+
+    .lead {
+        font:16px Miransans ;
+        color:#444 ;
+        padding:10px;
+        margin:10px 0 ;
+        background:#ededed ;
+    }
+
+    .description {
+        font:14px Liransans ;
+        color:#666 ;
+        padding:20px;
+        align-content:center ;
+        margin-top:50px;
+    }
+
+    .time {
+        font:13px ULiransans ;
+        color:#555 ;
+    }
+
+    .newsitem .title {
+        text-align: center;
+        color: #e6c11e;
+        font: 17px Miransans;
+        padding: 10px 5px;
+        margin-bottom:15px;
+    }
+    .newsitem .devider {
+        height: 1px;
+        background: #e6c11e;
+    }
+
+</style>
+@section HeaderAddition
+{
+    <link rel="canonical" href="https://www.amlakbashi.com@(ViewBag.raw_url)" />
+    <meta property="og:url" content="https://www.amlakbashi.com@(ViewBag.raw_url)" />
+}
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+    </script>
+@{ var url_splitted = ((string)ViewBag.raw_url).Substring(1).Split('/'); }
+<script type="application/ld+json">
+    {
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [{
+    "@@type": "ListItem",
+    "position": 1,
+    "name": "املاک باشی",
+    "item": "https://www.amlakbashi.com/"
+    }
+
+    @for (int i = 0; i < url_splitted.Length; i++)
+    {
+        var url = "https://www.amlakbashi.com/";
+        for (int j = 0; j < i; j++)
+        {
+            url += (url_splitted[j] + "/");
+        }
+        url += url_splitted[i];
+        var pos = i + 2;
+        @:,{
+        @:"@@type": "ListItem",
+        @:"position": @(pos),
+        @:"name": "@(url_splitted[i].Replace("-", " "))",
+        @:"item": "@(url)"}
+            }
+    ]
+    }
+</script>
+
+}
