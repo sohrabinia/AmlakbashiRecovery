@@ -1,0 +1,11 @@
+﻿@model Reserve
+@{
+    var informations = Model.GetCancelDiscussionList().Reverse();
+ }
+<div style="display:flex;flex-flow:column;">
+    @foreach (var item in informations)
+    {
+        <div style="direction:rtl; text-align: right;">@item</div>
+    }
+</div>
+

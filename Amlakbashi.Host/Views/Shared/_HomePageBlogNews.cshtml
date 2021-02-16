@@ -1,0 +1,20 @@
+﻿@model IEnumerable<BlogPost>
+@{
+}
+@if (Model != null && Model.Any())
+{
+<div class="home-page__category-label-container">
+    <p class="home-page-title-blog">جدیدترین مطالب وبلاگ</p>
+    <a target="_blank" href="https://blog.amlakbashi.com" class="home-page__category-link home-page__link">نمایش همه <i class="fa fa-chevron-left"></i></a>
+</div>
+    <div class="home-page__blog-news-container">
+        @foreach (var item in Model)
+        {
+            @Html.Partial("_BlogNewsItem", new ViewDataDictionary() {
+                {"title", item.Title },
+                {"href", item.BlogLink },
+                {"photoId", item.PhotoID }
+            })
+        }
+    </div>
+}

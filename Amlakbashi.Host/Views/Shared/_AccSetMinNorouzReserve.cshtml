@@ -1,0 +1,92 @@
+﻿@model Advertise
+
+@await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" }, { "noImageLazy", true } })
+
+<div class="acc-set-date__input-container">
+    <div onclick="setAsSelectedDate(this)" class="acc-set-date__button">انتخاب</div>
+    <div onclick="clearSelectedDate(this)" class="acc-set-date__button">حذف تاریخ</div>
+</div>
+<div class="acc-set-date__date-string"></div>
+<script type="text/javascript">
+    currentSelectedDay = undefined;
+    debugger;
+    var jalaliSelectedDay = @(Model.unixNorouzMinRequestDate > 0 ? "gregorianToJalaliDate(new Date(" + Model.unixNorouzMinRequestDate +"))" : "undefined");
+    if (jalaliSelectedDay != undefined) {
+        var value = @Model.unixNorouzMinRequestDate;
+        currentSelectedDay = {
+            date: jalaliSelectedDay.dateString,
+            value: value,
+            occupied: false,
+            price: 0
+        };
+    }
+    maxSupportedMonth = gregorianToJalaliDate(new Date(1582144200000));
+    updateDatePicker([$('#main-date-picker')[0]],jalaliSelectedDay != undefined ? jalaliSelectedDay : jalaliCurrentMonth,
+    {
+        priceDict: {},
+        occupiedList: [],
+        monthOffset: 0,
+        selectionType: 'single',
+        occupiedSelectEnabled: false,
+        onUpdateDate: onUpdateDate,
+        maxSupportedMonth: maxSupportedMonth
+    });
+    onUpdateDate();
+    function onUpdateDate () {
+        if (currentSelectedDay != undefined) {
+            var currentDayString = currentSelectedDay.date.substring(2);
+            $('.acc-set-date__date-string').html('از تاریخ ' + currentDayString + ' به بعد برای شما درخواست رزرو نوروزی ارسال میشود');
+        }
+        else {
+            $('.acc-set-date__date-string').html('بدون محدودیت');
+        }
+    }
+
+    var currentMonth;
+    var selectedDate;
+
+    function calculateSelectedDate() {
+        selectedDate = currentSelectedDay != undefined ? currentSelectedDay.value : 0;
+        currentMonth = selectedDate == 0 ? jalaliCurrentMonth : gregorianToJalaliDate(new Date(currentSelectedDay.value));
+    }
+
+    function clearSelectedDate(btn) {
+        currentSelectedDay = undefined;
+        setAsSelectedDate(btn);
+    }
+
+    function setAsSelectedDate(btn) {
+        if ($(btn).hasClass('acc-set-date__disabled-button')) {
+            return;
+        }
+        calculateSelectedDate();
+        myajax("accomodation/setnorouzminreservedate", "id=" + @Model.Id +
+         "&dateUnix=" + selectedDate, function (ret) {
+             if (ret.status == 0) {
+                 showErrorMessage('خطا', ret.msg);
+                 return;
+             }
+             var successMsg;
+             if (selectedDate > 0) {
+                 var successMsg = 'روز ' + gregorianToJalaliDate(new Date(selectedDate)).dateStringPersian + ' به عنوان اولین روز امکان رزرو برای نوروز انتخاب شد'
+             }
+             else {
+                 var successMsg = 'امکان رزرو برای نوروز بدون محدودیت شد';
+             }
+             showSuccessMessage('انجام شد', successMsg);
+             currentSelectedDay = undefined;
+             maxSupportedMonth = gregorianToJalaliDate(new Date(1582144200000));
+             updateDatePicker([$('#main-date-picker')[0]], currentMonth,
+             {
+                 priceDict: {},
+                 occupiedList: [],
+                 monthOffset: 0,
+                 selectionType: 'single',
+                 occupiedSelectEnabled: false,
+                 onUpdateDate: onUpdateDate,
+                 maxSupportedMonth: maxSupportedMonth
+             });
+             onChangeMinNorouzReserve(@Model.Id, selectedDate > 0 ? gregorianToJalaliDate(new Date(selectedDate)).dateString : undefined);
+         });
+    }
+</script>

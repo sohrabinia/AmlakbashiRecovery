@@ -1,0 +1,137 @@
+﻿@model Advertise
+@await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" }, { "noImageLazy", true } })
+<div class="acc-set-date__input-container" style="align-items: baseline;">
+    <span>قیمت: </span>
+    <div style="width: 25%;max-width: 400px;">
+        <input onkeyup="onChangeInputPrice()" style="width: 100%;max-width: 400px;" disabled id="js-price-input" class="acc-set-date__price-input" type="text" placeholder="" />
+        <div id="js-input-price-string" style="position: sticky;font: 12px Liransans;color:#34A853;"></div>
+    </div>
+    <span>تومان</span>
+    <span onclick="setPrice(this)" class="acc-set-date__button acc-set-date__disabled-button">ثبت قیمت</span>
+</div>
+<div class="acc-set-date__date-string"></div>
+<script type="text/javascript">
+    var priceDictStr = '@ViewBag.priceDict';
+    priceDictStr = priceDictStr.replaceAll('&quot;', '"');
+    var priceDict = JSON.parse(priceDictStr);
+    firstSelectedDay = undefined;
+    secondSelectedDay = undefined;
+    updateDatePicker([$('#main-date-picker')[0]], jalaliCurrentMonth,
+    {
+        priceDict: priceDict,
+        occupiedList: [],
+        monthOffset: 0,
+        selectionType: 'multi',
+        occupiedSelectEnabled: false,
+        onUpdateDate: onUpdateDate
+    });
+
+    function onUpdateDate () {
+        if (firstSelectedDay != undefined &&
+            secondSelectedDay == undefined) {
+            $('#js-price-input').val(firstSelectedDay.price.price);
+            onChangeInputPrice();
+        }
+        else {
+            $('#js-price-input').val('');
+            onChangeInputPrice();
+        }
+        if (firstSelectedDay != undefined &&
+            secondSelectedDay != undefined) {
+            var fromDayString = firstSelectedDay.date.substring(2);
+            var toDayString = secondSelectedDay.date.substring(2);
+            $('.acc-set-date__date-string').html('از شب ' + fromDayString + ' تا شب ' + toDayString);
+        }
+        else {
+            $('.acc-set-date__date-string').html('');
+        }
+        updateInput();
+    }
+
+    function updateInput() {
+        if (firstSelectedDay == undefined) {
+            if (!($('.acc-set-date__button').hasClass('acc-set-date__disabled-button'))) {
+                $('.acc-set-date__button').addClass('acc-set-date__disabled-button');
+            }
+            $('#js-price-input').attr('disabled', 'true');
+            $('#js-price-input').attr('placeholder', '');
+        }
+        else {
+            $('.acc-set-date__button').removeClass('acc-set-date__disabled-button');
+            $('#js-price-input').removeAttr('disabled');
+            $('#js-price-input').attr('placeholder', 'قیمت را وارد کنید');
+        }
+    }
+
+    var currentMonth;
+    var from_date;
+    var to_date;
+
+    function calculateSelectedRange() {
+        from_date = firstSelectedDay.date.replaceAll('/', ',');
+        if (secondSelectedDay != undefined) {
+            currentMonth = gregorianToJalaliDate(new Date(secondSelectedDay.value));
+            var nextDay = new Date(secondSelectedDay.value);
+            nextDay.setDate(nextDay.getDate() + 1);
+            nextDay = gregorianToJalaliDate(nextDay);
+            to_date = nextDay.dateString.replaceAll('/', ',');
+        }
+        else {
+            currentMonth = gregorianToJalaliDate(new Date(firstSelectedDay.value));
+            var nextDay = new Date(firstSelectedDay.value);
+            nextDay.setDate(nextDay.getDate() + 1);
+            nextDay = gregorianToJalaliDate(nextDay);
+            to_date = nextDay.dateString.replaceAll('/', ',');
+        }
+    }
+
+    function setPrice(btn) {
+        if ($(btn).hasClass('acc-set-date__disabled-button')) {
+            return;
+        }
+        var price = $('#js-price-input').val();
+        price = persianToEnglishNumber(price);
+        if (isNaN(price)) {
+            price = 0;
+        }
+        if (price < 30000) {
+            showErrorMessage('خطا', 'حداقل قیمت: 30000 تومان');
+            return;
+        }
+        calculateSelectedRange();
+        showNoYesMessage('تعیین قیمت', 'قیمت هر شب این اقامتگاه از تاریخ ' + from_date + ' تا ' + to_date + ' به میزان ' + getPriceString(price) + ' ثبت شود؟',
+            function () {
+                myajax("accomodation/setpricefordaterange","advertise_id=" + @(Model.Id) +
+                    "&from_date=" + from_date + "&to_date=" + to_date + "&price=" + price, function (ret) {
+                        if (ret.status == 0) {
+                            showErrorMessage('خطا', ret.msg);
+                            return;
+                        }
+                        showSuccessMessage('انجام شد', 'قیمت برای محدوده انتخاب شده ثبت شد');
+                        $('#js-price-input').val('');
+                        onChangeInputPrice();
+                        firstSelectedDay = undefined;
+                        secondSelectedDay = undefined;
+                        updateInput();
+                        updateDatePicker([$('#main-date-picker')[0]], currentMonth,
+                        {
+                            priceDict: ret.priceDict,
+                            occupiedList: [],
+                            monthOffset: 0,
+                            selectionType: 'multi',
+                            occupiedSelectEnabled: false,
+                            onUpdateDate: onUpdateDate
+                            });
+                });
+            }, undefined);
+    }
+
+    function onChangeInputPrice() {
+        var val = $('#js-price-input').val();
+        if (isNaN(val)) {
+            val = 0;
+        }
+        var str = val < 1 ? '' : getPriceString(val);
+        $('#js-input-price-string').html(str);
+    }
+</script>

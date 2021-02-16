@@ -1,0 +1,80 @@
+﻿@{
+    var newsItem = new dynamic[]{
+            new {
+                title = "خبرگزاری مهر",
+                href = "https://www.mehrnews.com/news/4674404/%D8%A7%D8%AC%D8%A7%D8%B1%D9%87-%D9%88%DB%8C%D9%84%D8%A7-%D8%AF%D8%B1-%D8%B4%D9%85%D8%A7%D9%84-%D8%A8%D8%A7-%D8%A8%D9%87%D8%AA%D8%B1%DB%8C%D9%86-%D8%A7%D9%85%DA%A9%D8%A7%D9%86%D8%A7%D8%AA",
+                logo = "mehrnews"
+            },new {
+                title = "تابناک",
+                href = "https://www.tabnak.ir/fa/news/961126/",
+                logo = "tabnak"
+            },new {
+                title = "خبر آنلاین",
+                href = "https://www.khabaronline.ir/news/1355794/%D8%A8%D8%B1%D8%A7%DB%8C-%D8%B3%D9%81%D8%B1-%D9%88-%D8%B1%D8%B2%D8%B1%D9%88-%D9%88%DB%8C%D9%84%D8%A7-%D8%B4%D9%85%D8%A7%D9%84-%DA%A9%D8%AF%D8%A7%D9%85-%D9%85%D9%82%D8%B5%D8%AF-%D9%BE%D8%B1-%D8%B7%D8%B1%D9%81%D8%AF%D8%A7%D8%B1%D8%AA%D8%B1-%D8%A7%D8%B3%D8%AA",
+                logo = "khabaronline"
+            },new {
+                title = "افکار نیوز",
+                href = "https://www.afkarnews.com/fa/tiny/news-943306",
+                logo = "afkarnews"
+            },new {
+                title = "جهان نیوز",
+                href = "http://www.jahannews.com/news/719599",
+                logo = "jahannews"
+            },new {
+                title = "روزیاتو",
+                href = "https://rooziato.com/1398238022/%d8%b4%d8%b1%d8%a7%db%8c%d8%b7-%d8%a7%d8%ac%d8%a7%d8%b1%d9%87-%d9%88%db%8c%d9%84%d8%a7-%d8%af%d8%b1-%d8%aa%d9%87%d8%b1%d8%a7%d9%86-%da%86%db%8c%d8%b3%d8%aa%d8%9f/",
+                logo = "rooziato"
+            },new {
+                title = "خبرگزاری ایلنا",
+                href = "https://www.ilna.news/fa/tiny/news-875780",
+                logo = "ilna"
+            },new {
+                title = "موسسه تبیان",
+                href = "https://article.tebyan.net/471237",
+                logo = "tebyan"
+            },new {
+                title = "همگردی",
+                href = "https://hamgardi.com/fa/Post/11615-%d8%a7%d8%ac%d8%a7%d8%b1%d9%87-%d9%88%db%8c%d9%84%d8%a7-%d8%af%d8%b1-%d8%b4%d9%85%d8%a7%d9%84-%d8%a8%d8%a7-%d8%a8%d9%87%d8%aa%d8%b1%db%8c%d9%86-%d8%a7%d9%85%da%a9%d8%a7%d9%86%d8%a7%d8%aa",
+                logo = "hamgardi"
+            },new {
+                title = "کلوب",
+                href = "https://www.cloob.com/timeline/reportage_79_1",
+                logo = "cloob"
+            },new {
+                title = "الف",
+                href = "https://www.alef.ir/news/3981204119.html",
+                logo = "alef"
+            },new {
+                title = "کجارو",
+                href = "https://www.kojaro.com/2019/6/22/178104/rent-villa-north-iran-amlakbashi-pr/",
+                logo = "kojaro"
+            },new {
+                title = "بهار نیوز",
+                href = "http://www.baharnews.ir/news/201748/%D8%A7%D8%AC%D8%A7%D8%B1%D9%87-%D8%A2%D9%BE%D8%A7%D8%B1%D8%AA%D9%85%D8%A7%D9%86-%D9%85%D8%A8%D9%84%D9%87-%D9%85%D9%82%D8%B1%D9%88%D9%86-%D8%B5%D8%B1%D9%81%D9%87-%D8%B2%DB%8C%D8%A8%D8%A7-%D8%B3%D9%81%D8%B1",
+                logo = "baharnews"
+            },new {
+                title = "خبرگزاری آریا",
+                href = "http://www.aryanews.com/News/20200222183132147/",
+                logo = "aryanews"
+            }
+       };
+}
+<div class="home-page-medium-box">
+    <p>املاک باشی در رسانه ها</p>
+    <p class="btnNext"><i class="fas fa-angle-right"></i></p>
+    <p class="btnPrevious"><i class="fas fa-angle-left"></i></p>
+    <div class="home-page_amlakbashi-medium carousel-container">
+        <div class="carousel">
+            @foreach (var item in newsItem)
+            {
+                @Html.Partial("_NewsLinkItem", new ViewDataDictionary() {
+                        {"title", item.title },
+                        {"href", item.href },
+                        {"logo", item.logo }
+                    })
+            }
+        </div>
+    </div>
+</div>
+
+

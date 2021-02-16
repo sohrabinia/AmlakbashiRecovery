@@ -1,0 +1,18 @@
+﻿@model IEnumerable<BlogPost>
+
+@if (Model != null && Model.Any())
+{
+    <div class="acc__blog-news-container">
+        @foreach (var item in Model)
+        {
+            @await Html.PartialAsync("_AccBlogNewsItem", new ViewDataDictionary(
+                new EmptyModelMetadataProvider(),
+                new ModelStateDictionary()) {
+                {"title", item.Title },
+                { "text", item.Text },
+                {"href", item.BlogLink },
+                {"photoId", item.PhotoID }
+            })
+        }
+    </div>
+}

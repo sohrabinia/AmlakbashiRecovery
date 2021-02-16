@@ -1,0 +1,32 @@
+[
+  {
+    "outputFileName": "wwwroot/css/dashboard.min.css",
+    "inputFiles": [
+      "wwwroot/resource/tmmegamenu/css/tmmegamenu.css",
+      "wwwroot/resource/bootstrap/css/bootstrap-rtl.min.css",
+      "wwwroot/resource/ticker/ticker-style.css",
+      "wwwroot/resource/chosen_v1.4.2/chosen.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.default.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.core.css",
+      "wwwroot/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css",
+      "wwwroot/resource/css/general/login/intlTelInput.css",
+      "wwwroot/resource/css/general/login/login-Popup.css",
+      "wwwroot/resource/dashboard.css",
+      "wwwroot/resource/css/general/chat-popup.css",
+      "wwwroot/resource/css/general/message-popup.css",
+      "wwwroot/resource/loader.min.css",
+      "wwwroot/resource/jquery-confirm/jquery-confirm.min.css",
+      "wwwroot/resource/rating/themes/fontawesome-stars.css",
+      "wwwroot/resource/star-rating/star-rating.css",
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/general/dashboardAccount.css",
+      "wwwroot/resource/css/general/popup-calendar.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/site.min.js",
+    "inputFiles": [
+      "wwwroot/js/site.js"
+    ]
+  }
+]

@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Amlakbashi.Core.DTOs.CategoryDTOs.SearchTableDTO>
+@{
+    if (Model != null)
+    {
+        @*if (Model.FirstOrDefault() != null &&
+            Model.FirstOrDefault().CategoryID == 55487)
+        {
+            <div style="color:#e8b912;margin:10px;padding-bottom:7px; width: fit-content; border-bottom: 1px solid #e8b912;font: 13px Miransans;">مناطق پر بازدید:</div>
+        }*@
+        foreach (var item in Model)
+        {
+            var link = item.link;
+            <div onclick="selectSearchRegion(this)" data-title="@item.title" data-href="@link" style="color:#242424">
+                <div>
+                    <span><i class="fa fa-map-marker-alt"></i>@item.title @(item.countAdvertise > 0 ? "(" + item.countAdvertise +")" : "")@(!string.IsNullOrEmpty(item.cityString)? " - " + item.cityString : "" )</span>
+                </div>
+            </div>
+        }
+    }
+}
+@if (ViewBag.showNotFound != null && ViewBag.showNotFound)
+{
+    <div onclick="selectSearchRegion(this)" data-title="@ViewBag.search_string" data-href="/s/p/@(ViewBag.search_string.Replace(" ", "-"))" style="color:#242424;font:13px Miransans;padding:5px 10px;display: flex;align-items: center;">
+        <i class="fa fa-search"></i>
+        <span>جستجوی عبارت "@(ViewBag.search_string)" در سایت</span>
+    </div>
+}
+

@@ -1,0 +1,40 @@
+﻿@using Entities = Amlakbashi.Core.Entities;
+@model User
+<div class="user-contact__container">
+    <div class="user-contact__profile">
+        <span class="user-contact__extra-msg" style="color:#EA4335"></span>
+        @if (Model.PhotoID > 0 && Model.PhotoStatus == (int)Entities.User.UserPhotoState.publish)
+        {
+            <img src='@string.Format("/عکس-پروفایل-{0}", Model.PhotoID)' width="80" height="80" rel="عکس پروفایل"/>
+        }
+        else
+        {
+            <i class="fa fa-user"></i>
+        }
+        <span>
+            @{
+                var full_name = Model.FullName;
+                if (!string.IsNullOrEmpty(full_name))
+                {
+                    @(full_name)
+                }
+            }
+        </span>
+    </div>
+    <div class="user-contact__mobile">
+        <a href="tel:@Model.Mobile">
+            <i class="fa fa-phone"></i>
+            <span>@Model.GetLocalPhoneNumber(Entities.User.PhoneType.OtherMobile1)</span>
+        </a>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.Mobile2))
+    {
+        <div class="user-contact__mobile">
+            <a href="tel:@Model.Mobile2">
+                <i class="fa fa-phone"></i>
+                <span>@Model.GetLocalPhoneNumber(Entities.User.PhoneType.OtherMobile2)</span>
+            </a>
+        </div>
+    }
+</div>
+

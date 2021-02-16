@@ -1,0 +1,28 @@
+﻿<div class="jalali-calendar @ViewData["class"]" id="@ViewData["id"]">
+    <div class="jalali-top-container">
+        <i class="fa fa-arrow-right jalali-month-change-btn js-prev-month-btn"></i>
+        <div class="jalali-year-label"></div>
+        <i class="fa fa-arrow-left jalali-month-change-btn js-next-month-btn"></i>
+    </div>
+    <div class="jalali-week-title-container">
+        <div>ش</div>
+        <div>ی</div>
+        <div>د</div>
+        <div>س</div>
+        <div>چ</div>
+        <div>پ</div>
+        <div>ج</div>
+    </div>
+    <div class="jalali-month"></div>
+    <div class="jalali-loading">
+        @if (ViewData["noImageLazy"] == null ||
+                bool.Parse(ViewData["noImageLazy"].ToString()) == false)
+        {
+            <img class="lazy" width="80" height="80" src="" data-src="/file/resourceimagegif?file_name=spinner" />
+        }
+        else
+        {
+            <img width="80" height="80" src="~/file/resourceimagegif?file_name=spinner" />
+        }
+    </div>
+</div>

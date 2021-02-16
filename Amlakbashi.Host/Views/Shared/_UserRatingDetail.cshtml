@@ -1,0 +1,11 @@
+﻿@model IEnumerable<ReportItem>
+
+<div>
+    @foreach (var item in Model)
+    {
+        <div style="display:flex;flex-flow:row;justify-content:space-between">
+            <div>@Comment.GetUserRatingTypeString((Comment.UserRatingType)item.ReportID)</div>
+            @Html.Partial("_StarRating", new ViewDataDictionary { { "score", (float)item.Score } })
+        </div>
+    }
+</div>
