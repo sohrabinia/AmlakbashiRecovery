@@ -5,6 +5,7 @@
 }
 
 @model IEnumerable<Advertise>
+@inject IUserAccessor userAccessor; 
 
 <div class="acc-container">
     <div class="dashboard-container">
@@ -25,7 +26,7 @@
                 </span>
             </a>*@
         @{
-            var userId = User.GetUser().Id;
+            var userId = userAccessor.CurrentUser.Id;
             var PostAcc = string.Format("/post/personal?userid={0}", userId);
             var Wallet = string.Format("/user/usercreditmanager?user_id={0}", userId);
             var Reserve = string.Format("/reserve/reserveitemmanager?user_id={0}", userId);
@@ -33,7 +34,7 @@
             var gifTtravel = string.Format("/post/presentandprize?userid={0}", userId);
             var favorite = string.Format("/post/favoritemanager?userid={0}", userId);
         }
-        @if (User.GetUser().UserGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
+        @if (userAccessor.CurrentUser.UserGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
         {
             @Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "title", "رزرو های من  " }, { "href", Reserve + string.Format("&selecttype={0}&category={1}", 1, 1) }, { "class", "fa-book" } })

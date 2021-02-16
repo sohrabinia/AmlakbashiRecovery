@@ -4,6 +4,7 @@
     Layout = "~/Views/Shared/_Dashboard.cshtml";
 }
 @model IEnumerable<AccommodationCardDTO>
+@inject IUserAccessor userAccessor;
 @section StyleLink
 {
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/dailyrent.css">
@@ -11,7 +12,7 @@
 }
 
 <input type="hidden" value="20" id="skipsize" />
-<input type="hidden" value="@User.GetUser().Id" id="userid" />
+<input type="hidden" value="@userAccessor.CurrentUser.Id" id="userid" />
 
 <div>
     <div class="row" style="font:18px Miransans;text-align:right;padding: 0 30px 30px 30px;color:#222; "><h1>علاقه مندی ها</h1></div>

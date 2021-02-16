@@ -14,34 +14,11 @@
     var for_advertise_page = (ViewBag.for_advertise_page != null && ViewBag.for_advertise_page) || (ViewData["for_advertise_page"] != null && bool.Parse(ViewData["for_advertise_page"].ToString()));
     bool all_images_lazy = ViewData["all_images_lazy"] != null ? bool.Parse(ViewData["all_images_lazy"].ToString()) : false; }
 @section StyleLink {
-    @*@MvcHtmlString.Create(
-        Bundle.Css()
-            .Add("~/Resource/css/general/jalali-date-picker.css")
-            .Add("/resource/css/portal/home-page.css")
-            .Add("/resource/css/general/home-page-search.css")
-            .Add("/resource/css/general/search-by-region.css")
-            .ForceRelease()
-           .Render("/resource/css_output/minifyhomepagecss_v3_3.css"))*@
+    <link rel="stylesheet" href="/js/home-page.min.css" />
 }
-@section StyleBlock {
-    @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/css_output/minifyhomepagecss_v3_3.css")))
+@section ScriptLink {
+    <script src="/js/home-page.min.js"></script>
 }
-@*@section ScriptLink {
-    @MvcHtmlString.Create(
-        Bundle.JavaScript()
-        .Add("/resource/scripts/general/jalali-date-converter.js")
-        .Add("/resource/scripts/general/jalali-date-handler.js")
-        .Add("/resource/scripts/general/jalali-date-picker.js")
-        .Add("/resource/scripts/page/home-page.js")
-        .Add("/resource/scripts/general/home-page-search.js")
-        .Add("/resource/scripts/general/search-by-region.js")
-        .Add("/resource/scripts/general/increase-decrease-button.js")
-        .Add("/resource/scripts/general/slider-scroll.js")
-        .Add("/resource/scripts/home-page-banner.js")
-        .ForceRelease()
-        .Render("/resource/js_output/minifyhomepagejs_v2_9.js"))*@
-@*<script src="~/Resource/Scripts/home-page-banner.js"></script>*@
-@*}*@
 <div style="clear:both;"></div>
 
 <div class="home-page__top-container">
@@ -230,7 +207,6 @@
 @section ScriptBlock
     {
     <script type="text/javascript">
-        @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/js_output/minifyhomepagejs_v2_9.js")))
         var isPortalHomePage = true;
     </script>
     <script type="application/ld+
