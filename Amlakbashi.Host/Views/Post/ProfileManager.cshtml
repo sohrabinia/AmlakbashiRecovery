@@ -6,18 +6,6 @@
 }
 @model Amlakbashi.Core.DTOs.UserDTOs.UserDTO
 
-@helper IsSelected(bool stat)
-{
-    if (stat)
-    {
-        @:selected="selected"
-    }
-    else
-    {
-        @:""
-    }
-}
-
 <div class="profile">
     @if (ViewBag.msg != null)
     {
@@ -111,19 +99,19 @@
                 <span class="profile__label">ساعت پاسخگویی از :</span>
                 <span class="profile__text">
                     <select name="responseFrom">
-                        <option value="2" @IsSelected(2 == Model.responseFrom)>۲ بامداد</option>
-                        <option value="3" @IsSelected(3 == Model.responseFrom)>۳ بامداد</option>
-                        <option value="4" @IsSelected(4 == Model.responseFrom)>۴ بامداد</option>
-                        <option value="5" @IsSelected(5 == Model.responseFrom)>۵ بامداد</option>
-                        <option value="6" @IsSelected(6 == Model.responseFrom)>۶ صبح</option>
-                        <option value="7" @IsSelected(7 == Model.responseFrom)>۷ صبح</option>
-                        <option value="8" @IsSelected(8 == Model.responseFrom)>۸ صبح</option>
-                        <option value="9" @IsSelected(9 == Model.responseFrom)>۹ صبح</option>
-                        <option value="10" @IsSelected(10 == Model.responseFrom)>۱۰ صبح</option>
-                        <option value="11" @IsSelected(11 == Model.responseFrom)>۱۱ صبح</option>
-                        <option value="12" @IsSelected(12 == Model.responseFrom)>۱۲ ظهر</option>
-                        <option value="13" @IsSelected(13 == Model.responseFrom)>۱ بعد از ظهر</option>
-                        <option value="14" @IsSelected(14 == Model.responseFrom)>۲ بعد از ظهر</option>
+                        <option value="2" is-selected="@(2 == Model.responseFrom)">۲ بامداد</option>
+                        <option value="3" is-selected="@(3 == Model.responseFrom)">۳ بامداد</option>
+                        <option value="4" is-selected="@(4 == Model.responseFrom)">۴ بامداد</option>
+                        <option value="5" is-selected="@(5 == Model.responseFrom)">۵ بامداد</option>
+                        <option value="6" is-selected="@(6 == Model.responseFrom)">۶ صبح</option>
+                        <option value="7" is-selected="@(7 == Model.responseFrom)">۷ صبح</option>
+                        <option value="8" is-selected="@(8 == Model.responseFrom)">۸ صبح</option>
+                        <option value="9" is-selected="@(9 == Model.responseFrom)">۹ صبح</option>
+                        <option value="10" is-selected="@(10 == Model.responseFrom)")>۱۰ صبح</option>
+                        <option value="11" is-selected="@(11 == Model.responseFrom)">۱۱ صبح</option>
+                        <option value="12" is-selected="@(12 == Model.responseFrom)">۱۲ ظهر</option>
+                        <option value="13" is-selected="@(13 == Model.responseFrom)">۱ بعد از ظهر</option>
+                        <option value="14" is-selected="@(14 == Model.responseFrom)">۲ بعد از ظهر</option>
                     </select>
                 </span>
             </div>
@@ -131,13 +119,13 @@
                 <span class="profile__label">ساعت پاسخگویی تا :</span>
                 <span class="profile__text">
                     <select name="responseTo">
-                        <option value="20" @IsSelected(20 == Model.responseTo)>۸ شب</option>
-                        <option value="21" @IsSelected(21 == Model.responseTo)>۹ شب</option>
-                        <option value="22" @IsSelected(22 == Model.responseTo)>۱۰ شب</option>
-                        <option value="23" @IsSelected(23 == Model.responseTo)>۱۱ شب</option>
-                        <option value="0" @IsSelected(0 == Model.responseTo)>۱۲ شب</option>
-                        <option value="1" @IsSelected(1 == Model.responseTo)>۱ بامداد</option>
-                        <option value="2" @IsSelected(2 == Model.responseTo)>۲ بامداد</option>
+                        <option value="20" is-selected="@(20 == Model.responseFrom)">۸ شب</option>
+                        <option value="21" is-selected="@(21 == Model.responseFrom)">۹ شب</option>
+                        <option value="22" is-selected="@(22 == Model.responseFrom)">۱۰ شب</option>
+                        <option value="23" is-selected="@(23 == Model.responseFrom)">۱۱ شب</option>
+                        <option value="0" is-selected="@(0 == Model.responseFrom)">۱۲ شب</option>
+                        <option value="1" is-selected="@(1 == Model.responseFrom)">۱ بامداد</option>
+                        <option value="2" is-selected="@(2 == Model.responseFrom)">۲ بامداد</option>
                     </select>
                 </span>
             </div>
