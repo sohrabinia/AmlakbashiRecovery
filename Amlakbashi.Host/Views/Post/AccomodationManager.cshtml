@@ -1,6 +1,4 @@
-﻿@using PagedList;
-@using PagedList.Mvc;
-@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs;
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs;
 @{
     ViewBag.Title = "آگهی های من";
     ViewBag.personal = true;
@@ -78,7 +76,8 @@
                     {
                         <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
                     }
-                 <div> @Html.Partial("_StarRating", new ViewDataDictionary { { "score", item.userRating } })</div>
+                 <div> @Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                    new ModelStateDictionary()) { { "score", item.userRating } })</div>
                     <a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="backgorund:@( item.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>
                 </div>
             </div>
@@ -107,8 +106,10 @@
                     </a>
                     <form style="display:@(item.mainType == AccMainType.Single && item.status != Advertise.AdvertiseStatus.NotCompleted ?  "block" : "none" );">
                         <span> امشب واحد : </span>
-                        @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " خالی" }, { "Active", item.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", item.id) } })
-                        @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " پر " }, { "Active", item.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", item.id) } })
+                        @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", " خالی" }, { "Active", item.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", item.id) } })
+                        @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", " پر " }, { "Active", item.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", item.id) } })
                     </form>
                     <div class="icons-style quick-access-desktop" style="text-align:left;display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
                         @*<a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>*@
@@ -127,8 +128,10 @@
                 </a>
                 <form style="display:@(item.mainType == AccMainType.Single && item.status != Advertise.AdvertiseStatus.NotCompleted ?  "block" : "none" );">
                     <span> امشب:</span>
-                    @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " خالی" }, { "Active", item.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", item.id) } })
-                    @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " پر " }, { "Active", item.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", item.id) } })
+                    @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", " خالی" }, { "Active", item.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", item.id) } })
+                    @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", " پر " }, { "Active", item.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", item.id) } })
                 </form>
                 <div class="icons div-unset" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
                     <div>
@@ -149,29 +152,36 @@
             {
                 <div class="fast-edit single-unit">
                     <!-- Start-edit-fast  -->
-                    @Html.Partial("_TitleBanner", new ViewDataDictionary() { { "title", item.title }, { "id", item.id }, { "avatar", item.photoUrl }, { "closeClass", "exit1" } })
+                    @Html.PartialAsync("_TitleBanner", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", item.title }, { "id", item.id }, { "avatar", item.photoUrl }, { "closeClass", "exit1" } })
                     <!-- start form -->
                     <form action="" class="setting-list">
                         <div class="status-banner">
                             @if (item.isVerified)
                             {
-                                @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", "نمایش آگهی " }, { "Active", item.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", item.id, "true") } })
-                                @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", "عدم نمایش آگهی " }, { "Active", !item.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", item.id, "false") } })
+                                @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "نمایش آگهی " }, { "Active", item.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", item.id, "true") } })
+                                @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "عدم نمایش آگهی " }, { "Active", !item.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", item.id, "false") } })
                             }
                             else if (!item.isVerified && item.notVerifyReasons.Count > 0)
                             {
                                 <div class="button_reason_not_verified" onclick="showReasons(@item.id)">دلیل عدم تایید<div></div></div>
                             }
                         </div>
-                        @Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", " رزرو آنی" } })
+                        @Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "titleList", " رزرو آنی" } })
                         <div class="instantReserve container-item">
-                            @Html.Partial("_InstantReserve", item, new ViewDataDictionary() { { "instantReserveAccess", (int)Model.instantReserveAccess }, { "UserID", ViewBag.UserID } })
+                            @Html.PartialAsync("_InstantReserve", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "instantReserveAccess", (int)Model.instantReserveAccess }, { "UserID", ViewBag.UserID } })
                         </div>
-                        @Html.Partial("_EditFast", item)
+                        @Html.PartialAsync("_EditFast", item)
                         <div class="day-set-@item.id">
-                            @Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "تعیین مدت رزرو " } })
+                            @Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "titleList", "تعیین مدت رزرو " } })
                             <div class="day-set-quick container-item">
-                                @Html.Partial("_MinAndMaxDay", new ViewDataDictionary() { { "js-min-input", "js-min-input-" + item.id }, { "js-max-input", "js-max-input-" + item.id }, { "minReserve", item.minReserveDays }, { "maxReserve", item.maxReserveDays }, { "id", item.id } })
+                                @Html.PartialAsync("_MinAndMaxDay", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "js-min-input", "js-min-input-" + item.id }, { "js-max-input", "js-max-input-" + item.id }, { "minReserve", item.minReserveDays }, { "maxReserve", item.maxReserveDays }, { "id", item.id } })
                             </div>
                         </div>
                     </form>
@@ -181,9 +191,11 @@
             {
                 <!-- Start-room-type-list -->
                 <div class="room-type-list">
-                    @Html.Partial("_TitleRoomsCard", item, new ViewDataDictionary() { { "UserID", ViewBag.UserID }, { "ReserveAccess", (int)Model.instantReserveAccess } })
+                    @Html.PartialAsync("_TitleRoomsCard", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "UserID", ViewBag.UserID }, { "ReserveAccess", (int)Model.instantReserveAccess } })
                     <div class="style_title-list">
-                        @Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", " تنظیم واحد ها " } })
+                        @Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "titleList", " تنظیم واحد ها " } })
                         <div class="parent-box">
                             <div class="room-type">
                                 <!-- apartmentunits -->
@@ -267,9 +279,11 @@
             {
                 <!-- Start-list-room-card  -->
                 <div class="list-room-card">
-                    @Html.Partial("_TitleRoomsCard", item, new ViewDataDictionary() { { "UserID", ViewBag.UserID }, { "ReserveAccess", (int)Model.instantReserveAccess } })
+                    @Html.PartialAsync("_TitleRoomsCard", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "UserID", ViewBag.UserID }, { "ReserveAccess", (int)Model.instantReserveAccess } })
                     <div class="style_title-list">
-                        @Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", " تنظیم واحد ها " } })
+                        @Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "titleList", " تنظیم واحد ها " } })
                         <div class="parent-box">
                             @foreach (var hotelRoom in item.hotelRooms)
                             {
@@ -286,8 +300,10 @@
                                     <div class="banner-room">
                                         <form>
                                             <span>  امشب :</span>
-                                            @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", " خالی" }, { "Active", hotelRoom.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", hotelRoom.id) } })
-                                            @Html.Partial("_RadioButtonForm", new ViewDataDictionary() { { "title", "پر " }, { "Active", hotelRoom.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", hotelRoom.id) } })
+                                            @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", " خالی" }, { "Active", hotelRoom.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", hotelRoom.id) } })
+                                            @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "پر " }, { "Active", hotelRoom.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", hotelRoom.id) } })
                                         </form>
                                         <div class="div-unset ">
                                             <a style="display:@( hotelRoom.newCommentCount == 0 ? "none" : "inline-block");" href="/comment/advertisecommentdetail?id=@hotelRoom.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@hotelRoom.newCommentCount</span></i></a>
@@ -299,10 +315,11 @@
                                 <!-- end-room-card -->
                                 <!-- Start-edit-fast  -->
                                 <div class="fast-edit-details">
-                                    @Html.Partial("_TitleBanner", new ViewDataDictionary() { { "title", hotelRoom.title }, { "id", @hotelRoom.id }, { "avatar", hotelRoom.photoUrl }, { "closeClass", "exit" } })
+                                    @Html.PartialAsync("_TitleBanner", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", hotelRoom.title }, { "id", @hotelRoom.id }, { "avatar", hotelRoom.photoUrl }, { "closeClass", "exit" } })
                                     <!-- start form -->
                                     <form action="" class="setting-list">
-                                        @Html.Partial("_EditFast", hotelRoom)
+                                        @Html.PartialAsync("_EditFast", hotelRoom)
                                     </form>
                                 </div>
                                 <!-- End-edit-fast -->

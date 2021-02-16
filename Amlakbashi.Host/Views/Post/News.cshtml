@@ -1,6 +1,4 @@
-﻿@using PagedList;
-@using PagedList.Mvc;
-@model List<IEnumerable<Post>>
+﻿@model List<IEnumerable<Post>>
 @{
     ViewBag.Title = "اخبار مقالات - املاک باشی";
     Layout = "~/Views/Shared/_Master.cshtml";
@@ -18,22 +16,22 @@
     <div class="newsitem">
         <div class="title">تازه های دکوراسیون</div>
         <div class="devider"></div>
-        @Html.Partial("_News", Model[0])
+        @Html.PartialAsync("_News", Model[0])
     </div>
     <div class="newsitem">
         <div class="title">اخبار سایت</div>       
         <div class="devider"></div>
-        @Html.Partial("_News", Model[1])
+        @Html.PartialAsync("_News", Model[1])
     </div>
     <div class="newsitem">
         <div class="title">مقالات</div>
         <div class="devider"></div>
-        @Html.Partial("_News", Model[2])
+        @Html.PartialAsync("_News", Model[2])
     </div>
     <div class="newsitem">
         <div class="title">اخبار مسکن</div>
         <div class="devider"></div>
-        @Html.Partial("_News", Model[3])
+        @Html.PartialAsync("_News", Model[3])
     </div>
 </div>
 

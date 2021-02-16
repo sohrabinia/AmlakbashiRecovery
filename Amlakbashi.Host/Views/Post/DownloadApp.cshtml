@@ -1,6 +1,4 @@
-﻿@using PagedList;
-@using PagedList.Mvc;
-@{
+﻿@{
     ViewBag.Title = "اپلیکیشن اجاره ویلا در شمال ، اجاره روزانه خانه";
     Layout = "~/Views/Shared/_Master.cshtml";
     ViewBag.Description = "اپلیکیشن املاک باشی ، اپلیکیشن تخصصی در زمینه ی ، اجاره روزانه ، اجاره ویلا ، اجاره روزانه خانه ، اجاره سوئیت و رزرو اقامتگاه در شمال ، تهران ، شیراز ، اصفهان ، یزد ، مشهد و سایر شهرهای  ایران";
@@ -31,7 +29,8 @@
                 <span>این نسخه از اپلیکیشن دیگر پشتیبانی نمیشود. لطفا نسخه جدید را نصب کنید:</span>
             }
         </div>
-        @Html.Partial("_DownloadApp", new ViewDataDictionary { { "h2", true } })
+        @Html.PartialAsync("_DownloadApp", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "h2", true } })
         @if (!ViewBag.fromApp)
         {
             <p style="font:13px Miransans">@ViewBag.Description</p>

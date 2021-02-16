@@ -31,7 +31,8 @@
         .ForceRelease()
         .Render("/resource/js_output/minifysearchpagejs_v1_5.js"))*@
 }
-@Html.Partial("_HomePageSearch", new ViewDataDictionary { { "autofocus", true } })
+@Html.PartialAsync("_HomePageSearch", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "autofocus", true } })
 @section HeaderAddition
 {
 }
