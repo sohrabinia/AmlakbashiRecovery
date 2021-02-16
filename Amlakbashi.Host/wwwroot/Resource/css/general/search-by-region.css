@@ -1,0 +1,39 @@
+﻿.general__region-filter-parent {
+
+}
+
+.general__region-filter-label {
+    color:#e8b912;
+    margin:10px;
+    padding-bottom:7px;
+    width: fit-content;
+    border-bottom: 1px solid #e8b912;
+    font: 13px Miransans;
+}
+
+.general__region-filter-container {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    font: 12px Miransans;
+}
+
+.general__region-filter-container select {
+    width: 150px;
+    height:30px;
+    margin:10px;
+    font: 12px Miransans;
+}
+
+.general__region-filter-button {
+    font:13px Liransans;
+    float:left;
+    margin:10px;
+    border-radius:5px;
+    text-align:center;
+    background-color:#fdd835;
+    padding:5px;
+    width:70px;
+    max-height:30px;
+    cursor:pointer;
+}

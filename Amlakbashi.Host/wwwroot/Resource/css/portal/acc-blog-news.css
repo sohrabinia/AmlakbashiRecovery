@@ -1,0 +1,124 @@
+﻿.acc__blog-post-root {
+
+}
+
+.acc__blog-news-container {
+    margin: 10px 0;
+    display:flex;
+    flex-flow:column;
+    align-items: center;
+}
+
+.acc__blog-news-item-root {
+    margin: 10px 0;
+    width: 90%;
+}
+
+.acc__blog-news-item {
+    display:flex;
+}
+
+.acc__blog-news-item-content {
+    padding:5px 20px 10px 0;
+    max-width: 65%;
+    max-height: 120px;
+    overflow: hidden;
+}
+
+.acc__blog-news-item-title {
+    margin: 0;
+    padding: 0 0 10px 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font: 16px Miransans;
+    color: #242424;
+}
+
+.acc__blog-news-item-text {
+    overflow:hidden;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font: 15px Liransans;
+    max-height: 75px;
+}
+
+.acc__blog-news-item-text p {
+    padding: 0;
+    margin: 0;
+}
+
+.acc__blog-news-item-text * {
+    font: 15px Liransans !important;
+    color:#242424;
+}
+
+.acc__blog-news-read-button {
+    align-self:flex-end;
+    font:13px Miransans;
+    width:20%;
+    color:#efa12b;
+}
+
+@media (max-width: 1000px) {
+
+    .acc__blog-news-item-content {
+        max-width: 50%;
+    }
+
+    .acc__blog-news-item-title {
+        font: 15px Miransans;
+    }
+
+    .acc__blog-news-item-text {
+        font: 14px Liransans;
+        max-height: 75px;
+    }
+
+    .acc__blog-news-item-text * {
+        font: 14px Liransans !important;
+    }
+}
+
+@media (max-width: 680px) {
+    .acc__blog-news-item-content {
+        max-height: 87px;
+        max-width: 100%;
+    }
+
+    .acc__blog-news-read-button {
+        display: none;
+    }
+
+    .acc__blog-news-item-title {
+        font: 14px Miransans;
+        white-space: unset;
+        max-height: 77px;
+    }
+
+    .acc__blog-news-item-text {
+        display: none;
+    }
+}
+
+@media (max-width: 500px) {
+    .acc__blog-news-item-content {
+        max-height: 73px;
+    }
+
+    .acc__blog-news-item-title {
+        max-height: 63px;
+        font: 13px Miransans;
+    }
+}
+
+@media (max-width: 380px) {
+    .acc__blog-news-item-content {
+        max-height: 62px;
+    }
+
+    .acc__blog-news-item-title {
+        max-height: 48px;
+        font: 13px Liransans;
+    }
+}

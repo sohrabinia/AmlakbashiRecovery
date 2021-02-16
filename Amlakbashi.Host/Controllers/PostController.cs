@@ -747,7 +747,7 @@ namespace Amlakbashi.Host.Controllers
                 string msg;
                 List<string> errors;
                 bool hasRefundInProgress = reserveService.UserHasRefundInProgress(user.id);
-                var done = userService.Update(user, userAccessor.CurrentUser.Id, hasRefundInProgress, ActionLogController.ActionSourceEnum.WebsiteDashboard, out errors);
+                var done = userService.Update(user, userAccessor.CurrentUser.Id, hasRefundInProgress, ActionLog.ActionSourceEnum.WebsiteDashboard, out errors);
                 if (done)
                 {
                     HttpContext.Session.SetObjectAsJson("impersonateUser", userService.Find(user.id));

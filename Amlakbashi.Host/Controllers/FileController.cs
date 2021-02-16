@@ -987,10 +987,11 @@ namespace Portal.Controllers
         [ResponseCache(Duration = 2592000, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult HomePageSlider(int number, string format = "webp")
         {
-            if (Request.Browser.Type.Contains("Chrome") && !Request.UserAgent.Contains("Edge"))
-            {
-                return File("/resource/img/home_page_slider_" + number + "." + format, format);
-            }
+            // TODO: find alternative for this
+            //if (Request.Browser.Type.Contains("Chrome") && !Request.UserAgent.Contains("Edge"))
+            //{
+            //    return File("/resource/img/home_page_slider_" + number + "." + format, format);
+            //}
             return File("/resource/img/home_page_slider_" + number + ".jpg", "image/jpeg");
         }
 
@@ -1003,10 +1004,11 @@ namespace Portal.Controllers
         [ResponseCache(Duration = 2592000, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "file_name" })]
         public ActionResult ResourceImageWebp(string file_name)
         {
-            if (Request.Browser.Type.Contains("Chrome") && !Request.UserAgent.Contains("Edge"))
-            {
-                return File("/resource/img/" + file_name + ".webp", "webp");
-            }
+            // TODO: find alternative for this
+            //if (Request.Browser.Type.Contains("Chrome") && !Request.UserAgent.Contains("Edge"))
+            //{
+            //    return File("/resource/img/" + file_name + ".webp", "webp");
+            //}
             return ResourceImage(file_name);
         }
 
@@ -1142,7 +1144,8 @@ namespace Portal.Controllers
         [Auth]
         public JsonResult MinifyAdvertiseImages()
         {
-            System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
+            // TODO: find alternative for this
+            //System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
             if (userAccessor.CurrentUser.Id != 1667)
             {
                 return null;
@@ -1170,7 +1173,8 @@ namespace Portal.Controllers
         [Auth]
         public JsonResult StopMinifyAdvertiseImages()
         {
-            System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
+            // TODO: find alternative for this
+            //System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
             if (userAccessor.CurrentUser.Id != 1667)
             {
                 return null;
@@ -1186,7 +1190,8 @@ namespace Portal.Controllers
         [Auth]
         public JsonResult StopQueue()
         {
-            System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
+            // TODO: find alternative for this
+            //System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
             if (userAccessor.CurrentUser.Id != 1667)
             {
                 return null;

@@ -1,0 +1,56 @@
+﻿.set_off-button input{
+  height: 40px;
+  width: 41px;
+  text-align: center;
+  margin: 0;
+  font-size:15px;
+  border:none;
+  background-color:transparent;
+
+}
+::placeholder {
+    color:#ccc;
+}
+.set_off-button input:active {
+    border: 1px solid black;
+}
+.set_off-button .add ,.set_off-button .sub{
+    border-radius: 50%;
+    background-color:transparent; 
+    width: 30px;
+    height: 30px;
+    font:15px Biransans;
+    text-align: center;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    margin: 0 5px;
+    box-shadow: 1px 2px 3px 0 rgba(0,0,0,.1);
+        padding: 2px 0;
+}
+/*.set_off-button .add {*/
+  /*margin-right: -5px;
+  border-radius: 5px 0 0 5px;
+  border-right: 0;
+}*/
+/*.set_off-button .sub {
+  border-radius: 0 5px 5px 0;
+  margin-left: -5px;
+  border-left: 0;
+}*/
+ .set_off-button .add:hover{
+  background: #34A853;
+  color:white;
+}
+ .set_off-button .sub:hover {
+     background:#ea4335;
+     color:white;
+ }
+.label-text-style{
+    font: 15px Liransans;
+    margin-right: -5px;
+}
+@media (max-width: 360px) {
+    button.add {
+    margin-left: 12px;
+}
+}

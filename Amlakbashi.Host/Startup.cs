@@ -9,6 +9,7 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -43,12 +44,18 @@ namespace Amlakbashi.Host
         // called by the runtime before the ConfigureContainer method, below.
         public void ConfigureServices(IServiceCollection services)
         {
+
             //Added for session state
             services.AddDistributedMemoryCache();
 
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(2);
+            });
+
+            // TODO: match authentication with previous system
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options=> {
+                options.Cookie.MaxAge = new TimeSpan(60, 0, 0, 0);
             });
 
             services.AddHangfire(configuration => configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
@@ -96,6 +103,7 @@ namespace Amlakbashi.Host
             app.UseStaticFiles();
             app.UseRouting();
             app.UseSession();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseResponseCaching();
 

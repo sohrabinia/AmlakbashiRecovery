@@ -1,0 +1,256 @@
+﻿.product {
+    margin:45px auto ;
+    width:1140px ;
+    direction:rtl ;
+}
+.product .zoner {
+    width:770px;
+    float:right ;
+}
+.product .zonel {
+    width:360px;
+    float:right ;
+    margin-right:10px;
+}
+.zoner .title {
+    text-align:right ;
+    color:#333 ;
+    font:20px bnassim ;    
+}
+.zoner .devider {
+    width:60px;
+    height:3px;
+    background-color:#f78130 ;
+    margin-bottom:30px;
+}
+.zoner .content {
+    height:130px; 
+    width:96% ;
+    background-color:#eeeeee ;
+    padding:2%;
+}
+.zoner .content .detail {
+    width:70% ;
+    float:right ;
+}
+.zoner .content .price {
+    width:30% ;
+    float:right ;
+}
+
+.content .detail .label{
+    background:rgba(0, 0, 0, 0) url("img/bullet3.png") no-repeat scroll right 5px center ;
+    padding:5px 20px 5px 5px;
+    text-align:right ;
+    color:#999 ;
+    font:15px bnassim ;
+}
+.content .detail .value{
+    padding:5px 20px 5px 5px;
+    text-align:right ;
+    color:#999 ;
+    font:15px bnassim ;
+}
+
+.zoner .bottom {
+    height:3px;
+    background-color:#f17e30 ;
+    margin:10px auto ;
+    width:100% ;
+    position:relative ;
+}
+.zoner .bottom .dl {
+    width:120px; 
+    position:absolute ;
+    left:210px;
+    top:-21px;
+    padding:10px 35px 10px 10px;
+    border-radius:20px;
+    color:#fff ;
+    font:16px bnassim ;
+    background:url(img/productdl.png) center right 5px no-repeat #fe4e50;
+    text-decoration:none ;
+    display:block ;
+}
+.zoner .bottom .sabad {
+    width:120px; 
+    position:absolute ;
+    left:25px;
+    top:-21px;
+    padding:10px 35px 10px 10px;
+    border-radius:20px;
+    color:#fff ;
+    font:16px bnassim ;
+    background:url(img/sabad.png) center right 5px no-repeat #00ab93;
+    text-decoration:none ;
+    display:block ;
+}
+
+.price .oldprice{
+    text-align:center ;
+    color:#e8443a  ;
+    font:17px bnassim ;
+    margin-top:20px;
+    position:relative ;
+}
+.price .oldprice .khat{
+    background-color: #e8443a;
+    height: 1px;
+    margin: 0 auto;
+    position: absolute;
+    right: 64px;
+    top: 13px;
+    width: 36%;
+}
+.price .newprice {
+    color:#00ab93 ;
+    text-align:center ;
+    font:33px bnassim; 
+}
+
+.zoner .description {
+    margin:30px 0 20px 0  ;
+}
+
+.zoner .description .text{
+    font:15px bnassim; 
+    color:#999 ;
+    padding:10px;
+}
+
+.zoner .services {
+    margin:0 auto ;
+}
+
+.zoner .services .text{
+    font:15px bnassim; 
+    color:#f17e30 ;
+    padding:10px;
+}
+.relation {
+    margin:30px 0  ;
+}
+.relation  .title {
+    text-align:right ;
+    color:#333 ;
+    font:20px bnassim ;    
+}
+.relation li{
+    width:166px;
+    height:300px;
+    border-radius:5px;
+    background-color:#eeeeee; 
+    list-style:none ;
+    float:right ;
+    margin-right:20px;
+}
+
+.productitem {
+    width:100% ;
+    height:100% ;
+    text-decoration:none ;
+    display:block ;
+}
+
+.productitem img {
+    display:block ;
+    margin:0 auto ;
+    margin-top:10px;
+    max-height:170px;
+}
+.productitem .title {
+   color: #333;
+    font: 13px bnassim;
+    height: 62px;
+    margin: 0 auto;
+    overflow: hidden;
+    text-align: right;
+    width: 130px;
+    margin-top:5px;
+}
+.productitem .oldprice{
+    text-align:center ;
+    color:#e8443a  ;
+    font:14px bnassim ;
+}
+.productitem .newprice {
+    color:#00ab93 ;
+    text-align:center ;
+    font:20px bnassim; 
+}
+.comment {
+    margin:30px 0  ;
+    width:750px;
+}
+.comment .title {
+    text-align:right ;
+    color:#333 ;
+    font:20px bnassim ;    
+}
+.comment .text table {
+    width:100% ;
+    height:100% ;
+}
+.comment .text td:nth-child(1) {
+    width:65% ;
+}
+.comment .text td:nth-child(2) {
+    width:35% ;
+}
+.comment .text input {
+    display:block ;
+    width:80% ;
+    margin:15px auto ;
+    font:16px bnassim;
+    border:1px solid #ccc ;
+    color:#999 ;
+    border-radius:4px;
+    text-align:right ;
+    padding:5px;
+}
+.comment .text textarea {
+    display:block ;
+    width:80% ;
+    height:110px;
+    margin:0 auto ;
+    font:16px bnassim;
+    border:1px solid #ccc ;
+    color:#999 ;
+    border-radius:4px;
+    text-align:right ;
+    padding:5px;
+}
+.comment .send {
+    font:20px bnassim ;
+    width:77px;
+    color:#fff ;
+    background-color:#fd8431 ;
+    padding:10px;
+    border-radius:5px; 
+    margin:0 10px;
+    text-align:center ;
+    cursor:pointer ;
+}
+.comment .imgcaptcha {
+    border:1px solid #ccc ;
+    height:50px;
+}
+.comment .imgcaptcha table {
+    width:100% ;
+    height:100% ;
+}
+.comment .imgcaptcha td {
+    vertical-align:middle ;
+}
+.comment .imgcaptcha img {
+    margin-top:10px;
+}
+.comment .imgcaptcha input {
+    font:15px bnassim ;
+    color:#999 ;
+    text-align:right ;
+    direction:rtl ;
+    width:200px;
+    display:block ;
+    padding:10px;
+}

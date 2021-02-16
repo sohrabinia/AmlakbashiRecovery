@@ -1,0 +1,107 @@
+﻿/*===================================================================================*/
+/*  General
+/*===================================================================================*/
+pre {
+    white-space: pre-wrap !important;
+}
+.contact-button-header {
+    background-color:white;
+    border:1px solid #ccc;
+    border-radius:5px;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow: 1px 2px 3px 0 rgba(0,0,0,.1);
+    padding: 5px 10px;
+}
+.public__header-text:hover {
+        background-color: #fce188;
+}
+.contact-parent {
+            
+}
+.contact-container {
+    margin: 20px 10px;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+}
+.contact-button {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: #242424;
+    margin: 10px;
+    width: 200px;
+    height: 52px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 1px 2px 3px 0 rgba(0,0,0,.1);
+}
+.contact-button span {
+    font-size: 15px;
+}
+.contact-button img {
+    background-color: #242424;
+    padding: 5px;
+    border-radius: 60px;
+}
+.contact-button i {
+    font-size: 25px;
+    color: #34A853;
+}
+.contact-button:hover {
+    background-color: #fce188;
+}
+.public_content-text{
+    font-size:16px;
+}
+/*===================================================================================*/
+/*   video-aparat
+/*===================================================================================*/
+.video-style { 
+    text-align:center;
+}
+.video-aparat{
+    width:35%;
+}
+/*===================================================================================*/
+/*   responsive
+/*===================================================================================*/
+@media (max-width: 960px){
+    .video-aparat{
+        width:45%;
+    }
+}
+@media(max-width: 780px) {
+    .contact-container {
+        justify-content: space-between;
+                
+    }
+    .public_content-text{
+        font-size:14px;
+    }
+    .contact-container .contact-button:first-child {
+        /*margin-right: 10%;*/
+    }
+    .contact-container .contact-button:last-child {
+        /*margin-left: 10%;*/
+    }
+}
+@media (max-width : 680px){
+            /*video*/
+    .video-aparat{
+        width: 90%;
+    }
+}
+
+@media(max-width: 519px) {
+    .contact-container {
+        justify-content: center;
+    }
+}
+@media(max-width: 450px) {
+    .public_content-text{
+        font-size:12px;
+    }
+}
