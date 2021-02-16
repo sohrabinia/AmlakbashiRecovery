@@ -11,8 +11,9 @@ using Amlakbashi.Mediator.Commands.ReserveCommands;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using log4net;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         IRequestHandler<ScheduleReservePaymentCommand>,
         IRequestHandler<ScheduleSendReserveRequestCallCommand, TimeSpan>,
         IRequestHandler<SendReserveRequestCallCommand>,
-        IRequestHandler<SendPayReserveCallCommand>,
+        IRequestHandler<SendPayReserveCallCommand>, 
         IRequestHandler<UpdateReserveArchivesCommand>
     {
         private readonly IRepository<Reserve, long> reserveRepository;
@@ -129,7 +130,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                 };
                 mediator.Enqueue(new SendMessageCommand(contact));
             }
-            catch (Exception exc)
+            catch(Exception exc)
             {
                 logger.Error("ReserveCommandHandler.FinishStayMessageCommand", exc);
             }
@@ -140,10 +141,18 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         {
             try
             {
+                if (request.status == ReserveStatus.Started ||
+                    request.status == ReserveStatus.Completed)
+                {
+                    if (accounting.IsReservePaidCompletely(request.reserveId) == false)
+                    {
+                        return Task.FromResult(Unit.Value);
+                    }
+                }
                 reserveState.UseReserve(request.reserveId).SetStatus(request.status,
                     request.sendSms, request.actionSource, request.doerUserId, request.force);
             }
-            catch (Exception exc)
+            catch(Exception exc)
             {
                 logger.Error("ReserveCommandHandler.SetReserveStatusCommand", exc);
             }

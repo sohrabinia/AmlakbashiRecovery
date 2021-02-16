@@ -519,13 +519,26 @@ a {
 /*****end share post*****/
 
 /*****support chat*****/
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v7.0.29,
+* Autoprefixer: v9.7.6
+* Browsers: last 4 version
+*/
+
 .support-chat__button {
     position: fixed;
     z-index: 99999;
     right: 14px;
     bottom: 30px;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     cursor: pointer;
     background-color: #fdd835;
@@ -535,17 +548,20 @@ a {
     height: 60px;
     opacity: .95;
     /*background-image: linear-gradient(to right ,#f9ca2c, #fdd835);*/
+    background-image: -webkit-gradient(linear,left top, right top,from(#fce188),to(#ffe068));
+    background-image: -o-linear-gradient(left,#fce188,#ffe068);
     background-image: linear-gradient(to right,#fce188,#ffe068);
     width: 57px;
     height: 57px;
+    -webkit-box-shadow: 1px 2px 3px 0 rgba(0,0,0,.1);
     box-shadow: 1px 2px 3px 0 rgba(0,0,0,.1);
 }
 
-.support-chat__button:hover {
-    /*background-image: linear-gradient(to right,#ffe068,#fce188);*/
-    background-image: none;
-    background-color: #ffeca0;
-}
+    .support-chat__button:hover {
+        /*background-image: linear-gradient(to right,#ffe068,#fce188);*/
+        background-image: none;
+        background-color: #ffeca0;
+    }
 
 
 .support-chat__light-icon {
@@ -573,14 +589,17 @@ a {
     border-radius: 5px;
     font: 0.8em Liransans;
     display: none;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: column;
     flex-flow: column;
     opacity: 1;
 }
 
-.support-chat__user-inform i {
-    text-align: left;
-    width: 100%;
-}
+    .support-chat__user-inform i {
+        text-align: left;
+        width: 100%;
+    }
 
 .support-chat__container {
     z-index: 1001;
@@ -593,14 +612,25 @@ a {
     height: 400px;
     max-height: 90%;
     border: 1px solid #e2e2e2;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: column;
     flex-flow: column;
 }
 
 .support-chat__header {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     border-radius: 5px 5px 0 0;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
     justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     cursor: pointer;
     background-color: #fdd835;
@@ -617,14 +647,16 @@ a {
 .support-chat__chat-box {
     height: 100%;
     padding: 5px;
-    display: flex;
-    flex-flow: column-reverse;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
 .support-chat__input-container {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     background-color: white;
     border-top: 1px solid #e2e2e2;
@@ -639,19 +671,31 @@ a {
 
 .support-chat__text-input {
     width: 100%;
-    padding: 5px;
+    padding: 12px 5px;
     background: none;
     border: none;
     height: auto;
     max-height: 250px;
+    font: 14px Miransans;
     overflow: hidden;
+    height:52px !important;
+}
+
+textarea.support-chat__text-input:focus {
+    outline: none;
 }
 
 .support-chat__new-count {
     z-index: 1000;
     position: absolute;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
     width: 30px;
     height: 30px;

@@ -22,7 +22,18 @@
       "wwwroot/resource/css/general/dashboardAccount.css",
       "wwwroot/resource/css/general/popup-calendar.css"
     ]
-  },
+  }
+  ,
+  {
+    "outputFileName": "wwwroot/js/home-page.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/portal/home-page.css",
+      "wwwroot/resource/css/general/home-page-search.css",
+      "wwwroot/resource/css/general/search-by-region.css"
+    ]
+  }
+  ,
   {
     "outputFileName": "wwwroot/js/dashboard.min.js",
     "inputFiles": [
@@ -67,9 +78,23 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/js/site.min.js",
+    "outputFileName": "wwwroot/js/home-page.min.js",
     "inputFiles": [
-      "wwwroot/js/site.js"
+      "wwwroot/resource/scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/scripts/page/home-page.js",
+      "wwwroot/resource/scripts/general/home-page-search.js",
+      "wwwroot/resource/scripts/general/search-by-region.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.j",
+      "wwwroot/resource/scripts/general/slider-scroll.js"
     ]
   }
+  //,
+  //{
+  //  "outputFileName": "wwwroot/js/site.min.js",
+  //  "inputFiles": [
+  //    "wwwroot/js/site.js"
+  //  ]
+  //}
 ]

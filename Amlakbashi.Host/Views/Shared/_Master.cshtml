@@ -73,8 +73,7 @@
             .Add("/resource/css/portal/portal-shared.css")
             .Add("/resource/css/portal/portal-header.css")
             .ForceRelease()
-           .Render("/resource/css_output/minifyportalcriticalcss_v3_0.css"))*@
-    @*<link rel="stylesheet" href="~/resource/css/portal/portal-shared.css" />*@
+           .Render("/resource/css_output/minifyportalcriticalcss_v3_2.css"))*@
     @*<link rel="preload" as="style" onload="this.rel = 'stylesheet'"
               type="text/css" href="/file/getcss?src=~/resource/css_output/minifyportalcss_v3_9.css" />
         <noscript>
@@ -98,13 +97,12 @@
             .Add("/resource/css/general/login/login-Popup.css")
             .Add("/resource/css/general/footer.css")
             .ForceRelease()
-            .Render("/resource/css_output/minifyportalcss_v6_7.css"))*@
-
+            .Render("/resource/css_output/minifyportalcss_v6_8.css"))*@
     @*<link rel="stylesheet" href="~/Resource/star-rating/star-rating.css" />*@
     @RenderSection("StyleLink", required: false)
     <style>
-        @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/css_output/minifyportalcriticalcss_v3_0.css")))
-        @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/css_output/minifyportalcss_v6_7.css")))
+        @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/css_output/minifyportalcriticalcss_v3_2.css")))
+        @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/css_output/minifyportalcss_v6_8.css")))
         @RenderSection("StyleBlock", required: false)
     </style>
     @*****   end style   ****@
@@ -130,32 +128,37 @@
 <div class="master__page">
     @if (ViewBag.LockInPage == null || !ViewBag.LockInPage)
     {
-        <div class="master__header">
-            <div class="master_header-child master_header-logo">
-                <a href="/" title="املاک باشی">
-                    <img srcset="/file/resourceimagepng?file_name=@(logoName)-400w 75w,
+    <div class="master__header">
+        <div class="master_header-child master_header-logo">
+            <a href="/" title="املاک باشی">
+                <img srcset="/file/resourceimagepng?file_name=@(logoName)-400w 75w,
                                 /file/resourceimagepng?file_name=@(logoName)-680w 94w,
                                 /file/resourceimagepng?file_name=@(logoName)-900w 112w,
                                  /file/resourceimagepng?file_name=@(logoName)-1200w 135w"
-                         sizes="(max-width: 400px) 75px,
+                     sizes="(max-width: 400px) 75px,
                                  (max-width: 680px) 94px,
                                  (max-width: 900px) 112px,
                                  135px"
-                         src="/file/resourceimagepng?file_name=@(logoName)-680w" alt="لوگوی املاک باشی" title="املاک باشی">
-                </a>
-                @if (ViewBag.CurrentPage == "AdvertiseCategory" ||
-            ViewBag.CurrentPage == "AdvertiseItem")
-                {
-                    @Html.Partial("_MasterSearch");
-                }
-            </div>
-            <div class="master_header-child">
-                <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account" style="">
-                    <p></p>
-                </a>
-            </div>
-            <p onclick="toggleMenu()" class="master_header-child master__header-menu"><i class="fa fa-bars"></i>منو</p>
+                     src="/file/resourceimagepng?file_name=@(logoName)-680w" alt="لوگوی املاک باشی" title="املاک باشی">
+            </a>
+            @if (ViewBag.CurrentPage == "AdvertiseCategory" ||
+        ViewBag.CurrentPage == "AdvertiseItem")
+            {
+                @Html.Partial("_MasterSearch");
+            }
         </div>
+        <div class="master_header-child">
+            <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account" style="">
+                <p></p>
+            </a>
+        </div>
+        <div class="master_header-child">
+            <div onclick="toggleMenu()" class="master__header-menu">
+                <i class="fa fa-bars"></i>
+                <span>منو</span>
+            </div>
+        </div>
+    </div>
         @RenderSection("TopPin", false)
         <div class="master__menu">
             @if (ViewBag.home == null || !ViewBag.home)
@@ -207,7 +210,7 @@
         .ForceRelease()
         .Render("/resource/js_output/minifyjs_v10_9.js"))*@
 
-    <script src="/file/getjs?src=/resource/js_output/minifyjsdefer_v10_4.js" defer></script>
+    <script src="/file/getjs?src=/resource/js_output/minifyjsdefer_v10_5.js" defer></script>
     @*@MvcHtmlString.Create(
         Bundle.JavaScript()
         .Add("/resource/scripts/general/message-popup.js")
@@ -227,7 +230,7 @@
         .Add("/resource/Scripts/general/login/intlTelInput.min.js")
         .Add("/resource/scripts/general/login/login-popup.js")
         .ForceRelease()
-        .Render("/resource/js_output/minifyjsdefer_v10_4.js"))*@
+        .Render("/resource/js_output/minifyjsdefer_v10_5.js"))*@
     @*****   end script   ****@
     @*<script src="/resource/scripts/firebase-5.9.4/firebase-app.js"></script>
         <script src="/resource/scripts/firebase-5.9.4/firebase-messaging.js"></script>
