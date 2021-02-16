@@ -42,16 +42,6 @@
         .Render("/resource/js_output/minifyhomepagejs_v2_9.js"))*@
 @*<script src="~/Resource/Scripts/home-page-banner.js"></script>*@
 @*}*@
-@helper getUrl(string url, string area)
-{if (string.IsNullOrEmpty(area))
-    {
-        @: @url
-    }
-    else
-    {
-        @: @string.Format("{0}/{1}", url, area)
-    }
-}
 <div style="clear:both;"></div>
 
 <div class="home-page__top-container">

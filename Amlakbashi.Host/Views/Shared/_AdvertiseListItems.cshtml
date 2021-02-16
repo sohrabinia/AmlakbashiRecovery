@@ -66,18 +66,6 @@
     }
 }
 
-@helper IsSelected(bool state)
-{
-    if (state)
-    {
-        @:selected
-    }
-    else
-    {
-        @:
-    }
-}
-
 <div class="accommodationList">
     @{
         @*if (!for_advertise_page)
@@ -240,7 +228,7 @@
                             }
                             else
                             {
-                                @:@Html.Partial("_StarRating", new ViewDataDictionary { { "score", rating } })
+                                @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", rating } })
                                 @*<select class="average-rating">
                                         <option @IsSelected(rating == 1) value="1">خیلی ضعیف</option>
                                         <option @IsSelected(rating == 2) value="2">ضعیف</option>
@@ -301,8 +289,8 @@
         (discount_homes || today_empty_homes || instant_reserve))
 {
     <div class="advertise-category-link__container">
-        @Html.Partial("_AdvertiseCategoryLink", category,
-            new ViewDataDictionary { { "queryString", queryString } })
+        @await Html.PartialAsync("_AdvertiseCategoryLink", category,
+            new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "queryString", queryString } })
     </div>
 }
 
@@ -312,8 +300,8 @@
     <div class="advertise-category-link__container">
         @foreach (var related_category in related_categories)
         {
-            @Html.Partial("_AdvertiseCategoryLink", related_category,
-                new ViewDataDictionary { { "queryString", queryString } })
+            @await Html.PartialAsync("_AdvertiseCategoryLink", related_category,
+                new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "queryString", queryString } })
         }
     </div>
 }

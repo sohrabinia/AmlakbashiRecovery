@@ -1,5 +1,7 @@
-﻿@using PadPortal.Extensions;
+﻿@using Amlakbashi.Host.Extensions;
 @using Entities = Amlakbashi.Core.Entities;
+@using Amlakbashi.Host.Authentication;
+@inject IUserAccessor userAccessor;
 <!DOCTYPE html>
 <html class="theme3">
 <head>
@@ -52,74 +54,20 @@
         <meta name="description" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
     }
     <meta name="enamad" content="344312021" />
-    @*@Html.Raw(ViewBag.ItemMetaDescription)*@
-    @*@Html.Raw(ViewBag.ItemMetaKeywords)*@
-    @{bool android = false;}
-    @if (Request.UserAgent.Contains("android") || Request.UserAgent.Contains("Android"))
-    {
-        android = true;
-    }
-    @{
-        ViewBag.MessageCount = 0;
-    }
-    @*****   style   ****@
-    @*<link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/dailyrent.css&v=2" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/tmmegamenu/css/tmmegamenu.css" media="all" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/bootstrap/css/bootstrap-rtl.min.css" media="all" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/ticker/ticker-style.css">
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/chosen_v1.4.2/chosen.css">
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/alertify.js-0.3.11/themes/alertify.default.css" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/alertify.js-0.3.11/themes/alertify.core.css" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css/general/login/intlTelInput.css" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css/general/login/login-Popup.css&v=1" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/dashboard.css&v=4" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/chat-popup.css&v=1" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/message-popup.css&v=3" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/loader.min.css" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/jquery-confirm/jquery-confirm.min.css" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/rating/themes/fontawesome-stars.css" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/star-rating/star-rating.css" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css/general/jalali-date-picker.css&v=3" />
-            <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css/general/dashboardAccount.css" />
-        <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css/general/popup-calendar.css">*@
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css_output/minifydashboardcss_v1_3.css">
-    @*@MvcHtmlString.Create(
-        Bundle.Css()
-            .Add("/resource/dailyrent.css")
-            .Add("/resource/tmmegamenu/css/tmmegamenu.css")
-            .Add("/resource/bootstrap/css/bootstrap-rtl.min.css")
-            .Add("/resource/ticker/ticker-style.css")
-            .Add("/resource/chosen_v1.4.2/chosen.css")
-            .Add("/resource/alertify.js-0.3.11/themes/alertify.default.css")
-            .Add("/resource/alertify.js-0.3.11/themes/alertify.core.css")
-            .Add("/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css")
-            .Add("/resource/css/general/login/intlTelInput.css")
-            .Add("/resource/css/general/login/login-Popup.css")
-            .Add("/resource/dashboard.css")
-            .Add("/resource/css/general/chat-popup.css")
-            .Add("/resource/css/general/message-popup.css")
-            .Add("/resource/loader.min.css")
-            .Add("/resource/jquery-confirm/jquery-confirm.min.css")
-            .Add("/resource/rating/themes/fontawesome-stars.css")
-            .Add("/resource/star-rating/star-rating.css")
-            .Add("/resource/css/general/jalali-date-picker.css")
-            .Add("/resource/css/general/dashboardAccount.css")
-            .Add("/resource/css/general/popup-calendar.css")
-            .ForceRelease()
-            .Render("/resource/css_output/minifydashboardcss_v1_3.css"))*@
+
+    <link rel="stylesheet" type="text/css" href="/css/dashboard.min.css">
     @RenderSection("StyleLink", required: false)
     @RenderSection("StyleBlock", required: false)
-    @*****   end style   ****@
-    @*<script src='https://www.google.com/recaptcha/api.js?hl=fa'></script>*@
-
 </head>
-@{ var selectType = ViewBag.selectType; }
 <body>
+    @{
+        ViewBag.MessageCount = 0;
+        var selectType = ViewBag.selectType;
+    }
     @*<section id="installBanner" class="install-app-banner">
             <button id="installBtn">نصب اپلیکیشن املاک باشی</button>
         </section>*@
-    @Html.Partial("_LoginPopup")
+    @await Html.PartialAsync("_LoginPopup")
     @*<div onclick="showPresentPopup()" style="display:none;" class="present-prize__button">
             <img srcset="/file/resourceimagegif?file_name=gift-75w 75w,
                     /file/resourceimagegif?file_name=gift-92w 92w"
@@ -127,9 +75,9 @@
                     92px"
                  src="/file/resourceimagegif?file_name=gift-75w" />
         </div>*@
-    @if (Session["impersonateAdmin"] != null)
+    @if (Context.Session.Keys.Any(a => a == "impersonateUser"))
     {
-        @Html.Partial("_ImpersonateContainer", new ViewDataDictionary { {"hidden", false } })
+        @await Html.PartialAsync("_ImpersonateContainer", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hidden", false } })
     }
     <div id="loading-icon" class="loading-contianer" style="z-index:2147483647">
         <div class="ui active large loader loading-icon"></div>
@@ -156,13 +104,13 @@
                         <i class="fa fa-user"></i>
                         @if (User.Identity.IsAuthenticated)
                         {
-                            if (string.IsNullOrEmpty(User.GetUser().FullName))
+                            if (string.IsNullOrEmpty(userAccessor.CurrentUser.FullName))
                             {
-                                <span> کاربر @User.GetUser().Id</span>
+                                <span> کاربر @userAccessor.CurrentUser.Id</span>
                             }
                             else
                             {
-                                <span> @User.GetUser().FullName </span>
+                                <span> @userAccessor.CurrentUser.FullName </span>
                             }
                         }
                         else
@@ -179,9 +127,9 @@
                     <i class="close-menu-dashboard fa fa-times-circle" onclick="close_menu()"></i>
                     <span class="menu__user">
                         @if (User.Identity.IsAuthenticated &&
-                            User.GetUser().PhotoID > 0)
+                           userAccessor.CurrentUser.PhotoID > 0)
                         {
-                            <img style="width: 66px;height: 66px;border-radius: 50px;margin-left: 5px;" src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=200", User.GetUser().PhotoID)' />
+                            <img style="width: 66px;height: 66px;border-radius: 50px;margin-left: 5px;" src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=200", userAccessor.CurrentUser.PhotoID)' />
                         }
                         else
                         {
@@ -192,13 +140,13 @@
                         <span>
                             @if (User.Identity.IsAuthenticated)
                             {
-                                if (string.IsNullOrEmpty(User.GetUser().FullName))
+                                if (string.IsNullOrEmpty(userAccessor.CurrentUser.FullName))
                                 {
-                                    @: کاربر @User.GetUser().Id
+                                    @: کاربر @userAccessor.CurrentUser.Id
                                 }
                                 else
                                 {
-                                    @User.GetUser().FullName
+                                    @userAccessor.CurrentUser.FullName
                                 }
                             }
                             else
@@ -231,46 +179,46 @@
                     </a>
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <a href="@string.Format("/post/personal?userid={0}", User.GetUser().Id)" class="menu__item @(ViewBag.personal != null ? "menu__item--active" : "") ">
+                        <a href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)" class="menu__item @(ViewBag.personal != null ? "menu__item--active" : "") ">
                             <i class="fa fa-th-list"></i>
                             <span>آگهی های من</span>
                         </a>
-                        if (User.GetUser().UserGeneralType !=
+                        if (userAccessor.CurrentUser.UserGeneralType !=
                             (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
                         {
                             <a href="/comment/advertisecommentmanager" class="menu__item @(ViewBag.advertise_comment != null ? "menu__item--active" : "") ">
                                 <i class="fa fa-comments"></i>
                                 <span>نظرات آگهی ها</span>
                                 @*<span style="background-color:#4485F2;border-radius:10px;font:12px Liransans;margin-right:3px;padding:3px;text-align:center;color:white">جدید</span>*@
-                                @Html.Action("GetNotSeenCommentCount","Comment")
+                                <vc:not-seen-comment-count></vc:not-seen-comment-count>
                             </a>
                         }
-                        if (User.GetUser().UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+                        if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
                         {
-                            <a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", User.GetUser().Id)" class="menu__item @(ViewBag.reserveGuest != null ? "menu__item--active" : "") ">
+                            <a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id)" class="menu__item @(ViewBag.reserveGuest != null ? "menu__item--active" : "") ">
                                 <i class="fa fa-book"></i>
                                 <span>رزرو ها</span>
                             </a>
                         }
                         else
                         {
-                            <a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", User.GetUser().Id)" class="menu__item @(ViewBag.reserveHost != null ? "menu__item--active" : "") ">
+                            <a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id)" class="menu__item @(ViewBag.reserveHost != null ? "menu__item--active" : "") ">
                                 <i class="fa fa-book"></i>
                                 <span> رزرو بعنوان میزبان  </span>
                             </a>
-                            <a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", User.GetUser().Id)" class="menu__item @(ViewBag.reserveGuest != null ? "menu__item--active" : "") ">
+                            <a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id)" class="menu__item @(ViewBag.reserveGuest != null ? "menu__item--active" : "") ">
                                 <i class="fa fa-book"></i>
                                 <span> رزرو بعنوان مهمان</span>
                             </a>
                         }
-                        if (User.GetUser().UserGeneralType > 0)
+                        if (userAccessor.CurrentUser.UserGeneralType > 0)
                         {
                             <a href="/reserve/invoice" class="menu__item @(ViewBag.Invoice != null ? "menu__item--active" : "") ">
                                 <i class="fa fa-list"></i>
                                 <span>صورت حساب رزرو ها</span>
                             </a>
                         }
-                        <a href='@string.Format("/post/presentandprize?userid={0}", User.GetUser().Id)' class="menu__item @(ViewBag.presentandprize != null ? "menu__item--active " : "") ">
+                        <a href='@string.Format("/post/presentandprize?userid={0}", userAccessor.CurrentUser.Id)' class="menu__item @(ViewBag.presentandprize != null ? "menu__item--active " : "") ">
                             <i class="fa fa-gift"></i>
                             <span> هدیه سفر </span>
                         </a>
@@ -449,7 +397,7 @@
     @*<script src="/file/getjs?src=/resource/detailed-date-picker/detailed-date-picker-helper.js&v=7"></script>*@
     @*<script src="/file/getjs?src=/resource/persian-date-picker/persian-date-picker-helper.js&v=4"></script>*@
     @{
-        if (User.GetUser().AccessType == (int)Amlakbashi.Core.Entities.User.AccessTypeEnum.LoginBanned)
+        if (userAccessor.CurrentUser.AccessType == (int)Amlakbashi.Core.Entities.User.AccessTypeEnum.LoginBanned)
         {
             Session["mobile"] = null;
             FormsAuthentication.SignOut();
