@@ -22,8 +22,7 @@
       "wwwroot/resource/css/general/dashboardAccount.css",
       "wwwroot/resource/css/general/popup-calendar.css"
     ]
-  }
-  ,
+  },
   {
     "outputFileName": "wwwroot/js/home-page.min.css",
     "inputFiles": [
@@ -32,8 +31,7 @@
       "wwwroot/resource/css/general/home-page-search.css",
       "wwwroot/resource/css/general/search-by-region.css"
     ]
-  }
-  ,
+  },
   {
     "outputFileName": "wwwroot/js/home-page.min.js",
     "inputFiles": [
@@ -47,11 +45,4 @@
       "wwwroot/resource/scripts/general/slider-scroll.js"
     ]
   }
-  //,
-  //{
-  //  "outputFileName": "wwwroot/js/site.min.js",
-  //  "inputFiles": [
-  //    "wwwroot/js/site.js"
-  //  ]
-  //}
 ]
