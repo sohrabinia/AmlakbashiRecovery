@@ -66,6 +66,9 @@
     <None Include="Views\Admin\SendWhatsappCoronaAdvMsg.cshtml" />
     <None Include="Views\Admin\Sms.cshtml" />
     <None Include="Views\Admin\UserChart.cshtml" />
+    <None Include="Views\Advertise\Admin.cshtml" />
+    <None Include="Views\Advertise\Edit.cshtml" />
+    <None Include="Views\Advertise\Index.cshtml" />
     <None Include="Views\Post\AccomodationManager.cshtml" />
     <None Include="Views\Post\Contact.cshtml" />
     <None Include="Views\Post\dashboard.cshtml" />
