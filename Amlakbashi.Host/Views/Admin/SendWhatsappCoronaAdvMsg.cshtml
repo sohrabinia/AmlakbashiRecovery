@@ -1,0 +1,61 @@
+﻿@{
+    ViewBag.Title = "ارسال واتس اپ کاربران";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+<div>
+    <div style="width:100px;text-align:center;cursor:pointer;border:1px solid #242424;border-radius:5px;padding:10px 5px; margin: 10px;" onclick="previewWaMessages()">پیش نمایش</div>
+    <div style="width:100px;text-align:center;cursor:pointer;border:1px solid #242424;border-radius:5px;padding:10px 5px; margin: 10px;" onclick="sendWaTestMessages()">ارسال تست</div>
+    <div style="width:100px;text-align:center;cursor:pointer;border:1px solid #242424;border-radius:5px;padding:10px 5px; margin: 10px;" onclick="sendWaMessages()">ارسال</div>
+</div>
+@section ScriptLink {
+    <script type="text/javascript" src="/file/getjs?src=/resource/scripts/whatsapp-bulk-sender/whatsapp-bulk-sender.js"></script>
+}
+
+@section ScriptBlock{
+    <script type="text/javascript">
+        function previewWaMessages() {
+            myajax('admin/getwacoronaadvmsgs', '', function (ret) {
+                if (ret.status == 0) {
+                    alertify.error(ret.msg);
+                    return;
+                }
+                alertify.success('تعداد پیام ها برای ارسال: ' + ret.val.length);
+                showInfoMessage('', JSON.stringify(ret.val));
+            });
+        }
+
+        function sendWaMessages() {
+            myajax('admin/getwacoronaadvmsgs', '', function (ret) {
+                if (ret.status == 0) {
+                    alertify.error(ret.msg);
+                    return;
+                }
+                showNoYesMessage('ارسال از طریق واتس اپ', 'تعداد ' + ret.val.length + ' پیغام برای ارسال آماده شد. آیا ارسال انجام شود؟', function () {
+                    try {
+                        sendWhatsappCoronaAdvBulkMsg(ret.val);
+                        alertify.success('ارسال پیام ها با موفقیت انجام شد. تعداد پیام ها: ' + ret.val.length);
+                    }
+                    catch (exc) {
+                        alertify.error('خطا', 'ارسال با خطا مواجه شد');
+                    }
+                });
+            });
+        }
+
+        function sendWaTestMessages() {
+            myajax('admin/getwacoronaadvtestmsgs', '', function (ret) {
+                if (ret.status == 0) {
+                    alertify.error(ret.msg);
+                    return;
+                }
+                try {
+                    sendWhatsappCoronaAdvBulkMsg(ret.val);
+                    alertify.success('ارسال پیام ها با موفقیت انجام شد. تعداد پیام ها: ' + ret.val.length);
+                }
+                catch (exc) {
+                    alertify.error('خطا', 'ارسال با خطا مواجه شد');
+                }
+            });
+        }      
+    </script>
+}

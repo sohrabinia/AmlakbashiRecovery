@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "ایمیل";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@section ScriptLink {
+    <script type="text/javascript" src="/file/getjs?src=/resource/ckeditor/ckeditor.js"></script>
+}
+<div style="color:green;font:14px bnassim; ">@ViewBag.suc</div>
+
+@using (Html.BeginForm("SendEmail", "admin", FormMethod.Post))
+{
+    <div>
+        <table>
+            <tr>
+                <td class="label">ایمیل خاص :</td>
+                <td style="text-align:right;" class="minw">
+                    <input type="text" name="email" />
+            </tr>
+            <tr>
+                <td class="label">عنوان ایمیل:</td>
+                <td style="text-align:right;" class="minw">
+                    <input type="text" name="title" />
+            </tr>
+            <tr>
+                <td class="label" style="vertical-align:top;">
+                    متن پست :
+                </td>
+                <td style="text-align:right;">
+                    <textarea id="Description" name="text"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="submit" style="font-size:16px; width:100px; padding:7px;" class="filter" value="ارسال ایمیل" /></td>
+
+            </tr>
+        </table>
+    </div>
+
+
+}
+<div class="mypagelist">
+</div>
+
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        CKEDITOR.replace('Description');
+    </script>
+}

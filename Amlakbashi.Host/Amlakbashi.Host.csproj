@@ -55,6 +55,17 @@
     <None Include="Views\Accomodation\ReserveComplexPartials\_ReservePrice.cshtml" />
     <None Include="Views\ActionLog\Detail.cshtml" />
     <None Include="Views\ActionLog\Index.cshtml" />
+    <None Include="Views\Admin\AdminStatistic.cshtml" />
+    <None Include="Views\Admin\AdvertiseChart.cshtml" />
+    <None Include="Views\Admin\Email.cshtml" />
+    <None Include="Views\Admin\Home.cshtml" />
+    <None Include="Views\Admin\PaymentChart.cshtml" />
+    <None Include="Views\Admin\PaymentComparisonChart.cshtml" />
+    <None Include="Views\Admin\ReserveFinanceChart.cshtml" />
+    <None Include="Views\Admin\SendGroupNotification.cshtml" />
+    <None Include="Views\Admin\SendWhatsappCoronaAdvMsg.cshtml" />
+    <None Include="Views\Admin\Sms.cshtml" />
+    <None Include="Views\Admin\UserChart.cshtml" />
     <None Include="Views\Post\AccomodationManager.cshtml" />
     <None Include="Views\Post\Contact.cshtml" />
     <None Include="Views\Post\dashboard.cshtml" />

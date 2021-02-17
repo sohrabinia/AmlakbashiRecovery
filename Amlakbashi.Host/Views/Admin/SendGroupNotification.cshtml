@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "ارسال نوتیفیکیشن گروهی";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<div class="title">ارسال نوتیفیکیشن گروهی</div>
+@using (Html.BeginForm("SendGroupNotification", "admin", FormMethod.Post, new { id = "ManageForm" }))
+{
+<table>
+    <tr>
+        <td class="label">
+            نوع کاربر :
+        </td>
+        <td style="width:300px;">
+            <select name="user_type">
+                <option value="-1" is-selected="@((int)ViewBag.user_type == -1)">همه</option>
+                <option value="1" is-selected="@((int)ViewBag.user_type == 1)">میزبان</option>
+                <option value="0" is-selected="@((int)ViewBag.user_type == 0)">مهمان</option>
+            </select>
+        </td>
+        <td></td>
+    </tr>
+    @await Component.InvokeAsync("RegionSelector")
+    <tr>
+        <td class="label">
+            عنوان :
+        </td>
+        <td style="width:300px;">
+            <input type="text" name="title" />
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="label">
+            متن :
+        </td>
+        <td style="width:300px;">
+            <input type="text" name="body" />
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="label">
+            لینک کلیک :
+        </td>
+        <td style="width:300px;">
+            <input type="text" name="click_action" />
+        </td>
+        <td></td>
+    </tr>
+</table>
+        <div style="margin-top:20px;">
+            <input class="apply" type="submit" value="ارسال" />
+        </div>
+    }
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        var msg = '@(ViewBag.msg)';
+        if (msg != '') {
+            alert(msg);
+        }
+    </script>
+}

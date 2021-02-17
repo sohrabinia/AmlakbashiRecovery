@@ -1,0 +1,145 @@
+﻿@{
+    ViewBag.Title = "نمودار آماری";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@model Dictionary<string, Amlakbashi.Core.DTOs.PaymentDTOs.PaymentStatisticsDTOs.PaymentChartDTO>
+
+<div style="width:100%;">
+    @using (Html.BeginForm("ReserveFinanceChart", "admin", FormMethod.Post))
+    {
+        <div class='dynamic-filter'>
+            @{
+                var objPersianCalendar = new System.Globalization.PersianCalendar();
+                var currentYear = objPersianCalendar.GetYear(DateTime.Now);
+            }
+            <div class="dynamic-filter__item">
+                <div class="dynamic-filter__label">انتخاب ماه :</div>
+                <div class="dynamic-filter__property">
+                    <select name="selected_month"> 
+                        <option is-selected="@(ViewBag.selected_month == 1)" value="1">فروردین</option>
+                        <option is-selected="@(ViewBag.selected_month == 2)" value="2">اردیبهشت</option>
+                        <option is-selected="@(ViewBag.selected_month == 3)" value="3">خرداد</option>
+                        <option is-selected="@(ViewBag.selected_month == 4)" value="4">تیر</option>
+                        <option is-selected="@(ViewBag.selected_month == 5)" value="5">مرداد</option>
+                        <option is-selected="@(ViewBag.selected_month == 6)" value="6">شهریور</option>
+                        <option is-selected="@(ViewBag.selected_month == 7)" value="7">مهر</option>
+                        <option is-selected="@(ViewBag.selected_month == 8)" value="8">آبان</option>
+                        <option is-selected="@(ViewBag.selected_month == 9)" value="9">آذر</option>
+                        <option is-selected="@(ViewBag.selected_month == 10)" value="10">دی</option>
+                        <option is-selected="@(ViewBag.selected_month == 11)" value="11">بهمن</option>
+                        <option is-selected="@(ViewBag.selected_month == 12)" value="12">اسفند</option>
+                    </select>
+                </div>
+            </div>
+            <div class="dynamic-filter__item">
+                <div class="dynamic-filter__label">سال :</div>
+                <div class="dynamic-filter__property">
+                    <select name="selected_year">
+                        <option is-selected="@(ViewBag.selected_year == currentYear)" value="@currentYear">@currentYear</option>
+                        <option is-selected="@(ViewBag.selected_year == (currentYear-1))" value="@(currentYear-1)">@((currentYear - 1).ToString())</option>
+                        <option is-selected="@(ViewBag.selected_year == ( currentYear-2))" value="@(currentYear-2)">@((currentYear - 2).ToString())</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="dynamic-filter__button">
+                <input type="submit" value="فیلتر" />
+            </div>
+        </div>
+
+                            }
+</div>
+<div style="clear:both ;"></div>
+<div style="direction:ltr;margin-top:50px;">
+    <div id="container" style="width:100%; height:400px;"></div>
+</div>
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        var cats = [];
+        var series = [];
+        @{
+        string str_title = "نمودار مالی رزرو";
+            for (int i = 31; i > 0; i--)
+            {
+                <text>
+                    cats.unshift(@i);
+                </text>
+            }
+
+        foreach(var item in Model){
+            <text>
+        var tmps = {}
+        tmps.name = '@item.Key';
+        tmps.data = [];
+        </text>
+
+            for (int i = 0; i < item.Value.AmountList.Count; i++) {
+                <text>
+        tmps.data.push(@item.Value.AmountList[i]);
+        </text>
+            }
+            <text>
+        series.push(tmps);
+        </text>
+        }
+    }
+
+        $(function () {
+            Highcharts.chart('container', {
+                title: {
+                    text: '@str_title',
+                    x: -20 //center
+                },
+                subtitle: {
+                    text: '',
+                    x: -20
+                },
+                xAxis: {
+                    categories: cats
+                },
+                yAxis: {
+                    title: {
+                        text: 'مبلغ'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    valueSuffix: '   '
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle',
+                    borderWidth: 0
+                },
+                series: series
+            });
+        });
+
+        $(document).ready(function () {
+            $(".highcharts-credits").hide();
+        })
+
+    </script>
+}
+@section StyleBlock{
+    <style>
+        div {
+            cursor: pointer;
+            text-align: center;
+        }
+
+        td {
+            background-color: #efefef !important;
+        }
+
+        .highcharts-title {
+            font: 40px bnassim;
+        }
+    </style>
+}
