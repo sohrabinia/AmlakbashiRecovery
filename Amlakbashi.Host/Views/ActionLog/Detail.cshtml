@@ -1,0 +1,75 @@
+﻿@using Amlakbashi.Core.Common.Utilities;
+@{
+    ViewBag.Title = "مشاهده تغییرات لاگ";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+    List<DetailedComparer.Variance> diff;
+    var type = (ActionLog.ActionTypeEnum)Model.Type;
+    switch (type)
+    {
+        case ActionLog.ActionTypeEnum.BankCard:
+            diff = DetailedComparer.DetailedCompare<BankCard>(
+                Model.PreviousData, Model.CurrentData);
+            break;
+        case ActionLog.ActionTypeEnum.User:
+            diff = DetailedComparer.DetailedCompare<User>(
+                Model.PreviousData, Model.CurrentData);
+            break;
+        default:
+            diff = null;
+            break;
+    }
+
+}
+@model ActionLog
+<div>
+    @if (string.IsNullOrEmpty(Model.PreviousData))
+    {
+        <div style="font:18px Biransans; color:#34A853;">افزودن:</div>
+        foreach (var item in diff)
+        {
+            <div style="direction:ltr">
+                <span style="font: 16px Miransans">@item.Prop : @item.valB</span>
+            </div>
+        }
+    }
+    else if (string.IsNullOrEmpty(Model.CurrentData))
+    {
+        <div style="font:18px Biransans;color:#EA4335;">حذف:</div>
+        foreach (var item in diff)
+        {
+            <div style="direction:ltr">
+                <span style="font: 16px Miransans">@item.Prop : @item.valA</span>
+            </div>
+        }
+    }
+    else
+    {
+        <div style="font:18px Biransans">تغییرات:</div>
+        if (diff != null)
+        {
+            if (diff.Count > 0)
+            {
+                foreach (var item in diff)
+                {
+                    <div style="direction:ltr">
+                        <span style="font: 16px Miransans">@item.Prop  :</span> <span style="font: 16px Miransans; color:#EA4335">@item.valA</span> => <span style="font: 16px Miransans; color:#34A853">@item.valB</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <div>بدون تغییر</div>
+            }
+        }
+        else
+        {
+            <div>خطا در اطلاعات لاگ</div>
+        }
+    }
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+    </script>
+}

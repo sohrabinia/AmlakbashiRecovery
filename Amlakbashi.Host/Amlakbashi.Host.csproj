@@ -53,6 +53,8 @@
     <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveDetailAmenities.cshtml" />
     <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveMainAmenities.cshtml" />
     <None Include="Views\Accomodation\ReserveComplexPartials\_ReservePrice.cshtml" />
+    <None Include="Views\ActionLog\Detail.cshtml" />
+    <None Include="Views\ActionLog\Index.cshtml" />
     <None Include="Views\Post\AccomodationManager.cshtml" />
     <None Include="Views\Post\Contact.cshtml" />
     <None Include="Views\Post\dashboard.cshtml" />

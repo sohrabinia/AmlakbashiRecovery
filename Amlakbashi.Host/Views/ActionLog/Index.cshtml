@@ -1,0 +1,172 @@
+﻿@{
+    ViewBag.Title = "مدیریت لاگ تغییرات";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@model IEnumerable<ActionLog>
+
+@using (Html.BeginForm("Index", "ActionLog", FormMethod.Post))
+{
+    <div style="overflow: auto;">
+        <table>
+            <tr>
+                <td class="label">کد کاربری عامل :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.user_id" name="user_id" />
+                </td>
+            </tr>
+            <tr>
+                @{ 
+                    var type_array = (ActionLog.ActionTypeEnum[])Enum.GetValues(typeof(ActionLog.ActionTypeEnum));
+                }
+                <td class="label">نوع :</td>
+                <td class="minw">
+                    <select name="action_type" onchange="onChangeActionType(this)">
+                        @foreach (var item in type_array)
+                        {
+                            <option value="@((int)item)" is-selected="@((int)ViewBag.action_type == (int)item)">@(ActionLog.GetActionTypeString(item))</option>
+                        }
+                    </select>
+                </td>
+                @{
+                    var source_array = (ActionLog.ActionSourceEnum[])Enum.GetValues(typeof(ActionLog.ActionSourceEnum));
+                }
+                <td class="label">محل تغییر :</td>
+                <td class="minw">
+                    <select name="action_source">
+                        @foreach (var item in source_array)
+                        {
+                            <option value="@((int)item)" is-selected="@((int)ViewBag.action_source == (int)item)">@(ActionLog.GetActionSourceString(item))</option>
+                        }
+                    </select>
+                </td>
+                <td><input type="submit" class="filter" value="فیلتر" /></td>
+                <td style="width:100%;"></td>
+            </tr>
+            <tr id="related_id_row" style="@((int)ViewBag.action_type > -1 ? "" : "display: none")">
+                <td class="label" id="related_id_label">@(ActionLog.GetActionTypeRelatedIDString((int)ViewBag.action_type)) :</td>
+                <td class="minw">
+                    <input id="related_id_input" type="text" style="width:150px;" value="@ViewBag.related_id" name="related_id" />
+                </td>
+            </tr>
+
+        </table>
+    </div>
+    <div style="overflow: auto;">
+        <table>
+            <tr>
+                <th class="minw">
+                    ردیف
+                </th>
+                <th>
+                    کد لاگ
+                </th>
+                <th>
+                     کد کاربر عامل
+                </th>
+                <th>
+                    تاریخ
+                </th>
+                <th>
+                    نوع
+                </th>
+                @if ((int)ViewBag.action_type > -1)
+                {
+                    <th>
+                        @(ActionLog.GetActionTypeRelatedIDString((int)ViewBag.action_type))
+                    </th>
+                }
+                <th>
+                    نوع تغییر
+                </th>
+                <th>
+                    محل تغییر
+                </th>
+                <th>
+                    عملیات
+                </th>
+            </tr>
+            @{
+                int Idx = (int)ViewBag.RowIndexStart;
+            }
+            @foreach (var item in Model)
+            {
+                Idx++;
+                <tr>
+                    <td>
+                        @Idx
+                    </td>
+                    <td>
+                        @item.Id
+                    </td>
+                    <td><a href="/user/index?code=@item.UserID">@item.UserID</a></td>
+                    <td>
+                        <span>@(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.Date))</span><br />
+                        <span>@(item.Date.ToString("HH:mm"))</span>
+                    </td>
+                    <td>
+                        @(ActionLog.GetActionTypeString(item.Type))
+                    </td>
+                    @if ((int)ViewBag.action_type > -1)
+                    {
+                        <td>
+                            @item.RelatedID
+                        </td>
+                    }
+                    <td>
+                        @{ 
+                            if (string.IsNullOrEmpty(item.PreviousData))
+                            {
+                                @:افزودن
+                            }
+                            else if (string.IsNullOrEmpty(item.CurrentData))
+                            {
+                                @:حذف
+                            }
+                            else
+                            {
+                                @:ویرایش
+                            }
+                        }
+                    </td>
+                    <td>
+                        @(ActionLog.GetActionSourceString(item.ActionSource))
+                    </td>
+                    <td>
+                        <a title="مشاهده تغییرات" class="adminicon fa fa-eye" target="_blank" href='@string.Format("/actionlog/detail?id={0}", item.Id)'></a>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+   }
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "ActionLog", new { page, user_id = (int)ViewBag.user_id, action_type = (int)ViewBag.action_type, action_source = (int)ViewBag.action_source, related_id = (long)ViewBag.related_id }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        function onChangeActionType(elem) {
+            var type_id = $(elem).val().toString();
+            $('#related_id_input').val('');
+            if (type_id == "-1") {
+                $('#related_id_row').hide();
+            }
+            else {
+                $('#related_id_label').html(getRelatedIDString(type_id));
+                $('#related_id_row').show();
+            }
+        }
+
+        function getRelatedIDString(type_id) {
+            switch (type_id) {
+                case '@((int)ActionLog.ActionTypeEnum.BankCard)':
+                case '@((int)ActionLog.ActionTypeEnum.User)':
+                    return 'کد کاربری';
+                default:
+                    return '';
+            }
+        }
+    </script>
+}
