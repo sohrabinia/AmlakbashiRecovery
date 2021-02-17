@@ -9,14 +9,16 @@ namespace Amlakbashi.Core.Entities
         [Column("OccupiedTableID")]
         public override long Id { get; set; }
         public long AdvertiseID { get; set; }
+
+        // TODO: fix this
         [ForeignKey("AdvertiseID")]
         public Advertise Advertise;
         public long? ReserveID { get; set; }
         [ForeignKey("ReserveID")]
-        public Reserve Reserve { get; set; }
+        public virtual Reserve Reserve { get; set; }
         public long? ExtrinsicReserveID { get; set; }
         [ForeignKey("ExtrinsicReserveID")]
-        public ExtrinsicReserve ExtrinsicReserve { get; set; }
+        public virtual ExtrinsicReserve ExtrinsicReserve { get; set; }
         public DateTime Date { get; set; }
         public bool IsDeleted { get; set; }
     }

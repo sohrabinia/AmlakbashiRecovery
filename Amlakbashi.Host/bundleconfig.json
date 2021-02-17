@@ -1,4 +1,5 @@
 [
+  // ####################################################### Styles
   {
     "outputFileName": "wwwroot/css/dashboard.min.css",
     "inputFiles": [
@@ -33,46 +34,76 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/css/master-critical.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/portal/portal-shared.css",
+      "wwwroot/resource/css/portal/portal-header.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/master.min.css",
+    "inputFiles": [
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.default.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.core.css",
+      "wwwroot/resource/css/fa-icons.css",
+      "wwwroot/resource/rating/themes/fontawesome-stars.css",
+      "wwwroot/resource/star-rating/star-rating.css",
+      "wwwroot/resource/css/general/chat-popup.css",
+      "wwwroot/resource/css/portal/portal-footer.css",
+      "wwwroot/resource/css/general/message-popup.css",
+      "wwwroot/resource/css/general/login/intlTelInput.css",
+      "wwwroot/resource/css/general/login/login-Popup.css",
+      "wwwroot/resource/css/general/footer.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/search.min.css",
+    "inputFiles": [
+      "wwwroot/Resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/general/home-page-search.css"
+    ]
+  },
+  // ####################################################### Scripts
+  {
     "outputFileName": "wwwroot/js/dashboard.min.js",
     "inputFiles": [
-      "wwwroot/resource/scripts/jquery-2.1.1.min.js",
-      "wwwroot/resource/scripts/jquery.maskedinput.min.js",
-      "wwwroot/resource/scripts/jquery.nicescroll.min.js",
-      "wwwroot/resource/ticker/jquery.ticker.js",
-      "wwwroot/resource/chosen_v1.4.2/chosen.jquery.min.js",
-      "wwwroot/resource/alertify.js-0.3.11/src/alertify.js",
-      "wwwroot/resource/scripts/general/lazy-loading.js",
-      "wwwroot/resource/jquery-confirm/jquery-confirm.min.js",
-      "wwwroot/resource/persian-date-picker/persian-datepicker.js",
-      "wwwroot/resource/Scripts/general/jalali-date-converter.js",
-      "wwwroot/resource/Scripts/general/jalali-date-handler.js",
-      "wwwroot/resource/Scripts/general/jalali-date-picker.js",
-      "wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.js",
-      "wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.plus.js",
-      "wwwroot/resource/Scripts/jquery.plugin.min.js",
-      "wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.all.js",
-      "wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.persian.js",
-      "wwwroot/resource/Scripts/jquery.onmutate.min.js",
-      "wwwroot//resource/rating/jquery.barrating.min.js",
-      //"wwwroot/resource/scripts/general/accommodation-edit-form.js",
-      "wwwroot/resource/scripts/general/ajax-helper.js",
-      "wwwroot/resource/drop-zone-2019/dropzone.js",
-      "wwwroot/resource/scripts/general/client-helper.js",
-      "wwwroot/resource/scripts/general/detail-button.js",
-      "wwwroot/resource/scripts/general/increase-decrease-button.js",
-      "wwwroot/resource/scripts/general/input-validation-helper.js",
-      "wwwroot/resource/scripts/general/loading-indicator.js",
-      "wwwroot/resource/Scripts/general/login/intlTelInput.min.js",
-      "wwwroot/resource/scripts/general/login/login-popup.js",
-      "wwwroot/resource/scripts/general/more-text-button.js",
-      "wwwroot/resource/scripts/general/price-string-generator.js",
-      "wwwroot/resource/scripts/general/rating-detail.js",
-      "wwwroot/resource/scripts/general/string-replace-all.js",
-      "wwwroot/resource/scripts/general/textarea-autoexpand.js",
-      "wwwroot/resource/scripts/general/user-rating.js",
-      "wwwroot/resource/scripts/general/message-popup.js",
-      "wwwroot/resource/scripts/general/confirm-alert-helper.js",
-      "wwwroot//scripts/jquery.unobtrusive-ajax.min.js"
+      //"wwwroot/resource/scripts/jquery-2.1.1.min.js",
+      //"wwwroot/resource/scripts/jquery.maskedinput.min.js",
+      //"wwwroot/resource/scripts/jquery.nicescroll.min.js",
+      //"wwwroot/resource/ticker/jquery.ticker.js",
+      //"wwwroot/resource/chosen_v1.4.2/chosen.jquery.min.js",
+      //"wwwroot/resource/alertify.js-0.3.11/src/alertify.js",
+      //"wwwroot/resource/scripts/general/lazy-loading.js",
+      //"wwwroot/resource/jquery-confirm/jquery-confirm.min.js",
+      //"wwwroot/resource/persian-date-picker/persian-datepicker.js",
+      //"wwwroot/resource/Scripts/general/jalali-date-converter.js",
+      //"wwwroot/resource/Scripts/general/jalali-date-handler.js",
+      //"wwwroot/resource/Scripts/general/jalali-date-picker.js",
+      //"wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.js",
+      //"wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.plus.js",
+      //"wwwroot/resource/Scripts/jquery.plugin.min.js",
+      //"wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.all.js",
+      //"wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.persian.js",
+      //"wwwroot/resource/Scripts/jquery.onmutate.min.js",
+      //"wwwroot//resource/rating/jquery.barrating.min.js",
+      //"wwwroot/resource/scripts/general/ajax-helper.js",
+      //"wwwroot/lib/dropzone/dropzone.js",
+      //"wwwroot/resource/scripts/general/client-helper.js",
+      //"wwwroot/resource/scripts/general/detail-button.js",
+      //"wwwroot/resource/scripts/general/increase-decrease-button.js",
+      //"wwwroot/resource/scripts/general/input-validation-helper.js",
+      //"wwwroot/resource/scripts/general/loading-indicator.js",
+      //"wwwroot/resource/Scripts/general/login/intlTelInput.min.js",
+      //"wwwroot/resource/scripts/general/login/login-popup.js",
+      //"wwwroot/resource/scripts/general/more-text-button.js",
+      //"wwwroot/resource/scripts/general/price-string-generator.js",
+      //"wwwroot/resource/scripts/general/rating-detail.js",
+      //"wwwroot/resource/scripts/general/string-replace-all.js",
+      //"wwwroot/resource/scripts/general/textarea-autoexpand.js",
+      //"wwwroot/resource/scripts/general/user-rating.js",
+      //"wwwroot/resource/scripts/general/message-popup.js",
+      //"wwwroot/resource/scripts/general/confirm-alert-helper.js",
+      //"wwwroot//scripts/jquery.unobtrusive-ajax.min.js"
     ]
   },
   {
@@ -86,6 +117,44 @@
       "wwwroot/resource/scripts/general/search-by-region.js",
       "wwwroot/resource/scripts/general/increase-decrease-button.j",
       "wwwroot/resource/scripts/general/slider-scroll.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/master-defer.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/general/message-popup.js",
+      "wwwroot/resource/alertify.js-0.3.11/src/alertify.js",
+      "wwwroot/Resource/rating/jquery.barrating.min.js",
+      "wwwroot/Resource/Scripts/jquery.scrollTo.min.js",
+      "wwwroot/resource/scripts/general/string-replace-all.js",
+      "wwwroot/resource/scripts/general/ajax-helper.js",
+      "wwwroot/resource/scripts/general/client-helper.js",
+      "wwwroot/resource/scripts/general/loading-indicator.js",
+      "wwwroot/resource/scripts/general/user-rating.js",
+      "wwwroot/resource/scripts/general/input-validation-helper.js",
+      "wwwroot/resource/scripts/general/master.js",
+      "wwwroot/resource/scripts/general/lazy-loading.js",
+      "wwwroot/resource/Scripts/general/login/intlTelInput.min.js",
+      "wwwroot/resource/scripts/general/login/login-popup.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/master.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/jquery-2.1.1.min.js",
+      "wwwroot/resource/scripts/firebase-5.9.4/firebase-app.js",
+      "wwwroot/resource/scripts/firebase-5.9.4/firebase-messaging.js",
+      "wwwroot/resource/scripts/firebase/firebase-initialization.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/search.min.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/scripts/general/home-page-search.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js"
     ]
   }
 ]

@@ -4,6 +4,7 @@ using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Amlakbashi.Data
@@ -55,7 +56,7 @@ namespace Amlakbashi.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("AmlakbashiDB"));
+            optionsBuilder.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("AmlakbashiDB"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -75,6 +76,33 @@ namespace Amlakbashi.Data
                     .WithMany(x => x.Childs)
                     .HasForeignKey(x => x.ParentID);
             });
+
+            //modelBuilder.Entity<DynamicCategory>(entity =>
+            //{
+            //    entity.HasMany(x => x.Advertises)
+            //        .WithMany(x => x.Categories)
+            //        .UsingEntity(x => {
+            //            x.ToTable("DynamicCategoryAdvertises");
+            //        });
+            //});
+
+            modelBuilder.Entity<DynamicCategory>()
+                .HasMany(p => p.Advertises)
+                .WithMany(p => p.Categories)
+                .UsingEntity<Dictionary<string, object>>(
+                    "DynamicCategoryAdvertises",
+                    j => j
+                        .HasOne<Advertise>()
+                        .WithMany()
+                        .HasForeignKey("Advertise_Id")
+                        .HasConstraintName("FK_dbo.DynamicCategoryAdvertises_dbo.Advertises_Advertise_Id")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne<DynamicCategory>()
+                        .WithMany()
+                        .HasForeignKey("DynamicCategory_Id")
+                        .HasConstraintName("FK_dbo.DynamicCategoryAdvertises_dbo.DynamicCategories_DynamicCategory_Id")
+                        .OnDelete(DeleteBehavior.ClientCascade));
         }
     }
 }

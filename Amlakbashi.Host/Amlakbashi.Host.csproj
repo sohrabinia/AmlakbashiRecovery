@@ -80,6 +80,7 @@
   <ItemGroup>
     <Folder Include="Logs\Logs\" />
     <Folder Include="Logs\HangfireLogs\" />
+    <Folder Include="Views\Accomodation\Components\" />
     <Folder Include="wwwroot\Resource\packages\jquery-mobile\images\" />
   </ItemGroup>
 

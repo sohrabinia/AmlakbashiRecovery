@@ -1,4 +1,5 @@
 ﻿@using Entities = Amlakbashi.Core.Entities;
+@inject IUserAccessor userAccessor;
 @{
     var isHomePage = ViewBag.HomePage != null &&
         ViewBag.HomePage;
@@ -32,7 +33,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="offline" href="/offline.html">
     <meta name="theme-color" content="#fdd835" />
-    <link rel='index' title='املاک باشی' href='@string.Format("http{0}://{1}", Request.IsSecureConnection ? "s" : "", Request.Url.Authority)' />
+    <link rel='index' title='املاک باشی' href='@string.Format("http{0}://{1}", Context.Request.Scheme, Context.Request.Host)' />
     <link rel='dns-prefetch' href='//googletagmanager.com' />
     @*<link rel='dns-prefetch' href='//client.crisp.chat' />*@
     <link rel='dns-prefetch' href='//google-analytics.com' />
@@ -59,57 +60,22 @@
             "املاک باشی - اجاره روزانه ویلا و اجاره روزانه سوئیت و آپارتمان مبله";
     }
     <meta name="description" content="@meta_description" />
-
     <meta property="og:locale" content="fa_IR" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="املاک باشی" />
     <meta property="og:title" content="@ViewBag.Title" />
     <meta property="og:description" content="@meta_description" />
-
     <meta name="enamad" content="344312021" />
 
-    @*@MvcHtmlString.Create(
-        Bundle.Css()
-            .Add("/resource/css/portal/portal-shared.css")
-            .Add("/resource/css/portal/portal-header.css")
-            .ForceRelease()
-           .Render("/resource/css_output/minifyportalcriticalcss_v3_2.css"))*@
-    @*<link rel="preload" as="style" onload="this.rel = 'stylesheet'"
-              type="text/css" href="/file/getcss?src=~/resource/css_output/minifyportalcss_v3_9.css" />
-        <noscript>
-            <link rel="stylesheet"
-                  href="/file/getcss?src=~/resource/css_output/minifyportalcss_v3_9.css">
-        </noscript>*@
-
-    @*@MvcHtmlString.Create(
-        Bundle.Css()
-            .Add("/resource/alertify.js-0.3.11/themes/alertify.default.css")
-            .Add("/resource/alertify.js-0.3.11/themes/alertify.core.css?v=1.0")
-            .Add("/resource/css/fa-icons.css")
-            //.Add("/resource/loader.min.css")
-            //.Add("/resource/jquery-confirm/jquery-confirm.min.css?v=1.2")
-            .Add("~/resource/rating/themes/fontawesome-stars.css")
-            .Add("/resource/star-rating/star-rating.css")
-            .Add("/resource/css/general/chat-popup.css")
-            .Add("/resource/css/portal/portal-footer.css")
-            .Add("/resource/css/general/message-popup.css")
-            .Add("/resource/css/general/login/intlTelInput.css")
-            .Add("/resource/css/general/login/login-Popup.css")
-            .Add("/resource/css/general/footer.css")
-            .ForceRelease()
-            .Render("/resource/css_output/minifyportalcss_v6_8.css"))*@
-    @*<link rel="stylesheet" href="~/Resource/star-rating/star-rating.css" />*@
+    <link rel="stylesheet" type="text/css" href="/css/master-critical.min.css">
     @RenderSection("StyleLink", required: false)
     <style>
-        @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/css_output/minifyportalcriticalcss_v3_2.css")))
-        @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/css_output/minifyportalcss_v6_8.css")))
         @RenderSection("StyleBlock", required: false)
     </style>
-    @*****   end style   ****@
 
 </head>
 <body>
-    @Html.Partial("_ImpersonateContainer", new ViewDataDictionary { { "hidden", true } })
+    @await Html.PartialAsync("_ImpersonateContainer", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hidden", true } })
     <div id="loading-icon" class="loading-contianer">
         <div class="ui active large loader loading-icon"></div>
     </div>
@@ -128,44 +94,43 @@
 <div class="master__page">
     @if (ViewBag.LockInPage == null || !ViewBag.LockInPage)
     {
-    <div class="master__header">
-        <div class="master_header-child master_header-logo">
-            <a href="/" title="املاک باشی">
-                <img srcset="/file/resourceimagepng?file_name=@(logoName)-400w 75w,
+        <div class="master__header">
+            <div class="master_header-child master_header-logo">
+                <a href="/" title="املاک باشی">
+                    <img srcset="/file/resourceimagepng?file_name=@(logoName)-400w 75w,
                                 /file/resourceimagepng?file_name=@(logoName)-680w 94w,
                                 /file/resourceimagepng?file_name=@(logoName)-900w 112w,
                                  /file/resourceimagepng?file_name=@(logoName)-1200w 135w"
-                     sizes="(max-width: 400px) 75px,
+                         sizes="(max-width: 400px) 75px,
                                  (max-width: 680px) 94px,
                                  (max-width: 900px) 112px,
                                  135px"
-                     src="/file/resourceimagepng?file_name=@(logoName)-680w" alt="لوگوی املاک باشی" title="املاک باشی">
-            </a>
-            @if (ViewBag.CurrentPage == "AdvertiseCategory" ||
-        ViewBag.CurrentPage == "AdvertiseItem")
-            {
-                @Html.Partial("_MasterSearch");
-            }
-        </div>
-        <div class="master_header-child">
-            <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account" style="">
-                <p></p>
-            </a>
-        </div>
-        <div class="master_header-child">
-            <div onclick="toggleMenu()" class="master__header-menu">
-                <i class="fa fa-bars"></i>
-                <span>منو</span>
+                         src="/file/resourceimagepng?file_name=@(logoName)-680w" alt="لوگوی املاک باشی" title="املاک باشی">
+                </a>
+                @if (ViewBag.CurrentPage == "AdvertiseCategory" || ViewBag.CurrentPage == "AdvertiseItem")
+                {
+                    @await Html.PartialAsync("_MasterSearch");
+                }
+            </div>
+            <div class="master_header-child">
+                <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account" style="">
+                    <p></p>
+                </a>
+            </div>
+            <div class="master_header-child">
+                <div onclick="toggleMenu()" class="master__header-menu">
+                    <i class="fa fa-bars"></i>
+                    <span>منو</span>
+                </div>
             </div>
         </div>
-    </div>
         @RenderSection("TopPin", false)
         <div class="master__menu">
             @if (ViewBag.home == null || !ViewBag.home)
             {
                 <a class="master__menu-item" href="/">صفحه اول</a>
             }
-            @if (User.GetUser().UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+            @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
             {
                 <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=1"> رزرو های من </a>
                 <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی </p>
@@ -176,7 +141,7 @@
             else
             {
                 <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=2"> رزرو های من</a>
-                <a class="master__menu-item" href="@string.Format("/post/personal?userid={0}", User.GetUser().Id)"> آگهی های من</a>
+                <a class="master__menu-item" href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)"> آگهی های من</a>
                 <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی</p>
                 <a class="master__menu-item" href="/contact"> تماس با ما </a>
                 <a class="master__menu-item" href="/post/downloadapp">نصب اپلیکیشن </a>
@@ -196,59 +161,10 @@
     }
     <div style="display: none" id="chat_hidden_holder"></div>
     <input type="hidden" value="0" id="js-support-chat-id">
-    @*****   script   ****@
-    @*@MvcHtmlString.Create(
-        Bundle.JavaScript()
-        .Add("/resource/scripts/jquery-2.1.1.min.js")
-        //.Add("~/Resource/Scripts/jquery.plugin.min.js")
-        //.Add("/resource/scripts/jquery.unobtrusive-ajax.min.js")
-        //.Add("~/Resource/Scripts/jquery.onmutate.min.js")
-        .Add("/resource/scripts/firebase-5.9.4/firebase-app.js")
-        .Add("/resource/scripts/firebase-5.9.4/firebase-messaging.js")
-        //.Add("/resource/scripts/firebase-5.9.4/firebase-database.js")
-        .Add("/resource/scripts/firebase/firebase-initialization.js")
-        .ForceRelease()
-        .Render("/resource/js_output/minifyjs_v10_9.js"))*@
-
-    <script src="/file/getjs?src=/resource/js_output/minifyjsdefer_v10_5.js" defer></script>
-    @*@MvcHtmlString.Create(
-        Bundle.JavaScript()
-        .Add("/resource/scripts/general/message-popup.js")
-        .Add("/resource/alertify.js-0.3.11/src/alertify.js")
-        .Add("/Resource/rating/jquery.barrating.min.js")
-        .Add("/Resource/Scripts/jquery.scrollTo.min.js")
-        //.Add("/resource/fingerprint/fingerprint.js")
-        .Add("/resource/scripts/general/string-replace-all.js")
-        //.Add("/resource/scripts/general/accommodation-item.js")
-        .Add("/resource/scripts/general/ajax-helper.js")
-        .Add("/resource/scripts/general/client-helper.js")
-        .Add("/resource/scripts/general/loading-indicator.js")
-        .Add("/resource/scripts/general/user-rating.js")
-        .Add("/resource/scripts/general/input-validation-helper.js")
-        .Add("/resource/scripts/general/master.js")
-        .Add("/resource/scripts/general/lazy-loading.js")
-        .Add("/resource/Scripts/general/login/intlTelInput.min.js")
-        .Add("/resource/scripts/general/login/login-popup.js")
-        .ForceRelease()
-        .Render("/resource/js_output/minifyjsdefer_v10_5.js"))*@
-    @*****   end script   ****@
-    @*<script src="/resource/scripts/firebase-5.9.4/firebase-app.js"></script>
-        <script src="/resource/scripts/firebase-5.9.4/firebase-messaging.js"></script>
-        <script src="/resource/scripts/firebase-5.9.4/firebase-database.js"></script>*@
-    @*<script>
-            // Initialize Firebase
-            var config = {
-            apiKey: "AIzaSyCaqJAXNu2zAqMJLqk1EF45PAx6QYtcqZg",
-            authDomain: "amlakbashi-7e6b2.firebaseapp.com",
-            databaseURL: "https://amlakbashi-7e6b2.firebaseio.com",
-            projectId: "amlakbashi-7e6b2",
-            storageBucket: "amlakbashi-7e6b2.appspot.com",
-            messagingSenderId: "173434342546"
-            };
-            firebase.initializeApp(config);
-        </script>*@
+    <link rel="stylesheet" type="text/css" href="/css/master.min.css">
+    <script src="/js/master-defer.js" defer></script>
+    <script src="/js/master.js"></script>
     <script type="text/javascript">
-            @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/js_output/minifyjs_v10_9.js")))
             var lockInPage = @(ViewBag.LockInPage != null && ViewBag.LockInPage == true ? "true" : "false");
             var isHomePage = @(ViewBag.home == null || !ViewBag.home ? "false" : "true");
     </script>
@@ -257,7 +173,7 @@
     <!--Reference the SignalR library. -->
     <script src="/file/getjs?src=/Scripts/jquery.signalR-2.4.1.min.js"></script>
     <!--Reference the autogenerated SignalR hub script. -->
-    <script src="~/signalr/hubs"></script>
+    <script src="/js/signalr/dist/browser/signalr.min.js"></script>
     @RenderSection("ScriptBlock", required: false)
     <script type="text/javascript">
         $(document).ready(function () {
@@ -369,7 +285,7 @@
     @*<img src="/file/loading" style="margin: auto;" />*@
     <!--</div>
     </div>-->
-    @Html.Partial("_footer")
-    @Html.Partial("_LoginPopup")
+    @await Html.PartialAsync("_footer")
+    @await Html.PartialAsync("_LoginPopup")
 </body>
 </html>

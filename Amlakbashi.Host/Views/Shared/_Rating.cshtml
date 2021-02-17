@@ -1,24 +1,14 @@
 ﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.UserRatingDTO
+@inject IUserAccessor userAccessor;
 @{
     var user_is_authenticated = User.Identity.IsAuthenticated;
-    int user_id = ViewBag.user_id == null ? User.GetUser().Id :
+    int user_id = ViewBag.user_id == null ? userAccessor.CurrentUser.Id :
         ViewBag.user_id;
-}
-@helper IsSelected(bool state)
-{
-if (state)
-{
-        @:selected
-    }
-else
-{
-        @:
-    }
 }
 <div class="comment__new">
     <input type="hidden" id="AdvertiseID" value="@Model.advertiseId" />
     <div id="write_comment_root" style="@(user_is_authenticated ? "" : "display: none;")">
-        <input class="js-cm-mobile" type="hidden" value="@User.GetUser().Mobile" />
+        <input class="js-cm-mobile" type="hidden" value="@userAccessor.CurrentUser.Mobile" />
         <input id="UserId" value="@user_id" type="hidden" />
         <div>
             <div>لطفا با امتیاز دهی و نظر درباره اقامتگاه دیگران را راهنمایی کنید</div>
@@ -31,12 +21,12 @@ else
                         <div class="comment__score-label">@userRating.typeString</div>
                         <div class="comment__score-value">
                             <select class="score-rating" report_id="@((int)userRating.type)" title="@userRating.typeString">
-                                <option @IsSelected(userRating.rating == 0) value=""></option>
-                                <option @IsSelected(userRating.rating == 1) value="1">خیلی ضعیف</option>
-                                <option @IsSelected(userRating.rating == 2) value="2">ضعیف</option>
-                                <option @IsSelected(userRating.rating == 3) value="3">متوسط</option>
-                                <option @IsSelected(userRating.rating == 4) value="4">خوب</option>
-                                <option @IsSelected(userRating.rating == 5) value="5">خیلی خوب</option>
+                                <option is-selected="@(userRating.rating == 0)" value=""></option>
+                                <option is-selected="@(userRating.rating == 1)" value="1">خیلی ضعیف</option>
+                                <option is-selected="@(userRating.rating == 2)" value="2">ضعیف</option>
+                                <option is-selected="@(userRating.rating == 3)" value="3">متوسط</option>
+                                <option is-selected="@(userRating.rating == 4)" value="4">خوب</option>
+                                <option is-selected="@(userRating.rating == 5)" value="5">خیلی خوب</option>
                             </select>
                         </div>
                     </div>
@@ -46,21 +36,19 @@ else
         @{
             var comment = ViewBag.comment;
         }
-        @using (Ajax.BeginForm("AddComment", "Advertise",new { }, new AjaxOptions() {OnSuccess="onAddComment" }, new { id = "addCommentForm", method = "post", enctype = "multipart/form-data"}))
-        {
+        <form id="addCommentForm" method="post" enctype="multipart/form-data" asp-action="AddComment" asp-controller="Advertise" data-ajax="true" data-ajax-success="onAddComment">
             <input type="hidden" name="advertiseID" value="@Model.advertiseId" />
             <input type="hidden" name="user_id" value="@user_id" />
-                <div class="comment__new-item">
-                    <div class="comment__new-label">متن نظر خود را @(comment == null || string.IsNullOrEmpty(comment.Text) ? "وارد" : "ویرایش") کنید</div>
-                    <div class="comment__new-value">
-                        <textarea name="text" class="js-cm-text">@(comment != null ? comment.Text : "")</textarea>
-                    </div>
+            <div class="comment__new-item">
+                <div class="comment__new-label">متن نظر خود را @(comment == null || string.IsNullOrEmpty(comment.Text) ? "وارد" : "ویرایش") کنید</div>
+                <div class="comment__new-value">
+                    <textarea name="text" class="js-cm-text">@(comment != null ? comment.Text : "")</textarea>
                 </div>
-
-                <div class="comment__new-submit">
-                    <div style="background-color:#fdd835;border-radius:4px;width: 100px;padding: 5px;text-align:center;cursor: pointer;" onclick="add_comment(@(user_id))">@(comment == null || string.IsNullOrEmpty(comment.Text) ? "ثبت" : "ویرایش") نظر</div>
-                </div>
-        }
+            </div>
+            <div class="comment__new-submit">
+                <div style="background-color:#fdd835;border-radius:4px;width: 100px;padding: 5px;text-align:center;cursor: pointer;" onclick="add_comment(@(user_id))">@(comment == null || string.IsNullOrEmpty(comment.Text) ? "ثبت" : "ویرایش") نظر</div>
+            </div>
+        </form>
     </div>
     <div class="comment__login" style="@(user_is_authenticated ? "display: none;" : "")">
         <input id="UserId" value="0" type="hidden" />

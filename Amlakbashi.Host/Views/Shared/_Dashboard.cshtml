@@ -28,7 +28,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="offline" href="/offline.html">
     <meta name="theme-color" content="#fdd835" />
-    <link rel='index' title='املاک باشی' href='@string.Format("http{0}://{1}", Request.IsSecureConnection ? "s" : "", Request.Url.Authority)' />
+    <link rel='index' title='املاک باشی' href='@string.Format("http{0}://{1}", Context.Request.Scheme, Context.Request.Host)' />
     <meta name="viewport" content="width=device-width, minimum-scale=0.25, maximum-scale=1.0, initial-scale=1.0" />
     <meta name="coverage" content="Worldwide" />
     <meta name="robots" content="index,follow,all" />

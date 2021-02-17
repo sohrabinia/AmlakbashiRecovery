@@ -1,5 +1,4 @@
-﻿
-@using Amlakbashi.Core.DTOs.AccommodationDTOs;
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs;
 @using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 @model IEnumerable<AccommodationCardDTO>
 
@@ -30,7 +29,7 @@
             var capacity = item.MinCapacity == item.MaxCapacity ? item.MinCapacity + " نفر" : item.MinCapacity + "-" + item.MaxCapacity + " نفر";
             var rating = item.OverallRate;
             var favourited = item.Favourited;
-            var initial_loaded_img = !all_images_lazy && counter <= (Request.Browser.IsMobileDevice ? 1 : 4);
+            var initial_loaded_img = !all_images_lazy && counter <= (Context.Request.IsMobileBrowser() ? 1 : 4);
             var img_src_to_show = initial_loaded_img ? img_src : "/file/resourceimagepng?file_name=lazy-16_9";
             var img_data_source = initial_loaded_img ? "" : " data-src=" + img_src;
             int queryStringIndex = 0;

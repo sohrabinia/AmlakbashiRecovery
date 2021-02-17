@@ -1,4 +1,5 @@
-﻿<div class="home-page__search-container">
+﻿@using Amlakbashi.Core.DTOs.CategoryDTOs; 
+<div class="home-page__search-container">
     @*<div class="home-page__search-empty-space"></div>*@
     <h1 class="home-page__search-title">اجاره روزانه خانه ، اجاره آنلاین ویلا و سوئیت در سراسر ایران</h1>
     <div class="home-page__search-box">
@@ -8,7 +9,7 @@
     </div>
     <div class="home-page__search-list-box">
         <div class="home-page__search-list-result-container">
-            @Html.Partial("_SearchTable", new ViewDataDictionary())
+            @await Html.PartialAsync("_SearchTable", new List<SearchTableDTO>()))
         </div>
         <div class="home-page__search-list-most-view-parent">
             <div class="home-page__search-list-most-view-label">مناطق پر بازدید:</div>
@@ -41,7 +42,7 @@
             </div>
             <div class="home-page__search-list-box js-dont-close" style="height: 70%;overflow-y: scroll;padding: 15px 0;display:flex;flex-flow:column;">
                 <div class="home-page__search-list-result-container">
-                    @Html.Partial("_SearchTable", new ViewDataDictionary())
+                    @await Html.PartialAsync("_SearchTable", new List<SearchTableDTO>()))
                 </div>
                 <div class="home-page__search-list-most-view-parent">
                     <div class="home-page__search-list-most-view-label">مناطق پر بازدید:</div>
@@ -56,12 +57,12 @@
         </div>
     </div>
     <div class="home-page__date-container">
-        @Html.Partial("_DatePicker", null, new ViewDataDictionary { { "id", "main-date-picker-from" }, { "class", "main-date-picker" } })
+        @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker-from" }, { "class", "main-date-picker" } })
         <div onclick="showFromDatePicker()" class="home-page__date-input-container">
             <input id="from_date_date_picker" readonly placeholder="تاریخ ورود" class="home-page__date-input" type="text" />
             <i onclick="clearSearch()" class="home-page__input-icon fa fa-angle-down"></i>
         </div>
-        @Html.Partial("_DatePicker", null, new ViewDataDictionary { { "id", "main-date-picker-to" }, { "class", "main-date-picker" } })
+        @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker-to" }, { "class", "main-date-picker" } })
         <div onclick="showToDatePicker()" class="home-page__date-input-container">
             <input id="to_date_date_picker" readonly placeholder="تاریخ خروج" class="home-page__date-input" type="text" />
             <i onclick="clearSearch()" class="home-page__input-icon fa fa-angle-down"></i>
