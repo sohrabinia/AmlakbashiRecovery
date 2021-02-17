@@ -369,7 +369,7 @@ a.dashboard__item_account:last-child {
 }
 a.dashboard__item_account:hover {
     background: #fdc831;
-    color: 363cb0;
+    color: #363cb0;
     transform: scale(.96);
 }
 .dashboard__item_account i{
@@ -2485,7 +2485,7 @@ comment-item__title-container {
     margin-left: 10px;
 }
 .home-page__favourite-button i {
-    color: rgb(237 184 103);
+    color: rgb(237, 184, 103);
 }
 .box-min-max-night p {
     text-decoration: none;
