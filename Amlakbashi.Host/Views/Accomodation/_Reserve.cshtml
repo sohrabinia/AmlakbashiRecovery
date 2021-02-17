@@ -1,0 +1,87 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs.ReservePopupDTO
+
+<div class="advertise-page__reserve-container">
+	<div class="advertise-page__reserve-header" style="@(ViewBag.forceHeaderShown != null && ViewBag.forceHeaderShown ? "display:flex" : "")">
+        <div class="advertise-page__reserve-header-text">رزرو</div>
+        <div onclick="hideReserveContainer()" class="advertise-page__reserve-close-btn">
+            <i class="fa fa-times"></i>
+        </div>
+    </div>
+    <p class="advertise-page__tip-parent" style="border:none;font: 12px Liransans;">تاریخ شروع و پایان سفر را انتخاب کنید:</p>
+    <div class="item-content__reserve-container">
+        <div class="item-content__reserve-mid">
+            <div class="item-content__reserve-range-container">
+                <div onclick="showDatePicker()" class="item-content__reserve-input" style="cursor:pointer;">
+                    @*<span>تاریخ سفر:</span>*@
+                    <div class="item-content__reserve-date-input">
+                        <p id="js-from-date-label" class="item-content__reserve-date-input-label">ورود</p>
+                        <p class="item-content__reserve-date-input-arrow">⟵</p>
+                        <p id="js-to-date-label" class="item-content__reserve-date-input-label">خروج</p>
+                    </div>
+                    <i class="fa fa-calendar-alt"></i>
+                </div>
+            </div>
+            <div class="item-content__reserve-input">
+                @*<span>تعداد نفرات:</span>*@
+                @*<select id="guest_count">*@
+                @{
+                    var max_guest_count = Model.Capacity + Model.MoreThanCapacity;
+                    @*for (int i = 0; i <= max_guest_count; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }*@
+                }
+                @*</select>*@
+                <div class="advertise-page__guest-select-item">
+                    <i class="fa fa-plus input-plus-button" onclick="clickGuestIncDec(this)" data-action="plus"></i>
+                    <input id="guest_count" style="text-align:center;" onpaste="onChangeGuestCount(this)" onkeyup="onChangeGuestCount(this)" onchange="onChangeGuestCount(this)" class="inc_dec_number" type="number" min="0" max="@max_guest_count" value="0">
+                    <i class="fa fa-minus input-minus-button" onclick="clickGuestIncDec(this)" data-action="minus"></i>
+                </div>
+                <div style="margin: 10px;font: 13px Miransans;">نفر</div>
+                <i class="fa fa-users"></i>
+            </div>
+            <div class="item-content__reserve-label box-reserve__details-reserve">
+                    <p class="normal_label" id="from_date_label"></p>
+                    <p class="normal_label" id="to_date_label"></p>
+                    <p class="normal_label" id="days_label"></p>
+                <p class="normal_label" id="reserve_price_label" style="display:none;margin:0;background-color:unset;"></p>
+            </div>
+        </div>
+    </div>
+    <div class="advertise-page__tip-parent">
+        <div id="js-instant-reserve-info" style="display:none" @*style="display:none;width:80%;margin:0 auto;margin-bottom:10px;border-radius:5px;border: 1px solid #242424; padding:5px;flex-flow:row;align-items:center;justify-content:space-around"*@>
+            <div class="advertise-page__reserve-tip" style="display:flex;align-items:center;">
+                <i style="color:#DF7549" class="fas fa-bolt"></i>
+                <div style="display:flex;flex-flow:column;width:100%;">
+                    <span @*style="color:#34A853;"*@>رزرو آنی (بدون نیاز به تایید میزبان)</span>
+                    @*<span style="padding-top:2px;">حداکثر شروع سفر: <span id="js-mxrsrvstart-label"></span></span>*@
+                </div>
+            </div>
+        </div>
+        <div class="advertise-page__reserve-tip" style="display:none;" id="js-normal-reserve-info">
+            @*<div class="advertise-page__reserve-tip-label">درخواست رزرو رایگان میباشد</div>*@
+                <p><i class="fa fa-info-circle" style="color:#242424;"></i>امکان بازدید برای اقامت های طولانی مدت</p>
+        </div>
+        @{
+            int discount = Model.DiscountData.Percent;
+            string date_string = Model.DiscountData.DateString;
+            if (discount > 0)
+            {
+                <div class="advertise-page__discount-label advertise-page__reserve-tip">
+                    <p><i class="fa fa-percent" style="font-size:12px;margin-left: 8px;color:#ea4335"></i>@(discount) درصد تخفیف از @date_string</p>
+                </div>
+            }
+        }
+    </div>
+    @Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" } })
+    <div class="item-content__reserve-bottom">
+        <div class="item-content__reserve-btn" id="reserve-request-button" onclick="checkReserve(true)">
+            
+            <p class="js-reserve-req-title"><i class="js-reserve-req-icon fa fa-calendar-check"></i>درخواست رزرو</p>
+        </div>
+        @if (ViewBag.forceHeaderShown == null || !ViewBag.forceHeaderShown)
+        {
+            <div class="advertise-page__reserve-free-ribbon advertise-page__reserve-free-ribon-desktop">رایگان</div>
+        }
+    </div>
+</div>

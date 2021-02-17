@@ -1,0 +1,207 @@
+﻿
+@model Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs.AmenitiesDTO
+
+@if (Model.Bathroom)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>حمام</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <i class="fa fa-bath"></i>
+        </div>
+    </div>
+}
+@if (Model.Sauna)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>سونا</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/sauna" alt="سونا" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.Jacuzzi)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>جکوزی</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/jacuzzi" alt="جکوزی" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.TV)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>تلویزیون</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <i class="fa fa-tv"></i>
+        </div>
+    </div>
+}
+@if (Model.SoundSystem)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>ضبط و باند</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/sound_system" alt="ضبط و باند" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.Wifi)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>وای فای</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <i class="fa fa-wifi"></i>
+        </div>
+    </div>
+}
+@if (Model.WashingMachine)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>لباسشویی</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/washing_machine" alt="ماشین لباسشویی" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.Refrigerator)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>یخچال</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/refrigerator" alt="یخچال" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.Oven)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>اجاق گاز</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/oven" alt="اجاق گاز" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.MicrowaveOven)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>مایکروویو</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/microwave_oven" alt="مایکروویو" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.KitchenHood)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>هود</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/kitchen_hood" alt="هود آشپرخانه" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.KitchenUtensils)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>ظروف</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <i class="fas fa-utensils"></i>
+        </div>
+    </div>
+}
+@if (Model.TeaMaker)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>چای ساز</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/tea_maker" alt="چای ساز" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.Hairdryer)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>سشوار</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/hairdryer" alt="سشوار" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.PoolTable)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>بیلیارد</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/pool_table" alt="بیلیارد" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.Foosball)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>فوتبال دستی</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <img src="/file/resourceimagepng?file_name=icons/foosball" alt="فوتبال دستی" width="32" height="32" />
+        </div>
+    </div>
+}
+@if (Model.Golf)
+{
+    <div class="advertise-page__amenities-detail-item">
+        <div style="display: flex; flex-flow: column-reverse; align-items: center">
+            <div>
+                <span>گلف</span>
+                <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i>
+            </div>
+            <i class="fa fa-golf-ball"></i>
+        </div>
+    </div>
+}

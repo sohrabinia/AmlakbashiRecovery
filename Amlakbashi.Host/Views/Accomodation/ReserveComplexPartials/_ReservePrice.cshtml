@@ -1,0 +1,58 @@
+﻿
+@model Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs.PriceDTO
+
+@if (ViewBag.DailyPrice != 0)
+{
+    <div class="advertie-page__price-item">
+        <span class="advertise-page__price-title">
+            قیمت روزهای عادی:
+        </span>
+        <span class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.DailyPrice) تومان
+        </span>
+    </div>
+}
+@if (Model.HolidayPrice != 0)
+{
+    <div class="advertie-page__price-item">
+        <span class="advertise-page__price-title">
+            قیمت روزهای تعطیل:
+        </span>
+        <span class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.HolidayPrice) تومان
+        </span>
+    </div>
+}
+@if (Model.HolidayPikePrice != 0)
+{
+    <div class="advertie-page__price-item">
+        <span class="advertise-page__price-title">
+            قیمت پیک تعطیلات
+        </span>
+        <span class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.HolidayPikePrice) تومان
+        </span>
+    </div>
+}
+@if (Model.RentPrice != 0)
+{
+    <div class="advertie-page__price-item">
+        <span class="advertise-page__price-title">
+            اجاره ماهیانه:
+        </span>
+        <span class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.RentPrice) تومان
+        </span>
+    </div>
+}
+@if (Model.MoreThanCapacityPrice != 0)
+{
+    <div class="advertie-page__price-item">
+        <span class="advertise-page__price-title">
+            هزینه هر مهمان بیشتر:
+        </span>
+        <span class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.MoreThanCapacityPrice) تومان
+        </span>
+    </div>
+}

@@ -1,0 +1,116 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+@using Entities = Amlakbashi.Core.Entities;
+@using Amlakbashi.Core.Common.Utilities; 
+@inject IUserAccessor userAccessor;
+
+@model AccommodationItemDTO
+
+@{
+    var owner = Model.AccUser;
+}
+
+<p class="advertise-page__comment-header">
+    نظرات مهمانان (@(StringUtility.EnglishNumberToPersian(Model.Comments.Count.ToString())) مهمان)
+</p>
+
+@if (Model.Comments.Count > 0)
+{
+    long temp_reserve_id = Model.SuspendedCommentReserveId;
+    var mySuspendedComment = Model.SuspendedComment;
+    <div class="advertise-page__comment-container">
+        @if (mySuspendedComment != null && !string.IsNullOrEmpty(mySuspendedComment.SuspendReason))
+        {
+            <a href="/reserve/reserveitemmanager?selecttype=1@(temp_reserve_id > 0 ? "&reserve_id=" + temp_reserve_id : "")" style="font:13px Miransans;text-decoration:none;color:#EA4335">
+                <p>نظر شما به این اقامتگاه به دلیل زیر تایید نشده:</p>
+                <p>@mySuspendedComment.SuspendReason</p>
+                <p>برای اصلاح نظر خود کلیک کنید</p>
+            </a>
+        }
+        @for (int i = 0; i < Model.Comments.Count; i++)
+        {
+            var comment = Model.Comments[i];
+            var sum_scr = comment.ReportItems == null ? 0 : (float)comment.ReportItems.Sum(x => x.Score);
+            var count_scr = comment.ReportItems == null ? 0 : (float)comment.ReportItems.Count();
+            var average_score = comment.ReportItems == null ? 0 : (sum_scr / count_scr);
+            var user = comment.User;
+            var reply = comment.ReplyComment;
+            <div style="@(i > 2 ? "display:none" : "")" class="advertise-page__comment-item@(i == 2 ? " js-comment-last-shown" : "")">
+                <div class="advertise-page__comment-item-container">
+                    <div class="advertise-page__comment-title">
+                        <div class="advertise-page__comment-title-image">
+                            @if (user.PhotoID > 0 && user.PhotoStatus == (int)Entities.User.UserPhotoState.publish)
+                            {
+                                <img style="border-radius:90px;" src='@string.Format("/عکس-پروفایل_کوچک-{0}", user.PhotoID)' alt='@(string.Format("عکس پروفایل {0}", user.FName))' ‌ width="40" height="40" />
+                            }
+                            else
+                            {
+                                <i class="fa fa-user-circle"></i>
+                            }
+                        </div>
+                        <div class="advertise-page__comment-title-info">
+                            <p>@user.FName</p>
+                            <p>@StringUtility.EnglishNumberToPersian(DateTimeUtility.ConvertDate(comment.Comment.CreateDate))</p>
+                        </div>
+                        <div>
+                            @Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) {
+                                       { "score", average_score },
+                                       { "onclick", "showRatingDetail(" + Model.Id + "," + comment.Comment.SenderUserID +")" }
+                                       })
+                        </div>
+                    </div>
+                    <p class="advertise-page__comment-content">
+                           @comment.Comment.Text
+                    </p>
+                </div>
+        @if (reply != null && reply.Status != (int)Comment.CommentStatus.ready)
+        {
+            <div class="advertise-page__comment-reply">
+                <div class="advertise-page__comment-title-info">پاسخ میزبان:</div>
+                @if (reply.Status == Comment.CommentStatus.suspend &&
+                !string.IsNullOrEmpty(reply.SuspendReason))
+                {
+                    if (reply.SenderUserID == userAccessor.CurrentUser.Id)
+                    {
+                        <a href="/comment/advertisecommentdetail?id=@Model.Id#comment-@comment.Comment.Id" style="font:13px Miransans;text-decoration:none;color:#EA4335">
+                            <p>پاسخ شما به این نظر به دلیل زیر تایید نشده:</p>
+                            <p>@reply.SuspendReason</p>
+                            <p>برای مدیریت نظرات آگهی و اصلاح پاسخ خود کلیک کنید</p>
+                        </a>
+                    }
+                }
+                else if (reply.Status == Comment.CommentStatus.publish)
+                {
+                    <div class="advertise-page_comment-rply-style">
+                        <div class="advertise-page__comment-title">
+                            <div class="advertise-page__comment-title-image">
+                                @if (owner.PhotoID > 0 && owner.PhotoStatus == (int)Entities.User.UserPhotoState.publish)
+                                {
+                                    <img style="border-radius:90px;" src='@string.Format("/عکس-پروفایل_کوچک-{0}", owner.PhotoID)' alt='@(string.Format("عکس پروفایل {0}", owner.FullName))' ‌ width="40" height="40" />
+                                }
+                                else
+                                {
+                                    <i class="fa fa-user-circle"></i>
+                                }
+                            </div>
+                            <div class="advertise-page__comment-title-info">
+                                <p>@owner.FullName</p>
+                                <p>@StringUtility.EnglishNumberToPersian(DateTimeUtility.ConvertDate(reply.CreateDate))</p>
+                            </div>
+                        </div>
+                        <p class="advertise-page__comment-content" >@reply.Text</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+        @if (Model.Comments.Count > 3)
+        {
+            <p id="js-more-comment-btn" class="advertise-page__more-comment-btn" onclick="moreComments()">نظرات بیشتر »</p>
+        }
+    </div>
+}
+else
+{
+    <p class="advertise-page__no-comment-label">هنوز نظری ثبت نشده</p>
+}

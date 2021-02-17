@@ -1,0 +1,96 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+
+@model AccommodationItemDTO
+
+@{
+    var capacityString = string.Empty;
+    if (Model.AdvertiseMode != Advertise.AdvertiseMode.Parent)
+    {
+        capacityString = Model.Capacity.MoreThanCapacity > 0 ?
+            Model.Capacity.Capacity + " نفر مجاز + " + Model.Capacity.MoreThanCapacity + " نفر اضافه" :
+            Model.Capacity.Capacity + " مهمان";
+    }
+}
+
+<div class="advertise-page__basic-properties-container">
+    @if (!string.IsNullOrEmpty(capacityString))
+    {
+        <p class="advertise-page__basic-property-item"><i class="fa fa-users"></i>@capacityString</p>
+    }
+    @if (Model.Room.Room != 0)
+    {
+        <p class="advertise-page__basic-property-item"><i class="fa fa-columns"></i>@Model.Room.Room اتاق</p>
+    }
+    @if (Model.BuildingSize.Metrazh != 0)
+    {
+<p class="advertise-page__basic-property-item"><i class="fa fa-building"></i>بنا : @Model.BuildingSize.Metrazh متر</p>
+    }
+    @if (Model.LandArea.LandArea != 0)
+    {
+        <p class="advertise-page__basic-property-item">
+            <i class="fa fa-chart-area"></i>زمین: @Model.LandArea.LandArea متر
+        </p>
+    }
+    @if (Model.Parking.Parking != Advertise.ParkingItems.Unset && Model.Parking.Parking != Advertise.ParkingItems.Unset)
+    {
+        <p class="advertise-page__basic-property-item">
+            @switch ((Advertise.ParkingItems)Model.Parking.Parking)
+            {
+                case Advertise.ParkingItems.One:
+                    <i class="fa fa-warehouse"></i>@("1 پارکینگ")
+                    break;
+                case Advertise.ParkingItems.Two:
+                    <i class="fa fa-warehouse"></i>@("2 پارکینگ")
+                    break;
+                case Advertise.ParkingItems.Three:
+                    <i class="fa fa-warehouse"></i>@("3 پارکینگ")
+                    break;
+                case Advertise.ParkingItems.MoreThanThree:
+                    <i class="fa fa-warehouse"></i>@("بیشتر از 3 پارکینگ")
+                    break;
+                case Advertise.ParkingItems.Jointly:
+                    <i class="fa fa-warehouse"></i>@("پارکینگ مشاع")
+                    break;
+                case Advertise.ParkingItems.NoParking:
+                    <i class="fa fa-warehouse"></i>@("بدون پارکینگ")
+                    break;
+                default:
+                    break;
+            }
+        </p>
+    }
+    @if (Model.Bed.SingleBed != 0)
+    {
+        <p class="advertise-page__basic-property-item"><i class="fa fa-bed"></i>@Model.Bed.SingleBed تخت یک نفره</p>
+    }
+    @if (Model.Bed.DoublesBed != 0)
+    {
+        <div class="advertise-page__basic-property-item">
+            <img width="24" height="24" src="/file/resourceimagepng?file_name=icons/double-bed" alt="تخت دونفره" />@Model.Bed.DoublesBed تخت دو نفره
+        </div>
+    }
+    @if (Model.Floor.Floor != Advertise.FloorItems.Unset)
+    {
+<p class="advertise-page__basic-property-item">
+    @switch (Model.Floor.Floor)
+    {
+        case Advertise.FloorItems.Underground:
+            <i class="fa fa-building"></i>@("طبقه: زیرزمین")
+            break;
+        case Advertise.FloorItems.Ground:
+            <i class="fa fa-building"></i>@("طبقه: همکف")
+            break;
+        case Advertise.FloorItems.MoreThan10th:
+            <i class="fa fa-building"></i>@("طبقه: بالاتر از 10")
+            break;
+        default:
+            <i class="fa fa-building"></i>@("طبقه:") @((int)Model.Floor.Floor)
+            break;
+    }
+</p>
+    }
+    @if (Model.Amenities.Pool != false)
+    {
+        <p class="advertise-page__basic-property-item"><i class="fa fa-swimming-pool"></i>استخر </p>
+    }
+</div>

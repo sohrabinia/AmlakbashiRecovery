@@ -1,0 +1,142 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.ExtraFormDTO
+
+@{
+    ViewBag.AddEditAccPage = true;
+    ViewBag.Title = "کارشناسی اقامتگاه";
+    ViewBag.keywords = "ثبت رزرو, ثبت رایگاه آگهی, ثبت آپارتمان مبله, ثبت سوئیت, ثبت ویلا اجاره ای, ثبت آگهی رزرو";
+    ViewBag.Description = "ثبت رایگان اقامتگاه برای اجاره روزانه و هفتگی - ثبت آگهی آپارتمان و سوئیت مبله - ثبت اجاره ویلا - ثبت آگهی هتل و مسافرخانه";
+    Layout = "~/Views/Shared/_masterAdmin.cshtml";
+    ViewBag.elevator = Model.elevator;
+}
+
+@section styleLink{
+    <link rel="stylesheet" href="~/Resource/css/dashboard/numberInput.css">
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-public-style-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-extra-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/admin-extra-admin.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/admin-complex-from.css" />
+}
+
+@{
+    var hasBuildingPart = Model.buildingSize != null || Model.landArea != null || Model.capacity != null ||
+        Model.room != null || Model.parking != null || Model.bed != null;
+}
+
+<div class="add-advertise-static-container">
+    <div class="add-static-title">
+        کارشناسی اقامتگاه
+    </div>
+    <div class="box-step-by-step">
+        <div id="form-step-button-container" class="form-step-button-container">
+            <div onclick="checkHaveChangeAdmin(1, @Model.Id)" class="form-step-button">اطلاعات اولیه</div>
+            <div onclick="checkHaveChangeAdmin(2, @Model.Id)" class="form-step-button">مشخصات کلی</div>
+            <div class="form-step-button form-step-button-selected">مشخصات تکمیلی</div>
+            @if (Model.advertiseMode == Advertise.AdvertiseMode.Parent)
+            {
+                if (ViewBag.type == Advertise.AdvertiseType.Complex ||
+                    ViewBag.type == Advertise.AdvertiseType.HotelApartment)
+                {
+                    <div onclick="checkHaveChangeAdmin(4, @Model.Id, 0)" class="form-step-button">مدیریت واحد ها</div>
+                }
+                else
+                {
+                    <div onclick="checkHaveChangeAdmin(4, @Model.Id, 1)" class="form-step-button">مدیریت اتاق ها</div>
+                }
+            }
+            <div onclick="checkHaveChangeAdmin(5, @Model.Id)" class="form-step-button">وضعیت کارشناسی</div>
+        </div>
+    </div>
+    @using (Html.BeginForm("adminextraform", "accomodation", new { Id = Model.Id }, FormMethod.Post, true, new { enctype = "multipart/form-data", id = "AccForm" }))
+    {
+        <input type="hidden" value="false" name="forceSave" id="forceSaveInput">
+        <input type="hidden" value="@(ViewBag.tab == null ? 0 : ViewBag.tab)" name="tab" id="tabInput" />
+        <div class="form-step" id="_AccFormGeneralElements" data-title="مشخصات کلی" style="display: block;">
+            @if (Model.price != null)
+            {
+                <div class="static-advertise advetise-form__part static-advertie__price-box">
+                    <p class="static-advertise__title"><i class="fa fa-dollar-sign"></i>اطلاعات قیمت اجاره روزانه اقامتگاه را ثبت کنید</p>
+                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPriceInput.cshtml", Model.price)
+                </div>
+            }
+            @if (hasBuildingPart == true)
+            {
+                <div class="static-advertise advetise-form__part advertise-form_part-details">
+                    <p class="static-advertise__title"><i class="fa fa-search-plus"></i>مشخصات اقامتگاه را ثبت کنید</p>
+                    @if (Model.buildingSize != null)
+                    {
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "متراژ بنا را مشخص کنید " }, { "name", "Metrazh" }, { "min", "0" }, { "data-allow-zero", "0" }, { "class", (Model.buildingSize.mandatory ? "js-mandatory" : "") }, { "value", Model.buildingSize.Metrazh }, { "valueData", Model.buildingSize.Metrazh.ToString() }, { "hasError", ViewData.ModelState["Metrazh"].ValidationState != ModelValidationState.Valid  } })
+                    }
+                    @if (Model.landArea != null)
+                    {
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "متراژ زمین را مشخص کنید " }, { "name", "LandArea" }, { "min", "0" }, { "data-allow-zero", "0" }, { "class", (Model.landArea.mandatory ? "js-mandatory" : "") }, { "value", Model.landArea.LandArea }, { "valueData", Model.landArea.LandArea.ToString() }, { "hasError", ViewData.ModelState["LandArea"].ValidationState != ModelValidationState.Valid } })
+                    }
+                    @if (Model.capacity != null)
+                    {
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "ظرفیت اقامتگاه را مشخص کنید" }, { "name", "Capacity" }, { "min", "0" }, { "data-allow-zero", "0" }, { "class", "js-mandatory" }, { "value", Model.capacity.Capacity }, { "valueData", Model.capacity.Capacity.ToString() }, { "hasError", ViewData.ModelState["Capacity"].ValidationState != ModelValidationState.Valid } })
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "حداکثر مهمان اضافه را مشخص کنید " }, { "name", "MoreThanCapacity" }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.capacity.MoreThanCapacity }, { "valueData", Model.capacity.MoreThanCapacity.ToString() } })
+                    }
+                    @if (Model.room != null)
+                    {
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد اتاق خواب را مشخص کنید" }, { "name", "room" }, { "min", Model.room.minValue }, { "data-allow-zero", (Model.room.allowZero ? 1 : 0) }, { "class", (Model.room.mandatory ? "js-mandatory" : "") }, { "value", Model.room.Room }, { "valueData", Model.room.Room.ToString() } })
+                    }
+                    @if (Model.bed != null)
+                    {
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تخت یک نفره را مشخص کنید" }, { "name", "SingleBed" }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.SingleBed }, { "valueData", Model.bed.SingleBed.ToString() } })
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تخت دو نفره را مشخص کنید" }, { "name", Advertise.Property.DoublesBed }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.DoublesBed }, { "valueData", Model.bed.DoublesBed.ToString() } })
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تشک و پتو را مشخص کنید" }, { "name", Advertise.Property.BlanketsAndMattresses }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.BlanketsAndMattresses }, { "valueData", Model.bed.BlanketsAndMattresses.ToString() } })
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccBedInput.cshtml", Model.bed)
+                    }
+                    @if (Model.parking != null)
+                    {
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccParkingInput.cshtml", Model.parking)
+                    }
+                </div>
+            }
+            @if (Model.amenities != null)
+            {
+                <div class="static-advertise advetise-form__part advertise-form_welfare-amenities">
+                    <p class="static-advertise__title"><i class="fa fa-football-ball"></i>امکانات رفاهی اقامتگاه را مشخص کنید</p>
+                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccAmenitiesInput.cshtml", Model.amenities)
+                </div>
+            }
+            @if (Model.rules != null)
+            {
+                <div class="static-advertise advetise-form__part advertise-form__part-low">
+                    <p class="static-advertise__title"><i class="fa fa-balance-scale"></i>قوانین و مقررات اقامتگاه </p>
+                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccRulesInput.cshtml", Model.rules)
+                </div>
+            }
+            @if (Model.ownership != null)
+            {
+                <div class="static-advertise advetise-form__part advertise-form__part-more">
+                    <p class="static-advertise__title"><i class="fa fa-address-card"></i>سایر موارد </p>
+                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccOwnershipInput.cshtml", Model.ownership)
+                </div>
+            }
+        </div>
+        <div class="static-advertise__btns-box">
+            <p class="static-advertise__btn-item" id="prev_step_button" onclick="checkHaveChangeAdmin(2, @Model.Id)"><i class="fa fa-chevron-right"></i> مرحله قبل</p>
+            <p class="static-advertise__btn-item form-submit_button" id="form-submit-button" style="width: 100px; background-color: #73C362;"> تایید <i class="fa fa-chevron-left"></i> </p>
+        </div>
+    }
+</div>
+
+@section ScriptLink{
+    <script src="~/Resource/Scripts/general/accommodation-edit-form.js"></script>
+    <script src="~/Resource/Scripts/dashboard/numberInput.js"></script>
+    <script src="~/Resource/Scripts/dashboard/acc-public-form.js"></script>
+}
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        @if (ViewBag.errors != null)
+        {
+            @:showNoYesMessage("", "بعضی از اطلاعات وارد شده نادرست است", undefined, forceSaveFormSubmit, { noText: 'ذخیره تغییرات', yesText: 'اصلاح' });
+            foreach(var error in ViewBag.errors)
+            {
+                @:alertify.error('@error');
+            }
+        }
+    </script>
+}

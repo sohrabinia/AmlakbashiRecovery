@@ -1,0 +1,61 @@
+﻿
+@if (ViewBag.BuildingSize != null && ViewBag.BuildingSize != 0)
+{
+    <div class="reserve-complex__iconic-info-item">
+        <i class="fa fa-building"></i><span>بنا: @ViewBag.BuildingSize متر</span>
+    </div>
+}
+@if (ViewBag.LandArea != null)
+{
+    <div class="reserve-complex__iconic-info-item">
+        <i class="fa fa-chart-area"></i><span>زمین: @ViewBag.LandArea متر</span>
+    </div>
+}
+@if (ViewBag.Parking != null && ViewBag.Parking != Advertise.ParkingItems.Unset)
+{
+    <div class="reserve-complex__iconic-info-item">
+        @switch ((Advertise.ParkingItems)ViewBag.Parking)
+        {
+            case Advertise.ParkingItems.One:
+                <i class="fa fa-warehouse"></i><span>1 پارکینگ</span>
+                break;
+            case Advertise.ParkingItems.Two:
+                <i class="fa fa-warehouse"></i><span>2 پارکینگ</span>
+                break;
+            case Advertise.ParkingItems.Three:
+                <i class="fa fa-warehouse"></i><span>3 پارکینگ</span>
+                break;
+            case Advertise.ParkingItems.MoreThanThree:
+                <i class="fa fa-warehouse"></i><span>بیشتر از 3 پارکینگ</span>
+                break;
+            case Advertise.ParkingItems.Jointly:
+                <i class="fa fa-warehouse"></i><span>@("پارکینگ مشاع")</span>
+                break;
+            case Advertise.ParkingItems.NoParking:
+                <i class="fa fa-warehouse"></i><span>@("بدون پارکینگ")</span>
+                break;
+            default:
+                break;
+        }
+    </div>
+}
+@if (ViewBag.SingleBed != null && ViewBag.SingleBed != 0)
+{
+    <div class="reserve-complex__iconic-info-item">
+        <i class="fa fa-bed"></i><span>@ViewBag.SingleBed تخت یک نفره</span>
+    </div>
+}
+@if (ViewBag.DoublesBed != null && ViewBag.DoublesBed != 0)
+{
+    <div class="reserve-complex__iconic-info-item">
+        <img width="24" height="24" src="/file/resourceimagepng?file_name=icons/double-bed" alt="تخت دونفره" /><span>@ViewBag.DoublesBed تخت دو نفره</span>
+    </div>
+}
+@if (ViewBag.Pool != null && ViewBag.Pool != false)
+{
+    <div class="reserve-complex__iconic-info-item">
+        <i class="fa fa-swimming-pool"></i><span>استخر</span>
+    </div>
+}
+
+

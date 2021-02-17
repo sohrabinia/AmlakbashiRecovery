@@ -1,0 +1,133 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+
+@model Tuple<AmenitiesDTO, BedDTO>
+
+@if (Model.Item1.HeatingSystem != Advertise.HeatingSystemItems.Unset)
+{
+    <div class="advertise-page__amenities-main-item">
+        <span class="advertise-page__amenities-main-title">
+            <i class="fa fa-temperature-high"></i> سیستم گرمایشی:
+        </span>
+        @switch ((Advertise.HeatingSystemItems)Model.Item1.HeatingSystem)
+        {
+            case Advertise.HeatingSystemItems.Heater:
+                <span class="advertise-page__amenities-main-content">بخاری</span>
+                break;
+            case Advertise.HeatingSystemItems.Package:
+                <span class="advertise-page__amenities-main-content">پکیج</span>
+                break;
+            case Advertise.HeatingSystemItems.Radiator:
+                <span class="advertise-page__amenities-main-content">شوفاژ</span>
+                break;
+            case Advertise.HeatingSystemItems.AirConditioner:
+                <span class="advertise-page__amenities-main-content">هواساز</span>
+                break;
+            case Advertise.HeatingSystemItems.FirePlace:
+                <span class="advertise-page__amenities-main-content">شومینه</span>
+                break;
+            case Advertise.HeatingSystemItems.Other:
+                <span class="advertise-page__amenities-main-content">غیره</span>
+                break;
+            case Advertise.HeatingSystemItems.None:
+                <span class="advertise-page__amenities-main-content">ندارد</span>
+                break;
+        }
+    </div>
+}
+@if (Model.Item1.CoolingSystem != Advertise.CoolingSystemItems.Unset)
+{
+    <div class="advertise-page__amenities-main-item">
+        <span class="advertise-page__amenities-main-title">
+            <i class="fa fa-temperature-low"></i> سیستم سرمایشی:
+        </span>
+        @switch ((Advertise.CoolingSystemItems)Model.Item1.CoolingSystem)
+        {
+            case Advertise.CoolingSystemItems.Chiller:
+                <span class="advertise-page__amenities-main-content">چیلر</span>
+                break;
+            case Advertise.CoolingSystemItems.Fancoel:
+                <span class="advertise-page__amenities-main-content">فنکوئل</span>
+                break;
+            case Advertise.CoolingSystemItems.WaterCooler:
+                <span class="advertise-page__amenities-main-content">کولر آبی</span>
+                break;
+            case Advertise.CoolingSystemItems.Splitter:
+                <span class="advertise-page__amenities-main-content">کولر گازی</span>
+                break;
+            case Advertise.CoolingSystemItems.AirConditioner:
+                <span class="advertise-page__amenities-main-content">هواساز</span>
+                break;
+            case Advertise.CoolingSystemItems.SplitterAndWaterCooler:
+                <span class="advertise-page__amenities-main-content">کولر آبی و گازی</span>
+                break;
+            case Advertise.CoolingSystemItems.Fan:
+                <span class="advertise-page__amenities-main-content">پنکه</span>
+                break;
+            case Advertise.CoolingSystemItems.Other:
+                <span class="advertise-page__amenities-main-content">غیره</span>
+                break;
+            case Advertise.CoolingSystemItems.None:
+                <span class="advertise-page__amenities-main-content">ندارد</span>
+                break;
+        }
+    </div>
+}
+@if (Model.Item1.WC != Advertise.WCItems.Unset)
+{
+    <div class="advertise-page__amenities-main-item">
+        <span class="advertise-page__amenities-main-title">
+            <i class="fa fa-toilet"></i> سرویس بهداشتی:
+        </span>
+        @switch ((Advertise.WCItems)Model.Item1.WC)
+        {
+            case Advertise.WCItems.Persian:
+                <span class="advertise-page__amenities-main-content">ایرانی</span>
+                break;
+            case Advertise.WCItems.Europian:
+                <span class="advertise-page__amenities-main-content">فرنگی</span>
+                break;
+            case Advertise.WCItems.EuropianAndPersian:
+                <span class="advertise-page__amenities-main-content">ایرانی و فرنگی</span>
+                break;
+        }
+    </div>
+}
+@if (Model.Item2.BlanketsAndMattresses != 0)
+{
+    <div class="advertise-page__amenities-main-item">
+        <span class="advertise-page__amenities-main-title">
+            <img src="/file/resourceimagepng?file_name=icons/blanket" alt="تشک و پتو" width="32" height="32" /> تشک و پتو:
+        </span>
+        <span class="advertise-page__amenities-main-content">@Model.Item2.BlanketsAndMattresses عدد</span>
+    </div>
+}
+@if (Model.Item2.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset)
+{
+    <div class="advertise-page__amenities-main-item">
+        <span class="advertise-page__amenities-main-title">
+            <img src="/file/resourceimagepng?file_name=icons/blanket" alt="پتوی اضافه" width="32" height="32" /> پتوی اضافه:
+        </span>
+        @switch ((Advertise.ExtraBlanketCountItems)Model.Item2.ExtraBlanketCount)
+        {
+            case Advertise.ExtraBlanketCountItems.One:
+                <span class="advertise-page__amenities-main-content">یک عدد</span>
+                break;
+            case Advertise.ExtraBlanketCountItems.Two:
+                <span class="advertise-page__amenities-main-content">دو عدد</span>
+                break;
+            case Advertise.ExtraBlanketCountItems.Three:
+                <span class="advertise-page__amenities-main-content">سه عدد</span>
+                break;
+            case Advertise.ExtraBlanketCountItems.Four:
+                <span class="advertise-page__amenities-main-content">چهار عدد</span>
+                break;
+            case Advertise.ExtraBlanketCountItems.Five:
+                <span class="advertise-page__amenities-main-content">پنج عدد</span>
+                break;
+            case Advertise.ExtraBlanketCountItems.MoreThanFive:
+                <span class="advertise-page__amenities-main-content">بیشتر از پنج عدد</span>
+                break;
+        }
+    </div>
+}
+

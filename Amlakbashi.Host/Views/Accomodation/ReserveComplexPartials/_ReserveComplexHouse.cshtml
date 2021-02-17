@@ -1,0 +1,169 @@
+﻿
+@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+
+@model AccommodationItemDTO
+
+@{
+    string parent_title = "خانه های ویلایی";
+    string unit_title = "واحد";
+    var count = Model.HouseChildren.Count();
+}
+
+<div class="reserve-complex__category-item">
+    <span>@parent_title</span>
+    @for (int i = 0; i < count; i++)
+    {
+        var child = Model.HouseChildren.ElementAt(i);
+        <div style="display:flex;flex-flow: row;width:100%;">
+            <div class="reserve-complex__unit-item">
+                <div>
+                    <div>@unit_title @(i + 1)</div>
+                </div>
+                <div class="reserve-complex__info-container">
+                    <div class="reserve-complex__iconic-info-item">
+                        @if (child.Floor.Floor != Advertise.FloorItems.Unset)
+                        {
+                            switch (child.Floor.Floor)
+                            {
+                                case Advertise.FloorItems.Underground:
+                                    <i class="fa fa-building"></i><span>طبقه: زیرزمین</span>
+                                    break;
+                                case Advertise.FloorItems.Ground:
+                                    <i class="fa fa-building"></i><span>طبقه: همکف</span>
+                                    break;
+                                case Advertise.FloorItems.MoreThan10th:
+                                    <i class="fa fa-building"></i><span>طبقه: بالاتر از 10</span>
+                                    break;
+                                default:
+                                    <i class="fa fa-building"></i><span>طبقه: @((int)child.Floor.Floor)</span>
+                                    break;
+                            }
+                        }
+                    </div>
+
+                    <div class="reserve-complex__iconic-info-item">
+                        @{
+                            var capacityString = child.Capacity.MoreThanCapacity > 0 ?
+                                child.Capacity.Capacity + " نفر مجاز + " + child.Capacity.MoreThanCapacity + " نفر اضافه" :
+                                child.Capacity.Capacity + " مهمان";
+                        }
+                        @if (!string.IsNullOrEmpty(capacityString))
+                        {
+                            <i class="fa fa-users"></i><span>@capacityString</span>
+                        }
+                    </div>
+
+                    <div class="reserve-complex__iconic-info-item">
+                        <i class="fa fa-columns"></i><span>@child.Room.Room اتاق</span>
+                    </div>
+                </div>
+
+                <div class="reserve-complex__daily-price">شروع قیمت: @string.Format("{0:n0}", child.Price.DailyPrice) تومان</div>
+
+                <div style="width: 185px;margin: auto;">
+                    @{
+                        List<long> album_photos;
+                        if (string.IsNullOrEmpty(child.Photo.AlbumPhoto) || child.Photo.AlbumPhoto == ",")
+                        {
+                            album_photos = new List<long>();
+                        }
+                        else
+                        {
+                            album_photos = Array.ConvertAll(child.Photo.AlbumPhoto.Trim(',').Split(','), x => long.Parse(x)).ToList();
+                            if (child.Photo.PhotoID != null)
+                            {
+                                album_photos.Remove((long)child.Photo.PhotoID);
+                            }
+                        }
+                        if (child.Photo.PhotoID != null)
+                        {
+                            album_photos.Insert(0, (long)child.Photo.PhotoID);
+                        }
+                    }
+                    @if (album_photos.Any())
+                    {
+                        <div @*class="advertise-page__slider-container-parent"*@>
+                            <div class="advertise-image-library advertise-page__slider-container">
+                                @{
+                                    for (int j = 0; j < album_photos.Count; j++)
+                                    {
+                                        var photo_id = album_photos[j];
+                                        string img_small;
+                                        //if (j == 0)
+                                        //{
+                                        //    img_small = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-خیلی-کوچک/{0}", child.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 146, 82);
+                                        //}
+                                        //else
+                                        //{
+                                        img_small = photo_id > 0 ? string.Format("/file/accthumbxsmall?accid={0}&fileid={1}", child.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 146, 82);
+                                        //}
+                                        <a href="@string.Format("/file/getimage?fileid={0}", photo_id)" data-lightbox="advertise-gallery-set-@(child.Id)" class="advertise-page__slider-image-container" data-alt="@(child.TitleDesc.Title)-@(j+1)" data-title="@(child.TitleDesc.Title)-@(j+1)">
+                                            <img src="/file/resourceimagepng?file_name=lazy-16_9" data-src="@img_small" alt="@(child.TitleDesc.Title)-@(j+1)" title="@(child.TitleDesc.Title)-@(j+1)" class="advertise-page__slider-image lazy" width="146" height="82" style="display:none;">
+                                        </a>
+
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="reserve-complex__detail-container" id="@(Advertise.AdvertiseType.House.ToString())_@(i)" style="display: none;">
+                    @if (Model.Amenities.HeatingSystem != Advertise.HeatingSystemItems.Unset ||
+                        Model.Amenities.CoolingSystem != Advertise.CoolingSystemItems.Unset ||
+                        Model.Amenities.WC != Advertise.WCItems.Unset ||
+                        Model.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset ||
+                        Model.Bed.BlanketsAndMattresses != 0)
+                    {
+                        <div class="advertise-page__basic-properties-container">
+                            @Html.Partial("ReserveComplexPartials/_ReserveBasicInfo", null, new ViewDataDictionary(){
+                                {"BuildingSize",child.BuildingSize.Metrazh }, {"LandArea", null }, {"Pool", child.Amenities.Pool },
+                                {"Parking",child.Parking.Parking }, {"SingleBed",child.Bed.SingleBed },
+                                {"DoublesBed",child.Bed.DoublesBed }, {"Class","reserve-complex__iconic-info-item" }})
+                        </div>
+                    }
+
+                    @if (child.Price.DailyPrice > 0 || child.Price.HolidayPrice > 0 || child.Price.HolidayPikePrice > 0 ||
+                        child.Price.RentPrice > 0 || child.Price.MoreThanCapacityPrice > 0)
+                    {
+                        <div class="advertise-page__price-container">
+                            @Html.Partial("ReserveComplexPartials/_ReservePrice", child.Price, new ViewDataDictionary(){
+                                {"Class","advertie-page__price-item" } })
+                        </div>
+                    }
+
+                    @if (child.Amenities.HeatingSystem != Advertise.HeatingSystemItems.Unset ||
+                        child.Amenities.CoolingSystem != Advertise.CoolingSystemItems.Unset ||
+                        child.Amenities.WC != Advertise.WCItems.Unset || child.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset ||
+                        child.Bed.BlanketsAndMattresses > 0)
+                    {
+                        <div class="advertise-page__amenities-main-container">
+                            @Html.Partial("ReserveComplexPartials/_ReserveMainAmenities", new Tuple<AmenitiesDTO, BedDTO>(child.Amenities, child.Bed), new ViewDataDictionary(){
+                                {"Class","advertise-page__amenities-main-item" } })
+                        </div>
+                    }
+
+                    @if (child.Amenities.Bathroom || child.Amenities.Pool || child.Amenities.PoolTable ||
+                        child.Amenities.Sauna || child.Amenities.Jacuzzi || child.Amenities.TV || child.Amenities.Wifi ||
+                        child.Amenities.WashingMachine || child.Amenities.Refrigerator || child.Amenities.Oven ||
+                        child.Amenities.MicrowaveOven || child.Amenities.KitchenHood || child.Amenities.KitchenUtensils ||
+                        child.Amenities.Hairdryer || child.Amenities.SoundSystem || child.Amenities.TeaMaker ||
+                        child.Amenities.Foosball || child.Amenities.Golf)
+                    {
+                        <div class="advertise-page__amenities-detail-container">
+                            @Html.Partial("ReserveComplexPartials/_ReserveDetailAmenities", child.Amenities, new ViewDataDictionary(){
+                                {"Class","advertise-page__amenities-detail-item" } })
+                        </div>
+                    }
+                </div>
+                <div class="reserve-complex__detail-button js-detail-button" data-state="0" data-change-text="1" data-text-expand="جزئیات بیشتر" data-text-collapse="جزئیات کمتر" data-target-id="@(Advertise.AdvertiseType.House.ToString())_@(i)">
+                    <span>جزئیات بیشتر</span>
+                    <i class="fa fa-angle-double-down"></i>
+                </div>
+            </div>
+            <div class="reserve-complex__reserve-button" onclick="showReservePopup(@(child.Id))">
+                <p><i class="fa fa-arrow-circle-right"></i>درخواست رزرو</p>
+            </div>
+        </div>
+    }
+</div>

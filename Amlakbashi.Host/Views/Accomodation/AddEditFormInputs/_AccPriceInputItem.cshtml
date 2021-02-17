@@ -1,0 +1,15 @@
+﻿
+<div class="static-advertise__item">
+    <p class="static-advertise__label"> @ViewBag.title</p>
+    <div class="static-advertise__property">
+        <input class="changed-input-target js-disable-error digit DailyPrice js-mandatory toman @(ViewBag.hasError ? "input-validation-error" : "")" data-min_value="@ViewBag.value"
+               onkeyup="validateNumber(this); return onAdvertisedigitschange(this);"
+               onchange="validateNumber(this)" type="tel"
+               name="@ViewBag.name" @( ViewBag.price > 0 ? "value=" + ViewBag.price : "") />
+        @if (ViewBag.errorMessage != null)
+        {
+            <sub style="color: red;">@ViewBag.errorMessage</sub>
+        }
+    </div>
+    <p class="static-advertise__extra-footer strtoman"></p>
+</div>

@@ -1,0 +1,74 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.BasicFormDTO
+
+@{
+    ViewBag.AddEditAccPage = true;
+    ViewBag.Title = "کارشناسی اقامتگاه";
+    ViewBag.keywords = "ثبت رزرو, ثبت رایگاه آگهی, ثبت آپارتمان مبله, ثبت سوئیت, ثبت ویلا اجاره ای, ثبت آگهی رزرو";
+    ViewBag.Description = "ثبت رایگان اقامتگاه برای اجاره روزانه و هفتگی - ثبت آگهی آپارتمان و سوئیت مبله - ثبت اجاره ویلا - ثبت آگهی هتل و مسافرخانه";
+    Layout = "~/Views/Shared/_masterAdmin.cshtml";
+}
+
+@section styleLink{
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-public-style-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/admin-public-style.css" />
+}
+
+<div class="add-advertise-static-container">
+    <div class="add-static-title">
+        کارشناسی اقامتگاه
+    </div>
+    <div class="box-step-by-step">
+        <div id="form-step-button-container" class="form-step-button-container">
+            <div class="form-step-button form-step-button-selected">اطلاعات اولیه</div>
+            <div onclick="checkHaveChangeAdmin(2, @Model.Id)" class="form-step-button">مشخصات کلی</div>
+            <div onclick="checkHaveChangeAdmin(3, @Model.Id)" class="form-step-button">مشخصات تکمیلی</div>
+            @if (Model.advertiseMode == Advertise.AdvertiseMode.Parent)
+            {
+                if (Model.advertiseType.TypeID == Advertise.AdvertiseType.Complex ||
+                    Model.advertiseType.TypeID == Advertise.AdvertiseType.HotelApartment)
+                {
+                    <div onclick="checkHaveChangeAdmin(4, @Model.Id, 0)" class="form-step-button">مدیریت واحد ها</div>
+                }
+                else
+                {
+                    <div onclick="checkHaveChangeAdmin(4, @Model.Id, 1)" class="form-step-button">مدیریت اتاق ها</div>
+                }
+            }
+            <div onclick="checkHaveChangeAdmin(5, @Model.Id)" class="form-step-button">وضعیت کارشناسی</div>
+        </div>
+    </div>
+    @using (Html.BeginForm("adminbasicform", "accomodation", new { Id = Model.Id }, FormMethod.Post, true, new { enctype = "multipart/form-data", id = "AccForm" }))
+    {
+        <input type="hidden" value="@(Model.Available == true ? "true" : "false")" name="Available" />
+        <input type="hidden" value="@(ViewBag.tab == null ? 0 : ViewBag.tab)" name="tab" id="tabInput" />
+        <div id="form-container" class="advertise-form__container">
+            <div class="form-step" id="_AccFormBasicElements" data-title="اطلاعات اولیه">
+                <p class="static-advertise__title"><i class="fa fa-bed"></i>اطلاعات اولیه اقامتگاه را وارد کنید</p>
+                <div class="static-advertise__item half-col disable-input">
+                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccTypeInput.cshtml", Model.advertiseType, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "haveChild", ViewBag.haveChild }, { "hasError", ViewData.ModelState["TypeID"].ValidationState != ModelValidationState.Valid } })
+                </div>
+                <div class="static-advertise__item half-col" style="margin-top:0;">
+                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPositionInput.cshtml", Model.position)
+                </div>
+            </div>
+        </div>
+        <div class="static-advertise__btns-box">
+            <p class="static-advertise__btn-item form-submit_button" id="next_step_button" style="width: 100px; background-color: #73C362;margin-right:auto;">تایید <i class="fa fa-chevron-left"></i></p>
+        </div>
+    }
+</div>
+@section ScriptLink{
+    <script src="~/Resource/Scripts/dashboard/acc-public-form.js"></script>
+}
+@section ScriptBlock
+{
+    <script type="text/javascript">
+       @if (ViewBag.errors != null)
+        {
+            foreach(var error in ViewBag.errors)
+            {
+                @:alertify.error('@error');
+            }
+        }
+    </script>
+}

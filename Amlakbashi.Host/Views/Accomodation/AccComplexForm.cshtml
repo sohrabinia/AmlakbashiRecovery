@@ -1,0 +1,143 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.ComplexUnitFormDTO
+
+@{
+    ViewBag.AddEditAccPage = true;
+    ViewBag.Title = (ViewBag.isEdit ? "ویرایش" : "ثبت") + " اقامتگاه";
+    ViewBag.keywords = "ثبت رزرو, ثبت رایگاه آگهی, ثبت آپارتمان مبله, ثبت سوئیت, ثبت ویلا اجاره ای, ثبت آگهی رزرو";
+    ViewBag.Description = "ثبت رایگان اقامتگاه برای اجاره روزانه و هفتگی - ثبت آگهی آپارتمان و سوئیت مبله - ثبت اجاره ویلا - ثبت آگهی هتل و مسافرخانه";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+    var childs = ViewBag.childs as Dictionary<Advertise.AdvertiseType, Dictionary<long, string>>;
+    ViewBag.elevator = Model.elevator;
+}
+
+@section StyleLink {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+    <link rel="stylesheet" href="~/Resource/css/dashboard/numberInput.css">
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-public-style-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-extra-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-hotel-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-general-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-complex-form.css" />
+}
+
+<div class="add-advertise-static-container">
+    <div class="add-static-title">
+        @(ViewBag.isEdit ? "ویرایش" : "ثبت") اقامتگاه
+    </div>
+    <div class="box-step-by-step">
+        <div id="form-step-button-container" class="form-step-button-container">
+            <div onclick="checkHaveChange(1, @Model.ParentId)" class="form-step-button"> اطلاعات اولیه</div>
+            <div onclick="checkHaveChange(2, @Model.ParentId)" class="form-step-button">مشخصات کلی</div>
+            <div onclick="checkHaveChange(3, @Model.ParentId)" class="form-step-button">مشخصات تکمیلی</div>
+            <div class="form-step-button form-step-button-selected">مدیریت واحد ها</div>
+        </div>
+    </div>
+    @if (childs != null && childs.Count > 0)
+    {
+        <div id="form-step-button-children" class="form-step-button-children">
+            @foreach (var type in childs.Keys)
+            {
+                var dic = childs[type];
+                foreach (var child in dic)
+                {
+                    <span class="form-step-child-button" onclick="checkHaveChange(@child.Key, @Model.ParentId, undefined, 0)" @(Model.Id == child.Key ? "style=background-color:#f9b905;" : "")>@(child.Value)</span>
+                }
+            }
+            <div onclick="checkHaveChange(0, @Model.ParentId, undefined, 0)" class="form-step-child-button static-advertise__btn-add" @(Model.Id == 0 ? "style=background-color:#f9b905;" : "")>
+                <p> افزودن <i class="fa fa-plus"></i></p>
+            </div>
+        </div>
+    }
+
+    @using (Html.BeginForm("acccomplexform", "accomodation", new { Id = Model.Id, parentId = Model.ParentId }, FormMethod.Post, true, new { enctype = "multipart/form-data", id = "AccForm" }))
+    {
+        <input type="hidden" value="false" name="saveAndNewRoom" id="saveFormInput" />
+        <input type="hidden" value="@(ViewBag.isEdit == true ? "true" : "false" )" name="isEdit" />
+        <input type="hidden" value="0" name="Tab" id="tabInput" />
+        if (Model.Id > 0 || ViewBag.post == true)
+        {
+            if (Model.Id < 1)
+            {
+                <div class="form-step static-advertise advetise-form__part" id="_AccFormComplexElements">
+                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_ComplexTypeInput.cshtml", Model.type, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hasError", ViewData.ModelState["TypeID"].ValidationState != ModelValidationState.Valid }, { "isAdmin", false } })
+                </div>
+            }
+            <div id="ajaxForm">
+                @Html.PartialAsync("_AccComplexTypeForm", Model)
+            </div>
+        }
+        else
+        {
+            <div class="form-step static-advertise advetise-form__part" id="_AccFormComplexElements">
+                @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_ComplexTypeInput.cshtml", Model.type, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hasError", ViewData.ModelState["TypeID"].ValidationState != ModelValidationState.Valid }, { "isAdmin", false } })
+                <p id="ajaxLoading">لطفا صبر کنید ...</p>
+            </div>
+            <div id="ajaxForm">
+
+            </div>
+        }
+
+        <div class="static-advertise__btns-box static-advertise__btn-add">
+            <p>ثبت و افزودن واحد جدید</p>
+        </div>
+        <div class="addAccommodation_button-creat-new-room">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+        </div>
+        <div class="static-advertise__btns-box">
+            <p class="static-advertise__btn-item" id="prev_step_button" onclick="checkHaveChange(3, @Model.ParentId)"><i class="fa fa-chevron-right"></i> مرحله قبل</p>
+            <a href="/accomodation/accComplexForm?id=-1&parentid=@Model.ParentId" @(Model.Id > 0 ? "style=display:none;" : "block") class="static-advertise__btn-item static-advertise__btn-cancle"> انصراف  </a>
+            <p class="static-advertise__btn-item static-advertise__btn-next"><i class="fas fa-check-circle"></i> اتمام فرآیند </p>
+        </div>
+    }
+</div>
+
+@section ScriptLink{
+    <script src="~/Resource/Scripts/general/accommodation-edit-form.js"></script>
+    <script src="~/Resource/Scripts/dashboard/numberInput.js"></script>
+    <script src="~/Resource/Scripts/dashboard/acc-public-form.js"></script>
+    <script src="~/Resource/Scripts/dashboard/complexForm.js"></script>
+}
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+        @if (ViewBag.errors != null)
+        {
+            foreach(var error in ViewBag.errors)
+            {
+                @:alertify.error('@error');
+            }
+        }
+
+        function getTypeForm() {
+            var selectedVal = $('#TypeID').val();
+            $.ajax({
+                url: "/accomodation/acccomplextypeform",
+                type: "get",
+                data: {
+                    parentId: @(Model.ParentId),
+                    childType: selectedVal
+                },
+                beforeSend: function () {
+                    $('#ajaxLoading').css("visibility", "visible");
+                },
+                success: function (data, status, xhr) {
+                    $('#ajaxForm').html(data);
+                    $('#ajaxLoading').css("visibility", "hidden");
+                    $(".addAccommodation_button-creat-new-room i.fa.fa-plus").css({ 'background': '#fdc831', 'cursor': 'pointer' });
+                    $(".static-advertise__btn-item.static-advertise__btn-next").css({ 'background': '#fdc831', 'cursor': 'pointer' });
+                    $(".static-advertise__btn-add p").css('cursor', 'pointer');
+                    removeDefultInput();
+                    refreshNumberInputs();
+                    uploadImage();
+                }
+            });
+        }
+    </script>
+}

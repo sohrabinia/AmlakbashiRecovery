@@ -13,6 +13,46 @@
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccAddressInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccAmenitiesInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccAvailableInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccBedInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccBuildingSizeInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccCapacityInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccCounterBox.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccElevatorPart.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccFloorInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccLandAreaInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccMetaTitleDescInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccOwnershipInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccParkingInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccPhotoInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccPositionInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccPriceInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccPriceInputItem.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccRoomInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccRulesInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccTitleDescInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AccTypeInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_AdminPhotoInput.cshtml" />
+    <None Include="Views\Accomodation\AddEditFormInputs\_ComplexTypeInput.cshtml" />
+    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageAddress.cshtml" />
+    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageAmenities.cshtml" />
+    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageBasicInfo.cshtml" />
+    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageComments.cshtml" />
+    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPagePrice.cshtml" />
+    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageRelatedLinks.cshtml" />
+    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageRules.cshtml" />
+    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageStatistics.cshtml" />
+    <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveBasicInfo.cshtml" />
+    <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveComplexApartment.cshtml" />
+    <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveComplexHouse.cshtml" />
+    <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveComplexHut.cshtml" />
+    <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveComplexSuit.cshtml" />
+    <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveComplexVilla.cshtml" />
+    <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveDetailAmenities.cshtml" />
+    <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveMainAmenities.cshtml" />
+    <None Include="Views\Accomodation\ReserveComplexPartials\_ReservePrice.cshtml" />
     <None Include="Views\Post\AccomodationManager.cshtml" />
     <None Include="Views\Post\Contact.cshtml" />
     <None Include="Views\Post\dashboard.cshtml" />

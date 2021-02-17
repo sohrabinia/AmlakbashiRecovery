@@ -1,0 +1,30 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+
+@model AccommodationItemDTO
+
+<div class="reserve-complex__category-container">
+    @if (Model.ApartmentChildren.Count > 0)
+    {
+        @Html.PartialAsync("ReserveComplexPartials/_ReserveComplexApartment", Model)
+    }
+    @if (Model.SuitChildren.Count > 0)
+    {
+        @Html.PartialAsync("ReserveComplexPartials/_ReserveComplexSuit", Model)
+    }
+    @if (Model.HouseChildren.Count > 0)
+    {
+        @Html.PartialAsync("ReserveComplexPartials/_ReserveComplexHouse", Model)
+    }
+    @if (Model.VillaChildren.Count > 0)
+    {
+        @Html.PartialAsync("ReserveComplexPartials/_ReserveComplexVilla", Model)
+    }
+    @if (Model.HutChildren.Count > 0)
+    {
+        @Html.PartialAsync("ReserveComplexPartials/_ReserveComplexHut", Model)
+    }
+    @*@if (Model.HotelChildren.Count > 0)
+    {
+        @Html.Partial("ReserveComplexPartials/_ReserveComplexHotel", Model)
+    }*@
+</div>

@@ -1,0 +1,33 @@
+﻿@model bool
+
+<div class="acc-avalible-input-style div-unset acc-amenities__box-button">
+    <label for="available_0_true" class="acc-amenities__label-style">
+        نمایش
+        <input id="available_0_true" type="radio" name="available" value="true" onchange="SetAvailable(true)" @(Model ? "checked" : "")>
+        <span class="checkmark-acc checkmark"></span>
+    </label>
+    <label for="available_0_false" class="acc-amenities__label-style">عدم نمایش
+    <input id="available_0_false" type="radio" name="available" value="false" onchange="SetAvailable(false)" @(Model ? "" : "checked")>
+    <span class="checkmark-faild  checkmark"></span>
+    </label>
+</div>
+
+
+<script>
+    function SetAvailable(value) {
+        $.ajax({
+            url: "/accomodation/available",
+            type: "post",
+            data: {
+                id: @ViewBag.id,
+                isavailable: value
+            },
+            success: function () {
+                alert("تغییر مورد نظر با موفقیت اعمال شد.");
+            },
+            error: function (jqXhr, textStatus, errorMessage) {
+                alert('Error: ' + errorMessage);
+            }
+        });
+    }
+</script>

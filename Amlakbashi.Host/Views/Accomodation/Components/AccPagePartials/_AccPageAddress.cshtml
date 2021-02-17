@@ -1,0 +1,31 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+
+@model AccommodationItemDTO
+
+<h2 class="advertise-page__main-property-item">
+    <i class="fa fa-map-marker-alt" style=""></i>
+    @if (Model.AccCategory.CountryDirection)
+    {
+    <a title="@(Model.AccCategory.CountryDirectionName)" href="@(Model.AccCategory.CountryDirectionUrl)">@(Model.AccCategory.CountryDirectionName)،</a>
+        @*<span> - </span>*@
+    }
+    <a title="@Model.AccCategory.ProvinceName" href="@Model.AccCategory.ProvinceUrl">استان @Model.AccCategory.ProvinceName</a>، <a id="city-title" title="@Model.AccCategory.CityName" href="@Model.AccCategory.CityUrl">@Model.AccCategory.CityName</a>
+    @*<span> - </span>*@
+    @*<span><a id="city-title" title="@cityName" href="@cityUrl">@cityName</a></span>*@
+    @if (Model.AccCategory.Area)
+    {
+        @*<span> - </span>*@
+    <a title="@Model.AccCategory.AreaName" href="@Model.AccCategory.AreaUrl"> ، @Model.AccCategory.AreaName</a>
+    }
+</h2>
+
+@if (Model.Address != null && !string.IsNullOrEmpty(Model.Address.Address))
+{
+    <h3 class="advertise-page__main-property-item" data-max-height="25">
+        <i class="fa fa-address-card"></i> @Model.Address.Address
+    </h3>
+}
+
+@*<div class="advertise-page__main-property-item">
+        <i class="fab fa-affiliatetheme"></i> کد آگهی: @Model.AdvertiseID
+    </div>*@

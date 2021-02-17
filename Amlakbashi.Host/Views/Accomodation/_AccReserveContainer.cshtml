@@ -1,0 +1,52 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+@using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+
+@model AccommodationItemDTO
+
+@{ 
+    var haveChilds = Model.ApartmentChildren.Count != 0 || Model.HotelChildren.Count != 0 ||
+        Model.HouseChildren.Count != 0 || Model.HutChildren.Count != 0 || Model.SuitChildren.Count != 0
+        || Model.VillaChildren.Count != 0 ? true : false;
+}
+
+@if (bool.Parse(Model.CanPublish.ToString()))
+{
+    <div id="@ViewData["root_id"]" class="advertise-page__property-box advertise-page__contact-box" style="background-color:white;@(ViewData["root_id"].ToString() == "reserve-desktop-container" ? "z-index:1;" : "")">
+        @if (haveChilds)
+        {
+            switch ((Advertise.AdvertiseType)Model.AdvertiseType.TypeID)
+            {
+                case Advertise.AdvertiseType.Hotel:
+                case Advertise.AdvertiseType.Camp:
+                case Advertise.AdvertiseType.TourismAccommodation:
+                case Advertise.AdvertiseType.Inn:
+                case Advertise.AdvertiseType.Pansion:
+                    @Html.PartialAsync("_ReserveHotel", Model)
+                    break;
+                case Advertise.AdvertiseType.HotelApartment:
+                case Advertise.AdvertiseType.Complex:
+                    @Html.PartialAsync("_ReserveComplex", Model)
+                    break;
+            }
+        }
+        else
+        {
+            {@Html.PartialAsync("~/views/accomodation/_Reserve.cshtml", Model.ReservePopupData)}
+        }
+    </div>
+}
+else
+{
+    <div id="@ViewData["root_id"]" class="advertise-page__property-box advertise-page__contact-box advertise-page__out-of-service-box">
+        <div class="advertise-page__out-of-service-container">
+            <span class="advertise-page__out-of-service-label">این آگهی در حال حاضر خارج از سرویس است</span>
+            @{
+                foreach (var category in Model.RelatedCategories)
+                {
+                    <a href="@CategoryUrlLocalization.CategoryToUrl(category)" class="advertise-page__out-of-service-link">برو به صفحه @category.Title</a>
+                }
+            }
+            <a class="advertise-page__out-of-service-link" href="/">برو به صفحه اصلی سایت املاک باشی</a>
+        </div>
+    </div>
+}

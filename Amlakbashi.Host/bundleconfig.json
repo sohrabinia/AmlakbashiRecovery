@@ -33,6 +33,20 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/css/acc-item.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/lightbox/lightbox.css",
+      "wwwroot/resource/slick/slick.css",
+      "wwwroot/resource/slick/slick-theme.css",
+      "wwwroot/resource/css/portal/advertise-item.css",
+      "wwwroot/resource/css/portal/reserve-dialog.css",
+      "wwwroot/resource/css/portal/acc-blog-news.css",
+      "wwwroot/resource/css/general/master-search.css",
+      "wwwroot/resource/css/general/search-by-region.css"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/js/home-page.min.js",
     "inputFiles": [
       "wwwroot/resource/scripts/general/jalali-date-converter.js",
@@ -43,6 +57,25 @@
       "wwwroot/resource/scripts/general/search-by-region.js",
       "wwwroot/resource/scripts/general/increase-decrease-button.j",
       "wwwroot/resource/scripts/general/slider-scroll.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/acc-item.min.js",
+    "inputFiles": [
+      "wwwroot/resource/Scripts/jquery.plugin.min.js",
+      "wwwroot/resource/slick/slick.js",
+      "wwwroot/resource/jquery-sticky-kit/jquery-sticky-kit.js",
+      "wwwroot/resource/lightbox/lightbox.js",
+      "wwwroot/resource/scripts/general/search-by-region.js",
+      "wwwroot/resource/scripts/general/master-search.js",
+      "wwwroot/resource/Scripts/general/jalali-date-converter.j",
+      "wwwroot/resource/Scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/Scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/scripts/general/rating-detail.js",
+      "wwwroot/resource/scripts/general/price-string-generator.j",
+      "wwwroot/resource/scripts/page/accommodation-item-page.js",
+      "wwwroot/resource/scripts/general/detail-button.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js"
     ]
   }
 ]

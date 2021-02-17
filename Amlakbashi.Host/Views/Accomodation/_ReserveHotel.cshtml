@@ -1,0 +1,169 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+
+@model AccommodationItemDTO
+
+@{
+    var childs = Model.HotelChildren;
+    var count = childs.Count();
+    var child_advertise_type = (Advertise.AdvertiseType)Model.AdvertiseType.TypeID;
+}
+
+<div class="reserve-complex__category-container">
+    @if (childs.Count() > 0)
+    {
+        string unit_title = "";
+        switch ((Advertise.AdvertiseType)Model.AdvertiseType.TypeID)
+        {
+            case Advertise.AdvertiseType.Hotel:
+            case Advertise.AdvertiseType.Inn:
+            case Advertise.AdvertiseType.Pansion:
+                unit_title = "اتاق";
+                break;
+            case Advertise.AdvertiseType.Camp:
+                unit_title = "چادر";
+                break;
+            case Advertise.AdvertiseType.TourismAccommodation:
+                unit_title = "واحد";
+                break;
+        }
+
+        string parent_title = unit_title + " های " + Model.TypeUserString;
+
+        <div class="reserve-complex__category-item">
+            <span>@parent_title</span>
+            @for (int i = 0; i < count; i++)
+            {
+                var child = childs.ElementAt(i);
+                <div style="display:flex;flex-flow: row;width:100%;">
+                    <div class="reserve-complex__unit-item">
+                        <div>
+                            @if (!string.IsNullOrEmpty(child.TitleDesc.Title))
+                            {
+                                <div>@child.TitleDesc.Title</div>
+                            }
+                            else
+                            {
+                                <div>@unit_title نوع @(i + 1)</div>
+                            }
+                            <div style="padding:3px;margin:auto 5px; border-radius:4px; background-color:#fdd835;color:#242424;font:13px Miransans;">تعداد @child.HotelUnitSpecific.Count @unit_title</div>
+                        </div>
+
+                        <div class="reserve-complex__info-container">
+                            <div class="reserve-complex__iconic-info-item">
+                                @{
+                                    var capacityString = child.Capacity.MoreThanCapacity > 0 ?
+                                        child.Capacity.Capacity + " نفر مجاز + " + child.Capacity.MoreThanCapacity + " نفر اضافه" :
+                                        child.Capacity.Capacity + " مهمان";
+                                }
+                                @if (!string.IsNullOrEmpty(capacityString))
+                                {
+                                    <i class="fa fa-users"></i><span>@capacityString</span>
+                                }
+                            </div>
+
+                            @if ((Advertise.AdvertiseType)Model.AdvertiseType.TypeID == Advertise.AdvertiseType.Camp)
+                            {
+                                <div class="reserve-complex__info-container">
+                                    <div class="reserve-complex__iconic-info-item">
+                                        <span class="advertise-page__amenities-main-title">
+                                            <img src="/file/resourceimagepng?file_name=icons/blanket" alt="تشک و پتو" width="32" height="32" /> تشک و پتو:
+                                        </span>
+                                        <span class="advertise-page__amenities-main-content">@child.Bed.BlanketsAndMattresses عدد</span>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                if (child.Bed.SingleBed > 0)
+                                {
+                                    <div class="reserve-complex__info-container">
+                                        <div class="reserve-complex__iconic-info-item">
+                                            <i class="fa fa-bed"></i><span>@(child.Bed.SingleBed + " تخت یکنفره")</span>
+                                        </div>
+                                    </div>
+                                }
+                                if (child.Bed.DoublesBed > 0)
+                                {
+                                    <div class="reserve-complex__info-container">
+                                        <div class="reserve-complex__iconic-info-item">
+                                            <img width="24" height="24" src="/file/resourceimagepng?file_name=icons/double-bed" alt="تخت دونفره" /><span>@(child.Bed.DoublesBed + " تخت دونفره")</span>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <div class="reserve-complex__daily-price">شروع قیمت: @string.Format("{0:n0}", child.Price.DailyPrice) تومان</div>
+
+                        <div class="reserve-complex__detail-container" id="@(child_advertise_type.ToString())_@(i)" style="display: none;">
+                            <div class="advertise-page__price-container">
+                                @if (ViewBag.DailyPrice != 0)
+                                {
+                                    <div class="advertie-page__price-item">
+                                        <span class="advertise-page__price-title">
+                                            قیمت روزهای عادی:
+                                        </span>
+                                        <span class="advertise-page__price-content">
+                                            @string.Format("{0:n0}", child.Price.DailyPrice) تومان
+                                        </span>
+                                    </div>
+                                }
+                                @if (child.Price.HolidayPrice != 0)
+                                {
+                                    <div class="advertie-page__price-item">
+                                        <span class="advertise-page__price-title">
+                                            قیمت روزهای تعطیل:
+                                        </span>
+                                        <span class="advertise-page__price-content">
+                                            @string.Format("{0:n0}", child.Price.HolidayPrice) تومان
+                                        </span>
+                                    </div>
+                                }
+                                @if (child.Price.HolidayPikePrice != 0)
+                                {
+                                    <div class="advertie-page__price-item">
+                                        <span class="advertise-page__price-title">
+                                            قیمت پیک تعطیلات
+                                        </span>
+                                        <span class="advertise-page__price-content">
+                                            @string.Format("{0:n0}", child.Price.HolidayPikePrice) تومان
+                                        </span>
+                                    </div>
+                                }
+                                @if (child.Price.RentPrice != 0)
+                                {
+                                    <div class="advertie-page__price-item">
+                                        <span class="advertise-page__price-title">
+                                            اجاره ماهیانه:
+                                        </span>
+                                        <span class="advertise-page__price-content">
+                                            @string.Format("{0:n0}", child.Price.RentPrice) تومان
+                                        </span>
+                                    </div>
+                                }
+                                @if (child.Price.MoreThanCapacityPrice != 0)
+                                {
+                                    <div class="advertie-page__price-item">
+                                        <span class="advertise-page__price-title">
+                                            هزینه هر مهمان بیشتر:
+                                        </span>
+                                        <span class="advertise-page__price-content">
+                                            @string.Format("{0:n0}", child.Price.MoreThanCapacityPrice) تومان
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="reserve-complex__detail-button js-detail-button" data-state="0" data-change-text="1" data-text-expand="جزئیات بیشتر" data-text-collapse="جزئیات کمتر" data-target-id="@(child_advertise_type.ToString())_@(i)">
+                            <span>جزئیات بیشتر</span>
+                            <i class="fa fa-angle-double-down"></i>
+                        </div>
+                    </div>
+                    <div class="reserve-complex__reserve-button" onclick="showReservePopup(@(child.Id))">
+                        <p><i class="fa fa-arrow-circle-right"></i>درخواست رزرو</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,11 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs.ComplexTypeInputDTO
+
+<p class="static-advertise__label">نوع اقامتگاه را انتخاب کنید</p>
+<select class="@(ViewBag.isAdmin != null && ViewBag.isAdmin ? "changed-input-target " : "")js-mandatory js-disable-error @(ViewBag.hasError ? "input-validation-error" : "")" name="TypeID" id="TypeID" onchange="getTypeForm()">
+    @foreach (var select_item in Model.complexTypeSelectItems)
+    {
+        <option is-selected="@(select_item.value == (int)Model.TypeID)" value="@select_item.value">
+            @select_item.title
+        </option>
+    }
+</select>

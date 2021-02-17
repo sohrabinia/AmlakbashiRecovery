@@ -1,0 +1,137 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.HotelUnitFormDTO
+
+@{
+    ViewBag.AddEditAccPage = true;
+    ViewBag.Title = "کارشناسی اقامتگاه";
+    ViewBag.keywords = "ثبت رزرو, ثبت رایگاه آگهی, ثبت آپارتمان مبله, ثبت سوئیت, ثبت ویلا اجاره ای, ثبت آگهی رزرو";
+    ViewBag.Description = "ثبت رایگان اقامتگاه برای اجاره روزانه و هفتگی - ثبت آگهی آپارتمان و سوئیت مبله - ثبت اجاره ویلا - ثبت آگهی هتل و مسافرخانه";
+    Layout = "~/Views/Shared/_masterAdmin.cshtml";
+    var childs = ViewBag.childs as Dictionary<Advertise.AdvertiseType, Dictionary<long, string>>;
+}
+
+@section styleLink{
+    <link rel="stylesheet" href="~/Resource/css/dashboard/numberInput.css">
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-public-style-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-extra-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-hotel-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/admin-complex-from.css" />
+}
+<div class="add-advertise-static-container">
+    <div class="add-static-title">
+        کارشناسی اقامتگاه
+    </div>
+    <div class="box-step-by-step">
+        <div id="form-step-button-container" class="form-step-button-container">
+            <div onclick="checkHaveChangeAdmin(1, @Model.ParentId)" class="form-step-button"> اطلاعات اولیه</div>
+            <div onclick="checkHaveChangeAdmin(2, @Model.ParentId)" class="form-step-button">مشخصات کلی</div>
+            <div onclick="checkHaveChangeAdmin(3, @Model.ParentId)" class="form-step-button">مشخصات تکمیلی</div>
+            <div class="form-step-button form-step-button-selected">مدیریت اتاق ها</div>
+            <div onclick="checkHaveChangeAdmin(5, @Model.ParentId)" class="form-step-button">وضعیت کارشناسی</div>
+        </div>
+    </div>
+    @if (childs != null && childs.Count > 0)
+    {
+        <div id="form-step-button-children" class="form-step-button-children">
+            @foreach (var type in childs.Values)
+            {
+                foreach (var child in type)
+                {
+                    <span class="form-step-child-button" onclick="checkHaveChangeAdmin(@child.Key, @Model.ParentId, 1)" @(Model.Id == child.Key ? "style=background-color:#f9b905;" : "")>@(child.Value)</span>
+                    @*<a class="form-step-child-button" href="/accomodation/adminhotelform?id=@(child.Key)&parentid=@Model.ParentId" @(Model.Id == child.Key ? "style=background-color:#f9b905;" : "")>@(child.Value) &nbsp;&nbsp;&nbsp;</a>*@
+                }
+            }
+        </div>
+    }
+
+    @if (Model.Id > 0)
+    {
+        using (Html.BeginForm("adminhotelform", "accomodation", new { Id = Model.Id, parentId = Model.ParentId }, FormMethod.Post, true, new { enctype = "multipart/form-data", id = "AccForm" }))
+        {
+            <input type="hidden" value="false" name="forceSave" id="forceSaveInput">
+            <input type="hidden" value="@(ViewBag.tab == null ? 0 : ViewBag.tab)" name="tab" id="tabInput" />
+            <div>
+                <div class="static-advertise advetise-form__part advetise-form__part1">
+                    <div class="acc-hotel__title-box">
+                        <h2 class="div-unset static-advertise__title"><i class="fas fa-bed"></i>@Model.titleAndDesc.Title</h2>
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccAvailableInput.cshtml", Model.Available, 
+                            new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", Model.Id } })
+                    </div>
+                    @if (Model.titleAndDesc != null)
+                    {
+                        <div class="static-advertise__item full-col static-advertise__title-room">
+                            <p class="static-advertise__label div-unset">عنوان اتاق را بنویسید:</p>
+                            <div class="box-input-title div-unset">
+                                <input class="js-disable-error static-advertise__property changed-input-target static-advertise__Introduction-title static-advertise__it@(Model.titleAndDesc.mandatory ? "js-mandatory" : "") @(ViewData.ModelState["Title"].ValidationState != ModelValidationState.Valid ? "" : "input-validation-error")" value="@Model.titleAndDesc.Title" placeholder="فارسی تایپ کنید" name="Title" />
+                                <p class="static-advertise__extra-footer"> مثلا: اتاق دو خوابه لوکس</p>
+                            </div>
+                        </div>
+                        <div class="static-advertise__item full-col">
+                            <p class="static-advertise__label">توضیحات</p>
+                            <div class="static-advertise__property">
+                                <textarea class="js-disable-error static-advertise__Introduction-title changed-input-target @(ViewData.ModelState["Description"].ValidationState != ModelValidationState.Valid ? "" : "input-validation-error")" name="Description">@Model.titleAndDesc.Description</textarea>
+                            </div>
+                            <div class="static-advertise__extra-footer">تمام جزئیات و نکات قابل توجه و جذاب اقامتگاه را به صورت کامل و دقیق ذکر کنید؛ توجه به این مورد به صورت قابل توجهی ابهامات کاربران را برطرف خواهد کرد و شانس موفقیت آگهی شما را افزایش خواهد داد.</div>
+                        </div>
+                    }
+                    <div class="set_off-button div-unset style-min-max-input">
+                        <i class="fas fa-info-circle js-help"></i>
+                        <label> مشخص کنید از این نوع اتاق چه تعداد دارید: </label>
+                        <button type="button" class="add"><i class="fa fa-plus"></i></button>
+                        <input type="text" name="Count" class="@(ViewData.ModelState["Count"].ValidationState != ModelValidationState.Valid ? "" : "input-validation-error ")changed-input-target set_min-max-day js-input @ViewData["class"]" value="@Model.hotelUnitSpecific.Count">
+                        <button type="button" class="sub"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                @if (Model.price != null)
+                {
+                    <div class="static-advertise advetise-form__part static-advertie__price-box">
+                        <p class="static-advertise__title"><i class="fa fa-dollar-sign"></i>اطلاعات قیمت اجاره روزانه اقامتگاه را ثبت کنید</p>
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPriceInput.cshtml", Model.price)
+                    </div>
+                }
+                <div class="static-advertise advetise-form__part advertise-form_part-details">
+                    <p class="static-advertise__title"><i class="fa fa-search-plus"></i>مشخصات اتاق را ثبت کنید</p>
+                    @if (Model.capacity != null)
+                    {
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "ظرفیت اقامتگاه را مشخص کنید" }, { "name", "Capacity" }, { "min", "0" }, { "data-allow-zero", "0" }, { "class", "js-mandatory" }, { "value", Model.capacity.Capacity }, { "valueData", Model.capacity.Capacity.ToString() }, { "hasError", ViewData.ModelState["Capacity"].ValidationState != ModelValidationState.Valid } })
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "حداکثر مهمان اضافه را مشخص کنید " }, { "name", "MoreThanCapacity" }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.capacity.MoreThanCapacity }, { "valueData", Model.capacity.MoreThanCapacity.ToString() } })
+                    }
+                    @if (Model.bed != null)
+                    {
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تخت یک نفره را مشخص کنید" }, { "name", "SingleBed" }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.SingleBed }, { "valueData", Model.bed.SingleBed.ToString() } })
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تخت دو نفره را مشخص کنید" }, { "name", Advertise.Property.DoublesBed }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.DoublesBed }, { "valueData", Model.bed.DoublesBed.ToString() } })
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تشک و پتو را مشخص کنید" }, { "name", Advertise.Property.BlanketsAndMattresses }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.BlanketsAndMattresses }, { "valueData", Model.bed.BlanketsAndMattresses.ToString() } })
+                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccBedInput.cshtml", Model.bed)
+                    }
+                </div>
+            </div>
+            <div class="static-advertise__btns-box">
+                <p class="static-advertise__btn-item form-submit_button" style="margin-right:auto;text-decoration:none;color:#242424;"> تایید <i class="fa fa-chevron-left"></i> </p>
+            </div>
+        }
+    }
+    else
+    {
+        @:<p style="color:red; text-align:center; margin-top:50px; font-size: x-large;">برای این اقامتگاه، اتاق یا واحدی ثبت نشده است</p>
+    }
+</div>
+
+@section ScriptLink{
+    <script src="~/Resource/Scripts/dashboard/numberInput.js"></script>
+    <script src="~/Resource/Scripts/dashboard/acc-public-form.js"></script>
+}
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        $(".js-help").click(function () {
+            showInfoMessage('', `<p> می توانید با انتخاب کردن تعداد اتاق، مشخص کنید چند اتاق از این نوع در هتل خود دارید</p><p>جهت افزودن اتاق های دیگر، از دکمه اضافه کردن اتاق جدید در پایین صفحه استفاده کنید.</p> `)
+        })
+        @if (ViewBag.errors != null)
+        {
+           @:showNoYesMessage("", "بعضی از اطلاعات وارد شده نادرست است", undefined, forceSaveFormSubmit, { noText: 'ذخیره تغییرات', yesText: 'اصلاح' });
+            foreach(var error in ViewBag.errors)
+            {
+                @:alertify.error('@error');
+            }
+        }
+    </script>
+}

@@ -1,0 +1,773 @@
+﻿@using Amlakbashi.Core.Entities;
+@using Entities = Amlakbashi.Core.Entities;
+@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+@using Amlakbashi.Core.Common.Utilities;
+
+@model AccommodationItemDTO
+@{
+    ViewBag.Title = Model.MetaTitleDesc.MetaTitle;
+    ViewBag.isAccPage = true;
+    ViewBag.CurrentPage = "AdvertiseItem";
+
+    if (!string.IsNullOrEmpty(Model.MetaTitleDesc.MetaDescription))
+    {
+        ViewBag.Description = Model.MetaTitleDesc.MetaDescription;
+    }
+    Layout = "~/Views/Shared/_Master.cshtml";
+    var owner = Model.AccUser;
+    var full_name = owner.FullName;
+
+    var haveBasicInfo = Model.Capacity.Capacity > 0 || Model.Room.Room > 0 || Model.BuildingSize.Metrazh > 0 ||
+        Model.LandArea.LandArea > 0 || Model.Floor.Floor != Advertise.FloorItems.Unset || (Model.Parking.Parking != Advertise.ParkingItems.Unset &&
+        Model.Parking.Parking != Advertise.ParkingItems.Unset) || Model.Bed.SingleBed > 0 || Model.Bed.DoublesBed > 0 || Model.Amenities.Pool == true ? true : false;
+
+    var haveMainAmenities = Model.Amenities.HeatingSystem != Advertise.HeatingSystemItems.Unset ||
+        Model.Amenities.CoolingSystem != Advertise.CoolingSystemItems.Unset || Model.Amenities.WC != Advertise.WCItems.Unset
+        || Model.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset || Model.Bed.BlanketsAndMattresses != 0
+        ? true : false;
+
+    var haveDetailedAmenities = Model.Elevator.Elevator || Model.Amenities.Bathroom || Model.Amenities.Pool ||
+        Model.Amenities.Sauna || Model.Amenities.Jacuzzi || Model.Amenities.TV || Model.Amenities.Wifi ||
+        Model.Amenities.WashingMachine || Model.Amenities.Refrigerator || Model.Amenities.Oven || Model.Amenities.MicrowaveOven ||
+        Model.Amenities.KitchenHood || Model.Amenities.KitchenUtensils || Model.Amenities.Hairdryer || Model.Amenities.SoundSystem ||
+        Model.Amenities.TeaMaker || Model.Amenities.Foosball || Model.Amenities.Golf || Model.Amenities.PoolTable ? true : false;
+}
+
+@section ScriptLink {
+    <script src="/js/acc-item.min.js"></script>
+}
+@section StyleLink {
+    <link rel="stylesheet" href="/css/acc-item.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossorigin="" />
+    <script defer="defer" src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+
+}
+@section HeaderAddition
+{
+    @if (!Model.IsPreview)
+    {
+        <link rel="canonical" href="https://www.amlakbashi.com@(Model.RawUrl)" />
+        <meta property="og:url" content="https://www.amlakbashi.com@(Model.RawUrl)" />
+        <meta property="og:image" content='@("https://www.amlakbashi.com" + (Model.Photo.PhotoID != null ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.Photo.PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
+    }
+    else
+    {
+        <meta name="robots" content="noindex, nofollow">
+    }
+}
+@{
+    List<long> album_photos;
+    if (string.IsNullOrEmpty(Model.Photo.AlbumPhoto) || Model.Photo.AlbumPhoto == ",")
+    {
+        album_photos = new List<long>();
+    }
+    else
+    {
+        album_photos = Array.ConvertAll(Model.Photo.AlbumPhoto.Trim(',').Split(','), x => long.Parse(x)).ToList();
+        if (Model.Photo.PhotoID != null)
+        {
+            album_photos.Remove((long)Model.Photo.PhotoID);
+        }
+    }
+    if (Model.Photo.PhotoID != null)
+    {
+        album_photos.Insert(0, (long)Model.Photo.PhotoID);
+    }
+}
+@{
+    var u_ = "https://www.amlakbashi.com" + Model.RawUrl;
+    var t_ = ViewBag.Title;
+    var img_ = "https://www.amlakbashi.com" + (Model.Photo.PhotoID != null ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.Photo.PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394));
+}
+<div class="share-post__container" style="flex-flow: row;left: 0;bottom: 0;right: 0;overflow: auto;background-color: white;width: fit-content;height: 70px;align-items: center;position: fixed;max-width: 100%;">
+    <a class="share-post__item" href="#" onclick="window.open('https://t.me/share/url?url=@(u_)&text=@(t_)', 'telegramShare', 'width=626,height=436'); return false;" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;width: 40px;height: 40px;">
+        <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram">
+    </a>
+    <a class="share-post__item" href="whatsapp://send?text=@(t_) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(t_) @(u_)')" title="اشتراک گذاری در واتس اپ" style="background-color: #1BD741;width: 40px;height: 40px;">
+        <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp">
+    </a>
+    <a class="share-post__item" href="#" onclick="window.open('http://twitter.com/share?text=@(t_);url=@(u_)', 'twitterShare', 'width=626,height=436'); return false;" title="توئیت کردن اقامتگاه" style="background-color: #55ACEE;width: 40px;height: 40px;">
+        <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter">
+    </a>
+    <a class="share-post__item" href="#" onclick="window.open('http://www.facebook.com/sharer.php?u=@(u_);t=@(t_)', 'facebookShare', 'width=626,height=436'); return false;" title="اشتراک گذاری در فیسبوک" style="background-color: #3b5998;width: 40px;height: 40px;">
+        <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook">
+    </a>
+    <a class="share-post__item" href="#" onclick="window.open('http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(t_)', 'pinterestShare', 'width=750,height=350'); return false;" title="پین کردن در پینترست" style="background-color: #BD081C;width: 40px;height: 40px;">
+        <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest">
+    </a>
+    <a class="share-post__item" href="mailto:?subject=@(t_);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" title="اشتراک گذاری با ایمیل" style="width: 40px;height: 40px;">
+        <i class="fa fa-envelope share-post__icon style-custom-email"></i>
+    </a>
+</div>
+<div class="advertise-page__bottom-pin" style="@(Model.AdvertiseMode == Advertise.AdvertiseMode.Parent || !Model.CanPublish ? "background-color:transparent;border:none;" : "")">
+    @if (Model.AdvertiseMode != Advertise.AdvertiseMode.Parent && Model.CanPublish)
+    {
+        <div onclick="showReserveContainer()" class="advertise-page__bottom-pin-button">
+            <p class="js-reserve-req-title">رزرو<i class="js-reserve-req-icon fa fa-calendar-check"></i></p>
+        </div>
+        <p class="advertise-page__reserve-free-ribbon">رایگان</p>
+    }
+</div>
+
+<div class="advertise-page__content-root" id="js-parent-of-content">
+    <div class="advertise-page__content-container">
+        <input type="hidden" id="Id" value="@Model.Id" />
+        @if (album_photos.Any())
+        {
+            <div class="advertise-page__slider-container-parent">
+                <div class="advertise-image-library advertise-page__slider-container">
+                    @{
+                        var lazy_img_small = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 213, 120);
+                        var lazy_img_medium = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 249, 140);
+                        var lazy_img_large = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 331, 186);
+                        var lazy_img_xlarge = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 450, 253);
+                        var lazy_img_xxlarge = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 600, 338);
+                        var lazy_img_xxxlarge = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 700, 394);
+                        for (int i = 0; i < album_photos.Count; i++)
+                        {
+                            var photo_id = album_photos[i];
+                            string img_small, img_medium, img_large, img_xlarge, img_xxlarge, img_xxxlarge;
+                            //if (i == 0)
+                            //{
+                            //    img_small = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-کوچک/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 213, 120);
+                            //    img_medium = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-متوسط/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 249, 140);
+                            //    img_large = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-بزرگ/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 331, 186);
+                            //    img_xlarge = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-بزرگتر/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 450, 253);
+                            //    img_xxlarge = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-خیلی-بزرگ/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 600, 338);
+                            //    img_xxxlarge = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-بزرگترین/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394);
+                            //}
+                            //else
+                            //{
+                            img_small = photo_id > 0 ? string.Format("/file/accthumbsmall?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 213, 120);
+                            img_medium = photo_id > 0 ? string.Format("/file/accthumbmedium?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 249, 140);
+                            img_large = photo_id > 0 ? string.Format("/file/accthumblarge?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 331, 186);
+                            img_xlarge = photo_id > 0 ? string.Format("/file/accthumbxlarge?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 450, 253);
+                            img_xxlarge = photo_id > 0 ? string.Format("/file/accthumbxxlarge?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 600, 338);
+                            img_xxxlarge = photo_id > 0 ? string.Format("/file/accthumbxxxlarge?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394);
+                            //}
+
+                            <a href="@string.Format("/file/getimage?fileid={0}", photo_id)" data-lightbox="advertise-gallery-set" class="advertise-page__slider-image-container" data-alt="@(Model.TitleDesc.Title)-@(i+1)" data-title="@(Model.TitleDesc.Title)-@(i+1)">
+                                <img data-srcset="@img_small 213w,
+                                    @img_medium 249w,
+                                    @img_large 331w,
+                                    @img_xlarge 450w,
+                                    @img_xxlarge 600w,
+                                    @img_xxxlarge 700w"
+                                     srcset='@(i == 0 ? img_small + " 213w," +
+                                        img_medium + " 249w," +
+                                        img_large + " 331w," +
+                                        img_xlarge + " 450w," +
+                                        img_xxlarge + " 600w," +
+                                        img_xxxlarge + " 700w" : "")'
+                                     sizes="(max-width: 312px) 213px,
+                                     (max-width: 320px) 249px,
+                                     (max-width: 400px) 249px,
+                                     (max-width: 550px) 331px,
+                                     (max-width: 680px) 450px,
+                                     (max-width: 780px) 600px,
+                                     (max-width: 900px) 450px,
+                                     (max-width: 1100px) 450px,
+                                     (max-width: 1200px) 700px,
+                                     700px"
+                                     @*src="/file/resourceimagepng?file_name=lazy-16_9"*@
+                                     @(i == 0 ? "" : "data-lazy=/file/resourceimagepng?file_name=lazy-16_9")
+                                     @*@(i == 0 ? "src=/file/resourceimagepng?file_name=lazy-16_9" : "")*@
+                                     
+                                     data-src="@img_small" @(i > 0 ? "data-" : "") alt="@(Model.TitleDesc.Title)-@(i+1)" @(i > 0 ? "data-" : "") title="@(Model.TitleDesc.Title)-@(i+1)"
+                                     class="advertise-page__slider-image lazy" style="@(i > 0 ? "display:none;" : "")">
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="advertise-page__main-elements-parent">
+            <div class="advertise-page__property-box advertise-page__info-box">
+
+                @* Title and Acc Code *@
+                <div class="advertise-page_title_item">
+                    <h1>@Model.TitleDesc.Title</h1>
+                    <p>کد آگهی : @Model.Id</p>
+                </div>
+
+                @* Acc Owner and Socials & Favorite *@
+                <div class="advertise-page__title-container">
+                    <div class="advertise-page__profile-container">
+                        @if (owner != null && owner.PhotoID > 0 && owner.PhotoStatus == (int)Entities.User.UserPhotoState.publish)
+                        {
+                            <img src='@(string.Format("/عکس-پروفایل_کوچک-{0}", owner.PhotoID))' alt='@(string.Format("عکس پروفایل {0}", owner.FullName))' width="40" height="40" style="object-fit: cover;border-radius: 45px;margin: auto;" />
+                        }
+                        else
+                        {
+                            <i class="fa fa-user-circle"></i>
+                        }
+                        @if (owner != null && !string.IsNullOrEmpty(full_name))
+                        {
+                            <p title="@full_name">@full_name</p>
+                        }
+                        else
+                        {
+                            <p>مالک اقامتگاه</p>
+                        }
+                    </div>
+                    <div class="master__favourite-button" onclick="onClickFavouriteBtn(this)" advertise_id="@Model.Id">
+                        <p>علاقه مندی</p>
+                        <i class="fa fa-heart" style="opacity: 0;font-size:15px;"></i>
+                    </div>
+                    <div class="share-post__button master__share-button">
+                        <p>اشتراک گذاری</p>
+                        <i class="fa fa-share-alt"></i>
+                    </div>
+                </div>
+
+                @* Address *@
+                <div class="advertise-page__main-properties-container">
+
+                    @Html.PartialAsync("AccPagePartials/_AccPageAddress", Model)
+                </div>
+
+                @* Basic Info *@
+                @if (haveBasicInfo)
+                {
+                    <div class="advertise-page__basic-properties-container">
+                        @Html.PartialAsync("AccPagePartials/_AccPageBasicInfo", Model)
+                    </div>
+                }
+
+                @* Price *@
+                @if (Model.AdvertiseMode != Advertise.AdvertiseMode.Parent)
+                {
+                    <div class="advertise-page__price-container">
+                        @Html.PartialAsync("AccPagePartials/_AccPagePrice", Model.Price)
+
+                        @*@if (Model.NorouzOverCapacityPrice > 0)
+                            {
+                                <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
+                                    <span class="advertise-page__price-title">
+                                        قیمت هر مهمان اضافه نوروز <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
+                                    </span>
+                                    <span class="advertise-page__price-content">
+                                        @string.Format("{0:n0}", Model.NorouzOverCapacityPrice) تومان
+                                    </span>
+                                </div>
+                            }*@
+                    </div>
+                }
+
+
+                @* Rules *@
+                @if (Model.CanPublish)
+                {
+                    <div class="advertise-page__rules-container">
+                        @Html.PartialAsync("AccPagePartials/_AccPageRules", Model.Rules)
+                    </div>
+                }
+            </div>
+
+            @Html.PartialAsync("_AccReserveContainer", Model,
+            new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "root_id", "reserve-mobile-container" } })
+        </div>
+
+        @if (Model.CanPublish)
+        {
+            @*<div class="advertise-page__detail-elements-parent">*@
+
+            @* Amenities *@
+            if (haveMainAmenities || haveDetailedAmenities)
+            {
+                <div class="advertise-page__property-box advertise-page__amenities-box">
+                    @Html.PartialAsync("AccPagePartials/_AccPageAmenities", Model)
+                </div>
+            }
+
+            @* About Acc *@
+            <div class="advertise-page__property-box advertise-page__description-box">
+                <P class="advertise-page__description-header">
+                    <i class="fa fa-info-circle"></i> درباره اقامتگاه
+                </P>
+                <p class="advertise-page__description" data-max-height="200">
+                    @Model.TitleDesc.Description
+                </p>
+            </div>
+
+            @* statistics *@
+            <div class="advertise-page__property-box advertise-page__overall-rating-box">
+                @Html.PartialAsync("AccPagePartials/_AccPageStatistics", Model)
+            </div>
+            @*</div>*@
+
+            @* Map *@
+            if (Model.Address.Latitude != 0 && Model.Address.Longitude != 0)
+            {
+                <div class="advertise-page__amenities-container advertise-page_map-box">
+                    <p class="advertise-page__amenities-header"><i class="fa fa-map-marker-alt"></i> موقعیت در نقشه</p>
+                    <div id="mapid" style="height:300px;z-index: 0"></div>
+                </div>
+            }
+
+            @* Comments *@
+            <div class="advertise-page__property-box advertise-page__comment-box">
+                @Html.PartialAsync("AccPagePartials/_AccPageComments", Model)
+            </div>
+        }
+
+        @* Related Links *@
+        <div class="advertise-page__property-box advertise-page__comment-box">
+            @Html.PartialAsync("AccPagePartials/_AccPageRelatedLinks", Model)
+        </div>
+
+        <div class="advertise-page__stick-reserve">
+        </div>
+    </div>
+
+    @Html.PartialAsync("_AccReserveContainer", Model, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "root_id", "reserve-desktop-container" } })
+</div>
+
+@* Related Acc *@
+@{
+    var relatedUrl = "/accomodation/getrelatedaccommodations?id=" + Model.Id;
+    relatedUrl += (!string.IsNullOrEmpty(Model.RelatedLinkCapacity) && int.Parse(Model.RelatedLinkCapacity) > 0 ? "&capacity=" + Model.RelatedLinkCapacity : "");
+    relatedUrl += (!string.IsNullOrEmpty(Model.EmptyRangeFrom) ? "&empty_range_from=" + Model.EmptyRangeFrom : "");
+    relatedUrl += (!string.IsNullOrEmpty(Model.EmptyRangeTo) ? "&empty_range_to=" + Model.EmptyRangeTo : "");
+}
+
+<p class="item__related-title">آگهی های مرتبط:</p>
+
+<div style="min-height: 381.56px;" class="advertise-page__related-container partialContents" data-url="@relatedUrl" data-onload="findLazyImages">
+</div>
+
+<div class="acc__blog-post-root partialContents" data-url="/accomodation/accblognews?id=@Model.Id" data-onload="findLazyImages">
+</div>
+
+@* Parents Reserve *@
+@if (Model.CanPublish && Model.AdvertiseMode == Advertise.AdvertiseMode.Parent)
+{
+    <div id="reserve_popup">
+        <div onclick="hideReservePopup()" class="item__contact-bg"></div>
+        <div style="margin:auto;background:white;border:1px solid #ccc;max-width:400px;">
+            @*<div class="item__contact-header">
+                    <div onclick="hideReservePopup()" class="item__contact-close-button">
+                        <i class="fa fa-times"></i>
+                        <span>بستن</span>
+                    </div>
+                    <span class="js-reserve-req-title">رزرو</span>
+                </div>*@
+            <div id="reserve_popup_container">
+                @Html.PartialAsync("~/views/accomodation/_Reserve.cshtml", Model.ReservePopupData)
+            </div>
+        </div>
+    </div>
+}
+
+@*@if (can_publish && ViewBag.contact_available)
+    {
+        <div class="advertise-page__contact-stick">
+            <div class="advertise-page__profile-container">
+                @if (owner != null && owner.PhotoID > 0 && owner.PhotoStatus == (int)UserDepend.UserPhotoState.publish)
+                {
+                    <img src='@(string.Format("/عکس-پروفایل_کوچک-{0}", owner.PhotoID))' alt='@(string.Format("عکس پروفایل {0}", owner.FullName))' width="40" height="40" style="object-fit: cover;border-radius: 45px;margin: auto;" />
+                }
+                else
+                {
+                    <i class="fa fa-user-circle" style="font-size: 40px;"></i>
+                }
+                @if (owner != null && !string.IsNullOrEmpty(full_name))
+                    {
+                    <span title="@full_name">@full_name</span>
+                }
+                else
+                {
+                    <span>مالک اقامتگاه</span>
+                }
+            </div>
+        </div>
+    }*@
+
+@section ScriptBlock
+{
+    @{
+        var rnd = new Random();
+        var OldRange = (1 - 0);
+        var NewRange = (Model.Address.Latitude + 0.0017 - Model.Address.Latitude - 0.0017);
+        var NewValue = (((rnd.NextDouble() - 0) * NewRange) / OldRange) + Model.Address.Latitude - 0.0017;
+        var lat = NewValue;
+        NewRange = (Model.Address.Longitude + 0.0017 - Model.Address.Longitude - 0.0017);
+        NewValue = (((rnd.NextDouble() - 0) * NewRange) / OldRange) + Model.Address.Longitude - 0.0017;
+        var lng = NewValue;
+    }
+    <script defer="defer" type="text/javascript">
+            @if (Model.Address.Latitude != 0 && Model.Address.Longitude != 0)
+            {
+                @:$(document).ready(function(){
+                    @:var lat = @lat;
+                    @:var lng = @lng;
+                    @:mymap = L.map('mapid').setView([@(Model.IsPreview ? Model.Address.Latitude.ToString() : "lat"), @(Model.IsPreview ? Model.Address.Longitude.ToString() : "lng")], @(Model.IsPreview ? 18 : 14));
+                    @:L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                    @:attribution: '',
+                    @:maxZoom: 18,
+                    @:id: 'mapbox/streets-v11',
+                    @:tileSize: 512,
+                    @:zoomOffset: -1,
+                    @:accessToken: 'REMOVED_MAPBOX_TOKEN'
+                    @:}).addTo(mymap);
+                    if (Model.IsPreview)
+                    {
+                        @:var circle = L.circle([@Model.Address.Latitude, @Model.Address.Longitude], {
+                            @:color: '#fdd835',
+                            @:fillColor: '#fff4d3',
+                            @:fillOpacity: 0.5,
+                            @:radius: 20
+                        @:}).addTo(mymap);
+                    }
+                    else {
+                        @:var circle = L.circle([lat, lng], {
+                            @:color: '#fdd835',
+                            @:fillColor: '#fff4d3',
+                            @:fillOpacity: 0.5,
+                            @:radius: @(Model.AdvertiseType.TypeID == Advertise.AdvertiseType.Villa ? 1000 : 700)
+                        @:}).addTo(mymap);
+                    }
+                    //mymap.on('click', onMapClick);
+            @:});
+    }
+
+            //var popup = L.popup();
+
+            //function onMapClick(e) {
+            //    if (typeof marker != 'undefined')
+            //        marker.remove();
+            //    marker = L.marker(e.latlng).addTo(mymap);
+            //    marker.bindPopup("تست").openPopup();
+            //}
+
+            if ($(".body").width() > 780) {
+                $("#reserve-mobile-container").remove();
+            }
+            else {
+                $("#reserve-desktop-container").remove();
+            }
+    </script>
+    <script defer="defer" type="text/javascript">
+    var reserve_wait_for_login = false;
+    var show_contact_wait_for_login = false;
+    var show_contact_id = null;
+    var show_contact_element = null;
+    var rules_string = '';
+    var short_rules_string = '';
+    var advertise_id = @(Model.Id);
+    const advertiseTitle = '@Model.TitleDesc.Title';
+    const commentsCount = @Model.Comments.Count;
+    var shownCommentsCount = @(Math.Min(Model.Comments.Count, 3));
+    var provinceName = '@(Model.AccCategory.ProvinceName)';
+    var cityName = '@(Model.AccCategory.CityName)';
+    var hostUserRating = @(Model.HostUserRating);
+    var fromDateValue = @(string.IsNullOrEmpty(Model.EmptyRangeFrom) ? "undefined" :
+        (DateTimeUtility.DateValueOfJS(DateTimeUtility.PersianDateToGregorian(StringUtility.PersianNumberToEnglish(Model.EmptyRangeFrom.Replace("/", ","))))).ToString());
+    var toDateValue = @(string.IsNullOrEmpty(Model.EmptyRangeTo) ? "undefined" :
+        (DateTimeUtility.DateValueOfJS(DateTimeUtility.PersianDateToGregorian(StringUtility.PersianNumberToEnglish(Model.EmptyRangeTo.Replace("/", ","))))).ToString());
+    var initialGuestCount =  @(string.IsNullOrEmpty(Model.RelatedLinkCapacity) ? "0" : Model.RelatedLinkCapacity);
+    @if (string.IsNullOrEmpty(Model.EmptyRangeFrom))
+    {
+        @:var empty_range_from = undefined;
+    }
+    else
+    {
+        @:var empty_range_from = "@Model.EmptyRangeFrom";
+    }
+    @if (string.IsNullOrEmpty(Model.EmptyRangeTo))
+    {
+        @:var empty_range_to = undefined;
+    }
+    else
+    {
+        @:var empty_range_to = "@Model.EmptyRangeTo";
+    }
+    currentGuestCount = parseInt(initialGuestCount);
+
+    var instantReserveAvailable;
+
+    var instantReserveActivated;
+    var instantReserveMaxStart = 30;
+    var maxInstantReserveStartUnix;
+    var maxReserveStartDate;
+    jalaliShowLoading();
+    $.ajax({
+    type: "GET",
+        url: "/accomodation/getaccommodationdynamicviewBag",
+        contentType: "application/json; charset=utf-8",
+        data: "id=" + advertise_id,
+        cache: false,
+        success: function (ret) {
+            jalaliHideLoading();
+            user_is_autenticated = ret.user_is_autenticated;
+            instantReserveAvailable = ret.instantReserveAvailable;
+            instantReserveActivated = ret.instantReserveAvailable;
+            instantReserveMaxStart = ret.instantReserveMaxStart;
+            maxInstantReserveStartUnix = ret.maxInstantReserveStartUnix;
+            maxReserveStartDate = ret.maxReserveStartDate;
+            updateReserveRequestButton();
+            var $elem = $('.master__favourite-button');
+            if (ret.is_favourited) {
+                $elem.addClass("active");
+                //$elem.children('span').html('حذف از علاقه مندی ها');
+    }
+    else {
+                $elem.removeClass("active");
+        //$elem.children('span').html('افزودن به علاقه مندی ها');
+    }
+            $elem.children('i').css('opacity', '1');
+
+    fillReserveInfo(advertise_id, ret.occupiedList,
+        ret.priceDict, ret.rules_string);
+    short_rules_string = ret.short_rules_string;
+            //date_price_dict = ret.price_dict;
+            for (var key in ret.price_property_dict) {
+        // check if the property/key is defined in the object itself, not in parent
+        if (ret.price_property_dict.hasOwnProperty(key)) {
+                    $(".js-" + key).find('.advertise-page__price-content').html(ret.price_property_dict[key]);
+        }
+    }
+    if (ret.price_property_dict.hasOwnProperty("NorouzOverCapacityPrice")) {
+                $(".js-" + "NorouzOverCapacityPrice").find('.advertise-page__price-content').html(ret.price_property_dict["NorouzOverCapacityPrice"]);
+    }
+},
+        error: function (result) {},
+        complete: function (result) {}
+});
+
+function updateReserveRequestButton() {
+    if (instantReserveAvailable && instantReserveActivated) {
+            $('#js-instant-reserve-info').css('display', 'flex');
+            $('.js-reserve-req-title').html('رزرو آنی');
+            $('.js-reserve-req-icon').removeClass("fa-calendar-check");
+            $('.js-reserve-req-icon').addClass("fa-bolt");
+            $('#js-mxrsrvstart-label').html(maxReserveStartDate);
+    }
+    else {
+            $('#js-normal-reserve-info').show();
+        $('.js-reserve-req-title').html(' <i class="js-reserve-req-icon fa fa-calendar-check"></i>درخواست رزرو');
+            $('.js-reserve-req-icon').removeClass("fa-bolt");
+            $('.js-reserve-req-icon').addClass("fa-calendar-check");
+    }
+}
+    </script>
+
+    @if (!Model.IsPreview)
+    {
+        <script defer="defer" type="application/ld+json">
+            {
+            "@@context":"https://schema.org",
+            "@@type":"RentAction",
+            "agent":{
+            "@@type":"Organization",
+            "name":"املاک باشی"
+            },
+            "landlord":{
+            "@@type":"Person",
+            "name":"@(owner.FullName)"
+            },
+            "price":"@(Model.Price.DailyPrice).00",
+            "location":{
+            "@@type":"Place",
+            "address":{
+            "@@type":"PostalAddress",
+            "addressLocality":"@(Model.Address.Area > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
+            "addressRegion":"@(Model.Address.Area > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
+            "streetAddress":"@(Model.FilteredAddress)"
+            }
+            },
+            "object":{
+            "@@type":"Hotel",
+            "name":"@(Model.TitleDesc.Title)",
+            "numberOfRooms":"@(Model.Room)",
+            "petsAllowed":"@(Model.Rules.AllowPets ? "Yes" : "No")",
+            @*"floorsize":{
+                "@@type":"QuantitativeValue",
+                "value":"@(Model.Metrazh)",
+                "unitCode":"MTK",
+                "unitText":"متر مربع"
+                },*@
+            "description":"@(Model.TitleDesc.Description)",
+            "image":"https://www.amlakbashi.com@(string.Format("/عکس-آگهی-بزرگ/{0}", Model.Slug))",
+            "url":"https://www.amlakbashi.com@(Model.RawUrl)"
+            @if (Model.ReportItems.CountReport > 0)
+            {
+                @:,
+                @:"aggregateRating": {
+                @:"@@type": "AggregateRating",
+                @:"ratingValue": "@(Model.ReportItems.FloatRating.ToString("F2"))",
+                @:"reviewCount": "@(Model.ReportItems.CountReport)",
+                @:"bestRating": "5",
+                @:"worstRating": "0"
+                @:}
+            }
+            ,
+            "priceRange" : "از شبی @(Model.Price.DailyPrice) تومان"
+            ,
+            "address" : {
+            "addressLocality" : "@(Model.Address.Area > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
+            "addressRegion" : "@(Model.Address.Area > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
+            "addressCountry" : "Iran",
+            "@@type" : "PostalAddress",
+            "streetAddress" : "@Model.FilteredAddress",
+            "postalCode" : "14717"
+            }
+            ,
+            "telephone" : "026-32565304"
+
+            }
+            }
+            }
+        </script>
+        if (Model.ReportItems.CountReport > 0)
+        {
+            <script type="application/ld+json">
+                {
+                "@@context": "https://schema.org",
+                "@@type": "Hotel",
+                "aggregateRating": {
+                "@@type": "AggregateRating",
+                "ratingValue": "@(Model.ReportItems.Rating)",
+                "reviewCount": "@(Model.ReportItems.CountReport)",
+                "bestRating": "5",
+                "worstRating": "0"
+                },
+                "name": "@(Model.TitleDesc.Title)",
+                "description": "@(Model.TitleDesc.Description)",
+                "image": "https://www.amlakbashi.com@(string.Format("/عکس-آگهی-بزرگ/{0}", Model.Slug))",
+                "review": [
+                @for (int i = 0; i < Model.ReportItems.ReportList.Count; i++)
+                {
+                    var report = Model.ReportItems.ReportList.ElementAt(i);
+                    var author_user = report.Key;
+                    var author_name = author_user.FullName;
+                    author_name = !string.IsNullOrEmpty(author_name) ? author_name : author_user.Id.ToString();
+                    var comment = Model.Comments.Where(w => w.Comment.SenderUserID == report.Key.Id).FirstOrDefault().Comment;
+                    var comment_str = comment != null ? comment.Text : "";
+                    var sum_scr = (float)report.Value.Sum(x => x.Score);
+                    var count_scr = (float)report.Value.Count();
+                    var average_score = sum_scr / count_scr;
+                    var date_published = report.Value.Max(x => x.LastModifyDate);
+                    @:{
+                    @:"@@type": "Review",
+                    @:"author": "@(author_name)",
+                    @:"datePublished": "@(date_published.ToString("yyyy-MM-dd"))",
+                    @:"description": "@(comment_str)",
+                    @:"reviewRating": {
+                    @:"@@type": "Rating",
+                    @:"bestRating": "5",
+                    @:"ratingValue": "@(average_score.ToString("F2"))",
+                    @:"worstRating": "1"
+                    @:}
+                    @:}
+                    if (i < Model.ReportItems.ReportList.Count - 1)
+                    {
+                        @:,
+                    }
+                }
+                ]
+
+                ,
+                "priceRange" : "از شبی @(Model.Price.DailyPrice) تومان"
+                ,
+                "address" : {
+                "addressLocality" : "@(Model.Address.Area > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
+                "addressRegion" : "@(Model.Address.Area > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
+                "addressCountry" : "Iran",
+                "@@type" : "PostalAddress",
+                "streetAddress" : "@Model.FilteredAddress",
+                "postalCode" : "14717"
+                }
+                ,
+                "telephone" : "026-32565304"
+
+                }
+            </script>
+        }
+        var url_splitted = ((string)Model.RawUrl).Substring(1).Split('/');
+        var pos = 3;
+        <script defer="defer" type="application/ld+json">
+            {
+            "@@context": "https://schema.org",
+            "@@type": "BreadcrumbList",
+            "itemListElement": [{
+            "@@type": "ListItem",
+            "position": 1,
+            "name": "املاک باشی",
+            "item": "https://www.amlakbashi.com"
+            }
+            ,
+            {
+            "@@type": "ListItem",
+            "position": 2,
+            "name": "اجاره روزانه",
+            "item": "https://www.amlakbashi.com/ایران"
+            }
+            @(pos > 1 ? "," : "" )
+            {
+            "@@type": "ListItem",
+            "position": @pos,
+            "name": "@Model.CityString",
+            "item": "https://www.amlakbashi.com/s/@(Model.Address.City)/@(Model.AccCategory.CityName)"
+            }
+            @{
+                pos++;
+            }
+            @{
+                var typeUrlString = Model.TypeUrlString;
+            }
+            ,
+            {
+            "@@type": "ListItem",
+            "position": @pos,
+            "name": "@typeUrlString",
+            "item": "@("https://www.amlakbashi.com/s/" +
+                    (
+                    (Model.Address.City + "/" + Model.AccCategory.CityName + "/" + typeUrlString)
+                    ))"
+            }
+            @{
+                pos++;
+            }
+            @for (int i = url_splitted.Length - 1; i < url_splitted.Length; i++)
+            {
+                var url = "https://www.amlakbashi.com/";
+                for (int j = 0; j < i; j++)
+                {
+                    url += (url_splitted[j] + "/");
+                }
+                url += url_splitted[i];
+                @:,{
+                @:"@@type": "ListItem",
+                @:"position": @(pos),
+                @:"name": "@(url_splitted[i].Replace("-", " "))",
+                @:"item": "@(url)"}
+                pos++;
+            }
+            ]
+            }
+        </script>
+    }
+
+    @*<script>*@
+    @*gtag('event', 'select_content', {
+            "content_type": "product",
+            "items": [
+              {
+                  "id": "@(Model.AdvertiseID)",
+                  "name": "@(Model.Title)",
+                  "category": "@(AdvertiseDepend.GetRegionInfo(Model.Province).PersianName)/@(AdvertiseDepend.GetRegionInfo(Model.City).PersianName)",
+                  "price": 0@(Model.Childs != null && Model.Childs.Count > 0 ? Model.Childs.Min(x => x.DailyPrice) : Model.DailyPrice)
+              }
+            ]
+        });*@
+    @*</script>*@
+
+    @*<script src="~/Resource/fotorama-4.6.4/fotorama.js"></script>*@
+
+}
