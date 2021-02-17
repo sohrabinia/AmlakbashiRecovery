@@ -73,6 +73,12 @@
     <None Include="Views\BlogPost\AddEdit.cshtml" />
     <None Include="Views\BlogPost\Index.cshtml" />
     <None Include="Views\BlogPost\_AddBlogPost.cshtml" />
+    <None Include="Views\Cart\Admin.cshtml" />
+    <None Include="Views\Cart\Bank.cshtml" />
+    <None Include="Views\Cart\Index.cshtml" />
+    <None Include="Views\Cart\PaymentIndex.cshtml" />
+    <None Include="Views\Cart\PerformPay.cshtml" />
+    <None Include="Views\Cart\TransactionResult.cshtml" />
     <None Include="Views\Post\AccomodationManager.cshtml" />
     <None Include="Views\Post\Contact.cshtml" />
     <None Include="Views\Post\dashboard.cshtml" />
