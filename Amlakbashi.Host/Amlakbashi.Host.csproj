@@ -70,6 +70,9 @@
     <None Include="Views\Advertise\Edit.cshtml" />
     <None Include="Views\Advertise\Index.cshtml" />
     <None Include="Views\BankCard\Index.cshtml" />
+    <None Include="Views\BlogPost\AddEdit.cshtml" />
+    <None Include="Views\BlogPost\Index.cshtml" />
+    <None Include="Views\BlogPost\_AddBlogPost.cshtml" />
     <None Include="Views\Post\AccomodationManager.cshtml" />
     <None Include="Views\Post\Contact.cshtml" />
     <None Include="Views\Post\dashboard.cshtml" />

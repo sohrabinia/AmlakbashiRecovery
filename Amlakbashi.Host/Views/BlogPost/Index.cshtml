@@ -1,0 +1,287 @@
+﻿@using Amlakbashi.Core.DTOs.BlogPostDTOs;
+@inject IUserAccessor userAccessor; 
+@{
+    ViewBag.Title = "مدیریت پست های وبلاگ";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+
+    var placeItems = (BlogPost.PlaceEnum[])Enum.GetValues(typeof(BlogPost.PlaceEnum));
+    ViewBag.region_filter_item_class = "admin-shared__filter-item";
+    ViewBag.region_filter_label_class = "admin-shared__filter-label";
+    ViewBag.region_filter_property_class = "admin-shared__filter-input";
+}
+
+@model IEnumerable<BlogPost>
+
+@{ 
+    var data = ViewBag.dto as IEnumerable<BlogPostIndexDTO>;
+}
+
+@section ScriptLink
+{
+}
+
+@section StyleLink
+{
+    <link rel="stylesheet" type="text/css" href="~/resource/css/admin/admin-shared.css" />
+}
+
+@{ 
+    var status = (BlogPost.BlogPostStatus)ViewBag.status;
+    var sortOrder = (BlogPost.SortOrdersEnum)ViewBag.sortOrder;
+    var showingPlace = (int)ViewBag.showingPlace;
+    string postTitle = ViewBag.postTitle == null ? (string)null : (string)ViewBag.postTitle;
+    var id = (int)ViewBag.id;
+}
+
+<div class="admin-shared__root">
+    @using (Html.BeginForm("Index", "BlogPost", FormMethod.Post, new { id = "js-filter-form" }))
+    {
+        <input type="hidden" id="js-sort-order-input" name="sortOrder" value="@((int)sortOrder)" />
+        <input type="hidden" id="js-status-input" name="status" value="@((int)status)" />
+        <div class="admin-shared__filter-parent">
+            <div class="admin-shared__filter-container">
+                <div class="admin-shared__filter-item">
+                    <div class="admin-shared__filter-label"> کد پست :</div>
+                    <input type="text" class="admin-shared__filter-input" value="@id" name="id" />
+                </div>
+                @await Component.InvokeAsync("RegionSelector", new { province = ViewBag.province, city = ViewBag.city, area = ViewBag.area })
+                <div class="admin-shared__filter-item">
+                    <div class="admin-shared__filter-label"> عنوان :</div>
+                    <input type="text" class="admin-shared__filter-input" value="@postTitle" name="postTitle" />
+                </div>
+                <div class="admin-shared__filter-item">
+                    <div class="admin-shared__filter-label"> محل نمایش :</div>
+                    <select class="admin-shared__filter-input" name="showingPlace">
+                        <option value="-1">همه</option>
+                        @foreach (var item in placeItems)
+                        {
+                            <option is-selected="@(Model != null && showingPlace == (int)item)" value="@((int)item)">@BlogPost.GetPlaceString(item)</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="admin-shared__filter-button-container">
+                <div onclick="submitFilter()" class="admin-shared__button">
+                    <i class="fa fa-filter"></i>
+                    <span>فیلتر</span>
+                </div>
+            </div>
+        </div>
+        <div class="admin-shared__action-container">
+            <div class="admin-shared__status-toggle-container">
+                @{
+                    var statusArr = new BlogPost.BlogPostStatus[] {
+                        BlogPost.BlogPostStatus.All,
+                        BlogPost.BlogPostStatus.Published,
+                        BlogPost.BlogPostStatus.Draft,
+                        BlogPost.BlogPostStatus.Scrap
+                    };
+                    foreach (var st in statusArr)
+                    {
+                        <div onclick="toggleStatus(@((int)st))"
+                             class="admin-shared__status-toggle-item@(status == st ? " selected-toggle" : "")">
+                            @(BlogPost.GetStatusString(st))
+                        </div>
+                    }
+                }
+            </div>
+            <div onclick="addBlogPost()" class="admin-shared__button">
+                <i class="fa fa-plus"></i>
+                <span>افزودن پست</span>
+            </div>
+        </div>
+        <div class="admin-shared__table-parent">
+            <table class="adminTable">
+                <tr>
+                    <th class="minw">ردیف</th>
+                    <th>کد پست</th>
+                    <th>عنوان</th>
+                    <th>عکس</th>
+                    <th>تاریخ ایجاد</th>
+                    <th>آخرین ویرایش</th>
+                    <th>محل نمایش</th>
+                    <th>شهر/منطقه</th>
+                    <th>نوع اقامتگاه</th>
+                    <th>فیلترها</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+                @{
+                    int Idx = (int)ViewBag.RowIndexStart;
+                }
+                @foreach (var item in data)
+                {
+                    Idx++;
+                    <tr id="js-@item.BlogPost.Id">
+                        <td>@Idx</td>
+                        <td>@item.BlogPost.Id</td>
+                        <td>@item.BlogPost.Title</td>
+                        <td>
+                            @if (item.BlogPost.PhotoID > 0)
+                            {
+                                <img src="/file/getimage?fileid=@item.BlogPost.PhotoID" style="max-width:30px;height:auto;" />
+                            }
+                            else
+                            {
+                                @:بدون عکس
+                        }
+                        </td>
+                        <td>
+                            <div style="display:flex;flex-flow:column;justify-content:center;align-items:center;">
+                                <div>@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.BlogPost.CreateTime).Substring(2).Replace(",", "/")</div>
+                                <div>@item.BlogPost.CreateTime.ToString("HH:mm")</div>
+                                <div>@item.UserFullName</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display:flex;flex-flow:column;justify-content:center;align-items:center;">
+                                <div>@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.BlogPost.LastModifyTime).Substring(2).Replace(",", "/")</div>
+                                <div>@item.BlogPost.LastModifyTime.ToString("HH:mm")</div>
+                                <div>@item.LastModifyUserFullName</div>
+                            </div>
+                        </td>
+                        <td>@(BlogPost.GetPlaceString(item.BlogPost.ShowingPlace))</td>
+                        <td>@item.ShowingPlace</td>
+                        <td>
+                        @if (item.BlogPost.ShowingPlace == BlogPost.PlaceEnum.HomePage || (Advertise.AdvertiseType)item.BlogPost.AccommodationType == Advertise.AdvertiseType.All)
+                        {
+                            @:-
+                        }
+                        else
+                        {
+                            @(Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianString((int)item.BlogPost.AccommodationType))
+                        }
+                    </td>
+                    <td>
+                        @if (item.BlogPost.ShowingPlace == BlogPost.PlaceEnum.HomePage || !item.BlogPost.AnyFilter())
+                        {
+                            @:-
+                        }
+                        else
+                        {
+                            <div style="display:flex;flex-flow:column;justify-content:center;align-items:center;">
+                                @if ((Advertise.PositionType)item.BlogPost.PositionType != Advertise.PositionType.none && (int)item.BlogPost.PositionType > 0)
+                                {
+                                    <div>موقعیت: @Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetPositionTypeString((int)item.BlogPost.PositionType)</div>
+                                }
+                                @if (item.BlogPost.PoolStatus == BlogPost.PoolStatusEnum.WithPool)
+                                {
+                                    <div>دارای استخر</div>
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td style="color:@BlogPost.GetStatusColor(item.BlogPost.Status)">
+                        @BlogPost.GetStatusString(item.BlogPost.Status)
+                    </td>
+                    <td>
+                        <div style="display:flex;justify-content:space-between">
+                            <div style="cursor:pointer" onclick="editItem(@item.BlogPost.Id)"><span class="editicon" title="ویرایش"></span></div>
+                            @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 12 ||
+                                userAccessor.CurrentUser.Id == 1667 || userAccessor.CurrentUser.Id == 2122 ||
+                                userAccessor.CurrentUser.Id == 19076)
+                            {
+                                switch (item.BlogPost.Status)
+                                {
+                                    case BlogPost.BlogPostStatus.Draft:
+                                    case BlogPost.BlogPostStatus.Published:
+                                        <span class="deleteicon" onclick="toRecycleBin(@item.BlogPost.Id)" title="انتقال به زباله دان"></span>
+                                        break;
+                                    case BlogPost.BlogPostStatus.Scrap:
+                                        <i class="fa fa-recycle" style="font-size:20px;cursor:pointer;color:#3f3f3f;" onclick="recycleItem(@item.BlogPost.Id)" title="بازیابی"></i>
+                                        <i class="fa fa-trash-alt" style="font-size:20px;cursor:pointer;color:red;" onclick="removeItem(@item.BlogPost.Id)" title="حذف"></i>
+                                        break;
+                                }
+                            }
+                        </div>
+                    </td>
+                </tr>
+                }
+            </table>
+        </div>
+
+                    }
+    <div class="mypagelist">
+        @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "BlogPost", new { page, id = id, status = (int)status, sortOrder = (int)sortOrder, showingPlace = showingPlace, postTitle = postTitle, Province = (int)ViewBag.Province, City = (int)ViewBag.City, Area = (int)ViewBag.Area }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+    </div>
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+        function submitFilter() {
+            $('#js-filter-form').submit();
+        }
+
+        $('.admin-shared__filter-input').on('keypress',function(e) {
+            if(e.which == 13) {
+                submitFilter();
+            }
+        });
+
+        function toggleStatus(targetStatus) {
+            $('#js-status-input').val(targetStatus);
+            submitFilter();
+        }
+
+        function addBlogPost() {
+            navigateToAddEdit();
+        }
+
+        function editItem(id) {
+            navigateToAddEdit(id);
+        }
+
+        function navigateToAddEdit(id) {
+            var targetUrl = '/blogpost/addedit?redirectStatus=' + @((int)status);
+            if (typeof id != 'undefined') {
+                targetUrl += '&id=' + id;
+            }
+            window.location.href = targetUrl;
+        }
+
+        function toRecycleBin(id) {
+            showNoYesMessage('انتقال به زباله دان', 'آیا پست مورد نظر به زباله دان انتقال یابد؟', function () {
+                myajax('blogpost/torecyclebin', 'id=' + id, function (ret) {
+                    if (ret.status == 0) {
+                        alertify.error(ret.msg);
+                    }
+                    else {
+                        alertify.success(ret.msg);
+                        location.reload();
+                    }
+                });
+            });
+        }
+
+        function recycleItem(id) {
+            showNoYesMessage('بازیابی', 'آیا پست مورد نظر بازیابی شود؟', function () {
+                myajax('blogpost/recycleItem', 'id=' + id, function (ret) {
+                    if (ret.status == 0) {
+                        alertify.error(ret.msg);
+                    }
+                    else {
+                        alertify.success(ret.msg);
+                        location.reload();
+                    }
+                });
+            });
+        }
+
+        function removeItem(id) {
+            showNoYesMessage('حذف', 'آیا پست مورد نظر به طور کلی حذف شود؟ (درصورت حذف ، پست دیگر قابل بازیابی نیست)', function () {
+                myajax('blogpost/remove', 'id=' + id, function (ret) {
+                    if (ret.status == 0) {
+                        alertify.error(ret.msg);
+                    }
+                    else {
+                        alertify.success(ret.msg);
+                        location.reload();
+                    }
+                });
+            });
+        }
+
+    </script>
+}
