@@ -24,7 +24,7 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/js/home-page.min.css",
+    "outputFileName": "wwwroot/css/home-page.min.css",
     "inputFiles": [
       "wwwroot/resource/css/general/jalali-date-picker.css",
       "wwwroot/resource/css/portal/home-page.css",
