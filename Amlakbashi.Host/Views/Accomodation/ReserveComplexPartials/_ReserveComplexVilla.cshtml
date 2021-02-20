@@ -116,7 +116,7 @@
                         Model.Bed.BlanketsAndMattresses != 0)
                     {
                         <div class="advertise-page__basic-properties-container">
-                            @Html.Partial("ReserveComplexPartials/_ReserveBasicInfo", null, new ViewDataDictionary(){
+                            @await Html.PartialAsync("ReserveComplexPartials/_ReserveBasicInfo", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()){
                                 {"BuildingSize",child.BuildingSize.Metrazh }, {"LandArea", child.LandArea.LandArea }, {"Pool", child.Amenities.Pool },
                                 {"Parking",child.Parking.Parking }, {"SingleBed",child.Bed.SingleBed },
                                 {"DoublesBed",child.Bed.DoublesBed }, {"Class","reserve-complex__iconic-info-item" }})
@@ -127,7 +127,7 @@
                         child.Price.RentPrice > 0 || child.Price.MoreThanCapacityPrice > 0)
                     {
                         <div class="advertise-page__price-container">
-                            @Html.Partial("ReserveComplexPartials/_ReservePrice", child.Price, new ViewDataDictionary(){
+                            @await Html.PartialAsync("ReserveComplexPartials/_ReservePrice", child.Price, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()){
                                 {"Class","advertie-page__price-item" } })
                         </div>
                     }
@@ -138,7 +138,7 @@
                         child.Bed.BlanketsAndMattresses > 0)
                     {
                         <div class="advertise-page__amenities-main-container">
-                            @Html.Partial("ReserveComplexPartials/_ReserveMainAmenities", new Tuple<AmenitiesDTO, BedDTO>(child.Amenities, child.Bed), new ViewDataDictionary(){
+                            @await Html.PartialAsync("ReserveComplexPartials/_ReserveMainAmenities", new Tuple<AmenitiesDTO, BedDTO>(child.Amenities, child.Bed), new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()){
                                 {"Class","advertise-page__amenities-main-item" } })
                         </div>
                     }
@@ -151,7 +151,7 @@
                         child.Amenities.Foosball || child.Amenities.Golf)
                     {
                         <div class="advertise-page__amenities-detail-container">
-                            @Html.Partial("ReserveComplexPartials/_ReserveDetailAmenities", child.Amenities, new ViewDataDictionary(){
+                            @await Html.PartialAsync("ReserveComplexPartials/_ReserveDetailAmenities", child.Amenities, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()){
                                 {"Class","advertise-page__amenities-detail-item" } })
                         </div>
                     }

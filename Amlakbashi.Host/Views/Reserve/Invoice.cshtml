@@ -1,6 +1,4 @@
-﻿@using PagedList;
-@using PagedList.Mvc;
-@using Amlakbashi.Core.DTOs.ReserveDTOs;
+﻿@using Amlakbashi.Core.DTOs.ReserveDTOs;
 @model IEnumerable<Reserve>
 @{
     ViewBag.Title = "صورتحساب مالی";
@@ -56,7 +54,8 @@
         </div>
         @foreach (var item in data)
         {
-            @Html.Partial("_InvoiceItem", item, new ViewDataDictionary {
+            @await Html.PartialAsync("_InvoiceItem", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                new ModelStateDictionary()) {
                 { "currentRowNumber", currentRowNumber}})
 
             currentRowNumber--;

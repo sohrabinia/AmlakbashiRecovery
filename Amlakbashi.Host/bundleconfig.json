@@ -92,6 +92,7 @@
     "outputFileName": "wwwroot/js/dashboard.min.js",
     "inputFiles": [
       "wwwroot/resource/scripts/jquery-2.1.1.min.js",
+      "wwwroot/lib/dropzone/dropzone.js",
       "wwwroot/resource/scripts/jquery.maskedinput.min.js",
       "wwwroot/resource/scripts/jquery.nicescroll.min.js",
       "wwwroot/resource/ticker/jquery.ticker.js",
@@ -111,7 +112,6 @@
       "wwwroot/resource/Scripts/jquery.onmutate.min.js",
       "wwwroot//resource/rating/jquery.barrating.min.js",
       "wwwroot/resource/scripts/general/ajax-helper.js",
-      "wwwroot/lib/dropzone/dropzone.js",
       "wwwroot/resource/scripts/general/client-helper.js",
       "wwwroot/resource/scripts/general/detail-button.js",
       "wwwroot/resource/scripts/general/increase-decrease-button.js",

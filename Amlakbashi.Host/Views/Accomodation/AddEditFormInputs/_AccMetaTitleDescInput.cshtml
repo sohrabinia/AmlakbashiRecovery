@@ -14,19 +14,19 @@
 
 <div class="static-advertise__item acc-title-decs-input">
     <p class="static-advertise__label">متای عنوان گوگل</p>
-    <input class="js-disable-error static-advertise__property changed-input-target static-advertise__Introduction-title static-advertise__it@(Model.mandatory ? "js-mandatory" : "") @(ViewData.ModelState.IsValidField("MetaTitle") ? "" : "input-validation-error")" value="@Model.MetaTitle" placeholder="فارسی تایپ کنید" name="MetaTitle" @*@(metaEnabled ? "" : "disabled")*@ />
+    <input class="js-disable-error static-advertise__property changed-input-target static-advertise__Introduction-title static-advertise__it@(Model.mandatory ? "js-mandatory" : "") @(ViewData.ModelState["MetaTitle"].ValidationState == ModelValidationState.Valid ? "" : "input-validation-error")" value="@Model.MetaTitle" placeholder="فارسی تایپ کنید" name="MetaTitle" @*@(metaEnabled ? "" : "disabled")*@ />
     <p class="static-advertise__extra-footer">از کلماتی استفاده کنید که فکر می‌کنید بیشتر در گوگل جستجو میشود و در گوگل ترند داغ تر هست.</p>
 </div>
 
 <div class="static-advertise__item full-col">
     <p class="static-advertise__label">متای توضیحات گوگل</p>
     <div class="static-advertise__property">
-        <textarea class="js-disable-error static-advertise__Introduction-title changed-input-target @(Model.mandatory ? "js-mandatory" : "") @(ViewData.ModelState.IsValidField("MetaDescription") ? "" : "input-validation-error")" name="MetaDescription" @*@(metaEnabled ? "" : "disabled")*@>@Model.MetaDescription</textarea>
+        <textarea class="js-disable-error static-advertise__Introduction-title changed-input-target @(Model.mandatory ? "js-mandatory" : "") @(ViewData.ModelState["MetaDescription"].ValidationState == ModelValidationState.Valid ? "" : "input-validation-error")" name="MetaDescription" @*@(metaEnabled ? "" : "disabled")*@>@Model.MetaDescription</textarea>
     </div>
     <div class="static-advertise__extra-footer">در این قسمت از عبارات و کلید واژه هایی استفاده کنید که برای مخاطب جذاب باشد و اطلاعات کلیدی درباره‌ی آگهی را به وی برساند.</div>
 </div>
 
 <div class="static-advertise__item acc-title-decs-input">
     <p class="static-advertise__label">Url آگهی</p>
-    <input class="js-disable-error static-advertise__property changed-input-target static-advertise__Introduction-title static-advertise__it@(Model.mandatory ? "js-mandatory" : "") @(ViewData.ModelState.IsValidField("Slug") ? "" : "input-validation-error")" value="@Model.Slug" name="Slug" @(metaEnabled ? "" : "disabled")/>
+    <input class="js-disable-error static-advertise__property changed-input-target static-advertise__Introduction-title static-advertise__it@(Model.mandatory ? "js-mandatory" : "") @(ViewData.ModelState["Slug"].ValidationState == ModelValidationState.Valid ? "" : "input-validation-error")" value="@Model.Slug" name="Slug" @(metaEnabled ? "" : "disabled")/>
 </div>

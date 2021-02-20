@@ -1,4 +1,5 @@
 ﻿@using Amlakbashi.Core.Common.Utilities;
+@inject IUserAccessor userAccessor;
 @model ReservePayment
 
 @{
@@ -19,7 +20,7 @@
                 کد پشتیبان
             </td>
             <td>
-                @if (User.GetUser().Id == 3)
+                @if (userAccessor.CurrentUser.Id == 3)
                 {
                     @Html.EditorFor(model => model.OperatorID, new { id = "operator_id" })
                 }
@@ -84,7 +85,7 @@
                     @{
                         var payment_type_values = (ReservePayment.ReservePaymentType[])Enum.GetValues(typeof(ReservePayment.ReservePaymentType));
                         var ids_allow = new List<int>() { 3, 12, 1667, 2122};
-                        if (!is_edit && !ids_allow.Contains(User.GetUser().Id))
+                        if (!is_edit && !ids_allow.Contains(userAccessor.CurrentUser.Id))
                         {
                             var allow_types = new List<ReservePayment.ReservePaymentType>()
                             {

@@ -36,14 +36,14 @@
     <None Include="Views\Accomodation\AddEditFormInputs\_AccTypeInput.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AdminPhotoInput.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_ComplexTypeInput.cshtml" />
-    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageAddress.cshtml" />
-    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageAmenities.cshtml" />
-    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageBasicInfo.cshtml" />
-    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageComments.cshtml" />
-    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPagePrice.cshtml" />
-    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageRelatedLinks.cshtml" />
-    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageRules.cshtml" />
-    <None Include="Views\Accomodation\Components\AccPagePartials\_AccPageStatistics.cshtml" />
+    <None Include="Views\Accomodation\AccPagePartials\_AccPageAddress.cshtml" />
+    <None Include="Views\Accomodation\AccPagePartials\_AccPageAmenities.cshtml" />
+    <None Include="Views\Accomodation\AccPagePartials\_AccPageBasicInfo.cshtml" />
+    <None Include="Views\Accomodation\AccPagePartials\_AccPageComments.cshtml" />
+    <None Include="Views\Accomodation\AccPagePartials\_AccPagePrice.cshtml" />
+    <None Include="Views\Accomodation\AccPagePartials\_AccPageRelatedLinks.cshtml" />
+    <None Include="Views\Accomodation\AccPagePartials\_AccPageRules.cshtml" />
+    <None Include="Views\Accomodation\AccPagePartials\_AccPageStatistics.cshtml" />
     <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveBasicInfo.cshtml" />
     <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveComplexApartment.cshtml" />
     <None Include="Views\Accomodation\ReserveComplexPartials\_ReserveComplexHouse.cshtml" />
@@ -195,7 +195,6 @@
   <ItemGroup>
     <Folder Include="Logs\Logs\" />
     <Folder Include="Logs\HangfireLogs\" />
-    <Folder Include="Views\Accomodation\Components\" />
     <Folder Include="wwwroot\Resource\packages\jquery-mobile\images\" />
   </ItemGroup>
 
