@@ -21,7 +21,7 @@ namespace Amlakbashi.Core.Entities
         public string CustomTitle { get; set; }
 
         [ForeignKey("UserID")]
-        public User User { get; set; }
+        public virtual User User { get; set; }
 
         [ForeignKey("ReserveID")]
         public virtual Reserve Reserve { get; set; }

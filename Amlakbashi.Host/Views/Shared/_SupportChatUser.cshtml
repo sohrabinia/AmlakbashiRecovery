@@ -1,15 +1,4 @@
-﻿@helper StyleHelper(string style)
-{
-    if (string.IsNullOrEmpty(style))
-    {
-        @:
-    }
-    else
-    {
-        @:style="@style"
-    }
-}
-<div class="support-chat__user-inform">
+﻿<div class="support-chat__user-inform">
     <i class="fa fa-times" onclick="hideSupportChatInform()"></i>
     <span style="padding:10px 5px" onclick="showSupportChat()">سلام چطور میتونم کمکتون کنم؟</span>
 </div>
@@ -37,7 +26,7 @@
     </div>
     <div class="support-chat__chat-box">
     </div>
-    <div @StyleHelper(ViewBag.onlineSupport ? "display:none" : "") class="support-chat__input-container">
+    <div @(ViewBag.onlineSupport ? "style='display:none'" : "") class="support-chat__input-container">
         <i class="fa fa-play support-chat__send-button" onclick="sendSupportChatMessage()"></i>
         <textarea onkeyup="chat_box_inputkeyup()" type="text" class="support-chat__text-input" placeholder="متن خود را اینجا بنویسید"></textarea>
     </div>

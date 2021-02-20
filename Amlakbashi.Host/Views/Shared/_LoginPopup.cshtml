@@ -38,7 +38,7 @@
                             @*برای تایید و ورود کد ارسال شده از طریق پیامک را وارد کنید*@
                         @*</div>*@
                         <input class="login__box-input" onkeyup="validateNumber(this);" onchange="validateNumber(this)" type="text" name="code" id="code" value="">
-                        @Html.Partial("_resend-form-login", new ViewDataDictionary { { "id", "resend_form" }, { "title", "درخواست ارسال مجدد" }, { "id_resend", "resend_button" }, { "id_count_down_timer", "count_down_timer" } })
+                        @await Html.PartialAsync("_resend-form-login", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "resend_form" }, { "title", "درخواست ارسال مجدد" }, { "id_resend", "resend_button" }, { "id_count_down_timer", "count_down_timer" } })
                         <input type="submit" onkeypress="onMobileKeyPress" value="تایید کد" id="success__code" class="login__box-button" />
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                     <p class="login__resend-message">ابتدا پوشه inbox و spam ایمیل خود را چک کنید. </p>
                     <p class="login__resend-message">  اگر ایمیلی ارسال نشده بود,پس از گذشت 2 دقیقه بر روی دکمه زیر کلیک کنید</p>
                 </div>
-                @Html.Partial("_resend-form-login", new ViewDataDictionary { { "id", "resend_form_email" }, { "title", "درخواست ارسال مجدد" }, { "id_resend", "email_resend_button" }, { "id_count_down_timer", "email_count_down_timer" } })
+                @await Html.PartialAsync("_resend-form-login", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "resend_form_email" }, { "title", "درخواست ارسال مجدد" }, { "id_resend", "email_resend_button" }, { "id_count_down_timer", "email_count_down_timer" } })
             </div>
         </div>
     </div>

@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject IUserAccessor userAccessor;
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Global Site Tag (gtag.js) - Google Analytics -->
@@ -18,7 +19,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="offline" href="/offline.html">
     <meta name="theme-color" content="#fdd835" />
-    <link rel='index' title='املاک باشی' href='@string.Format("http{0}://{1}", Request.IsSecureConnection ? "s" : "", Request.Url.Authority)' />
+    <link rel='index' title='املاک باشی' href='@string.Format("http{0}://{1}", Context.Request.Scheme, Context.Request.Host)' />
     <meta name="coverage" content="Worldwide" />
     <meta name="robots" content="index,follow,all" />
     <meta name="googlebot" content="index,follow" />
@@ -66,11 +67,11 @@
                     <a href="/bankcard/index" style="background-image:url(/resource/img/bankCard.png)" class="item">حساب بانکی</a>
                     <a href="/supportchat/index" style="background-image:url(/resource/img/Message-icon-grey.png)" class="item">چت پشتیبانی</a>
                     <a href="/cart/admin" style="background-image:url(/resource/img/buy.png)" class="item">مالی</a>
-                    @if (User.GetUser().Id == 3 || User.GetUser().Id == 1667 || User.GetUser().Id == 12 || User.GetUser().Id == 2122)
+                    @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667 || userAccessor.CurrentUser.Id == 12 || userAccessor.CurrentUser.Id == 2122)
                     {
                         <a href="/grouppayment/index" style="background-image:url(/resource/img/credit_card_multi-512.png)" class="item">پرداخت گروهی</a>
                     }
-                    @if (User.GetUser().Id == 3 || User.GetUser().Id == 1667 || User.GetUser().Id == 12 || User.GetUser().Id == 19076 || User.GetUser().Id == 71082)
+                    @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667 || userAccessor.CurrentUser.Id == 12 || userAccessor.CurrentUser.Id == 19076 || userAccessor.CurrentUser.Id == 71082)
                     {
                         <a href="/blogpost/index" style="background-image:url(/resource/img/post.png)" class="item">پست وبلاگ</a>
                         @*<a href="/categorypost/index" style="background-image:url(/resource/img/post.png)" class="item">پست دسته بندی</a>*@
@@ -83,9 +84,9 @@
                     <a href="/admin/sms" style="background-image: url(/resource/img/Message-icon-grey.png)" class="item">ارسال اس ام اس</a>
                     <a href="/actionlog/index" style="background-image:url(/resource/img/log.png)" class="item">لاگ تغییرات</a>
                     @{
-                        if (User.GetUser().Id == 3 || User.GetUser().Id == 1667 ||
-                            User.GetUser().Id == 12 || User.GetUser().Id == 2122 ||
-                            User.GetUser().Id == 19076)
+                        if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667 ||
+                            userAccessor.CurrentUser.Id == 12 || userAccessor.CurrentUser.Id == 2122 ||
+                            userAccessor.CurrentUser.Id == 19076)
                         {
                             <a href="/admin/SendGroupNotification" style="background-image: url(/resource/img/Message-icon-grey.png)" class="item">نوتیفیکیشن گروهی</a>
                         }

@@ -2,45 +2,28 @@
     ViewBag.Title = "املاک باشی - اجاره ویلا در شمال ، اجاره سوئیت و آپارتمان مبله در تهران و سراسر ایران";
     Layout = "~/Views/Shared/_Master.cshtml";
 }
+
 @section StyleLink {
-
-    @*@MvcHtmlString.Create(
-        Bundle.Css()
-            .Add("~/Resource/css/general/jalali-date-picker.css")
-            .Add("/resource/css/general/home-page-search.css")
-            .ForceRelease()
-            .Render("/resource/css_output/minifysearchpagecss_v1_2.css"))*@
-
+    <link rel="stylesheet" type="text/css" href="/css/search.min.css">
 }
-@section StyleBlock {
-    @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/css_output/minifysearchpagecss_v1_2.css")))
 
+@section StyleBlock {
     .home-page__search-title {
-        color:#242424;
-        text-shadow:none;
+    color:#242424;
+    text-shadow:none;
     }
 }
+
 @section ScriptLink {
-    @*@MvcHtmlString.Create(
-        Bundle.JavaScript()
-        .Add("/resource/scripts/general/jalali-date-converter.js")
-        .Add("/resource/scripts/general/jalali-date-handler.js")
-        .Add("/resource/scripts/general/jalali-date-picker.js")
-        .Add("/resource/scripts/general/home-page-search.js")
-        .Add("/resource/scripts/general/increase-decrease-button.js")
-        .ForceRelease()
-        .Render("/resource/js_output/minifysearchpagejs_v1_5.js"))*@
+    <script src="~/js/search.min.js"></script>
 }
+
 @await Html.PartialAsync("_HomePageSearch", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "autofocus", true } })
-@section HeaderAddition
-{
-}
 
 @section ScriptBlock
 {
     <script type="text/javascript">
-        @Html.Raw(System.IO.File.ReadAllText(Server.MapPath("/resource/js_output/minifysearchpagejs_v1_5.js")))
         $(document).ready(function () {
             setTimeout(function () {
                 $('#js-search-input-main').click();

@@ -1,23 +1,12 @@
 ﻿@using Amlakbashi.Core.Infrastructure.HtmlHelpers;
 @using Amlakbashi.Core.DTOs.SupportChatDTOs;
-
+@inject IUserAccessor userAccessor;
 @model SupportChatPopupDTO
 
-@helper StyleHelper(string style)
-{
-    if (string.IsNullOrEmpty(style))
-    {
-        @:
-    }
-    else
-    {
-        @:style="@style"
-    }
-}
 <div class="chat-popup__container">
     @{
-        var is_user = Model == null || Model.SupportChat == null || Model.SupportChat.UserID == 0 || Model.SupportChat.UserID == User.GetUser().Id;
-        var user_id = User.GetUser().Id;
+        var is_user = Model == null || Model.SupportChat == null || Model.SupportChat.UserID == 0 || Model.SupportChat.UserID == userAccessor.CurrentUser.Id;
+        var user_id = userAccessor.CurrentUser.Id;
         if (Model == null || Model.SupportChat == null || !Model.SupportChat.Messages.Any())
         {
             <div style="font:11px Miransans;min-width: 294px;">سلام چطور میتونم کمکتون کنم؟</div>
@@ -61,7 +50,7 @@
                     <span>@(is_self ? "شما" : (is_user ? "پشتیبان" : user_id == 0 ? "ناشناس" : Model.UserFullName))</span>
                 </div>
                 }
-                <div @StyleHelper(item.UserID >= 0 ? "" : "width:100%;margin:0;") class="@(is_self ? "speech-bubble-right" : "speech-bubble-left")">
+                <div @(item.UserID >= 0 ? "" : "style='width:100%;margin:0;'") class="@(is_self ? "speech-bubble-right" : "speech-bubble-left")">
                     @for (int i = 0; i < chatSentences.Count; i++)
                     {
                         if (i > 0)

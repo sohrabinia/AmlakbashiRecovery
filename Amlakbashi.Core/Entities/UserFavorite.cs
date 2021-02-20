@@ -10,5 +10,11 @@ namespace Amlakbashi.Core.Entities
         public override int Id { get; set; }
         public long AdvertiseID { get; set; }
         public DateTime SetDate { get; set; }
+
+        [Column("User_Id")]
+        public int UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public virtual User User { get; set; }
     }
 }

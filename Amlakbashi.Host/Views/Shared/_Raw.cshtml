@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@inject UserAccessor userAccessor;
+<!DOCTYPE html>
 <html class="theme3">
 <head>
     <title>@ViewBag.Title</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="icon" type="image/png" href="https://www.amlakbashi.com/favicon.png" />
-    <link rel='index' title='@System.Configuration.ConfigurationManager.AppSettings["sitetitle"]' href='@string.Format("http://{0}", Request.Url.Authority)' />
+    <link rel='index' title='@System.Configuration.ConfigurationManager.AppSettings["sitetitle"]' href='@string.Format("http://{0}", Context.Request.Host)' />
     <meta name="viewport" content="width=device-width, minimum-scale=0.25, maximum-scale=1.0, initial-scale=1.0" />
     <meta name="coverage" content="Worldwide" />
     <meta name="robots" content="index,follow,all" />
@@ -60,13 +61,13 @@
                         <i class="fa fa-user"></i>
                         @if (User.Identity.IsAuthenticated)
                         {
-                            if (string.IsNullOrEmpty(User.GetUser().FullName))
+                            if (string.IsNullOrEmpty(userAccessor.CurrentUser.FullName))
                             {
-                                <span> کاربر @User.GetUser().Id</span>        
+                                <span> کاربر @userAccessor.CurrentUser.Id</span>        
                             }
                             else
                             {
-                                <span> @User.GetUser().FullName </span>
+                                <span> @userAccessor.CurrentUser.FullName </span>
                             }
                         }
                         else

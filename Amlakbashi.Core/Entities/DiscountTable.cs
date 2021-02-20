@@ -14,7 +14,7 @@ namespace Amlakbashi.Core.Entities
         public long AdvertiseID { get; set; }
         [ForeignKey("AdvertiseID")]
         [JsonIgnore]
-        public Advertise Advertise { get; set; }
+        public virtual Advertise Advertise { get; set; }
         public DateTime From { get; set; }
         public DateTime To { get; set; }
         public int Percent { get; set; }

@@ -47,7 +47,6 @@ namespace Amlakbashi.Host
 
             //Added for session state
             services.AddDistributedMemoryCache();
-
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(2);
@@ -72,7 +71,7 @@ namespace Amlakbashi.Host
             services.AddHangfireServer();
 
             services.AddResponseCaching();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddSignalR();
         }
 
