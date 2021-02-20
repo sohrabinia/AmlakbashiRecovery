@@ -7,7 +7,7 @@
 تعداد نظرات: @StringUtility.EnglishNumberToPersian(Model.Statistics.CountUserRating.ToString()) مهمان
 </pre>
 <div class="advertise-page__socre-box"><p class="advertise-page__score-advertise">امتیاز آگهی :</p>
-    @Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", Model.ReportItems.FloatRating } })
+    @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", Model.ReportItems.FloatRating } })
     </div>
 <div class="advertise-page__overall-rating-container">
     @{ var userRatingTypes = Enum.GetValues(typeof(Comment.UserRatingType)) as Comment.UserRatingType[]; }
@@ -18,7 +18,7 @@
             <p class="advertise-page__overall-rating-title">@Model.Statistics.UserRatingTypeString[userRatingType]</p>
                 @if (current_rating > 0)
                 {
-                    @:@(Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", current_rating } }))
+                    @:@(await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", current_rating } }))
                 }
                 else
                 {

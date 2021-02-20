@@ -1,20 +1,20 @@
 ﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs.DashboardAccDTO
 
-@Html.PartialAsync("_TitleBanner", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+@await Html.PartialAsync("_TitleBanner", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "title", Model.title }, { "id", Model.id }, {"avatar", Model.photoUrl }, { "closeClass", "exit1" } })
 <!-- start form -->
 <!-- ----------active-banner------ -->
 <div class="style_title-list general-style-banner">
-    @Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+    @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", " تنظیمات کلی " + Model.typeString } })
     <div class="parent-box">
         @if (Model.isVerified)
         {
             <form class="setting-list">
                 <div class="status-banner">
-                    @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                    @await Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "title", "نمایش آگهی " }, { "Active", Model.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "true") } })
-                    @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                    @await Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "title", "عدم نمایش آگهی " }, { "Active", !Model.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "false") } })
                 </div>
             </form>
@@ -25,12 +25,12 @@
         }
         <p class="title-box">تعیین مدت رزرو </p>
         <div class="day-set-quick ">
-            @Html.PartialAsync("_MinAndMaxDay", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+            @await Html.PartialAsync("_MinAndMaxDay", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "js-min-input", "js-min-input-" + Model.id }, { "js-max-input", "js-max-input-" + Model.id }, { "minReserve", Model.minReserveDays }, { "maxReserve", Model.maxReserveDays }, { "id", Model.id } })
         </div>
         <p class="title-box"> رزروآنی</p>
         <div class="instantReserve style-instant-reserve">
-            @Html.PartialAsync("_InstantReserve", Model, new ViewDataDictionary(new EmptyModelMetadataProvider(),
+            @await Html.PartialAsync("_InstantReserve", Model, new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "instantReserveAccess", ViewData["ReserveAccess"] }, { "UserID", ViewBag.UserID } })
         </div>
     </div>

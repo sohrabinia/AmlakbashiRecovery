@@ -79,6 +79,26 @@
     <None Include="Views\Cart\PaymentIndex.cshtml" />
     <None Include="Views\Cart\PerformPay.cshtml" />
     <None Include="Views\Cart\TransactionResult.cshtml" />
+    <None Include="Views\Category\DynamicEdit.cshtml" />
+    <None Include="Views\Category\DynamicIndex.cshtml" />
+    <None Include="Views\Category\Item.cshtml" />
+    <None Include="Views\Category\SiteMap.cshtml" />
+    <None Include="Views\Chat\Edit.cshtml" />
+    <None Include="Views\Chat\Index.cshtml" />
+    <None Include="Views\Comment\AdvertiseCommentDetail.cshtml" />
+    <None Include="Views\Comment\AdvertiseCommentManager.cshtml" />
+    <None Include="Views\Comment\Edit.cshtml" />
+    <None Include="Views\Comment\Index.cshtml" />
+    <None Include="Views\Comment\_AdvertiseCommentItem.cshtml" />
+    <None Include="Views\Errors\AccessDenied.cshtml" />
+    <None Include="Views\Errors\Http404.cshtml" />
+    <None Include="Views\Errors\Http500.cshtml" />
+    <None Include="Views\File\Edit.cshtml" />
+    <None Include="Views\File\Index.cshtml" />
+    <None Include="Views\File\PhotoCropper.cshtml" />
+    <None Include="Views\GroupPayment\Index.cshtml" />
+    <None Include="Views\GroupPayment\_GroupPaymentDetail.cshtml" />
+    <None Include="Views\GroupPayment\_GroupPaymentList.cshtml" />
     <None Include="Views\Post\AccomodationManager.cshtml" />
     <None Include="Views\Post\Contact.cshtml" />
     <None Include="Views\Post\dashboard.cshtml" />
@@ -107,6 +127,19 @@
     <None Include="Views\Post\_TitleBanner.cshtml" />
     <None Include="Views\Post\_TitleList.cshtml" />
     <None Include="Views\Post\_TitleRoomsCard.cshtml" />
+    <None Include="Views\Reserve\Admin.cshtml" />
+    <None Include="Views\Reserve\Chat.cshtml" />
+    <None Include="Views\Reserve\Edit.cshtml" />
+    <None Include="Views\Reserve\GuestReceipt.cshtml" />
+    <None Include="Views\Reserve\Index.cshtml" />
+    <None Include="Views\Reserve\Invoice.cshtml" />
+    <None Include="Views\Reserve\ReserveItemManager.cshtml" />
+    <None Include="Views\Reserve\_AddGuestPayment.cshtml" />
+    <None Include="Views\Reserve\_InvoiceItem.cshtml" />
+    <None Include="Views\Reserve\_InvoicePopup.cshtml" />
+    <None Include="Views\Reserve\_ReserveItem.cshtml" />
+    <None Include="Views\Reserve\_ReserveList.cshtml" />
+    <None Include="Views\Reserve\_ReservePayment.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

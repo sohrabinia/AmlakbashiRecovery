@@ -228,14 +228,14 @@
                 @* Address *@
                 <div class="advertise-page__main-properties-container">
 
-                    @Html.PartialAsync("AccPagePartials/_AccPageAddress", Model)
+                    @await Html.PartialAsync("AccPagePartials/_AccPageAddress", Model)
                 </div>
 
                 @* Basic Info *@
                 @if (haveBasicInfo)
                 {
                     <div class="advertise-page__basic-properties-container">
-                        @Html.PartialAsync("AccPagePartials/_AccPageBasicInfo", Model)
+                        @await Html.PartialAsync("AccPagePartials/_AccPageBasicInfo", Model)
                     </div>
                 }
 
@@ -243,7 +243,7 @@
                 @if (Model.AdvertiseMode != Advertise.AdvertiseMode.Parent)
                 {
                     <div class="advertise-page__price-container">
-                        @Html.PartialAsync("AccPagePartials/_AccPagePrice", Model.Price)
+                        @await Html.PartialAsync("AccPagePartials/_AccPagePrice", Model.Price)
 
                         @*@if (Model.NorouzOverCapacityPrice > 0)
                             {
@@ -264,12 +264,12 @@
                 @if (Model.CanPublish)
                 {
                     <div class="advertise-page__rules-container">
-                        @Html.PartialAsync("AccPagePartials/_AccPageRules", Model.Rules)
+                        @await Html.PartialAsync("AccPagePartials/_AccPageRules", Model.Rules)
                     </div>
                 }
             </div>
 
-            @Html.PartialAsync("_AccReserveContainer", Model,
+            @await Html.PartialAsync("_AccReserveContainer", Model,
             new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "root_id", "reserve-mobile-container" } })
         </div>
 
@@ -281,7 +281,7 @@
             if (haveMainAmenities || haveDetailedAmenities)
             {
                 <div class="advertise-page__property-box advertise-page__amenities-box">
-                    @Html.PartialAsync("AccPagePartials/_AccPageAmenities", Model)
+                    @await Html.PartialAsync("AccPagePartials/_AccPageAmenities", Model)
                 </div>
             }
 
@@ -297,7 +297,7 @@
 
             @* statistics *@
             <div class="advertise-page__property-box advertise-page__overall-rating-box">
-                @Html.PartialAsync("AccPagePartials/_AccPageStatistics", Model)
+                @await Html.PartialAsync("AccPagePartials/_AccPageStatistics", Model)
             </div>
             @*</div>*@
 
@@ -312,20 +312,20 @@
 
             @* Comments *@
             <div class="advertise-page__property-box advertise-page__comment-box">
-                @Html.PartialAsync("AccPagePartials/_AccPageComments", Model)
+                @await Html.PartialAsync("AccPagePartials/_AccPageComments", Model)
             </div>
         }
 
         @* Related Links *@
         <div class="advertise-page__property-box advertise-page__comment-box">
-            @Html.PartialAsync("AccPagePartials/_AccPageRelatedLinks", Model)
+            @await Html.PartialAsync("AccPagePartials/_AccPageRelatedLinks", Model)
         </div>
 
         <div class="advertise-page__stick-reserve">
         </div>
     </div>
 
-    @Html.PartialAsync("_AccReserveContainer", Model, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "root_id", "reserve-desktop-container" } })
+    @await Html.PartialAsync("_AccReserveContainer", Model, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "root_id", "reserve-desktop-container" } })
 </div>
 
 @* Related Acc *@
@@ -358,7 +358,7 @@
                     <span class="js-reserve-req-title">رزرو</span>
                 </div>*@
             <div id="reserve_popup_container">
-                @Html.PartialAsync("~/views/accomodation/_Reserve.cshtml", Model.ReservePopupData)
+                @await Html.PartialAsync("~/views/accomodation/_Reserve.cshtml", Model.ReservePopupData)
             </div>
         </div>
     </div>

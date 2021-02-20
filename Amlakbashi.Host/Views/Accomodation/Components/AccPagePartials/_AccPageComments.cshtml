@@ -52,7 +52,7 @@
                             <p>@StringUtility.EnglishNumberToPersian(DateTimeUtility.ConvertDate(comment.Comment.CreateDate))</p>
                         </div>
                         <div>
-                            @Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) {
+                            @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) {
                                        { "score", average_score },
                                        { "onclick", "showRatingDetail(" + Model.Id + "," + comment.Comment.SenderUserID +")" }
                                        })

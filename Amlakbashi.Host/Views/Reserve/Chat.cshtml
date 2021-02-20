@@ -1,0 +1,58 @@
+﻿@model IEnumerable<Chat>
+
+@{
+    ViewBag.Title = "چت رزرو";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+<a class="cancel" href="../Reserve/Index" style="float:left;">بازگشت</a>
+<table style="margin-bottom:10px;table-layout:fixed;">
+    <tr>
+        <td class="label">
+            کد رزرو :
+        </td>
+        <td style="width:300px;color:white;">
+            <a href="/Reserve/Index?reserve_id=@ViewBag.ReserveID">@ViewBag.ReserveID</a>
+        </td>
+    </tr>
+    <tr>
+        <td class="label">
+            کد مهمان :
+        </td>
+        <td style="width:300px;">
+            <a href="/User/Index?code=@ViewBag.GuestUserID">@ViewBag.GuestUserID</a>
+        </td>
+    </tr>
+    <tr>
+        <td class="label">
+            کد میزبان :
+        </td>
+        <td style="width:300px;">
+            <a href="/User/Index?code=@ViewBag.HostUserID">@ViewBag.HostUserID</a>
+        </td>
+    </tr>
+</table>
+<table style="margin-bottom:10px;table-layout:fixed;">
+    @{
+        if (Model == null || Model.Count() == 0)
+        {
+            <tr>
+                <td style="color:red;">بدون چت</td>
+            </tr>
+        }
+        foreach (var item in Model)
+        {
+            var is_guest = item.UserID == ViewBag.GuestUserID;
+            <tr style="background-color: #EAEAEA;">
+                <td class="label" style="text-align:center;width:15px;">
+                    @(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.CreateTime))_@(item.CreateTime.ToString("HH:mm"))
+                </td>
+                <td class="label" style="text-align:center;width:15px;">
+                    @(is_guest ? "مهمان" : "میزبان")
+                </td>
+                <td class="label" style="text-align:center;width:40px;white-space:normal;">
+                    @item.Text
+                </td>
+            </tr>
+        }
+    }
+</table>

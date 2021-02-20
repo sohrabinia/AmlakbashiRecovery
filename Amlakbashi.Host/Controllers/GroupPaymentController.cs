@@ -477,7 +477,7 @@ namespace Amlakbashi.Host.Controllers
             List<Reserve> todayPayments, paymentsWithError, excludingPayments;
             accounting.GetGroupPaymentReserves(out todayPayments, out paymentsWithError, out excludingPayments);
 
-            var model = new Dictionary<GroupPayment.GroupPaymentStatus, IEnumerable<GroupPaymentItemDTO>>();
+            var model = new Dictionary<GroupPaymentStatusDTO, IEnumerable<GroupPaymentItemDTO>>();
             List<GroupPaymentItemDTO> dtoList = new List<GroupPaymentItemDTO>();
 
             foreach (var item in todayPayments)
@@ -498,7 +498,7 @@ namespace Amlakbashi.Host.Controllers
                         item.PrizePrice)
                 });
             }
-            model.Add(GroupPayment.GroupPaymentStatus.ReadyToPay, dtoList);
+            model.Add(new GroupPaymentStatusDTO(GroupPayment.GroupPaymentStatus.ReadyToPay), dtoList);
 
             dtoList = new List<GroupPaymentItemDTO>();
             foreach (var item in paymentsWithError)
@@ -519,7 +519,7 @@ namespace Amlakbashi.Host.Controllers
                         item.PrizePrice)
                 });
             }
-            model.Add(GroupPayment.GroupPaymentStatus.WithError, dtoList);
+            model.Add(new GroupPaymentStatusDTO(GroupPayment.GroupPaymentStatus.WithError), dtoList);
 
             dtoList = new List<GroupPaymentItemDTO>();
             foreach (var item in excludingPayments)
@@ -540,7 +540,7 @@ namespace Amlakbashi.Host.Controllers
                         item.PrizePrice)
                 });
             }
-            model.Add(GroupPayment.GroupPaymentStatus.Excluded, dtoList);
+            model.Add(new GroupPaymentStatusDTO(GroupPayment.GroupPaymentStatus.Excluded), dtoList);
 
             return PartialView("_GroupPaymentList", model);
         }

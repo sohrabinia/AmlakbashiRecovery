@@ -7,7 +7,7 @@
 {
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/dashboard.css">
 }
-@Html.PartialAsync("_CommentItem", Model)
+@await Html.PartialAsync("_CommentItem", Model)
 <div class="reply-comment">
     <div class="reply-comment__container" style="@(!ViewBag.ReplySent ? "display:none;" : "")">
         <div class="reply-comment__title-container">

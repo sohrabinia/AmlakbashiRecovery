@@ -47,6 +47,16 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/css/cat-item.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/portal/advertise-list.css",
+      "wwwroot/resource/css/portal/post-list.css",
+      "wwwroot/resource/css/general/master-search.css",
+      "wwwroot/resource/css/general/search-by-region.css"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/js/home-page.min.js",
     "inputFiles": [
       "wwwroot/resource/scripts/general/jalali-date-converter.js",
@@ -76,6 +86,27 @@
       "wwwroot/resource/scripts/page/accommodation-item-page.js",
       "wwwroot/resource/scripts/general/detail-button.js",
       "wwwroot/resource/scripts/general/increase-decrease-button.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/cat-item.min.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/jquery.plugin.min.js",
+      "wwwroot/resource/scripts/general/detail-button.js",
+      "wwwroot/resource/scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/scripts/general/master-search.js",
+      "wwwroot/resource/scripts/general/search-by-region.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/scripts/general/price-slider.js",
+      "wwwroot/resource/scripts/general/price-string-generator.js",
+      "wwwroot/resource/scripts/page/accommodation-list-page.js",
+      "wwwroot/resource/scripts/page/custom-filter-elements.js",
+      "wwwroot/resource/scripts/page/filter-subject.js",
+      "wwwroot/resource/scripts/page/filter-ui-manager.js",
+      "wwwroot/resource/scripts/page/filter-data-manager.js",
+      "wwwroot/resource/scripts/page/filter-submit-manager.js"
     ]
   }
 ]

@@ -1,0 +1,174 @@
+﻿@model Reserve
+
+@{
+    ViewBag.Title = "رزرو";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+@helper isSelected(bool stat)
+{
+    if (stat)
+    {
+        @:selected="selected"
+    }
+    else
+    {
+        @:""
+    }
+}
+
+<div class="title">ویرایش رزرو</div>
+
+@if (Model != null)
+{
+    using (Html.BeginForm("Edit", "Reserve", FormMethod.Post))
+    {
+
+        @Html.HiddenFor(model => model.Id)
+        <table>
+            <tr>
+                <td class="label">
+                    کد آگهی :
+                </td>
+                <td>
+                    <span>@Model.AdvertiseID</span>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">
+                    کد کاربری مهمان :
+                </td>
+                <td>
+                    <span>@Model.UserID</span>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">
+                    تاریخ شروع :
+                </td>
+                <td>
+                    @if (User.GetUser().Id == 3 || User.GetUser().Id == 1667 ||
+                        User.GetUser().Id == 12 || User.GetUser().Id == 2122 ||
+                        User.GetUser().Id == 19076)
+                    {
+                        <input name="start_date" type="text" value="@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.StartDate)" />
+                    }
+                    else
+                    {
+                        <span>@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.StartDate)</span>
+                    }
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">
+                    تاریخ پایان :
+                </td>
+                <td>
+                    @if (User.GetUser().Id == 3 || User.GetUser().Id == 1667 ||
+                        User.GetUser().Id == 12 || User.GetUser().Id == 2122 ||
+                        User.GetUser().Id == 19076)
+                    {
+                        <input name="end_date" type="text" value="@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.EndDate)" />
+                    }
+                    else
+                    {
+                        <span>@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.EndDate)</span>
+                    }
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">
+                    تعداد نفرات :
+                </td>
+                <td>
+                    @Html.EditorFor(model => model.NumberOfGuests)
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">
+                    مبلغ کل :
+                </td>
+                <td>
+                    @Html.EditorFor(model => model.TotalPrice)
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">
+                    مبلغ بیعانه :
+                </td>
+                <td>
+                    @Html.EditorFor(model => model.DepositPrice)
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">
+                    پاسخ میزبان :
+                </td>
+                <td style="width:300px;">
+                    <select name="HostResponse">
+                        @{
+                            var host_response_values = (Reserve.HostResponseEnum[])Enum.GetValues(typeof(Reserve.HostResponseEnum));
+                            foreach (var value in host_response_values)
+                            {
+                                <option @isSelected(value == Model.HostResponse) value="@((int)value)">@(ReserveLocalization.GetHostResponseString((int)value))</option>
+                            }
+                        }
+                    </select>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">
+                    وضعیت :
+                </td>
+                <td style="width:300px;">
+                    <select name="Status">
+                        @{
+                            var status_values = (Reserve.ReserveStatus[])Enum.GetValues(typeof(Reserve.ReserveStatus));
+                            foreach (var value in status_values)
+                            {
+                                if (value != Reserve.ReserveStatus.Deleted && value != Reserve.ReserveStatus.Default)
+                                {
+                                    <option @isSelected(value == Model.Status) value="@((int)value)">@(ReserveLocalization.GetStatusString((int)value, Reserve.StatusStringType.Site))</option>
+                                }
+                            }
+                        }
+                    </select>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">
+                    دلیل کنسلی :
+                </td>
+                <td>
+                    @Html.EditorFor(model => model.CancelReason)
+                </td>
+                <td></td>
+            </tr>
+        </table>
+
+        <div style="margin-top:20px;">
+            <input class="apply" type="submit" value="ثبت" />
+            <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
+        </div>
+    }
+}
+
+<div class="adminmsg">@ViewBag.msg</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        @if (ViewBag.errorMsg != null) {
+            @:showErrorMessage('', '@ViewBag.errorMsg');
+        }
+    </script>
+}

@@ -53,7 +53,7 @@
                 <div class="static-advertise advetise-form__part advetise-form__part1">
                     <div class="acc-hotel__title-box">
                         <h2 class="div-unset static-advertise__title"><i class="fas fa-bed"></i>@Model.titleAndDesc.Title</h2>
-                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccAvailableInput.cshtml", Model.Available, 
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccAvailableInput.cshtml", Model.Available, 
                             new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", Model.Id } })
                     </div>
                     @if (Model.titleAndDesc != null)
@@ -85,22 +85,22 @@
                 {
                     <div class="static-advertise advetise-form__part static-advertie__price-box">
                         <p class="static-advertise__title"><i class="fa fa-dollar-sign"></i>اطلاعات قیمت اجاره روزانه اقامتگاه را ثبت کنید</p>
-                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPriceInput.cshtml", Model.price)
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPriceInput.cshtml", Model.price)
                     </div>
                 }
                 <div class="static-advertise advetise-form__part advertise-form_part-details">
                     <p class="static-advertise__title"><i class="fa fa-search-plus"></i>مشخصات اتاق را ثبت کنید</p>
                     @if (Model.capacity != null)
                     {
-                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "ظرفیت اقامتگاه را مشخص کنید" }, { "name", "Capacity" }, { "min", "0" }, { "data-allow-zero", "0" }, { "class", "js-mandatory" }, { "value", Model.capacity.Capacity }, { "valueData", Model.capacity.Capacity.ToString() }, { "hasError", ViewData.ModelState["Capacity"].ValidationState != ModelValidationState.Valid } })
-                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "حداکثر مهمان اضافه را مشخص کنید " }, { "name", "MoreThanCapacity" }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.capacity.MoreThanCapacity }, { "valueData", Model.capacity.MoreThanCapacity.ToString() } })
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "ظرفیت اقامتگاه را مشخص کنید" }, { "name", "Capacity" }, { "min", "0" }, { "data-allow-zero", "0" }, { "class", "js-mandatory" }, { "value", Model.capacity.Capacity }, { "valueData", Model.capacity.Capacity.ToString() }, { "hasError", ViewData.ModelState["Capacity"].ValidationState != ModelValidationState.Valid } })
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "حداکثر مهمان اضافه را مشخص کنید " }, { "name", "MoreThanCapacity" }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.capacity.MoreThanCapacity }, { "valueData", Model.capacity.MoreThanCapacity.ToString() } })
                     }
                     @if (Model.bed != null)
                     {
-                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تخت یک نفره را مشخص کنید" }, { "name", "SingleBed" }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.SingleBed }, { "valueData", Model.bed.SingleBed.ToString() } })
-                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تخت دو نفره را مشخص کنید" }, { "name", Advertise.Property.DoublesBed }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.DoublesBed }, { "valueData", Model.bed.DoublesBed.ToString() } })
-                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تشک و پتو را مشخص کنید" }, { "name", Advertise.Property.BlanketsAndMattresses }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.BlanketsAndMattresses }, { "valueData", Model.bed.BlanketsAndMattresses.ToString() } })
-                        @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccBedInput.cshtml", Model.bed)
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تخت یک نفره را مشخص کنید" }, { "name", "SingleBed" }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.SingleBed }, { "valueData", Model.bed.SingleBed.ToString() } })
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تخت دو نفره را مشخص کنید" }, { "name", Advertise.Property.DoublesBed }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.DoublesBed }, { "valueData", Model.bed.DoublesBed.ToString() } })
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "تعداد تشک و پتو را مشخص کنید" }, { "name", Advertise.Property.BlanketsAndMattresses }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.bed.BlanketsAndMattresses }, { "valueData", Model.bed.BlanketsAndMattresses.ToString() } })
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccBedInput.cshtml", Model.bed)
                     }
                 </div>
             </div>

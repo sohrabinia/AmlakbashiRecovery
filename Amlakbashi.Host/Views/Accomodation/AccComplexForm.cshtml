@@ -64,17 +64,17 @@
             if (Model.Id < 1)
             {
                 <div class="form-step static-advertise advetise-form__part" id="_AccFormComplexElements">
-                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_ComplexTypeInput.cshtml", Model.type, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hasError", ViewData.ModelState["TypeID"].ValidationState != ModelValidationState.Valid }, { "isAdmin", false } })
+                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_ComplexTypeInput.cshtml", Model.type, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hasError", ViewData.ModelState["TypeID"].ValidationState != ModelValidationState.Valid }, { "isAdmin", false } })
                 </div>
             }
             <div id="ajaxForm">
-                @Html.PartialAsync("_AccComplexTypeForm", Model)
+                @await Html.PartialAsync("_AccComplexTypeForm", Model)
             </div>
         }
         else
         {
             <div class="form-step static-advertise advetise-form__part" id="_AccFormComplexElements">
-                @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_ComplexTypeInput.cshtml", Model.type, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hasError", ViewData.ModelState["TypeID"].ValidationState != ModelValidationState.Valid }, { "isAdmin", false } })
+                @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_ComplexTypeInput.cshtml", Model.type, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hasError", ViewData.ModelState["TypeID"].ValidationState != ModelValidationState.Valid }, { "isAdmin", false } })
                 <p id="ajaxLoading">لطفا صبر کنید ...</p>
             </div>
             <div id="ajaxForm">

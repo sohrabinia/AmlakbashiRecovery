@@ -54,33 +54,33 @@
             {
                 <div class="static-advertise advetise-form__part">
                     <p class="static-advertise__title"><i class="fa fa-map-marker"></i>اطلاعات آدرس اقامتگاه را وارد کنید </p>
-                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccAddressInput.cshtml", Model.address)
+                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccAddressInput.cshtml", Model.address)
                 </div>
             }
             @if (Model.floor != null)
             {
                 <div class="static-advertise__item-floor">
-                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccFloorInput.cshtml", Model.floor)
+                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccFloorInput.cshtml", Model.floor)
                 </div>
             }
             @if (Model.photo != null)
             {
                 <div class="static-advertise__item-gallery">
-                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AdminPhotoInput.cshtml", Model.photo)
+                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AdminPhotoInput.cshtml", Model.photo)
                 </div>
             }
             @if (Model.titleAndDesc != null)
             {
                 <div class="static-advertise advetise-form__part">
                     <p class="static-advertise__title"> <i class="fa fa-file-alt"></i>معرفی اقامتگاه به مهمان ها </p>
-                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccTitleDescInput.cshtml", Model.titleAndDesc)
+                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccTitleDescInput.cshtml", Model.titleAndDesc)
                 </div>
             }
             @if (Model.metaTitleAndDesc != null)
             {
                 <div class="static-advertise advetise-form__part">
                     <p class="static-advertise__title"> <i class="fa fa-file-alt"></i>معرفی اقامتگاه به موتورهای جستجو </p>
-                    @Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccMetaTitleDescInput.cshtml", Model.metaTitleAndDesc)
+                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccMetaTitleDescInput.cshtml", Model.metaTitleAndDesc)
                 </div>
             }
         </div>

@@ -1,0 +1,174 @@
+﻿@model DynamicCategory
+
+@{
+    ViewBag.Title = "ثبت و ویرایش صفحات داینامیک";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+<div class="title">ثبت و ویرایش صفحه</div>
+@using (Html.BeginForm("DynamicEdit", "Category", FormMethod.Post, new { id = "ManageForm" }))
+{
+
+    @Html.HiddenFor(model => model.Id)
+    <table>
+        <tr>
+            <td class="label">
+                عنوان سایت (h1)
+            </td>
+            <td style="width:300px;">
+                @Html.EditorFor(model => model.Title)
+            </td>
+            <td></td>
+        </tr>
+
+        @*<tr>
+            <td class="label">
+                متای عنوان (سرچ)  :
+            </td>
+            <td style="width:300px;">
+                @Html.EditorFor(model => model.MetaTitle)
+            </td>
+            <td></td>
+        </tr>*@
+        <tr>
+            <td class="label">
+                آدرس  :
+            </td>
+            <td style="width:300px;">
+                @Html.EditorFor(model => model.URL)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                استان  :
+            </td>
+            <td style="width:300px;">
+                <input type="number" value="@Model.Province" id="Province" name="Province" />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                شهر  :
+            </td>
+            <td style="width:300px;">
+                <input type="number" value="@Model.City" id="City" name="City" />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                منطقه  :
+            </td>
+            <td style="width:300px;">
+                <input type="number" value="@Model.Area" id="Area" name="Area" />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                نوع آگهی :
+            </td>
+            <td style="width:300px;">
+                <input type="number" value="@Model.Type" name="Type" id="type" />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                 (h1)عنوان پایین صفحه :
+            </td>
+            <td style="width:300px;">
+                <textarea name="DescriptionH1" id="descriptionH1">@Model.DescriptionH1</textarea>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                متن پایین صفحه :
+            </td>
+            <td style="width:300px;">
+                @Html.TextAreaFor(model => model.Description, new { id= "description" })
+                @*<textarea name="Description" id="description">@Model.Description</textarea>*@
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                نمایش متن پایین صفحه :
+            </td>
+            <td style="float: right;">
+                @Html.EditorFor(model => model.ShowDescription)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                موارد مشابه: (کدهای دسته را با ویرگول جدا کنید)
+            </td>
+            <td style="width:300px;">
+                <textarea name="RelatedCategoryIds">@Model.RelatedCategoryIds</textarea>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                عنوان دلخواه برای url
+            </td>
+            <td style="width:300px;">
+                <textarea name="CustomUrlTitle">@Model.CustomUrlTitle</textarea>
+            </td>
+            <td></td>
+        </tr>
+        @*<tr>
+            <td class="label">کلید واژه</td>
+            <td style="width:300px;">
+                <textarea name="Keyword">@Model.Keyword</textarea>
+            </td>
+            <td>کلید واژه ها را با , جدا کنید</td>
+        </tr>*@
+        @*<tr>
+            <td class="label">
+                 توضیحات :
+            </td>
+            <td style="width:300px;">
+                <textarea name="Description">@Model.Description</textarea>
+            </td>
+            <td></td>
+        </tr>*@
+        @*<tr>
+            <td class="label">
+                ترتیب  :
+            </td>
+            <td style="width:300px;">
+                <input type="number" value="@Model.Order" id="Order" name="Order" />
+            </td>
+            <td></td>
+        </tr>*@
+    </table>    
+    
+        
+    <div style="margin-top:20px;">
+        <input class="apply" type="submit" value="ثبت" />
+        <a class="cancel" href='@Url.Action("DynamicIndex")'>انصراف</a>
+    </div>
+}
+
+@section ScriptLink
+{
+    <script type="text/javascript" src="/file/getjs?src=/resource/ckeditor/ckeditor.js"></script>
+}
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        var config = {
+        }
+        $(".chosen-select").chosen();
+
+        $("#ManageForm").submit(function () {
+        })
+        CKEDITOR.replace('Description');
+    </script>
+
+}

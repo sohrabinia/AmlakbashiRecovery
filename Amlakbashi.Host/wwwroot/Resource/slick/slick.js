@@ -1754,7 +1754,7 @@
             image = $imgsToLoad.first();
             imageSource = image.attr('data-lazy');
             imageSrcSet = image.attr('data-srcset');
-            imageAlt = $(this).attr('data-alt'),
+            var imageAlt = $(this).attr('data-alt'),
             imageTitle = $(this).attr('data-title'),
             imageSizes  = image.attr('data-sizes') || _.$slider.attr('data-sizes');
             imageToLoad = document.createElement('img');

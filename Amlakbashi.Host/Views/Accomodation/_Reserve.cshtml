@@ -73,7 +73,7 @@
             }
         }
     </div>
-    @Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" } })
+    @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" } })
     <div class="item-content__reserve-bottom">
         <div class="item-content__reserve-btn" id="reserve-request-button" onclick="checkReserve(true)">
             

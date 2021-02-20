@@ -1,0 +1,128 @@
+﻿@model Amlakbashi.Core.DTOs.CommentDTOs.AdvertiseCommentDetailDTO
+@{ 
+    ViewBag.Title = "نظرات مهمانان";
+    ViewBag.advertise_comment = true;
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+    int user_id = ViewBag.user_id;
+    var img_src = string.Format("/file/imgThumb?fileid={0}&w={1}&h={2}", Model.Overview.photoId, 50, 50);
+}
+@section StyleLink {
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/advertise-comment-detail.css&v=5">
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/star-rating/star-rating.css&v=2">
+}
+@section ScriptLink{
+}
+<div class="advertise-comment-detail__parent">
+    <a href="@ViewBag.UrlReferrer" class="advertise-comment-detail__return-button">بازگشت <i class="fa fa-arrow-left"></i></a>
+    <a href="@Model.Overview.url" target="_blank" class="advertise-comment-detail__advertise-container">
+        <div class="advertise-comment-detail__advertise-info">
+            <div class="advertise-comment-detail__label">تعداد نظرات: @Model.Overview.commentCount</div>
+            <div style="display:flex;flex-flow:row;">
+                <div class="advertise-comment-detail__label">امتیاز کل: </div>
+                @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", Model.Overview.overallScore } })
+                <div class="advertise-comment-detail__label" style="margin-right:10px">@Model.Overview.rateCount نفر</div>
+            </div>
+        </div>
+        <div class="advertise-comment-detail__advertise-info" style="margin:auto">
+            <div class="advertise-comment-detail__label">کد آگهی: @Model.Overview.advertiseId</div>
+            <div class="advertise-comment-detail__label">@Model.Overview.typeString</div>
+            @if (!string.IsNullOrEmpty(Model.Overview.parentTitle))
+            {
+                <div class="advertise-comment-detail__label">@Model.Overview.parentTitle</div>
+            }
+            @if (!string.IsNullOrEmpty(Model.Overview.selfTitle))
+            {
+                <div class="advertise-comment-detail__label">@Model.Overview.selfTitle</div>
+            }
+        </div>
+        <div class="advertise-comment-detail__advertise-main">
+            <img class="advertise-comment-detail__advertise-image" src="@img_src" width="50" height="50" />
+            <div class="advertise-comment-detail__label">@Model.Overview.title</div>
+        </div>
+    </a>
+    @if (Model.Detail.comments.Count() > 0)
+    {
+        <div class="advertise-comment-detail__comment-container">
+            @for (int i = 0; i < Model.Detail.comments.Count; i++)
+            {
+                var comment = Model.Detail.comments[i];
+                <div id="comment-@comment.commentId" class="advertise-comment-detail__comment-item">
+                    <div class="advertise-comment-detail__item-container">
+                        <div class="advertise-comment-detail__comment-info-container">
+                            <div class="advertise-comment-detail__comment-image-container">
+                                @if (comment.photoId > 0)
+                                {
+                                    <img src='@string.Format("/عکس-پروفایل_کوچک-{0}", comment.photoId)' alt='@(string.Format("عکس پروفایل {0}", comment.name))' ‌ width="40" height="40" />
+                                }
+                                else
+                                {
+                                    <i class="fa fa-user-circle"></i>
+                                }
+                            </div>
+                            <div class="advertise-comment-detail__comment-info">
+                                <span>@(!string.IsNullOrEmpty(comment.name) ? comment.name : "بدون نام")</span>
+                                <span>@comment.dateString</span>
+                            </div>
+                        </div>
+                        <div class="advertise-comment-detail__comment-content">
+                            <div>@await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) {
+                                { "score", comment.overallScore },
+                                { "onclick", "showRatingDetail(" + Model.Overview.advertiseId + "," + comment.guestUserId + ")" }
+                            })
+                                <p style="word-break: break-word;">@comment.text</p>
+                            </div>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(comment.text))
+                    {
+                        <div class="advertise-comment-detail__response">
+                            <div style="@(comment.reply != null ? "display:none" : "")" onclick="showResponseElements(this)" class="advertise-comment-detail__response-button">پاسخ</div>
+                            <div style="@(comment.reply == null ? "display:none" : "")" class="advertise-comment-detail__label">پاسخ شما: </div>
+                            <textarea style="@(comment.reply == null ? "display:none" : "")" placeholder="پاسخ خود را بنویسید" class="js-response-textarea">@(comment.reply != null ? comment.reply.text : "")</textarea>
+                            <div onclick="submitResponse(@comment.guestUserId, this)" style="@(comment.reply == null ? "display:none" : "")" class="advertise-comment-detail__response-button">@(comment.reply == null ? "ثبت" : "ویرایش") پاسخ</div>
+                        </div>
+                    }
+                </div>
+            }            
+        </div>
+    }
+    else
+    {
+        <div class="advertise-comment-detail__comment-container">
+            <div class="advertise-comment-detail__no-comment-label">هنوز نظری ثبت نشده</div>
+        </div>
+    }
+</div>
+
+@section ScriptBlock {
+    <script type="text/javascript">
+
+        function showResponseElements(btnElem) {
+            var $elem = $(btnElem);
+            $elem.hide();
+            $elem.next().show();
+            var $textArea = $elem.next().next();
+            $textArea.show();
+            $textArea.focus();
+            $textArea.next().show();
+        }
+
+        function submitResponse(user_id, btnElem) {
+            var $elem = $(btnElem);
+            var text = encodeURI($elem.prev().val());
+            var tempAdvertiseID = @(Model.Overview.advertiseId);
+            var parentID = @(Model.Overview.parentAdvertiseId);
+
+            myajax("advertise/addhostreplycomment", "advertiseID=" + tempAdvertiseID +
+                "&text=" + text + "&user_id=" + user_id + "&parentID=" + parentID, function (ret) {
+                    if (ret.status == 0) {
+                        showErrorMessage('خطا', ret.val);
+                    }
+                    else if (ret.status == 1) {
+                        showSuccessMessage('پاسخ شما ثبت شد', 'پاسخ شما ثبت شد و بعد از تایید کارشناس منتشر خواهد شد');
+                        $elem.html('ویرایش پاسخ');
+                    }
+                });
+        }
+    </script>
+}

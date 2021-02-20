@@ -1,0 +1,309 @@
+﻿@{
+    ViewBag.Title = "پرداخت گروهی";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@model IEnumerable<GroupPayment>
+
+@section ScriptLink{
+}
+@section StyleLink{
+}
+@using (Html.BeginForm("Index", "GroupPayment", FormMethod.Post, new { id = "filter_form" }))
+{
+    <div>
+        <div>پرداخت گروهی تسویه میزبان برای مبالغ زیر 500 هزار تومان</div>
+        <div style="display:flex;flex-flow:row;margin: 10px;">
+            <div style="margin-left: 10px">در انتظار پرداخت امروز: @ViewBag.totalPaymentsCount</div>
+            @if (ViewBag.totalPaymentsCount > 0)
+            {
+                <div style="background-color:#fDc831;border-radius:5px;padding:5px;cursor:pointer; margin-left:10px;"
+                     onclick="showPayments()">مشاهده</div>
+            }
+            <div style="background-color:#fDc831;border-radius:5px;padding:5px;cursor:pointer;"
+                 onclick="generateGroupPay()">پرداخت گروهی</div>
+        </div>
+        <div style="display:flex;flex-flow:row;margin: 10px;">
+            <div style="margin-left: 10px; color:#34A853;">آماده پرداخت: @ViewBag.todayPaymentsCount</div>
+            <div style="margin-left: 10px; color:#FF7F00">دارای مشکل: @ViewBag.paymentsWithErrorCount</div>
+            <div style="margin-left: 10px; color:#EA4335">مستثنی شده: @ViewBag.excludingPaymentsCount</div>
+        </div>
+        @*<div style="display:flex;flex-flow:row;margin: 10px;">
+            
+            @if (ViewBag.paymentsWithErrorCount > 0)
+            {
+                <div style="background-color:#fDc831;border-radius:5px;padding:5px;cursor:pointer;"
+                     onclick="showPaymentsWithError()">مشاهده</div>
+            }
+        </div>
+        <div style="display:flex;flex-flow:row;margin: 10px;">
+            
+            @if (ViewBag.excludingPaymentsCount > 0)
+            {
+                <div style="background-color:#fDc831;border-radius:5px;padding:5px;cursor:pointer;"
+                     onclick="showExcludingPayments()">مشاهده</div>
+            }
+        </div>*@
+    </div>
+    <div style="overflow: auto">
+        <table class="adminTable">
+            <tr>
+                <th class="minw">ردیف</th>
+                <th>کد پرداخت گروهی</th>
+                <th>تاریخ ایجاد</th>
+                <th>وضعیت</th>
+                <th>جمع مبلغ</th>
+                <th>مبلغ پرداختی</th>
+                <th>تعداد</th>
+                <th>ناموفق</th>
+                <th>تاریخ پرداخت</th>
+                <th>عملیات</th>
+            </tr>
+            @{
+                int Idx = (int)ViewBag.RowIndexStart;
+            }
+            @foreach (var item in Model)
+            {
+                Idx++;
+                <tr id="js-@item.Id">
+                    <td>
+                        @Idx
+                    </td>
+                    <td>
+                        @item.Id
+                    </td>
+                    <td>
+                        @(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.CreateDate).Remove(0, 2)) _ @(item.CreateDate.ToString("HH:mm"))
+                    </td>
+                    <td style="color:@item.StatusColor">
+                        @item.StatusString
+                    </td>
+                    <td>
+                        @string.Format("{0:n0}", item.TotalPrice) ت
+                    </td>
+                    <td>
+                        @(item.PaidPrice > 0 ? (string.Format("{0:n0}", item.PaidPrice) + " ت") : "-" )
+                    </td>
+                    <td>
+                        @item.CountPayments
+                    </td>
+                    <td>
+                        @(item.Status == GroupPayment.PaymentStatus.Paid ? item.CountFailedPayments.ToString() : "-")
+                    </td>
+                    <td>
+                        @(item.PayDate == null ? "-" : Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate((DateTime)item.PayDate).Remove(0, 2) + "_" + ((DateTime)item.PayDate).ToString("HH:mm"))
+                    </td>
+                    <td>
+                        @if (item.Status == GroupPayment.PaymentStatus.ReadyToPay)
+                        {
+                            <i class="fas fa-download"
+                               style="cursor:pointer;font-size:20px;margin: 0 5px;color:@(item.DownloadCount > 0 ? "#34A853" : "#242424")"
+                               onclick="downloadGroupPaymentFile(@item.Id, false, this)"
+                               title="دانلود"></i>
+                            <i class="fas fa-upload"
+                               style="cursor:pointer;font-size:20px;margin: 0 5px;color:#242424"
+                               onclick="uploadBankFile(@item.Id)"
+                               title="آپلود"></i>
+                            <i class="fas fa-times"
+                               style="cursor:pointer;font-size:20px;margin: 0 5px;color:#EA4335"
+                               onclick="cancelGroupPayment(@item.Id)"
+                               title="لغو"></i>
+                        }
+                        <i class="fas fa-eye"
+                           style="cursor:pointer;font-size:20px;margin: 0 5px;color:#242424"
+                           onclick="showPaymentDetail(@item.Id)"
+                           title="مشاهده"></i>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+@using (Html.BeginForm("UploadBankFile", "GroupPayment", FormMethod.Post, new { enctype = "multipart/form-data", id = "UploadForm" }))
+{
+    <input type="hidden" id="FileUploadID" name="id" value="0" />
+    <input style="display:none;" type="file" id="FileUpload1" name="FileUpload1" />
+}
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "GroupPayment", new { page, status = (int)ViewBag.status}), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            console.log('DOM fully loaded and parsed');
+            document.getElementById("FileUpload1").onchange = function () {
+                console.log('file uploaded');
+                if ($('#UploadForm').length == 0) {
+                    console.log('we haven`t got any upload form');
+                }
+                else if ($('#UploadForm').length > 0) {
+                    console.log('upload form exists');
+                }
+                $("#UploadForm").submit();
+            };
+            var msg = '@(ViewBag.msg)';
+            var done = '@(ViewBag.done)' == 'True';
+            if (msg != '') {
+                if (done) {
+                    showSuccessMessage('', msg);
+                }
+                else {
+                    showErrorMessage('خطا', msg);
+                }
+            }
+        });
+
+        function formatDate(date) {
+            var monthNames = [
+              "January", "February", "March",
+              "April", "May", "June", "July",
+              "August", "September", "October",
+              "November", "December"
+            ];
+
+            var day = date.getDate();
+            var monthIndex = date.getMonth();
+            var year = date.getFullYear();
+
+            return day + ' ' + monthNames[monthIndex] + ' ' + year;
+        }
+
+        function downloadGroupPaymentFile(id, confirm, elem) {
+            confirm = confirm == undefined ? false : confirm;
+            myajax("grouppayment/downloadgrouppaymentfile", "id=" + id + "&confirm=" + confirm, function(ret){
+                if (ret.status == 1) {
+                    var type = "text/plain";
+                    var fileName = "group_payment_" + formatDate(new Date());
+                    // Create an invisible A element
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    document.body.appendChild(a);
+
+                    // Set the HREF to url to be downloaded
+                    a.href = "download?path=" + ret.path;
+
+                    // Use download attribute to set set desired file name
+                    a.setAttribute("download", "");
+
+                    // Trigger the download by simulating click
+                    a.click();
+
+                    // Cleanup
+                    window.URL.revokeObjectURL(a.href);
+                    document.body.removeChild(a);
+                    $(elem).css('color', '#34A853');
+                }
+                else if (ret.status == 2) {
+                    showNoYesMessage('', ret.msg, function(){
+                        downloadGroupPaymentFile(id, true);
+                    });
+                }
+                else {
+                    showErrorMessage('خطا', ret.msg);
+                }
+            });
+        }
+
+        function uploadBankFile(id) {
+            $('#FileUploadID').val(id);
+            $('#FileUpload1').click();
+        }
+
+        function cancelGroupPayment(id) {
+            showNoYesMessage('لغو پرداخت گروهی', 'آیا پرداخت گروهی با کد ' + id + ' لغو شود؟', function () {
+                myajax("grouppayment/cancelpayment", "id=" + id , function(ret){
+                    if (ret.status == 1) {
+                        showSuccessMessage('', ret.msg,
+                        {
+                            onClose: function () {
+                                window.location.href = window.location.href;
+                            }
+                        });
+                    }
+                    else {
+                        showErrorMessage('خطا', ret.msg);
+                    }
+                });
+            });
+        }
+
+        function showPaymentDetail(id) {
+            $.confirm({
+                title: false,
+                content: 'url:/grouppayment/getpaymentDetailpopup?id=' + id,
+                buttons: {
+                    "بستن": function () {
+                    }
+                }
+            });
+        }
+
+        function generateGroupPay() {
+            myajax("grouppayment/generategrouppay", "", function(ret){
+                if (ret.status == 1) {
+                    showSuccessMessage('', ret.msg,
+                    {
+                        onClose: function () {
+                            window.location.href = window.location.href;
+                        }
+                    });
+                }
+                else {
+                    showErrorMessage('خطا', ret.msg);
+                }
+            });
+        }
+
+        function showPayments() {
+            $.confirm({
+                title: false,
+                content: 'url:/grouppayment/getpaymentslistpopup',
+                buttons: {
+                    "بستن": function () {
+                        window.location.href = window.location.href;
+                    }
+                }
+            });
+        }
+
+        function excludeFromGroupPayment(reserveId, elem) {
+            myajax("grouppayment/excludefromgrouppayment", "reserveid=" + reserveId, function (ret) {
+                if (ret.status == 1) {
+                    $(elem).parent().parent().css('background-color', '#f2e4e3');
+                    $(elem).remove();
+                }
+                else {
+                    showErrorMessage('خطا', ret.msg);
+                }
+            });
+        }
+
+        function includeToGroupPayment(reserveId, elem) {
+            myajax("grouppayment/includetogrouppayment", "reserveid=" + reserveId, function (ret) {
+                if (ret.status == 1) {
+                    $(elem).parent().parent().css('background-color', '#edf7ee');
+                    $(elem).remove();
+                }
+                else {
+                    showErrorMessage('خطا', ret.msg);
+                }
+            });
+        }
+
+        function errorResolved(reserveId, elem) {
+            myajax("grouppayment/errorresolved", "reserveid=" + reserveId, function (ret) {
+                if (ret.status == 1) {
+                    $(elem).parent().parent().css('background-color', '#edf7ee');
+                    $(elem).remove();
+                }
+                else {
+                    showErrorMessage('خطا', ret.msg);
+                }
+            });
+        }
+
+    </script>
+}

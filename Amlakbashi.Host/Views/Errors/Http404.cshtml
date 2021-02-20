@@ -1,0 +1,45 @@
+﻿@{
+    ViewBag.Title = "404 not fount";
+    Layout = "~/Views/Shared/_Master.cshtml";
+}
+@{ 
+    var isAccommodation = ViewBag.isAccommodation != null ?
+        ViewBag.isAccommodation : false;
+}
+<div class="error__background">
+    <span class="error__error-number-label">404</span>
+    <span class="error__error-description-label">
+        @{
+
+            if (isAccommodation == false)
+            {
+                @("صفحه ی مورد نظر وجود ندارد")
+            }
+            else
+            {
+                @("آگهی مورد نظر وجود ندارد و یا غیرفعال است")
+            }
+
+        }
+    </span>
+    <a class="error__page-link" href="/">برو به صفحه اصلی سایت املاک باشی</a>
+    @{
+        if (isAccommodation == true)
+        {
+            foreach (var link in ViewBag.relatedCategories)
+            {
+                <a href="@link.URL" class="error__page-link">برو به صفحه @link.Title</a>
+            }
+        }
+    }
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+    </script>
+}
+@section StyleLink {
+    <link rel="stylesheet" href="/resource/css/portal/portal-error.css" />
+}
+

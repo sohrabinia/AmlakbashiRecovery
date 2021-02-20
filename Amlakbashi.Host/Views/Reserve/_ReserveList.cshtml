@@ -1,0 +1,49 @@
+﻿
+@model IEnumerable<Amlakbashi.Core.DTOs.ReserveDTOs.ReserveDashboardItemDTO>
+
+@helper IsSelected(bool stat)
+{
+    if (stat)
+    {
+        @:selected="selected"
+    }
+    else
+    {
+        @:""
+    }
+}
+@{
+    var status_values = (Reserve.ReserveStatus[])Enum.GetValues(typeof(Reserve.ReserveStatus));
+    <div class="reserve-dashboard__item-root">
+        @if (Model.Any() == false)
+        {
+            if (ViewData["reserveId"].ToString() != "" &&
+                ViewData["reserveId"].ToString() != "-1" &&
+                ViewData["reserveId"].ToString() != "0")
+            {
+                <div style="display:flex;justify-content:center;flex-flow:column;align-items:center;width:100%;">
+                    <div style="color:#242424;font: 15px Miransans;width:100%;text-align:center;">کد رزرو مورد نظر یافت نشد</div>
+                    <a href="/reserve/reserveitemmanager" style="font:13px Miransans;color:#242424;padding:10px;margin:10px;border:1px solid #242424;border-radius:5px;">تمام رزرو ها</a>
+                </div>
+            }
+            else if (ViewData["categoryString"].ToString() != "")
+            {
+                <div style="display:flex;justify-content:center;flex-flow:column;align-items:center;width:100%;">
+                    <div style="color:#242424;font: 15px Miransans;width:100%;text-align:center;">@ViewData["categoryString"] ندارید</div>
+                </div>
+            }
+            else
+            {
+                <div style="display:flex;justify-content:center;flex-flow:column;align-items:center;width:100%;">
+                    <div style="color:#242424;font: 15px Miransans;width:100%;text-align:center;">هیچ درخواست رزروی یافت نشد</div>
+                </div>
+            }
+        }
+        @foreach (var item in Model)
+        {
+            <div class="reserve-dashboard__item-container js-reserve-@(item.reserveId)">
+                @Html.Partial("_ReserveItem", item)
+            </div>
+        }
+    </div>
+}

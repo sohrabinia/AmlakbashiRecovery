@@ -1,0 +1,118 @@
+﻿@model Reserve
+
+@if (ViewBag.alreadyPaid)
+{
+    <div style="font: 15px Miransans">مهمان کل مبلغ را پرداخت کرده است</div>
+}
+else
+{
+    <div style="font: 15px Miransans">
+        <div style="display:flex; flex-flow:row;margin:10px;">
+            <div style="margin-left: 10px;">نام مهمان:</div>
+            <div>@ViewBag.userFullName</div>
+        </div>
+        <div style="display:flex; flex-flow:row;margin:10px;">
+            <div style="margin-left: 10px;">روش پرداخت:</div>
+            <select style="font:15px Miransans" onchange="onPaymentMethodChange(this)" id="js-payment-method">
+                <option selected value="@((int)ReservePayment.ReservePaymentMethod.BankCard)" title="کارت به کارت">کارت به کارت</option>
+                <option value="@((int)ReservePayment.ReservePaymentMethod.AmlakbashiCredit)" title="کیف پول">کیف پول</option>
+            </select>
+        </div>
+        <div style="display:flex; flex-flow:row;margin:10px;">
+            <div style="margin-left: 10px;">نوع پرداخت مهمان:</div>
+            @if (ViewBag.depositeAvailable)
+            {
+                <select style="font:15px Miransans" onchange="onPaymentTypeChange(this)" id="js-payment-type">
+                    <option value="@((int)ReservePayment.ReservePaymentType.GuestClearing)" title="کل مبلغ">کل مبلغ</option>
+                    <option selected value="@((int)ReservePayment.ReservePaymentType.GuestDeposite)" title="بیعانه">بیعانه</option>
+                </select>
+            }
+            else
+            {
+                <input type="hidden" id="js-payment-type" value="@((int)ReservePayment.ReservePaymentType.GuestClearing)" />
+                <div>کل مبلغ</div>
+            }
+        </div>
+        <div style="display:flex; flex-flow:row;margin:10px;">
+            <div style="margin-left: 10px;">مبلغ:</div>
+            <input id="js-price-input" type="hidden" name="price" value="@ViewBag.totalPrice" />
+            <div style="color:#5DB975" id="js-price-label">@(string.Format("{0:n0}", ViewBag.totalPrice) + " تومان")</div>
+        </div>
+        <div id="js-transaction-id-container" style="display:flex; flex-flow:row;margin:10px;">
+            <div style="margin-left: 10px;">شماره تراکنش:</div>
+            <input type="number" id="js-transaction-id-input" value="0" />
+        </div>
+        <div onclick="addReservePayment()" style="background-color:#fdd835;border-radius:5px;padding:5px 10px; margin: 10px;width:fit-content;cursor:pointer;">افزودن پرداخت</div>
+    </div>
+}
+
+<script type="text/javascript">
+    var depositePrice = @ViewBag.depositePrice;
+    var totalPrice = @ViewBag.totalPrice;
+    var depositeAvailable = @(ViewBag.depositeAvailable ? "true" : "false");
+
+    @if (ViewBag.depositeAvailable)
+    {
+        @:onPaymentTypeChange($('#js-payment-type'));
+    }
+
+    function onPaymentTypeChange(elem) {
+        if ($(elem).val().toString() == '@((int)ReservePayment.ReservePaymentType.GuestDeposite)') {
+            $('#js-price-input').val(depositePrice);
+            $('#js-price-label').html(getPriceThousandSeperatorStr(depositePrice) + ' تومان');
+            $('#js-price-label').css('color', '#FF7F00');
+        }
+        else {
+            $('#js-price-input').val(totalPrice);
+            $('#js-price-label').html(getPriceThousandSeperatorStr(totalPrice) + ' تومان');
+            $('#js-price-label').css('color', '#5DB975');
+        }
+    }
+
+    function onPaymentMethodChange(elem) {
+        if ($(elem).val().toString() == '@((int)ReservePayment.ReservePaymentMethod.BankCard)') {
+            $('#js-transaction-id-container').css('display', 'flex');
+        }
+        else {
+            $('#js-transaction-id-input').val(0);
+            $('#js-transaction-id-container').css('display', 'none');
+        }
+    }
+
+    function addReservePayment() {
+        var payMethod = $('#js-payment-method').val();
+        var transactionIdVal = $('#js-transaction-id-input').val();
+        if (payMethod == 2 && transactionIdVal < 1) {
+            showErrorMessage('خطا', 'لطفا شماره تراکنش را وارد کنید');
+            return;
+        }
+        var payType = $('#js-payment-type').val();
+        var priceVal = $('#js-price-input').val();
+        var typeText = payType == 0 ? 'بیعانه'  : 'کل مبلغ';
+        var methodString = payMethod == 1 ? 'کیف پول' : 'کارت به کارت';
+        showNoYesMessage('افزودن پرداخت مهمان',
+            '<div>' +
+            '<div>نوع پرداخت: ' + typeText + '</div>'+
+            '<div>مبلغ: ' + getPriceString(priceVal) + '</div>'+
+            '<div>روش پرداخت: ' + methodString + '</div>'+
+            (payMethod == 1 ? '' : ('<div>شماره تراکنش: ' + transactionIdVal + '</div>')) +
+            '<div>آیا پرداخت اضافه شود؟</div>'+
+            '</div>',
+            function(){
+            myajax('reserve/addguestpayment',
+            'id=' + @Model.Id
+            + '&type=' + payType
+            + '&method=' + payMethod
+            + '&price=' + priceVal
+            + '&transactionId=' + transactionIdVal, function(ret) {
+                if (ret.status == 0) {
+                    showErrorMessage('خطا', ret.msg);
+                    return;
+                }
+                if (typeof onAddGuestPaymentDone != 'undefined') {
+                    onAddGuestPaymentDone();
+                }
+            });
+        });
+    }
+</script>

@@ -1,0 +1,86 @@
+﻿@using Amlakbashi.Core.DTOs.PaymentDTOs;
+
+@model Dictionary<GroupPaymentStatusDTO, IEnumerable<GroupPaymentItemDTO>>
+@{
+
+    var statusList = new List<GroupPayment.GroupPaymentStatus>() {
+            GroupPayment.GroupPaymentStatus.ReadyToPay,
+            GroupPayment.GroupPaymentStatus.WithError,
+            GroupPayment.GroupPaymentStatus.Excluded
+        };
+}
+
+<style>
+    .group-payment-list__item {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-between;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .group-payment-list__cell {
+        width: 10%;
+        margin: 10px auto;
+    }
+</style>
+
+<div style="direction:rtl;display:flex;flex-flow: column;">
+    @foreach (var status in statusList)
+    {
+        var statusKeyValue = Model.FirstOrDefault(f => f.Key.status == status);
+        if (statusKeyValue.Value.Any())
+        {
+            <div>@statusKeyValue.Key.title</div>
+            foreach (var item in statusKeyValue.Value)
+            {
+                <div class="group-payment-list__item" style="background-color:@statusKeyValue.Key.color">
+                    <a target="_blank" href="/reserve/index?reserve_id=@item.ReserveId" class="group-payment-list__cell">کد رزرو: @item.ReserveId</a>
+                    <div class="group-payment-list__cell">کد مهمان: @item.GuestUserId</div>
+                    <div class="group-payment-list__cell">کد میزبان: @item.HostUserId</div>
+                    <div class="group-payment-list__cell">مبلغ: @(string.Format("{0:n0}", item.HostPayablePrice) + " ت")</div>
+                    <div class="group-payment-list__cell">
+                        <div>نام میزبان:</div>
+                        <div>@(string.IsNullOrEmpty(item.HostUserFullName) ? "-" : item.HostUserFullName)</div>
+                    </div>
+                    <div class="group-payment-list__cell">
+                        <div>نام صاحب کارت:</div>
+                        <div>@(string.IsNullOrEmpty(item.HostBankCardFullName) ? "-" : item.HostBankCardFullName)</div>
+                    </div>
+                    @if (item.HostUserCredit == 0)
+                    {
+                        <div class="group-payment-list__cell">موجودی: 0</div>
+                    }
+                    else if (item.HostUserCredit > 0)
+                    {
+                        <div class="group-payment-list__cell" style="color:#34A853">
+                            <div>موجودی:</div>
+                            <div>@(string.Format("{0:n0}", item.HostUserCredit) + " ت")</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="group-payment-list__cell" style="color:#EA4335">
+                            <div>بدهی:</div>
+                            <div>@(string.Format("{0:n0}", Math.Abs(item.HostUserCredit)) + " ت")</div>
+                        </div>
+                    }
+                    <div class="group-payment-list__cell">
+                        @if (status == GroupPayment.GroupPaymentStatus.ReadyToPay ||
+                            status == GroupPayment.GroupPaymentStatus.WithError)
+                        {
+                            <i onclick="excludeFromGroupPayment(@item.ReserveId, this)" style="cursor:pointer;color:#EA4335;" class="fa fa-times"></i>
+                        }
+                        @if (status == GroupPayment.GroupPaymentStatus.WithError)
+                        {
+                            <i onclick="errorResolved(@item.ReserveId, this)" style="cursor:pointer;color:#34A853;" class="fa fa-check"></i>
+                        }
+                        @if (status == GroupPayment.GroupPaymentStatus.Excluded)
+                        {
+                            <i onclick="includeToGroupPayment(@item.ReserveId, this)" style="cursor:pointer;color:#242424;" class="fa fa-plus"></i>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    }
+</div>

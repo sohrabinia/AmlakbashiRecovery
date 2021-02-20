@@ -1,0 +1,231 @@
+﻿@model Amlakbashi.Core.DTOs.PaymentDTOs.ReservePaymentDTO
+
+<div style="font-family: Liransans;display:flex;flex-flow:column;width:fit-content;max-width: 90%;margin: auto;">
+    <div style="margin:5px 0;align-items: center;">
+        <label style="font:12px Miransans;margin-right:3px;">کل مبلغ رزرو: <span>@string.Format("{0:n0}", Model.TotalPrice)</span> تومان</label>
+    </div>
+    @if (Model.PaidAmount > 0)
+    {
+        <label style="cursor:pointer;margin-right: 5px;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+            <span style="margin: 0 3px;font:12px Liransans;">پرداختی شما: <span>@string.Format("{0:n0}", Model.PaidAmount)</span> ت</span>
+        </label>
+        if (Model.CouponPrice > 0)
+        {
+            <label style="cursor:pointer;margin-right: 5px;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+                <span style="margin: 0 3px;font:12px Liransans;">بن تخفیف: <span>@string.Format("{0:n0}", Model.CouponPrice)</span> ت</span>
+            </label>
+        }
+        if (Model.PrizePrice > 0)
+        {
+            <label style="cursor:pointer;margin-right: 5px;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+                <span style="margin: 0 3px;font:12px Liransans;">کیف هدیه: <span>@string.Format("{0:n0}", Model.PrizePrice)</span> ت</span>
+            </label>
+        }
+    }
+    @if (!Model.AlreadyUsedDiscount)
+    {
+        <div style="width:unset;font: 12px Miransans;border-top: 1px solid lightgray;padding-top: 7px;">تخفیف:</div>
+    }
+    @if (Model.AlreadyUsedDiscount == false && Model.CouponId > 0)
+    {
+        <div style="display:flex;flex-flow:row;justify-content:space-between;align-items: center;">
+            <label for="js-use-discount-coupon" style="cursor:pointer;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+                <span style="margin: 0 3px;font:12px Liransans;">استفاده بن تخفیف: </span>
+                <span style="margin: 0 3px;font:12px Liransans;">@(string.Format("{0:n0}", Model.AvailableCouponPrice)) تومان</span>
+                <input type="checkbox" id="js-use-discount-coupon" />
+            </label>
+        </div>
+    }
+    @if (!Model.AlreadyUsedDiscount && Model.AvailablePrizeCredit > 0)
+    {
+        <div style="display:flex;flex-flow:row;justify-content:space-between;align-items: center;">
+            <label for="js-use-prize-credit" style="cursor:pointer;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+                <span style="margin: 0 3px;font:12px Liransans;">استفاده کیف هدیه: </span>
+                <span style="margin: 0 3px;font:12px Liransans;">@(string.Format("{0:n0}", Model.AvailablePrizeCredit)) تومان</span>
+                <input type="checkbox" id="js-use-prize-credit" />
+            </label>
+        </div>
+    }
+    <div style="width:unset;font: 12px Miransans;border-top: 1px solid lightgray;padding-top: 7px;">قابل پرداخت:</div>
+    <div style="display:flex;margin: 3px 0;flex-flow:column;">
+        <label for="js-payment-type-total" style="cursor:pointer;margin-left: 5px;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+            <span style="margin: 0 3px;font:12px Liransans;">@(Model.PaidAmount > 0 ? "الباقی مبلغ" : "تسویه"): <span id="js-final-total-price-label">@string.Format("{0:n0}", Model.TotalPrice - Model.PaidAmount)</span> ت</span>
+            <input checked type="radio" id="js-payment-type-total" name="payType" value="total" />
+        </label>
+        @if (Model.PaidAmount < 1 && Model.DepositePrice < Model.TotalPrice)
+        {
+            <label for="js-payment-type-deposite" style="cursor:pointer;margin-right: 5px;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+                <span style="margin: 0 3px;font:12px Liransans;">بیعانه: <span id="js-final-deposite-price-label">@string.Format("{0:n0}", Model.DepositePrice)</span> ت</span>
+                <input type="radio" id="js-payment-type-deposite" name="payType" value="deposite" />
+            </label>
+        }
+    </div>
+    <div style="width:unset;font: 12px Miransans;border-top: 1px solid lightgray;padding-top: 7px;">روش پرداخت:</div>
+    <div style="display:flex;margin: 3px 0;flex-flow:row;align-items: center;">
+        <label for="js-payment-method-online" style="cursor:pointer;margin-left: 5px;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+            <span style="margin: 0 3px;font:11px Liransans;">آنلاین</span>
+            <input checked type="radio" id="js-payment-method-online" name="payMethod" value="online" />
+        </label>
+        @if (Model.ReserveStatus == Reserve.ReserveStatus.Reserved)
+        {
+            <label for="js-payment-method-pacuniary" style="cursor:pointer;margin-right: 5px;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+                <span style="margin: 0 3px;font:11px Liransans;"> نقدی به میزبان </span>
+                <input type="radio" id="js-payment-method-pacuniary" name="payMethod" value="pacuniary" />
+            </label>
+        }
+        @{
+            if (Model.CurrentCredit > 0)
+            {
+                <label for="js-payment-method-credit" style="cursor:pointer;margin-right: 5px;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+                    @*<i style="margin: 0 1px" class="fa fa-money-bill-alt"></i>*@
+                    <span style="margin: 0 17px 0 3px;font:11px Liransans;display:flex;flex-flow:column;">
+                        <span>کیف پول</span>
+                        <span style="color:#34A853">@string.Format("{0:n0}", Model.CurrentCredit) ت</span>
+                    </span>
+                    <input type="radio" id="js-payment-method-credit" name="payMethod" value="credit" />
+                </label>
+            }
+        }
+        @{
+            if (false)
+            {
+                <label for="js-payment-method-card" style="cursor:pointer;margin-right: 5px;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
+                    @*<i style="margin: 0 1px" class="fa fa-money-bill-alt"></i>*@
+                    <span style="margin: 0 3px;font:11px Liransans;">کارت به کارت</span>
+                    <input type="radio" id="js-payment-method-card" name="payMethod" value="card" />
+                </label>
+            }
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    var reservePaymentData = {
+        userId: @Model.UserId,
+        reserveId: @Model.ReserveId,
+        totalPrice: @Model.TotalPrice,
+        depositePrice: @Model.DepositePrice,
+        paidPrice: @Model.PaidAmount,
+        couponId: @Model.CouponId,
+        couponPrice: @Model.AvailableCouponPrice,
+        prizePrice: @Model.AvailablePrizeCredit,
+        price: @Model.TotalPrice,
+        finalPriceTotal: @Model.TotalPrice,
+        finalPriceDeposite: @Model.DepositePrice,
+        finalPrice: @Model.TotalPrice,
+        useCoupon: false,
+        usePrize: false,
+        usedCouponPrice: @Model.CouponPrice,
+        usedPrizePrice: @Model.PrizePrice,
+        payType: 1,
+        payMethod: 0
+    };
+
+    updatePaymentPrice();
+    $('input[type=radio][name=payType]').change(function() {
+        updatePaymentPrice();
+    });
+    $('input[type=radio][name=payMethod]').change(function() {
+        var payMethod = getSelectedPayMethod();
+        reservePaymentData.payMethod = payMethod;
+    });
+    $('#js-use-discount-coupon').change(function () {
+        if ($(this).is(":checked")) {
+            $('#js-use-prize-credit').removeAttr('checked');
+        }
+        updatePaymentPrice();
+    });
+    $('#js-use-prize-credit').change(function () {
+        if ($(this).is(":checked")) {
+            $('#js-use-discount-coupon').removeAttr('checked');
+        }
+        updatePaymentPrice();
+    });
+    function updatePaymentPrice() {
+        var usePrize = $('#js-use-prize-credit').is(":checked");
+        var useCoupon = $('#js-use-discount-coupon').is(":checked");
+        var payType = getSelectedPayType();
+        reservePaymentData.price = (payType == 0 ? reservePaymentData.depositePrice :
+            reservePaymentData.totalPrice)
+            - reservePaymentData.paidPrice
+            - reservePaymentData.usedCouponPrice
+            - reservePaymentData.usedPrizePrice;
+        reservePaymentData.finalPriceTotal = reservePaymentData.totalPrice -
+            (useCoupon ? reservePaymentData.couponPrice : 0) -
+            (usePrize ? reservePaymentData.prizePrice : 0) -
+            reservePaymentData.paidPrice
+            - reservePaymentData.usedCouponPrice
+            - reservePaymentData.usedPrizePrice;
+        reservePaymentData.finalPriceDeposite = reservePaymentData.depositePrice -
+            (useCoupon ? reservePaymentData.couponPrice : 0) -
+            (usePrize ? reservePaymentData.prizePrice : 0);
+        reservePaymentData.finalPrice = reservePaymentData.price -
+            (useCoupon ? reservePaymentData.couponPrice : 0) -
+            (usePrize ? reservePaymentData.prizePrice : 0);
+
+        reservePaymentData.useCoupon = useCoupon;
+        reservePaymentData.usePrize = usePrize;
+
+        reservePaymentData.payType = payType;
+
+        if (onUpdatePaymentData != undefined) {
+            onUpdatePaymentData(reservePaymentData);
+        }
+
+        $('#js-final-total-price-label').html(getPriceThousandSeperatorStr(reservePaymentData.finalPriceTotal));
+        $('#js-final-deposite-price-label').html(getPriceThousandSeperatorStr(reservePaymentData.finalPriceDeposite));
+        //if (useCoupon) {
+        //    $('#js-reserve-price-label').css('text-decoration-line', 'line-through');
+        //    $('#js-final-total-price-label').html(getPriceThousandSeperatorStr(reservePaymentData.finalPrice));
+        //    $('#js-final-price-container').show();
+        //}
+        //else if (usePrize) {
+        //    $('#js-reserve-price-label').css('text-decoration-line', 'line-through');
+        //    $('#js-final-price-label').html(getPriceThousandSeperatorStr(reservePaymentData.finalPrice));
+        //    $('#js-final-price-container').show();
+        //}
+        //else {
+        //    $('#js-reserve-price-label').css('text-decoration-line', 'none');
+        //    $('#js-final-price-label').html('');
+        //    $('#js-final-price-container').hide();
+        //}
+
+
+    }
+    function getSelectedPayMethod() {
+        var payMethod = getRadioValue('payMethod');
+        if (payMethod == "credit") {
+            return 1;
+        }
+        else if (payMethod == "card") {
+            return 2;
+        }
+        else if (payMethod == "pacuniary"){
+            return 3;
+        }
+        return 0;
+    }
+
+    function getSelectedPayType() {
+        var payType = getRadioValue('payType');
+        if (payType == "deposite") {
+            return 0;
+        }
+        return 1;
+    }
+
+    function getRadioValue(name) {
+        var radios = document.getElementsByName(name);
+
+        for (var i = 0, length = radios.length; i < length; i++) {
+            if (radios[i].checked) {
+                // do whatever you want with the checked radio
+                return radios[i].value;
+
+                // only one radio can be logically checked, don't check the rest
+                break;
+            }
+        }
+        return undefined;
+    }
+</script>
