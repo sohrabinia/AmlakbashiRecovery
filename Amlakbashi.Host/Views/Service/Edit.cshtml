@@ -1,0 +1,55 @@
+﻿@model Service
+
+@{
+    ViewBag.Title = "مدیریت سرویس ها";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<div class="title">ثبت و ویرایش  سرویس</div>
+
+
+@using (Html.BeginForm("Edit", "Service", FormMethod.Post, new { id = "ManageForm" }))
+{
+
+    @Html.HiddenFor(model => model.Id)
+    <table>
+        <tr>
+            <td class="label">
+                نام سرویس :
+            </td>
+            <td style="width:300px;">
+                @Html.EditorFor(model => model.Title)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                والد سرویس :
+            </td>
+            <td style="width:300px;">
+                <select name="ParentId">
+                    <option selected="selected" value="-1">   ------   </option>
+                    @if (ViewBag.Services!=null)
+                    {
+                        foreach (var item in ViewBag.Services)
+                        {
+                            <option is-selected="@(item.Id==Model.ParentId)" value="@item.Id">@item.Title</option>
+                            foreach (var child in item.children)
+                            {
+                                <option is-selected="@(child.Id == Model.ParentId)" value="@child.Id"> --------- @child.Title</option>
+                            }
+                        }
+                    }
+                </select>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+
+    <div style="margin-top:20px;">
+        <input class="apply" type="submit" value="ثبت" />
+        <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
+    </div>
+}
+
+<div class="adminmsg">@ViewBag.msg</div>

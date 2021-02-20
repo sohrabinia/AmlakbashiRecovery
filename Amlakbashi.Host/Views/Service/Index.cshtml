@@ -1,0 +1,76 @@
+﻿@{
+    ViewBag.Title = "مدیریت سرویس ها";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@model IEnumerable<ServiceDTO>
+
+<a href="/Service/Edit" class="add">افزودن سرویس</a>
+<table>
+    <tr>
+        <th class="minw">
+            ردیف
+        </th>
+        <th>
+            نام سرویس
+        </th>
+        <th>
+            نام سرویس والد
+        </th>
+        <th>
+            عملیات
+        </th>
+    </tr>
+    @{
+        int Idx = (int)ViewBag.RowIndexStart;
+    }
+    @foreach (var item in Model)
+    {
+        Idx++;
+
+        <tr>
+            <td>
+                @Idx
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @if (item.ParentId != -1)
+                {;
+                    @item.Parent.Title
+                }
+                else
+                { 
+                    @: -----
+                }
+            </td>
+            <td>
+                <a href="@Url.Action("Edit",new {id= item.Id})"><span class="editicon" title="ویرایش"></span></a>
+                <span class="deleteicon" onclick="deleteItem(@item.Id,this)" title="حذف"></span>
+            </td>
+        </tr>
+    }
+
+</table>
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Service", new { page }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+        function deleteItem($id, obj) {
+            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟")) {
+                myajax("Service/Delete", "id=" + $id, function (ret) {
+                    if (ret.status == 1) {
+                        $(obj).parent().parent().remove();
+                    }
+                });
+            }
+        }
+
+    </script>
+}
