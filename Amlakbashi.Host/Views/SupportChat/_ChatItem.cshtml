@@ -1,0 +1,40 @@
+﻿@using Amlakbashi.Core.DTOs.SupportChatDTOs;
+@using Amlakbashi.Core.Infrastructure.HtmlHelpers;
+
+@model SupportChatMessageDTO
+
+@{
+    var chatSentences = ChatHtmlHelper.GenerateMultilineChat(Model.text);
+}
+
+<div id="js-chat-item-@Model.id" class="support-chat-index__chat support-chat-index__chat-@(Model.self ? "right" : "left")">
+    <div class="support-chat-index__chat-profile">
+        <img width="40" height="40" src="/عکس-پروفایل_کوچک-@(Model.userPhotoId)" />
+        <span>@(Model.userName)</span>
+    </div>
+    <div class="support-chat-index__chat-text-box">
+        <div class="support-chat-index__chat-text">
+            @for (int i = 0; i < chatSentences.Count; i++)
+            {
+                if (i > 0)
+                {
+                    @:<br />
+                }
+                @Html.Raw(chatSentences[i])
+            }
+        </div>
+        <div class="support-chat-index__chat-date">
+            <div style="width:25px;margin-right:5px;">
+                @if (Model.self && (Model.read || Model.sent))
+                {
+                    <i style="color:#34A853;font-size:15px;margin-left:-5px;" class="fas fa-check"></i>
+                }
+                @if (Model.self && Model.read)
+                {
+                    <i style="color:#34A853;font-size:15px;margin-right:-5px;" class="fas fa-check"></i>
+                }
+            </div>
+            <span>@Model.dateString</span>
+        </div>
+    </div>
+</div>

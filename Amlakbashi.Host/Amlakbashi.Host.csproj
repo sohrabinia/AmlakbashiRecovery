@@ -144,6 +144,17 @@
     <None Include="Views\Reserve\_ReservePayment.cshtml" />
     <None Include="Views\Service\Edit.cshtml" />
     <None Include="Views\Service\Index.cshtml" />
+    <None Include="Views\SupportChat\Index.cshtml" />
+    <None Include="Views\SupportChat\_ChatItem.cshtml" />
+    <None Include="Views\SupportChat\_ChatItemList.cshtml" />
+    <None Include="Views\SupportChat\_SupportItem.cshtml" />
+    <None Include="Views\SupportChat\_SupportItemList.cshtml" />
+    <None Include="Views\User\Admin.cshtml" />
+    <None Include="Views\User\Edit.cshtml" />
+    <None Include="Views\User\Index.cshtml" />
+    <None Include="Views\User\MobileLogin.cshtml" />
+    <None Include="Views\User\UserCreditManager.cshtml" />
+    <None Include="Views\User\_InstantReserveConfirm.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

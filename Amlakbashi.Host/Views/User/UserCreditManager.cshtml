@@ -1,0 +1,216 @@
+﻿@using Entities = Amlakbashi.Core.Entities;
+@{
+    ViewBag.Title = "کیف پول";
+    ViewBag.UserCredit = true;
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+    var credit = ViewBag.Credit;
+}
+@model IEnumerable<CreditTransaction>
+<div class="user-credit__container">
+    <div class="user-credit__current-credit-container">
+        <div class="user-credit__add-credit-button" onclick="addToCredit()">
+            <i class="fa fa-plus"></i>
+            <span>افزودن به موجودی</span>
+        </div>
+        @if (credit < 0)
+        {
+            <span style="color:#e85335;" class="user-credit__current-credit-label">بدهی شما: @string.Format("{0:n0}", Math.Abs(credit)) تومان</span>
+        }
+        else
+        {
+            <span style="color:@(credit > 0 ? "#34A853" : "#242424");" class="user-credit__current-credit-label">موجودی شما: @string.Format("{0:n0}", credit < 0 ? 0 : credit) تومان</span>
+        }
+    </div>
+    <div class="dashboard-table">
+        <div class="dashboard-table-first-row">
+            <span class="dashboard-table-cell">کد تراکنش کیف پول</span>
+            <span class="dashboard-table-cell">تاریخ</span>
+            <span class="dashboard-table-cell">نوع تراکنش</span>
+            <span class="dashboard-table-cell">مبلغ</span>
+            <span class="dashboard-table-cell">مانده</span>
+        </div>
+        @for (int i = 0; i <= Model.Count(); i++)
+        {
+            CreditTransaction item;
+            if (i == Model.Count())
+            {
+                long initial_credit;
+                if (Model.Count() == 0)
+                {
+                    initial_credit = ViewBag.Credit;
+                }
+                else
+                {
+                    var first_item = Model.ElementAt(Model.Count() - 1);
+                    initial_credit = first_item.RemainedPrice - first_item.Price;
+                }
+                if (initial_credit > 0)
+                {
+                    item = new CreditTransaction()
+                    {
+                        Id = 0,
+                        BankTransactionID = 0,
+                        ReserveID = 0,
+                        UserID = ViewBag.UserID,
+                        Date = DateTime.MinValue,
+                        Price = initial_credit,
+                        TransactionCause = (int)Entities.User.CreditTransactionCause.Other,
+                        TransactionCauseString = "مانده از قبل",
+                        RemainedPrice = initial_credit
+                    };
+                }
+                else if (initial_credit < 0)
+                {
+                    item = new CreditTransaction()
+                    {
+                        Id = 0,
+                        BankTransactionID = 0,
+                        ReserveID = 0,
+                        UserID = ViewBag.UserID,
+                        Date = DateTime.MinValue,
+                        Price = initial_credit,
+                        TransactionCause = (int)Entities.User.CreditTransactionCause.Other,
+                        TransactionCauseString = "بدهی از قبل",
+                        RemainedPrice = initial_credit
+                    };
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                item = Model.ElementAt(i);
+            }
+            <div class="dashboard-table-row">
+                <span class="dashboard-table-cell">@(item.Id == 0 ? "-" : item.Id.ToString())</span>
+                <div class="dashboard-table-cell">
+                    <span>@(item.Date == DateTime.MinValue ? "-" : Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate((DateTime)item.Date))</span>
+                    <span>@(item.Date == DateTime.MinValue ? "" : ((DateTime)item.Date).ToString("HH:mm"))</span>
+                </div>
+                <div class="dashboard-table-cell">
+                    @switch ((Entities.User.CreditTransactionCause)item.TransactionCause)
+                    {
+                        case Entities.User.CreditTransactionCause.Reserve:
+                        case Entities.User.CreditTransactionCause.SitePortion:
+                            <span style="color:#4285F4;">@Entities.User.GetCreditTransactionCauseString(item.TransactionCause,item.TransactionCauseString)</span>
+                            <span>کد رزرو: @item.ReserveID</span>
+                            break;
+                        case Entities.User.CreditTransactionCause.Charge:
+                            <span style="color:#34A853;">@Entities.User.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
+                            <span>کد پیگیری: @item.BankTransactionID</span>
+                            break;
+                        case Entities.User.CreditTransactionCause.Clearing:
+                        case Entities.User.CreditTransactionCause.Refund:
+                            <span style="color:#34A853;">@Entities.User.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
+                            <span>کد رزرو: @item.ReserveID</span>
+                            break;
+                        case Entities.User.CreditTransactionCause.ContactAdvertise:
+                            <span style="color:#34A853;">@Entities.User.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
+                            <span>نمایش تماس آگهی</span>
+                            break;
+                        case Entities.User.CreditTransactionCause.Other:
+                            <span style="color:#4285F4;">@Entities.User.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
+                            if (item.BankTransactionID > 0)
+                            {
+                                <span>کد پیگیری: @item.BankTransactionID</span>
+                            }
+                            break;
+                    }
+                </div>
+                @if (item.Price > 0)
+                {
+                    <span style="color:#34A853;" class="dashboard-table-cell">+ @string.Format("{0:n0}", item.Price) تومان</span>
+                }
+                else
+                {
+                    <span style="color:#EA4335;" class="dashboard-table-cell">- @string.Format("{0:n0}", Math.Abs(item.Price)) تومان</span>
+                }
+                <span class="dashboard-table-cell">@string.Format("{0:n0}",item.RemainedPrice) تومان</span>
+            </div>
+        }
+    </div>
+</div>
+@section ScriptBlock{
+    <script type="text/javascript">
+        function addToCredit()
+        {
+            $.confirm({
+                title: 'افزودن به کیف پول',
+                content: '' +
+                '<div id="pay_type_container">' +
+                '<label>لطفا مبلغ را در کادر زیر وارد کنید و دکمه پرداخت را بزنید</label>' +
+                '<input type="text" onkeyup="convertToEnglishNumber(this)" id="add_credit_input"/> تومان' +
+                '<div id="js-persian-price-string">' +              
+                '</div>' +
+                '</div>',
+                type: 'blue',
+                typeAnimated: true,
+                buttons: {
+                    پرداخت: function () {
+                        var price = this.$content.find('#add_credit_input').val();
+                        if (price < 1000) {
+                            $.confirm({
+                                title: 'خطا',
+                                content: 'مبلغ نمیتواند کمتر از هزار تومان باشد',
+                                type: 'red',
+                                typeAnimated: true,
+                                buttons: {
+                                    بستن: function () {
+                                    },
+                                }
+                            });
+                            return false;
+                        }
+                        myajax("User/IncreaseCredit", "price=" + price, function (ret) {
+                            if (ret.status == 1) {
+                                window.location.href = "/cart/performpay?payment_id=" + ret.pid;
+                            }
+                            else {
+                                $.confirm({
+                                    title: 'خطا',
+                                    content: 'متاسفانه عملیات با خطا مواجه شد',
+                                    type: 'red',
+                                    typeAnimated: true,
+                                    buttons: {
+                                        بستن: function () {
+                                        },
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    انصراف: function () {
+                    }
+                }
+            });
+        }
+
+        var payment_success_msg = '@TempData["payment_success_msg"]';
+        var payment_error_msg = '@TempData["payment_error_msg"]';
+        if (payment_error_msg != '' || payment_success_msg != '') {
+            var msg = payment_success_msg != '' ? payment_success_msg : payment_error_msg;
+            var msg_color = payment_success_msg != '' ? 'green' : 'red';
+            $.confirm({
+                title: '',
+                content: msg,
+                type: msg_color,
+                smoothContent: true,
+                typeAnimated: true,
+                columnClass: 'small',
+                animation: 'scale',
+                closeIcon: true,
+                buttons: {
+                    بستن: function () {
+                    }
+                }
+            });
+        }
+
+        function convertToEnglishNumber(elem) {
+            $(elem).val(persianNumberToEnglish($(elem).val()));
+            $('#js-persian-price-string').html(getPriceString($(elem).val()));
+        }
+    </script>
+}

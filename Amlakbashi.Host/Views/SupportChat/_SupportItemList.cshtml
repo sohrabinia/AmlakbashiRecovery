@@ -1,0 +1,7 @@
+﻿@using Amlakbashi.Core.DTOs.SupportChatDTOs;
+@model IEnumerable<SupportChatDTO>
+
+@foreach (var item in Model)
+{
+    @await Html.PartialAsync("_SupportItem", item)
+}

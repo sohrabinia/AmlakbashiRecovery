@@ -1,0 +1,736 @@
+﻿@using Entities = Amlakbashi.Core.Entities;
+@using Amlakbashi.Core.DTOs.UserDTOs;
+
+@{
+    ViewBag.Title = "مدیریت کاربران";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+@model IEnumerable<User>
+
+@{
+    var data = ViewBag.dto as UserIndexDTO;
+}
+
+@using (Html.BeginForm("Index", "User", FormMethod.Post, new { id = "js-filter-form" }))
+{
+    <input type="hidden" name="userFilterType" id="userFilterType" value="@((int)data.UserFilterType)" />
+    <a href="/User/Edit" class="add">افزودن کاربر</a>
+    <div style="overflow: auto;">
+        <table>
+            <tr>
+                <td class="label"> کد کاربری :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@data.Code" name="code" />
+                </td>
+                <td class="label">نام کاربری :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@data.Username" name="username" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label">نام :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@data.Uname" name="uname" />
+                </td>
+                <td class="label">موبایل  :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@data.Mobile" name="mobile" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label">وضعیت عکس پروفایل :</td>
+                <td class="minw">
+                    <select name="photo">
+                        <option value="-1"> همه کاربران</option>
+                        <option value="0" is-selected="@((int)data.Photo == 0)">عکس ندارد</option>
+                        <option value="1" is-selected="@((int)data.Photo == 1)">آماده انتشار</option>
+                        <option value="2" is-selected="@((int)data.Photo == 2)">انتشار یافته</option>
+                        <option value="3" is-selected="@((int)data.Photo == 3)">تایید نشده</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">وضعیت شماره موبایل :</td>
+                <td class="minw">
+                    <select name="mobile_status">
+                        <option value="-1"is-selected="@((int)data.MobileStatus == -1)">همه</option>
+                        <option value="0" is-selected="@((int)data.MobileStatus == 0)">شماره موبایل اشتباه</option>
+                        <option value="1" is-selected="@((int)data.MobileStatus == 1)">شماره موبایل تکراری</option>
+                    </select>
+                </td>
+                <td class="label">وضعیت کاربر :</td>
+                <td class="minw">
+                    <select name="status">
+                        <option value="-1" is-selected="@((int)data.Status == -1)">همه وضعیت ها</option>
+                        <option value="@((int)Entities.User.UserState.Acticved)" is-selected="@((int)data.Status == (int)Entities.User.UserState.Acticved)">@Entities.User.GetStateTitle((int)Entities.User.UserState.Acticved)</option>
+                        <option value="@((int)Entities.User.UserState.InActived)" is-selected="@((int)data.Status == (int)Entities.User.UserState.InActived)">@Entities.User.GetStateTitle((int)Entities.User.UserState.InActived)</option>
+                        <option value="@((int)Entities.User.UserState.Suspend)" is-selected="@((int)data.Status == (int)Entities.User.UserState.Suspend)">@Entities.User.GetStateTitle((int)Entities.User.UserState.Suspend)</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">تعداد آگهی :</td>
+                <td class="minw">
+                    <select name="advertise_count">
+                        <option value="-1" is-selected="@((int)data.AdvertiseCount == -1)">همه</option>
+                        <option value="0" is-selected="@((int)data.AdvertiseCount == 0)">بدون آگهی</option>
+                        <option value="1" is-selected="@((int)data.AdvertiseCount == 1)">یک آگهی</option>
+                        <option value="2" is-selected="@((int)data.AdvertiseCount == 2)">دو آگهی</option>
+                        <option value="3" is-selected="@((int)data.AdvertiseCount == 3)">بیشتر از دو آگهی</option>
+                    </select>
+                </td>
+                <td class="label">وضعیت مالکیت :</td>
+                <td class="minw">
+                    <select name="ownership">
+                        <option value="-1"> همه کاربران</option>
+                        <option value="0" is-selected="@((int)data.Ownership == 0)">واسطه‌ی حتمی</option>
+                        <option value="1" is-selected="@((int)data.Ownership == 1)">واسطه‌ی احتمالی</option>
+                        <option value="3" is-selected="@((int)data.Ownership == 3)">مالک احتمالی</option>
+                        <option value="10" is-selected="@((int)data.Ownership == 10)">مالک حتمی</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">وضعیت تکمیل آگهی :</td>
+                <td class="minw">
+                    <select name="complete_profile_status">
+                        <option value="-1" is-selected="@((int)data.CompleteProfileStatus == -1)">همه وضعیت ها</option>
+                        <option value="0" is-selected="@((int)data.CompleteProfileStatus == 0)">عدم تکمیل</option>
+                        <option value="1" is-selected="@((int)data.CompleteProfileStatus == 1)">تکمیل</option>
+                    </select>
+                </td>
+                <td class="label">وضعیت تماس تکمیل آگهی :</td>
+                <td class="minw">
+                    <select name="complete_profile_contact_status">
+                        <option value="-1" is-selected="@((int)data.CompleteProfileContactStatus == -1)">همه وضعیت ها</option>
+                        <option value="0" is-selected="@((int)data.CompleteProfileContactStatus == 0)">عدم تماس</option>
+                        <option value="1" is-selected="@((int)data.CompleteProfileContactStatus == 1)">تماس</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">نوع کاربر :</td>
+                <td class="minw">
+                    <select name="user_general_type">
+                        <option value="-1" is-selected="@((int)data.UserGeneralType == -1)">همه کاربر ها</option>
+                        @{
+                            var all_general_user_types = (Entities.User.UserGeneralTypeEnum[])Enum.GetValues(typeof(Entities.User.UserGeneralTypeEnum));
+                            foreach (var type in all_general_user_types)
+                            {
+                                <option style="color:@(Entities.User.GetUserGeneralTypeColor((int)type))" value="@((int)type)" is-selected="@((Entities.User.UserGeneralTypeEnum)data.UserGeneralType == type)">@Entities.User.GetUserGeneralTypeString((int)type)</option>
+                            }
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">وضعیت دسترسی :</td>
+                <td class="minw">
+                    <select name="access_type">
+                        <option value="-1" is-selected="@((int)data.AccessType == -1))">همه وضعیت ها</option>
+                        @{
+                            var all_access_type_states = (User.AccessTypeEnum[])Enum.GetValues(typeof(User.AccessTypeEnum));
+                            foreach (var state in all_access_type_states)
+                            {
+                                <option value="@((int)state)" is-selected="@((User.AccessTypeEnum)data.AccessType == state)">@Entities.User.GetAccessTypeString(state)</option>
+                            }
+                        }
+                    </select>
+                </td>
+                <td class="label">مرتب سازی :</td>
+                <td class="minw">
+                    <select name="sort_order">
+                        <option value="-1">هیچ کدام</option>
+                        <option value="0" is-selected="@((int)data.SortOrder == 0)">تعداد آگهی</option>
+                        <option value="1" is-selected="@((int)data.SortOrder == 1)">اعتبار کیف پول</option>
+                        <option value="2" is-selected="@((int)data.SortOrder == 2)">رزرو های بدون پاسخ</option>
+                        <option value="3" is-selected="@((int)data.SortOrder == 3)">رزرو های رد شده</option>
+                        <option value="4" is-selected="@((int)data.SortOrder == 4)">رد شده بدلیل پر بودن</option>
+                        <option value="5" is-selected="@((int)data.SortOrder == 5)">رزرو شده</option>
+                        <option value="6" is-selected="@((int)data.SortOrder == 6)">رزرو های لغو شده</option>
+                    </select>
+                </td>
+
+            </tr>
+            <tr>
+                <td class="label">موقعیت میزبان:</td>
+                <td style="display:flex;">
+                    @await Component.InvokeAsync("RegionSelector", new { province = data.Province, city = data.City, area = data.Area })
+                </td>
+                <td class="label"> کد آگهی :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@data.AdvertiseId" name="advertiseId" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label">وضعیت حساب بانکی :</td>
+                <td>
+                    <select name="card_status">
+                        <option value="-1">همه</option>
+                        <option value="0" is-selected="@(data.CardStatus == 0)">دارای شماره شبا</option>
+                        <option value="1" is-selected="@(data.CardStatus == 1)">فقط شماره کارت</option>
+                        <option value="2" is-selected="@(data.CardStatus == 2)">بدون حساب</option>
+                    </select>
+                </td>
+                <td class="label"> حداقل رزرو نوروز از :</td>
+                <td class="minw">
+                    <input name="minReserveNorouzFromDate" class="js-filter-date-picker" type="text" id="minReserveNorouzFromDate" value="@(data.MinReserveNorouzFromDate)" />
+                </td>
+                <td><input type="submit" class="filter" value="فیلتر" /></td>
+                <td style="width:100%;"></td>
+            </tr>
+        </table>
+    </div>
+    <div style="display:flex;max-width:800px;flex-flow:row;margin:10px;justify-content:space-between;border:1px solid #ccc;padding: 10px;">
+        <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.All))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.All ? "#fdd835" : "#ffffff")">همه</div>
+        <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.ActiveHost))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.ActiveHost ? "#fdd835" : "#ffffff")">میزبان فعال</div>
+        <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.Host))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.Host ? "#fdd835" : "#ffffff")">میزبان</div>
+        <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.Guest))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.Guest ? "#fdd835" : "#ffffff")">مهمان</div>
+        <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.Staff))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.Staff ? "#fdd835" : "#ffffff")">پشتیبان</div>
+        <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.InstantReserveRequest))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ? "#fdd835" : "#ffffff")">درخواست رزرو آنی</div>
+        <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.InstantReserveAllow))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow ? "#fdd835" : "#ffffff")">رزرو آنی</div>
+        <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.PhotoChangeRequest))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.PhotoChangeRequest ? "#fdd835" : "#ffffff")">در انتظار تایید عکس</div>
+    </div>
+    <div style="overflow: auto;">
+        <table>
+            <tr>
+                <th class="minw">
+                    ردیف
+                </th>
+                <th>
+                    کد
+                </th>
+                <th>
+                    نام کاربری
+                </th>
+                <th>
+                    موبایل
+                </th>
+                <th>
+                    نام و نام خانوادگی
+                </th>
+                @if (data.UserFilterType != Entities.User.UserFilterType.Staff)
+                {
+                    <th>
+                        وضعیت
+                    </th>
+                    <th>
+                        تماس زمان نوروزی
+                    </th>
+                    if (data.UserFilterType != Entities.User.UserFilterType.Guest)
+                    {
+                        <th>
+                            امتیاز
+                        </th>
+                    }
+                    <th>
+                        اعتبار کیف پول
+                    </th>
+                    <th>
+                        نوع کاربر
+                    </th>
+                }
+                @if (data.UserFilterType == Entities.User.UserFilterType.Staff)
+                {
+                    <th>شماره کارت</th>
+                    <th>شماره شبا</th>
+                }
+                @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ||
+                    data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
+                {
+                    <th>
+                        رزرو آنی
+                    </th>
+                }
+                <th>
+                    عملیات
+                </th>
+            </tr>
+            @{
+                int Idx = (int)data.RowIndexStart;
+            }
+            @foreach (var item in data.UserItems)
+            {
+                Idx++;
+
+        <tr id="js-row-@item.User.Id">
+            <td>
+                @Idx
+            </td>
+            <td>@item.User.Id</td>
+            <td style="direction:ltr">
+                @Html.DisplayFor(modelItem => item.User.MainMobile)
+            </td>
+            <td style="direction:ltr">
+                @Html.DisplayFor(modelItem => item.User.Mobile)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.FullName)
+            </td>
+            @if (data.UserFilterType != Entities.User.UserFilterType.Staff)
+            {
+                <td>
+                    <span onclick="changeUserStatus(@item.User.Id,this)" class="imgstatus @(item.User.State==(int)Entities.User.UserState.Acticved ? "enable" : "disable")"></span>
+                </td>
+                <td>
+                    <span onclick="changeCompleteProfileContact(@item.User.Id,this)" class="imgstatus @(!string.IsNullOrEmpty(item.User.ContactPhone) && item.User.ContactPhone == "1" ? "enable" : "disable")"></span>
+                </td>
+                if (data.UserFilterType != Entities.User.UserFilterType.Guest)
+                {
+                    <td>
+                        @item.User.UserScore
+                    </td>
+
+                }
+                <td class="credit_label">
+                    @(string.Format("{0:n0}", item.User.Credit)) تومان
+                </td>
+                <td>
+                    <span class="general_type_label" style="color:@(Entities.User.GetUserGeneralTypeColor(item.User.UserGeneralType))">@(Entities.User.GetUserGeneralTypeString(item.User.UserGeneralType))</span>
+                </td>
+            }
+            @if (data.UserFilterType == Entities.User.UserFilterType.Staff)
+            {
+                var bankCard = item.BankCard;
+                <td>
+                    @(bankCard != null && !string.IsNullOrEmpty(bankCard.BankCardNumber) ? bankCard.BankCardNumber : "-")
+                </td>
+                <td>
+                    @(bankCard != null && !string.IsNullOrEmpty(bankCard.ShabaNumber) ? bankCard.ShabaNumber : "-")
+                </td>
+            }
+            @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest)
+            {
+                <td>
+                    <div onclick="showInstantReserveMsg(@item.User.Id)" style="cursor:pointer;border-radius:5px;background-color:#fdd835;padding:5px;">تایید درخواست</div>
+                </td>
+            }
+            @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
+            {
+                <td>
+                    <div style="display:flex;flex-flow:row;">
+                        <div style="margin:0 10px;color:@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "red" : "#34A853")">@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "ممنوع" : "فعال")</div>
+                        <div>تعداد لغو:‌ @item.InstantReserveCancel</div>
+                    </div>
+                </td>
+            }
+            @if (item.User.AccessType < 2)
+            {
+                <td>
+                    <a href="@Url.Action("Edit",new {uid= item.User.Id})"><span class="editicon" title="ویرایش"></span></a>
+                    <span class="deleteicon" onclick="deleteItem(@item.User.Id,this)" title="حذف"></span>
+                    <a title="آگهی های کاربر" class="adminicon fa fa-home" href='/user/impersonate?userId=@(item.User.Id)&url=/post/accomodationmanager' target="_blank"></a>
+                    <a title="کیف پول" class="adminicon fa fa-money-bill-alt" style="margin: 0 5px;" href='/user/impersonate?userId=@(item.User.Id)&url=/user/usercreditmanager' target="_blank"></a>
+                    <a class="adminicon fa fa-heart" href="/user/impersonate?userId=@(item.User.Id)&url=/post/favoritemanager?userid=@item.User.Id" target="_blank"></a>
+                    <a class="adminicon fa fa-eye" href="/user/impersonate?userId=@(item.User.Id)&url=/post/profilemanager" target="_blank"></a>
+                    <span class="adminicon fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></span>
+                    <span class="adminicon fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></span>
+                    <i onclick="incDecCredit(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="واریز/برداشت کیف پول"></i>
+                    <a href="/user/impersonate?userId=@item.User.Id" class="fa fa-sign-in-alt" style="color:#242424; cursor:pointer;" title="ورود به عنوان کاربر" target="_blank"></a>
+                    <a title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/index?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id">
+                        <i style="color:#242424" class="fa fa-book"></i>
+                    </a>
+                </td>
+            }
+            else
+            {
+                <td>
+                    <a href="@Url.Action("Edit",new {uid= item.User.Id})"><span class="editicon" title="ویرایش"></span></a>
+                    <span class="deleteicon" onclick="deleteItem(@item.User.Id,this)" title="حذف"></span>
+                    <a class="adminicon fa fa-home impersonateDenied" href='#' style="color:grey;"></a>
+                    <a title="کیف پول" class="adminicon fa fa-money-bill-alt impersonateDenied" style="margin: 0 5px; color: grey;" href='#'></a>
+                    <a class="adminicon fa fa-heart impersonateDenied" href="#" style="color: grey;"></a>
+                    <a class="adminicon fa fa-eye impersonateDenied" href="#" style="color:grey;"></a>
+                    <span class="adminicon fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></span>
+                    <span class="adminicon fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></span>
+                    <i onclick="incDecCredit(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="واریز/برداشت کیف پول"></i>
+                    <a href="#" class="fa fa-sign-in-alt impersonateDenied" style="color:grey;" title="ورود به عنوان کاربر"></a>
+                    <a title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/index?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id">
+                        <i style="color:#242424" class="fa fa-book"></i>
+                    </a>
+                </td>
+            }
+        </tr>
+            }
+        </table>
+    </div>
+}
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "User", new
+    {
+        page,
+        uname = data.Uname,
+        photo = data.Photo,
+    sort_order = data.SortOrder,
+        ownership = data.Ownership,
+    mobile_status = data.MobileStatus,
+        status = data.Status,
+        advertise_count = data.AdvertiseCount,
+    complete_profile_status = data.CompleteProfileStatus,
+        complete_profile_contact_status = data.CompleteProfileContactStatus,
+    user_general_type = data.UserGeneralType,
+        access_type = data.AccessType,
+        Province = data.Province,
+    City = data.City,
+        Area = data.Area,
+        advertiseId = data.AdvertiseId,
+        userFilterType = (int)data.UserFilterType,
+    card_status = data.CardStatus,
+        minReserveNorouzFromDate = data.MinReserveNorouzFromDate
+    }),
+    new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        function loginUserDirectly(id) {
+            myajax('user/loginuserdirectly', 'id=' + id, function (ret) {
+                if (ret.status == 0) {
+                    showErrorMessage('خطا', ret.msg);
+                    return;
+                }
+                var url = '/admin/loginuserdirectly?token=' + ret.token;
+                copyStringToClipboard('https://www.amlakbashi.com' + url, 'لینک ورود');
+            });
+        }
+
+        $('.impersonateDenied').on('click', function () {
+            showErrorMessage("", "وضعیت دسترسی کاربر در حالت «عدم دسترسی به وب سایت» قرار دارد");
+        });
+
+        function copyStringToClipboard (str, name) {
+            // Create new element
+            var el = document.createElement('textarea');
+            // Set value (string to be copied)
+            el.value = str;
+            // Set non-editable to avoid focus and move outside of view
+            el.setAttribute('readonly', '');
+            el.style = {position: 'absolute', left: '-9999px'};
+            document.body.appendChild(el);
+            // Select text inside element
+            el.select();
+            // Copy text to clipboard
+            document.execCommand('copy');
+            // Remove temporary element
+            document.body.removeChild(el);
+            alertify.success(name + " کپی شد");
+        }
+
+        function changeUserStatus($uid, obj) {
+            if ($(obj).hasClass("enable"))
+            {
+                myajax("User/changeUserStatus", "uid=" + $uid + "&status=false", function (ret) {
+                    if (ret.status==1) {
+                        $(obj).removeClass("enable").addClass("disable");
+                    }
+                });
+            }
+            else
+            {
+                myajax("User/changeUserStatus", "uid=" + $uid + "&status=true", function (ret) {
+                    if (ret.status==1) {
+                        $(obj).removeClass("disable").addClass("enable");
+                    }
+                });
+            }
+        }
+
+        function changeCompleteProfileContact($uid, obj)
+        {
+            if ($(obj).hasClass("enable"))
+            {
+                myajax("User/changeCompleteProfileContactStatus", "uid=" + $uid + "&status=false", function (ret) {
+                    if (ret.status==1) {
+                        $(obj).removeClass("enable").addClass("disable");
+                    }
+                });
+            }
+            else
+            {
+                myajax("User/changeCompleteProfileContactStatus", "uid=" + $uid + "&status=true", function (ret) {
+                    if (ret.status==1) {
+                        $(obj).removeClass("disable").addClass("enable");
+                    }
+                });
+            }
+        }
+
+        function deleteItem($id, obj) {
+            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟"))
+            {
+                myajax("User/Delete", "uid=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        $(obj).parent().parent().remove() ;
+                    }
+                });
+            }
+        }
+
+        function toggleUserFilter(target) {
+            $('#userFilterType').val(target);
+            $('#js-filter-form').submit();
+        }
+
+        //function setLoginBan($id, active, obj) {
+        //    var activation_string = active ? "غیرفعال" : "فعال";
+        //    if (confirm("آیا امکان ورود به سایت برای این کاربر " + activation_string + " شود؟")) {
+        //        myajax("user/setloginban", "user_id=" + $id + "&active=" + active, function(ret) {
+        //            switch (ret.status) {
+        //                case 1:
+        //                    alert("امکان ورود به سایت با موفقیت " + activation_string + " شد");
+        //                    window.location.reload();
+        //                    break;
+        //                case 0:
+        //                    alert("عملیات با خطا مواجه شد");
+        //                    break;
+        //            }
+        //        });
+        //    }
+        //}
+
+        //function setReserveBan($id, active, obj) {
+        //    var activation_string = active ? "غیرفعال" : "فعال";
+        //    if (confirm("آیا امکان ورود به سایت برای این کاربر " + activation_string + " شود؟")) {
+        //        myajax("user/setreserveban", "user_id=" + $id + "&active=" + active, function(ret) {
+        //            switch (ret.status) {
+        //                case 1:
+        //                    alert("امکان ورود به سایت با موفقیت " + activation_string + " شد");
+        //                    window.location.reload();
+        //                    break;
+        //                case 0:
+        //                    alert("عملیات با خطا مواجه شد");
+        //                    break;
+        //            }
+        //        });
+        //    }
+        //}
+
+        function publish_photo($id, obj) {
+            if (confirm("آیا از انتشار عکس این کاربر اطمینان دارید ؟"))
+            {
+                myajax("User/PhotoPublish", "uid=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        alert("عکس کاربر با موفقیت انتشار داده شد.") ;
+                    }
+                });
+            }
+        }
+
+        function disapprove_photo($id, obj) {
+            if (confirm("آیا از عدم تایید عکس این کاربر اطمینان دارید ؟"))
+            {
+                myajax("User/PhotoDisapprove", "uid=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        alert("عکس کاربر در حالت عدم تایید قرار گرفت.") ;
+                    }
+                });
+            }
+        }
+
+        function incDecCredit(id) {
+            incDecMsg = showInfoMessage('واریز/برداشت کیف پول',
+                '<div style="display:flex;justify-content:space-between;">'
+                + '<div onclick="increaseCredit(' + id + ')" style="background-color:#34A853;color:white;border-radius:5px;padding:20px;cursor:pointer;margin: 20px;">واریز به کیف پول</div>'
+                + '<div onclick="decreaseCredit(' + id + ')" style="background-color:#EA4335;color:white;border-radius:5px;padding:20px;cursor:pointer;margin: 20px;">برداشت از کیف پول</div>'
+                + '</div>');
+        }
+
+        function increaseCredit($id) {
+            if (typeof incDecMsg != 'undefined') {
+                incDecMsg.close();
+            }
+            var content_addition = '<span>مبلغ: </span><input type="number" id="increase_credit_input"/>' + '<br />' +
+                '<span>شماره تراکنش: </span><input type="number" id="increase_credit_transaction_id"/>' + '<br />' +
+                '<span>دلیل افزودن مبلغ: </span><input type="text" id="increase_credit_transaction_cause"/>' + '<br />' +
+                '<input type="checkbox" id="increase_credit_send_sms" /> ارسال اس ام اس';
+            $.confirm({
+                title: 'واریز به کیف پول',
+                content: 'لطفا مبلغ را وارد کنید' + '<br />' + content_addition,
+                type: 'blue',
+                rtl: true,
+                typeAnimated: true,
+                buttons: {
+                    افزودن: function () {
+                        var input_amount = $("#increase_credit_input").val() == "" ? 0 : $("#increase_credit_input").val();
+                        var input_transaction_id = $("#increase_credit_transaction_id").val() == "" ? 0 : $("#increase_credit_transaction_id").val();
+                        var input_transaction_cause = $("#increase_credit_transaction_cause").val();
+                        var send_sms = $('#increase_credit_send_sms').is(":checked");
+                        showNoYesMessage('افزودن به کیف پول',
+                            '<div>' +
+                            '<div>مبلغ: ' + getPriceString(input_amount) + '</div>' +
+                            '<div>آیا مبلغ به کیف پول افزوده شود؟</div>' +
+                            '</div>',
+                            function () {
+                            myajax("User/AdminIncreaseCredit", "user_id=" + $id + "&amount=" + input_amount + "&transaction_cause=" + input_transaction_cause + "&transaction_id=" + input_transaction_id + "&send_sms=" + send_sms, function (ret) {
+                                if (ret.status == 1) {
+                                    $.confirm({
+                                        title: '',
+                                        content: ret.msg,
+                                        type: 'green',
+                                        rtl: true,
+                                        typeAnimated: true,
+                                        buttons: {
+                                            بستن: function () {
+                                            }
+                                        }
+                                    });
+                                    debugger;
+                                    $('#js-row-' + $id).find(".credit_label").html(ret.new_credit);
+                                }
+                                else if (ret.status == 0) {
+                                    $.confirm({
+                                        title: 'خطا',
+                                        content: ret.msg,
+                                        type: 'red',
+                                        rtl: true,
+                                        typeAnimated: true,
+                                        buttons: {
+                                            بستن: function () {
+                                            }
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                        });
+                    },
+                    انصراف: function () {
+                    }
+                }
+            });
+        }
+
+        function decreaseCredit($id) {
+            if (typeof incDecMsg != 'undefined') {
+                incDecMsg.close();
+            }
+            var content_addition = '<span>مبلغ: </span><input type="number" id="decrease_credit_input"/>' + '<br />' +
+                '<span>شماره تراکنش: </span><input type="number" id="decrease_credit_transaction_id"/>' + '<br />' +
+                '<span>دلیل کسر مبلغ: </span><input type="text" id="decrease_credit_transaction_cause"/>' + '<br />' +
+                '<input type="checkbox" id="decrease_credit_send_sms" /> ارسال اس ام اس';
+            $.confirm({
+                title: 'برداشت از کیف پول',
+                content: 'لطفا مبلغ را وارد کنید' + '<br />' + content_addition,
+                type: 'blue',
+                rtl: true,
+                typeAnimated: true,
+                buttons: {
+                    کسر: function () {
+                        var input_amount = $("#decrease_credit_input").val() == "" ? 0 : $("#decrease_credit_input").val();
+                        var input_transaction_id = $("#decrease_credit_transaction_id").val() == "" ? 0 : $("#decrease_credit_transaction_id").val();
+                        var input_transaction_cause = $("#decrease_credit_transaction_cause").val();
+                        var send_sms = $('#decrease_credit_send_sms').is(":checked");
+                        showNoYesMessage('افزودن به کیف پول',
+                            '<div>' +
+                            '<div>مبلغ: ' + getPriceString(input_amount) + '</div>' +
+                            '<div>آیا مبلغ از کیف پول کسر شود؟</div>' +
+                            '</div>', function () {
+                                myajax("User/AdminDecreaseCredit", "user_id=" + $id + "&amount=" + input_amount + "&transaction_cause=" + input_transaction_cause + "&transaction_id=" + input_transaction_id + "&send_sms=" + send_sms, function (ret) {
+                                    if (ret.status == 1) {
+                                        $.confirm({
+                                            title: '',
+                                            content: ret.msg,
+                                            type: 'green',
+                                            rtl: true,
+                                            typeAnimated: true,
+                                            buttons: {
+                                                بستن: function () {
+                                                }
+                                            }
+                                        });
+                                        $('#js-row-' + $id).find(".credit_label").html(ret.new_credit);
+                                    }
+                                    else if (ret.status == 0) {
+                                        $.confirm({
+                                            title: 'خطا',
+                                            content: ret.msg,
+                                            type: 'red',
+                                            rtl: true,
+                                            typeAnimated: true,
+                                            buttons: {
+                                                بستن: function () {
+                                                }
+                                            }
+                                        });
+                                        return false;
+                                    }
+                                });
+                            });
+                    },
+                    انصراف: function () {
+                    }
+                }
+            });
+        }
+
+        var instantReserveMsg;
+
+        function showInstantReserveMsg(id) {
+            instantReserveMsg = showInfoMessage('تایید رزرو آنی', '',
+                {
+                    contentUrl: '/user/getinstantreserveaccs?userid=' + id,
+                    onClose: function (){
+                        $('#js-filter-form').submit();
+                    }
+                });
+        }
+
+        function confirmInstantReserve(elem) {
+            myajax('user/confirminstantreserve', 'id=' + $(elem).attr('js-acc-id'), function (ret) {
+                if (ret.status == 1) {
+                    alertify.success('تایید شد');
+                    $(elem).remove();
+                }
+                else {
+                    alertify.error('عملیات با خطای فنی مواجه شد');
+                }
+            });
+        }
+
+        function confirmInstantReserveAll(elem) {
+            myajax('user/confirmallinstantreserves', 'userid=' + $(elem).attr('js-user-id'), function (ret) {
+                if (ret.status == 1) {
+                    alertify.success('تایید شد');
+                    instantReserveMsg.close();
+                }
+                else {
+                    alertify.error('عملیات با خطای فنی مواجه شد');
+                }
+            });
+        }
+
+        function cancelInstantReserveAll(elem) {
+            myajax('user/cancellallinstantreserves', 'userid=' + $(elem).attr('js-user-id'), function (ret) {
+                if (ret.status == 1) {
+                    alertify.success('لغو شد');
+                    instantReserveMsg.close();
+                }
+                else {
+                    alertify.error('عملیات با خطای فنی مواجه شد');
+                }
+            });
+        }
+
+        $(".js-filter-date-picker").persianDatepicker({
+            altField: '#to_date-alt',
+            format: 'YYYY/MM/DD',
+            altFormat: 'YYYY/MM/DD',
+            autoClose: true,
+            toolbox: {
+                calendarSwitch: { enabled: false },
+                todayButton: { enabled: true },
+                submitButton: { enabled: true, text: { fa: "بستن", en: close } }
+            },
+            navigator: {
+                scroll: { enabled: false },
+                text: { btnNextText: '>', btnPrevText: '<' },
+            },
+            initialValue: true
+        });
+        $("#minReserveNorouzFromDate").val('@data.MinReserveNorouzFromDate');
+
+    </script>
+}

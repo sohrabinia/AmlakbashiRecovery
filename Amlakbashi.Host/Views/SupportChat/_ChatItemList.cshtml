@@ -1,0 +1,7 @@
+﻿@using Amlakbashi.Core.DTOs.SupportChatDTOs;
+@model IEnumerable<SupportChatMessageDTO>
+
+@foreach (var item in Model)
+{
+    @Html.Partial("_ChatItem", item)
+}

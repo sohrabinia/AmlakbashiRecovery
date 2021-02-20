@@ -1,0 +1,18 @@
+﻿@model IEnumerable<Advertise>
+
+<div>
+    <div style="display:flex;flex-flow:row;margin-bottom:15px">
+        <div js-user-id="@ViewBag.userid" onclick="confirmInstantReserveAll(this)" style="width:100px;text-align:center;background-color:#fdd835;padding:5px;border-radius:5px;margin: 0 10px; cursor:pointer;">تایید همه</div>
+        <div js-user-id="@ViewBag.userid" onclick="cancelInstantReserveAll(this)" style="width:100px;text-align:center;background-color:#fdd835;padding:5px;border-radius:5px;margin: 0 10px; cursor:pointer;">لغو همه</div>
+    </div>
+    @foreach (var item in Model)
+    {
+        <div style="display:flex;flex-flow:row;margin:auto;width:85%;justify-content: space-between;">
+            <div style="margin:10px 0;width:33.33%;">@item.Title</div>
+            <a target="_blank" href="@string.Format("/{0}/{1}", AdvertiseMainLocalization.CategoryTitle, item.Slug)" style="margin:10px 0;width:33.33%;">
+                کد آگهی @item.Id
+            </a>
+            <div js-acc-id="@item.Id" onclick="confirmInstantReserve(this)" style="margin:10px 0;background-color:#fdd835;padding:5px;border-radius:5px;cursor:pointer;">تایید</div>
+        </div>
+    }
+</div>
