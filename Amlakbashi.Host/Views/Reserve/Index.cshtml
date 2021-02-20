@@ -1,22 +1,11 @@
-﻿@using PagedList;
-@using PagedList.Mvc;
+﻿@model IEnumerable<Reserve>
+@inject IUserAccessor userAccessor;
+
 @{
     ViewBag.Title = "مدیریت رزرو ها";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
-@model IEnumerable<Reserve>
 
-@helper IsSelected(bool flg)
-{
-    if (flg)
-    {
-        @: selected="selected"
-    }
-    else
-    {
-        @:
-    }
-}
 @section ScriptLink
 {
     <!--Reference the SignalR library. -->
@@ -72,7 +61,7 @@
                             {
                                 if (value != Reserve.ReserveStatus.Deleted && value != Reserve.ReserveStatus.Default)
                                 {
-                                    <option value="@((int)value)" @IsSelected((int)ViewBag.reserve_status == (int)value)>@ReserveLocalization.GetStatusString((int)value, Reserve.StatusStringType.Site)</option>
+                                    <option value="@((int)value)" is-selected="@((int)ViewBag.reserve_status == (int)value)">@ReserveLocalization.GetStatusString((int)value, Reserve.StatusStringType.Site)</option>
                                 }
                             }
                         }
@@ -86,7 +75,7 @@
                             var host_response_values = (Reserve.HostResponseEnum[])Enum.GetValues(typeof(Reserve.HostResponseEnum));
                             foreach (var value in host_response_values)
                             {
-                                <option value="@((int)value)" @IsSelected((int)ViewBag.host_response_status == (int)value)>@ReserveLocalization.GetHostResponseString((int)value)</option>
+                                <option value="@((int)value)" is-selected="@((int)ViewBag.host_response_status == (int)value)">@ReserveLocalization.GetHostResponseString((int)value)</option>
                             }
                         }
                     </select>
@@ -97,17 +86,17 @@
                 <td class="minw">
                     <select name="general_status" id="general_status_input">
                         <option value="-1"> همه رزرو ها</option>
-                        <option value="0" @IsSelected(ViewBag.general_status == 0)>پرداخت شده ها</option>
+                        <option value="0" is-selected="@(ViewBag.general_status == 0)">پرداخت شده ها</option>
                     </select>
                 </td>
                 <td class="label"> وضعیت تسویه سایت :</td>
                 <td class="minw">
                     <select name="site_cleared_status" id="cleared_status_input">
                         <option value="-1"> همه رزرو ها</option>
-                        <option value="0" @IsSelected(ViewBag.site_cleared_status == 0)>تسویه شده</option>
-                        <option value="1" @IsSelected(ViewBag.site_cleared_status == 1)>تسویه نشده</option>
-                        <option value="2" @IsSelected(ViewBag.site_cleared_status == 2)>عودت داده شده</option>
-                        <option value="3" @IsSelected(ViewBag.site_cleared_status == 3)>در انتظار عودت</option>
+                        <option value="0" is-selected="@(ViewBag.site_cleared_status == 0)">تسویه شده</option>
+                        <option value="1" is-selected="@(ViewBag.site_cleared_status == 1)">تسویه نشده</option>
+                        <option value="2" is-selected="@(ViewBag.site_cleared_status == 2)">عودت داده شده</option>
+                        <option value="3" is-selected="@(ViewBag.site_cleared_status == 3)">در انتظار عودت</option>
                     </select>
                 </td>
             </tr>
@@ -130,17 +119,17 @@
                 <td class="minw">
                     <select name="supporter_id">
                         <option value="-1">همه</option>
-                        @if (User.GetUser().Id == 3 || User.GetUser().Id == 12 ||
-                    User.GetUser().Id == 1667 || User.GetUser().Id == 2122)
+                        @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 12 ||
+                   userAccessor.CurrentUser.Id == 1667 || userAccessor.CurrentUser.Id == 2122)
                         {
                             foreach (var supp in ViewBag.supporterList)
                             {
-                                <option @IsSelected(ViewBag.supporter_id == supp.id) value="@(supp.id)">@(supp.fullName)</option>
+                                <option is-selected="@(ViewBag.supporter_id == supp.id)" value="@(supp.id)">@(supp.fullName)</option>
                             }
                         }
                         else
                         {
-                            <option @IsSelected(ViewBag.supporter_id == User.GetUser().Id) value="@(User.GetUser().Id)">@(User.GetUser().FullName)</option>
+                            <option is-selected="@(ViewBag.supporter_id == userAccessor.CurrentUser.Id)" value="@(userAccessor.CurrentUser.Id)">@(userAccessor.CurrentUser.FullName)</option>
                         }
                     </select>
                 </td>
@@ -163,9 +152,9 @@
                 <td>
                     <select name="host_card_status">
                         <option value="-1">همه</option>
-                        <option value="0" @IsSelected(ViewBag.host_card_status == 0)>دارای شماره شبا</option>
-                        <option value="1" @IsSelected(ViewBag.host_card_status == 1)>فقط شماره کارت</option>
-                        <option value="2" @IsSelected(ViewBag.host_card_status == 2)>بدون حساب</option>
+                        <option value="0" is-selected="@(ViewBag.host_card_status == 0)">دارای شماره شبا</option>
+                        <option value="1" is-selected="@(ViewBag.host_card_status == 1)">فقط شماره کارت</option>
+                        <option value="2" is-selected="@(ViewBag.host_card_status == 2)">بدون حساب</option>
                     </select>
                 </td>
                 <td><input type="submit" class="filter" value="فیلتر" /></td>
@@ -240,234 +229,235 @@
             @foreach (var item in data.reserveList)
             {
                 Idx++;
-        <tr id="js-@item.id">
-            <td>
-                @Idx
-            </td>
-            <td>
-                <div>@item.id</div>
-                <div><i style="font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.id)', 'کد رزرو @(item.id)')"></i></div>
-            </td>
-            <td>
-                <div>زمان درخواست: @(item.createDateString)</div>
-                <div>کد آگهی: <a href="/Advertise/Index?status=-1&id=@(item.parentAccomodationId > 0 ? item.parentAccomodationId : item.accommodationId)">@item.accommodationId @(item.parentAccomodationId > 0 ? " >> " + item.parentAccomodationId : "")</a><i style="margin: 0 10px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.accommodationId)', 'کد آگهی @(item.accommodationId)')"></i></div>
-                <div>کد میزبان: <a href="/User/Index?code=@item.hostUserId">@item.hostUserId</a><i style="margin: 0 10px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.hostUserId)', 'کد میزبان @(item.hostUserId)')"></i><i style="cursor:pointer;margin: 0 5px 0 0" class="fa fa-phone" onclick="showCallPopup(@(item.hostUserId),@(item.id),'میزبان')"></i></div>
-                <div>کد مهمان: <a href="/User/Index?code=@item.guestUserId">@item.guestUserId</a><i style="margin: 0 10px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.guestUserId)', 'کد مهمان @(item.guestUserId)')"></i><i style="cursor:pointer;margin: 0 5px 0 0" class="fa fa-phone" onclick="showCallPopup(@(item.guestUserId),@(item.id),'مهمان')"></i></div>
-            </td>
-            <td>
-                <span>از @item.startDateString تا @item.endDateString</span><br />
-                <span>@item.guestCount نفر به مدت @item.stayDays شب</span><br />
-                <span style="color:@(item.totalPaidPrice > 0 ? "#34A853" : "#242424")">مبلغ: @string.Format("{0:n0}", item.totalPrice) ت</span><br />
-                @if (item.depositePrice != item.totalPrice)
-                {
-                    <span style="color:@(item.depositePaidPrice > 0 || item.totalPaidPrice > 0 ? "#34A853" : "#242424")">بیعانه: @string.Format("{0:n0}", item.depositePrice) ت</span>
-                }
-            </td>
-            <td>
-                @if (item.instantReserve && item.payments == null)
-                {
-                    <span>مهمان پرداخت نکرده</span>
-                }
-                else
-                {
-                    if ((item.payments == null || item.payments.Count == 0) && item.paymentTryCount < 1)
-                    {
-                        <span>-</span>
-                    }
-                    else
-                    {
-                        <a style="text-decoration:none;color:#242424;" target="_blank" href="~/reservepayment/index?reserve_id=@(item.id)">
-                            @if (item.paymentTryCount > 0)
+                <tr id="js-@item.id">
+                    <td>
+                        @Idx
+                    </td>
+                    <td>
+                        <div>@item.id</div>
+                        <div><i style="font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.id)', 'کد رزرو @(item.id)')"></i></div>
+                    </td>
+                    <td>
+                        <div>زمان درخواست: @(item.createDateString)</div>
+                        <div>کد آگهی: <a href="/Advertise/Index?status=-1&id=@(item.parentAccomodationId > 0 ? item.parentAccomodationId : item.accommodationId)">@item.accommodationId @(item.parentAccomodationId > 0 ? " >> " + item.parentAccomodationId : "")</a><i style="margin: 0 10px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.accommodationId)', 'کد آگهی @(item.accommodationId)')"></i></div>
+                        <div>کد میزبان: <a href="/User/Index?code=@item.hostUserId">@item.hostUserId</a><i style="margin: 0 10px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.hostUserId)', 'کد میزبان @(item.hostUserId)')"></i><i style="cursor:pointer;margin: 0 5px 0 0" class="fa fa-phone" onclick="showCallPopup(@(item.hostUserId),@(item.id),'میزبان')"></i></div>
+                        <div>کد مهمان: <a href="/User/Index?code=@item.guestUserId">@item.guestUserId</a><i style="margin: 0 10px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.guestUserId)', 'کد مهمان @(item.guestUserId)')"></i><i style="cursor:pointer;margin: 0 5px 0 0" class="fa fa-phone" onclick="showCallPopup(@(item.guestUserId),@(item.id),'مهمان')"></i></div>
+                    </td>
+                    <td>
+                        <span>از @item.startDateString تا @item.endDateString</span><br />
+                        <span>@item.guestCount نفر به مدت @item.stayDays شب</span><br />
+                        <span style="color:@(item.totalPaidPrice > 0 ? "#34A853" : "#242424")">مبلغ: @string.Format("{0:n0}", item.totalPrice) ت</span><br />
+                        @if (item.depositePrice != item.totalPrice)
+                        {
+                            <span style="color:@(item.depositePaidPrice > 0 || item.totalPaidPrice > 0 ? "#34A853" : "#242424")">بیعانه: @string.Format("{0:n0}", item.depositePrice) ت</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.instantReserve && item.payments == null)
+                        {
+                            <span>مهمان پرداخت نکرده</span>
+                        }
+                        else
+                        {
+                            if ((item.payments == null || item.payments.Count == 0) && item.paymentTryCount < 1)
                             {
-                                <span style="color:#EA4335">@item.paymentTryCount تلاش برای پرداخت</span><br />
-                                <span style="color:#EA4335">@item.lastPaymentTryDate</span><br />
-                            }
-                            @foreach (var paymentItem in item.payments)
-                            {
-                                <span style="color:#34A853">@(paymentItem.title): @string.Format("{0:n0}", paymentItem.amount) ت</span><br />
-                                <span>@paymentItem.dateString</span><br />
-                            }
-                            @if (item.couponPrice > 0)
-                            {
-                                <span style="color:#4285F4">بن تخفیف: @string.Format("{0:n0}", item.couponPrice) ت</span><br />
-                            }
-                            @if (item.prizePrice > 0)
-                            {
-                                <span style="color:#4285F4">کیف هدیه: @string.Format("{0:n0}", item.prizePrice) ت</span><br />
-                            }
-                        </a>
-                    }
-                }
-            </td>
-            <td class="reserve-status-label" style="color:@item.statusColor; max-width: 70px;">
-                <div style="display:flex;flex-flow:column">
-                    <div>@item.statusString</div>
-                    @if (item.status == (int)Reserve.ReserveStatus.Completed)
-                    {
-                        <div style="color:#242424">
-                            @if (item.guestScore > 0)
-                            {
-                                @Html.Partial("_StarRating", new ViewDataDictionary {
-                                    { "score", item.guestScore },
-                                    { "onclick", "showRatingDetail(" + item.accommodationId + "," + item.guestUserId +")" },
-                                    { "fontSize", 11 },
-                                    { "iconSize", 11 },
-                                    { "labelWidth", 13 }
-                                })
+                                <span>-</span>
                             }
                             else
                             {
-                                <div>بدون امتیازدهی</div>
+                                <a style="text-decoration:none;color:#242424;" target="_blank" href="~/reservepayment/index?reserve_id=@(item.id)">
+                                    @if (item.paymentTryCount > 0)
+                                    {
+                                        <span style="color:#EA4335">@item.paymentTryCount تلاش برای پرداخت</span><br />
+                                        <span style="color:#EA4335">@item.lastPaymentTryDate</span><br />
+                                    }
+                                    @foreach (var paymentItem in item.payments)
+                                    {
+                                        <span style="color:#34A853">@(paymentItem.title): @string.Format("{0:n0}", paymentItem.amount) ت</span><br />
+                                        <span>@paymentItem.dateString</span><br />
+                                    }
+                                    @if (item.couponPrice > 0)
+                                    {
+                                        <span style="color:#4285F4">بن تخفیف: @string.Format("{0:n0}", item.couponPrice) ت</span><br />
+                                    }
+                                    @if (item.prizePrice > 0)
+                                    {
+                                        <span style="color:#4285F4">کیف هدیه: @string.Format("{0:n0}", item.prizePrice) ت</span><br />
+                                    }
+                                </a>
                             }
-                            @if (!string.IsNullOrEmpty(item.guestComment))
+                        }
+                    </td>
+                    <td class="reserve-status-label" style="color:@item.statusColor; max-width: 70px;">
+                        <div style="display:flex;flex-flow:column">
+                            <div>@item.statusString</div>
+                            @if (item.status == (int)Reserve.ReserveStatus.Completed)
                             {
-                                <div onclick="showComment('@(Uri.EscapeUriString(item.guestComment))')" style="cursor:pointer;background-color:#fdd835;border-radius:5px; padding:5px;">مشاهده نظر</div>
+                                <div style="color:#242424">
+                                    @if (item.guestScore > 0)
+                                    {
+                                        @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                                            new ModelStateDictionary()) {
+                                            { "score", item.guestScore },
+                                            { "onclick", "showRatingDetail(" + item.accommodationId + "," + item.guestUserId +")" },
+                                            { "fontSize", 11 },
+                                            { "iconSize", 11 },
+                                            { "labelWidth", 13 }
+                                        })
+                                    }
+                                    else
+                                    {
+                                        <div>بدون امتیازدهی</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.guestComment))
+                                    {
+                                        <div onclick="showComment('@(Uri.EscapeUriString(item.guestComment))')" style="cursor:pointer;background-color:#fdd835;border-radius:5px; padding:5px;">مشاهده نظر</div>
+                                    }
+                                    else
+                                    {
+                                        <div>بدون نظر</div>
+                                    }
+                                    <div onclick="editRating(@item.id)" style="cursor:pointer;margin-top:5px;background-color:#fdd835;border-radius:5px; padding:5px;">ویرایش نظر</div>
+                                </div>
                             }
-                            else
-                            {
-                                <div>بدون نظر</div>
-                            }
-                            <div onclick="editRating(@item.id)" style="cursor:pointer;margin-top:5px;background-color:#fdd835;border-radius:5px; padding:5px;">ویرایش نظر</div>
                         </div>
-                    }
-                </div>
 
-            </td>
-            <td style="max-width: 70px;">
-                @if (item.instantReserve)
-                {
-                    <div style="display:flex;flex-flow:row;padding:10px;justify-content:space-between;">
-                        <i style="font-size:20px;color:#DF7549" class="fas fa-bolt"></i>
-                        <span style="color:#DF7549;">رزرو آنی</span>
-                    </div>
-                }
-                else
-                {
-                    <span style="color:@item.hostResponseColor">@item.hostResponseString</span>
-                    if ((Reserve.HostResponseEnum)item.hostResponse != Reserve.HostResponseEnum.None)
-                    {
-                        <br />
-                        <span>@(item.hostResponseDateString))</span><br />
-                        <span>@(item.hostResponseTimeString)</span>
-                    }
-                }
-            </td>
-            <td style="width: 100px">
-                <div class="call_state_h" js-call-state="@(item.hostCallState)" style="cursor:pointer;font:10px Miransans;color:@(item.hostCallStateColor);" onclick="nextCallState(@(item.id), 'h', 'میزبان', this)">✆ثبت تماس میزبان</div>
-                <div class="call_state_g" js-call-state="@(item.guestCallState)" style="cursor:pointer;font:10px Miransans;color:@(item.guestCallStateColor);" onclick="nextCallState(@(item.id), 'g', 'مهمان', this)">✆ثبت تماس مهمان</div>
-                <i onclick="showAddInfoDialog(@(item.id))" class="fa fa-plus" style="color:#242424;cursor:pointer;" title="افزودن توضیحات"></i>
-                <i onclick="showInfo(@(item.id))" class="fa fa-eye" style="color:#242424;cursor:pointer;" title="نمایش توضیحات"></i>
-                <span class="js-info-count">(@(item.supportInfoCount) توضیح)</span>
-            </td>
-            <td class="support_state_td">
-                @{
-                    if (item.canGrantSupport)
-                    {
-                        <div style="cursor:pointer;border-radius: 5px;padding: 5px;background-color:#fdd835;" onclick="doSupport(@(item.id),this)">انجام پشتیبانی</div>
-                    }
-                    <div class="support_state" style="color:@(item.supportStateColor)">@(item.supportStateString)</div>
-                    foreach (var rs in item.supporters)
-                    {
-                        <div style="display:flex;flex-flow:row; justify-content: center; align-items:center;">
-                            @if (rs.imageId > 0)
+                    </td>
+                    <td style="max-width: 70px;">
+                        @if (item.instantReserve)
+                        {
+                            <div style="display:flex;flex-flow:row;padding:10px;justify-content:space-between;">
+                                <i style="font-size:20px;color:#DF7549" class="fas fa-bolt"></i>
+                                <span style="color:#DF7549;">رزرو آنی</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <span style="color:@item.hostResponseColor">@item.hostResponseString</span>
+                            if ((Reserve.HostResponseEnum)item.hostResponse != Reserve.HostResponseEnum.None)
                             {
-                                <img style="border-radius: 90px" width="20" height="20" src="@string.Format("/file/imgThumb?FileID={0}&w=200&h=200", rs.imageId)" />
+                                <br />
+                                <span>@(item.hostResponseDateString))</span><br />
+                                <span>@(item.hostResponseTimeString)</span>
                             }
-                            else
+                        }
+                    </td>
+                    <td style="width: 100px">
+                        <div class="call_state_h" js-call-state="@(item.hostCallState)" style="cursor:pointer;font:10px Miransans;color:@(item.hostCallStateColor);" onclick="nextCallState(@(item.id), 'h', 'میزبان', this)">✆ثبت تماس میزبان</div>
+                        <div class="call_state_g" js-call-state="@(item.guestCallState)" style="cursor:pointer;font:10px Miransans;color:@(item.guestCallStateColor);" onclick="nextCallState(@(item.id), 'g', 'مهمان', this)">✆ثبت تماس مهمان</div>
+                        <i onclick="showAddInfoDialog(@(item.id))" class="fa fa-plus" style="color:#242424;cursor:pointer;" title="افزودن توضیحات"></i>
+                        <i onclick="showInfo(@(item.id))" class="fa fa-eye" style="color:#242424;cursor:pointer;" title="نمایش توضیحات"></i>
+                        <span class="js-info-count">(@(item.supportInfoCount) توضیح)</span>
+                    </td>
+                    <td class="support_state_td">
+                        @{
+                            if (item.canGrantSupport)
                             {
-                                <i class="fa fa-user-circle" style="font-size:20px"></i>
+                                <div style="cursor:pointer;border-radius: 5px;padding: 5px;background-color:#fdd835;" onclick="doSupport(@(item.id),this)">انجام پشتیبانی</div>
                             }
-                            <div style="margin: 0 5px;color:@(rs.color);">@(rs.name)</div>
-                            @if (!string.IsNullOrEmpty(rs.transferReason))
+                            <div class="support_state" style="color:@(item.supportStateColor)">@(item.supportStateString)</div>
+                            foreach (var rs in item.supporters)
                             {
-                                <i style="cursor:pointer;color:#EA4335;" class="fa fa-info-circle" onclick="showInfoPopup('دلیل انتقال پشتیبانی', '@(rs.transferReason)')"></i>
+                                <div style="display:flex;flex-flow:row; justify-content: center; align-items:center;">
+                                    @if (rs.imageId > 0)
+                                    {
+                                        <img style="border-radius: 90px" width="20" height="20" src="@string.Format("/file/imgThumb?FileID={0}&w=200&h=200", rs.imageId)" />
+                                    }
+                                    else
+                                    {
+                                        <i class="fa fa-user-circle" style="font-size:20px"></i>
+                                    }
+                                    <div style="margin: 0 5px;color:@(rs.color);">@(rs.name)</div>
+                                    @if (!string.IsNullOrEmpty(rs.transferReason))
+                                    {
+                                        <i style="cursor:pointer;color:#EA4335;" class="fa fa-info-circle" onclick="showInfoPopup('دلیل انتقال پشتیبانی', '@(rs.transferReason)')"></i>
+                                    }
+                                </div>
                             }
-                        </div>
-                    }
-                }
-            </td>
-            @*<td style="text-overflow:clip;white-space:nowrap;">
-            @{
-                if (item.GuestCallDate != null)
-                {
-                    <span>@(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate((DateTime)item.GuestCallDate))</span><br />
-                    <span>@(((DateTime)item.GuestCallDate).ToString("HH:mm"))</span>
-                }
-                else
-                {
-                    @:-
-            }
-            }
-        </td>
-        <td style="text-overflow:clip;white-space:nowrap;">
-            @{
-                if (item.HostCallDate != null)
-                {
-                    <span>@(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate((DateTime)item.HostCallDate))</span><br />
-                    <span>@(((DateTime)item.HostCallDate).ToString("HH:mm"))</span>
-                }
-                else
-                {
-                    @:-
-            }
-            }
-        </td>*@
-            <td style="width:90px">
-                <a href="@Url.Action("Edit",new {reserve_id= item.id})"><span class="editicon" title="ویرایش"></span></a>
-                @if (item.status == (int)Reserve.ReserveStatus.WaitForResponse ||
-                    item.status == (int)Reserve.ReserveStatus.WaitForReserve)
-                {
-                    if (item.status == (int)Reserve.ReserveStatus.WaitForResponse)
-                    {
-                        <i class="fas fa-phone js-system-called-host" style="cursor:pointer;font-size:16px;color:@(item.systemCalledToHost ? "#34A853" : "#242424")" onclick="callForRequest(@item.id)" title="تماس سیستم با میزبان"></i>
-                    }
-                    else if (item.status == (int)Reserve.ReserveStatus.WaitForReserve)
-                    {
-                        <i class="fas fa-phone js-system-called-guest" style="cursor:pointer;font-size:16px;color:@(item.systemCalledToGuest ? "#34A853" : "#242424")" onclick="callForPayment(@item.id)" title="تماس سیستم با مهمان"></i>
-                    }
-                    <span class="fa fa-times" style="color:#3d3c3c;font-size:22px;cursor:pointer;" onclick="cancelBySystem(@item.id,this)" title="لغو رزرو توسط سیستم"></span>
-                }
-                <a target="_blank" href="@Url.Action("Chat",new {reserve_id= item.id})">
-                    <div class="itemicon" title="چت ها">
-                        <div class="js-chat-info" style="display:@(item.totalChatCount == 0 ? "none" : "unset");position:relative;right:10px;bottom:10px;border-radius:90px;padding:0 7px;background-color:@(item.newChatCount > 0 ? "#EA4335" : "#4485F2");width:18px;height:18px;font-size:12px;color:white;">@(item.newChatCount > 0 ? "!" : item.totalChatCount.ToString())</div>
-                    </div>
-                </a>
-                @if (item.mustDoClearing)
-                {
-                    <span class="fa fa-credit-card clearing_button" onclick="siteClearingHost(@item.id, false, null, 0, 0, 0, 0, null, this)" style="font-size:18px;cursor:pointer;color:#ff572d;" title="تسویه میزبان"></span>
-                    <span class="fa fa-money-bill-alt clearing_button" onclick="siteClearingHostWithCredit(@item.id, this)" style="font-size:18px;cursor:pointer;color:#ff572d;" title="تسویه میزبان با کیف پول"></span>
-                }
-                else if (item.canDoClearing)
-                {
-                    <span class="fa fa-credit-card clearing_button" onclick="siteClearingHost(@item.id, false, null, 0, 0, 0, 0, null, this)" style="font-size:18px;cursor:pointer;color:green;" title="تسویه میزبان"></span>
-                    <span class="fa fa-money-bill-alt clearing_button" onclick="siteClearingHostWithCredit(@item.id, this)" style="font-size:18px;cursor:pointer;color:green;" title="تسویه میزبان با کیف پول"></span>
-                }
-                @{
-                    if (item.mustRefund)
-                    {
-                        <span class="fa fa-credit-card refund_button" style="font-size:20px;color:red;cursor:pointer;cursor:pointer;color:red;" onclick="siteRefundGuest(@item.id, false, null, 0, 0, 0, null, this)" title="عودت به مهمان"></span>
-                        <span class="fa fa-money-bill-alt refund_button" style="font-size:20px;color:red;cursor:pointer;cursor:pointer;color:red;" onclick="siteRefundGuestWithCredit(@item.id, this)" title="عودت به مهمان با کیف پول"></span>
-                    }
-                }
-                @{
-                    if (item.canBePaidByHost)
-                    {
-                        <span class="fa fa-money-bill-alt payReserveWithCreditHost" onclick="payReserveWithCreditHost(@item.id, this)" style="font-size:18px;cursor:pointer;color:dodgerblue;" title="پرداخت درصد املاک باشی از حساب میزبان"></span>
-                    }
-                }
-                <i class="fas fa-comments-dollar" style="cursor:pointer" onclick="showCancelDiscussion(@item.id)" title="مذاکره لغو"></i>
-                <i class="fa fa-bullseye should-follow-button" style="font-size:18px;cursor:pointer; color:@(item.shouldFollow ? "#34A853" : "#242424")" onclick="toggleShouldFollow(@item.id)" title="@(item.shouldFollow ? "حذف" : "افزودن") در حال پیگیری"></i>
-                @if (User.GetUser().Id == 3 || User.GetUser().Id == 12 ||
-                User.GetUser().Id == 1667 || User.GetUser().Id == 2122)
-                {
-                    <span class="deleteicon" onclick="deleteItem(@item.id,this)" title="حذف"></span>
-                }
-                <a style="text-decoration:none;" title="رزرو های این مهمان" href="~/reserve/index?guest_user_id=@(item.guestUserId)"><i class="fa fa-book" style="font-size:18px;color:#242424"></i></a>
-                <span style="cursor:pointer;vertical-align:-webkit-baseline-middle" title="افزودن پرداخت مهمان" onclick="addGuestPayment(@item.id)"><img width="24" height="24" src="/file/resourceimagepng?file_name=add-guest-pay" /></span>
-                <span style="cursor:pointer;vertical-align:-webkit-baseline-middle;" title="عدم لغو سیستم" onclick="toggleDisableAutoCancel(@item.id, this)" data-value="@item.disableAutoCancel.ToString().ToLower()"><img width="18" height="18" style="padding: 5px;background-color:@(item.disableAutoCancel ? "#34A853" : "none");border-radius:60px;" src="/file/resourceimagepng?file_name=no-gear" /></span>
-                <span style="cursor:pointer;vertical-align:-webkit-baseline-middle;" title="بازدید مهمان از اقامتگاه" onclick="toggleAccVisited(@item.id, this)" data-value="@item.accVisitedByGuest.ToString().ToLower()"><img width="18" height="18" style="padding: 5px;background-color:@(item.accVisitedByGuest ? "#34A853" : "none");border-radius:60px;" src="/file/resourceimagepng?file_name=acc-visit" /></span>
-            </td>
-        </tr>
+                        }
+                    </td>
+                    @*<td style="text-overflow:clip;white-space:nowrap;">
+                            @{
+                                if (item.GuestCallDate != null)
+                                {
+                                    <span>@(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate((DateTime)item.GuestCallDate))</span><br />
+                                    <span>@(((DateTime)item.GuestCallDate).ToString("HH:mm"))</span>
+                                }
+                                else
+                                {
+                                    @:-
+                            }
+                            }
+                        </td>
+                        <td style="text-overflow:clip;white-space:nowrap;">
+                            @{
+                                if (item.HostCallDate != null)
+                                {
+                                    <span>@(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate((DateTime)item.HostCallDate))</span><br />
+                                    <span>@(((DateTime)item.HostCallDate).ToString("HH:mm"))</span>
+                                }
+                                else
+                                {
+                                    @:-
+                            }
+                            }
+                        </td>*@
+                    <td style="width:90px">
+                        <a href="@Url.Action("Edit",new {reserve_id= item.id})"><span class="editicon" title="ویرایش"></span></a>
+                        @if (item.status == (int)Reserve.ReserveStatus.WaitForResponse ||
+                           item.status == (int)Reserve.ReserveStatus.WaitForReserve)
+                        {
+                            if (item.status == (int)Reserve.ReserveStatus.WaitForResponse)
+                            {
+                                <i class="fas fa-phone js-system-called-host" style="cursor:pointer;font-size:16px;color:@(item.systemCalledToHost ? "#34A853" : "#242424")" onclick="callForRequest(@item.id)" title="تماس سیستم با میزبان"></i>
+                            }
+                            else if (item.status == (int)Reserve.ReserveStatus.WaitForReserve)
+                            {
+                                <i class="fas fa-phone js-system-called-guest" style="cursor:pointer;font-size:16px;color:@(item.systemCalledToGuest ? "#34A853" : "#242424")" onclick="callForPayment(@item.id)" title="تماس سیستم با مهمان"></i>
+                            }
+                            <span class="fa fa-times" style="color:#3d3c3c;font-size:22px;cursor:pointer;" onclick="cancelBySystem(@item.id,this)" title="لغو رزرو توسط سیستم"></span>
+                        }
+                        <a target="_blank" href="@Url.Action("Chat",new {reserve_id= item.id})">
+                            <div class="itemicon" title="چت ها">
+                                <div class="js-chat-info" style="display:@(item.totalChatCount == 0 ? "none" : "unset");position:relative;right:10px;bottom:10px;border-radius:90px;padding:0 7px;background-color:@(item.newChatCount > 0 ? "#EA4335" : "#4485F2");width:18px;height:18px;font-size:12px;color:white;">@(item.newChatCount > 0 ? "!" : item.totalChatCount.ToString())</div>
+                            </div>
+                        </a>
+                        @if (item.mustDoClearing)
+                        {
+                            <span class="fa fa-credit-card clearing_button" onclick="siteClearingHost(@item.id, false, null, 0, 0, 0, 0, null, this)" style="font-size:18px;cursor:pointer;color:#ff572d;" title="تسویه میزبان"></span>
+                            <span class="fa fa-money-bill-alt clearing_button" onclick="siteClearingHostWithCredit(@item.id, this)" style="font-size:18px;cursor:pointer;color:#ff572d;" title="تسویه میزبان با کیف پول"></span>
+                        }
+                        else if (item.canDoClearing)
+                        {
+                            <span class="fa fa-credit-card clearing_button" onclick="siteClearingHost(@item.id, false, null, 0, 0, 0, 0, null, this)" style="font-size:18px;cursor:pointer;color:green;" title="تسویه میزبان"></span>
+                            <span class="fa fa-money-bill-alt clearing_button" onclick="siteClearingHostWithCredit(@item.id, this)" style="font-size:18px;cursor:pointer;color:green;" title="تسویه میزبان با کیف پول"></span>
+                        }
+                        @{
+                            if (item.mustRefund)
+                            {
+                                <span class="fa fa-credit-card refund_button" style="font-size:20px;color:red;cursor:pointer;cursor:pointer;color:red;" onclick="siteRefundGuest(@item.id, false, null, 0, 0, 0, null, this)" title="عودت به مهمان"></span>
+                                <span class="fa fa-money-bill-alt refund_button" style="font-size:20px;color:red;cursor:pointer;cursor:pointer;color:red;" onclick="siteRefundGuestWithCredit(@item.id, this)" title="عودت به مهمان با کیف پول"></span>
+                            }
+                        }
+                        @{
+                            if (item.canBePaidByHost)
+                            {
+                                <span class="fa fa-money-bill-alt payReserveWithCreditHost" onclick="payReserveWithCreditHost(@item.id, this)" style="font-size:18px;cursor:pointer;color:dodgerblue;" title="پرداخت درصد املاک باشی از حساب میزبان"></span>
+                            }
+                        }
+                        <i class="fas fa-comments-dollar" style="cursor:pointer" onclick="showCancelDiscussion(@item.id)" title="مذاکره لغو"></i>
+                        <i class="fa fa-bullseye should-follow-button" style="font-size:18px;cursor:pointer; color:@(item.shouldFollow ? "#34A853" : "#242424")" onclick="toggleShouldFollow(@item.id)" title="@(item.shouldFollow ? "حذف" : "افزودن") در حال پیگیری"></i>
+                        @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 12 ||
+                       userAccessor.CurrentUser.Id == 1667 || userAccessor.CurrentUser.Id == 2122)
+                        {
+                            <span class="deleteicon" onclick="deleteItem(@item.id,this)" title="حذف"></span>
+                        }
+                        <a style="text-decoration:none;" title="رزرو های این مهمان" href="~/reserve/index?guest_user_id=@(item.guestUserId)"><i class="fa fa-book" style="font-size:18px;color:#242424"></i></a>
+                        <span style="cursor:pointer;vertical-align:-webkit-baseline-middle" title="افزودن پرداخت مهمان" onclick="addGuestPayment(@item.id)"><img width="24" height="24" src="/file/resourceimagepng?file_name=add-guest-pay" /></span>
+                        <span style="cursor:pointer;vertical-align:-webkit-baseline-middle;" title="عدم لغو سیستم" onclick="toggleDisableAutoCancel(@item.id, this)" data-value="@item.disableAutoCancel.ToString().ToLower()"><img width="18" height="18" style="padding: 5px;background-color:@(item.disableAutoCancel ? "#34A853" : "none");border-radius:60px;" src="/file/resourceimagepng?file_name=no-gear" /></span>
+                        <span style="cursor:pointer;vertical-align:-webkit-baseline-middle;" title="بازدید مهمان از اقامتگاه" onclick="toggleAccVisited(@item.id, this)" data-value="@item.accVisitedByGuest.ToString().ToLower()"><img width="18" height="18" style="padding: 5px;background-color:@(item.accVisitedByGuest ? "#34A853" : "none");border-radius:60px;" src="/file/resourceimagepng?file_name=acc-visit" /></span>
+                    </td>
+                </tr>
             }
         </table>
     </div>
@@ -1632,7 +1622,7 @@
 
         function addGuestPayment(id) {
             var allowedUsers = [3,12,2122,19076,1667];
-            var allowed = allowedUsers.includes(@User.GetUser().Id);
+            var allowed = allowedUsers.includes(@userAccessor.CurrentUser.Id);
             if (!allowed) {
                 showErrorMessage('خطا', 'شما دسترسی انجام این کار را ندارید');
                 return;

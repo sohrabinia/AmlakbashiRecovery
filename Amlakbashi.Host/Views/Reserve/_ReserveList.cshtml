@@ -1,17 +1,5 @@
-﻿
-@model IEnumerable<Amlakbashi.Core.DTOs.ReserveDTOs.ReserveDashboardItemDTO>
+﻿@model IEnumerable<Amlakbashi.Core.DTOs.ReserveDTOs.ReserveDashboardItemDTO>
 
-@helper IsSelected(bool stat)
-{
-    if (stat)
-    {
-        @:selected="selected"
-    }
-    else
-    {
-        @:""
-    }
-}
 @{
     var status_values = (Reserve.ReserveStatus[])Enum.GetValues(typeof(Reserve.ReserveStatus));
     <div class="reserve-dashboard__item-root">
@@ -42,7 +30,7 @@
         @foreach (var item in Model)
         {
             <div class="reserve-dashboard__item-container js-reserve-@(item.reserveId)">
-                @Html.Partial("_ReserveItem", item)
+                @await Html.PartialAsync("_ReserveItem", item)
             </div>
         }
     </div>

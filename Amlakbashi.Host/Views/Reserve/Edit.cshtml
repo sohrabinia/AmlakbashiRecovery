@@ -1,20 +1,9 @@
 ﻿@model Reserve
+@inject IUserAccessor userAccessor;
 
 @{
     ViewBag.Title = "رزرو";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
-}
-
-@helper isSelected(bool stat)
-{
-    if (stat)
-    {
-        @:selected="selected"
-    }
-    else
-    {
-        @:""
-    }
 }
 
 <div class="title">ویرایش رزرو</div>
@@ -49,9 +38,9 @@
                     تاریخ شروع :
                 </td>
                 <td>
-                    @if (User.GetUser().Id == 3 || User.GetUser().Id == 1667 ||
-                        User.GetUser().Id == 12 || User.GetUser().Id == 2122 ||
-                        User.GetUser().Id == 19076)
+                    @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667 ||
+                        userAccessor.CurrentUser.Id == 12 || userAccessor.CurrentUser.Id == 2122 ||
+                        userAccessor.CurrentUser.Id == 19076)
                     {
                         <input name="start_date" type="text" value="@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.StartDate)" />
                     }
@@ -67,9 +56,9 @@
                     تاریخ پایان :
                 </td>
                 <td>
-                    @if (User.GetUser().Id == 3 || User.GetUser().Id == 1667 ||
-                        User.GetUser().Id == 12 || User.GetUser().Id == 2122 ||
-                        User.GetUser().Id == 19076)
+                    @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667 ||
+                        userAccessor.CurrentUser.Id == 12 || userAccessor.CurrentUser.Id == 2122 ||
+                        userAccessor.CurrentUser.Id == 19076)
                     {
                         <input name="end_date" type="text" value="@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.EndDate)" />
                     }
@@ -117,7 +106,7 @@
                             var host_response_values = (Reserve.HostResponseEnum[])Enum.GetValues(typeof(Reserve.HostResponseEnum));
                             foreach (var value in host_response_values)
                             {
-                                <option @isSelected(value == Model.HostResponse) value="@((int)value)">@(ReserveLocalization.GetHostResponseString((int)value))</option>
+                                <option is-selected="@(value == Model.HostResponse)" value="@((int)value)">@(ReserveLocalization.GetHostResponseString((int)value))</option>
                             }
                         }
                     </select>
@@ -136,7 +125,7 @@
                             {
                                 if (value != Reserve.ReserveStatus.Deleted && value != Reserve.ReserveStatus.Default)
                                 {
-                                    <option @isSelected(value == Model.Status) value="@((int)value)">@(ReserveLocalization.GetStatusString((int)value, Reserve.StatusStringType.Site))</option>
+                                    <option is-selected="@(value == Model.Status)" value="@((int)value)">@(ReserveLocalization.GetStatusString((int)value, Reserve.StatusStringType.Site))</option>
                                 }
                             }
                         }
