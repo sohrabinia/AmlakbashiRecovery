@@ -10,7 +10,7 @@
     <div class="home-page__blog-news-container">
         @foreach (var item in Model)
         {
-            @Html.Partial("_BlogNewsItem", new ViewDataDictionary() {
+            @await Html.PartialAsync("_BlogNewsItem", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) {
                 {"title", item.Title },
                 {"href", item.BlogLink },
                 {"photoId", item.PhotoID }

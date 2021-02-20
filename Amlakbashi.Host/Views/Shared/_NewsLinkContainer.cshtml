@@ -67,7 +67,7 @@
         <div class="carousel">
             @foreach (var item in newsItem)
             {
-                @Html.Partial("_NewsLinkItem", new ViewDataDictionary() {
+                @await Html.PartialAsync("_NewsLinkItem", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) {
                         {"title", item.title },
                         {"href", item.href },
                         {"logo", item.logo }

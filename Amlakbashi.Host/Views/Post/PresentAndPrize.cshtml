@@ -1,8 +1,7 @@
-﻿@using PagedList;
-@using PagedList.Mvc;
+﻿
 @{ 
     ViewBag.Title = "هدیه سفر";
     Layout = "~/Views/Shared/_Dashboard.cshtml";
     ViewBag.presentandprize = true;
 }
-@Html.Partial("_PresentAndPrize", null, new ViewDataDictionary { { "presentorCode", ViewBag.presentorCode }, { "refreshOnLogin", ViewBag.refreshOnLogin != null ? ViewBag.refreshOnLogin : false } })
+@await Html.PartialAsync("_PresentAndPrize", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "presentorCode", ViewBag.presentorCode }, { "refreshOnLogin", ViewBag.refreshOnLogin != null ? ViewBag.refreshOnLogin : false } })

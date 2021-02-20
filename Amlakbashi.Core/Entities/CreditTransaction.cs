@@ -15,7 +15,7 @@ namespace Amlakbashi.Core.Entities
         public int UserID { get; set; }
 
         [ForeignKey("UserID")]
-        public User User { get; set; }
+        public virtual User User { get; set; }
         public long Price { get; set; }
         public DateTime Date { get; set; }
         public long RemainedPrice { get; set; }

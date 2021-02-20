@@ -15,13 +15,13 @@ namespace Amlakbashi.Core.Entities
         public DateTime CreateDate { get; set; }
 
         [ForeignKey("AdvertiseID")]
-        public Advertise Advertise { get; set; }
+        public virtual Advertise Advertise { get; set; }
 
         [ForeignKey("NotifierUserID")]
-        public User NotifierUser { get; set; }
+        public virtual User NotifierUser { get; set; }
 
         [ForeignKey("HostUserID")]
-        public User HostUser { get; set; }
+        public virtual User HostUser { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

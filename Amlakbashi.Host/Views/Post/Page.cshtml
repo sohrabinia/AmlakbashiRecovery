@@ -14,7 +14,7 @@
     var for_advertise_page = (ViewBag.for_advertise_page != null && ViewBag.for_advertise_page) || (ViewData["for_advertise_page"] != null && bool.Parse(ViewData["for_advertise_page"].ToString()));
     bool all_images_lazy = ViewData["all_images_lazy"] != null ? bool.Parse(ViewData["all_images_lazy"].ToString()) : false; }
 @section StyleLink {
-    <link rel="stylesheet" href="/js/home-page.min.css" />
+    <link rel="stylesheet" href="/css/home-page.min.css" />
 }
 @section ScriptLink {
     <script src="/js/home-page.min.js"></script>
@@ -22,7 +22,7 @@
 <div style="clear:both;"></div>
 
 <div class="home-page__top-container">
-    @Html.PartialAsync("_HomePageSearch")
+    @await Html.PartialAsync("_HomePageSearch")
     <div id="slideshow" class="home-page__slide-show home-page__slide-show-style">
         <img src="/file/resourceimagepng?file_name=lazy-home-slider" data-src="/file/resourceimagewebp?file_name=home-page-bg" class="slidernew lazy" alt="املاک باشی">
     </div>
@@ -161,7 +161,7 @@
             <a target="_blank" href="@CategoryUrlLocalization.CategoryToUrl(category.category)" class="home-page__category-link home-page__link">نمایش همه  (@(category.category.CountAdvertise))<i class="fa fa-chevron-left"></i></a>
         </div>
         <div class="home-page__category-container" data-url="/advertise/mostviewadvertisebycity?city_id=@(category.category.City)&province_id=@(category.category.Province)&type_id=@(category.category.Type)&count=5">
-            @Html.PartialAsync("_AdvertiseList", category.AdvertiseItems, new ViewDataDictionary(new EmptyModelMetadataProvider(),
+            @await Html.PartialAsync("_AdvertiseList", category.AdvertiseItems, new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "all_images_lazy", true } })
             @*<img src="/file/loading" style="margin: auto;" />*@
         </div> counterBox = counterBox + 1;
@@ -190,8 +190,8 @@
             <img src="/file/loading" style="margin: auto;" />
             </div>*@}
 
-    @Html.PartialAsync("_NewsLinkContainer")
-    @Html.PartialAsync("_HomePageBlogNews", (IEnumerable<BlogPost>)ViewBag.BlogPostNews)
+    @await Html.PartialAsync("_NewsLinkContainer")
+    @await Html.PartialAsync("_HomePageBlogNews", (IEnumerable<BlogPost>)ViewBag.BlogPostNews)
     <p class="box-text-style">
         املاک باشی وبسایت رزرو آنلاین است که در زمینه اجاره روزانه خانه،  آپارتمان مبله، اجاره سوئیت ، اجاره ویلا و رزرو اقامتگاه بوم گردی فعالیت دارد.<br />املاک باشی مجموعه‌ای از سوئیت تهران ، آپارتمان مبله تهران ، ویلا شمال، ویلا کردان ، سوئیت اصفهان ، سوئیت یزد ، سوئیت شیراز ، سوئیت مشهد ، سوئیت کیش ، اقامتگاه‌های بوم گردی و ویلا اطراف تهران را در دسته بندی های مختلف گرد هم آورده است تا خدمات آنلاین اجاره ویلا و اجاره روزانه خانه را برای مسافران ساده‌تر کند.<br />خدمات املاک باشی  شامل : <a target="_blank" href="/s/2/تهران">اجاره روزانه خانه در تهران</a>، <a target="_blank" href="/s/2/تهران">اجاره سوئیت تهران</a>، <a target="_blank" href="/شمال">اجاره ویلا شمال</a>، <a target="_blank" href="/s/448/کردان">اجاره ویلا کردان</a>، <a target="_blank" href="/s/1583/رامسر">اجاره ویلا رامسر</a>، <a target="_blank" href="/s/1053/ماسال">اجاره ویلا ماسال</a> ، <a target="_blank" href="/s/1558/نوشهر">اجاره ویلا در نوشهر</a> ، <a target="_blank" href="/s/1562/چالوس">اجاره ویلا در چالوس</a> ،  <a target="_blank" href="/s/1580/سلمان-شهر">اجاره ویلا متل قو</a>، <a target="_blank" href="/s/1/استان-تهران/ویلا">اجاره ویلا اطراف تهران</a>، <a target="_blank" href="/ایران">اجاره ویلا و سوئیت</a> ، <a target="_blank" href="/ایران/ویلا?t=83&pool=1">اجاره ویلاهای استخردار</a> ، <a target="_blank" href="/ایران/ویلا?t=83&region=1">اجاره ویلا ساحلی</a> ، <a target="_blank" href="/ایران/ویلا?t=83&region=2">اجاره ویلا جنگلی</a> ، <a target="_blank" href="/ایران/بومگردی">رزرو اقامتگاه بوم گردی</a> ، <a target="_blank" href="/s/794/اصفهان">اجاره سوئیت اصفهان</a> ، <a target="_blank" href="/s/1532/یزد">اجاره سوئیت یزد</a> ، <a target="_blank" href="/s/451/مشهد">اجاره سوئیت مشهد</a> ، <a target="_blank" href="/s/1279/کیش">اجاره سوئیت کیش</a> و <a target="_blank" href="/s/1622/شیراز">اجاره سوئیت شیراز</a> و در سایر شهرهای توریستی ایران می باشد.
     </p>

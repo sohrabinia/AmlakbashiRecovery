@@ -1,5 +1,4 @@
-﻿@using Amlakbashi.Host.Extensions;
-@using Entities = Amlakbashi.Core.Entities;
+﻿@using Entities = Amlakbashi.Core.Entities;
 @using Amlakbashi.Host.Authentication;
 @inject IUserAccessor userAccessor;
 <!DOCTYPE html>
@@ -29,7 +28,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="offline" href="/offline.html">
     <meta name="theme-color" content="#fdd835" />
-    <link rel='index' title='املاک باشی' href='@string.Format("http{0}://{1}", Request.IsSecureConnection ? "s" : "", Request.Url.Authority)' />
+    <link rel='index' title='املاک باشی' href='@string.Format("http{0}://{1}", Context.Request.Scheme, Context.Request.Host)' />
     <meta name="viewport" content="width=device-width, minimum-scale=0.25, maximum-scale=1.0, initial-scale=1.0" />
     <meta name="coverage" content="Worldwide" />
     <meta name="robots" content="index,follow,all" />
@@ -54,7 +53,6 @@
         <meta name="description" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
     }
     <meta name="enamad" content="344312021" />
-
     <link rel="stylesheet" type="text/css" href="/css/dashboard.min.css">
     @RenderSection("StyleLink", required: false)
     @RenderSection("StyleBlock", required: false)
@@ -136,7 +134,6 @@
                             <i class="fa fa-user-circle">
                             </i>
                         }
-
                         <span>
                             @if (User.Identity.IsAuthenticated)
                             {
@@ -299,109 +296,13 @@
             <button onclick="close_alert()" class="alert__btn">بستن</button>
         </div>
     }
-
-
-    @*<script type="text/javascript" src="/file/getjs?src=/resource/scripts/jquery-2.1.1.min.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/jquery.maskedinput.min.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/jquery.nicescroll.min.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/ticker/jquery.ticker.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/chosen_v1.4.2/chosen.jquery.min.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/alertify.js-0.3.11/src/alertify.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/lazy-loading.js&v=1"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/drop-zone-2019/dropzone.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=~/Resource/jquery-confirm/jquery-confirm.min.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=~/Resource/persian-date-picker/persian-datepicker.js&v=4"></script>
-        <script type="text/javascript" src="/file/getjs?src=~/resource/Scripts/general/jalali-date-converter.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=~/resource/Scripts/general/jalali-date-handler.js&v=5"></script>
-        <script type="text/javascript" src="/file/getjs?src=~/resource/Scripts/general/jalali-date-picker.js&v=3"></script>
-        <script type="text/javascript" src="/file/getjs?src=~/Resource/jquery.calendars.package-2.1.0/js/jquery.calendars.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=~/Resource/jquery.calendars.package-2.1.0/js/jquery.calendars.plus.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=~/Resource/Scripts/jquery.plugin.min.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=~/Resource/jquery.calendars.package-2.1.0/js/jquery.calendars.all.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=~/Resource/jquery.calendars.package-2.1.0/js/jquery.calendars.persian.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/Resource/Scripts/jquery.onmutate.min.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/Resource/rating/jquery.barrating.min.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/accommodation-edit-form.js&v=2"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/ajax-helper.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/client-helper.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/detail-button.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/increase-decrease-button.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/input-validation-helper.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/loading-indicator.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/Scripts/general/login/intlTelInput.min.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/login/login-popup.js&v=2"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/more-text-button.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/price-string-generator.js&v=1"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/rating-detail.js&v=1"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/string-replace-all.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/textarea-autoexpand.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/user-rating.js&v=1"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/message-popup.js&v=5"></script>
-        <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/confirm-alert-helper.js"></script>
-        <script type="text/javascript" src="/file/getjs?src=/Scripts/jquery.unobtrusive-ajax.min.js&v=1"></script>*@
-    <script type="text/javascript" src="/file/getjs?src=/resource/scripts/jquery-2.1.1.min.js"></script>
-    <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/loading-indicator.js"></script>
-    <script type="text/javascript" src="/file/getjs?src=/resource/scripts/general/ajax-helper.js"></script>
-    <script type="text/javascript" src="/file/getjs?src=/resource/drop-zone-2019/dropzone.js"></script>
-    <script type="text/javascript" src="/file/getjs?src=/resource/js_output/dashboardminifyjs_v2_3.js"></script>
-    @*@MvcHtmlString.Create(
-        Bundle.JavaScript()
-        //.Add("/resource/scripts/jquery-2.1.1.min.js")
-        .Add("/resource/scripts/jquery.maskedinput.min.js")
-        .Add("/resource/scripts/jquery.nicescroll.min.js")
-        .Add("/resource/ticker/jquery.ticker.js")
-        .Add("/resource/chosen_v1.4.2/chosen.jquery.min.js")
-        .Add("/resource/alertify.js-0.3.11/src/alertify.js")
-        .Add("/resource/scripts/general/lazy-loading.js")
-        //.Add("/resource/drop-zone-2019/dropzone.js")
-        .Add("/resource/jquery-confirm/jquery-confirm.min.js")
-        .Add("/resource/persian-date-picker/persian-datepicker.js")
-        .Add("/resource/Scripts/general/jalali-date-converter.js")
-        .Add("/resource/Scripts/general/jalali-date-handler.js")
-        .Add("/resource/Scripts/general/jalali-date-picker.js")
-        .Add("/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.js")
-        .Add("/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.plus.js")
-        .Add("/resource/Scripts/jquery.plugin.min.js")
-        .Add("/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.all.js")
-        .Add("/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.persian.js")
-        .Add("/resource/Scripts/jquery.onmutate.min.js")
-        .Add("/resource/rating/jquery.barrating.min.js")
-        //.Add("/resource/scripts/general/accommodation-edit-form.js")
-        //.Add("/resource/scripts/general/ajax-helper.js")
-        .Add("/resource/scripts/general/client-helper.js")
-        .Add("/resource/scripts/general/detail-button.js")
-        .Add("/resource/scripts/general/increase-decrease-button.js")
-        .Add("/resource/scripts/general/input-validation-helper.js")
-        //.Add("/resource/scripts/general/loading-indicator.js")
-        .Add("/resource/Scripts/general/login/intlTelInput.min.js")
-        .Add("/resource/scripts/general/login/login-popup.js")
-        .Add("/resource/scripts/general/more-text-button.js")
-        .Add("/resource/scripts/general/price-string-generator.js")
-        .Add("/resource/scripts/general/rating-detail.js")
-        .Add("/resource/scripts/general/string-replace-all.js")
-        .Add("/resource/scripts/general/textarea-autoexpand.js")
-        .Add("/resource/scripts/general/user-rating.js")
-        .Add("/resource/scripts/general/message-popup.js")
-        .Add("/resource/scripts/general/confirm-alert-helper.js")
-        .Add("/scripts/jquery.unobtrusive-ajax.min.js")
-        .ForceRelease()
-        .Render("/resource/js_output/dashboardminifyjs_v2_3.js"))*@
-    @*<script src="/resource/scripts/general/login/login-popup.js"></script>*@
-    @*<script src="/file/getjs?src=~/Resource/detailed-date-picker/persian-datepicker.js&v=5"></script>*@
-    @*<script src="/file/getjs?src=~/Resource/persian-date-picker/persian-date.min.js"></script>*@
-    @*<script src="/file/getjs?src=/resource/scripts/general/accommodation-item.js"></script>*@
-    @*<script src="/file/getjs?src=/resource/scripts/general/date-time-helper.js"></script>*@
-    @*<script src="/file/getjs?src=/resource/scripts/general/region-selector.js"></script>*@
-    @*<script src="/file/getjs?src=~/Resource/dropzone-v5.4/dropzone.min.js"></script>*@
-
-    @*<script src="/file/getjs?src=/resource/detailed-date-picker/detailed-date-picker-helper.js&v=7"></script>*@
-    @*<script src="/file/getjs?src=/resource/persian-date-picker/persian-date-picker-helper.js&v=4"></script>*@
     @{
-        if (userAccessor.CurrentUser.AccessType == (int)Amlakbashi.Core.Entities.User.AccessTypeEnum.LoginBanned)
-        {
-            Session["mobile"] = null;
-            FormsAuthentication.SignOut();
-        }
+        // TODO: ckeck this into related actions
+        //if (userAccessor.CurrentUser.AccessType == (int)Amlakbashi.Core.Entities.User.AccessTypeEnum.LoginBanned)
+        //{
+        //    Session["mobile"] = null;
+        //    FormsAuthentication.SignOut();
+        //}
     }
     <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-messaging.js"></script>
