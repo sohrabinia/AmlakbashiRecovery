@@ -1,0 +1,287 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+
+@model AccommodationItemDTO
+
+@{
+    var mainAmenities = Model.Amenities.HeatingSystem != Advertise.HeatingSystemItems.Unset ||
+        Model.Amenities.CoolingSystem != Advertise.CoolingSystemItems.Unset || Model.Amenities.WC != Advertise.WCItems.Unset
+        || Model.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset || Model.Bed.BlanketsAndMattresses != 0
+        ? true : false;
+    var detailedAmenities = Model.Elevator.Elevator || Model.Amenities.Bathroom || Model.Amenities.Pool ||
+        Model.Amenities.Sauna || Model.Amenities.Jacuzzi || Model.Amenities.TV || Model.Amenities.Wifi ||
+        Model.Amenities.WashingMachine || Model.Amenities.Refrigerator || Model.Amenities.Oven || Model.Amenities.MicrowaveOven ||
+        Model.Amenities.KitchenHood || Model.Amenities.KitchenUtensils || Model.Amenities.Hairdryer || Model.Amenities.SoundSystem ||
+        Model.Amenities.TeaMaker || Model.Amenities.Foosball || Model.Amenities.Golf || Model.Amenities.PoolTable ? true : false;
+}
+
+@if (mainAmenities || detailedAmenities)
+{
+    <p class="advertise-page__amenities-header"><i class="fa fa-football-ball"></i> امکانات رفاهی اقامتگاه</p>
+    <div class="advertise-page__amenities-container">
+        @if (mainAmenities)
+        {
+            <div class="advertise-page__amenities-main-container">
+                @if (Model.Amenities.HeatingSystem != Advertise.HeatingSystemItems.Unset)
+                {
+                    <div class="advertise-page__amenities-main-item">
+                        <p class="advertise-page__amenities-main-title">
+                            <i class="fa fa-temperature-high"></i> سیستم گرمایشی:
+                        </p>
+                        @switch (Model.Amenities.HeatingSystem)
+                        {
+                            case Advertise.HeatingSystemItems.Heater:
+                                <p class="advertise-page__amenities-main-content">بخاری</p>
+                                break;
+                            case Advertise.HeatingSystemItems.Package:
+                                <p class="advertise-page__amenities-main-content">پکیج</p>
+                                break;
+                            case Advertise.HeatingSystemItems.Radiator:
+                                <p class="advertise-page__amenities-main-content">شوفاژ</p>
+                                break;
+                            case Advertise.HeatingSystemItems.AirConditioner:
+                                <p class="advertise-page__amenities-main-content">هواساز</p>
+                                break;
+                            case Advertise.HeatingSystemItems.FirePlace:
+                                <p class="advertise-page__amenities-main-content">شومینه</p>
+                                break;
+                            case Advertise.HeatingSystemItems.Other:
+                                <p class="advertise-page__amenities-main-content">غیره</p>
+                                break;
+                            case Advertise.HeatingSystemItems.None:
+                                <p class="advertise-page__amenities-main-content">ندارد</p>
+                                break;
+                        }
+                    </div>
+                }
+                @if (Model.Amenities.CoolingSystem != Advertise.CoolingSystemItems.Unset)
+                {
+                    <div class="advertise-page__amenities-main-item">
+                        <p class="advertise-page__amenities-main-title">
+                            <i class="fa fa-temperature-low"></i> سیستم سرمایشی:
+                        </p>
+                        @switch (Model.Amenities.CoolingSystem)
+                        {
+                            case Advertise.CoolingSystemItems.Chiller:
+                                <p class="advertise-page__amenities-main-content">چیلر</p>
+                                break;
+                            case Advertise.CoolingSystemItems.Fancoel:
+                                <p class="advertise-page__amenities-main-content">فنکوئل</p>
+                                break;
+                            case Advertise.CoolingSystemItems.WaterCooler:
+                                <p class="advertise-page__amenities-main-content">کولر آبی</p>
+                                break;
+                            case Advertise.CoolingSystemItems.Splitter:
+                                <p class="advertise-page__amenities-main-content">کولر گازی</p>
+                                break;
+                            case Advertise.CoolingSystemItems.AirConditioner:
+                                <p class="advertise-page__amenities-main-content">هواساز</p>
+                                break;
+                            case Advertise.CoolingSystemItems.SplitterAndWaterCooler:
+                                <p class="advertise-page__amenities-main-content">کولر آبی و گازی</p>
+                                break;
+                            case Advertise.CoolingSystemItems.Fan:
+                                <p class="advertise-page__amenities-main-content">پنکه</p>
+                                break;
+                            case Advertise.CoolingSystemItems.Other:
+                                <p class="advertise-page__amenities-main-content">غیره</p>
+                                break;
+                            case Advertise.CoolingSystemItems.None:
+                                <p class="advertise-page__amenities-main-content">ندارد</p>
+                                break;
+                        }
+                    </div>
+                }
+                @if (Model.Amenities.WC != Advertise.WCItems.Unset)
+                {
+                    <div class="advertise-page__amenities-main-item">
+                        <p class="advertise-page__amenities-main-title">
+                            <i class="fa fa-toilet"></i> سرویس بهداشتی:
+                        </p>
+                        @switch (Model.Amenities.WC)
+                        {
+                            case Advertise.WCItems.Persian:
+                                <p class="advertise-page__amenities-main-content">ایرانی</p>
+                                break;
+                            case Advertise.WCItems.Europian:
+                                <p class="advertise-page__amenities-main-content">فرنگی</p>
+                                break;
+                            case Advertise.WCItems.EuropianAndPersian:
+                                <p class="advertise-page__amenities-main-content">ایرانی و فرنگی</p>
+                                break;
+                        }
+                    </div>
+                }
+                @if (Model.Bed.BlanketsAndMattresses != 0)
+                {
+                    <div class="advertise-page__amenities-main-item">
+                        <p class="advertise-page__amenities-main-title">
+                            <img src="/file/resourceimagepng?file_name=icons/blanket" alt="تشک و پتو" width="32" height="32" /> تشک و پتو:
+                        </p>
+                        <p class="advertise-page__amenities-main-content">@Model.Bed.BlanketsAndMattresses عدد</p>
+                    </div>
+                }
+                @if (Model.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset)
+                {
+                    <div class="advertise-page__amenities-main-item">
+                        <p class="advertise-page__amenities-main-title">
+                            <img src="/file/resourceimagepng?file_name=icons/blanket" alt="پتوی اضافه" width="32" height="32" /> پتوی اضافه:
+                        </p>
+                        @switch (Model.Bed.ExtraBlanketCount)
+                        {
+                            case Advertise.ExtraBlanketCountItems.One:
+                                <p class="advertise-page__amenities-main-content">یک عدد</p>
+                                break;
+                            case Advertise.ExtraBlanketCountItems.Two:
+                                <p class="advertise-page__amenities-main-content">دو عدد</p>
+                                break;
+                            case Advertise.ExtraBlanketCountItems.Three:
+                                <p class="advertise-page__amenities-main-content">سه عدد</p>
+                                break;
+                            case Advertise.ExtraBlanketCountItems.Four:
+                                <p class="advertise-page__amenities-main-content">چهار عدد</p>
+                                break;
+                            case Advertise.ExtraBlanketCountItems.Five:
+                                <p class="advertise-page__amenities-main-content">پنج عدد</p>
+                                break;
+                            case Advertise.ExtraBlanketCountItems.MoreThanFive:
+                                <p class="advertise-page__amenities-main-content">بیشتر از پنج عدد</p>
+                                break;
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        @if (detailedAmenities)
+        {
+            <div class="advertise-page__amenities-detail-container">
+                @if (Model.Elevator.Elevator)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>آسانسور<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <img src="/file/resourceimagepng?file_name=icons/elevator" alt="آسانسور" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.Bathroom)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>حمام<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <i class="fa fa-bath"></i>
+                    </div>
+                }
+                @if (Model.Amenities.Sauna)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>سونا<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <img src="/file/resourceimagepng?file_name=icons/sauna" alt="سونا" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.Jacuzzi)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>جکوزی<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>                         
+                        <img src="/file/resourceimagepng?file_name=icons/jacuzzi" alt="جکوزی" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.TV)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>تلویزیون<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <i class="fa fa-tv"></i>
+                    </div>
+                }
+                @if (Model.Amenities.SoundSystem)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                            <p>ضبط و باند<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                            <img src="/file/resourceimagepng?file_name=icons/sound_system" alt="ضبط و باند" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.Wifi)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>وای فای<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                            <i class="fa fa-wifi"></i>
+                    </div>
+                }
+                @if (Model.Amenities.WashingMachine)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>لباسشویی<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <img src="/file/resourceimagepng?file_name=icons/washing_machine" alt="ماشین لباسشویی" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.Refrigerator)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>یخچال<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>      
+                        <img src="/file/resourceimagepng?file_name=icons/refrigerator" alt="یخچال" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.Oven)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>اجاق گاز <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>              
+                        <img src="/file/resourceimagepng?file_name=icons/oven" alt="اجاق گاز" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.MicrowaveOven)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                            <p>مایکروویو<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>      
+                            <img src="/file/resourceimagepng?file_name=icons/microwave_oven" alt="مایکروویو" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.KitchenHood)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>هود<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <img src="/file/resourceimagepng?file_name=icons/kitchen_hood" alt="هود آشپرخانه" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.KitchenUtensils)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>ظروف<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>  
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                }
+                @if (Model.Amenities.TeaMaker)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>چای ساز<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <img src="/file/resourceimagepng?file_name=icons/tea_maker" alt="چای ساز" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.Hairdryer)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>سشوار<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <img src="/file/resourceimagepng?file_name=icons/hairdryer" alt="سشوار" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.PoolTable)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>بیلیارد<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <img src="/file/resourceimagepng?file_name=icons/pool_table" alt="بیلیارد" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.Foosball)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>فوتبال دستی<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>    
+                        <img src="/file/resourceimagepng?file_name=icons/foosball" alt="فوتبال دستی" width="32" height="32" />
+                    </div>
+                }
+                @if (Model.Amenities.Golf)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                            <span>گلف <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></span>
+                            <i class="fa fa-golf-ball"></i>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}

@@ -29,7 +29,7 @@
                 <span>این نسخه از اپلیکیشن دیگر پشتیبانی نمیشود. لطفا نسخه جدید را نصب کنید:</span>
             }
         </div>
-        @Html.PartialAsync("_DownloadApp", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        @await Html.PartialAsync("_DownloadApp", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "h2", true } })
         @if (!ViewBag.fromApp)
         {

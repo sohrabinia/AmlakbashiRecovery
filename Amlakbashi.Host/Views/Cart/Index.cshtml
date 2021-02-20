@@ -1,0 +1,149 @@
+﻿@using Amlakbashi.Core.DTOs.CartDTOs; 
+
+@{
+    ViewBag.Title = "مدیریت خرید ها";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+@model IEnumerable<Cart>
+@{
+    var data = ViewBag.dto as IEnumerable<CartIndexDTO>;
+}
+
+@using (Html.BeginForm("Index", "Cart", FormMethod.Post))
+{
+<div>
+    <table>
+        <tr>
+            <td class="label">وضعیت خرید</td>
+            <td class="minw">
+                <select name="status" style="width:120px;">
+                    <option value="-1">همه</option>
+                    <option is-selected="@(1 == (int)ViewBag.status)" value="1">پرداخت شده</option>
+                    <option is-selected="@(0 == (int)ViewBag.status)" value="0">پرداخت نشده</option>
+                </select>
+            </td>
+            <td class="label">کاربر</td>
+            <td class="minw">
+                <input type="text" name="uid" style="width:150px;" value="@ViewBag.uid" />
+            </td>
+            <td class="label">شماره تراکنش</td>
+            <td class="minw">
+                <input type="text" name="refid" style="width:150px;" value="@ViewBag.refid" />
+            </td>
+            <td><input type="submit" class="filter" value="فیلتر" /></td>
+            <td style="width:100%;"></td>
+        </tr>
+    </table>
+</div>
+
+<table>
+    <tr>
+        <th class="minw">
+            ردیف
+        </th>
+        <th>
+            کد خرید
+        </th>
+        <th>
+            کاربر
+        </th>
+        <th>
+            تعداد
+        </th>
+        <th>
+            وضعیت
+        </th>
+        <th>
+            تاریخ ثبت
+        </th>
+        <th>
+            قیمت پرداختی
+        </th>
+        <th>
+            نوع پرداخت
+        </th>
+       <th>کد آگهی</th>
+        @*<th>
+            عملیات
+        </th>*@
+    </tr>
+    @{
+        int Idx = (int)ViewBag.RowIndexStart;
+    }
+    @foreach (var item in data)
+    {
+        Idx++;
+
+        <tr>
+            <td>
+                @Idx
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cart.Id)
+            </td>
+            <td>
+                <a style="text-decoration:none;display:block" target="_blank" href="@string.Format("/user/index?code={0}" , item.Cart.UserID)">@item.UserPhoneNumber</a>
+            </td>
+            <td>
+                @item.Cart.Count
+            </td>
+            <td>
+                <span  class="imgstatus @(item.Cart.Status==(int)Cart.CartStatus.Paid ? "enable" : "disable")"></span>
+            </td>
+            <td>
+                @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(item.Cart.CreateDate).ToString()
+            </td>
+            <td>
+                @item.Cart.Price
+            </td>
+            <td>
+                @if (item.Cart.Type == "amlak")
+                {
+                     <span>سایت املاک</span>
+                }
+                else if (item.Cart.Type == "banner")
+                {
+                    <span>بنر تبلیغاتی</span>
+                }
+                else
+                {
+                    if (item.Cart.ReserveID > 0)
+                    {
+                        <span>@PaymentLocalization.GetPaymentTypePersianString(item.Cart.Type)</span>
+                    }
+                }
+            </td>
+            <td>
+                @item.Cart.AdvertiseID
+            </td>
+            @*<td>
+                <span class="deleteicon" onclick="deleteItem(@item.Id, this)" title="حذف"></span>
+            </td>*@
+        </tr>
+    }
+
+</table>
+}
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Cart", new { page, status = (int)ViewBag.status, uid = (int)ViewBag.uid, refid=(long)ViewBag.refid}), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+
+@*@section ScriptBlock
+{
+    <script type="text/javascript">
+
+        function deleteItem($id, obj) {
+            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟"))
+            {
+                myajax("Cart/Delete", "id=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        $(obj).parent().parent().remove() ;
+                    }
+                });
+            }
+        }
+
+    </script>
+}*@

@@ -1,0 +1,45 @@
+﻿@model Chat
+
+@{
+    ViewBag.Title = "چت";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<div class="title">ویرایش چت</div>
+
+
+@using (Html.BeginForm("Edit", "Chat", FormMethod.Post))
+{
+
+    @Html.HiddenFor(model => model.Id)
+    <table>
+        <tr>
+            <td class="label">
+                متن چت :
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Text)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                وضعیت :
+            </td>
+            <td style="width:300px;">
+                <select name="ChatStatus">
+                    <option is-selected="@((int)Chat.ChatStatusEnum.Sent == Model.ChatStatus)" value="@((int)Chat.ChatStatusEnum.Sent)">@(ChatLocalization.GetStatusString((int)Chat.ChatStatusEnum.Sent))</option>
+                    <option is-selected="@((int)Chat.ChatStatusEnum.HasForbiddenCharacters == Model.ChatStatus)" value="@((int)Chat.ChatStatusEnum.HasForbiddenCharacters)">@(ChatLocalization.GetStatusString((int)Chat.ChatStatusEnum.HasForbiddenCharacters))</option>
+                </select>
+            </td>
+            <td></td>
+        </tr> 
+    </table>
+
+    <div style="margin-top:20px;">
+        <input class="apply" type="submit" value="ثبت" />
+        <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
+    </div>
+}
+
+<div class="adminmsg">@ViewBag.msg</div>

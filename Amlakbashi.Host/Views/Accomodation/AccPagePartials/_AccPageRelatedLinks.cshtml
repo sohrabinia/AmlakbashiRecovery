@@ -1,0 +1,56 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+
+@model AccommodationItemDTO
+
+<div class="advertise-page__description-container">
+    <div class="advertise-page__related-link-header">
+        <p><i class="fa fa-link"></i>لینک های مرتبط</p>
+        <a class="advertise-page__related-link" title="املاک باشی" href="/" target="_blank">اجاره روزانه خانه ، ویلا ، سوئیت و آپارتمان مبله در سراسر ایران</a>
+    </div>
+    <div class="advertise-page__related-links-container">
+        @if (Model.AccCategory.CountryDirection)
+        {
+            <a title="@Model.AccCategory.CountryDirectionName" href="@Model.AccCategory.CountryDirectionUrl" target="_blank">
+                اجاره ویلا و سوئیت در @Model.AccCategory.CountryDirectionName
+            </a>
+            <a title="ویلا ساحلی @Model.AccCategory.CountryDirectionName" href="@(Model.AccCategory.CountryDirectionUrl + "?region=1")" target="_blank">
+                اجاره ویلا ساحلی در @Model.AccCategory.CountryDirectionName
+            </a>
+            <a title="ویلا جنگلی @Model.AccCategory.CountryDirectionName" href="@(Model.AccCategory.CountryDirectionUrl + "?region=2")" target="_blank">
+                اجاره ویلا جنگلی در @Model.AccCategory.CountryDirectionName
+            </a>
+            <a title="ویلا استخردار @Model.AccCategory.CountryDirectionName" href="@(Model.AccCategory.CountryDirectionUrl + "?pool=1")" target="_blank">
+                اجاره ویلا استخردار در @Model.AccCategory.CountryDirectionName
+            </a>
+        }
+        @*<a title="@provinceName" href="@ProvinceUrl" target="_blank">
+                @AdvertiseTypeHelper.GetTitle(provinceCat.MostAccType, 81,
+                        provinceName, null, null, null)
+            </a>*@
+        @if (Model.Address.Province == 1 || Model.Address.Province == 352)
+        {
+            var customName = Model.Address.Province == 1 ? "تهران" : "کرج";
+            <a title="ویلا استخردار اطراف @customName" href="@(Model.AccCategory.ProvinceUrl + "?pool=1")" target="_blank">
+                اجاره ویلا استخردار اطراف @customName
+            </a>
+        }
+        <a title="@Model.AccCategory.CityName" href="@Model.AccCategory.CityUrl" target="_blank">
+            @(Model.AccCategory.CityMostAccType == 83 ? "اجاره ویلا و سوئیت در " : "اجاره روزانه خانه در ")@Model.AccCategory.CityName
+        </a>
+        @if (Model.AccCategory.CityCountAdvertise > 10)
+        {
+            <a title="@Model.AccCategory.CityName ارزان" href="@(Model.AccCategory.CityUrl + "?sort=2")" target="_blank">
+                @(Model.AccCategory.CityMostAccType == 83 ? "اجاره ویلا و سوئیت ارزان در " : "اجاره سوئیت ارزان در ")@Model.AccCategory.CityName
+            </a>
+            <a title="@Model.AccCategory.CityName لوکس" href="@(Model.AccCategory.CityUrl + "?sort=1")" target="_blank">
+                @(Model.AccCategory.CityMostAccType == 83 ? "اجاره ویلا و سوئیت لوکس در " : "اجاره سوئیت لوکس در ")@Model.AccCategory.CityName
+            </a>
+        }
+        @if (Model.AccCategory.Area)
+        {
+            <a title="@Model.AccCategory.AreaName" href="@Model.AccCategory.AreaUrl" target="_blank">
+                اجاره روزانه خانه در @Model.AccCategory.AreaName
+            </a>
+        }
+    </div>
+</div>

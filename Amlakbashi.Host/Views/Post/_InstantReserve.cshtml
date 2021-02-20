@@ -45,7 +45,7 @@
 </a>
 
 <div style="display:@(Model.instantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed ?"flex" : "none");" class="div-unset  maxInstantReserve" id="maxInstantReserve-@Model.id">
-    @Html.PartialAsync("_NumberInput", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+    @await Html.PartialAsync("_NumberInput", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "name", "حداکثر شروع سفر تا " }, { "placeholder", "حداکثر شروع... " }, { "class", "input-set-max_instant-reserve js-input" }, { "id", "setMaxInstantReserve-" + Model.id }, { "inputValue", @Model.maxInstantReserveStart }, { "onclick", "" }, { "text", "روز" } })
     <button type="button" onclick="setMaxInstantReserve(@Model.id , this)" class="set-button_on-calendar">ثبت روز</button>
 </div>

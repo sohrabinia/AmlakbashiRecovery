@@ -3,12 +3,12 @@
 <!-- Start-edit-fast  -->
 <!-- item 1 -->
 <div id="set-calendar-@Model.id">
-    @Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+    @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", "تنظیم تقویم" } })
     <div class="container-item js-set-date-parent" data-id="@Model.id" data-initialized="false">
         <div class="calendars-edit-fast" id="calendars-edit-fast-@Model.id">
             <p class="help-text-data-picker">لطفا روز یا بازه مد نظرتان را مشخص کنید</p>
-            @Html.PartialAsync("_DatePicker", new ViewDataDictionary(null) { { "class", "date-picker-style" } })
+            @await Html.PartialAsync("_DatePicker", new ViewDataDictionary(null) { { "class", "date-picker-style" } })
             <p class="strDatepicker js-string"></p>
             <div class="box-set-callener buttonClick">
                 <div class="clickButton set-button_on-calendar set-button-full_on-calander deactive-set-button js-full-day" onclick="setFullRooms(@Model.id , this)">پر است</div>
@@ -19,17 +19,17 @@
 </div>
 <!-- item 2 -->
 <div id="offer-@Model.id">
-    @Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+    @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", " تخفیف ها" } })
     <div class="container-item js-set-offer-parent" data-id="@Model.id" data-initialized="false">
         <div class="set-offer">
             <div class="acc-set-offer" id="acc-set-offer-@Model.id">
                 <p class="help-text-data-picker">لطفا روز یا بازه مد نظرتان را مشخص کنید</p>
-                @Html.PartialAsync("_DatePicker", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                @await Html.PartialAsync("_DatePicker", new ViewDataDictionary(new EmptyModelMetadataProvider(),
                     new ModelStateDictionary()) { { "class", "date-picker-style" } })
                 <p class="strDatepicker js-string"></p>
                 <div class="box-set-Offer buttonClick">
-                    @Html.PartialAsync("_NumberInput", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                    @await Html.PartialAsync("_NumberInput", new ViewDataDictionary(new EmptyModelMetadataProvider(),
                         new ModelStateDictionary()) { { "name", "درصد تخفیف" }, { "placeholder", "درصد تخفیف" }, { "class", "clickButton js-input inputPerecent" }, { "id", "js-percent-input-" + Model.id }, { "inputValue", "0 " }, { "onclick", String.Format("strSetOffer({0} ,this)", Model.id) }, { "text", " % " } })
                     <button type="button" onclick="setOffer(@Model.id , this)" class="set-button_on-calendar deactive-set-button">ثبت تخفیف</button>
                 </div>
@@ -54,12 +54,12 @@
 </div>
 <!-- item 3 -->
 <div id="set-price-@Model.id" class="set-price">
-    @Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+    @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", "تنظیم قیمت" } })
     <div class="container-item js-set-price-parent" data-id="@Model.id" data-initialized="false">
         <div class="acc-set-price" id="acc-set-price-@Model.id" style="align-items: baseline;">
             <p class="help-text-data-picker">لطفا روز یا بازه مد نظرتان را مشخص کنید</p>
-            @Html.PartialAsync("_DatePicker", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+            @await Html.PartialAsync("_DatePicker", new ViewDataDictionary(new EmptyModelMetadataProvider(),
                 new ModelStateDictionary()) { { "class", "date-picker-style" } })
             <p class="strDatepicker js-string"></p>
             <div class="boxSetPrice">

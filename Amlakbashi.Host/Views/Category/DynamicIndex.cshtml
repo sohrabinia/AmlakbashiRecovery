@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title = "مدیریت صفحات داینامیک ";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@model IEnumerable<DynamicCategory>
+
+<a href="/Advertise/Admin" class="adminback"></a>
+<div style="clear:both ;"></div>
+@using (Html.BeginForm("DynamicIndex", "Category", FormMethod.Post))
+{
+    <div>
+        <table>
+            <tr>
+                <td class="label">جستجو در عنوان  :</td>
+                <td class="minw">
+                    <input style="padding:10px; display:inline-block;border:1px solid #ccc ;" type="search" name="q" value="@ViewBag.q" />
+                </td>
+                <td class="label">
+                    نوع آگهی :
+                </td>
+                <td>
+                    @{
+                        var type_arr = Advertise.GetAdvertiseTypes(Advertise.AdvertisePageType.Filter);
+                    }
+                    <select name="Type" value="@ViewBag.Type" type="text">
+                        <option value="-1">همه</option>
+                        <option value="@((int)Advertise.AdvertiseType.All)" is-selected="@((int)ViewBag.Type == (int)Advertise.AdvertiseType.All)">اجاره روزانه</option>
+                        @foreach (var t in type_arr)
+                        {
+                            <option value="@((int)t)" is-selected="@((int)ViewBag.Type == (int)t)">@(Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypeUserString(t))</option>
+                        }
+                    </select>
+                </td>
+                <td class="label">
+                    ترتیب :
+                </td>
+                <td class="minw">
+                    <select name="sort" style="width:100px;">
+                        <option value="adcount" is-selected="@("adcount" == (string)ViewBag.sort)">تعداد آگهی</option>
+                        <option value="viewcount" is-selected="@("viewcount" == (string)ViewBag.sort)">تعداد بازدید</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div style="display:flex;flex-flow: row;margin: 0 0 10px 0;">
+            @await Component.InvokeAsync("RegionSelector", new { province = ViewBag.province, city = ViewBag.city, area = ViewBag.area })
+            <input type="submit" class="filter" style="height:40px;margin-top: 30px;" value="فیلتر" />
+        </div>
+    </div>
+}
+<table>
+    <tr>
+        <th class="minw">
+            ردیف
+        </th>
+        <th class="minw">
+            کد دسته بندی
+        </th>
+        <th>
+            عنوان
+        </th>
+        <th>
+            آدرس
+        </th>
+        <th>
+            تعداد آگهی
+        </th>
+        <th>
+            تعداد بازدید
+        </th>
+        <th>
+            عملیات
+        </th>
+    </tr>
+    @{
+        int Idx = (int)ViewBag.RowIndexStart;
+    }
+    @foreach (DynamicCategory item in Model)
+    {
+        Idx++;
+
+        <tr>
+            <td>
+                @Idx
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.URL)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CountAdvertise)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CountView)
+            </td>
+            <td style="white-space:nowrap;">
+                <a href="@Url.Action("DynamicEdit",new {id= item.Id})"><span class="editicon" title="ویرایش"></span></a>
+                <span class="deleteicon" onclick="deleteItem(@item.Id,this)" title="حذف"></span>
+            </td>
+        </tr>
+    }
+
+</table>
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("DynamicIndex", "Category", new { page, Type=(int)ViewBag.Type, Province=(int)ViewBag.Province, City=(int)ViewBag.City, Area=(int)ViewBag.Area, sort=(string)ViewBag.sort, q=(string)ViewBag.q }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+        function deleteItem($id, obj) {
+            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟")) {
+                myajax("Category/DynamicDelete", "id=" + $id, function (ret) {
+                    if (ret.status == 1) {
+                        $(obj).parent().parent().remove();
+                    }
+                });
+            }
+        }
+
+    </script>
+}

@@ -1,0 +1,311 @@
+﻿@model Advertise
+@{
+    ViewBag.Title = "مدیریت آگهی";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@section StyleLink
+{
+    @*<link rel="stylesheet" type="text/css" href="/resource/ckeditor/ckeditor.css">*@
+}
+@section ScriptLink
+{
+    <script type="text/javascript" src="/file/getjs?src=/resource/ckeditor/ckeditor.js"></script>
+}
+<div class="title">ویرایش  آگهی</div>
+
+@using (Html.BeginForm("Edit", "Advertise", FormMethod.Post, new { enctype = "multipart/form-data", id = "ManageForm" }))
+{
+
+    @Html.HiddenFor(model => model.Id)
+    <table>
+
+        <tr>
+            <td class="label">  امتیاز اصلی آگهی :</td>
+            <td class="value">
+                @Model.AdvertiseScore
+            </td>
+        </tr>
+        <tr>
+            <td class="label">  تعداد نمایش :</td>
+            <td class="value">
+                @Html.EditorFor(model => model.Overview)
+            </td>
+        </tr>
+        <tr>
+            <td class="label">  تعداد کلیک :</td>
+            <td class="value">
+                @Html.EditorFor(model => model.WebVisit)
+            </td>
+        </tr>
+        <tr>
+            <td class="label">  تعداد نمایش تماس :</td>
+            <td class="value">
+                @Html.EditorFor(model => model.ContactClick)
+            </td>
+        </tr>
+        <tr>
+            <td class="label">
+                 کد کاربر :
+            </td>
+            <td style="width:300px;">
+                @Html.EditorFor(model => model.UserID)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                عنوان آگهی :
+            </td>
+            <td style="width:300px;">
+                @Html.EditorFor(model => model.Title)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">  عنوان برای گوگل - متا:</td>
+            <td class="value">
+                @Html.EditorFor(model => model.MetaTitle)
+            </td>
+        </tr>        
+        <tr>
+            <td class="label">    آدرس URL :</td>
+            <td class="value">
+                @Html.EditorFor(model => model.Slug)
+            </td>
+        </tr>       
+        <tr>
+            <td class="label">   توضیح برای گوگل - متا :</td>
+            <td class="value">
+                @Html.TextAreaFor(model => model.MetaDescription)
+            </td>
+        </tr>    
+        <tr>
+            <td class="label">
+                توضیحات آگهی :
+            </td>
+            <td style="width:300px;">
+                @Html.TextAreaFor(model => model.Description)
+            </td>
+            <td></td>
+        </tr>             
+
+        <tr>
+            <td class="label">
+                تاریخ ایجاد :
+            </td>
+            <td style="width:300px;">
+                @Html.TextBoxFor(model => model.CreateDate, new { @class = "form-control datepicker" })
+            </td>
+
+            <td>
+                @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(Model.CreateDate).ToString()
+            </td>
+        </tr>
+        <tr>
+            <td class="label">
+                تاریخ آخرین ویرایش :
+            </td>
+            <td style="width:300px;">
+                @Html.TextBoxFor(model => model.LastModifyDate, new { @class = "form-control datepicker" })
+
+            </td>
+            <td>
+                @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(Model.LastModifyDate).ToString()
+            </td>
+        </tr>
+
+        <tr>
+            <td class="label">
+                امتیاز املاک باشی:
+            </td>
+            <td style="width:300px;">
+                @Html.EditorFor(model => model.AmlakbashiScore)
+            </td>
+            <td></td>
+        </tr>     
+    </table>
+
+    <div style="margin-top:20px;">
+        <input class="apply" type="button" onclick="submit_form()" value="ثبت" />
+        <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
+    </div>
+}
+
+<div class="adminmsg">@ViewBag.msg</div>
+<style>
+    /***advertise****/
+
+    .grouptitle {
+        text-align: right;
+        font: 16px Miransans;
+        color: #444;
+    }
+
+    .propertycontainer {
+        text-align: right;
+        direction: rtl;
+        background-color: #eee;
+        padding: 25px 40px;
+    }
+
+    .propertyItem {
+        margin: 5px 0;
+        padding: 5px 0;
+        border-bottom: 1px dotted #dbdbdb;
+    }
+
+        .propertyItem span {
+            width: 150px;
+            text-align: right;
+            display: inline-block;
+            font: 13px Liransans;
+            overflow: hidden;
+        }
+
+    /***advertise****/
+    .dropdown {
+        display: inline-block;
+        margin: 0 10px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 7px;
+    }
+
+        .dropdown dd, .dropdown dt {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .dropdown ul {
+            margin: -1px 0 0 0;
+        }
+
+        .dropdown dd {
+            position: relative;
+        }
+
+        .dropdown a,
+        .dropdown a:visited {
+            color: #000;
+            text-decoration: none;
+            outline: none;
+            font: 14px bnassim;
+        }
+
+        .dropdown dt a span, .multiSel span {
+            cursor: pointer;
+            display: inline-block;
+            padding: 0 3px 2px 0;
+        }
+
+        .dropdown dd ul {
+            background-color: #626262;
+            border: 0;
+            color: #fff;
+            display: none;
+            right: 0px;
+            padding: 2px 15px 2px 5px;
+            position: absolute;
+            top: 12px;
+            width: 200px;
+            overflow: auto;
+        }
+
+        .dropdown span.value {
+            display: none;
+        }
+
+        .dropdown dd ul li a {
+            padding: 5px;
+            display: block;
+        }
+
+        .dropdown dd ul li {
+            list-style: none;
+        }
+
+            .dropdown dd ul li a:hover {
+                background-color: #fff;
+            }
+</style>
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+        $(function () {
+            $(".datepicker").datepicker();
+        });
+
+        $("#imgcontainer").niceScroll({ railalign: "left" });
+
+        $(".dropdown dt a").on('click', function () {
+            $(this).parent().next().find("ul").slideToggle('slow');
+        });
+
+        function submit_form()
+        {
+            var url = $("#Slug").val();
+            var slug = "@(Model.Slug)";
+            var url_contain_space = /\s/.test(url);
+            if (url != slug)
+            {
+                if (confirm("متن URL آگهی به '" + url +"' تغییر داده شده، آیا مطمئن هستید؟"))
+                {
+                    if (!url_contain_space)
+                    {
+                        $("#ManageForm").submit();
+                        return;
+                    }
+                }
+            }
+            if (url_contain_space)
+            {
+                alert("در URL آگهی نباید از کاراکتر فاصله استفاده کرد، لطفا اصلاح کنید.");
+                return;
+            }
+            $("#ManageForm").submit();
+        }
+
+
+        //$('textarea').jqte();
+        //CKEDITOR.replace('Description');
+        var PopType = 0;
+
+        function ClosePopup() {
+            $('.popup input:checkbox').prop('checked', false);
+            $(".popup").hide();
+        }
+
+        function AddMainPhoto() {
+            PopType = 0;
+            $(".popup").show();
+        }
+
+        function Removeimg() {
+            $(".postimg").find("img").attr("src", "");
+            $(".postimg").find("img").hide();
+            $("#photoid").val("0");
+        }
+
+        function AddFile() {
+            if (PopType == 0) {
+                if ($(".popup input:checkbox:checked").length > 1) {
+                    alert("لطفا فقط یک عکس برای عکس اصلی آگهی انتخاب کنید.");
+                    return;
+                }
+
+                if ($(".popup input:checkbox:checked").length > 0) {
+                    var strsrc = $(".popup input:checkbox:checked").first().parent().parent().find("img").attr("src");
+                    var fid = $(".popup input:checkbox:checked").first().parent().find("span").text();
+                    $(".postimg").find("img").attr("src", strsrc);
+                    $(".postimg").find("img").show();
+                    $("#photoid").val(fid);
+                }
+            }
+            $('.popup input:checkbox').prop('checked', false);
+            $(".popup").hide();
+        }
+
+
+    </script>
+}

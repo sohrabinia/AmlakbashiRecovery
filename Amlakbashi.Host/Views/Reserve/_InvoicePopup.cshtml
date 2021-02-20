@@ -1,0 +1,25 @@
+﻿@using Amlakbashi.Core.DTOs.ReserveDTOs;
+
+@model Amlakbashi.Core.DTOs.ReserveDTOs.InvoiceItemDTO
+
+<div class="invoice__container" style="width:100%;overflow:scroll;">
+    <div class="dashboard-table" style="width:fit-content">
+        <div class="dashboard-table-first-row">
+            <span class="dashboard-table-cell">کد رزرو</span>
+            <span class="dashboard-table-cell">مدت رزرو</span>
+            <span class="dashboard-table-cell">تاریخ سفر</span>
+            <span class="dashboard-table-cell">تاریخ درخواست رزرو</span>
+            <span class="dashboard-table-cell">نام مهمان</span>
+            <span class="dashboard-table-cell">مبلغ کل</span>
+            <span class="dashboard-table-cell">پرداختی مهمان به سایت</span>
+            <span class="dashboard-table-cell">پرداختی از کیف پول میزبان</span>
+            <span class="dashboard-table-cell">سهم املاک باشی (10%)</span>
+            <span class="dashboard-table-cell">جریمه لغو رزرو</span>
+            <span class="dashboard-table-cell">مبلغ قابل پرداخت</span>
+            @*<span class="dashboard-table-cell">زمان تسویه حساب با میزبان</span>*@
+            <span class="dashboard-table-cell">وضعیت تسویه با شما</span>
+            @*<span class="dashboard-table-cell">مانده</span>*@
+        </div>
+        @await Html.PartialAsync("_InvoiceItem", Model)
+    </div>
+</div>

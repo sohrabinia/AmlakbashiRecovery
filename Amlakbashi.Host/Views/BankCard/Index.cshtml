@@ -1,0 +1,166 @@
+﻿@{
+    ViewBag.Title = "مدیریت کارت های بانکی";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@model IEnumerable<BankCard>
+
+@using (Html.BeginForm("Index", "BankCard", FormMethod.Post))
+{
+    <div style="overflow: auto;">
+        <table>
+            <tr>
+                <td class="label"> کد کاربری :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.user_id" name="user_id" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label">شماره کارت :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.bank_card_number" name="bank_card_number" />
+                </td>
+                <td class="label">شماره شبا  :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.shaba_number" name="shaba_number" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label">وضعیت شماره کارت :</td>
+                <td class="minw">
+                    <select name="bank_card_status">
+                        <option value="-1">همه</option>
+                        <option value="1" is-selected="@((int)ViewBag.bank_card_status == 1)">عدم تایید</option>
+                        <option value="0" is-selected="@((int)ViewBag.bank_card_status == 0)">تایید شده</option>
+                    </select>
+                </td>
+                <td class="label">وضعیت شماره شبا :</td>
+                <td class="minw">
+                    <select name="shaba_status">
+                        <option value="-1">همه</option>
+                        <option value="1" is-selected="@((int)ViewBag.shaba_status == 1)">عدم تایید</option>
+                        <option value="0" is-selected="@((int)ViewBag.shaba_status == 0)">تایید شده</option>
+                    </select>
+                </td>
+                <td><input type="submit" class="filter" value="فیلتر" /></td>
+                <td style="width:100%;"></td>
+            </tr>
+        </table>
+    </div>
+    <div style="overflow: auto;">
+        <table>
+            <tr>
+                <th class="minw">
+                    ردیف
+                </th>
+                <th>
+                    کد کاربر
+                </th>
+                <th>
+                    نام و نام خانوادگی
+                </th>
+                <th>
+                    تاریخ ثبت
+                </th>
+                <th>
+                    تاریخ آخرین ویرایش
+                </th>
+                <th>
+                    شماره کارت
+                </th>
+                <th>
+                    شماره شبا
+                </th>
+                <th>
+                    وضعیت شماره کارت
+                </th>
+                <th>
+                    وضعیت شماره شبا
+                </th>
+            </tr>
+            @{
+                int Idx = (int)ViewBag.RowIndexStart;
+            }
+            @foreach (var item in Model)
+            {
+                Idx++;
+                var full_name = (item.FName != null ? item.FName + " " : "") + (item.LName != null ? item.LName : "");
+                <tr>
+                    <td>
+                        @Idx
+                    </td>
+                    <td><a href="/user/index?code=@item.UserID">@item.UserID</a></td>
+                    @if (!string.IsNullOrEmpty(full_name))
+                    {
+                        <td>@full_name</td>
+                    }
+                    else
+                    {
+                        <td style="color:red">بدون نام</td>
+                    }
+                    <td>
+                        <span>@(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.CreateDate))</span><br />
+                        <span>@(item.CreateDate.ToString("HH:mm"))</span>
+                    </td>
+                    <td>
+                        <span>@(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.LastModifyDate))</span><br />
+                        <span>@(item.LastModifyDate.ToString("HH:mm"))</span>
+                    </td>
+                    <td>
+                        @(string.IsNullOrEmpty(item.BankCardNumber) ? "-" : item.BankCardNumber)
+                    </td>
+                    <td>
+                        @(string.IsNullOrEmpty(item.ShabaNumber) ? "-" : item.ShabaNumber)
+                    </td>
+                    <td>
+                        <span onclick="toggleBankCardStatus(@item.Id,this)" class="imgstatus @(item.BankCardStatus==(int)BankCard.BankCardStatusEnum.Verified ? "enable" : "disable")"></span>
+                    </td>
+                    <td>
+                        <span onclick="toggleShabaStatus(@item.Id,this)" class="imgstatus @(item.ShabaStatus==(int)BankCard.BankCardStatusEnum.Verified ? "enable" : "disable")"></span>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+   }
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "BankCard", new { page, user_id = (int)ViewBag.user_id, bank_card_number = (string)ViewBag.bank_card_number, shaba_number = (string)ViewBag.shaba_number, bank_card_status = (int)ViewBag.bank_card_status, shaba_status = (int)ViewBag.shaba_status }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        function toggleBankCardStatus($id, obj) {
+            myajax("bankcard/togglebankcardstatus", "id=" + $id, function (ret) {
+                if (ret.status==1) {
+                    if (ret.new_status.toString() == '@((int)BankCard.BankCardStatusEnum.Verified)') {
+                        $(obj).removeClass("disable").addClass("enable");
+                    }
+                    else {
+                        $(obj).removeClass("enable").addClass("disable");
+                    }
+                }
+                else {
+                    showErrorMessage('خطا', 'عملیات انجام نشد. خطای سیستم');
+                }
+            });
+        }
+
+        function toggleShabaStatus($id, obj) {
+            myajax("bankcard/toggleshabastatus", "id=" + $id, function (ret) {
+                if (ret.status == 1) {
+                    if (ret.new_status.toString() == '@((int)BankCard.BankCardStatusEnum.Verified)') {
+                        $(obj).removeClass("disable").addClass("enable");
+                    }
+                    else {
+                        $(obj).removeClass("enable").addClass("disable");
+                    }
+                }
+                else {
+                    showErrorMessage('خطا', 'عملیات انجام نشد. خطای سیستم');
+                }
+            });
+        }
+
+    </script>
+}

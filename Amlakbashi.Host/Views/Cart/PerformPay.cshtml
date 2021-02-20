@@ -1,0 +1,53 @@
+﻿@model Payment
+@{
+    ViewBag.Title = "سبد خرید";
+    Layout = "~/Views/Shared/_Master.cshtml";
+
+}
+@section StyleLink
+{
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/cart.css">
+}
+<div class="container">
+    <div @*class="row"*@>
+
+        <div class="col-md-6 col-sm-6 " style="padding: 10px;width:100%;">
+            <div style="font-family: Miransans;margin-top: 50px;padding: 20px;background-color: #f1f1f1;border-radius: 12px;">
+                <div style="font-family: Miransans;font-size: 23px;">اطلاعات پرداخت</div>
+                <div style="padding: 10px;">تاریخ پرداخت : @ViewBag.PayDate</div>
+                @switch (Model.ProductType)
+                {
+                    case "Credit_Inc_Then_Res":
+                        <div style="padding: 5px;">مبلغ رزرو: @(string.Format("{0:n0}", Model.ReservePrice * 10)) ریال</div>
+                        <div style="padding: 5px;">موجودی کیف پول: @(string.Format("{0:n0}", (Model.ReservePrice - (Model.TotalPrice / 10)) * 10)) ریال</div>
+                        break;
+                }
+                <div style="padding: 5px 0 15px 0;">مبلغ پرداختی : @string.Format("{0:n0}",ViewBag.PayPrice) ریال</div>
+                <a class="btn btn-lg btn-block btn-success" target="_blank" href="@Url.Action("ConfirmAndPayment", new { id = Model.Id , bank = 2})" style="font-family: Miransans;background-color: #fdd835;color: #242424;padding: 5px;border-radius: 5px;"> تایید و پرداخت </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        clientIsInIran(function (is_in_iran) {
+            if (!is_in_iran)
+            {
+                $.confirm({
+                    title: '',
+                    content: 'لطفا قبل از پرداخت فیلترشکن خود را خاموش کنید',
+                    type: 'red',
+                    typeAnimated: true,
+                    closeIcon: true,
+                    buttons: {
+                        بستن: function () {
+                        }
+                    },
+                });
+            }
+        });
+    </script>
+}

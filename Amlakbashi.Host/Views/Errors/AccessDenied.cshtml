@@ -1,0 +1,63 @@
+﻿@inject IUserAccessor userAccessor;
+@{
+    ViewBag.Title = "Access Denied";
+    Layout = "~/Views/Shared/_Master.cshtml";
+    var loggedIn = userAccessor.CurrentUser.Id > 0;
+    string originUrl = ViewBag.originUrl;
+}
+@if (ViewBag.is_login_banned != null && ViewBag.is_login_banned)
+{
+    <div>امکان ورود شما به سایت املاک باشی مسدود شده است. جهت قعالسازی با پشتیبانی تماس بگیرید</div>
+    <a href="/contact">تماس با پشتیبانی</a>
+}
+else
+{
+    if (loggedIn || string.IsNullOrEmpty(originUrl))
+    {
+        if (Context.Session.GetObjectFromJson<User>("impersonateUser") != null)
+        {
+            @:<div>شما از طرف کاربر دیگری وارد شده اید. برای دسترسی به این قسمت، به حساب کاربری ادمین خود بازگردید.</div><br />
+            <div><a href="/user/impersonatelogout">بازگشت به حساب کاربری ادمین</a></div>
+        }
+        else
+        {
+            @:<div>کاربر گرامی، شما مجوز کافی برای دسترسی به این قسمت را ندارید</div>
+        }
+    }
+    else
+    {
+        <div>برای دسترسی به این قسمت ابتدا وارد سایت شوید</div>
+    }
+}
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        @if (loggedIn == false)
+        {
+            if (string.IsNullOrEmpty(originUrl) == false)
+            {
+            @:function on_login () {
+            @:window.location.href = '@originUrl';
+            @:}
+            @: function on_login_action() {
+            @:window.location.href = '@originUrl';
+            @:}
+            }
+            @:$(document).ready(function () {
+            @:toggle_login();
+            @:});
+        }
+    </script>
+}
+
+@section StyleBlock{
+    div {
+    cursor: pointer;
+    text-align: center;
+    color:#ff0000 ;
+    font:16px bnassim;
+    margin:0 auto ;
+    }
+}
+

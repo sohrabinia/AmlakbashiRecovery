@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Amlakbashi.Core.Entities.GroupPayment;
 using static Amlakbashi.Core.Entities.ReservePayment;
 
 namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
@@ -73,6 +74,20 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "پرداخت تسویه میزبان توسط سایت";
                 case ReservePaymentType.SiteRefundToGuest:
                     return "عودت مبلغ به مهمان توسط سایت";
+                default:
+                    return "";
+            }
+        }
+        public static string GetGroupPaymentStatusString(GroupPaymentStatus groupPaymentStatus)
+        {
+            switch (groupPaymentStatus)
+            {
+                case GroupPaymentStatus.ReadyToPay:
+                    return "آماده پرداخت";
+                case GroupPaymentStatus.WithError:
+                    return "دارای مشکل";
+                case GroupPaymentStatus.Excluded:
+                    return "مستثنی شده";
                 default:
                     return "";
             }

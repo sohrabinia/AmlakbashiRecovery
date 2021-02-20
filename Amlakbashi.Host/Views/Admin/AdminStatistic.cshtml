@@ -1,0 +1,112 @@
+﻿@inject IUserAccessor userAccessor;
+@{
+    ViewBag.Title = "مدیریت آمار";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<div class="adminmain">
+    <div class="adminitem">
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="80">
+                    <div class="adminicon" style="background-image:url('/resource/img/siteicon.png')"></div>
+                </td>
+                <td>
+                    <div style="padding:10px;">
+                        <a href="/admin/PaymentChart" class="admintitle">مدیریت آمار مالی</a>
+                        <div class="adminabstract">
+                            در این قسمت شما می توانید ، آمار مالی را مشاهده کنید .
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    @if (userAccessor.CurrentUser.Id == 3 ||
+                userAccessor.CurrentUser.Id == 1667)
+    {
+        <div class="adminitem">
+            <table cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="80">
+                        <div class="adminicon" style="background-image:url('/resource/img/siteicon.png')"></div>
+                    </td>
+                    <td>
+                        <div style="padding:10px;">
+                            <a href="/admin/ReserveFinanceChart" class="admintitle">آمار مالی رزروها</a>
+                            <div class="adminabstract">
+                                در این قسمت شما می توانید ، آمار رزرو ها را مشاهده کنید .
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    }
+    <div class="adminitem">
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="80">
+                    <div class="adminicon" style="background-image:url('/resource/img/compare.png')"></div>
+                </td>
+                <td>
+                    <div style="padding:10px;">
+                        <a href="/admin/PaymentComparisonChart" class="admintitle">مقایسه ماه به ماه مالی</a>
+                        <div class="adminabstract">
+                            در این قسمت شما می توانید ، آمار مالی دو ماه مختلف را با هم مقایسه کنید .
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="adminitem">
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="80">
+                    <div class="adminicon fa fa-line-chart"></div>
+                </td>
+                <td>
+                    <div style="padding:10px;">
+                        <a href="/admin/UserChart" class="admintitle">آمار کاربران</a>
+                        <div class="adminabstract">
+                            در این قسمت شما میتوانید، نمودار ثبت نام کاربران را مشاهده کنید .
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="adminitem">
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="80">
+                    <div class="adminicon fa fa-bar-chart"></div>
+                </td>
+                <td>
+                    <div style="padding:10px;">
+                        <a href="/admin/AdvertiseChart" class="admintitle">آمار ثبت آگهی</a>
+                        <div class="adminabstract">
+                            در این قسمت شما میتوانید، نمودار ثبت آگهی ها را مشاهده کنید .
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="clear:both; "></div>
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+    </script>
+}
+
+@section StyleBlock{
+    <style>
+    </style>
+}
+

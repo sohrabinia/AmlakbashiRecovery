@@ -1,0 +1,332 @@
+﻿@using Amlakbashi.Core.Common.Utilities;
+@inject IUserAccessor userAccessor;
+@model ReservePayment
+
+@{
+    var is_edit = Model.Id > 0;
+    ViewBag.Title = is_edit ? "ویرایش" : "ایجاد" + " پرداخت رزرو";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<div class="title">@ViewBag.Title</div>
+
+
+@using (Html.BeginForm("AddEdit", "ReservePayment", FormMethod.Post, new { id = "add_edit_form" }))
+{
+    @Html.HiddenFor(model => model.Id)
+    <table>
+        <tr>
+            <td class="label">
+                کد پشتیبان
+            </td>
+            <td>
+                @if (userAccessor.CurrentUser.Id == 3)
+                {
+                    @Html.EditorFor(model => model.OperatorID, new { id = "operator_id" })
+                }
+                else
+                {
+                    <input name="OperatorID" readonly value="@Model.OperatorID" />
+                }
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                کد رزرو :
+            </td>
+            <td>
+                @if (is_edit)
+                {
+                    <input name="ReserveID" readonly value="@Model.ReserveID"/>
+                }
+                else
+                {
+                    @Html.EditorFor(model => model.ReserveID, new { id = "reserve_id" })
+                }
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                کد کاربری پرداخت کننده :
+            </td>
+            <td>
+                @if (is_edit)
+                {
+                    <input name="UserID" readonly value="@Model.UserID"/>
+                }
+                else
+                {
+                    @Html.EditorFor(model => model.UserID, new { id = "user_id" })
+                }
+            </td>
+            <td></td>
+        </tr>
+        @if (is_edit)
+        {
+            <tr>
+                <td class="label">
+                    تاریخ پرداخت :
+                </td>
+                <td>
+                    <input name="CreateDate" readonly value="@Model.CreateDate" hidden />
+                    <span>@DateTimeUtility.GregorianToPersianDate(Model.CreateDate)</span>
+                </td>
+                <td></td>
+            </tr>
+        }
+        <tr>
+            <td class="label">
+                نوع پرداخت :
+            </td>
+            <td>
+                <select name="PaymentType">
+                    @{
+                        var payment_type_values = (ReservePayment.ReservePaymentType[])Enum.GetValues(typeof(ReservePayment.ReservePaymentType));
+                        var ids_allow = new List<int>() { 3, 12, 1667, 2122};
+                        if (!is_edit && !ids_allow.Contains(userAccessor.CurrentUser.Id))
+                        {
+                            var allow_types = new List<ReservePayment.ReservePaymentType>()
+                            {
+                                ReservePayment.ReservePaymentType.GuestDeposite,
+                                ReservePayment.ReservePaymentType.GuestClearing
+                            };
+                            payment_type_values = payment_type_values.Where(x => allow_types.Contains(x)).ToArray();
+                        }
+                        <option value="-1">انتخاب کنید</option>
+                        foreach (var value in payment_type_values)
+                        {
+                            <option is-selected="@((int)value == Model.PaymentType)" value="@((int)value)">@(PaymentLocalization.GetPaymentTypePersianString((int)value))</option>
+                        }
+                    }
+                </select>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                مبلغ :
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Price, new { id = "price" })
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+            <td>
+                <div style="color:red;font-size:20px;" id="priceString"></div>
+            </td>
+        </tr>
+        <tr>
+            <td class="label">
+                شماره تراکنش :
+            </td>
+            <td>
+                @Html.EditorFor(model => model.TransactionID, new { id = "transaction_id" })
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                روش پرداخت :
+            </td>
+            <td>
+                <select name="PaymentMethod">
+                    @{
+                        var payment_method_values = (ReservePayment.ReservePaymentMethod[])Enum.GetValues(typeof(ReservePayment.ReservePaymentMethod));
+                        payment_method_values = payment_method_values.Where(x => x != ReservePayment.ReservePaymentMethod.AmlakbashiCredit).ToArray();
+                        foreach (var value in payment_method_values)
+                        {
+                            <option is-selected="@((int)value == Model.PaymentMethod)" value="@((int)value)">@(PaymentLocalization.GetPaymentMethodString((int)value))</option>
+                        }
+                    }
+                </select>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+
+    <div style="margin-top:20px;">
+        <input class="apply" style="max-width:50px;" value="ثبت" onclick="send_form(false, null)" />
+        <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
+    </div>
+}
+
+@section ScriptBlock {
+<script type="text/javascript">
+    @{ 
+        var has_message = ViewBag.OperationStatus != null;
+    }
+
+    $(document).ready(function () {
+        $("#Price").keyup(function () {
+            onChangePrice(this);
+        });
+    });
+
+    function onChangePrice(elem) {
+        var val = $(elem).val();
+        $('#priceString').html(getPriceString(val));
+    }
+
+    var has_message = '@has_message' === 'True';
+    if (has_message)
+    {
+        var message = '@ViewBag.AlertMessage';
+        var operation_status = '@ViewBag.OperationStatus';
+        $.confirm({
+            title: '',
+            content: message,
+            type: operation_status == '1' ? 'green' : 'red',
+            smoothContent: true,
+            typeAnimated: true,
+            rtl: true,
+            columnClass: 'small',
+            animation: 'scale',
+            closeIcon: true,
+            buttons: {
+                بستن: function () {
+                }
+            },
+            onClose: function () {
+                var is_edit = '@is_edit' === 'True';
+                if (!is_edit)
+                {
+                    $("#ReserveID").attr('value','');
+                    $("#Price").attr('value','');
+                    $("#TransactionID").attr('value','');
+                }
+            }
+        });
+    }
+    function send_form(confirmed, send_sms)
+    {
+        var reserve_payment_id = $("[name=Id]").val();
+        var reserve_id = $("[name=ReserveID]").val();
+        var user_id = $("[name=UserID]").val();
+        var payment_type = $("[name=PaymentType]").val();
+        var price = $("[name=Price]").val();
+        var transaction_id = $("[name=TransactionID]").val();
+        var method_id = $("[name=PaymentMethod]").val();
+        var set_parameters_string = "reserve_payment_id=" + reserve_payment_id +
+            "&reserve_id=" + reserve_id +
+            "&user_id=" + user_id +
+            "&payment_type=" + payment_type +
+            "&price=" + price +
+            "&transaction_id=" + transaction_id +
+            "&method_id=" + method_id +
+            "&confirmed=" + confirmed +
+            "&send_sms=" + send_sms;
+        myajax("ReservePayment/CheckAddEdit", set_parameters_string, function (ret) {
+            debugger;
+            switch (ret.status) {
+                case 0:
+                    $.confirm({
+                        title: '',
+                        content: ret.msg,
+                        type: 'red',
+                        smoothContent: true,
+                        typeAnimated: true,
+                        columnClass: 'small',
+                        rtl: true,
+                        animation: 'scale',
+                        closeIcon: true,
+                        buttons: {
+                            بستن: function () {
+                            }
+                        }
+                    });
+                    break;
+                case 1:
+                    if (ret.askBeforeSubmit) {
+                        $.confirm({
+                            title: '',
+                            content: 'آیا تایید میکنید؟' +
+                                '<br />' +
+                                'کد رزرو: ' + reserve_id +
+                                '<br />' +
+                                'مهمان: ' + ret.guest_name +
+                                '<br />' +
+                                'مبلغ: ' + price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' تومان' + ' معادل ' + getPriceString(price) +
+                                '<br />' +
+                                'شماره تراکنش: ' + transaction_id +
+                                '',
+                            type: 'blue',
+                            smoothContent: true,
+                            typeAnimated: true,
+                            rtl: true,
+                            columnClass: 'small',
+                            animation: 'scale',
+                            closeIcon: true,
+                            buttons: {
+                                بله: function () {
+                                    $("#add_edit_form").submit();
+                                },
+                                نه: function () {
+                                    //nothing
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        $("#add_edit_form").submit();
+                    }
+                    break;
+                case 2:
+                    $.confirm({
+                        title: '',
+                        content: 'آیا تایید میکنید؟' +
+                            '<br />' +
+                            'کد رزرو: ' + reserve_id +
+                            '<br />' +
+                            'میزبان: ' + ret.host_name +
+                            '<br />' +
+                            'مبلغ: ' + ret.price + ' معادل ' + getPriceString(price) +
+                            '<br />' +
+                            'شماره تراکنش: ' + transaction_id +
+                            '',
+                        type: 'blue',
+                        smoothContent: true,
+                        typeAnimated: true,
+                        rtl: true,
+                        columnClass: 'small',
+                        animation: 'scale',
+                        closeIcon: true,
+                        buttons: {
+                            بله: function () {
+                                send_form(true, null);
+                            },
+                            نه: function () {
+                                //nothing
+                            }
+                        }
+                    });
+                    break;
+                case 3:
+                    $.confirm({
+                        title: '',
+                        content: 'آیا به میزبان پیامک ارسال شود؟',
+                        type: 'blue',
+                        smoothContent: true,
+                        rtl: true,
+                        typeAnimated: true,
+                        columnClass: 'small',
+                        animation: 'scale',
+                        closeIcon: true,
+                        buttons: {
+                            بله: function () {
+                                send_form(true, true);
+                            },
+                            نه: function () {
+                                send_form(true, false);
+                            }
+                        }
+                    });
+                    break;
+            }
+        });
+    }
+</script>
+}

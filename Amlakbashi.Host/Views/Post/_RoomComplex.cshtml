@@ -13,7 +13,7 @@
                     {
                         <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
                     }
-                    @Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                    @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
                         new ModelStateDictionary()) { { "score", Model.userRating } })
                     <a style="display:@( Model.newCommentCount == 0 ? "none" : "block");"  href="/comment/advertisecommentdetail?id=@Model.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="backgorund:@( Model.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@Model.newCommentCount</span></i></a>
                 </div>
@@ -39,9 +39,9 @@
             <div class="banner-room">
                 <form>
                     <span>  امشب :</span>
-                    @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                    @await Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "title", " خالی" }, { "Active", Model.todayIsEmpty }, { "classActive", "empty" }, { "onclick", String.Format("setTodayEmpty({0} ,this)", Model.id) } })
-                    @Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                    @await Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "title", " پر " }, { "Active", Model.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", Model.id) } })
                 </form>
                 <div class="div-unset ">
@@ -53,11 +53,11 @@
         </div>
         <!-- Start-edit-fast  -->
         <div class="fast-edit-details">
-            @Html.PartialAsync("_TitleBanner", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+            @await Html.PartialAsync("_TitleBanner", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "title", Model.title }, { "id", Model.id }, {"avatar", Model.photoUrl }, { "closeClass", "exit" } })
             <!-- start form -->
             <form action="" class="setting-list">
-                @Html.PartialAsync("_EditFast", Model)
+                @await Html.PartialAsync("_EditFast", Model)
             </form>
         </div>
         <!-- End-edit-fast -->

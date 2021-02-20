@@ -1,0 +1,177 @@
+﻿@using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+@using Amlakbashi.Core.DTOs.CommentDTOs;
+
+@{
+    ViewBag.Title = "مدیریت نظر ها";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+@model IEnumerable<Comment>
+
+@{ 
+    var data = ViewBag.dto as IEnumerable<CommentIndexDTO>;
+}
+
+@using (Html.BeginForm("Index", "Comment", FormMethod.Post))
+{
+    <div>
+        @*<a href="/Comment/Add" class="add" style="float:right;">ارسال پیام</a>*@
+        <table>
+            <tr>
+                <td class="label">کد نظر :</td>
+                <td class="minw"><input style="width:60px;padding:5px;" type="text" name="comment_id" value="@ViewBag.comment_id" /></td>
+                <td class="label">کد فرستنده :</td>
+                <td class="minw"><input style="width:60px;padding:5px;" type="text" name="sender_user_id" value="@ViewBag.sender_user_id" /></td>
+                <td class="label">کد آگهی :</td>
+                <td class="minw"><input style="width:60px;padding:5px;" type="text" name="advertise_id" value="@ViewBag.advertise_id" /></td>
+                <td class="label">وضعیت نظر :</td>
+                <td class="minw">
+                    <select name="status" style="width:120px;">
+                        <option is-selected="@(ViewBag.status == -1)" value="-1">همه نظرات</option>
+                        <option is-selected="@((int)Comment.CommentStatus.ready == (int)ViewBag.status)" value="@((int)Comment.CommentStatus.ready)">آماده انتشار</option>
+                        <option is-selected="@((int)Comment.CommentStatus.publish == (int)ViewBag.status)" value="@((int)Comment.CommentStatus.publish)">انتشار یافته</option>
+                        <option is-selected="@((int)Comment.CommentStatus.suspend == (int)ViewBag.status)" value="@((int)Comment.CommentStatus.suspend)">عدم تایید</option>
+                    </select>
+                </td> 
+                <td class="label">نوع نظر :</td>
+                <td class="minw">
+                    <select name="comment_type" style="width:120px;">
+                        <option is-selected="@(ViewBag.comment_type == -1)" value="-1">همه نظرات</option>
+                        <option is-selected="@((int)Comment.CommentType.advertise == (int)ViewBag.comment_type)" value="@((int)Comment.CommentType.advertise)">آگهی</option>
+                        <option is-selected="@((int)Comment.CommentType.advertiseHostReply == (int)ViewBag.comment_type)" value="@((int)Comment.CommentType.advertiseHostReply)">پاسخ میزبان</option>
+                        <option is-selected="@((int)Comment.CommentType.post == (int)ViewBag.comment_type)" value="@((int)Comment.CommentType.post)">پست</option>
+                    </select>
+                </td> 
+                <td><input type="submit" class="filter" value="فیلتر" /></td>          
+            </tr>
+        </table>
+    </div>
+
+    <table>
+        <tr>
+            <th class="minw">
+                ردیف
+            </th>
+            <th>
+                کد نظر
+            </th>
+            <th>
+                نوع نظر
+            </th>
+            <th>
+                کد آگهی
+            </th>
+            <th>
+                کد پست
+            </th>
+            <th>
+                فرستنده
+            </th>
+            <th>
+                تاریخ ثبت
+            </th>
+            <th>
+                عملیات
+            </th>
+        </tr>
+        @{
+            int Idx = (int)ViewBag.RowIndexStart;
+        }
+        @foreach (var item in data)
+        {
+            Idx++;
+            <tr>
+                <td>
+                    @Idx
+                </td>
+                <td>
+                    @item.Comment.Id
+                </td>
+                <td>
+                    @CommentLocalization.GetCommentTypeTitle((int)item.Comment.type)
+                </td>
+                <td>
+                    <a href="/advertise/index?id=@(item.Comment.AdvertiseID)&status=-1">@item.Comment.AdvertiseID</a> 
+                </td>
+                <td>
+                    @item.Comment.PostID
+                </td>
+                <td>
+                    @if (item.Comment.SenderUserID > 0)
+                    {
+                        @item.UserPhoneNumber
+                    }
+                    else
+                    {
+                        @: بدون کاربر
+                    }
+                </td>
+                <td>
+                    @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(item.Comment.CreateDate).ToString()
+                </td>
+                <td style="white-space:nowrap;">
+                    <a href="@Url.Action("Edit",new {id = item.Comment.Id})"><span class="editicon" title="ویرایش"></span></a>
+                    @if (item.Comment.Status == (int)Comment.CommentStatus.ready|| item.Comment.Status == Comment.CommentStatus.suspend)
+                    {
+                        <span class="publishicon" onclick="Publish(@item.Comment.Id,this)" title="انتشار"></span>
+                    }
+                    @if (item.Comment.Status == Comment.CommentStatus.publish || item.Comment.Status == (int)Comment.CommentStatus.ready)
+                    {
+                        <span class="suspendicon" onclick="Suspen(@item.Comment.Id,this)" title="عدم تایید"></span>
+                    }
+                    <span class="deleteicon" onclick="deleteItem(@item.Comment.Id,this)" title="حذف"></span>
+                </td>
+            </tr>
+                        }
+    </table>
+}
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Comment", new { page, status = (int)ViewBag.status, advertise_id = (int)ViewBag.advertise_id, comment_type = (int)ViewBag.comment_type, comment_id = ViewBag.comment_id, sender_user_id = (int)ViewBag.sender_user_id }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+        function deleteItem($id, obj) {
+            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟"))
+            {
+                myajax("Comment/Delete", "id=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        $(obj).parent().parent().remove() ;
+                    }
+                });
+            }
+        }
+
+        function Publish($id, obj) {
+            if (confirm("آیا از انتشار این آیتم اطمینان دارید ؟"))
+            {
+                myajax("Comment/Publish", "id=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        $(obj).parent().parent().remove() ;
+                        alert("نظر مورد نظر انتشار یافت .") ;
+                    }
+                });
+            }
+        }
+
+        function Suspen($id, obj) {
+            showNoYesMessage('عدم تایید نظر',
+                '<div>'
+                + '<div>دلیل عدم تایید را بنویسید:</div>'
+                + '<input type="text" id="js-not-confirm-reason" />'
+                + '</div>'
+                ,
+                function() {
+                    myajax("Comment/Suspend", "id=" + $id + "&reason=" + $('#js-not-confirm-reason').val() , function (ret) {
+                        if (ret.status==1) {
+                            $(obj).parent().parent().remove() ;
+                            alert("نظر مورد نظر به تاییده نشده ها پیوست .") ;
+                        }
+                    });
+                }
+                );
+        }
+    </script>
+}

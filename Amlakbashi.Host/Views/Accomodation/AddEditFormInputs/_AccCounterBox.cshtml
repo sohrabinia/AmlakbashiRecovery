@@ -1,0 +1,12 @@
+﻿
+<div class="set_off-button div-unset style-min-max-input">
+    <label>  @ViewData["title"]</label>
+    <button type="button" class="add"><i class="fa fa-plus"></i></button>
+    <input type="text" name="@ViewData["name"]" min="@ViewData["min"]"
+           data-allow-zero="@ViewData["data-allow-zero"]"
+           class="js-disable-error @(ViewBag.hasError != null && ViewBag.hasError ? "input-validation-error " : "")changed-input-target set_min-max-day js-input @ViewData["class"]"
+           value="@((int)ViewData["value"] > 0 ? ViewData["valueData"] : "0")"
+           onkeyup="validateNumber(this); return onAdvertisedigitschange(this);"
+           onchange="validateNumber(this)">
+    <button type="button" class="sub"><i class="fa fa-minus"></i></button>
+</div>

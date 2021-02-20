@@ -1,0 +1,264 @@
+﻿@using Amlakbashi.Core.DTOs.ReserveDTOs;
+@using Amlakbashi.Core.Common.Utilities;
+@model ReserveGuestReceiptDTO
+@{
+    ViewBag.Title = Model.Reserve.Status == Reserve.ReserveStatus.WaitForReserve ? "پیش فاکتور درخواست رزرو" : "رسید رزرو مهمان";
+    Layout = null;
+    var guest = Model.Reserve.GuestUser;
+    var advertise = Model.Reserve.Advertise;
+    var province_name = advertise.RegionProvince.PersianName;
+    var city_name = advertise.RegionCity.PersianName;
+    var area_name = advertise.Area == null ? null : advertise.RegionArea.PersianName;
+    var payed_price = Model.PayedPrice;
+
+    var payable_price = Model.PayablePrice;
+}
+<style type="text/css">
+    @@font-face {
+        font-family: "Biransans";
+        src: url("../../../resource/fonts/IRANSans-Bold-web.eot") format("eot"), url("../../../resource/fonts/IRANSans-Bold-web.woff") format("woff"), url("../../../resource/fonts/IRANSans-Bold-web.ttf") format("truetype");
+    }
+
+    @@font-face {
+        font-family: "Liransans";
+        src: url("../../../resource/fonts/IRANSans-Light-web.eot") format("eot"), url("../../../resource/fonts/IRANSans-Light-web.woff") format("woff"), url("../../../resource/fonts/IRANSans-Light-web.ttf") format("truetype");
+    }
+
+    @@font-face {
+        font-family: "Miransans";
+        src: url("../../../resource/fonts/IRANSans-Medium-web.eot") format("eot"), url("../../../resource/fonts/IRANSans-Medium-web.woff") format("woff"), url("../../../resource/fonts/IRANSans-Medium-web.ttf") format("truetype");
+    }
+
+    @@font-face {
+        font-family: "ULiransans";
+        src: url("../../../resource/fonts/IRANSans-UltraLight-web.eot") format("eot"), url("../../../resource/fonts/IRANSans-UltraLight-web.woff") format("woff"), url("../../../resource/fonts/IRANSans-UltraLight-web.ttf") format("truetype");
+    }
+
+    * {
+        direction: rtl;
+        font: Liransans;
+    }
+
+    .guest-receipt__parent {
+        display: flex;
+        flex-flow: column;
+        margin: 5px;
+    }
+
+    .guest-receipt__header {
+        display: flex;
+        justify-content: space-between;
+    }
+
+        .guest-receipt__header > * {
+            width: 33%;
+        }
+
+    .guest-receipt__header-right {
+    }
+
+    .guest-receipt__header-middle {
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+    }
+
+    .guest-receipt__header-left {
+    }
+
+    .guest-receipt__date-container {
+    }
+
+    .guest-receipt__guest-info {
+        display: flex;
+        flex-flow: column;
+        border: solid thin #242424;
+        padding: 5px;
+        margin: 5px 0;
+    }
+
+        .guest-receipt__guest-info > * {
+            margin: 5px;
+            font: 13px Liransans;
+        }
+
+    .guest-receipt__reserve-info {
+        margin: 5px 0;
+    }
+
+        .guest-receipt__reserve-info > div {
+            margin: 5px 0;
+            display: flex;
+            flex-flow: wrap;
+            border: solid thin #242424;
+        }
+
+            .guest-receipt__reserve-info > div > div {
+                display: flex;
+                flex-flow: column;
+                width: 33.33%;
+            }
+
+                .guest-receipt__reserve-info > div > div > * {
+                    padding: 0 10px;
+                    font: 13px Liransans;
+                    text-align: center;
+                }
+
+                    .guest-receipt__reserve-info > div > div > *:first-child {
+                        font: 13px Biransans;
+                        background-color: #b5b5b5;
+                    }
+
+    .guest-receipt__bottom {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .guest-receipt__description {
+        width: 39%;
+        border: solid thin #242424;
+        padding: 5px;
+        margin: 5px 0;
+    }
+
+    .guest-receipt__price-info {
+        display: flex;
+        flex-flow: column;
+        border: solid thin #242424;
+        padding: 5px;
+        margin: 5px 0;
+        width: 59%;
+    }
+
+        .guest-receipt__price-info > div {
+            display: flex;
+            justify-content: space-between;
+        }
+
+            .guest-receipt__price-info > div > *:first-child {
+                text-align: left;
+                width: 50%;
+            }
+
+            .guest-receipt__price-info > div > *:nth-child(2) {
+                /*width: 45%;*/
+                width: 120px;
+                text-align: left;
+            }
+
+        .guest-receipt__price-info > * {
+            font: 12px Liransans;
+        }
+</style>
+<div class="guest-receipt__parent">
+    <div class="guest-receipt__header">
+        <div class="guest-receipt__header-right">
+            <div class="guest-receipt__date-container">
+                <span style="font: 13px Liransans;">تاریخ: </span>
+                <span style="font: 13px Miransans;">@DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date).Replace(",", "/")</span>
+            </div>
+        </div>
+        <div class="guest-receipt__header-middle">
+            <span style="font: 15px Biransans;">@(Model.Reserve.Status == Reserve.ReserveStatus.WaitForReserve ? "پیش فاکتور درخواست رزرو" : "رسید رزرو")</span>
+        </div>
+        <div class="guest-receipt__header-left">
+        </div>
+    </div>
+    <div class="guest-receipt__guest-info">
+        <span>نام مهمان: @guest.FullName</span>
+        <span>کد کاربری مهمان: @guest.Id)</span>
+    </div>
+    <div class="guest-receipt__reserve-info">
+        <div>
+            <div>
+                <span>کد رزرو</span>
+                <span>@(Model.Reserve.Id)</span>
+            </div>
+            <div>
+                <span>کد آگهی</span>
+                <span>@(Model.Reserve.Id)</span>
+            </div>
+            <div>
+                <span>تاریخ رزرو</span>
+                <span>@DateTimeUtility.GregorianToPersianDate(Model.Reserve.CreateDate).Replace(",", "/")</span>
+            </div>
+            <div>
+                <span>تاریخ ورود</span>
+                <span>@DateTimeUtility.GregorianToPersianDate(Model.Reserve.StartDate).Replace(",", "/")</span>
+            </div>
+            <div>
+                <span>تاریخ خروج</span>
+                <span>@DateTimeUtility.GregorianToPersianDate(Model.Reserve.EndDate).Replace(",", "/")</span>
+            </div>
+            <div>
+                <span>مدت اقامت</span>
+                <span>@(DateTimeUtility.GetDatRangeDays(Model.Reserve.StartDate, Model.Reserve.EndDate)) شب</span>
+            </div>
+            <div>
+                <span>تعداد مهمان</span>
+                <span>@Model.Reserve.NumberOfGuests نفر</span>
+            </div>
+            <div>
+                <span>موقعیت اقامتگاه</span>
+                <span>@province_name - @city_name @(!string.IsNullOrEmpty(area_name) ? " - " + area_name : "")</span>
+            </div>
+            <div>
+                <span>کد کاربری میزبان</span>
+                <span>@(advertise.UserID)</span>
+            </div>
+        </div>
+    </div>
+    <div class="guest-receipt__bottom">
+        <div class="guest-receipt__description">
+            <span>توضحیات:</span>
+        </div>
+        <div class="guest-receipt__price-info">
+            <div>
+                <span>مبلغ کل:</span>
+                <span>@(string.Format("{0:n0}", Model.Reserve.TotalPrice*10)) ریال</span>
+            </div>
+            <div>
+                <span>قابل پرداخت به میزبان:</span>
+                @if (Model.Reserve.Status == Reserve.ReserveStatus.WaitForReserve)
+                {
+                    <span>@(string.Format("{0:n0}", (Model.Reserve.TotalPrice - Model.Reserve.DepositPrice - Model.Reserve.CouponPrice - Model.Reserve.PrizePrice) * 10)) ریال</span>
+                }
+                else
+                {
+                    <span>@(string.Format("{0:n0}", (Model.Reserve.TotalPrice - payed_price - Model.Reserve.CouponPrice - Model.Reserve.PrizePrice) * 10)) ریال</span>
+                }
+            </div>
+            <div>
+                <span>بن تخفیف:</span>
+                <span>@(string.Format("{0:n0}", Model.Reserve.CouponPrice * 10)) ریال</span>
+            </div>
+            <div>
+                <span>بن هدیه:</span>
+                <span>@(string.Format("{0:n0}", Model.Reserve.PrizePrice * 10)) ریال</span>
+            </div>
+            @if (Model.Reserve.Status == Reserve.ReserveStatus.WaitForReserve)
+            {
+                <div>
+                    <span>مبلغ پیش پرداخت:</span>
+                    <span>@(string.Format("{0:n0}", Model.Reserve.DepositPrice * 10)) ریال</span>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <span>مبلغ پرداخت شده:</span>
+                    <span>@(string.Format("{0:n0}", payed_price * 10)) ریال</span>
+                </div>
+            }
+            <div>
+                <span>مبلغ باقیمانده:</span>
+                <span>@(string.Format("{0:n0}", (Model.Reserve.TotalPrice - payed_price - Model.Reserve.CouponPrice - Model.Reserve.PrizePrice)*10)) ریال</span>
+            </div>
+        </div>
+    </div>
+</div>
+@section ScriptBlock{
+    <script type="text/javascript">
+    </script>
+}

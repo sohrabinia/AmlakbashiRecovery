@@ -1,0 +1,180 @@
+﻿@model BlogPost
+@{ 
+    var placeItems = (BlogPost.PlaceEnum[])Enum.GetValues(typeof(BlogPost.PlaceEnum));
+    var accItems = Advertise.GetAdvertiseTypes(Advertise.AdvertisePageType.Filter);
+
+    var positionItems = (Advertise.PositionType[])Enum.GetValues(typeof(Advertise.PositionType));
+    var posItemList = positionItems.ToList();
+    posItemList.Remove(Advertise.PositionType.none);
+    positionItems = posItemList.ToArray();
+
+    ViewBag.province = Model == null ? 0 : Model.Province;
+    ViewBag.city = Model == null ? 0 : Model.City;
+    ViewBag.area = Model == null ? 0 : Model.Area;
+}
+<form data-ajax="true" asp-action="addeditblogpost" asp-controller="blogpost" data-ajax-success="addPostDone" id="js-add-post-form" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="ID" value="@(Model == null ? 0 : Model.Id)" />
+    <input type="hidden" id="blog-post-status" name="Status" value="@(Model == null ? 0 : (int)Model.Status)" />
+    <input type="hidden" id="blog-post-photo-id" name="PhotoID" value="@(Model == null ? 0 : Model.PhotoID)" />
+    <input type="hidden" id="blog-post-pool-state" name="PoolStatus" value="@(Model == null ? 0 : (int)Model.PoolStatus)" />
+    <div class="blog-post-add__container">
+        <div class="blog-post-add__input-container">
+            <div class="blog-post-add__input-label">عنوان:</div>
+            <input class="blog-post-add__input" placeholder="عنوان را وارد کنید" name="Title" value="@(Model == null ? "" : Model.Title)" />
+        </div>
+        <div class="blog-post-add__input-container" style="justify-content:flex-start">
+            <div class="blog-post-add__input-label">متن:</div>
+            <textarea class="blog-post-add__input" placeholder="متن را وارد کنید" name="Text">@(Model == null ? "" : Model.Text)</textarea>
+        </div>
+        <div class="blog-post-add__input-container">
+            <div class="blog-post-add__input-label">لینک وبلاگ:</div>
+            <input class="blog-post-add__input" placeholder="لینک را وارد کنید" name="BlogLink" value="@(Model == null ? "" : Model.BlogLink)" />
+        </div>
+        <div class="blog-post-add__input-container">
+            <div class="blog-post-add__input-label">محل نمایش:</div>
+            <select class="blog-post-add__input" name="ShowingPlace">
+                @foreach (var item in placeItems)
+                {
+                    <option is-selected="@(Model != null && Model.ShowingPlace == item)" value="@((int)item)">@BlogPost.GetPlaceString(item)</option>
+                }
+            </select>
+        </div>
+        <div class="blog-post-add__input-container">
+            <div class="blog-post-add__input-label">عکس:</div>
+            <div id="js-post-photo-upload"></div>
+        </div>
+        <div id="js-region-input-container" class="blog-post-add__input-container">
+            <div class="blog-post-add__input-label">شهر و منطقه:</div>
+            <div class="blog-post-add__region-container">
+                @await Component.InvokeAsync("RegionSelector", new { province = ViewBag.province, city = ViewBag.city, area = ViewBag.area })
+            </div>
+        </div>
+        <div id="js-acctype-input-container" class="blog-post-add__input-container">
+            <div class="blog-post-add__input-label">نوع اقامتگاه:</div>
+            <select class="blog-post-add__input" name="AccommodationType">
+                <option value="0">هیچ کدام</option>
+                @foreach (var item in accItems)
+                {
+                    <option is-selected="@(Model != null && Model.AccommodationType == (int)item)" value="@((int)item)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianString((int)item)</option>
+                }
+            </select>
+        </div>
+        <div id="js-position-input-container" class="blog-post-add__input-container">
+            <div class="blog-post-add__input-label">موقعیت اقامتگاه:</div>
+            <select class="blog-post-add__input" name="PositionType">
+                <option value="0">هیچ کدام</option>
+                @foreach (var item in positionItems)
+                {
+                    <option is-selected="@(Model != null && Model.PositionType == (int)item)" value="@((int)item)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetPositionTypeString((int)item)</option>
+                }
+            </select>
+        </div>
+        <div id="js-pool-input-container" class="blog-post-add__input-container">
+            <div class="blog-post-add__input-label">استخر دار:</div>
+            <input style="width:20px; height:20px;" onclick="togglePoolState()" id="blog-post-pool-check" class="blog-post-add__input" type="checkbox" />
+        </div>
+        <div class="blog-post-add__button-container">
+            <div onclick="submitAddPostForm(0)" class="blog-post-add__button">@(Model == null ? "ذخیره پیش نویس" : "ثبت ویرایش در پیش نویس")</div>
+            <div onclick="submitAddPostForm(1)" class="blog-post-add__button">@(Model == null ? "ذخیره و انتشار" : "ویرایش و انتشار")</div>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+
+    function submitAddPostForm(targetStatus) {
+        for (instance in CKEDITOR.instances) {
+            CKEDITOR.instances[instance].updateElement();
+        }
+        $('#blog-post-status').val(targetStatus);
+        $('#js-add-post-form').submit();
+    }
+
+    document.addEventListener("DOMContentLoaded", function(){
+        $('select[name=ShowingPlace]').change(onShowingPlaceChanged);
+    });
+
+    function onShowingPlaceChanged() {
+        var value = $('select[name=ShowingPlace]').val();
+        if (value == 0) {
+            $('#js-region-input-container').css('display', '');
+            $('#js-acctype-input-container').css('display', '');
+            $('#js-position-input-container').css('display', '');
+            $('#js-pool-input-container').css('display', '');
+        }
+        else {
+            $('#js-region-input-container').css('display', 'none');
+            $('#js-acctype-input-container').css('display', 'none');
+            $('#js-position-input-container').css('display', 'none');
+            $('#js-pool-input-container').css('display', 'none');
+        }
+    }
+
+    function addPostDone(ret) {
+        if (ret.status == 0) {
+            for (var i = 0; i < ret.errorMessages.length; i++) {
+                alertify.error(ret.errorMessages[i]);
+            }
+            return;
+        }
+        alertify.success(ret.msg);
+        if (typeof onSaveAddEdit != 'undefined') {
+            onSaveAddEdit();
+        }
+        else {
+            location.reload();
+        }
+    }
+
+    function togglePoolState() {
+        var currentState = $('#blog-post-pool-state').val();
+        if (currentState == 0) {
+            $('#blog-post-pool-state').val(1)
+            $("#blog-post-pool-check").prop("checked", true);
+        }
+        else {
+            $('#blog-post-pool-state').val(0)
+            $("#blog-post-pool-check").prop("checked", false);
+        }
+    }
+
+    function onAddBlogContentLoaded() {
+        var initPoolState = @(Model != null && Model.PoolStatus == BlogPost.PoolStatusEnum.WithPool ? 1 : 0);
+        if (initPoolState == 1) {
+            $("#blog-post-pool-check").prop("checked", true);
+        }
+        onShowingPlaceChanged();
+        CKEDITOR.replace('Text');
+        var manualUploader = new qq.FineUploader({
+            element: document.getElementById('js-post-photo-upload'),
+            template: 'qq-template',
+            request: {
+                endpoint: '/file/uploadPhoto'
+            },
+            @if (Model != null && Model.PhotoID > 0)
+            {
+                @:session:
+                @:{
+                    @:endpoint: '/file/getuploadedphoto?id=' + @Model.PhotoID
+                @:},
+            }
+            deleteFile: {
+                enabled: false
+            },
+            callbacks: {
+                onComplete: function (id, name, data, error) {
+                    $('#blog-post-photo-id').val(data.id);
+                }
+            },
+            thumbnails: {
+                placeholders: {
+                    waitingPath: '/resource/packages/fine-uploader/placeholders/waiting-generic.png',
+                    notAvailablePath: '/resource/packages/fine-uploader/placeholders/not_available-generic.png'
+                }
+            },
+            autoUpload: true,
+            debug: false,
+            multiple: false
+        });
+    }
+</script>

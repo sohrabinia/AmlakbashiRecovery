@@ -1,0 +1,96 @@
+﻿@model Comment
+@{
+    ViewBag.Title = "ویرایش نظر";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@section StyleLink
+{
+    @*<link rel="stylesheet" type="text/css" href="/resource/ckeditor/ckeditor.css">*@
+}
+@section ScriptLink
+{
+    <script src="/resource/ckeditor/ckeditor.js"></script>
+}
+<div class="title">ویرایش  نظر</div>
+
+@using (Html.BeginForm("Edit", "Comment", FormMethod.Post, new { enctype = "multipart/form-data", id = "ManageForm" }))
+{
+    @Html.HiddenFor(model => model.Id)
+    <table>
+        <tr>
+            <td class="label">
+                متن :
+            </td>
+            <td style="width:300px;">
+                @Html.TextAreaFor(model => model.Text, new { id = "description" })
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                کد کاربری فرستنده :
+            </td>
+            <td style="width:300px;">
+                @Html.EditorFor(model => model.SenderUserID)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                کد کاربری گیرنده :
+            </td>
+            <td style="width:300px;">
+                @Html.EditorFor(model => model.RecieverUserID)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                نوع نظر :
+            </td>
+            <td style="width:300px;">
+                <select name="type">
+                    <option value="@((int)Comment.CommentType.advertise)" is-selected="@(Model.type == (int)Comment.CommentType.advertise)">آگهی</option>
+                    <option value="@((int)Comment.CommentType.advertiseHostReply)" is-selected="@(Model.type == Comment.CommentType.advertiseHostReply)">پاسخ میزبان</option>
+                    <option value="@((int)Comment.CommentType.post)" is-selected="@(Model.type == Comment.CommentType.post)">پست</option> 
+                </select>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                وضعیت نظر :
+            </td>
+            <td style="width:300px;">
+                <select name="Status">
+                    <option value="@((int)Comment.CommentStatus.ready)" is-selected="@(Model.Status == (int)Comment.CommentStatus.ready)">آماده انتشار</option>
+                    <option value="@((int)Comment.CommentStatus.publish)" is-selected="@(Model.Status == Comment.CommentStatus.publish)">انتشار یافته</option>
+                    <option value="@((int)Comment.CommentStatus.suspend)" is-selected="@(Model.Status == Comment.CommentStatus.suspend)">عدم تایید</option>
+                </select>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                دلیل عدم تایید :
+            </td>
+            <td style="width:300px;">
+                <input type="text" name="SuspendReason" value="@(string.IsNullOrEmpty(Model.SuspendReason) ? "" : Model.SuspendReason)" />
+            </td>
+            <td></td>
+        </tr>
+    </table>
+
+    <div style="margin-top:20px;">
+        <input class="apply" type="submit" value="ثبت" />
+        <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
+    </div>
+
+<div class="adminmsg">@ViewBag.msg</div>
+}
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+    </script>
+}

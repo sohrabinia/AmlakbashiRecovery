@@ -1,0 +1,112 @@
+﻿@{
+    ViewBag.Title = "مدیریت چت ها";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@model IEnumerable<Chat>
+
+@using (Html.BeginForm("Index", "Chat", FormMethod.Post))
+{
+    <div>
+        <table>
+            <tr>
+                <td class="label"> کد چت :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.chat_id" name="chat_id" />
+                </td>
+                <td class="label"> کد رزرو :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.reserve_id" name="reserve_id" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"> کد کاربر :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.user_id" name="user_id" />
+                </td>
+                <td class="label">وضعیت :</td>
+                <td class="minw">
+                    <select name="chat_status">
+                        <option value="-1"> همه چت ها</option>
+                        <option value="@((int)Chat.ChatStatusEnum.Sent)" is-selected="@((int)ViewBag.chat_status == (int)Chat.ChatStatusEnum.Sent)">@ChatLocalization.GetStatusString((int)Chat.ChatStatusEnum.Sent)</option>
+                        <option value="@((int)Chat.ChatStatusEnum.HasForbiddenCharacters)" is-selected="@((int)ViewBag.chat_status == (int)Chat.ChatStatusEnum.HasForbiddenCharacters)">@ChatLocalization.GetStatusString((int)Chat.ChatStatusEnum.HasForbiddenCharacters)</option>
+                    </select>
+                </td>
+                <td><input type="submit" class="filter" value="فیلتر" /></td>
+                <td style="width:100%;"></td>
+            </tr>
+        </table>
+    </div>
+
+    <table>
+        <tr>
+            <th class="minw">
+                ردیف
+            </th>
+            <th>
+                کد
+            </th>
+            <th>
+                کد رزرو
+            </th>
+            <th>
+                کد کاربر
+            </th>
+            <th>
+                وضعیت
+            </th>
+            <th>
+                متن
+            </th>
+            <th>
+                عملیات
+            </th>
+        </tr>
+        @{
+            int Idx = (int)ViewBag.RowIndexStart;
+        }
+        @foreach (var item in Model)
+        {
+            Idx++;
+
+            <tr>
+                <td>
+                    @Idx
+                </td>
+                <td>@item.Id</td>
+                <td>@item.ReserveID</td>
+                <td>@item.UserID</td>
+                <td>
+                    @ChatLocalization.GetStatusString(item.ChatStatus)
+                </td>
+                <td>
+                    @item.Text
+                </td>
+                <td>
+                    <a href="@Url.Action("Edit",new {chat_id= item.Id})"><span class="editicon" title="ویرایش"></span></a>
+                    <span class="deleteicon" onclick="deleteItem(@item.Id,this)" title="حذف"></span>
+                </td>
+            </tr>
+                        }
+
+    </table>
+                        }
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Chat", new { page, chat_id = (long)ViewBag.chat_id, reserve_id = (long)ViewBag.reserve_id, user_id = (int)ViewBag.user_id, chat_status = (int)ViewBag.chat_status }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        function deleteItem($id, obj) {
+            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟"))
+            {
+                myajax("Chat/Delete", "chat_id=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        $(obj).parent().parent().remove() ;
+                    }
+                });
+            }
+        }
+    </script>
+}

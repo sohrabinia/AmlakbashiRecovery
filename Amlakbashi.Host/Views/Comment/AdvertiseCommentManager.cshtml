@@ -1,0 +1,34 @@
+﻿@model Amlakbashi.Core.DTOs.CommentDTOs.AdvertiseCommentOverviewDataDTO
+@{
+    ViewBag.Title = "نظرات آگهی ها";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+    ViewBag.advertise_comment = true;
+    int user_id = ViewBag.user_id;
+}
+@section StyleLink
+{
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/advertise-comment-manager.css&v=3">
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/star-rating/star-rating.css&v=2">
+}
+@section ScriptLink
+{
+}
+<div class="advertise-comment-manager__parent">
+    @if (Model.advertisesOverviews.Any())
+    {
+        <div class="advertise-comment-manager__container">
+            @foreach (var item in Model.advertisesOverviews)
+            {
+                @Html.Partial("_AdvertiseCommentItem", item)
+            }
+        </div>
+    }
+    else
+    {
+        <div class="advertise-comment-manager__no-item-msg">در حال حاضر برای هیچ کدام از آگهی های شما نظر ثبت نشده</div>
+    }
+</div>
+
+@section ScriptBlock
+{
+}

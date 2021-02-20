@@ -1,0 +1,106 @@
+﻿@{
+    Layout = "~/Views/Shared/_Master.cshtml";
+    ViewBag.Title = "نقشه سایت - املاک باشی";
+    ViewBag.Description = "نقشه سایت املاک باشی" + (ViewBag.cityItem != null ? (" - " + ViewBag.cityItem.PersianName) : "");
+}
+
+@section StyleLink
+{
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/home.css">
+}
+
+@section StyleBlock
+{
+        .cat-title {
+            color:#555 ;
+            text-align:center ;
+            font:16px Miransans ;
+            margin:15px 0 ;
+        }
+
+        .cat-item {
+            display:block ;
+            font:13px Liransans ;
+            text-decoration :none ;
+            cursor:pointer ;
+            color:#fff ;
+            background-color:#242424 ;
+            margin:8px 15px ;
+            padding:8px 15px;
+            text-align:right ;
+        }
+
+        .cat-item:hover {
+            color: #FDD835;
+        }
+
+        .site-map {
+            color: #000;
+            text-align: center;
+            font: 18px Biransans;
+            margin:20px 0 ;
+        }
+
+}
+
+
+<div class="container">
+    @if (ViewBag.categories.Count > 0)
+    {
+        if (ViewBag.city > 0)
+        {
+            <div class="site-map">آگهی های محبوب در @ViewBag.cityItem.PersianName</div>
+        }
+        else
+        {
+            <div class="site-map">آگهی های اجاره روزانه</div>
+        }
+        <div class="row">
+            @foreach (var item in ViewBag.categories)
+            {
+                <div class="col-sm-6 col-xs-12">
+                    <a class="cat-item" href="@CategoryUrlLocalization.CategoryToUrl(item)">@item.Title (@item.CountAdvertise)</a>
+                </div>
+
+            }
+        </div>
+    }
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+    </script>
+@{ var url_splitted = ("/نقشه-سایت").Substring(1).Split('/'); }
+<script type="application/ld+json">
+    {
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [{
+    "@@type": "ListItem",
+    "position": 1,
+    "name": "املاک باشی",
+    "item": "https://www.amlakbashi.com/"
+    }
+
+    @for (int i = 0; i < url_splitted.Length; i++)
+    {
+        var url = "https://www.amlakbashi.com/";
+        for (int j = 0; j < i; j++)
+        {
+            url += (url_splitted[j] + "/");
+        }
+        url += url_splitted[i];
+        var pos = i + 2;
+        @:,{
+        @:"@@type": "ListItem",
+        @:"position": @(pos),
+        @:"name": "@(url_splitted[i].Replace("-", " "))",
+        @:"item": "@(url)"}
+            }
+    ]
+    }
+</script>
+
+}

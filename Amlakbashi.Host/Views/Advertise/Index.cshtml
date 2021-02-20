@@ -1,0 +1,378 @@
+﻿@using Amlakbashi.Core.Common.Utilities;
+@using Amlakbashi.Core.DTOs.AccommodationDTOs;
+
+@{
+    ViewBag.Title = "مدیریت آگهی ها";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+@model IEnumerable<Advertise>
+@{ 
+    var data = ViewBag.dto as IEnumerable<AdvertiseIndexDTO>;
+}
+
+@using (Html.BeginForm("Index", "Advertise", FormMethod.Get))
+{
+    <div>
+        <table>
+            <tr>
+                <td class="label">کد آگهی</td>
+                <td class="minw"><input style="width:60px;padding:5px;" type="text" name="id" value="@ViewBag.id" /></td>
+
+                <td class="label">کد کاربر :</td>
+                <td class="minw"><input type="text" name="userid" value="@ViewBag.userid" style="width:100px;" /></td>
+
+                <td class="label">وضعیت آگهی :</td>
+                <td class="minw">
+                    <select id="js-status-filter-select" name="status" style="width:120px;">
+                        <option value="-1">همه وضعیت ها</option>
+                        <option is-selected="@(0 == (int)ViewBag.status)" value="0">آماده انتشار</option>
+                        <option is-selected="@(1 == (int)ViewBag.status)" value="1">انتشار یافته</option>
+                        <option is-selected="@(2 == (int)ViewBag.status)" value="2">تعلیق شده</option>
+                        <option is-selected="@(6 == (int)ViewBag.status)" value="6">آگهی جدید</option>
+                        <option is-selected="@(5 == (int)ViewBag.status)" value="5">تکمیل نشده ها</option>
+                        <option is-selected="@(4 == (int)ViewBag.status)" value="4">تایید نشده</option>
+                        <option is-selected="@(3 == (int)ViewBag.status)" value="3">حذف شده ها</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr style="display: flex;align-items: baseline;">
+                <td>حداقل عکس: </td>
+                <td class="minw"><input style="width:60px;padding:5px;" type="number" name="imageCountMin" value="@ViewBag.imageCountMin" /></td>
+                <td>حداکثر عکس: </td>
+                <td class="minw"><input style="width:60px;padding:5px;" type="number" name="imageCountMax" value="@ViewBag.imageCountMax" /></td>
+                <td><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+                <td>ترتیب : </td>
+                <td class="minw">
+                    <select id="js-sort-filter-select" name="sort" style="width:100px;">
+                        <option value="score" is-selected="@("score" == (string)ViewBag.sort)">امتیاز آگهی</option>
+                        <option value="date" is-selected="@("date" == (string)ViewBag.sort)">تاریخ ثبت </option>
+                        <option value="modify" is-selected="@("modify" == (string)ViewBag.sort)">تاریخ ویرایش </option>
+                        <option value="click" is-selected="@("click" == (string)ViewBag.sort)">کلیک </option>
+                        <option value="contact" is-selected="@("contact" == (string)ViewBag.sort)">نمایش تماس </option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div style="display:flex;flex-flow: row;margin: 0 0 10px 0;">
+            @await Component.InvokeAsync("RegionSelector", new { province = ViewBag.province, city = ViewBag.city, area = ViewBag.area })
+        </div>
+
+        <table>
+            <tr>
+                @*<td class="label">
+                        کاربر :
+                    </td>
+                    <td class="minw">
+                        <input type="text" name="userid" value="@ViewBag.userid" style="width:100px;" />
+                    </td>*@
+                @*<td class="label">
+                        ترتیب :
+                    </td>
+                    <td class="minw">
+                        <select id="js-sort-filter-select" name="sort" style="width:100px;">
+                            <option value="score" @IsSelected("score" == (string)ViewBag.sort)>امتیاز آگهی</option>
+                            <option value="date" @IsSelected("date" == (string)ViewBag.sort)>تاریخ ثبت </option>
+                            <option value="modify" @IsSelected("modify" == (string)ViewBag.sort)>تاریخ ویرایش </option>
+                            <option value="click" @IsSelected("click" == (string)ViewBag.sort)>کلیک </option>
+                            <option value="contact" @IsSelected("contact" == (string)ViewBag.sort)>نمایش تماس </option>
+                        </select>
+                    </td>*@
+            </tr>
+            <tr>
+                <td class="label"> حداقل رزرو نوروز از :</td>
+                <td class="minw">
+                    <input name="minReserveNorouzFromDate" class="js-filter-date-picker" type="text" id="minReserveNorouzFromDate" value="@(ViewBag.minReserveNorouzFromDate)" />
+                </td>
+                <td class="label">وضعیت رزرو آنی :</td>
+                <td class="minw">
+                    <select name="instantReserveStatus" style="width:120px;">
+                        <option value="-1">همه وضعیت ها</option>
+                        @{
+                            var instantReserveStatusArr = (Advertise.InstantReserveStatusEnum[])Enum.GetValues(typeof(Advertise.InstantReserveStatusEnum));
+                        }
+                        @foreach (var st in instantReserveStatusArr)
+                        {
+                            <option is-selected="@((int)st == (int)ViewBag.instantReserveStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetInstantReserveStatusString(st)</option>
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="submit" class="filter" value="فیلتر" /></td>
+                <td style="width:100%;"></td>
+            </tr>
+        </table>
+    </div>
+    <div style="overflow: auto;">
+        <table class="adminTable">
+            <tr>
+                <th class="minw">
+                    ردیف
+                </th>
+                <th>
+                    کد آگهی
+                </th>
+                <th>
+                    عنوان آگهی
+                </th>
+                <th>شهر</th>
+                <th>
+                    کاربر
+                </th>
+                <th>
+                    تاریخ ثبت
+                </th>
+                <th>
+                    قیمت کل/شبانه
+                </th>
+                <th>
+                    امتیاز آگهی
+                </th>
+                <th>
+                     کلیک
+                </th>
+                <th>
+                    رزرو نوروز از
+                </th>
+                <th>
+                    توضیحات کارشناس
+                </th>
+                <th>
+                    عملیات
+                </th>
+            </tr>
+            @{
+                int Idx = (int)ViewBag.RowIndexStart;
+                string jalalitoday = DateTimeUtility.ConvertDate(DateTime.Now);
+                string keyday = jalalitoday.Replace("/", "");
+            }
+            @foreach (var item in data)
+            {
+                Idx++;
+                string previewLink = string.Format("/accomodation/adminpreview?id={0}", item.Advertise.Id);
+                <tr>
+                    <td>
+                        @Idx
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Advertise.Id)
+                    </td>
+                    <td>
+                        <a href="@previewLink" target="_blank">@item.Advertise.Title</a>
+                    </td>
+                    <td>
+                            @if (!string.IsNullOrEmpty(item.CityPersianName))
+                            {
+                                <span>
+                                    @item.CityPersianName
+                                </span>
+                            }
+                    </td>
+                    <td style="width:130px;">
+                        @if (item.Advertise.UserID > 0)
+                        {
+                            <a href='@(string.Format("/user/index?code={0}", item.Advertise.UserID))'>
+                                <div style="direction:ltr">
+                                    @item.UserPhoneNumber
+                                    <br />کد کاربر: @item.Advertise.UserID
+                                    <br />امتیاز کاربر: @item.UserScore
+                                </div>
+                            </a>
+                        }
+                        else
+                        {
+                            @: بدون کاربر
+                        }
+                    </td>
+                    <td>
+                        @DateTimeUtility.ConvertDate(item.Advertise.CreateDate).ToString()
+                    </td>
+                    <td>
+                        @item.Advertise.DailyPrice
+                    </td>
+                    <td>@item.Advertise.AdvertiseScore</td>
+                    <td>@item.Advertise.WebVisit</td>
+                    <td>@(item.Advertise.unixNorouzMinRequestDate < 1 ? "-" : DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(item.Advertise.unixNorouzMinRequestDate)).Replace(",", "/"))</td>
+                    <td style="width: 120px">
+                        @{
+                            var infoList = item.Advertise.GetSupportInfoList();
+                            var infoCount = infoList.Length;
+                        }
+                        <i onclick="showAddInfoDialog(@(item.Advertise.Id))" class="fa fa-plus" style="color:#242424;cursor:pointer;" title="افزودن توضیحات"></i>
+                        <i onclick="showInfo(@(item.Advertise.Id))" class="fa fa-eye" style="color:#242424;cursor:pointer;" title="نمایش توضیحات"></i>
+                        <span class="js-info-count">(@(infoCount) توضیح)</span>
+                    </td>
+                    <td style="white-space:nowrap;">
+                        <a style="margin-left:5px;" href="/accomodation/adminbasicform?id=@item.Advertise.Id"><i class="fa-icon fa fa-user-plus"></i></a>
+                        <a href="@Url.Action("Edit",new {id = item.Advertise.Id})"><span class="editicon" title="ویرایش"></span></a>
+                        @if (item.Advertise.Status == Advertise.AdvertiseStatus.FirstReady || item.Advertise.Status == Advertise.AdvertiseStatus.ReadyToPublish || item.Advertise.Status == Advertise.AdvertiseStatus.Archived || item.Advertise.Status == Advertise.AdvertiseStatus.Deleted)
+                        {
+                            <span class="publishicon" onclick="PublishAdvertise(@item.Advertise.Id,this)" title="انتشار"></span>
+                        }
+                        @if (item.Advertise.Status == Advertise.AdvertiseStatus.Published || item.Advertise.Status == Advertise.AdvertiseStatus.ReadyToPublish || item.Advertise.Status == Advertise.AdvertiseStatus.FirstReady)
+                        {
+                            <span class="suspendicon" onclick="SuspenAdvertise(@item.Advertise.Id,this)" title="تعلیق"></span>
+                        }
+                        @if (item.Advertise.Status != Advertise.AdvertiseStatus.NotVerified)
+                        {
+                            <span class="fa-icon fa fa-times" onclick="NotVerifyAdvertise(@item.Advertise.Id,this)" title="عدم تایید"></span>
+                        }
+                        <span class="deleteicon" onclick="deleteItem(@item.Advertise.Id,this)" title="حذف"></span>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+
+}
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Advertise", new { page, status = (int)ViewBag.status, adtype = (int)ViewBag.adtype, userid = (int)ViewBag.userid, Province = (int)ViewBag.province, City = (int)ViewBag.city, Area = (int)ViewBag.area, sort = (string)ViewBag.sort, instantReserveStatus = (int)ViewBag.instantReserveStatus, minReserveNorouzFromDate = ViewBag.minReserveNorouzFromDate, imageCountMin = (int)ViewBag.imageCountMin, imageCountMax = (int)ViewBag.imageCountMax }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+
+        function deleteItem($id, obj) {
+            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟"))
+            {
+                myajax("Advertise/Delete", "id=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        $(obj).parent().parent().remove() ;
+                    }
+                });
+            }
+        }
+
+        function PublishAdvertise($id, obj) {
+            if (confirm("آیا از انتشار این آیتم اطمینان دارید ؟"))
+            {
+                myajax("accomodation/publish", "id=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        $(obj).parent().parent().remove() ;
+                        alert("آگهی مورد نظر انتشار یافت .") ;
+                    }
+                });
+            }
+        }
+
+        function SortDown($id, obj) {
+            if (confirm("آیا از پرت کردن این آگهی اطمینان دارید ؟"))
+            {
+                myajax("Advertise/SortDown", "id=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        $(obj).parent().parent().remove() ;
+                        alert("آگهی مورد نظر پرت شد .") ;
+                    }
+                });
+            }
+        }
+
+        function SuspenAdvertise($id, obj) {
+            myajax("accomodation/suspend", "id=" + $id , function (ret) {
+                if (ret.status==1) {
+                    $(obj).parent().parent().remove() ;
+                    alert("آگهی مورد نظر تعلیق شد .") ;
+                }
+            });
+        }
+
+        function NotVerifyAdvertise($id, obj) {
+            myajax("Advertise/NotVerify", "id=" + $id , function (ret) {
+                if (ret.status==1) {
+                    $(obj).parent().parent().remove() ;
+                    alert("آگهی مورد نظر به تایید نشده ها پیوست .") ;
+                }
+            });
+        }
+
+        function showAddInfoDialog(advertise_id) {
+            showInfoMessage('افزودن توضیحات به آگهی با کد ' + advertise_id,
+                '<input id="addInfoInput" type="text" />' + '<br />' + '<button onclick="addInfo‌ByElem(' +
+                advertise_id + ',this.previousSibling.previousSibling)" style="padding: 5px;margin:5px; width:100px; height: 30px;"><i class="fa fa-plus"></i> افزودن</button>',
+                {onOpen: function(){
+                    $('#addInfoInput').keypress(function(e){
+                        if(e.keyCode==13)
+                            this.nextSibling.nextSibling.click();
+                    });
+                }});
+        }
+
+        function addInfo‌ByElem(advertise_id, input_elem) {
+            var text = $(input_elem).val();
+            addInfo(advertise_id, text);
+        }
+
+        function addInfo(advertise_id, text, notShowMessage) {
+            if (notShowMessage === true) {
+                executeAddInfo(advertise_id, text, true);
+            }
+            else {
+                showNoYesMessage('افزودن توضیحات',
+                'متن توضیحات: "' + text + '" اضافه شود؟',
+                function () { executeAddInfo(advertise_id, text, false); })
+            }
+        }
+
+        function executeAddInfo(advertise_id, text, notShowMessage) {
+            myajax("advertise/addsupporterinfotoadvertise",
+                "advertise_id=" + advertise_id + "&text=" + text, function (ret) {
+                    if (ret.status == 0) {
+                        showErrorMessage("خطا", "متاسفانه عملیات با خطا مواجه شد");
+                    }
+                    else if (ret.status == 1) {
+                        if (notShowMessage === true) {
+                            //hub.server.addSupporterInfoToAdvertise(advertise_id, text);
+                            window.location.href = window.location.href;
+                        }
+                        else {
+                            showSuccessMessage('', 'اطلاعات مورد نظر با موفقیت ثبت شد',
+                            {
+                                onClose: function () {
+                                    //hub.server.addSupporterInfoToAdvertise(advertise_id, text);
+                                    window.location.href = window.location.href;
+                                }
+                            });
+                        }
+                    }
+                });
+        }
+
+        function showInfo(advertise_id) {
+            $.confirm({
+                title: false,
+                content: 'url:/advertise/getadvertisesupporterinfo?advertise_id=' + advertise_id,
+                buttons: {
+                    "بستن": function () {
+                    }
+                }
+            });
+        }
+
+        $(".js-filter-date-picker").persianDatepicker({
+            altField: '#to_date-alt',
+            format: 'YYYY/MM/DD',
+            altFormat: 'YYYY/MM/DD',
+            autoClose: true,
+            toolbox: {
+                calendarSwitch: { enabled: false },
+                todayButton: { enabled: true },
+                submitButton: {enabled: true,text:{fa: "بستن", en: close}}},
+            navigator: {
+                scroll: { enabled: false },
+                text: { btnNextText: '>', btnPrevText: '<' },
+            },
+            initialValue: true
+        });
+        $("#minReserveNorouzFromDate").val('@ViewBag.minReserveNorouzFromDate');
+
+        $('#js-status-filter-select').change(function () {
+            if ($(this).val() == "0") {
+                $('#js-sort-filter-select').val('modify');
+            }
+        });
+    </script>
+}

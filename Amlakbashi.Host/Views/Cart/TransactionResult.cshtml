@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "نتیجه تراکنش";
+    Layout = "~/Views/Shared/_Master.cshtml";
+}
+@section StyleLink
+{
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/cart.css">
+}
+
+<div class="cart-container" style="margin:30px auto;">
+    @if (TempData["payment_error_msg"] != null)
+    {
+        <div style="text-align:center;font:18px Biransans;color:red ;padding:15px;direction:rtl;">@TempData["payment_error_msg"]</div>
+    }
+    @if (TempData["payment_success_msg"] != null)
+    {
+        <div style="text-align:center;font:18px Biransans;color:green ; padding:15px;direction:rtl;">@TempData["payment_success_msg"]</div>
+    }
+</div>

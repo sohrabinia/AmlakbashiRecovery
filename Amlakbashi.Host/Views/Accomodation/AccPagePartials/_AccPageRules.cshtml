@@ -1,0 +1,46 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+
+@model RulesDTO
+
+<p class="advertise-page__rules-header"><i class="fa fa-balance-scale"></i> قوانین و مقررات اقامتگاه </p>
+
+
+@if (!string.IsNullOrEmpty(Model.EvidenceRequired))
+{
+    <div class="advertise-page__rule-item">
+        <p class="advertise-page__rule-title"><i class="fa fa-id-card"></i> مدارک مورد نیاز:</p>
+        <p class="advertise-page__rule-content" data-max-height="30">@Model.EvidenceRequired</p>
+    </div>
+}
+
+<div class="add-advertise__item advertise-page__rule-content">
+    <img width="32" height="32" alt="@(Model.AllowSmoking ? "استعمال دخانیات مجاز" : "استعمال دخانیات ممنوع")" src="/file/resourceimagepng?file_name=icons/@(Model.AllowSmoking ? "rules_smoking_allow_icon" : "rules_smoking_deny_icon")" />
+    استعمال دخانیات @(Model.AllowSmoking ? "مجاز" : "ممنوع")
+</div>
+
+<div class="add-advertise__item advertise-page__rule-content">
+    <img width="32" height="32" alt="@(Model.AllowPets ? "حیوانات خانگی مجاز" : "حیوانات خانگی ممنوع")" src="/file/resourceimagepng?file_name=icons/@(Model.AllowPets ? "rules_pet_allow_icon" : "rules_pet_deny_icon")" />
+    آوردن حیوانات خانگی @(Model.AllowPets ? "مجاز" : "ممنوع")
+</div>
+
+<div class="add-advertise__item advertise-page__rule-content">
+    <img width="32" height="32" alt="@(Model.AllowParty ? "گرفتن مهمانی مجاز" : "گرفتن مهمانی ممنوع")" src="/file/resourceimagepng?file_name=icons/@(Model.AllowParty ? "rules_party_allow_icon" : "rules_party_deny_icon")" />
+    گرفتن مهمانی @(Model.AllowParty ? "مجاز" : "ممنوع")
+</div>
+
+@if (!string.IsNullOrEmpty(Model.OtherRules))
+{
+    <div class="advertise-page__rule-item">
+        <p class="advertise-page__rule-title">سایر شرایط و قوانین اقامتگاه:</p>
+        <p class="advertise-page__rule-content" data-max-height="50">@Model.OtherRules</p>
+    </div>
+}
+
+<p class="advertise-page__rule-title">قوانین کنسلی توسط مهمان:</p>
+<pre class="advertise-page__rule-content">
+کنسل نمودن رزرو توسط مهمان تا ۷۲ ساعت مانده به شروع اقامت: کسر ۱۰٪ از مبلغ کل رزرو و بازگشت باقی‌مانده مبلغ.
+کنسل نمودن رزرو توسط مهمان کمتر از ۷۲ ساعت مانده به شروع اقامت: کسر مبلغ اولین شب رزرو و بازگشت باقی‌مانده مبلغ.
+کنسل نمودن رزرو توسط مهمان در روز شروع اقامت: کسر مبلغ ۲ شب اول رزرو و بازگشت باقی‌مانده مبلغ
+در ایام پیک تعطیلات، بازه‌ی ۷۲ ساعت، ۱ هفته محاسبه می‌شود و امکان کنسلی وجود ندارد
+</pre>
+@*<div class="advertise-page__rule-content">رزرو های مربوط به نوروز از تاریخ 1398/12/28 لغایت 99/1/15 فقط با رضایت میزبان قابل لغو میباشد</div>*@

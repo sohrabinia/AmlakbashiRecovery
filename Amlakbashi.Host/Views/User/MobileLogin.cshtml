@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "صفحه ورود";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+    User presentor = ViewBag.presentor == null ? null : (User)ViewBag.presentor;
+}
+@section ScriptBlock
+{
+
+    <script type="text/javascript">
+        @if (presentor != null)
+        {
+            @:var jsPresentorCode = '@ViewBag.presentorCode';
+            @:var jsPresentorName = '@presentor.FullName';
+        }
+        toggle_login();
+        function on_login() {
+            window.location.href = '@ViewBag.returnUrl';
+        }
+    </script>
+}

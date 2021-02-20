@@ -1,0 +1,29 @@
+﻿@using Amlakbashi.Core.Common.Utilities;
+@model Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs.AccommodationItemDTO
+
+<pre class="advertise-page__overall-rating-header">
+تعداد کل رزروها: @StringUtility.EnglishNumberToPersian(Model.Statistics.SuccessfullReserveCount.ToString()) مهمان
+
+تعداد نظرات: @StringUtility.EnglishNumberToPersian(Model.Statistics.CountUserRating.ToString()) مهمان
+</pre>
+<div class="advertise-page__socre-box"><p class="advertise-page__score-advertise">امتیاز آگهی :</p>
+    @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", Model.ReportItems.FloatRating } })
+    </div>
+<div class="advertise-page__overall-rating-container">
+    @{ var userRatingTypes = Enum.GetValues(typeof(Comment.UserRatingType)) as Comment.UserRatingType[]; }
+    @foreach (var userRatingType in userRatingTypes)
+    {
+        var current_rating = Model.Statistics.OverallRatingDecimal[userRatingType];
+        <div class="advertise-page__overall-rating-item">
+            <p class="advertise-page__overall-rating-title">@Model.Statistics.UserRatingTypeString[userRatingType]</p>
+                @if (current_rating > 0)
+                {
+                    @:@(await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", current_rating } }))
+                }
+                else
+                {
+                    @:بدون نظر
+                }
+        </div>
+    }
+</div>

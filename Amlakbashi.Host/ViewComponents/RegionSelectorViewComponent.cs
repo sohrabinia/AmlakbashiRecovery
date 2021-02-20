@@ -3,8 +3,6 @@ using Amlakbashi.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static Amlakbashi.Core.Entities.Region;
 
 namespace Amlakbashi.Host.ViewComponents

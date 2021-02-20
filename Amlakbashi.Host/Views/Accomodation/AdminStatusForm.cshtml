@@ -1,0 +1,213 @@
+﻿@model Advertise
+
+
+@{
+    ViewBag.AddEditAccPage = true;
+    ViewBag.Title = "کارشناسی اقامتگاه";
+    ViewBag.keywords = "ثبت رزرو, ثبت رایگاه آگهی, ثبت آپارتمان مبله, ثبت سوئیت, ثبت ویلا اجاره ای, ثبت آگهی رزرو";
+    ViewBag.Description = "ثبت رایگان اقامتگاه برای اجاره روزانه و هفتگی - ثبت آگهی آپارتمان و سوئیت مبله - ثبت اجاره ویلا - ثبت آگهی هتل و مسافرخانه";
+    Layout = "~/Views/Shared/_masterAdmin.cshtml";
+    var childs = ViewBag.childs as Dictionary<Advertise.AdvertiseType, Dictionary<long, string>>;
+    var haveChild = childs != null && childs.Count > 0;
+    var urlReferrer = Context.Session.GetString("urlReferrer");
+    if (string.IsNullOrEmpty(urlReferrer))
+    {
+        urlReferrer = "/advertise/index";
+    }
+}
+
+@section styleLink{
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-public-style-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/admin-public-style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossorigin="" />
+}
+
+<div class="add-advertise-static-container">
+    <div class="add-static-title">
+        کارشناسی اقامتگاه
+    </div>
+    <div class="box-step-by-step">
+        <div id="form-step-button-container" class="form-step-button-container">
+            <div onclick="checkHaveChangeAdmin(1, @Model.Id)" class="form-step-button">اطلاعات اولیه</div>
+            <div onclick="checkHaveChangeAdmin(2, @Model.Id)" class="form-step-button">مشخصات کلی</div>
+            <div onclick="checkHaveChangeAdmin(3, @Model.Id)" class="form-step-button">مشخصات تکمیلی</div>
+            @if (ViewBag.mode == Advertise.AdvertiseMode.Parent)
+            {
+                if (ViewBag.type == Advertise.AdvertiseType.Complex ||
+                    ViewBag.type == Advertise.AdvertiseType.HotelApartment)
+                {
+                    <div onclick="checkHaveChangeAdmin(4, @Model.Id, 0)" class="form-step-button">مدیریت واحد ها</div>
+                }
+                else
+                {
+                    <div onclick="checkHaveChangeAdmin(4, @Model.Id, 1)" class="form-step-button">مدیریت اتاق ها</div>
+                }
+            }
+            <div class="form-step-button form-step-button-selected">وضعیت کارشناسی</div>
+        </div>
+    </div>
+    @if (haveChild)
+    {
+        var actionMethod = ViewBag.type == Advertise.AdvertiseType.Complex ? "acccomplexform" :
+            (ViewBag.type == Advertise.AdvertiseType.HotelApartment ? "acchotelapartmentform" : "acchotelform");
+        <div id="form-step-button-container" class="form-step-button-container">
+            @foreach (var type in childs.Values)
+            {
+                foreach (var child in type)
+                {
+                    <a href="/accomodation/@actionMethod?id=@(child.Key)&parentid=@Model.Id">@(child.Value) </a><span>&nbsp;&nbsp;&nbsp;</span>
+                }
+            }
+            <a href="/accomodation/@actionMethod?parentid=@Model.Id"><span class="fa fa-plus"></span> </a>
+        </div>
+    }
+
+    @using (Html.BeginForm("adminstatusform", "accomodation", FormMethod.Post, new { enctype = "multipart/form-data", id = "AccForm" }))
+    {
+        <input type="hidden" value="@Model.Id" name="id" />
+        <input type="hidden" value="false" id="statusInput" name="status" />
+        <div id="confirmation-form-step" class="form-step" data-title="نظر کارشناس">
+            <div class="static-advertise advetise-form__part" style="flex-flow: column;align-items:flex-start;">
+                <div class="static-advertise__group">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>کارشناسی آگهی</span>
+                </div>
+
+                <div class="static-advertise__item half-col">
+                    <div class="static-advertise__label">دلایل عدم تایید</div>
+                    <div class="static-advertise__property">
+                        @{ var not_verify_reasons = (Advertise.NotVerifyReasonsEnum[])Enum.GetValues(typeof(Advertise.NotVerifyReasonsEnum));
+                            var strPropertiesSelected = "," + Model.NotVerifyReasons + ","; }
+                        <select name="notVerifyReasons" id="not-verify-dp" data-placeholder="انتخاب دلایل عدم تایید ..." class="chosen-select chosen-rtl" multiple>
+                            @foreach (var item in not_verify_reasons)
+                            {
+                                <option value="@((int)item)" is-selected="@(strPropertiesSelected.Contains(string.Format(",{0},", (int)item)))">@AdvertiseMainLocalization.GetNotVerifyReasonTitle((int)item)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="static-advertise__extra-footer">
+                    </div>
+                </div>
+                <div onclick="set_watermark()" class="advertise__watermark">واترمارک همه عکس ها</div>
+            </div>
+            <div class="admin-status_button-box">
+                <a href='@urlReferrer' class="static-advertise__submit" style="text-decoration:none;background-color:#fdd835; color:#242424; margin-left:auto;width:auto;">بازگشت به مدیریت آگهی</a>
+                @if (Model.Status != Advertise.AdvertiseStatus.NotVerified)
+                {
+                    <button type="button" class="static-advertise__submit" onclick="statusSubmitForm(false)" style="background:#EA4335; color:white;">عدم تایید</button>
+                }
+                @if (Model.Status != Advertise.AdvertiseStatus.Published)
+                {
+                    <button type="button" class="static-advertise__submit" style="background-color: #34A853; color:white; margin-left:0;" onclick="statusSubmitForm(true)">انتشار آگهی</button>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section ScriptLink{
+    <script src="~/Resource/Scripts/dashboard/acc-public-form.js"></script>
+}
+@section ScriptBlock
+{
+    <script type="text/javascript">
+       @if (ViewBag.errors != null)
+        {
+            foreach(var error in ViewBag.errors)
+            {
+                @:alertify.error('@error');
+            }
+        }
+
+        function statusSubmitForm(status) {
+            if (status == false) {
+                $("#statusInput").val("false");
+            }
+            else if (status == true) {
+                $("#statusInput").val("true");
+            }
+            $('#AccForm').submit();
+        }
+    </script>
+
+    <script type="text/javascript">
+        //initializeFormSteps(false);
+        //setupDropZone();
+        @if (haveChild)
+        {
+            @: currentChildUnitIndex = @(childs.Count-1);
+            @: currentApartmentIndex = @(childs.Count(x => x.Key == Advertise.AdvertiseType.Apartment)-1);
+            @: currentSuitIndex = @(childs.Count(x => x.Key == Advertise.AdvertiseType.SuitAndRoom) - 1);
+            @: currentHouseIndex = @(childs.Count(x => x.Key == Advertise.AdvertiseType.House) - 1);
+            @: currentVillaIndex = @(childs.Count(x => x.Key == Advertise.AdvertiseType.Villa) - 1);
+            @: currentHutIndex = @(childs.Count(x => x.Key == Advertise.AdvertiseType.Hut) - 1);
+        }
+        $.onCreate('.uploader-container,.js-checkbox-confirm,.js-form-boolean', function (elements) {
+            elements.each(function () {
+                if ($(this).hasClass('uploader-container')) {
+                    initializeNewDropZone(this);
+                }
+                if ($(this).hasClass('js-checkbox-confirm')) {
+                    $(this).click(function(){
+                        confirmCheckbox(this);
+                    });
+                }
+                if ($(this).hasClass('js-form-boolean')) {
+                    $(this).change(function(){
+                        onChangeFormBoolean(this);
+                    });
+                }
+            });
+        }, true);
+        function send_form(status_content){
+            send_accomodation_form(true, status_content);
+        }
+        $(".chosen-select").chosen();
+        $(".chosen-container").css('width', '100%');
+        function set_watermark(advertise_id) {
+            advertise_id = advertise_id == undefined ||
+                advertise_id == null ? @(Model.Id) : advertise_id;
+            myajax("File/SetWatermark", "id=" + advertise_id , function (ret) {
+                if (ret.status == 1) {
+                    alertify.success(ret.val) ;
+                }
+                else{
+                    alert(ret.val) ;
+                }
+            });
+        }
+        function setImagesAsFixed(id) {
+            myajax('accomodation/setbrokenimageasfixed', 'id=' + id, function(ret){
+                if (ret.status == 1) {
+                    alertify.success(ret.msg);
+                }
+                else {
+                    alertify.error(ret.msg);
+                }
+            });
+        }
+        @*@if (childs == null || childs.Count == 0)
+        {
+            @:refreshAdvertiseFormElements();
+        }*@
+        if ($("#mapid:visible").length) {
+            setTimeout(function(){if ($("#mapid:visible").length){initializeMap();}}, 1000);
+        }
+        else {
+            $('#next_step_button').click(function () {
+                setTimeout(function(){if ($("#mapid:visible").length){initializeMap();}}, 1000);
+            });
+            $('.form-step-button').click(function () {
+                if ($(this).attr('data-index') == "1") {
+                    setTimeout(function(){}, 1000);
+                }
+            });
+        }
+    </script>
+
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+}
