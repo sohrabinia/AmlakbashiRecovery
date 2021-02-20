@@ -1,0 +1,177 @@
+﻿@inject UserAccessor userAccessor;
+
+@{
+    ViewBag.Title = "مدیریت پرداخت های رزرو";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+@model IEnumerable<ReservePayment>
+
+@using (Html.BeginForm("Index", "ReservePayment", FormMethod.Post))
+{
+    if (userAccessor.CurrentUser.Id == 3 ||
+        userAccessor.CurrentUser.Id == 1667 ||
+        userAccessor.CurrentUser.Id == 12 ||
+        userAccessor.CurrentUser.Id == 2122)
+    {
+        <a href="/ReservePayment/AddEdit" class="add">افزودن پرداخت</a>
+    }
+    <div>
+        <table>
+            <tr>
+                <td class="label"> کد پرداخت :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.reserve_payment_id" name="reserve_payment_id" />
+                </td>
+                <td class="label"> کد رزرو :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.reserve_id" name="reserve_id" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"> کد آگهی :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.advertise_id" name="advertise_id" />
+                </td>
+                <td class="label"> کد کاربر :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.user_id" name="user_id" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"> شماره تراکنش :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@ViewBag.transaction_id" name="transaction_id" />
+                </td>
+                <input type="hidden" name="status" value="0" />
+                @*<td class="label">وضعیت :</td>
+                <td class="minw">
+                    <select name="status">
+                        <option value="0" @IsSelected(ViewBag.status == 0)> پرداخت شده ها</option>
+                        <option value="@((int)ReservePayment.ReservePaymentStatus.Deleted)" @IsSelected(ViewBag.status == (int)ReservePayment.ReservePaymentStatus.Deleted)> پاک شده ها</option>
+                    </select>
+                </td>*@
+            </tr>
+            <tr>
+                <td class="label">نوع پرداخت :</td>
+                <td class="minw">
+                    <select name="payment_type">
+                        <option value="-1"> همه پرداخت ها</option>
+                        @{
+                            var payment_type_values = (ReservePayment.ReservePaymentType[])Enum.GetValues(typeof(ReservePayment.ReservePaymentType));
+                            foreach (var value in payment_type_values)
+                            {
+                                <option value="@((int)value)" is-selected="@((int)ViewBag.payment_type == (int)value)">@PaymentLocalization.GetPaymentTypePersianString((int)value)</option>
+                            }
+                        }
+                        <option value="100" is-selected="@((int)ViewBag.payment_type == 100)">پرداخت های مهمان</option>
+                    </select>
+                </td>
+                <td><input type="submit" class="filter" value="فیلتر" /></td>
+                <td style="width:100%;"></td>
+            </tr>
+        </table>
+    </div>
+
+    <table>
+        <tr>
+            <th class="minw">
+                ردیف
+            </th>
+            <th>
+                کد
+            </th>
+            <th>
+                کد رزرو
+            </th>
+            <th>
+                کد کاربر
+            </th>
+            <th>
+                کد پشتیبان
+            </th>
+            <th>
+                نوع پرداخت
+            </th>
+            <th>
+                روش پرداخت
+            </th>
+            <th>
+                شماره تراکنش
+            </th>
+            <th>
+                مبلغ
+            </th>
+            <th>
+                تاریخ پرداخت
+            </th>
+            <th>
+                عملیات
+            </th>
+        </tr>
+        @{
+            int Idx = (int)ViewBag.RowIndexStart;
+        }
+        @foreach (var item in Model)
+        {
+            Idx++;
+            var reserve = item.Reserve;
+            var advertise = reserve.Advertise;
+            <tr>
+                <td>
+                    @Idx
+                </td>
+                <td>@item.Id</td>
+                <td>@item.ReserveID</td>
+                <td>@item.UserID</td>
+                <td>@(item.OperatorID > 0 ? item.OperatorID.ToString() : "-")</td>
+                <td>@(
+                    (item.PaymentType == (int)ReservePayment.ReservePaymentType.GuestClearing ||
+                    item.PaymentType == (int)ReservePayment.ReservePaymentType.GuestDeposite) &&
+                        item.UserID == advertise.UserID && item.UserID != reserve.UserID ?
+                     "پرداخت درصد سایت توسط میزبان": PaymentLocalization.GetPaymentTypePersianString(item.PaymentType)
+                )</td>
+                @if (item.PaymentMethod == 1)
+                {
+            <td>
+                <a target="_blank" href="/user/impersonate?userId=@(item.UserID)&url=/user/usercreditmanager">کیف پول</a>
+            </td>
+                }
+                else
+                {
+                    <td>@(PaymentLocalization.GetPaymentMethodString(item.PaymentMethod))</td>
+                }
+                <td>@item.TransactionID</td>
+                <td>@string.Format("{0:n0}", item.Price) تومان</td>
+                <td>@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.CreateDate)</td>
+                <td>
+                    @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667)
+                    {
+                        <a href="@Url.Action("AddEdit",new {reserve_payment_id = item.Id})"><span class="editicon" title="ویرایش"></span></a>
+                            <span class="deleteicon" onclick="deleteItem(@item.Id,this)" title="حذف"></span>
+                    }
+                </td>
+            </tr>
+                        }
+
+    </table>
+                        }
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "ReservePayment", new { page, reserve_payment_id = (long)ViewBag.reserve_payment_id, reserve_id = (long)ViewBag.reserve_id, advertise_id = (long)ViewBag.advertise_id, user_id = (int)ViewBag.user_id, payment_type = (int)ViewBag.payment_type, transaction_id = (long)ViewBag.transaction_id, status = (int)ViewBag.status }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        function deleteItem($id, obj) {
+            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟"))
+            {
+                myajax("ReservePayment/Delete", "reserve_payment_id=" + $id , function (ret) {
+                    if (ret.status==1) {
+                        $(obj).parent().parent().remove() ;
+                    }
+                });
+            }
+        }
+    </script>
+}
