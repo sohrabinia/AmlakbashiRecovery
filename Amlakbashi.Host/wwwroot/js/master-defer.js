@@ -1197,7 +1197,10 @@ function on_login() {
     }
 }
 
-var hub = $.connection.portalHub;
+const portalHubConnection = new signalR.HubConnectionBuilder()
+    .withUrl("/PortalHub")
+    .build();
+
 var registered_service_worker;
 
 function updateAccDetail() {
@@ -1312,7 +1315,7 @@ function initializeLoginPopup() {
 }
 
 function initializeMasterHub() {
-    hub.client.reloadSupportChat = function (supportChatId, newCount, userId) {
+    portalHubConnection.on('reloadSupportChat', (supportChatId, newCount, userId) => {
         var id = $('#js-support-chat-id').val();
         supportChatId = parseInt(supportChatId);
         id = parseInt(id);
@@ -1320,8 +1323,10 @@ function initializeMasterHub() {
             $('#js-support-chat-id').val(supportChatId);
             refreshChatBox(supportChatId, newCount);
         }
-    }
-    $.connection.hub.start();
+    });
+    portalHubConnection.start()
+        .then(() => console.log('portal hub connected!'))
+        .catch(console.error);
 }
 
 function initializeServiceWorker() {
