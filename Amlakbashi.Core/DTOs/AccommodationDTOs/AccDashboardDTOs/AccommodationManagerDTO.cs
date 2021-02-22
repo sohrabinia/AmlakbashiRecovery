@@ -59,7 +59,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                     //_unavailableDates = ReserveDepend.GetAdvertiseUnavailableDates(item.AdvertiseID,
                     //    ReserveDepend.OccupiedSelectType.ForFrom,
                     //    ReserveDepend.OccupiedSource.All, item, reserves, occupiedTables).ConvertAll(x => x.Replace(",", "/"));
-                    _unavailableDates = item.OccupiedDates.Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+                    _unavailableDates = item.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
                 }
                 var _mainType = !hasChildren ? AccMainType.Single :
                         (hotelAccTypes.Contains(item.TypeID) ?
@@ -84,7 +84,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                             //    item.AdvertiseID,
                             //    ReserveDepend.OccupiedSelectType.ForFrom,
                             //    ReserveDepend.OccupiedSource.All, child, reserves, occupiedTables).ConvertAll(x => x.Replace(",", "/"));
-                            var _ud = child.OccupiedDates.Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+                            var _ud = child.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
 
                             _hotelRooms.Add(new DashboardHotelRoomDTO()
                             {
@@ -111,7 +111,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                     case AccMainType.Complex:
                         foreach (var child in item.Childs)
                         {
-                            var _ud = child.OccupiedDates.Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+                            var _ud = child.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
                             var childData = new DashboardComplexUnitDTO()
                             {
                                 id = child.Id,

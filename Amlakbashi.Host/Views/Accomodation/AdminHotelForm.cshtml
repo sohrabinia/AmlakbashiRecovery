@@ -61,14 +61,14 @@
                         <div class="static-advertise__item full-col static-advertise__title-room">
                             <p class="static-advertise__label div-unset">عنوان اتاق را بنویسید:</p>
                             <div class="box-input-title div-unset">
-                                <input class="js-disable-error static-advertise__property changed-input-target static-advertise__Introduction-title static-advertise__it@(Model.titleAndDesc.mandatory ? "js-mandatory" : "") @(ViewData.ModelState["Title"].ValidationState != ModelValidationState.Valid ? "" : "input-validation-error")" value="@Model.titleAndDesc.Title" placeholder="فارسی تایپ کنید" name="Title" />
+                                <input class="js-disable-error static-advertise__property changed-input-target static-advertise__Introduction-title static-advertise__it@(Model.titleAndDesc.mandatory ? "js-mandatory" : "") @(ViewData.ModelState.GetValidationState("Title") == ModelValidationState.Invalid ? "input-validation-error" : "")" value="@Model.titleAndDesc.Title" placeholder="فارسی تایپ کنید" name="Title" />
                                 <p class="static-advertise__extra-footer"> مثلا: اتاق دو خوابه لوکس</p>
                             </div>
                         </div>
                         <div class="static-advertise__item full-col">
                             <p class="static-advertise__label">توضیحات</p>
                             <div class="static-advertise__property">
-                                <textarea class="js-disable-error static-advertise__Introduction-title changed-input-target @(ViewData.ModelState["Description"].ValidationState != ModelValidationState.Valid ? "" : "input-validation-error")" name="Description">@Model.titleAndDesc.Description</textarea>
+                                <textarea class="js-disable-error static-advertise__Introduction-title changed-input-target @(ViewData.ModelState.GetValidationState("Description") == ModelValidationState.Invalid ? "input-validation-error" : "")" name="Description">@Model.titleAndDesc.Description</textarea>
                             </div>
                             <div class="static-advertise__extra-footer">تمام جزئیات و نکات قابل توجه و جذاب اقامتگاه را به صورت کامل و دقیق ذکر کنید؛ توجه به این مورد به صورت قابل توجهی ابهامات کاربران را برطرف خواهد کرد و شانس موفقیت آگهی شما را افزایش خواهد داد.</div>
                         </div>
@@ -77,7 +77,7 @@
                         <i class="fas fa-info-circle js-help"></i>
                         <label> مشخص کنید از این نوع اتاق چه تعداد دارید: </label>
                         <button type="button" class="add"><i class="fa fa-plus"></i></button>
-                        <input type="text" name="Count" class="@(ViewData.ModelState["Count"].ValidationState != ModelValidationState.Valid ? "" : "input-validation-error ")changed-input-target set_min-max-day js-input @ViewData["class"]" value="@Model.hotelUnitSpecific.Count">
+                        <input type="text" name="Count" class="@(ViewData.ModelState.GetValidationState("Count") == ModelValidationState.Invalid ? "input-validation-error " : "")changed-input-target set_min-max-day js-input @ViewData["class"]" value="@Model.hotelUnitSpecific.Count">
                         <button type="button" class="sub"><i class="fa fa-minus"></i></button>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
                     <p class="static-advertise__title"><i class="fa fa-search-plus"></i>مشخصات اتاق را ثبت کنید</p>
                     @if (Model.capacity != null)
                     {
-                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "ظرفیت اقامتگاه را مشخص کنید" }, { "name", "Capacity" }, { "min", "0" }, { "data-allow-zero", "0" }, { "class", "js-mandatory" }, { "value", Model.capacity.Capacity }, { "valueData", Model.capacity.Capacity.ToString() }, { "hasError", ViewData.ModelState["Capacity"].ValidationState != ModelValidationState.Valid } })
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "ظرفیت اقامتگاه را مشخص کنید" }, { "name", "Capacity" }, { "min", "0" }, { "data-allow-zero", "0" }, { "class", "js-mandatory" }, { "value", Model.capacity.Capacity }, { "valueData", Model.capacity.Capacity.ToString() }, { "hasError", ViewData.ModelState.GetValidationState("Capacity") == ModelValidationState.Invalid } })
                         @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "حداکثر مهمان اضافه را مشخص کنید " }, { "name", "MoreThanCapacity" }, { "min", "0" }, { "data-allow-zero", "1" }, { "value", Model.capacity.MoreThanCapacity }, { "valueData", Model.capacity.MoreThanCapacity.ToString() } })
                     }
                     @if (Model.bed != null)

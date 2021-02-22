@@ -9,7 +9,10 @@ namespace Amlakbashi.Host.TagHelpers
         public bool IsChecked { get; set; }
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            output.Attributes.SetAttribute("checked", IsChecked ? "checked" : "");
+            if (IsChecked)
+            {
+                output.Attributes.SetAttribute("checked", IsChecked ? "checked" : "");
+            }
         }
     }
 }

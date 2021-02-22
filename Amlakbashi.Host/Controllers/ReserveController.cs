@@ -1774,7 +1774,7 @@ namespace Amlakbashi.Host.Controllers
             var startDate = DateTime.Now.TimeOfDay.Hours > 3 ? DateTime.Now.Date : DateTime.Now.Date.AddDays(-1);
             var acc = advertiseService.Find(accommodation_id);
 
-            var occDatesFrom = acc.OccupiedDates.Select(s => DateTimeUtility.DateValueOfJS(s));
+            var occDatesFrom = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s));
             //var to_occupied_dates = SerializeUtility.SerializeToJS(
             //    ReserveDepend.GetAdvertiseUnavailableDates(accommodation_id,
             //    ReserveDepend.OccupiedSelectType.ForTo, ReserveDepend.OccupiedSource.All, advertise));

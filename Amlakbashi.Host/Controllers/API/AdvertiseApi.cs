@@ -513,7 +513,7 @@ namespace Amlakbashi.Host.Controllers.API
                 var advertise = advertiseService.FindIncludingDeleted(id);
                 var occDatesFrom = new List<string>();
                 var occDatesTo = new List<string>();
-                var occDatesOrig = advertise.OccupiedDates;
+                var occDatesOrig = advertise.OccupiedDates();
                 if (occDatesOrig.Any())
                 {
                     var orderedOccDates = occDatesOrig.Distinct()

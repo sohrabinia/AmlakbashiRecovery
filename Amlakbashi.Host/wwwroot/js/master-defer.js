@@ -1198,7 +1198,7 @@ function on_login() {
 }
 
 const portalHubConnection = new signalR.HubConnectionBuilder()
-    .withUrl("/PortalHub")
+    .withUrl("/portalhub")
     .build();
 
 var registered_service_worker;

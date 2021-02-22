@@ -15,7 +15,7 @@ namespace Amlakbashi.Data
         public DbSet<Service> Services { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<ServicePost> ServicePostItems { get; set; }
-        public DbSet<BankCard> BankCarts { get; set; }
+        public DbSet<BankCard> BankCards { get; set; }
         public DbSet<SupportChat> SupportChats { get; set; }
         public DbSet<SupportChatMessage> SupportChatMessages { get; set; }
         public DbSet<ReportItem> ReportItems { get; set; }
@@ -102,6 +102,24 @@ namespace Amlakbashi.Data
                         .WithMany()
                         .HasForeignKey("DynamicCategory_Id")
                         .HasConstraintName("FK_dbo.DynamicCategoryAdvertises_dbo.DynamicCategories_DynamicCategory_Id")
+                        .OnDelete(DeleteBehavior.ClientCascade));
+
+            modelBuilder.Entity<Advertise>()
+                .HasMany(p => p.Photos)
+                .WithMany(p => p.Advertises)
+                .UsingEntity<Dictionary<string, object>>(
+                    "FileAdvertises",
+                    j => j
+                        .HasOne<File>()
+                        .WithMany()
+                        .HasForeignKey("File_Id")
+                        .HasConstraintName("FK_dbo.FileAdvertises_dbo.Files_File_Id")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne<Advertise>()
+                        .WithMany()
+                        .HasForeignKey("Advertise_Id")
+                        .HasConstraintName("FK_dbo.FileAdvertises_dbo.Advertises_Advertise_Id")
                         .OnDelete(DeleteBehavior.ClientCascade));
         }
     }

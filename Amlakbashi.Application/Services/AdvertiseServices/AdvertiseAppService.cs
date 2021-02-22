@@ -438,6 +438,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 if (data.Id < 1)
                 {
+                    data.Id = 0;
                     Repository.Insert(data);
                     Repository.Save();
                     mediator.Publish(new CreateAdvertiseBasicEvent(data.Id, userId));
@@ -1113,7 +1114,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 reasons = new List<NotVerifyReasonsEnum>();
             }
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            acc.NotVerifyReasonsConverter = reasons;
+            acc.SetNotVerifyReasons(reasons);
             Repository.Update(acc);
             Repository.Save();
         }
@@ -1699,7 +1700,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var advertise = Repository.Query(q => q.FirstOrDefault(f => f.Id == advertiseId));
             List<string> range = DateTimeUtility.PersianDateRangeToList(fromDate, toDate, true, false);
-            occupiedDates = advertise.OccupiedDates.Select(
+            occupiedDates = advertise.OccupiedDates().Select(
                 s => DateTimeUtility.GregorianToPersianDate(s)).Intersect(range).ToList();
             isOccupied = occupiedDates.Any();
             guestsOutOfRange = numberOfGuests > advertise.Capacity + advertise.MoreThanCapacity;
@@ -1709,7 +1710,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public IList<string> GetOccupiedDatesInRange(long advertiseId, string persianFrom, string persianTo)
         {
             var acc = Repository.Find(advertiseId);
-            var occupiedDates = acc.OccupiedDates.Select(s => DateTimeUtility.GregorianToPersianDate(s));
+            var occupiedDates = acc.OccupiedDates().Select(s => DateTimeUtility.GregorianToPersianDate(s));
             var intersects = DateTimeUtility.PersianDateRangeToList(persianFrom, persianTo, true, false)
                 .Intersect(occupiedDates);
             return intersects.ToList();
@@ -1745,7 +1746,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             string from_date, string to_date)
         {
             var acc = Repository.Find(advertiseId);
-            var reservedDates = acc.ReservedDates.Select(s => DateTimeUtility.GregorianToPersianDate(s));
+            var reservedDates = acc.ReservedDates().Select(s => DateTimeUtility.GregorianToPersianDate(s));
             var reservedIntersects = DateTimeUtility.PersianDateRangeToList(from_date, to_date, true, false)
                 .Intersect(reservedDates);
             if (reservedIntersects.Any())
@@ -1767,7 +1768,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             string from_date, string to_date)
         {
             var acc = Repository.Find(advertiseId);
-            var reservedDates = acc.ReservedDates.Select(s => DateTimeUtility.GregorianToPersianDate(s));
+            var reservedDates = acc.ReservedDates().Select(s => DateTimeUtility.GregorianToPersianDate(s));
             var reservedIntersects = DateTimeUtility.PersianDateRangeToList(from_date, to_date, true, false)
                 .Intersect(reservedDates);
             if (reservedIntersects.Any())
@@ -1778,7 +1779,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     FailedDates = reservedIntersects
                 };
             }
-            var acceptedReserveDates = acc.AcceptedReserveDates.Select(
+            var acceptedReserveDates = acc.AcceptedReserveDates().Select(
                 s => DateTimeUtility.GregorianToPersianDate(s));
             var acceptedReservesIntersects = DateTimeUtility.PersianDateRangeToList(from_date, to_date, true, false)
                 .Intersect(acceptedReserveDates);
@@ -1790,7 +1791,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     FailedDates = acceptedReservesIntersects
                 };
             }
-            var reserveRequestDates = acc.ReserveRequestDates.Select(
+            var reserveRequestDates = acc.ReserveRequestDates().Select(
                 s => DateTimeUtility.GregorianToPersianDate(s));
             var reserveRequestIntersects = DateTimeUtility.PersianDateRangeToList(
                 from_date, to_date, true, false).Intersect(reserveRequestDates);
@@ -1869,7 +1870,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 msg = "تاریخ ورود و خروج گذشته است. لطفا زمان درست انتخاب کنید.";
                 return false;
             }
-            var occupiedDates = advertise.OccupiedDates.Select(s => DateTimeUtility.GregorianToPersianDate(s));
+            var occupiedDates = advertise.OccupiedDates().Select(s => DateTimeUtility.GregorianToPersianDate(s));
             var intersects = DateTimeUtility.PersianDateRangeToList(startDate, endDate, true, false)
                 .Intersect(occupiedDates);
             if (intersects.Any())

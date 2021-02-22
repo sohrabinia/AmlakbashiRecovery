@@ -128,7 +128,7 @@
                 <td class="label">وضعیت دسترسی :</td>
                 <td class="minw">
                     <select name="access_type">
-                        <option value="-1" is-selected="@((int)data.AccessType == -1))">همه وضعیت ها</option>
+                        <option value="-1" is-selected="@((int)data.AccessType == -1)">همه وضعیت ها</option>
                         @{
                             var all_access_type_states = (User.AccessTypeEnum[])Enum.GetValues(typeof(User.AccessTypeEnum));
                             foreach (var state in all_access_type_states)

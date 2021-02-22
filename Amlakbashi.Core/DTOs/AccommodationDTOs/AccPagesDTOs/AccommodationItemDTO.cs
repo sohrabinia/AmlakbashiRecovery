@@ -110,8 +110,8 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             IList<ReportItem> allUserReportItems)
         {
             AccommodationItemDTO dto = director;
-            var reportItems = advertise.UserRatingDict;
-            var comments = advertise.PublishedComments;
+            var reportItems = advertise.UserRatingDict();
+            var comments = advertise.PublishedComments();
             var noTextComments = new List<Comment>();
             if (reportItems.Count > comments.Count())
             {
@@ -209,7 +209,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
                 advertise.CountryDirection, advertise.RegionProvince, advertise.RegionCity, advertise.RegionArea);
 
             var userRatingTypes = Enum.GetValues(typeof(Comment.UserRatingType)) as Comment.UserRatingType[];
-            dto.Statistics.SuccessfullReserveCount = advertise.SuccessfullReserves.Count();
+            dto.Statistics.SuccessfullReserveCount = advertise.SuccessfullReserves().Count();
             dto.Statistics.CountUserRating = reportItems.Count;
             foreach (var item in userRatingTypes)
             {

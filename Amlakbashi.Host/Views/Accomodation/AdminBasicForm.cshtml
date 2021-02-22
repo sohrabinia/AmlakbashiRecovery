@@ -45,7 +45,7 @@
             <div class="form-step" id="_AccFormBasicElements" data-title="اطلاعات اولیه">
                 <p class="static-advertise__title"><i class="fa fa-bed"></i>اطلاعات اولیه اقامتگاه را وارد کنید</p>
                 <div class="static-advertise__item half-col disable-input">
-                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccTypeInput.cshtml", Model.advertiseType, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "haveChild", ViewBag.haveChild }, { "hasError", ViewData.ModelState["TypeID"].ValidationState != ModelValidationState.Valid } })
+                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccTypeInput.cshtml", Model.advertiseType, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "haveChild", ViewBag.haveChild }, { "hasError", ViewData.ModelState.GetValidationState("TypeID") == ModelValidationState.Invalid } })
                 </div>
                 <div class="static-advertise__item half-col" style="margin-top:0;">
                     @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPositionInput.cshtml", Model.position)
