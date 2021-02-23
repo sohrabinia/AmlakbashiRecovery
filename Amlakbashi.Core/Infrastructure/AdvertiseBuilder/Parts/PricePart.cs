@@ -15,6 +15,8 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
         public int HolidayPikePrice { get; set; }
         public int MoreThanCapacityPrice { get; set; }
         public long RentPrice { get; set; }
+        public int NorouzPrice { get; set; }
+        public int NorouzOverCapacityPrice { get; set; }
 
         public bool Validate(out Dictionary<string, string> errors, out string msg)
         {

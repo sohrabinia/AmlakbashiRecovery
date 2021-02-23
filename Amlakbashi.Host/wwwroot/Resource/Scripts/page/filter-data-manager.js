@@ -25,6 +25,13 @@ function initializeFilterData() {
     else {
         filterInputData.todayEmptyHomes = false;
     }
+    tempFilter = $('#advertise-filter-form input[name="norouz_special"]').attr('value');
+    if (tempFilter == 'True') {
+        filterInputData.norouzSpecial = true;
+    }
+    else {
+        filterInputData.norouzSpecial = false;
+    }
     filterInputData.countryDirection = $('#advertise-filter-form input[name="country_direction"]').attr('value');
     filterInputData.province = $('#advertise-filter-form input[name="Province"]').attr('value');
     filterInputData.city = $('#advertise-filter-form input[name="City"]').attr('value');
@@ -102,6 +109,13 @@ function toggleDiscount() {
     filterInputData.page = 1;
     filterInputData.ajax = true;
     filterInputData.discountHomes = !filterInputData.discountHomes;
+    sendNewFilterData();
+}
+
+function toggleNorouz() {
+    filterInputData.page = 1;
+    filterInputData.ajax = true;
+    filterInputData.norouzSpecial = !filterInputData.norouzSpecial;
     sendNewFilterData();
 }
 

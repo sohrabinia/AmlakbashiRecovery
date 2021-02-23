@@ -92,6 +92,7 @@
                     <div class="icons-style quick-access-desktop" style="text-align:left;display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
                         @*<a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>*@
                         <a style="opacity:@(item.mainType == AccMainType.Single ?  "1" : "0" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
+                        <a title="نوروز" class="icons-item icons-desktop" @*onclick="showNorouzPopup(@item.id)"*@ href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="32" height="32" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32" /></a>
                         <a title="حذف" onclick="deleteButton(@item.id ,this)" class="icons-item trash-icon icons-desktop"><i class="fa fa-trash"></i></a>
                         <a href="@item.editUrl" class="icons-item edit-icon-banner icons-desktop" target="_blank"><i class="fas fa-pencil-alt"></i></a>
                         <a title="تنظیمات " data-type='@item.mainType.ToString().ToLower()' class="icons-item setting-icon icons-desktop"><i class="fa fa-cog"></i></a>
@@ -114,6 +115,7 @@
                 <div class="icons div-unset" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
                     <div>
                         <a style="opacity:@(item.mainType == AccMainType.Single ?  "1" : "0" )" title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
+                        <a title="نوروز" class="icons-item icons-desktop" @*onclick="showNorouzPopup(@item.id)"*@ href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="32" height="32" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32" /></a>
                         <a title="حذف " class="icons-item trash-icon" onclick="deleteButton(@item.id , this)"><i class="fa fa-trash"></i></a>
                         <a href="@item.editUrl" class="icons-item edit-icon-banner" target="_blank"><i class="fas fa-pencil-alt"></i></a>
                         <a title="تنظیمات " data-type='@item.mainType.ToString().ToLower()' class="icons-item setting-icon"><i class="fa fa-cog"></i></a>

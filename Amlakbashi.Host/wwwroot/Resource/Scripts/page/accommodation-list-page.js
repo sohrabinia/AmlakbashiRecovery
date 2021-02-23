@@ -204,11 +204,6 @@ function previousPage() {
     $('#advertise-filter-form').submit();
 }
 
-function toggleNorouzSpecial() {
-    $('[name=norouz_special]').val(norouz_special ? "false" : "true");
-    $('#advertise-filter-form').submit();
-}
-
 function shareOnWathsapp(text) {
     var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (!isMobile) {

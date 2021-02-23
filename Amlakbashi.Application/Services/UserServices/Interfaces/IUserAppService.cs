@@ -56,5 +56,6 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void SendVerificationSms(string localNumber, string code);
         bool VerifyLogin(string mobile, string code, out int user_id, string presentorCode, out string errorMsg);
         void SendMessage(UserContactDTO userContact);
+        void SendSms(UserContactDTO userContact);
     }
 }

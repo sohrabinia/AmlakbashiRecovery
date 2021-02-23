@@ -58,7 +58,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Base
             return errors.Any() == false;
         }
 
-        protected void BuildAdvertisePart<T>() where T : class, IPart, new()
+        protected void BuildAdvertisePart<T>() where T : class,IPart, new ()
         {
             T part = new T();
             PropertyCopier<Advertise, T>.Copy(data, part);

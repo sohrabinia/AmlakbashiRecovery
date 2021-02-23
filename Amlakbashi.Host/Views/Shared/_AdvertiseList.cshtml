@@ -133,7 +133,7 @@
                         <h3 class="home-page__advertise-title">@item.Title</h3>
                     }
                     <p id="js-daily-price" class="home-page__advertise-price">شروع قیمت: @(string.Format("{0:n0}", item.DailyPrice)) تومان</p>
-                    <pre class="home-page__advertise-price">@*قیمت نوروز: @(item.NorouzPrice > 0 ? string.Format("{0:n0} تومان", item.NorouzPrice) : "تعیین نشده")*@
+                    <pre class="home-page__advertise-price">قیمت نوروز: @(item.NorouzPrice > 0 ? string.Format("{0:n0} تومان", item.NorouzPrice) : "تعیین نشده")
 کد آگهی: @(item.AdvertiseID)
     @if (!isParent)
     {
@@ -145,7 +145,6 @@
     }
 
 </pre>
-                    @*<span class="home-page__advertise-price">قیمت نوروز: @(item.NorouzPrice > 0 ? string.Format("{0:n0} تومان", item.NorouzPrice) : "تعیین نشده") </span>*@
                     <!--<p class="home-page__advertise-price">کد آگهی: @(item.AdvertiseID)</p>
                     <div class="home-page_details-advertise">
                         @if (item.HasChild)

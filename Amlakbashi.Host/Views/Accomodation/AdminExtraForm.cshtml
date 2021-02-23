@@ -58,13 +58,19 @@
                     @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPriceInput.cshtml", Model.price)
                 </div>
             }
+            @if (Model.hygieneProtocol != null)
+            {
+                <div class="static-advertise advetise-form__part">
+                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccHygieneProtocolInput.cshtml", Model.hygieneProtocol)
+                </div>
+            }
             @if (hasBuildingPart == true)
             {
                 <div class="static-advertise advetise-form__part advertise-form_part-details">
                     <p class="static-advertise__title"><i class="fa fa-search-plus"></i>مشخصات اقامتگاه را ثبت کنید</p>
                     @if (Model.buildingSize != null)
                     {
-                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "متراژ بنا را مشخص کنید " }, { "name", "Metrazh" }, { "min", "0" }, { "data-allow-zero", "0" }, { "class", (Model.buildingSize.mandatory ? "js-mandatory" : "") }, { "value", Model.buildingSize.Metrazh }, { "valueData", Model.buildingSize.Metrazh.ToString() }, { "hasError", ViewData.ModelState.GetValidationState("Metrazh") == ModelValidationState.Invalid  } })
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccCounterBox.cshtml", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "title", "متراژ بنا را مشخص کنید " }, { "name", "Metrazh" }, { "min", "0" }, { "data-allow-zero", "0" }, { "class", (Model.buildingSize.mandatory ? "js-mandatory" : "") }, { "value", Model.buildingSize.Metrazh }, { "valueData", Model.buildingSize.Metrazh.ToString() }, { "hasError", ViewData.ModelState.GetValidationState("Metrazh") == ModelValidationState.Invalid } })
                     }
                     @if (Model.landArea != null)
                     {

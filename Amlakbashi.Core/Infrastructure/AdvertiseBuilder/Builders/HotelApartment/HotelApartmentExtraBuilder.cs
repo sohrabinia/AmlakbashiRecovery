@@ -15,6 +15,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.HotelApartmen
 
         protected override void BuildParts()
         {
+            BuildAdvertisePart<HygieneProtocolPart>();
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<OwnershipPart>();
         }

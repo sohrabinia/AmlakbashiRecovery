@@ -1,6 +1,7 @@
 ﻿filterSubject.addListener(updateInstantReserveUI);
 filterSubject.addListener(updateTodayEmptyUI);
 filterSubject.addListener(updateDiscountUI);
+filterSubject.addListener(updateNorouzUI);
 filterSubject.addListener(updateDateUI);
 filterSubject.addListener(updateCapacityUI);
 filterSubject.addListener(updateSortUI);
@@ -32,6 +33,15 @@ function updateDiscountUI(newData) {
     }
     else {
         $('#discount-homes-filter-button').css("background-color", "white");
+    }
+}
+
+function updateNorouzUI(newData) {
+    if (newData.norouzSpecial == true) {
+        $('#norouz-special-filter-button').css("background-color", "#fdd835");
+    }
+    else {
+        $('#norouz-special-filter-button').css("background-color", "white");
     }
 }
 
