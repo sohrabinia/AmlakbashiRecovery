@@ -675,6 +675,11 @@ namespace Amlakbashi.Host.Controllers
             int poolTable = 0, int foosball = 0, int teaMaker = 0,
             int rules_pets = 0, int rules_party = 0, int rules_smoking = 0,
             int parking = 0, int sort = 0, string roomList = "",
+            int frompaypernight = -1, int topaypernight = -1,
+            int fromMetrazh = -1, int toMetrazh = -1,
+            int region = -1, int capacity = -1,
+            int room = -1, int elevator = -1, int pool = -1, 
+            string empty_range_from = "", string empty_range_to = "",
             string phrase = "", bool ajax = false)
         {
             province = Math.Max(province, 0);
@@ -732,17 +737,17 @@ namespace Amlakbashi.Host.Controllers
                 name = locationString;
             }
             // TODO: check this
-            var frompaypernight = Request.Query["frompaypernight"];
-            var topaypernight = Request.Query["topaypernight"];
-            var fromMetrazh = Request.Query["fromMetrazh"];
-            var toMetrazh = Request.Query["toMetrazh"];
-            var region = Request.Query["region"];
-            var capacity = Request.Query["capacity"];
-            var room = Request.Query["room"];
-            var elevator = Request.Query["elevator"];
-            var pool = Request.Query["pool"];
-            var empty_range_from = Request.Query["empty_range_from"];
-            var empty_range_to = Request.Query["empty_range_to"];
+            //var frompaypernight = Request.Query["frompaypernight"];
+            //var topaypernight = Request.Query["topaypernight"];
+            //var fromMetrazh = Request.Query["fromMetrazh"];
+            //var toMetrazh = Request.Query["toMetrazh"];
+            //var region = Request.Query["region"];
+            //var capacity = Request.Query["capacity"];
+            //var room = Request.Query["room"];
+            //var elevator = Request.Query["elevator"];
+            //var pool = Request.Query["pool"];
+            //var empty_range_from = Request.Query["empty_range_from"];
+            //var empty_range_to = Request.Query["empty_range_to"];
             string query_string = "";
             if (page > 1)
             {
@@ -831,14 +836,12 @@ namespace Amlakbashi.Host.Controllers
                 query_string = HtmlUtility.AddToQueryString(query_string,
                     "pool", pool.ToString());
             }
-            var fromDateAvailable = empty_range_from != "";
-            var toDateAvailable = empty_range_to != "";
-            if (fromDateAvailable)
+            if (string.IsNullOrEmpty(empty_range_from) == false)
             {
                 query_string = HtmlUtility.AddToQueryString(query_string,
                     "empty_range_from", empty_range_from.ToString());
             }
-            if (toDateAvailable)
+            if (string.IsNullOrEmpty(empty_range_from) == false)
             {
                 query_string = HtmlUtility.AddToQueryString(query_string,
                     "empty_range_to", empty_range_to.ToString());
