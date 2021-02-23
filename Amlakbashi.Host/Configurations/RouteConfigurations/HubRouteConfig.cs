@@ -10,10 +10,10 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations
     {
         public static void Config(IEndpointRouteBuilder endpointRouteBuilder)
         {
-            endpointRouteBuilder.MapHub<PortalHub>("/PortalHub");
-            endpointRouteBuilder.MapHub<ReserveAdminHub>("/ReserveAdminHub");
-            endpointRouteBuilder.MapHub<SupportChatAdminHub>("/SupportChatAdminHub");
-            endpointRouteBuilder.MapHub<ReserveDashboardHub>("/ReserveDashboardHub");
+            endpointRouteBuilder.MapHub<PortalHub>("/portalhub");
+            endpointRouteBuilder.MapHub<ReserveAdminHub>("/reserveadminhub");
+            endpointRouteBuilder.MapHub<SupportChatAdminHub>("/supportchatadminhub");
+            endpointRouteBuilder.MapHub<ReserveDashboardHub>("/reservedashboardhub");
         }
     }
 }

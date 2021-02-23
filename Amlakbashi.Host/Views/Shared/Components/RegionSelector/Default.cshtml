@@ -8,26 +8,26 @@
 <div class="dynamic-filter_box-items form-step">
     <div class="@filterItemClass">
         <p class="@filterLabelClass">استان </p>
-        <select is-disabled="@(!selectEnabled)" class="js-province-select js-disable-error changed-input-target @(ViewBag.mandatory ? "js-mandatory" : "") @(ViewBag.provinceError == null || ViewBag.provinceError ? "" : "input-validation-error")" name="@ViewBag.provinceName"
+        <select is-disabled="@(!selectEnabled)" class="js-province-select js-disable-error changed-input-target @(ViewBag.mandatory ? "js-mandatory" : "") @(ViewBag.haveProvinceError != null && ViewBag.haveProvinceError ? "input-validation-error" : "")" name="@ViewBag.provinceName"
                 onchange='callRegionFillChild("@(ViewBag.guid)", this, @((int)Region.AdvertiseRegion.City), @((int)ViewBag.region_filter_status))'
                 pid="@(ViewBag.guid + "-" + (int)Region.AdvertiseRegion.Province)">
             <option value="-1">استان را انتخاب کنید </option>
             @foreach (var item in ViewBag.provinces)
             {
-                <option is-disabled="@(item.Id == ViewBag.province)" value="@item.Id">@item.PersianName</option>
+                <option is-selected="@(item.Id == ViewBag.province)" value="@item.Id">@item.PersianName</option>
             }
         </select>
     </div>
 
     <div class="@filterItemClass">
         <p class="@filterLabelClass">شهر </p>
-        <select is-disabled="@(!selectEnabled)" class="js-city-select js-disable-error changed-input-target js-region-select-input @(ViewBag.mandatory ? "js-mandatory" : "") @(ViewBag.cityError == null || ViewBag.cityError ? "" : "input-validation-error")" name="@ViewBag.cityName" pid="@(ViewBag.guid + "-" + (int)Region.AdvertiseRegion.City)" onchange='callRegionFillChild("@(ViewBag.guid)", this, @((int)Region.AdvertiseRegion.Area), @((int)ViewBag.region_filter_status))'>
+        <select is-disabled="@(!selectEnabled)" class="js-city-select js-disable-error changed-input-target js-region-select-input @(ViewBag.mandatory ? "js-mandatory" : "") @(ViewBag.haveCityError != null && ViewBag.haveCityError ? "input-validation-error" : "")" name="@ViewBag.cityName" pid="@(ViewBag.guid + "-" + (int)Region.AdvertiseRegion.City)" onchange='callRegionFillChild("@(ViewBag.guid)", this, @((int)Region.AdvertiseRegion.Area), @((int)ViewBag.region_filter_status))'>
             @if (ViewBag.province > 0)
             {
                 <option value="-1">شهر را انتخاب کنید </option>
                 foreach (var item in ViewBag.cities)
                 {
-                    <option is-disabled="@(item.Id == ViewBag.city)" value="@item.Id">@item.PersianName</option>
+                    <option is-selected="@(item.Id == ViewBag.city)" value="@item.Id">@item.PersianName</option>
                 }
             }
             else
@@ -47,7 +47,7 @@
                     <option value="-1">منطقه را انتخاب کنید </option>
                     foreach (var item in ViewBag.areas)
                     {
-                        <option is-disabled="@(item.Id == ViewBag.area)" value="@item.Id">@item.PersianName</option>
+                        <option is-selected="@(item.Id == ViewBag.area)" value="@item.Id">@item.PersianName</option>
                     }
                 }
                 else

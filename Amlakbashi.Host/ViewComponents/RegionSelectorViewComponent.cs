@@ -25,7 +25,7 @@ namespace Amlakbashi.Host.ViewComponents
             string areaName = "Area",
             bool selectEnabled = true,
             bool mandatory = true,
-            bool provinceError = false, bool cityError = false)
+            bool haveProvinceError = false, bool haveCityError = false)
         {
             ViewBag.province = province;
             ViewBag.city = city;
@@ -50,8 +50,8 @@ namespace Amlakbashi.Host.ViewComponents
                 region_filter_status, RegionSortOrder.PersianName) :
                 new List<Region>();
             ViewBag.guid = Guid.NewGuid();
-            ViewBag.provinceError = provinceError;
-            ViewBag.cityError = cityError;
+            ViewBag.haveProvinceError = haveProvinceError;
+            ViewBag.haveCityError = haveCityError;
             return View();
         }
     }

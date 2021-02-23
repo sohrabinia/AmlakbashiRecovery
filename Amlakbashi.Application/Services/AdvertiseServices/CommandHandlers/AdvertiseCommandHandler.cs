@@ -247,7 +247,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             var today = DateTime.Now.Date;
             foreach (var advertise in instantReserveAdvertises)
             {
-                if (advertise.OccupiedDates.Any(a => a == today))
+                if (advertise.OccupiedDates().Any(a => a == today))
                 {
                     if (advertise.TodayIsEmpty == true)
                     {
@@ -293,7 +293,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             advertiseRepository.Reload(acc);
             var reservedDates = new Dictionary<Reserve, List<DateTime>>();
             var extrinsicReservedDates = new Dictionary<ExtrinsicReserve, DateTime>();
-            foreach (var reserve in acc.SuccessfullReserves)
+            foreach (var reserve in acc.SuccessfullReserves())
             {
                 for (var d = reserve.StartDate.Date; d < reserve.EndDate.Date; d = d.AddDays(1))
                 {
@@ -344,7 +344,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             var range_list = DateTimeUtility.PersianDateRangeToList(
                 request.fromDate, request.toDate, true, false);
             DateTime gregorian_date;
-            var occupiedDatesPersian = acc.OccupiedDates.Select(
+            var occupiedDatesPersian = acc.OccupiedDates().Select(
                 s => DateTimeUtility.GregorianToPersianDate(s));
             for (int i = 0; i < request.count; i++)
             {

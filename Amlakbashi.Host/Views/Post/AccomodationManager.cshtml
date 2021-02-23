@@ -186,7 +186,7 @@
                                         <div class="roomCard">
                                             @foreach (var apartmentUnit in item.apartmentUnits)
                                             {
-                                                @Html.Partial("_RoomComplex", apartmentUnit)
+                                                @await Html.PartialAsync("_RoomComplex", apartmentUnit)
                                             }
                                         </div>
                                     </div>
@@ -200,7 +200,7 @@
                                         <div class="roomCard">
                                             @foreach (var suitUnit in item.suitUnits)
                                             {
-                                                @Html.Partial("_RoomComplex", suitUnit)
+                                                @await Html.PartialAsync("_RoomComplex", suitUnit)
                                             }
                                         </div>
                                     </div>
@@ -214,7 +214,7 @@
                                         <div class="roomCard">
                                             @foreach (var villaUnit in item.villaUnits)
                                             {
-                                                @Html.Partial("_RoomComplex", villaUnit)
+                                                @await Html.PartialAsync("_RoomComplex", villaUnit)
                                             }
                                         </div>
                                     </div>
@@ -228,7 +228,7 @@
                                         <div class="roomCard">
                                             @foreach (var houseUnit in item.houseUnits)
                                             {
-                                                @Html.Partial("_RoomComplex", houseUnit)
+                                                @await Html.PartialAsync("_RoomComplex", houseUnit)
                                             }
                                         </div>
                                     </div>
@@ -242,7 +242,7 @@
                                         <div class="roomCard">
                                             @foreach (var hutUnit in item.hutUnits)
                                             {
-                                                @Html.Partial("_RoomComplex", hutUnit)
+                                                @await Html.PartialAsync("_RoomComplex", hutUnit)
                                             }
                                         </div>
                                     </div>

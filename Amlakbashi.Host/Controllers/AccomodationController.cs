@@ -944,7 +944,7 @@ namespace Amlakbashi.Host.Controllers
                     ModelState.Clear();
                     foreach (var item in errors)
                     {
-                        ModelState.AddModelError(item.Key, item.Value);
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
                     }
                     if (isEdit)
                     {
@@ -1376,7 +1376,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                var occupiedList = acc.OccupiedDates.Select(s => DateTimeUtility.DateValueOfJS(s));
+                var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s));
                 return GenerateJsonResult(new { status = 1, occupiedList = occupiedList });
             }
             catch (Exception exc)
@@ -1405,7 +1405,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     extrinsicReserveService.Insert(advertise_id, from_date, to_date, ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id, acc.Count);
                     acc = advertiseService.Find(acc.Id, true);
-                    occupiedList = acc.OccupiedDates.Select(s =>
+                    occupiedList = acc.OccupiedDates().Select(s =>
                         DateTimeUtility.DateValueOfJS(s)).ToList();
                     return GenerateJsonResult(new { status = 0, msg = "محدوده انتخاب شده به عنوان روز های پر ثبت شد" });
                 }
@@ -1451,7 +1451,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     advertiseService.DeleteExtrinsicReserves(advertise_id, from_date, to_date);
                     advertise = advertiseService.Find(advertise_id, true);
-                    var occupiedList = advertise.OccupiedDates.Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+                    var occupiedList = advertise.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
                     return GenerateJsonResult(new
                     {
                         status = 1,
@@ -2209,7 +2209,7 @@ namespace Amlakbashi.Host.Controllers
             var user_is_autenticated = User.Identity.IsAuthenticated;
             //List<long> occupiedList;
             //Dictionary<string, DatePriceDTO> priceDict;
-            var occupiedList = advertise.OccupiedDates.Select(s => DateTimeUtility.DateValueOfJS(s));
+            var occupiedList = advertise.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s));
             var priceDict = advertiseService.GetAccPriceDatesInfo(id);
             var maxInstantReserveDate = DateTime.Now.Date.AddDays(advertise.MaxInstantReserveStart);
             var data = new
@@ -2586,7 +2586,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 return null;
             }
-            var occupiedList = acc.OccupiedDates.Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+            var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
             ViewBag.occupiedList = SerializeUtility.SerializeToJS(occupiedList);
             return PartialView("_AccSetOccupied", acc);
         }

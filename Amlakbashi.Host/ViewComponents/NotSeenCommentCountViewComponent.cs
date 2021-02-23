@@ -20,9 +20,9 @@ namespace Amlakbashi.Host.ViewComponents
         {
             if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
             {
-                return View("_NotSeenCommentCount", 0);
+                return View(model: 0);
             }
-            return View("_NotSeenCommentCount", commentService.GetNotSeenCommentCount(userAccessor.CurrentUser.Id));
+            return View(commentService.GetNotSeenCommentCount(userAccessor.CurrentUser.Id));
         }
     }
 }

@@ -128,7 +128,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
                 images = string.Join(",", images_list);
 
                 _userRatingCount = advertise.ReportItems.Count;
-                _totalReserveCount = advertise.SuccessfullReserves.Count();
+                _totalReserveCount = advertise.SuccessfullReserves().Count();
                 _userRatings = new ApiUserRatingItemDTO()
                 {
                     tidiness = (float)advertise.ReportItems.Where(w => w.ReportID == 1).Select(s => s.Score).DefaultIfEmpty().Average(),

@@ -223,108 +223,65 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        [JsonIgnore]
-        [NotMapped]
-        public List<NotVerifyReasonsEnum> NotVerifyReasonsConverter
+        public List<NotVerifyReasonsEnum> GetNotVerifyReasons()
         {
-            get
+            return this.NotVerifyReasons.Split(',').Select(s => (NotVerifyReasonsEnum)Convert.ToInt32(s)).ToList();
+        }
+
+        public void SetNotVerifyReasons(IList<NotVerifyReasonsEnum> list)
+        {
+            this.NotVerifyReasons = string.Join(",", list.Cast<int>().ToArray());
+        }
+
+        public IEnumerable<Reserve> SuccessfullReserves()
+        {
+            if (Childs != null && Childs.Any())
             {
-                return this.NotVerifyReasons.Split(',').Select(s => (NotVerifyReasonsEnum)Convert.ToInt32(s)).ToList();
+                var result = new List<Reserve>();
+                foreach (var child in Childs)
+                {
+                    result.AddRange(child.Reserves.Where(w =>
+                        w.Status == Reserve.ReserveStatus.CancelRequestByHost ||
+                        (w.Status > Reserve.ReserveStatus.Rejected &&
+                        w.Status < Reserve.ReserveStatus.CanceledByGuest)));
+                }
+                return result;
             }
-            set
+            else
             {
-                this.NotVerifyReasons = string.Join(",", value.Cast<int>().ToArray());
+                return Reserves.Where(w =>
+                        w.Status == Reserve.ReserveStatus.CancelRequestByHost ||
+                        (w.Status > Reserve.ReserveStatus.Rejected &&
+                        w.Status < Reserve.ReserveStatus.CanceledByGuest));
             }
         }
 
-        [NotMapped]
-        [JsonIgnore]
-        public IEnumerable<Reserve> SuccessfullReserves
+        public IEnumerable<Comment> PublishedComments()
         {
-            get
-            {
-                if (Childs != null && Childs.Any())
-                {
-                    var result = new List<Reserve>();
-                    foreach (var child in Childs)
-                    {
-                        result.AddRange(child.Reserves.Where(w => 
-                            w.Status == Reserve.ReserveStatus.CancelRequestByHost ||
-                            (w.Status > Reserve.ReserveStatus.Rejected &&
-                            w.Status < Reserve.ReserveStatus.CanceledByGuest)));
-                    }
-                    return result;
-                }
-                else
-                {
-                    return Reserves.Where(w =>
-                            w.Status == Reserve.ReserveStatus.CancelRequestByHost ||
-                            (w.Status > Reserve.ReserveStatus.Rejected &&
-                            w.Status < Reserve.ReserveStatus.CanceledByGuest));
-                }
-            }
-        }
-
-        [NotMapped]
-        [JsonIgnore]
-        public IEnumerable<Reserve> AcceptedReserveRequests
-        {
-            get
-            {
-                if (Childs != null && Childs.Any())
-                {
-                    var result = new List<Reserve>();
-                    foreach (var child in Childs)
-                    {
-                        result.AddRange(child.Reserves.Where(w =>
-                            w.Status == Reserve.ReserveStatus.WaitForReserve));
-                    }
-                    return result;
-                }
-                else
-                {
-                    return Reserves.Where(w =>
-                            w.Status == Reserve.ReserveStatus.WaitForReserve);
-                }
-            }
-        }
-
-        [NotMapped]
-        [JsonIgnore]
-        public IEnumerable<Comment> PublishedComments
-        {
-            get
-            {
-                return Comments.Where(w => w.Status == Comment.CommentStatus.publish &&
+            return Comments.Where(w => w.Status == Comment.CommentStatus.publish &&
                     w.type == Comment.CommentType.advertise)
                     .OrderByDescending(o => o.Id);
-            }
         }
 
-        [NotMapped]
-        [JsonIgnore]
-        public Dictionary<int, List<ReportItem>> UserRatingDict
+        public Dictionary<int, List<ReportItem>> UserRatingDict()
         {
-            get
+            var dict = new Dictionary<int, List<ReportItem>>();
+            var userRatingItems = ReportItems;
+            foreach (var rp in userRatingItems)
             {
-                var dict = new Dictionary<int, List<ReportItem>>();
-                var userRatingItems = ReportItems;
-                foreach (var rp in userRatingItems)
+                if (dict.ContainsKey(rp.UserID))
                 {
-                    if (dict.ContainsKey(rp.UserID))
-                    {
-                        dict[rp.UserID].Add(rp);
-                    }
-                    else
-                    {
-                        dict.Add(rp.UserID, new List<ReportItem>() { rp });
-                    }
+                    dict[rp.UserID].Add(rp);
                 }
-                return dict;
+                else
+                {
+                    dict.Add(rp.UserID, new List<ReportItem>() { rp });
+                }
             }
+            return dict;
         }
 
-        public DiscountDTO GetFirstDiscountData( bool shortenedDate = false,
+        public DiscountDTO GetFirstDiscountData(bool shortenedDate = false,
             bool shortenedYear = false)
         {
             var today = DateTime.Now.Date;
@@ -469,58 +426,42 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        [JsonIgnore]
-        public List<DateTime> OccupiedDates
+        public List<DateTime> OccupiedDates()
         {
-            get
+            var yesterday = DateTime.Now.Date.AddDays(-1);
+            if (Count > 1)
             {
-                var yesterday = DateTime.Now.Date.AddDays(-1);
-                if (Count > 1)
-                {
-                    return OccupiedTables.Where(w => w.Date >= yesterday)
-                        .GroupBy(g => g.Date)
-                        .Where(s => s.Count() >= Count)
-                        .Select(s => s.Key).Distinct().ToList();
-                }
                 return OccupiedTables.Where(w => w.Date >= yesterday)
-                    .Select(s => s.Date).Distinct().ToList();
+                    .GroupBy(g => g.Date)
+                    .Where(s => s.Count() >= Count)
+                    .Select(s => s.Key).Distinct().ToList();
             }
+            return OccupiedTables.Where(w => w.Date >= yesterday)
+                .Select(s => s.Date).Distinct().ToList();
         }
 
-        [JsonIgnore]
-        public List<DateTime> ReservedDates
+        public List<DateTime> ReservedDates()
         {
-            get
-            {
-                return OccupiedTables.Where(w => w.ReserveID != null)
-                    .Select(s => s.Date).Distinct().ToList();
-            }
+            return OccupiedTables.Where(w => w.ReserveID != null)
+                .Select(s => s.Date).Distinct().ToList();
         }
 
-        [JsonIgnore]
-        public List<DateTime> ReserveRequestDates
+        public List<DateTime> ReserveRequestDates()
         {
-            get
-            {
-                return OccupiedTables.Where(w => w.Reserve != null &&
-                    w.Reserve.Status == Reserve.ReserveStatus.WaitForResponse)
-                    .Select(s => s.Date).Distinct().ToList();
-            }
+            return OccupiedTables.Where(w => w.Reserve != null &&
+                w.Reserve.Status == Reserve.ReserveStatus.WaitForResponse)
+                .Select(s => s.Date).Distinct().ToList();
         }
 
-        [JsonIgnore]
-        public List<DateTime> AcceptedReserveDates
+        public List<DateTime> AcceptedReserveDates()
         {
-            get
-            {
-                if (OccupiedTables == null || !OccupiedTables.Any())
-                    return new List<DateTime>();
-                var list = OccupiedTables.Where(w => w.Reserve != null &&
-                     w.Reserve.Status == Reserve.ReserveStatus.WaitForReserve);
-                if (list == null || !list.Any())
-                    return new List<DateTime>();
-                return list.Select(s => s.Date).Distinct().ToList();
-            }
+            if (OccupiedTables == null || !OccupiedTables.Any())
+                return new List<DateTime>();
+            var list = OccupiedTables.Where(w => w.Reserve != null &&
+                 w.Reserve.Status == Reserve.ReserveStatus.WaitForReserve);
+            if (list == null || !list.Any())
+                return new List<DateTime>();
+            return list.Select(s => s.Date).Distinct().ToList();
         }
         #endregion
 
