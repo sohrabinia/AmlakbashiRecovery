@@ -1112,6 +1112,15 @@ input[type=number] {
         min-width: 78px;
     }
 
+    #norouz-special-filter-button span {
+        margin-left: -10px;
+    }
+
+    #norouz-special-filter-button {
+        width: 78px;
+        min-width: 78px;
+    }
+
     #today-empty-filter-button span {
         margin-left: -10px;
     }
@@ -1165,10 +1174,20 @@ input[type=number] {
         margin-left: 0;
     }
 
+    #norouz-special-filter-button {
+        width: 64px;
+        min-width: 64px;
+    }
+
+    #norouz-special-filter-button span {
+        margin-left : 0;
+    }
+
 
     #today-empty-filter-button i,
     #discount-homes-filter-button i,
-    #instant-reserve-filter-button i {
+    #instant-reserve-filter-button i,
+    #norouz-special-filter-button i{
         display: none;
     }
 }

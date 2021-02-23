@@ -15,7 +15,7 @@
     Layout = "~/Views/Shared/_Master.cshtml";
     ViewBag.region_filter_status = (int)Region.RegionStatus.HasAdvertise;
     var related_categories = (ViewBag.related_categories == null ? new List<DynamicCategory>() : ViewBag.related_categories) as IEnumerable<DynamicCategory>;
-    //bool norouz_special = ViewBag.norouz_special != null && ViewBag.norouz_special == "1";
+    bool norouz_special = ViewBag.norouz_special != null && ViewBag.norouz_special == "1";
     bool today_empty_homes = ViewBag.today_empty_homes != null && ViewBag.today_empty_homes == "1";
     bool discount_homes = ViewBag.discount_homes != null && ViewBag.discount_homes == "1";
     bool instant_reserve = ViewBag.instant_reserve != null && ViewBag.instant_reserve == "1";
@@ -750,7 +750,7 @@
     </div>
 }
 
-@await Html.PartialAsync("_AdvertiseFilter", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "dcategory", category }, { "norouz_special", false }, { "discount_homes", discount_homes }, { "today_empty_homes", today_empty_homes }, { "instant_reserve", instant_reserve }, { "ViewBag", ViewBag } })
+@await Html.PartialAsync("_AdvertiseFilter", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "dcategory", category }, { "norouz_special", norouz_special }, { "discount_homes", discount_homes }, { "today_empty_homes", today_empty_homes }, { "instant_reserve", instant_reserve }, { "ViewBag", ViewBag } })
 
 
 @*@if (category == null || (category.Province != 1 && category.Province != 352))
@@ -878,6 +878,10 @@
                 <i class="fa fa-percent"></i>
                 <span>تخفیف دار</span>
             </div>
+            @*<div id="norouz-special-filter-button" onclick="toggleNorouz()" style="background-color:@(norouz_special ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+                <img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32" />
+                <span>ویژه نوروز</span>
+            </div>*@
         </div>
         <div class="advertise-filter__inpage-filter-left">
             <div onclick="toggleSortPopup()" id="sort-filter-button" class="advertise-list__pin-filter-item">
@@ -939,6 +943,7 @@
         { "all_images_lazy", false }, { "ViewBag", ViewBag },{ "currentPageNumber", ViewBag.currentPageNumber }, { "dcategory", ViewBag.dcategory },
         { "pagesCount", ViewBag.pagesCount },{ "urlWithParameters",ViewBag.urlWithParameters }, { "instant_reserve", ViewBag.instant_reserve },
         { "today_empty_homes", ViewBag.today_empty_homes }, { "discount_homes",ViewBag.discount_homes }, { "capacity", ViewBag.capacity },
+        { "norouz_special", ViewBag.norouz_special },
         { "empty_range_from", ViewBag.empty_range_from }, {"empty_range_to", ViewBag.empty_range_to }, { "related_categories", ViewBag.related_categories } })
     </div>
 </div>
@@ -1044,7 +1049,7 @@
         var categoryCity = @(category == null || category.City == null ? 0 : category.City);
         var next_page = @(next_page);
         var previous_page = @(previous_page);
-        @*var norouz_special = @(norouz_special ? "true" : "false" );*@
+        var norouz_special = @(norouz_special ? "true" : "false" );
         var discount_homes = @(discount_homes ? "true" : "false" );
         var instant_reserve = @(instant_reserve ? "true" : "false");
         var today_empty_homes = @(today_empty_homes ? "true" : "false" );

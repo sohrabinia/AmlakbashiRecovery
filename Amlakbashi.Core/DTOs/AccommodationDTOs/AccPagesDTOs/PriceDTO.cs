@@ -13,5 +13,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
         public int HolidayPikePrice { get; set; }
         public int MoreThanCapacityPrice { get; set; }
         public long RentPrice { get; set; }
+        public int NorouzPrice { get; set; }
+        public int NorouzOverCapacityPrice { get; set; }
     }
 }

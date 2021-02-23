@@ -12,6 +12,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Camp
 
         protected override void BuildParts()
         {
+            BuildAdvertisePart<HygieneProtocolPart>();
             BuildAdvertisePart<AmenitiesPart>();
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<OwnershipPart>();

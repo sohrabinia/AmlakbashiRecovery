@@ -735,7 +735,7 @@ namespace Amlakbashi.Host.Controllers
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
                 int level;
-                var director = advertiseService.SubmitBasicForm(data, userAccessor.DoerUser.Id, out errors, out groupErrors, out level);
+                var director = advertiseService.SubmitBasicForm(data, userAccessor.CurrentUser.Id, out errors, out groupErrors, out level);
                 if (errors.Any() || groupErrors.Any())
                 {
                     ModelState.Clear();

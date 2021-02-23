@@ -16,6 +16,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Villa
         protected override void BuildParts()
         {
             BuildAdvertisePart<PricePart>();
+            BuildAdvertisePart<HygieneProtocolPart>();
             BuildAdvertisePart<BuildingSizePart>();
             BuildAdvertisePart<LandAreaPart>();
             BuildAdvertisePart<CapacityPart>();

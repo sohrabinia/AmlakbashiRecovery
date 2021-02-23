@@ -9,6 +9,7 @@
     bool today_empty_homes = ViewBag.today_empty_homes != null && ViewBag.today_empty_homes == "1";
     bool discount_homes = ViewBag.discount_homes != null && ViewBag.discount_homes == "1";
     bool instant_reserve = ViewBag.instant_reserve != null && ViewBag.instant_reserve == "1";
+    bool norouz_special = ViewBag.norouz_special != null && ViewBag.norouz_special == "1";
     int currPage = ViewBag.currentPageNumber == null ? 0 : ViewBag.currentPageNumber;
     var for_advertise_page = (ViewBag.for_advertise_page != null && ViewBag.for_advertise_page) || (ViewData["for_advertise_page"] != null && bool.Parse(ViewData["for_advertise_page"].ToString()));
     var previous_page_available = ViewBag.currentPageNumber > 1;
@@ -168,13 +169,15 @@
                             @if (item.instantReserveAvailable)
                             {<p style="color:white;font-size:11px"><i style="font-size:13px;" class="fa fa-bolt"></i> رزرو آنی</p>}
                             @if (item.TodayIsEmpty)
-                            {<p style="color:white;font-size:11px;background-color:#6b6767;"><i class="fa fa-home" style="font-size: 13px;"></i>خالی امشب</p> }
+                            {<p style="color:white;font-size:11px;background-color:#6b6767;"><i class="fa fa-home" style="font-size: 13px;"></i>خالی امشب</p>}
+                            @if (item.NorouzPrice >= 30000)
+                            {<p style="color:white;font-size:11px;background-color:#6b6767;"><img width="16" height="16" rel="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />نوروزی</p> }
                             @*@if (item.NorouzPrice > 0)
-                                {
-                                    <div style="margin:1px 2px;background-color:white;border: 1px solid #898888;width:max-content;border-radius:5px;padding:5px;">
-                                        <div style="color:#242424;font-size:11px"><img style="margin-left:2px" width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />نوروزی</div>
-                                    </div>
-                                }*@
+                            {
+                                <div style="margin:1px 2px;background-color:white;border: 1px solid #898888;width:max-content;border-radius:5px;padding:5px;">
+                                    <div style="color:#242424;font-size:11px"><img style="margin-left:2px" width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />نوروزی</div>
+                                </div>
+                            }*@
                         </div>
                         <p class="home-page__advertise-city"><i class="fa fa-map-marker-alt"></i> @(city_name)</p>
                         @*@if (contact_available)
@@ -190,7 +193,7 @@
                             <h3 class="home-page__advertise-title">@item.Title</h3>
                         }
                         <p id="js-daily-price" class="home-page__advertise-price">شروع قیمت: @(string.Format("{0:n0}", item.DailyPrice)) تومان</p>
-                        <pre class="home-page__advertise-price">@*قیمت نوروز: @(item.NorouzPrice > 0 ? string.Format("{0:n0} تومان", item.NorouzPrice) : "تعیین نشده")*@
+                        <pre class="home-page__advertise-price">قیمت نوروز: @(item.NorouzPrice > 0 ? string.Format("{0:n0} تومان", item.NorouzPrice) : "تعیین نشده")
 کد آگهی: @(item.AdvertiseID)
     @if (!isParent)
     {
@@ -286,7 +289,7 @@
 }
 
 @if (ViewBag.currentPageNumber == 1 && Model.Count() < 5 &&
-        (discount_homes || today_empty_homes || instant_reserve))
+        (discount_homes || today_empty_homes || instant_reserve || norouz_special))
 {
     <div class="advertise-category-link__container">
         @await Html.PartialAsync("_AdvertiseCategoryLink", category,

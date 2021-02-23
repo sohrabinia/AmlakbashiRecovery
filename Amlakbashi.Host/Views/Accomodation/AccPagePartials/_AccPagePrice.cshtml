@@ -1,58 +1,69 @@
 ﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
 
 @model PriceDTO
-    @if (Model.DailyPrice != 0)
-    {
-        <div class="advertie-page__price-item js-DailyPrice">
-            <p class="advertise-page__price-title">
-                قیمت روزهای عادی:
-            </p>
-            <p class="advertise-page__price-content">
-                @string.Format("{0:n0}", Model.DailyPrice) تومان
-            </p>
-        </div>
-    }
-    @if (Model.HolidayPrice != 0)
-    {
-        <div class="advertie-page__price-item js-HolidayPrice">
-            <p class="advertise-page__price-title">
-                قیمت روزهای تعطیل:
-            </p>
-            <p class="advertise-page__price-content">
-                @string.Format("{0:n0}", Model.HolidayPrice) تومان
-            </p>
-        </div>
-    }
-    @if (Model.HolidayPikePrice != 0)
-    {
-        <div class="advertie-page__price-item js-HolidayPikePrice">
-            <p class="advertise-page__price-title">
-                قیمت پیک تعطیلات
-            </p>
-            <p class="advertise-page__price-content">
-                @string.Format("{0:n0}", Model.HolidayPikePrice) تومان
-            </p>
-        </div>
-    }
-    @if (Model.RentPrice != 0)
-    {
-        <div class="advertie-page__price-item js-RentPrice">
-            <p class="advertise-page__price-title">
-                اجاره ماهیانه:
-            </p>
-            <p class="advertise-page__price-content">
-                @string.Format("{0:n0}", Model.RentPrice) تومان
-            </p>
-        </div>
-    }
-    @if (Model.MoreThanCapacityPrice != 0)
-    {
-        <div class="advertie-page__price-item js-MoreThanCapacityPrice">
-            <p class="advertise-page__price-title">
-                هزینه هر مهمان بیشتر:
-            </p>
-            <p class="advertise-page__price-content">
-                @string.Format("{0:n0}", Model.MoreThanCapacityPrice) تومان
-            </p>
-        </div>
-    }
+@if (Model.DailyPrice != 0)
+{
+    <div class="advertie-page__price-item js-DailyPrice">
+        <p class="advertise-page__price-title">
+            قیمت روزهای عادی:
+        </p>
+        <p class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.DailyPrice) تومان
+        </p>
+    </div>
+}
+@if (Model.HolidayPrice != 0)
+{
+    <div class="advertie-page__price-item js-HolidayPrice">
+        <p class="advertise-page__price-title">
+            قیمت روزهای تعطیل:
+        </p>
+        <p class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.HolidayPrice) تومان
+        </p>
+    </div>
+}
+@if (Model.HolidayPikePrice != 0)
+{
+    <div class="advertie-page__price-item js-HolidayPikePrice">
+        <p class="advertise-page__price-title">
+            قیمت پیک تعطیلات
+        </p>
+        <p class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.HolidayPikePrice) تومان
+        </p>
+    </div>
+}
+@if (Model.RentPrice != 0)
+{
+    <div class="advertie-page__price-item js-RentPrice">
+        <p class="advertise-page__price-title">
+            اجاره ماهیانه:
+        </p>
+        <p class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.RentPrice) تومان
+        </p>
+    </div>
+}
+@if (Model.MoreThanCapacityPrice != 0)
+{
+    <div class="advertie-page__price-item js-MoreThanCapacityPrice">
+        <p class="advertise-page__price-title">
+            هزینه هر مهمان بیشتر:
+        </p>
+        <p class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.MoreThanCapacityPrice) تومان
+        </p>
+    </div>
+}
+@if (Model.NorouzPrice > 0)
+{
+    <div class="advertie-page__price-item js-NorouzPrice">
+        <p class="advertise-page__price-title">
+            قیمت روزهای نوروز <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
+        </p>
+        <p class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.NorouzPrice) تومان
+        </p>
+    </div>
+}
