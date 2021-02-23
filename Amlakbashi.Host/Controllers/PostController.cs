@@ -350,6 +350,15 @@ namespace Amlakbashi.Host.Controllers
                 itemDTOs.Add(dto);
             }
             ViewBag.mostDiscountAdvertise = itemDTOs;
+            var norouzAccs = advertiseService.GetNorouzAdvertises(5);
+            var norouzItemDTOs = new List<AccommodationCardDTO>();
+            foreach (var item in norouzAccs)
+            {
+                var dto = (AccommodationCardDTO)item;
+                dto.Favourited = user.Id > 0 && userFavorites.Any(x => x.AdvertiseID == item.Id);
+                norouzItemDTOs.Add(dto);
+            }
+            ViewBag.norouzAdvertises = norouzItemDTOs;
 
             ViewBag.advertiseItemCount = advertiseItemCount;
             ViewBag.homePageCategories = home_categories;

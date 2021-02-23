@@ -2164,5 +2164,21 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             reserveId = reserve.Id;
             return true;
         }
+
+        public IList<Advertise> GetNorouzAdvertises(int count)
+        {
+            var advertises = Repository.Query(q => q.Where(w => w.Available &&
+                w.Status == Advertise.AdvertiseStatus.Published &&
+                w.HideInCategory == false && w.Count < 1));
+            return advertises.OrderByDescending(o => o.AdvertiseScore).Take(count).ToList();
+        }
+
+        public void SetHygieneProtocol(long id, bool value)
+        {
+            var acc = Repository.Find(id);
+            acc.HygieneProtocol = value;
+            Repository.Update(acc);
+            Repository.Save();
+        }
     }
 }

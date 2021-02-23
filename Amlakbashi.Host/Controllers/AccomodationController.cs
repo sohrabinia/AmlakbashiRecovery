@@ -2661,5 +2661,43 @@ namespace Amlakbashi.Host.Controllers
                 (int)acc.Position, acc.Pool == null ? false : (bool)acc.Pool, 2);
             return PartialView("_AccBlogNews", model);
         }
+
+        [Auth]
+        public JsonResult SetHygieneProtocol(long id, bool value)
+        {
+            try
+            {
+                advertiseService.SetHygieneProtocol(id, value);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Accomodation.SetHygieneProtocol", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        public JsonResult MustShowHygieneProtocolPopup()
+        {
+            bool result = false;
+            try
+            {
+                var user = userAccessor.CurrentUser;
+                if (user.Id > 0 && user.UserGeneralType > 0)
+                {
+                    var userAccs = user.Advertises;
+                    if (userAccs != null && userAccs.Count == 1 && userAccs.FirstOrDefault().HygieneProtocol == null)
+                    {
+                        result = true;
+                    }
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Accomodation.MustShowHygieneProtocolPopup", exc);
+                result = false;
+            }
+            return GenerateJsonResult(new { result = result });
+        }
     }
 }
