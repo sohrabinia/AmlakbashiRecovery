@@ -321,6 +321,7 @@ namespace Amlakbashi.Application.Services.Category
                 (today_empty_homes != null &&
                 today_empty_homes == "1"))
             {
+                var test = advertises.ToList();
                 if (today_empty_homes != null && today_empty_homes == "1" &&
                     (string.IsNullOrEmpty(empty_range_from) ||
                     string.IsNullOrEmpty(empty_range_to)))
@@ -339,6 +340,7 @@ namespace Amlakbashi.Application.Services.Category
                     OccupiedTablesincluded = true;
                 }
                 advertises = advertiseFilter.FilterEmptyInRange(advertises, range);
+                test = advertises.ToList();
             }
             IOrderedQueryable<Advertise> model_output;
             if (capacity_int > 0)
