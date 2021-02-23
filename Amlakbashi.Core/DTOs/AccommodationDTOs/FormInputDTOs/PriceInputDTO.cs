@@ -14,6 +14,8 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
         public int pikeHolidayPrice { get; set; }//just to handle app
         public int moreThanCapacityPrice { get; set; }
         public long rentPrice { get; set; }
+        public int norouzPrice { get; set; }
+        public int norouzOverCapacityPrice { get; set; }
         public int minValue { get; set; }
         public long minValueMonthly { get; set; }
         public PriceInputDTO()

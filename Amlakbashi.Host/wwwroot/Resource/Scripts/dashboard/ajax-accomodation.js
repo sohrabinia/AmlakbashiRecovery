@@ -423,3 +423,7 @@ function deleteButton(id, elem) {
 function showOccupiedPopup(id, title) {
     showInfoMessage('  کد آگهی: ' + id, '', { contentUrl: '/accomodation/getsetoccupiedpopup?id=' + id, fullScreen: screen.width < 781 });
 }
+
+function showNorouzPopup(id) {
+    showInfoMessage('  کد آگهی: ' + id, '', { contentUrl: '/accomodation/getsetminnorouzreservepopup?id=' + id, fullScreen: screen.width < 781 });
+}

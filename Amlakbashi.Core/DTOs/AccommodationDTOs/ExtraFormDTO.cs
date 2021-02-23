@@ -11,6 +11,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
     {
         public long Id { get; set; }
         public PriceInputDTO price { get; set; }
+        public HygieneProtocolInputDTO hygieneProtocol { get; set; }
         public BuildingSizeInputDTO buildingSize { get; set; }
         public LandAreaInputDTO landArea { get; set; }
         public CapacityInputDTO capacity { get; set; }
@@ -38,6 +39,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             model.ownership = director.GetAdvertisePart<OwnershipPart>();
             model.parking = director.GetAdvertisePart<ParkingPart>();
             model.price = director.GetAdvertisePart<PricePart>();
+            model.hygieneProtocol = director.GetAdvertisePart<HygieneProtocolPart>();
             model.room = director.GetAdvertisePart<RoomPart>();
             model.rules = director.GetAdvertisePart<RulesPart>();
             model.elevator = director.GetAdvertisePart<ElevatorPart>();

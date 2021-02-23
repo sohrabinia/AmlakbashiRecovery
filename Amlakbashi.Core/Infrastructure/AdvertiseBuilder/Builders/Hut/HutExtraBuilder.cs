@@ -16,6 +16,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Hut
         protected override void BuildParts()
         {
             BuildAdvertisePart<PricePart>();
+            BuildAdvertisePart<HygieneProtocolPart>();
             BuildAdvertisePart<BuildingSizePart>();
             BuildAdvertisePart<CapacityPart>();
             BuildAdvertisePart<RoomPart>();

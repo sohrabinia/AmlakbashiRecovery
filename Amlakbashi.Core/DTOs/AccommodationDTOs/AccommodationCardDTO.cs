@@ -52,10 +52,9 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             dto.Description = advertise.Description;
             dto.Slug = advertise.Slug;
             dto.DailyPrice = advertise.BasePrice;
-            //NorouzPrice = has_child ?
-            //    advertise.Childs.Min(x => x.NorouzPrice) :
-            //    advertise.NorouzPrice,
-            dto.NorouzPrice = 0;
+            dto.NorouzPrice = has_child ?
+                advertise.Childs.Min(x => x.NorouzPrice) :
+                advertise.NorouzPrice;
             dto.AdvertiseType = advertise.TypeID;
             dto.AdvertiseTypeString = !has_child ? null :
                 AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID);

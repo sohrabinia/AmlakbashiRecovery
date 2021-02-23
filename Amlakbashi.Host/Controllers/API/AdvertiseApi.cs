@@ -90,22 +90,24 @@ namespace Amlakbashi.Host.Controllers.API
                         items = dto
                     });
                 }
-                //var norouzItems = new List<HomePageCarousel>();
-                //var norouzCarouselItem = new HomePageCarousel()
-                //{
-                //    title = "اقامتگاه های ویژه نوروز ۹۹",
-                //    cid = 0,
-                //    type = 2,
-                //    items = AdvertiseItem.GenerateFromAdvertiseList(
-                //        advertiseService.GetMostViewedNorouzAdvertises(8),
-                //        all_discounts, now)
-                //};
-                //if (!norouzCarouselItem.items.Any())
-                //{
-                //    norouzCarouselItem = null;
-                //}
-                //return GenerateJsonResult(new { items = items, norouzItem = norouzCarouselItem });
-                return GenerateJsonResult(new { items = items, norouzItem = (ApiHomePageCarouselDTO)null });
+                var norouzAccs = advertiseService.GetMostViewedNorouzAdvertises(8);
+                ApiHomePageCarouselDTO norouzCarouselItem = null;
+                if (norouzAccs.Any() == true)
+                {
+                    var norouzItems = new List<ApiAdvertiseItemDTO>();
+                    foreach (var item in norouzAccs)
+                    {
+                        norouzItems.Add(item);
+                    }
+                    norouzCarouselItem = new ApiHomePageCarouselDTO()
+                    {
+                        title = "اقامتگاه های ویژه نوروز ۱۴۰۰",
+                        cid = 0,
+                        type = 2,
+                        items = norouzItems
+                    };
+                }
+                return GenerateJsonResult(new { items = items, norouzItem = norouzCarouselItem });
             }
             catch (Exception exc)
             {
@@ -343,14 +345,10 @@ namespace Amlakbashi.Host.Controllers.API
                         },
                         stayDuration = new StayDurationDTO() { id = advertise.Id, min = advertise.MinReserveDays, max = advertise.MaxReserveDays },
                         maxInstantReserveStart = advertise.MaxInstantReserveStart,
-                        //norouzPrice = advertise.NorouzPrice,
-                        norouzPrice = 0,
-                        //norouzPriceString = string.Format("{0:n0}", advertise.NorouzPrice),
-                        norouzPriceString = "",
-                        //norouzMinReserveDateString = advertise.unixNorouzMinRequestDate < 1 ? null : DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate)).Replace(",", "/"),
-                        norouzMinReserveDateString = "",
-                        //norouzOverCapacityPrice = advertise.NorouzOverCapacityPrice
-                        norouzOverCapacityPrice = 0
+                        norouzPrice = advertise.NorouzPrice,
+                        norouzPriceString = string.Format("{0:n0}", advertise.NorouzPrice),
+                        norouzMinReserveDateString = advertise.unixNorouzMinRequestDate < 1 ? null : DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate)).Replace(",", "/"),
+                        norouzOverCapacityPrice = advertise.NorouzOverCapacityPrice
                     });
                 }
                 var result = output;
@@ -420,8 +418,6 @@ namespace Amlakbashi.Host.Controllers.API
             {
                 start_date = start_date == "null" ? null : start_date;
                 end_date = end_date == "null" ? null : end_date;
-                //List<ApiAdvertiseItemDTO> result = advertiseService.GetAllAvailableAdvertises(start_date, end_date,
-                //    for_discount, for_instant_reserve, for_norouz_special);
                 var category = categoryService.Find(AdvertiseType.All,
                     CountryDirection.Unset, 0, 0, 0);
                 var result = new List<ApiAdvertiseItemDTO>();
@@ -432,7 +428,7 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     result.Add(advertise);
                 }
-                return GenerateJsonResult(new { items = result, websiteUrl = result.Any() ? (GeneralData.WebsiteUrl + "/ایران" + (for_discount ? "?discount_homes=1" : (for_instant_reserve ? "?instant_reserve=1" : ""))) : null });
+                return GenerateJsonResult(new { items = result, websiteUrl = result.Any() ? (GeneralData.WebsiteUrl + "/ایران" + (for_discount ? "?discount_homes=1" : (for_instant_reserve ? "?instant_reserve=1" : (for_norouz_special ? "?norouz_special=1" : "")))) : null });
             }
             catch (Exception exc)
             {

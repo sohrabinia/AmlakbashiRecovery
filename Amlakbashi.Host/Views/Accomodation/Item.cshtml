@@ -245,17 +245,17 @@
                     <div class="advertise-page__price-container">
                         @await Html.PartialAsync("AccPagePartials/_AccPagePrice", Model.Price)
 
-                        @*@if (Model.NorouzOverCapacityPrice > 0)
-                            {
-                                <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
-                                    <span class="advertise-page__price-title">
-                                        قیمت هر مهمان اضافه نوروز <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
-                                    </span>
-                                    <span class="advertise-page__price-content">
-                                        @string.Format("{0:n0}", Model.NorouzOverCapacityPrice) تومان
-                                    </span>
-                                </div>
-                            }*@
+                        @if (Model.Price.NorouzOverCapacityPrice > 0)
+                        {
+                            <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
+                                <span class="advertise-page__price-title">
+                                    قیمت هر مهمان اضافه نوروز <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
+                                </span>
+                                <span class="advertise-page__price-content">
+                                    @string.Format("{0:n0}", Model.Price.NorouzOverCapacityPrice) تومان
+                                </span>
+                            </div>
+                        }
                     </div>
                 }
 

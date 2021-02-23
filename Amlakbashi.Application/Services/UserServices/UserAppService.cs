@@ -630,5 +630,9 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             mediator.Enqueue(new SendMessageCommand(userContact));
         }
+        public void SendSms(UserContactDTO userContact)
+        {
+            mediator.Enqueue(new SendSmsCommand(userContact));
+        }
     }
 }

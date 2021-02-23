@@ -207,6 +207,7 @@ namespace Amlakbashi.Host.Controllers
         //            query.ContainsKey("empty_range_to") ||
         //            query.ContainsKey("today_empty_homes") ||
         //            query.ContainsKey("discount_homes") ||
+        //            query.ContainsKey(""norouz_special") ||
         //            query.ContainsKey("frompaypernight") ||
         //            query.ContainsKey("topaypernight") ||
         //            query.ContainsKey("instant_reserve") ||
@@ -943,6 +944,7 @@ namespace Amlakbashi.Host.Controllers
             var discountHomes = discount_homes ? 1 : 0;
             var todayEmpty = today_empty_homes ? 1 : 0;
             var instantReserve = instant_reserve ? 1 : 0;
+            var norouzSpecial = norouz_special ? 1 : 0;
             var path = url + query_string;
             if (ajax)
             {
@@ -952,7 +954,7 @@ namespace Amlakbashi.Host.Controllers
                     regionId,
                     name,
                     type,
-                    norouz_special,
+                    norouz_special = norouzSpecial,
                     today_empty_homes = todayEmpty,
                     discount_homes = discountHomes,
                     countryDirection = country_direction,
