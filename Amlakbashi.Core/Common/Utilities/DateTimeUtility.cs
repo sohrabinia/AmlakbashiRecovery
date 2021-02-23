@@ -7,14 +7,14 @@ namespace Amlakbashi.Core.Common.Utilities
 {
     public static class DateTimeUtility
     {
-        private static List<string> norouz_dates = new List<string>() {
-                               "1399,12,28", "1399,12,29", "1400,1,1",
+        public static List<string> norouz_dates = new List<string>() {
+                               "1399,12,28", "1399,12,29", "1399,12,30", "1400,1,1",
                                "1400,1,2", "1400,1,3","1400,1,4",
                                "1400,1,5", "1400,1,6", "1400,1,7",
                                "1400,1,8","1400,1,9", "1400,1,10",
                                "1400,1,11", "1400,1,12", "1400,1,13"};
 
-        private static List<string> persian_holidays = new List<string>() {
+        public static List<string> persian_holidays = new List<string>() {
                                "1399,10,28", "1399,11,22",
                                "1399,12,7", "1399,12,21", "1399,12,30",
                                "1400,1,1", "1400,1,2", "1400,1,3",

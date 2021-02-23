@@ -49,6 +49,10 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
             {
                 errors.Add("MoreThanCapacityPrice", null);
             }
+            if (NorouzPrice > 0 && NorouzPrice < 30000)
+            {
+                errors.Add("NorouzPrice", string.Format(LocalizationStringData.Get("ACC_VALIDATION_PRICE_MIN"), 30000));
+            }
             var anyError = errors.Any();
             msg = anyError ? LocalizationStringData.Get("ACC_VALIDATION_PRICE") : null;
 

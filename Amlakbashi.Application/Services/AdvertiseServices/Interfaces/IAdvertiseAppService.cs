@@ -119,5 +119,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void DeleteExtrinsicReserves(long advertiseId, string from_date, string to_date);
         bool ReserveRequest(long advertiseId, int userId, string startDate,
             string endDate, int guestCount, bool instantReserve, out string msg, out long reserveId);
+        IList<Advertise> GetNorouzAdvertises(int count);
+        void SetHygieneProtocol(long id, bool value);
     }
 }
