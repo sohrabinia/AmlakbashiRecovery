@@ -12,10 +12,9 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
     {
         public IQueryable<Advertise> FilterEmptyInRange(IQueryable<Advertise> input, List<DateTime> range)
         {
-            var test = input.ToList();
             input = input.Where(w => w.OccupiedTables.Any(a =>
-                range.Contains(a.Date)) == false);
-            test = input.ToList();
+                range.Select(s => s).Contains(
+                    a.Date)) == false);
             return input;
         }
 

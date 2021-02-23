@@ -19,6 +19,8 @@ namespace Amlakbashi.Core.Entities
         public long? ExtrinsicReserveID { get; set; }
         [ForeignKey("ExtrinsicReserveID")]
         public virtual ExtrinsicReserve ExtrinsicReserve { get; set; }
+
+        [Column(TypeName = "datetime")]
         public DateTime Date { get; set; }
         public bool IsDeleted { get; set; }
     }

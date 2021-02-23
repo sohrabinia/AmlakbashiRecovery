@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Amlakbashi.Data.Migrations
 {
     [DbContext(typeof(AmlakbashiDB))]
-    [Migration("20210213084722_initializeEntities")]
-    partial class initializeEntities
+    [Migration("20210223094347_initialCore")]
+    partial class initialCore
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,36 +20,6 @@ namespace Amlakbashi.Data.Migrations
                 .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.2");
-
-            modelBuilder.Entity("AdvertiseDynamicCategory", b =>
-                {
-                    b.Property<long>("AdvertisesId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("CategoriesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AdvertisesId", "CategoriesId");
-
-                    b.HasIndex("CategoriesId");
-
-                    b.ToTable("AdvertiseDynamicCategory");
-                });
-
-            modelBuilder.Entity("AdvertiseFile", b =>
-                {
-                    b.Property<long>("AdvertisesId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PhotosId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("AdvertisesId", "PhotosId");
-
-                    b.HasIndex("PhotosId");
-
-                    b.ToTable("AdvertiseFile");
-                });
 
             modelBuilder.Entity("Amlakbashi.Core.Entities.ActionLog", b =>
                 {
@@ -199,6 +169,9 @@ namespace Amlakbashi.Data.Migrations
 
                     b.Property<int>("HolidayPrice")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("HygieneProtocol")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ImageThumbGenerateStatus")
                         .HasColumnType("int");
@@ -474,7 +447,7 @@ namespace Amlakbashi.Data.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("BankCarts");
+                    b.ToTable("BankCards");
                 });
 
             modelBuilder.Entity("Amlakbashi.Core.Entities.BlogPost", b =>
@@ -1997,8 +1970,9 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<DateTime>("SetDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("User_Id");
 
                     b.HasKey("Id");
 
@@ -2007,34 +1981,34 @@ namespace Amlakbashi.Data.Migrations
                     b.ToTable("UserFavorites");
                 });
 
-            modelBuilder.Entity("AdvertiseDynamicCategory", b =>
+            modelBuilder.Entity("DynamicCategoryAdvertises", b =>
                 {
-                    b.HasOne("Amlakbashi.Core.Entities.Advertise", null)
-                        .WithMany()
-                        .HasForeignKey("AdvertisesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<long>("Advertise_Id")
+                        .HasColumnType("bigint");
 
-                    b.HasOne("Amlakbashi.Core.Entities.DynamicCategory", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("DynamicCategory_Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("Advertise_Id", "DynamicCategory_Id");
+
+                    b.HasIndex("DynamicCategory_Id");
+
+                    b.ToTable("DynamicCategoryAdvertises");
                 });
 
-            modelBuilder.Entity("AdvertiseFile", b =>
+            modelBuilder.Entity("FileAdvertises", b =>
                 {
-                    b.HasOne("Amlakbashi.Core.Entities.Advertise", null)
-                        .WithMany()
-                        .HasForeignKey("AdvertisesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<long>("Advertise_Id")
+                        .HasColumnType("bigint");
 
-                    b.HasOne("Amlakbashi.Core.Entities.File", null)
-                        .WithMany()
-                        .HasForeignKey("PhotosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<long>("File_Id")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Advertise_Id", "File_Id");
+
+                    b.HasIndex("File_Id");
+
+                    b.ToTable("FileAdvertises");
                 });
 
             modelBuilder.Entity("Amlakbashi.Core.Entities.ActionLog", b =>
@@ -2500,9 +2474,47 @@ namespace Amlakbashi.Data.Migrations
 
             modelBuilder.Entity("Amlakbashi.Core.Entities.UserFavorite", b =>
                 {
-                    b.HasOne("Amlakbashi.Core.Entities.User", null)
+                    b.HasOne("Amlakbashi.Core.Entities.User", "User")
                         .WithMany("Favorite")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DynamicCategoryAdvertises", b =>
+                {
+                    b.HasOne("Amlakbashi.Core.Entities.Advertise", null)
+                        .WithMany()
+                        .HasForeignKey("Advertise_Id")
+                        .HasConstraintName("FK_dbo.DynamicCategoryAdvertises_dbo.Advertises_Advertise_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Amlakbashi.Core.Entities.DynamicCategory", null)
+                        .WithMany()
+                        .HasForeignKey("DynamicCategory_Id")
+                        .HasConstraintName("FK_dbo.DynamicCategoryAdvertises_dbo.DynamicCategories_DynamicCategory_Id")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FileAdvertises", b =>
+                {
+                    b.HasOne("Amlakbashi.Core.Entities.Advertise", null)
+                        .WithMany()
+                        .HasForeignKey("Advertise_Id")
+                        .HasConstraintName("FK_dbo.FileAdvertises_dbo.Advertises_Advertise_Id")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("Amlakbashi.Core.Entities.File", null)
+                        .WithMany()
+                        .HasForeignKey("File_Id")
+                        .HasConstraintName("FK_dbo.FileAdvertises_dbo.Files_File_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Amlakbashi.Core.Entities.Advertise", b =>
