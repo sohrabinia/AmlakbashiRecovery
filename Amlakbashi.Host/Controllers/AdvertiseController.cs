@@ -68,7 +68,7 @@ namespace Amlakbashi.Host.Controllers
         public ActionResult Index(int? page, int status = -1,
             int adtype = -1, int userid = -1, string sort = "score",
             long id = -1, int instantReserveStatus = -1, string minReserveNorouzFromDate = "",
-            int imageCountMin = 0, int imageCountMax = 0)
+            int imageCountMin = 0, int imageCountMax = 0, int province = -1, int city = -1, int area = -1)
         {
             try
             {
@@ -79,13 +79,6 @@ namespace Amlakbashi.Host.Controllers
                         StringUtility.PersianNumberToEnglish(minReserveNorouzFromDate).Replace('/', ','));
                     unixDate = DateTimeUtility.DateValueOfJS(gregorianDate);
                 }
-
-                var province = string.IsNullOrEmpty(Request.Form["Province"]) ? -1 :
-                    int.Parse(Request.Form["Province"]);
-                var city = string.IsNullOrEmpty(Request.Form["City"]) ? -1 :
-                    int.Parse(Request.Form["City"]);
-                var area = string.IsNullOrEmpty(Request.Form["Area"]) ? -1 :
-                    int.Parse(Request.Form["Area"]);
 
                 var model = advertiseService.Filter((AdvertiseStatus)status, adtype, userid, sort, id, instantReserveStatus,
                     unixDate, imageCountMin, imageCountMax, province, city, area);
@@ -126,7 +119,7 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Advertise.Index", exc);
-                return Redirect(Request.Headers["Referrer"].ToString());
+                return Redirect(Request.Headers["Referer"].ToString());
             }
         }
 

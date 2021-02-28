@@ -226,8 +226,11 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Auth(UserRoles.Admin)]
+        [HttpPost]
         public JsonResult SendTextSupporter(long id, string text)
         {
+            var test = Request.Headers["referer"];
+            var test2 = Request.Form;
             try
             {
                 var supportChat = supportChatService.Find(id);

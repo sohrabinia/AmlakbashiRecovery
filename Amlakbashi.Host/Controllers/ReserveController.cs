@@ -319,6 +319,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Auth(UserRoles.Admin)]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(Reserve reserve,
             string start_date = null, string end_date = null)
         {
@@ -329,7 +330,8 @@ namespace Amlakbashi.Host.Controllers
                     userAccessor.CurrentUser.Id == 1667 ||
                     userAccessor.CurrentUser.Id == 12 ||
                     userAccessor.CurrentUser.Id == 2122 ||
-                    userAccessor.CurrentUser.Id == 19076))
+                    userAccessor.CurrentUser.Id == 19076 ||
+                    userAccessor.CurrentUser.Id == 82119))
                 {
                     ViewBag.errorMsg = "شما مجوز ویرایش ندارید";
                     return View();

@@ -1,4 +1,4 @@
-﻿@inject UserAccessor userAccessor;
+﻿@inject IUserAccessor userAccessor;
 
 @{
     ViewBag.Title = "مدیریت پرداخت های رزرو";
@@ -11,7 +11,8 @@
     if (userAccessor.CurrentUser.Id == 3 ||
         userAccessor.CurrentUser.Id == 1667 ||
         userAccessor.CurrentUser.Id == 12 ||
-        userAccessor.CurrentUser.Id == 2122)
+        userAccessor.CurrentUser.Id == 2122 ||
+        userAccessor.CurrentUser.Id == 82119)
     {
         <a href="/ReservePayment/AddEdit" class="add">افزودن پرداخت</a>
     }

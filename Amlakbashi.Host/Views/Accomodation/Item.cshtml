@@ -34,7 +34,25 @@
 }
 
 @section ScriptLink {
-    <script src="/js/acc-item.min.js"></script>
+    <environment include="Development">
+        <script src="/resource/Scripts/jquery.plugin.min.js"></script>
+        <script src="/resource/slick/slick.js"></script>
+        <script src="/resource/jquery-sticky-kit/jquery-sticky-kit.js"></script>
+        <script src="/resource/lightbox/lightbox.js"></script>
+        <script src="/resource/scripts/general/search-by-region.js"></script>
+        <script src="/resource/scripts/general/master-search.js"></script>
+        <script src="/resource/Scripts/general/jalali-date-converter.js"></script>
+        <script src="/resource/Scripts/general/jalali-date-handler.js"></script>
+        <script src="/resource/Scripts/general/jalali-date-picker.js"></script>
+        <script src="/resource/scripts/general/rating-detail.js"></script>
+        <script src="/resource/scripts/general/price-string-generator.js"></script>
+        <script src="/resource/scripts/page/accommodation-item-page.js"></script>
+        <script src="/resource/scripts/general/detail-button.js"></script>
+        <script src="/resource/scripts/general/increase-decrease-button.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/acc-item.min.js"></script>
+    </environment>
 }
 @section StyleLink {
     <link rel="stylesheet" href="/css/acc-item.min.css" />
@@ -176,7 +194,6 @@
                                      @*src="/file/resourceimagepng?file_name=lazy-16_9"*@
                                      @(i == 0 ? "" : "data-lazy=/file/resourceimagepng?file_name=lazy-16_9")
                                      @*@(i == 0 ? "src=/file/resourceimagepng?file_name=lazy-16_9" : "")*@
-                                     
                                      data-src="@img_small" @(i > 0 ? "data-" : "") alt="@(Model.TitleDesc.Title)-@(i+1)" @(i > 0 ? "data-" : "") title="@(Model.TitleDesc.Title)-@(i+1)"
                                      class="advertise-page__slider-image lazy" style="@(i > 0 ? "display:none;" : "")">
                             </a>
@@ -497,7 +514,7 @@
     var maxReserveStartDate;
     jalaliShowLoading();
     $.ajax({
-    type: "GET",
+        type: "GET",
         url: "/accomodation/getaccommodationdynamicviewBag",
         contentType: "application/json; charset=utf-8",
         data: "id=" + advertise_id,

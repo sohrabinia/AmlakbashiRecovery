@@ -681,41 +681,9 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [HttpGet]
-        public ActionResult FrequentlyQuestions(bool amp_version = false)
-        {
-            try
-            {
-                if (HttpContext.Request.Path.Value.ToLower() == "/post/frequentlyquestions")
-                {
-                    return RedirectPermanent("/سوالات-متداول");
-                }
-                ViewBag.amp_version = amp_version;
-                return View();
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Post.FrequentlyQuestions", exc);
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
-        }
-
-        [HttpGet]
-        public ActionResult Contact()
-        {
-            try
-            {
-                return View();
-            }
-            catch (Exception exc)
-            {
-                logger.Error("", exc);
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
-        }
-
         [Auth]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult ProfileManager(UserDTO user)
         {
             try
@@ -759,7 +727,10 @@ namespace Amlakbashi.Host.Controllers
                 var done = userService.Update(user, userAccessor.CurrentUser.Id, hasRefundInProgress, ActionLog.ActionSourceEnum.WebsiteDashboard, out errors);
                 if (done)
                 {
-                    HttpContext.Session.SetObjectAsJson("impersonateUser", userService.Find(user.id));
+                    if (HttpContext.Session.GetObjectFromJson<User>("impersonateUser") != null)
+                    {
+                        HttpContext.Session.SetObjectAsJson("impersonateUser", userService.Find(user.id));
+                    }
                     msg = "ویرایش پروفایل شما با موفقیت انجام شد";
                     TempData["suc"] = msg;
                 }
@@ -774,6 +745,39 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Post.ProfileManager", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [HttpGet]
+        public ActionResult FrequentlyQuestions(bool amp_version = false)
+        {
+            try
+            {
+                if (HttpContext.Request.Path.Value.ToLower() == "/post/frequentlyquestions")
+                {
+                    return RedirectPermanent("/سوالات-متداول");
+                }
+                ViewBag.amp_version = amp_version;
+                return View();
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Post.FrequentlyQuestions", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [HttpGet]
+        public ActionResult Contact()
+        {
+            try
+            {
+                return View();
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
                 return Redirect(Request.Headers["Referer"].ToString());
             }
         }

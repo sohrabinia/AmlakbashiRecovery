@@ -587,8 +587,7 @@ function sendSupportChatMessage(id, text, questionNumber) {
             if (ret.status == 1) {
                 debugger;
                 $('#js-support-chat-id').val(ret.id);
-                hub.server.reloadSupportChat(ret.id, 0,
-                    current_user_id);
+                portalHubConnection.invoke('reloadSupportChat', ret.id, 0, current_user_id);
                 $(".support-chat__text-input").focus();
                 $(".support-chat__chat-box").stop().animate({ scrollTop: $(".support-chat__chat-box")[0].scrollHeight }, 1000);
             }

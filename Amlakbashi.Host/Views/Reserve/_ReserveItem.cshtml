@@ -3,7 +3,7 @@
 @{
     string adv_link = string.Format("/{0}/{1}", "اجاره-روزانه", Model.advertiseSlug);
     var img_src = Model.advertisePhotoId > 0 ? string.Format("/عکس-آگهی/{0}", Model.advertiseSlug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
-    
+
     var panedingList = new List<int>()
 {
         (int)Reserve.ReserveStatus.WaitForResponse,
@@ -124,7 +124,7 @@
             <div onclick="confirmCashPay(@(Model.reserveId),false)" class="reserve-dashboard__item-container-button bottun_bill_reserve">
                 @*<i class="fa fa-ban"></i>*@
                 مبلغ را به صورت نقدی دریافت نکردم
-            </div>
+            </div> 
         }
         else if (Model.status == Reserve.ReserveStatus.CancelRequestByHost)
         {
@@ -141,7 +141,7 @@
             case Reserve.ReserveStatus.CancelRequestByHost:
                 if (Model.paidAmount > 0)
                 {
-                    <div onclick="contactUser(@(Model.guestUserId),null,'',@Model.reserveId,@Model.isGuest)" class="reserve-dashboard__item-container-button reserve_dashboard__contactUser">
+                    <div onclick="contactUser(@(Model.guestUserId), null, '',@Model.reserveId, @(Model.isGuest ? Json.Serialize(true) : Json.Serialize(false)))" class="reserve-dashboard__item-container-button reserve_dashboard__contactUser">
                         @*<i class="fa fa-phone"></i>*@
                         تماس با مهمان
                     </div>
@@ -284,7 +284,7 @@
                 //case Reserve.ReserveStatus.WaitForReserve:
                 if (Model.paidAmount > 0)
                 {
-                    <div onclick="contactUser(@(Model.hostlerUserId),null,'@(Model.status == Reserve.ReserveStatus.WaitForReserve ? "مبلغ بیعانه را حتما به حساب سایت واریز کنید در غیر اینصورت هیچگونه مسئولیتی شامل حال املاک باشی نمیگردد" : "")',@Model.reserveId,@Model.isGuest)" class="reserve-dashboard__item-container-button @((Model.status == Reserve.ReserveStatus.Started) ? "call_contant" : "contentCall")">
+                    <div onclick="contactUser(@(Model.hostlerUserId),null,'@(Model.status == Reserve.ReserveStatus.WaitForReserve ? "مبلغ بیعانه را حتما به حساب سایت واریز کنید در غیر اینصورت هیچگونه مسئولیتی شامل حال املاک باشی نمیگردد" : "")', @Model.reserveId, @(Model.isGuest ? Json.Serialize(true) : Json.Serialize(false)))" class="reserve-dashboard__item-container-button @((Model.status == Reserve.ReserveStatus.Started) ? "call_contant" : "contentCall")">
                         @*<i class="fa fa-phone"></i>*@
                         تماس با میزبان
                     </div>

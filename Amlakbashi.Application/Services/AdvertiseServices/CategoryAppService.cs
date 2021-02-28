@@ -631,7 +631,7 @@ namespace Amlakbashi.Application.Services.Category
             data.ShowDescription = editedCategory.ShowDescription;
             data.CustomUrlTitle = editedCategory.CustomUrlTitle;
             data.RelatedCategoryIds = editedCategory.RelatedCategoryIds;
-            Repository.Update(editedCategory);
+            Repository.Update(data);
             Repository.Save();
         }
 
