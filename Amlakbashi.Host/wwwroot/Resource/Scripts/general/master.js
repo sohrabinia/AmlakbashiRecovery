@@ -572,16 +572,14 @@ function sendSupportChatMessage(id, text, questionNumber) {
     }
     is_sending_chat = true;
     $(".support-chat__text-input").val("");
-
     $.ajax({
         type: "POST",
         url: "/supportchat/sendtextuser",
-        data: "{user_id:" + current_user_id + ",id:" + id +
-            ",text:'" + text + "'" +
-            (typeof questionNumber === 'undefined' ? "" : ",questionnumber:" + questionNumber) +
-            "}",
-        contentType: "application/json",
-        dataType: "json",
+        data: {
+            user_id: current_user_id,
+            id: id,
+            text: text,
+        },
         success: function (ret) {
             is_sending_chat = false;
             if (ret.status == 1) {
