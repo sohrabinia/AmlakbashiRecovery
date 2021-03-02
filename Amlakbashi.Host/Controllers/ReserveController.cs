@@ -442,9 +442,9 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.countDict = countDict;
                 ViewBag.msg = msg;
                 var payment_reserve_id = TempData.GetObjectFromJson<long>("payment_reserve_id");
-                if (payment_reserve_id != null)
+                if (payment_reserve_id > 0)
                 {
-                    ViewBag.paymentReserve = reserveService.Find(long.Parse(payment_reserve_id.ToString()));
+                    ViewBag.paymentReserve = reserveService.Find(payment_reserve_id);
                 }
                 return View(model);
             }
