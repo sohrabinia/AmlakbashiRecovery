@@ -143,7 +143,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                 if (request.status == ReserveStatus.Started ||
                     request.status == ReserveStatus.Completed)
                 {
-                    if (accounting.IsReservePaidCompletely(request.reserveId) == false)
+                    if (request.force == false && accounting.IsReservePaidCompletely(request.reserveId) == false)
                     {
                         return Task.FromResult(Unit.Value);
                     }

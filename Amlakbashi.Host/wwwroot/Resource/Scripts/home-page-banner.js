@@ -77,12 +77,16 @@
     }
 }
 
-var slider = new Slider('.home-page__banner-container', {
+var slider = new Slider('.home-page__banner-discount', {
     nextElement: '.next',
     prevElement: '.prev',
     timer: 5000
 })
-
+var norozSlider = new Slider('.home-page_noroz-slider', {
+    nextElement: '.next',
+    prevElement: '.prev',
+    timer: 5000
+})
 
 //carousel 
 
@@ -100,8 +104,11 @@ class Carousel {
         this.slidesPerViewXl = config.slidesPerViewXl ? config.slidesPerViewXl : this.slidesPerView;
         this.slidesPerViewLg = config.slidesPerViewLg ? config.slidesPerViewLg : this.slidesPerView;
         this.slidesPerViewMd = config.slidesPerViewMd ? config.slidesPerViewMd : this.slidesPerView;
+        this.slidesPerViewM = config.slidesPerViewM ? config.slidesPerViewM : this.slidesPerView;
         this.slidesPerViewSm = config.slidesPerViewSm ? config.slidesPerViewSm : this.slidesPerView;
+        this.slidesPerViewXSm = config.slidesPerViewXSm ? config.slidesPerViewXSm : this.slidesPerView;
         this.slidesPerViewXs = config.slidesPerViewXs ? config.slidesPerViewXs : this.slidesPerView;
+        this.slidesPerViewXXs = config.slidesPerViewXXs ? config.slidesPerViewXXs : this.slidesPerView;
         this.slidesPerView = null;
         this.widthSlides = null;
         this.isDown = false;
@@ -110,24 +117,29 @@ class Carousel {
         this.initSlider();
     }
     initSlider() {
-        debugger;
         this.slides.addClass('slide-item');
         this.activeSlide.addClass(this.activeClass);
         this.calculetslidesPerView();
         this.setupEventListeners();
     }
     calculetslidesPerView() {
-        var widthShowItems = this.slider.parent().width();
+        var widthShowItems = $('body').width();
         if (widthShowItems >= 1200) {
             this.slidesPerView = this.slidesPerViewXl;
-        } else if (widthShowItems >= 992) {
+        } else if (widthShowItems >= 970) {
             this.slidesPerView = this.slidesPerViewLg;
         } else if (widthShowItems >= 768) {
             this.slidesPerView = this.slidesPerViewMd;
-        } else if (widthShowItems >= 450) {
+        } else if (widthShowItems >= 680) {
+            this.slidesPerView = this.slidesPerViewM;   
+        } else if (widthShowItems >= 560) {
             this.slidesPerView = this.slidesPerViewSm;
-        } else if (widthShowItems >= 360) {
-            this.slidesPerView = this.slidesPerViewXs;
+        }else if (widthShowItems >= 450) {
+            this.slidesPerView = this.slidesPerViewXSm;     
+        } else if (widthShowItems >= 380 ) {
+            this.slidesPerView = this.slidesPerViewXs;     
+        } else if (widthShowItems >= 320 ) {
+            this.slidesPerView = this.slidesPerViewXXs;
         }
         this.widthSlides = widthShowItems / this.slidesPerView;
         this.slides.css('min-width', this.widthSlides);
@@ -218,17 +230,18 @@ class Carousel {
     }
 
     calculetCurrentItem() {
+        debugger;
         var lastOffsetLeft = this.slides.last().offset().left;
         var firstOfffsetLeft = this.slides.first().offset().left;
         if (lastOffsetLeft >= 0 - this.widthSlides / 2) {
-            this.nextElement.css("display", "none");
-            this.prevElement.css("display", "flex");
+            this.nextElement.css("color", "#d9d9d9");
+            this.prevElement.css("color", "#242424");
         } else if (firstOfffsetLeft <= this.startOffSetLeft) {
-            this.nextElement.css("display", "flex");
-            this.prevElement.css("display", "none");
+            this.nextElement.css("color", "#242424");
+            this.prevElement.css("color", "#d9d9d9");
         } else {
-            this.prevElement.css("display", "flex");
-            this.nextElement.css("display", "flex");
+            this.prevElement.css("color", "#242424");
+            this.nextElement.css("color", "#242424");
         }
     }
 }
@@ -239,9 +252,12 @@ var carouselMedium = new Carousel('.home-page_amlakbashi-medium', {
     prevElement: '.home-page-medium-box .btnNext',
     slidesPerViewXl: '6',
     slidesPerViewLg: '5',
-    slidesPerViewMd: '4',
-    slidesPerViewSm: '3',
-    slidesPerViewXs: '2',
+    slidesPerViewMd: '4.5',
+    slidesPerViewM: '3.8',
+    slidesPerViewSm: '3.5',
+    slidesPerViewXSm: '3',
+    slidesPerViewXs: '3',
+    slidesPerViewXXs: '2.5',
 })
 
 var carouselVisited = new Carousel('.home-page_box-visited', {
@@ -249,8 +265,11 @@ var carouselVisited = new Carousel('.home-page_box-visited', {
     nextElement: '.home-page-visited-box .btnPrevious',
     prevElement: '.home-page-visited-box .btnNext',
     slidesPerViewXl: '5',
-    slidesPerViewLg: '4.5',
-    slidesPerViewMd: '3.5',
-    slidesPerViewSm: '2.5',
-    slidesPerViewXs: '1.5',
+    slidesPerViewLg: '4.3',
+    slidesPerViewMd: '3.3',
+    slidesPerViewM: '3.5',
+    slidesPerViewSm: '3.2',
+    slidesPerViewXSm: '2.5',
+    slidesPerViewXs: '2.2',
+    slidesPerViewXXs: '1.8',
 })

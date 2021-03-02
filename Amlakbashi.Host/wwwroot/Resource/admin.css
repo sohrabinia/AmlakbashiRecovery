@@ -703,18 +703,21 @@ textarea{
     color: #fff;
 }
 
-.dz-preview .dz-edit{
+.dz-preview .dz-edit {
     background-color: rgba(0, 0, 0, 0.7);
     position: absolute;
     top: 3px;
     left: 3px;
     border-radius: 3px;
     cursor: pointer;
-    display:inline-block ;
-    font:11px Liransans;
-    color:#fff ;
-    padding:5px 10px;
-    text-decoration:none ;
+    display: flex;
+    font: 10px Liransans;
+    width: 32px;
+    justify-content: center;
+    color: #fff;
+    align-items: center;
+    padding: 4px 10px;
+    text-decoration: none;
 }
 
 .dz-preview .dz-upload {

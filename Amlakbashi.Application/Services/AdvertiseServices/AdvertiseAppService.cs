@@ -2041,14 +2041,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var acc = Repository.Find(advertiseId);
             var fromGregorian = DateTimeUtility.PersianDateToGregorian(from_date);
             var toGregorian = DateTimeUtility.PersianDateToGregorian(to_date);
-            var idsToDelete = acc.ExtrinsicReserves.Where(
-                w => w.StartDate >= fromGregorian && w.StartDate <= toGregorian)
-                .Select(s => s.Id).ToList();
+            //var idsToDelete = acc.ExtrinsicReserves.Where(
+            //    w => w.StartDate >= fromGregorian && w.StartDate <= toGregorian)
+            //    .Select(s => s.Id).ToList();
 
             Repository.RemoveChildren<ExtrinsicReserve, long,
                 IQueryable<ExtrinsicReserve>>(advertiseId, "ExtrinsicReserves",
                 q => q.Where(w => w.StartDate >= fromGregorian &&
-                w.StartDate <= toGregorian).AsQueryable());
+                w.StartDate < toGregorian).AsQueryable());
             Repository.Save();
             mediator.Send(new UpdateAdvertiseOccupiedCommand(advertiseId));
         }
@@ -2167,7 +2167,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
         public IList<Advertise> GetNorouzAdvertises(int count)
         {
-            var advertises = Repository.Query(q => q.Where(w => w.Available &&
+            var advertises = Repository.Query(q => q.Where(w =>
+                w.NorouzPrice > 0 && w.Available &&
                 w.Status == Advertise.AdvertiseStatus.Published &&
                 w.HideInCategory == false && w.Count < 1));
             return advertises.OrderByDescending(o => o.AdvertiseScore).Take(count).ToList();

@@ -1034,6 +1034,16 @@ input[type=number] {
     }
 }
 
+@media (max-width:550px) {
+    .advertise-filter__inpage-filter {
+        flex-flow: column wrap;
+    }
+
+    .advertise-filter__extra-filter-container {
+        margin: 10px auto;
+    }
+}
+
 @media (max-width: 420px) {
     .advertise-list__pin-filter-item { 
         width:82px;
