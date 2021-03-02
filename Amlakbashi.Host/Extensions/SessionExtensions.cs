@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json;
 
 namespace Amlakbashi.Host.Extensions
@@ -25,6 +26,17 @@ namespace Amlakbashi.Host.Extensions
         {
             var value = session.GetInt32(key);
             return value != null && value == 1; 
+        }
+
+        public static void SetObjectAsJson(this ITempDataDictionary tempData, string key, object value)
+        {
+            tempData[key] = JsonConvert.SerializeObject(value);
+        }
+
+        public static T GetObjectFromJson<T>(this ITempDataDictionary tempData, string key)
+        {
+            var value = tempData[key];
+            return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value as string);
         }
     }
 }

@@ -2,6 +2,7 @@
 @inject IUserAccessor userAccessor;
 
 @model IEnumerable<Amlakbashi.Core.DTOs.ReserveDTOs.ReserveDashboardItemDTO>
+
 @{
     ViewBag.Title = "رزرو ها";
     Layout = "~/Views/Shared/_Dashboard.cshtml";
@@ -16,9 +17,8 @@
     var is_host = Model.Any() == false ? false : Model.FirstOrDefault().isHostler;
     var is_guest = !is_host;
     var categories = Enum.GetValues(typeof(Reserve.ReserveCategory)) as Reserve.ReserveCategory[];
-}
-@{
-    var payment_reserve_id = TempData["payment_reserve_id"];
+    var paymentTransactionId = TempData.GetObjectFromJson<long>("payment_transaction_id");
+    var payment_reserve_id = TempData.GetObjectFromJson<long>("payment_reserve_id");
     Reserve reserve = null;
     Advertise advertise = null;
     if (ViewBag.paymentReserve != null)
@@ -27,6 +27,7 @@
         advertise = reserve.Advertise;
     }
 }
+
 @section StyleLink
 {
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/cart.css">
@@ -39,6 +40,7 @@
     <!--Reference the SignalR library. -->
     <script src="/js/signalr/dist/browser/signalr.min.js"></script>
 }
+
 @using (Html.BeginForm("ReserveItemManager", "Reserve", FormMethod.Get))
 {
     <input type="hidden" name="user_id" value="@ViewBag.user_id" />
@@ -449,7 +451,7 @@
                 typeAnimated: true,
                 buttons: {
                     پرداخت: function () {
-                        var pay_type = this.$content.find('.pay_type_select:radio:checked').val();
+                        var pay_type = this.$content.find('.pay_typepaymentTransactionIdselect:radio:checked').val();
                         var user_id = @(userAccessor.CurrentUser.Id);
                         payWithCredit(pay_type, reserve_id, total_price, deposite_price, user_id, 0);
                     },
@@ -833,7 +835,7 @@
 
            var payment_success_msg = '@TempData["payment_success_msg"]';
         var payment_error_msg = '@TempData["payment_error_msg"]';
-        var payment_transaction_id = '@TempData["payment_transaction_id"]';
+        var payment_transaction_id = '@paymentTransactionId';
         if (payment_transaction_id != '') {
             var registered = @(reserve != null ? (reserve.PaymentGTAGRegistered ? "true" : "false") : "false");
             if (!registered)

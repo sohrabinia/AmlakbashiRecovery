@@ -25,6 +25,7 @@ using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
+using Amlakbashi.Host.Extensions;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -440,7 +441,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.selectType = selectType;
                 ViewBag.countDict = countDict;
                 ViewBag.msg = msg;
-                var payment_reserve_id = TempData["payment_reserve_id"];
+                var payment_reserve_id = TempData.GetObjectFromJson<long>("payment_reserve_id");
                 if (payment_reserve_id != null)
                 {
                     ViewBag.paymentReserve = reserveService.Find(long.Parse(payment_reserve_id.ToString()));
@@ -939,8 +940,8 @@ namespace Amlakbashi.Host.Controllers
                     case GuestPayResult.Paid:
                         var msg = " پرداخت شما با موفقیت انجام شد . شماره تراکنش پرداخت شما " + payment_id + "می باشد .";
                         TempData["payment_success_msg"] = msg;
-                        TempData["payment_transaction_id"] = payment_id;
-                        TempData["payment_reserve_id"] = reserve_id;
+                        TempData.SetObjectAsJson("payment_transaction_id", payment_id);
+                        TempData.SetObjectAsJson("payment_reserve_id", reserve_id);
                         return Redirect("/reserve/reserveitemmanager?category=2&selecttype=1");
                     default:
                         return Redirect(Request.Headers["referer"].ToString());

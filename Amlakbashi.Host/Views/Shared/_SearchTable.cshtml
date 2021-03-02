@@ -12,7 +12,7 @@
             var link = item.link;
             <div onclick="selectSearchRegion(this)" data-title="@item.title" data-href="@link" style="color:#242424">
                 <div>
-                    <span><i class="fa fa-map-marker-alt"></i>@item.title @(item.countAdvertise > 0 ? "(" + item.countAdvertise +")" : "")@(!string.IsNullOrEmpty(item.cityString)? " - " + item.cityString : "" )</span>
+                    <span><i class="fa fa-map-marker-alt"></i>@item.title @(item.countAdvertise > 0 ? "(" + item.countAdvertise + ")" : "")@(!string.IsNullOrEmpty(item.cityString)? " - " + item.cityString : "" )</span>
                 </div>
             </div>
         }

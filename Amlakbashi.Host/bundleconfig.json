@@ -212,7 +212,7 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/css/search.min.js",
+    "outputFileName": "wwwroot/js/search.min.js",
     "inputFiles": [
       "wwwroot/resource/scripts/general/jalali-date-converter.js",
       "wwwroot/resource/scripts/general/jalali-date-handler.js",

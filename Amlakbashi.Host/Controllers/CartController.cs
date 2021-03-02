@@ -276,7 +276,7 @@ namespace Amlakbashi.Host.Controllers
                 string jsonText = JsonConvert.SerializeXNode(doc);
                 dynamic resp = ((dynamic)JsonConvert.DeserializeObject<ExpandoObject>(jsonText)).resultObj;
                 TempData["payment_transaction_id"] = (string)resp.referenceNumber;
-                TempData["payment_reserve_id"] = accounting.FindPayment(pid).ReserveID;
+                TempData.SetObjectAsJson("payment_reserve_id", accounting.FindPayment(pid).ReserveID);
             }
             return Redirect(string.Format("/{0}/{1}", redirect_controller, redirect_action));
         }

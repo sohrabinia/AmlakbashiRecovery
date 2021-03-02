@@ -274,6 +274,11 @@ namespace Amlakbashi.Application.Services.Category
             //filter by norouz special
             if (norouz_special != null && norouz_special == "1")
             {
+                if (!Childrenincluded)
+                {
+                    advertises = advertises.Include(i => i.Childs);
+                    Childrenincluded = true;
+                }
                 advertises = advertises.Where(a => a.NorouzPrice > 0 ||
                     (a.Childs.Any() && a.Childs.All(x => x.NorouzPrice > 0)));
             }
@@ -384,10 +389,11 @@ namespace Amlakbashi.Application.Services.Category
                     }
                 }
             }
-            //else if (!string.IsNullOrEmpty(norouz_special) && norouz_special == "1")
-            //{
-            //    model_output = tmpResult.OrderBy(x => x.unixNorouzMinRequestDate > todayUnix ? 1 : 0);
-            //}
+            else if (!string.IsNullOrEmpty(norouz_special) && norouz_special == "1")
+            {
+                var todayUnix = DateTimeUtility.DateValueOfJS(DateTime.Now.Date);
+                model_output = advertises.OrderBy(x => x.unixNorouzMinRequestDate > todayUnix ? 1 : 0);
+            }
             else
             {
                 if (priorType > 0)
@@ -631,7 +637,7 @@ namespace Amlakbashi.Application.Services.Category
             data.ShowDescription = editedCategory.ShowDescription;
             data.CustomUrlTitle = editedCategory.CustomUrlTitle;
             data.RelatedCategoryIds = editedCategory.RelatedCategoryIds;
-            Repository.Update(data);
+            Repository.Update(editedCategory);
             Repository.Save();
         }
 
