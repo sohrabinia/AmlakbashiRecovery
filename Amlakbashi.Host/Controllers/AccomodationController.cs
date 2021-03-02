@@ -1407,7 +1407,7 @@ namespace Amlakbashi.Host.Controllers
                     acc = advertiseService.Find(acc.Id, true);
                     occupiedList = acc.OccupiedDates().Select(s =>
                         DateTimeUtility.DateValueOfJS(s)).ToList();
-                    return GenerateJsonResult(new { status = 0, msg = "محدوده انتخاب شده به عنوان روز های پر ثبت شد" });
+                    return GenerateJsonResult(new { status = 1, msg = "محدوده انتخاب شده به عنوان روز های پر ثبت شد" });
                 }
                 else
                 {
@@ -2226,10 +2226,11 @@ namespace Amlakbashi.Host.Controllers
                 occupiedList = occupiedList,
                 priceDict = priceDict
             };
-            return GenerateJsonResult(new
-            {
-                Data = data
-            });
+            //return GenerateJsonResult(new
+            //{
+            //    Data = data
+            //});
+            return GenerateJsonResult(data);
         }
 
         public JsonResult GetAccListDynamicViewBag(string ids)
@@ -2598,7 +2599,7 @@ namespace Amlakbashi.Host.Controllers
                 id = StringUtility.PersianNumberToEnglish(id);
                 var idLong = long.Parse(id);
                 var acc = advertiseService.Find(idLong);
-                if (acc.Status != AdvertiseStatus.Published ||
+                if (acc == null || acc.Status != AdvertiseStatus.Published ||
                     acc.Count > 0 || !acc.Available)
                 {
                     return GenerateJsonResult(new

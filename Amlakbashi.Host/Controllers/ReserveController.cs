@@ -25,6 +25,7 @@ using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
+using Amlakbashi.Host.Extensions;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -319,6 +320,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Auth(UserRoles.Admin)]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(Reserve reserve,
             string start_date = null, string end_date = null)
         {
@@ -329,7 +331,8 @@ namespace Amlakbashi.Host.Controllers
                     userAccessor.CurrentUser.Id == 1667 ||
                     userAccessor.CurrentUser.Id == 12 ||
                     userAccessor.CurrentUser.Id == 2122 ||
-                    userAccessor.CurrentUser.Id == 19076))
+                    userAccessor.CurrentUser.Id == 19076 ||
+                    userAccessor.CurrentUser.Id == 82119))
                 {
                     ViewBag.errorMsg = "شما مجوز ویرایش ندارید";
                     return View();
@@ -438,7 +441,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.selectType = selectType;
                 ViewBag.countDict = countDict;
                 ViewBag.msg = msg;
-                var payment_reserve_id = TempData["payment_reserve_id"];
+                var payment_reserve_id = TempData.GetObjectFromJson<long>("payment_reserve_id");
                 if (payment_reserve_id != null)
                 {
                     ViewBag.paymentReserve = reserveService.Find(long.Parse(payment_reserve_id.ToString()));
@@ -937,8 +940,8 @@ namespace Amlakbashi.Host.Controllers
                     case GuestPayResult.Paid:
                         var msg = " پرداخت شما با موفقیت انجام شد . شماره تراکنش پرداخت شما " + payment_id + "می باشد .";
                         TempData["payment_success_msg"] = msg;
-                        TempData["payment_transaction_id"] = payment_id;
-                        TempData["payment_reserve_id"] = reserve_id;
+                        TempData.SetObjectAsJson("payment_transaction_id", payment_id);
+                        TempData.SetObjectAsJson("payment_reserve_id", reserve_id);
                         return Redirect("/reserve/reserveitemmanager?category=2&selecttype=1");
                     default:
                         return Redirect(Request.Headers["referer"].ToString());

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Amlakbashi.Data.Migrations
 {
-    public partial class initializeEntities : Migration
+    public partial class initialCore : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -451,7 +451,8 @@ namespace Amlakbashi.Data.Migrations
             //        NorouzOverCapacityPrice = table.Column<int>(type: "int", nullable: false),
             //        ImageThumbGenerateStatus = table.Column<int>(type: "int", nullable: false),
             //        Latitude = table.Column<double>(type: "float", nullable: false),
-            //        Longitude = table.Column<double>(type: "float", nullable: false)
+            //        Longitude = table.Column<double>(type: "float", nullable: false),
+            //        HygieneProtocol = table.Column<bool>(type: "bit", nullable: true)
             //    },
             //    constraints: table =>
             //    {
@@ -495,7 +496,7 @@ namespace Amlakbashi.Data.Migrations
             //    });
 
             //migrationBuilder.CreateTable(
-            //    name: "BankCarts",
+            //    name: "BankCards",
             //    columns: table => new
             //    {
             //        BankCardID = table.Column<int>(type: "int", nullable: false)
@@ -513,9 +514,9 @@ namespace Amlakbashi.Data.Migrations
             //    },
             //    constraints: table =>
             //    {
-            //        table.PrimaryKey("PK_BankCarts", x => x.BankCardID);
+            //        table.PrimaryKey("PK_BankCards", x => x.BankCardID);
             //        table.ForeignKey(
-            //            name: "FK_BankCarts_Users_UserID",
+            //            name: "FK_BankCards_Users_UserID",
             //            column: x => x.UserID,
             //            principalTable: "Users",
             //            principalColumn: "UserID",
@@ -656,64 +657,16 @@ namespace Amlakbashi.Data.Migrations
             //            .Annotation("SqlServer:Identity", "1, 1"),
             //        AdvertiseID = table.Column<long>(type: "bigint", nullable: false),
             //        SetDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-            //        UserId = table.Column<int>(type: "int", nullable: true)
+            //        User_Id = table.Column<int>(type: "int", nullable: false)
             //    },
             //    constraints: table =>
             //    {
             //        table.PrimaryKey("PK_UserFavorites", x => x.FavoriteID);
             //        table.ForeignKey(
-            //            name: "FK_UserFavorites_Users_UserId",
-            //            column: x => x.UserId,
+            //            name: "FK_UserFavorites_Users_User_Id",
+            //            column: x => x.User_Id,
             //            principalTable: "Users",
             //            principalColumn: "UserID",
-            //            onDelete: ReferentialAction.Restrict);
-            //    });
-
-            //migrationBuilder.CreateTable(
-            //    name: "AdvertiseDynamicCategory",
-            //    columns: table => new
-            //    {
-            //        AdvertisesId = table.Column<long>(type: "bigint", nullable: false),
-            //        CategoriesId = table.Column<int>(type: "int", nullable: false)
-            //    },
-            //    constraints: table =>
-            //    {
-            //        table.PrimaryKey("PK_AdvertiseDynamicCategory", x => new { x.AdvertisesId, x.CategoriesId });
-            //        table.ForeignKey(
-            //            name: "FK_AdvertiseDynamicCategory_Advertises_AdvertisesId",
-            //            column: x => x.AdvertisesId,
-            //            principalTable: "Advertises",
-            //            principalColumn: "AdvertiseID",
-            //            onDelete: ReferentialAction.Cascade);
-            //        table.ForeignKey(
-            //            name: "FK_AdvertiseDynamicCategory_DynamicCategories_CategoriesId",
-            //            column: x => x.CategoriesId,
-            //            principalTable: "DynamicCategories",
-            //            principalColumn: "CategoryID",
-            //            onDelete: ReferentialAction.Cascade);
-            //    });
-
-            //migrationBuilder.CreateTable(
-            //    name: "AdvertiseFile",
-            //    columns: table => new
-            //    {
-            //        AdvertisesId = table.Column<long>(type: "bigint", nullable: false),
-            //        PhotosId = table.Column<long>(type: "bigint", nullable: false)
-            //    },
-            //    constraints: table =>
-            //    {
-            //        table.PrimaryKey("PK_AdvertiseFile", x => new { x.AdvertisesId, x.PhotosId });
-            //        table.ForeignKey(
-            //            name: "FK_AdvertiseFile_Advertises_AdvertisesId",
-            //            column: x => x.AdvertisesId,
-            //            principalTable: "Advertises",
-            //            principalColumn: "AdvertiseID",
-            //            onDelete: ReferentialAction.Cascade);
-            //        table.ForeignKey(
-            //            name: "FK_AdvertiseFile_Files_PhotosId",
-            //            column: x => x.PhotosId,
-            //            principalTable: "Files",
-            //            principalColumn: "FileID",
             //            onDelete: ReferentialAction.Cascade);
             //    });
 
@@ -829,6 +782,30 @@ namespace Amlakbashi.Data.Migrations
             //    });
 
             //migrationBuilder.CreateTable(
+            //    name: "DynamicCategoryAdvertises",
+            //    columns: table => new
+            //    {
+            //        Advertise_Id = table.Column<long>(type: "bigint", nullable: false),
+            //        DynamicCategory_Id = table.Column<int>(type: "int", nullable: false)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_DynamicCategoryAdvertises", x => new { x.Advertise_Id, x.DynamicCategory_Id });
+            //        table.ForeignKey(
+            //            name: "FK_dbo.DynamicCategoryAdvertises_dbo.Advertises_Advertise_Id",
+            //            column: x => x.Advertise_Id,
+            //            principalTable: "Advertises",
+            //            principalColumn: "AdvertiseID",
+            //            onDelete: ReferentialAction.Cascade);
+            //        table.ForeignKey(
+            //            name: "FK_dbo.DynamicCategoryAdvertises_dbo.DynamicCategories_DynamicCategory_Id",
+            //            column: x => x.DynamicCategory_Id,
+            //            principalTable: "DynamicCategories",
+            //            principalColumn: "CategoryID",
+            //            onDelete: ReferentialAction.Restrict);
+            //    });
+
+            //migrationBuilder.CreateTable(
             //    name: "ExtrinsicReserves",
             //    columns: table => new
             //    {
@@ -861,6 +838,30 @@ namespace Amlakbashi.Data.Migrations
             //            column: x => x.NotifierUserID,
             //            principalTable: "Users",
             //            principalColumn: "UserID",
+            //            onDelete: ReferentialAction.Cascade);
+            //    });
+
+            //migrationBuilder.CreateTable(
+            //    name: "FileAdvertises",
+            //    columns: table => new
+            //    {
+            //        Advertise_Id = table.Column<long>(type: "bigint", nullable: false),
+            //        File_Id = table.Column<long>(type: "bigint", nullable: false)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_FileAdvertises", x => new { x.Advertise_Id, x.File_Id });
+            //        table.ForeignKey(
+            //            name: "FK_dbo.FileAdvertises_dbo.Advertises_Advertise_Id",
+            //            column: x => x.Advertise_Id,
+            //            principalTable: "Advertises",
+            //            principalColumn: "AdvertiseID",
+            //            onDelete: ReferentialAction.Restrict);
+            //        table.ForeignKey(
+            //            name: "FK_dbo.FileAdvertises_dbo.Files_File_Id",
+            //            column: x => x.File_Id,
+            //            principalTable: "Files",
+            //            principalColumn: "FileID",
             //            onDelete: ReferentialAction.Cascade);
             //    });
 
@@ -1281,16 +1282,6 @@ namespace Amlakbashi.Data.Migrations
             //    column: "UserID");
 
             //migrationBuilder.CreateIndex(
-            //    name: "IX_AdvertiseDynamicCategory_CategoriesId",
-            //    table: "AdvertiseDynamicCategory",
-            //    column: "CategoriesId");
-
-            //migrationBuilder.CreateIndex(
-            //    name: "IX_AdvertiseFile_PhotosId",
-            //    table: "AdvertiseFile",
-            //    column: "PhotosId");
-
-            //migrationBuilder.CreateIndex(
             //    name: "IX_AdvertiseReports_AdvertiseID",
             //    table: "AdvertiseReports",
             //    column: "AdvertiseID");
@@ -1326,8 +1317,8 @@ namespace Amlakbashi.Data.Migrations
             //    column: "UserID");
 
             //migrationBuilder.CreateIndex(
-            //    name: "IX_BankCarts_UserID",
-            //    table: "BankCarts",
+            //    name: "IX_BankCards_UserID",
+            //    table: "BankCards",
             //    column: "UserID");
 
             //migrationBuilder.CreateIndex(
@@ -1431,6 +1422,11 @@ namespace Amlakbashi.Data.Migrations
             //    column: "Province");
 
             //migrationBuilder.CreateIndex(
+            //    name: "IX_DynamicCategoryAdvertises_DynamicCategory_Id",
+            //    table: "DynamicCategoryAdvertises",
+            //    column: "DynamicCategory_Id");
+
+            //migrationBuilder.CreateIndex(
             //    name: "IX_ExtrinsicReserves_AdvertiseID",
             //    table: "ExtrinsicReserves",
             //    column: "AdvertiseID");
@@ -1444,6 +1440,11 @@ namespace Amlakbashi.Data.Migrations
             //    name: "IX_ExtrinsicReserves_NotifierUserID",
             //    table: "ExtrinsicReserves",
             //    column: "NotifierUserID");
+
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_FileAdvertises_File_Id",
+            //    table: "FileAdvertises",
+            //    column: "File_Id");
 
             //migrationBuilder.CreateIndex(
             //    name: "IX_OccupiedTables_AdvertiseID",
@@ -1556,9 +1557,9 @@ namespace Amlakbashi.Data.Migrations
             //    column: "UserID");
 
             //migrationBuilder.CreateIndex(
-            //    name: "IX_UserFavorites_UserId",
+            //    name: "IX_UserFavorites_User_Id",
             //    table: "UserFavorites",
-            //    column: "UserId");
+            //    column: "User_Id");
 
             //migrationBuilder.CreateIndex(
             //    name: "IX_Users_PhotoID",
@@ -1572,16 +1573,10 @@ namespace Amlakbashi.Data.Migrations
             //    name: "actionLogs");
 
             //migrationBuilder.DropTable(
-            //    name: "AdvertiseDynamicCategory");
-
-            //migrationBuilder.DropTable(
-            //    name: "AdvertiseFile");
-
-            //migrationBuilder.DropTable(
             //    name: "AdvertiseReports");
 
             //migrationBuilder.DropTable(
-            //    name: "BankCarts");
+            //    name: "BankCards");
 
             //migrationBuilder.DropTable(
             //    name: "BlogPosts");
@@ -1603,6 +1598,12 @@ namespace Amlakbashi.Data.Migrations
 
             //migrationBuilder.DropTable(
             //    name: "DiscountTables");
+
+            //migrationBuilder.DropTable(
+            //    name: "DynamicCategoryAdvertises");
+
+            //migrationBuilder.DropTable(
+            //    name: "FileAdvertises");
 
             //migrationBuilder.DropTable(
             //    name: "GroupPayments");
@@ -1653,10 +1654,10 @@ namespace Amlakbashi.Data.Migrations
             //    name: "UserFavorites");
 
             //migrationBuilder.DropTable(
-            //    name: "DynamicCategories");
+            //    name: "Payments");
 
             //migrationBuilder.DropTable(
-            //    name: "Payments");
+            //    name: "DynamicCategories");
 
             //migrationBuilder.DropTable(
             //    name: "ExtrinsicReserves");

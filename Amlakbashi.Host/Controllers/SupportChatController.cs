@@ -152,6 +152,7 @@ namespace Amlakbashi.Host.Controllers
             return View(dtoList);
         }
 
+        [HttpPost]
         public JsonResult SendTextUser(int user_id, long id, string text, int questionNumber = -1)
         {
             try
@@ -226,8 +227,11 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Auth(UserRoles.Admin)]
+        [HttpPost]
         public JsonResult SendTextSupporter(long id, string text)
         {
+            var test = Request.Headers["referer"];
+            var test2 = Request.Form;
             try
             {
                 var supportChat = supportChatService.Find(id);

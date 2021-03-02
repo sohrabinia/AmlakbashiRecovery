@@ -17,7 +17,7 @@
         <div class="profile__suc">@ViewBag.suc</div>
     }
 
-    @using (Html.BeginForm("ProfileManager", "Post", FormMethod.Post, new { enctype = "multipart/form-data", id = "ManageForm" }))
+    @using (Html.BeginForm("profilemanager", "post", FormMethod.Post, new { enctype = "multipart/form-data", id = "ManageForm" }))
     {
         <input type="hidden" name="id" value="@Model.id" />
         <input type="hidden" name="mainMobile" value="@Model.mainMobile" />

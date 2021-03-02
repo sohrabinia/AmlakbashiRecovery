@@ -139,7 +139,7 @@
       "wwwroot/resource/scripts/page/home-page.js",
       "wwwroot/resource/scripts/general/home-page-search.js",
       "wwwroot/resource/scripts/general/search-by-region.js",
-      "wwwroot/resource/scripts/general/increase-decrease-button.j",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
       "wwwroot/resource/scripts/general/slider-scroll.js"
     ]
   },
@@ -152,11 +152,11 @@
       "wwwroot/resource/lightbox/lightbox.js",
       "wwwroot/resource/scripts/general/search-by-region.js",
       "wwwroot/resource/scripts/general/master-search.js",
-      "wwwroot/resource/Scripts/general/jalali-date-converter.j",
+      "wwwroot/resource/Scripts/general/jalali-date-converter.js",
       "wwwroot/resource/Scripts/general/jalali-date-handler.js",
       "wwwroot/resource/Scripts/general/jalali-date-picker.js",
       "wwwroot/resource/scripts/general/rating-detail.js",
-      "wwwroot/resource/scripts/general/price-string-generator.j",
+      "wwwroot/resource/scripts/general/price-string-generator.js",
       "wwwroot/resource/scripts/page/accommodation-item-page.js",
       "wwwroot/resource/scripts/general/detail-button.js",
       "wwwroot/resource/scripts/general/increase-decrease-button.js"
@@ -184,7 +184,7 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/js/master-defer.js",
+    "outputFileName": "wwwroot/js/master-defer.min.js",
     "inputFiles": [
       "wwwroot/resource/scripts/general/message-popup.js",
       "wwwroot/resource/alertify.js-0.3.11/src/alertify.js",
@@ -203,7 +203,7 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/js/master.js",
+    "outputFileName": "wwwroot/js/master.min.js",
     "inputFiles": [
       "wwwroot/resource/scripts/jquery-2.1.1.min.js",
       "wwwroot/resource/scripts/firebase-5.9.4/firebase-app.js",
@@ -212,7 +212,7 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/css/search.min.js",
+    "outputFileName": "wwwroot/js/search.min.js",
     "inputFiles": [
       "wwwroot/resource/scripts/general/jalali-date-converter.js",
       "wwwroot/resource/scripts/general/jalali-date-handler.js",

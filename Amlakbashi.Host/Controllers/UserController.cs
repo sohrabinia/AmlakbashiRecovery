@@ -1034,20 +1034,19 @@ namespace Amlakbashi.Host.Controllers
 
         public ActionResult Signout()
         {
-            HttpContext.Session.SetString("mobile", null);
+            // TODO: check this
+            //HttpContext.Session.SetString("mobile", null);
             //FormsAuthentication.SignOut();
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
             HttpContext.Session.Clear();
             return Redirect("/");
         }
 
         public ActionResult LogOff()
         {
-            HttpContext.Session.SetString("mobile", null);
+            //HttpContext.Session.SetString("mobile", null);
             //FormsAuthentication.SignOut();
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
             HttpContext.Session.Clear();
             return Redirect("/");
         }
@@ -1340,10 +1339,9 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                HttpContext.Session.SetString("mobile", null);
+                //HttpContext.Session.SetString("mobile", null);
                 //FormsAuthentication.SignOut();
                 HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
                 HttpContext.Session.Clear();
                 return GenerateJsonResult(new { status = 1 });
             }

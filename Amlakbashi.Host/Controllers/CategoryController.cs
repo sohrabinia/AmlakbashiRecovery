@@ -223,6 +223,7 @@ namespace Amlakbashi.Host.Controllers
         //    }
         //}
 
+        // TODO: uncomment this
         //[LiveOutputCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
         public ActionResult Item(int regionType,
             int regionId = 0, string name = "",
@@ -243,14 +244,16 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
+                var rawUrl = HttpContext.Request.Path.Value;
+                rawUrl = string.IsNullOrEmpty(HttpContext.Request.QueryString.Value) ?
+                    rawUrl : rawUrl + "?" + HttpContext.Request.QueryString.Value;
                 if (ajax == false)
                 {
-                    var rawUrl = HttpContext.Request.Path.Value;
                     if (rawUrl.Last() == '/')
                     {
                         return RedirectPermanent(rawUrl.Remove(rawUrl.Length - 1));
                     }
-                    if (page == 1 && HttpContext.Request.Path.Value.Contains("?page=1"))
+                    if (page == 1 && HttpContext.Request.QueryString.Value.Contains("?page=1"))
                     {
                         return RedirectPermanent(HtmlUtility.RemoveFromQueryString(rawUrl, "page", "1"));
                     }
@@ -393,8 +396,8 @@ namespace Amlakbashi.Host.Controllers
                     foosball == 1, teaMaker == 1, rules_pets == 1, rules_party == 1, rules_smoking == 1,
                     parking == 1, sort, deserializedRoomList, phrase.Replace("-", " "));
 
-                ViewBag.raw_url = ajax ? path.Split('?')[0] : HttpContext.Request.Path.Value.Split('?')[0];
-                ViewBag.urlWithParameters = ajax ? path : HttpContext.Request.Path.Value;
+                ViewBag.raw_url = ajax ? path.Split('?')[0] : HttpContext.Request.Path.Value;
+                ViewBag.urlWithParameters = ajax ? path : rawUrl;
                 ViewBag.dcategory = category;
                 ViewBag.area = area;
                 var provinceString = category.Province == null ? "" : category.RegionProvince.PersianName;
@@ -448,7 +451,9 @@ namespace Amlakbashi.Host.Controllers
                             areaRegionRelated.Trim(',').Split(','), x => int.Parse(x));
                 ViewBag.related_categories = subCategory != null ?
                     categoryService.GetRelatedCategories(subCategory.Id, areaRegionRelatedIds, model.Count())
-                    : (category == null ? new List<DynamicCategory>() : categoryService.GetRelatedCategories(category.Id, areaRegionRelatedIds, model.Count()));
+                    : (category == null ? new List<DynamicCategory>() :
+                    categoryService.GetRelatedCategories(category.Id, areaRegionRelatedIds, model.Count()));
+
                 ViewBag.AnyTodayEmpty = today_empty_homes == "1" || model.Any(x => x.TodayIsEmpty || x.Childs.All(y => y.TodayIsEmpty));
                 var pages_count = Math.Max(1, Math.Ceiling((float)((float)model.Count() / 12f)));
                 ViewBag.pagesCount = pages_count;

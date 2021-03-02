@@ -15,7 +15,8 @@ namespace Amlakbashi.Host.Configurations.UrlRewriteRules
             PathString path = context.HttpContext.Request.Path;
             HostString host = context.HttpContext.Request.Host;
 
-            if (path.HasValue && path.Value.Any(char.IsUpper) || host.HasValue && host.Value.Any(char.IsUpper))
+            if ((path.HasValue && path.Value.Any(char.IsUpper) || host.HasValue && host.Value.Any(char.IsUpper))
+                && request.Method != "POST")
             {
                 HttpResponse response = context.HttpContext.Response;
                 response.StatusCode = StatusCode;

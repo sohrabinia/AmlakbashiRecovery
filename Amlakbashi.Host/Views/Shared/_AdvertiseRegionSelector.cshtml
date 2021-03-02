@@ -14,7 +14,7 @@
             <option value="-1">استان را انتخاب کنید </option>
             @foreach (var item in ViewBag.provinces)
             {
-                <option is-disabled="@(item.Id == ViewBag.province)" value="@item.Id">@item.PersianName</option>
+                <option is-selected="@(item.Id == ViewBag.province)" value="@item.Id">@item.PersianName</option>
             }
         </select>
     </div>
@@ -27,7 +27,7 @@
                 <option value="-1">شهر را انتخاب کنید </option>
                 foreach (var item in ViewBag.cities)
                 {
-                    <option is-disabled="@(item.Id == ViewBag.city)" value="@item.Id">@item.PersianName</option>
+                    <option is-selected="@(item.Id == ViewBag.city)" value="@item.Id">@item.PersianName</option>
                 }
             }
             else
@@ -47,7 +47,7 @@
                     <option value="-1">منطقه را انتخاب کنید </option>
                     foreach (var item in ViewBag.areas)
                     {
-                        <option is-disabled="@(item.Id == ViewBag.area)" value="@item.Id">@item.PersianName</option>
+                        <option is-selected="@(item.Id == ViewBag.area)" value="@item.Id">@item.PersianName</option>
                     }
                 }
                 else

@@ -572,23 +572,20 @@ function sendSupportChatMessage(id, text, questionNumber) {
     }
     is_sending_chat = true;
     $(".support-chat__text-input").val("");
-
     $.ajax({
         type: "POST",
         url: "/supportchat/sendtextuser",
-        data: "{user_id:" + current_user_id + ",id:" + id +
-            ",text:'" + text + "'" +
-            (typeof questionNumber === 'undefined' ? "" : ",questionnumber:" + questionNumber) +
-            "}",
-        contentType: "application/json",
-        dataType: "json",
+        data: {
+            user_id: current_user_id,
+            id: id,
+            text: text,
+        },
         success: function (ret) {
             is_sending_chat = false;
             if (ret.status == 1) {
                 debugger;
                 $('#js-support-chat-id').val(ret.id);
-                hub.server.reloadSupportChat(ret.id, 0,
-                    current_user_id);
+                portalHubConnection.invoke('reloadSupportChat', ret.id, 0, current_user_id);
                 $(".support-chat__text-input").focus();
                 $(".support-chat__chat-box").stop().animate({ scrollTop: $(".support-chat__chat-box")[0].scrollHeight }, 1000);
             }

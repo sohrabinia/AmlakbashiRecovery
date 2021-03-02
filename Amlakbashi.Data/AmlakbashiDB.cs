@@ -77,15 +77,6 @@ namespace Amlakbashi.Data
                     .HasForeignKey(x => x.ParentID);
             });
 
-            //modelBuilder.Entity<DynamicCategory>(entity =>
-            //{
-            //    entity.HasMany(x => x.Advertises)
-            //        .WithMany(x => x.Categories)
-            //        .UsingEntity(x => {
-            //            x.ToTable("DynamicCategoryAdvertises");
-            //        });
-            //});
-
             modelBuilder.Entity<DynamicCategory>()
                 .HasMany(p => p.Advertises)
                 .WithMany(p => p.Categories)
@@ -102,7 +93,7 @@ namespace Amlakbashi.Data
                         .WithMany()
                         .HasForeignKey("DynamicCategory_Id")
                         .HasConstraintName("FK_dbo.DynamicCategoryAdvertises_dbo.DynamicCategories_DynamicCategory_Id")
-                        .OnDelete(DeleteBehavior.ClientCascade));
+                        .OnDelete(DeleteBehavior.Cascade));
 
             modelBuilder.Entity<Advertise>()
                 .HasMany(p => p.Photos)
@@ -120,7 +111,7 @@ namespace Amlakbashi.Data
                         .WithMany()
                         .HasForeignKey("Advertise_Id")
                         .HasConstraintName("FK_dbo.FileAdvertises_dbo.Advertises_Advertise_Id")
-                        .OnDelete(DeleteBehavior.ClientCascade));
+                        .OnDelete(DeleteBehavior.Cascade));
         }
     }
 }
