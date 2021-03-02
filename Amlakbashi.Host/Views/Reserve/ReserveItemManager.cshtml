@@ -18,7 +18,6 @@
     var is_guest = !is_host;
     var categories = Enum.GetValues(typeof(Reserve.ReserveCategory)) as Reserve.ReserveCategory[];
     var paymentTransactionId = TempData.GetObjectFromJson<long>("payment_transaction_id");
-    var payment_reserve_id = TempData.GetObjectFromJson<long>("payment_reserve_id");
     Reserve reserve = null;
     Advertise advertise = null;
     if (ViewBag.paymentReserve != null)
@@ -835,8 +834,8 @@
 
            var payment_success_msg = '@TempData["payment_success_msg"]';
         var payment_error_msg = '@TempData["payment_error_msg"]';
-        var payment_transaction_id = '@paymentTransactionId';
-        if (payment_transaction_id != '') {
+        var payment_transaction_id = @paymentTransactionId;
+        if (payment_transaction_id > 0) {
             var registered = @(reserve != null ? (reserve.PaymentGTAGRegistered ? "true" : "false") : "false");
             if (!registered)
             {
