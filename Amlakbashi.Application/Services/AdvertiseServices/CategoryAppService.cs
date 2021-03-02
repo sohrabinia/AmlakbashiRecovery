@@ -88,86 +88,30 @@ namespace Amlakbashi.Application.Services.Category
           bool hasParking = false,
           int sort = 0,
           List<int> roomList = null,
-          string phrase = ""
+          string phrase = "",
+          bool forceIncludeChildren = false,
+          bool forceIncludeDiscounts = false
       )
         {
-            bool OccupiedTablesincluded = false;
-            bool DiscountTablesincluded = false;
-            bool Childrenincluded = false;
             IQueryable<Advertise> advertises;
             var category = Repository.Find(categoryId);
             var advertiseIds = category.Advertises.Select(s => s.Id).ToList();
             advertises = Repository.Query<Advertise, long>(q =>
                 q.Where(w => advertiseIds.Contains(w.Id)));
-            //if (includeOccupiedTables || includeDiscountTables || includeChildren)
-            //{
-            //    var advertiseIds = category.Advertises.Select(s => s.Id).ToList();
-            //    advertises = Repository.Query<Advertise, long>(q =>
-            //        q.Where(w => advertiseIds.Contains(w.Id)));
-            //    if (includeOccupiedTables)
-            //    {
-            //        advertises = advertises.Include(i => i.OccupiedTables);
-            //    }
-            //    if (includeDiscountTables)
-            //    {
-            //        advertises = advertises.Include(i => i.DiscountTables);
-            //    }
-            //    if (includeChildren)
-            //    {
-            //        advertises = advertises.Include(i => i.Childs);
-            //    }
-            //}
-            //else
-            //{
-            //    advertises = category.Advertises.AsQueryable();
-            //}
 
-            //if ((!string.IsNullOrEmpty(empty_range_from) &&
-            //    !string.IsNullOrEmpty(empty_range_to)) ||
-            //    (today_empty_homes != null &&
-            //    today_empty_homes == "1"))
-            //{
-            //    var advertiseIds = category.Advertises.Select(s => s.Id).ToList();
-            //    if (includeRelations)
-            //    {
-            //        advertises = Repository.Query<Advertise, long>(q =>
-            //            q.Include(i => i.OccupiedTables)
-            //            .Include(i => i.DiscountTables)
-            //            .Include(i => i.Childs).Where(f =>
-            //            advertiseIds.Contains(f.Id)));
-            //    }
-            //    else
-            //    {
-            //        if (today_empty_homes != null && today_empty_homes == "1")
-            //        {
-            //            advertises = Repository.Query<Advertise, long>(q =>
-            //                q.Include(i => i.OccupiedTables)
-            //                .Include(i => i.Childs)
-            //                .Where(f =>
-            //                advertiseIds.Contains(f.Id)));
-            //        }
-            //        advertises = Repository.Query<Advertise, long>(q =>
-            //            q.Include(i => i.OccupiedTables).Where(f =>
-            //            advertiseIds.Contains(f.Id)));
-            //    }
-            //}
-            //else
-            //{
-            //    if (includeRelations)
-            //    {
-            //        var advertiseIds = category.Advertises.Select(s => s.Id).ToList();
-            //        advertises = Repository.Query<Advertise, long>(q =>
-            //            q.Include(i => i.DiscountTables)
-            //            .Include(i => i.Childs)
-            //            .Include(i => i.OccupiedTables)
-            //            .Where(f =>
-            //            advertiseIds.Contains(f.Id)));
-            //    }
-            //    else
-            //    {
-            //        advertises = category.Advertises.AsQueryable();
-            //    }
-            //}
+            bool OccupiedTablesincluded = false;
+            bool DiscountTablesincluded = false;
+            bool Childrenincluded = false;
+            if (forceIncludeDiscounts)
+            {
+                advertises = advertises.Include(i => i.DiscountTables);
+                DiscountTablesincluded = true;
+            }
+            if (forceIncludeChildren)
+            {
+                advertises = advertises.Include(i => i.Childs);
+                Childrenincluded = true;
+            }
 
             //filter by phrase or area
             advertises = advertiseFilter.FilterPhrase(advertises, phrase);
@@ -274,13 +218,7 @@ namespace Amlakbashi.Application.Services.Category
             //filter by norouz special
             if (norouz_special != null && norouz_special == "1")
             {
-                if (!Childrenincluded)
-                {
-                    advertises = advertises.Include(i => i.Childs);
-                    Childrenincluded = true;
-                }
-                advertises = advertises.Where(a => a.NorouzPrice > 0 ||
-                    (a.Childs.Any() && a.Childs.All(x => x.NorouzPrice > 0)));
+                advertises = advertises.Where(a => a.NorouzPrice > 0);
             }
             //filter instant reserve accommodations
             if (instant_reserve != null && instant_reserve == "1")

@@ -307,6 +307,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             //set parent's base price
             parent.BasePrice = parent.BasePrice < 1 ? child.BasePrice :
                 Math.Min(parent.BasePrice, child.BasePrice);
+            parent.NorouzPrice = parent.NorouzPrice < 1 ? child.NorouzPrice :
+                Math.Min(parent.NorouzPrice, child.NorouzPrice);
 
             //save changes
             advertiseRepository.Update(child);
@@ -359,6 +361,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             //set parent's base price
             parent.BasePrice = parent.BasePrice < 1 ? child.BasePrice :
                 Math.Min(parent.BasePrice, child.BasePrice);
+            parent.NorouzPrice = parent.NorouzPrice < 1 ? child.NorouzPrice :
+                Math.Min(parent.NorouzPrice, child.NorouzPrice);
             //initialize slug, title and description
             var cityTitle = child.RegionCity.PersianName;
             var areaTitle = child.RegionArea != null ? child.RegionArea.PersianName : null;
