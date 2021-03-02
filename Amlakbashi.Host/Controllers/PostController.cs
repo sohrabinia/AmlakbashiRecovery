@@ -258,7 +258,9 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
+#if !DEBUG
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "amp_version" })]
+#endif
         public ActionResult Page(bool amp_version = false)
         {
             ViewBag.MessageShowOnReady = TempData["MessageShowOnReady"];

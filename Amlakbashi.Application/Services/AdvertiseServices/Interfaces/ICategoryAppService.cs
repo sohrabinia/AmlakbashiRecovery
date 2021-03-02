@@ -40,7 +40,9 @@ namespace Amlakbashi.Application.Services.Category.Interfaces
           bool hasParking = false,
           int sort = 0,
           List<int> roomList = null,
-          string phrase = ""
+          string phrase = "",
+          bool forceIncludeChildren = false,
+          bool forceIncludeDiscounts = false
       );
         IList<DynamicCategory> GetProvincesForXML(bool old);
         IList<DynamicCategory> GetCitiesForXML(bool old);

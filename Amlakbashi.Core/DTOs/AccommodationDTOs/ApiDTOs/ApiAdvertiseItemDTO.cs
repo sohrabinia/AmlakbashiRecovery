@@ -46,10 +46,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
                 discountDateString = discountData.DateString;
                 discountPercent = discountData.Percent;
             }
-            //var norouzPrice = advertise.Childs.Any() ?
-            //        advertise.Childs.Min(x => x.NorouzPrice) :
-            //        advertise.NorouzPrice;
-            var norouzPrice = 0;
+            var norouzPrice = advertise.NorouzPrice;
 
             var dto = new ApiAdvertiseItemDTO();
             dto.id = advertise.Id;
@@ -69,7 +66,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
             dto.adType = ConvertAdvertiseType((int)advertise.TypeID);
             dto.adPosition = ConvertAdvertisePosition((int)advertise.Position);
             dto.elevator = advertise.Elevator == null ? false : (bool)advertise.Elevator;
-            dto.pool = (bool)advertise.Pool;
+            dto.pool = advertise.Pool == null ? false : (bool)advertise.Pool;
             dto.parking = advertise.Parking != Advertise.ParkingItems.Unset &&
                 advertise.Parking != Advertise.ParkingItems.NoParking;
             dto.todayEmpty = advertise.TodayIsEmpty || advertise.Childs.Any(x => x.TodayIsEmpty);
