@@ -449,21 +449,10 @@ namespace Amlakbashi.Host.Controllers
                 var areaRegionRelated = area < 1 ? null : regionService.Find(area).Related;
                 var areaRegionRelatedIds = string.IsNullOrEmpty(areaRegionRelated) ? null : Array.ConvertAll(
                             areaRegionRelated.Trim(',').Split(','), x => int.Parse(x));
-                //ViewBag.related_categories = subCategory != null ?
-                //    categoryService.GetRelatedCategories(subCategory.Id, areaRegionRelatedIds, model.Count())
-                //    : (category == null ? new List<DynamicCategory>() : 
-                //    categoryService.GetRelatedCategories(category.Id, areaRegionRelatedIds, model.Count()));
-
-                if (subCategory != null)
-                {
-                    var test = categoryService.GetRelatedCategories(subCategory.Id, areaRegionRelatedIds, model.Count());
-                }
-                if (category !=  null)
-                {
-                    var m = model.ToList();
-                    var count = model.Count();
-                    var test = categoryService.GetRelatedCategories(category.Id, areaRegionRelatedIds, model.Count());
-                }
+                ViewBag.related_categories = subCategory != null ?
+                    categoryService.GetRelatedCategories(subCategory.Id, areaRegionRelatedIds, model.Count())
+                    : (category == null ? new List<DynamicCategory>() :
+                    categoryService.GetRelatedCategories(category.Id, areaRegionRelatedIds, model.Count()));
 
                 ViewBag.AnyTodayEmpty = today_empty_homes == "1" || model.Any(x => x.TodayIsEmpty || x.Childs.All(y => y.TodayIsEmpty));
                 var pages_count = Math.Max(1, Math.Ceiling((float)((float)model.Count() / 12f)));
