@@ -67,12 +67,12 @@
     <meta property="og:description" content="@meta_description" />
     <meta name="enamad" content="344312021" />
 
-    <link rel="stylesheet" type="text/css" href="/css/master-critical.min.css">
     @RenderSection("StyleLink", required: false)
+    <link rel="stylesheet" type="text/css" href="/css/master.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/master-critical.min.css">
     <style>
         @RenderSection("StyleBlock", required: false)
     </style>
-
 </head>
 <body>
     @await Html.PartialAsync("_ImpersonateContainer", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hidden", true } })
@@ -161,15 +161,29 @@
     }
     <div style="display: none" id="chat_hidden_holder"></div>
     <input type="hidden" value="0" id="js-support-chat-id">
-    <link rel="stylesheet" type="text/css" href="/css/master.min.css">
-    <script src="/js/master-defer.min.js" defer></script>
     <environment include="Development">
+        <script src="/resource/scripts/general/message-popup.js" defer></script>
+        <script src="/resource/alertify.js-0.3.11/src/alertify.js" defer></script>
+        <script src="/resource/rating/jquery.barrating.min.js" defer></script>
+        <script src="/resource/Scripts/jquery.scrollTo.min.js" defer></script>
+        <script src="/resource/scripts/general/string-replace-all.js" defer></script>
+        <script src="/resource/scripts/general/ajax-helper.js" defer></script>
+        <script src="/resource/scripts/general/client-helper.js" defer></script>
+        <script src="/resource/scripts/general/loading-indicator.js" defer></script>
+        <script src="/resource/scripts/general/user-rating.js" defer></script>
+        <script src="/resource/scripts/general/input-validation-helper.js" defer></script>
+        <script src="/resource/scripts/general/master.js" defer></script>
+        <script src="/resource/scripts/general/lazy-loading.js" defer></script>
+        <script src="/resource/Scripts/general/login/intlTelInput.min.js" defer></script>
+        <script src="/resource/scripts/general/login/login-popup.js" defer></script>
+
         <script src="/resource/scripts/jquery-2.1.1.min.js"></script>
         <script src="/resource/scripts/firebase-5.9.4/firebase-app.js"></script>
         <script src="/resource/scripts/firebase-5.9.4/firebase-messaging.js"></script>
         <script src="/resource/scripts/firebase/firebase-initialization.js"></script>
     </environment>
     <environment exclude="Development">
+        <script src="/js/master-defer.min.js" defer></script>
         <script src="/js/master.min.js"></script>
     </environment>
     <script type="text/javascript">

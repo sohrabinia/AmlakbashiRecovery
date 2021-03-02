@@ -14,11 +14,31 @@
     var for_advertise_page = (ViewBag.for_advertise_page != null && ViewBag.for_advertise_page) || (ViewData["for_advertise_page"] != null && bool.Parse(ViewData["for_advertise_page"].ToString()));
     bool all_images_lazy = ViewData["all_images_lazy"] != null ? bool.Parse(ViewData["all_images_lazy"].ToString()) : false; }
 @section StyleLink {
-    <link rel="stylesheet" href="/css/home-page.min.css" />
+    <environment include="Development">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/jalali-date-picker.css" />
+        <link rel="stylesheet" type="text/css" href="/resource/css/portal/home-page.css" />
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/home-page-search.css" />
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/search-by-region.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" type="text/css" href="/css/home-page.min.css" />
+    </environment>
 }
 @section ScriptLink {
-    <script src="/js/home-page.min.js"></script>
-    @*<script src="/js/search.min.js"></script>*@
+    <environment include="Development">
+        <script src="/resource/scripts/general/jalali-date-converter.js"></script>
+        <script src="/resource/scripts/general/jalali-date-handler.js"></script>
+        <script src="/resource/scripts/general/jalali-date-picker.js"></script>
+        <script src="/resource/scripts/page/home-page.js"></script>
+        <script src="/resource/scripts/general/home-page-search.js"></script>
+        <script src="/resource/scripts/general/search-by-region.js"></script>
+        <script src="/resource/scripts/general/increase-decrease-button.js"></script>
+        <script src="/resource/scripts/general/slider-scroll.js"></script>
+        <script src="/resource/scripts/home-page-banner.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/home-page.min.js"></script>
+    </environment>
 }
 <div style="clear:both;"></div>
 
