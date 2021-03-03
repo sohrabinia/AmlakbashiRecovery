@@ -1,4 +1,5 @@
-﻿@import url('home-page.css');
+﻿/*@import url('home-page.css');*/
+
 .master__page {
     width: 100%;
     overflow: hidden;
@@ -411,7 +412,7 @@ a.home-page__category-link.home-page__link i {
     /*background-image: linear-gradient(to left bottom, #fdd007, #fdd215, #fdd31f, #fdd526, #fdd62d, #fdd737, #fcd93f, #fcda47, #fbdc53, #fade5e, #fadf68, #f9e172);*/
     /*background-image: linear-gradient(to left bottom, #ffd518, #ffd724, #ffd82d, #ffda36, #ffdb3d, #ffdd46, #ffde4e, #ffe056, #ffe261, #ffe46c, #ffe676, #ffe880);*/
     background-image: linear-gradient(to left bottom, #fdd51f, #fdd939, #fddc4c, #fee05c, #fee36c, #fee36c, #fee36c, #fee36c, #fee05c, #fddc4c, #fdd939, #fdd51f);
-    box-shadow: 0 3px 5px 0 rgb(0 0 0 / 7%), 0 6px 8px 0 rgba(0,0,0,.1);
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.7), 0 6px 8px 0 rgba(0,0,0,.1);
 }
 
 .home-page__instant-reserve-banner__head-text {
@@ -552,7 +553,7 @@ input[type=number] {
     margin: 30px auto;
     overflow: hidden;
     position: relative;
-    box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 1px 3px 1px;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.3) 0px 1px 3px 1px;
 }
 .home-page__banner-container {
     height: 315px;
@@ -1734,7 +1735,7 @@ a.home-page_title-blog p {
         height: fit-content;
     }
 
-    .text-border-bottom_style h3:before, .text-border-bottom_style a:before, .text-border-bottom_style h2:before, .text-border-bottom_style:after,, .text-border-bottom_style p {
+    .text-border-bottom_style h3:before, .text-border-bottom_style a:before, .text-border-bottom_style h2:before, .text-border-bottom_style:after, .text-border-bottom_style p {
         background-color: transparent;
     }
 
