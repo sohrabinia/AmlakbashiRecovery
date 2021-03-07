@@ -44,9 +44,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         bool SetHostResponse(long reserveId, HostResponseEnum response,
             bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId);
         bool CashPay(long reserveId, out string msg,
-            ActionSourceEnum actionSource, int doerUserId);
+            int userId, ActionSourceEnum actionSource, int doerUserId);
         bool ConfirmCashPay(long reserveId, bool paid, out string msg,
-            ActionSourceEnum actionSource, int doerUserId);
+            int userId, ActionSourceEnum actionSource, int doerUserId);
         void CancelReserve(User user, long reserve_id, int cancel_reason_code,
             string cancel_reason_string, bool is_host, out string msg,
             out bool isPending, ActionSourceEnum actionSource, int doerUserId);

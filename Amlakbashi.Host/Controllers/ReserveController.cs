@@ -625,7 +625,8 @@ namespace Amlakbashi.Host.Controllers
             {
                 string msg;
                 var done = reserveService.CashPay(reserve_id, out msg,
-                    ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
+                    userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.WebsiteDashboard,
+                    userAccessor.DoerUser.Id);
                 return GenerateJsonResult(new { val = done ? 1 : 0, msg = msg });
             }
             catch (Exception exc)
@@ -642,7 +643,8 @@ namespace Amlakbashi.Host.Controllers
             {
                 string msg;
                 var done = reserveService.ConfirmCashPay(reserve_id, payed, out msg,
-                    ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
+                    userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.WebsiteDashboard,
+                    userAccessor.DoerUser.Id);
                 return GenerateJsonResult(new
                 {
                     val = done ? 1 : 0,
@@ -898,13 +900,15 @@ namespace Amlakbashi.Host.Controllers
 
         [Auth]
         public ActionResult GuestPayReserve(long reserve_id,
-            int pay_reserve_type, bool useCoupon = false, bool usePrize = false
+            int pay_reserve_type, bool useCoupon = false, bool usePrize = false, long couponId = 0
             )
         {
             try
             {
                 long payment_id;
-                var result = accounting.GuestPayReserve(userAccessor.CurrentUser.Id, reserve_id, pay_reserve_type, out payment_id, userAccessor.DoerUser.Id, ActionLog.ActionSourceEnum.WebsiteDashboard, useCoupon, usePrize);
+                var result = accounting.GuestPayReserve(userAccessor.CurrentUser.Id, reserve_id,
+                    pay_reserve_type, out payment_id, userAccessor.DoerUser.Id,
+                    ActionLog.ActionSourceEnum.WebsiteDashboard, useCoupon, usePrize, couponId);
                 switch (result)
                 {
                     case GuestPayResult.ReadyToPay:
@@ -923,7 +927,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Auth]
         public ActionResult GuestPayReserveWithCredit(long reserve_id,
-            int pay_reserve_type, bool useCoupon = false, bool usePrize = false)
+            int pay_reserve_type, bool useCoupon = false, bool usePrize = false, long couponId = 0)
         {
             try
             {
@@ -931,7 +935,7 @@ namespace Amlakbashi.Host.Controllers
                 var reserve = reserveService.Find(reserve_id);
                 var result = accounting.GuestPayReserveWithCredit(reserve.UserID,
                     reserve_id, pay_reserve_type, out payment_id, userAccessor.DoerUser.Id,
-                    ActionLog.ActionSourceEnum.WebsiteDashboard, useCoupon, usePrize);
+                    ActionLog.ActionSourceEnum.WebsiteDashboard, useCoupon, usePrize, couponId);
                 switch (result)
                 {
                     case GuestPayResult.NotEnoughCredit:
@@ -2387,6 +2391,46 @@ namespace Amlakbashi.Host.Controllers
                     msg = "عملیات با خطای فنی مواجه شد"
                 });
             }
+        }
+
+        public JsonResult SubmitDiscountCode(string code, long reserveId)
+        {
+            if (string.IsNullOrEmpty(code))
+            {
+                return GenerateJsonResult(new { status = 0, msg = "لطفا کد را وارد کنید" });
+            }
+            if (code.ToLower() != "inst8" && code.ToLower() != "amb5")
+            {
+                return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
+            }
+            var startDate = DateTime.Parse("10/28/2020");
+            if (userAccessor.CurrentUser.CreateDate.Value.Date < startDate.Date)
+            {
+                return GenerateJsonResult(new { status = 0, msg = "شما مجوز استفاده از کد تخفیف را ندارید" });
+            }
+            var discountCodeType = code.ToLower() == "amb5" ? DiscountCoupon.DiscountCouponType.Moupon :
+                DiscountCoupon.DiscountCouponType.Instagram;
+            var coupon = accounting.FindDiscountCoupon(userAccessor.CurrentUser.Id, discountCodeType);
+            if (coupon == null)
+            {
+                coupon = accounting.InsertDiscountCoupon(userAccessor.CurrentUser.Id, discountCodeType, 5);
+            }
+            else
+            {
+                if (coupon.UsingReserveID > 0)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "این کد استفاده شده است" });
+                }
+            }
+            var reserve = reserveService.Find(reserveId);
+            var discountPrice = accounting.CalculateDiscountCouponPrice(coupon.Percent, reserve.CouponCalculationPrice);
+            return GenerateJsonResult(new
+            {
+                status = 1,
+                couponId = coupon.Id,
+                discountPrice = discountPrice,
+                msg = "کد تخفیف اعمال شد"
+            });
         }
     }
 }
