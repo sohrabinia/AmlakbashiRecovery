@@ -7,6 +7,7 @@
     Layout = null;
     var category = (DynamicCategory)ViewBag.dcategory;
     bool today_empty_homes = ViewBag.today_empty_homes != null && ViewBag.today_empty_homes == "1";
+    bool hygieneProtocol = ViewBag.hygieneProtocol != null && ViewBag.hygieneProtocol == "1";
     bool discount_homes = ViewBag.discount_homes != null && ViewBag.discount_homes == "1";
     bool instant_reserve = ViewBag.instant_reserve != null && ViewBag.instant_reserve == "1";
     bool norouz_special = ViewBag.norouz_special != null && ViewBag.norouz_special == "1";
@@ -289,7 +290,7 @@
 }
 
 @if (ViewBag.currentPageNumber == 1 && Model.Count() < 5 &&
-        (discount_homes || today_empty_homes || instant_reserve || norouz_special))
+        (discount_homes || today_empty_homes || instant_reserve || norouz_special || hygieneProtocol))
 {
     <div class="advertise-category-link__container">
         @await Html.PartialAsync("_AdvertiseCategoryLink", category,

@@ -650,5 +650,21 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             paragraphs[3] = "در ایام پیک تعطیلات، بازه‌ی ۷۲ ساعت، ۱ هفته محاسبه می‌شود و امکان کنسلی وجود ندارد";
             return "قوانین کنسلی توسط مهمان:";
         }
+        public static string GetHygieneProtocolStatusText(HygieneProtocolStatus hygieneProtocolStatus)
+        {
+            switch (hygieneProtocolStatus)
+            {
+                case HygieneProtocolStatus.NotConsider:
+                    return "عدم رعایت";
+                case HygieneProtocolStatus.Consider:
+                    return "رعایت پروتکل ها";
+                case HygieneProtocolStatus.Verified:
+                    return "تایید پشتیبان";
+                case HygieneProtocolStatus.NotVerified:
+                    return "عدم تایید";
+                default:
+                    return "";
+            }
+        }
     }
 }

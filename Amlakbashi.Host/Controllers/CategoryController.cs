@@ -211,6 +211,7 @@ namespace Amlakbashi.Host.Controllers
         //            query.ContainsKey("frompaypernight") ||
         //            query.ContainsKey("topaypernight") ||
         //            query.ContainsKey("instant_reserve") ||
+        //            query.ContainsKey("hygieneProtocol") ||
         //            query["ajax"] != false)
         //        {
         //            // clear cache
@@ -240,7 +241,7 @@ namespace Amlakbashi.Host.Controllers
             int poolTable = 0, int foosball = 0, int teaMaker = 0,
             int rules_pets = 0, int rules_party = 0, int rules_smoking = 0,
             int parking = 0, int sort = 0, string roomList = "",
-            string phrase = "", bool ajax = false, string path = null)
+            string phrase = "", string hygieneProtocol = null, bool ajax = false, string path = null)
         {
             try
             {
@@ -394,7 +395,8 @@ namespace Amlakbashi.Host.Controllers
                     t, (priceRangeTypes)priceRangeType,
                     wcType, wifi == 1, washingMachine == 1, jacuzzi == 1, poolTable == 1,
                     foosball == 1, teaMaker == 1, rules_pets == 1, rules_party == 1, rules_smoking == 1,
-                    parking == 1, sort, deserializedRoomList, phrase.Replace("-", " "));
+                    parking == 1, sort, deserializedRoomList, phrase.Replace("-", " "),
+                    string.IsNullOrEmpty(hygieneProtocol) == false && hygieneProtocol == "1");
 
                 ViewBag.raw_url = ajax ? path.Split('?')[0] : HttpContext.Request.Path.Value;
                 ViewBag.urlWithParameters = ajax ? path : rawUrl;
@@ -418,6 +420,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.fromMetrazh = fromMetrazh;
                 ViewBag.toMetrazh = toMetrazh;
                 ViewBag.parking = parking;
+                ViewBag.hygieneProtocol = hygieneProtocol;
                 ViewBag.region = region;
                 ViewBag.capacity = capacity;
                 ViewBag.room = room;
@@ -686,7 +689,7 @@ namespace Amlakbashi.Host.Controllers
             int region = -1, int capacity = -1,
             int room = -1, int elevator = -1, int pool = -1, 
             string empty_range_from = "", string empty_range_to = "",
-            string phrase = "", bool ajax = false)
+            string phrase = "", bool hygieneProtocol = false, bool ajax = false)
         {
             province = Math.Max(province, 0);
             city = Math.Max(city, 0);
@@ -929,6 +932,11 @@ namespace Amlakbashi.Host.Controllers
                 query_string = HtmlUtility.AddToQueryString(query_string,
                     "parking", "1");
             }
+            if (hygieneProtocol)
+            {
+                query_string = HtmlUtility.AddToQueryString(query_string,
+                    "hygieneProtocol", "1");
+            }
             if (url[url.Length - 1] == '/')
             {
                 url = url.Remove(url.Length - 1, 1);
@@ -979,6 +987,7 @@ namespace Amlakbashi.Host.Controllers
                     pool,
                     empty_range_from,
                     empty_range_to,
+                    hygieneProtocol = hygieneProtocol ? 1 : 0,
                     ajax,
                     path
                 });

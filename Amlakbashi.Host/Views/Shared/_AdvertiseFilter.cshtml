@@ -6,6 +6,7 @@
     var discount_homes = ViewData["discount_homes"] == null ? false : bool.Parse(ViewData["discount_homes"].ToString());
     var instant_reserve = ViewData["instant_reserve"] == null ? false : bool.Parse(ViewData["instant_reserve"].ToString());
     var today_empty_homes = ViewData["today_empty_homes"] == null ? false : bool.Parse(ViewData["today_empty_homes"].ToString());
+    var hygieneProtocol = ViewData["hygieneProtocol"] == null ? false : bool.Parse(ViewData["hygieneProtocol"].ToString());
 }
 
 <form style="display:none;" id="advertise-filter-form" class="advertise-filter__form" target="_top" action="/category/category">
@@ -15,6 +16,7 @@
     <input type="hidden" name="discount_homes" value="@(discount_homes.ToString())" />
     <input type="hidden" name="instant_reserve" value="@(instant_reserve.ToString())" />
     <input type="hidden" name="today_empty_homes" value="@(today_empty_homes.ToString())" />
+    <input type="hidden" name="hygieneProtocol" value="@(hygieneProtocol.ToString())" />
     <input type="hidden" name="country_direction" value="@(category != null ? (int)category.CountryDirection : 0)" />
     <input type="hidden" name="Province" value="@category.Province" />
     <input type="hidden" name="City" value="@category.City" />

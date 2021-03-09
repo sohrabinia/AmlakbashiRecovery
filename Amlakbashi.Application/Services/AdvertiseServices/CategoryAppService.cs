@@ -89,6 +89,7 @@ namespace Amlakbashi.Application.Services.Category
           int sort = 0,
           List<int> roomList = null,
           string phrase = "",
+          bool hygieneProtocol = false,
           bool forceIncludeChildren = false,
           bool forceIncludeDiscounts = false
       )
@@ -112,7 +113,10 @@ namespace Amlakbashi.Application.Services.Category
                 advertises = advertises.Include(i => i.Childs);
                 Childrenincluded = true;
             }
-
+            if (hygieneProtocol)
+            {
+                advertises = advertises.Where(w => w.HygieneProtocol == HygieneProtocolStatus.Verified);
+            }
             //filter by phrase or area
             advertises = advertiseFilter.FilterPhrase(advertises, phrase);
             if (string.IsNullOrEmpty(phrase) && area > 0)

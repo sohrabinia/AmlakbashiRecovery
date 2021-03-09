@@ -82,7 +82,7 @@ var slider = new Slider('.home-page__banner-discount', {
     prevElement: '.prev',
     timer: 5000
 })
-var norozSlider = new Slider('.home-page_noroz-slider', {
+var norozSlider = new Slider('.home-page__banner-norouz', {
     nextElement: '.next',
     prevElement: '.prev',
     timer: 5000

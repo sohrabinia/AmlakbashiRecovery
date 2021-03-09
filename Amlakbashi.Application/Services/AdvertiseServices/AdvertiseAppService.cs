@@ -141,7 +141,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public IList<Advertise> Filter(AdvertiseStatus status, int adtype, int userid, string sort, long id, int instantReserveStatus,
-            long unixDate, int imageCountMin, int imageCountMax, int province, int city, int area)
+            long unixDate, int imageCountMin, int imageCountMax, int province, int city, int area, int hygieneProtocolStatus)
         {
             IQueryable<Advertise> model = Repository.Query(q => q);
             model = model.Where(w => w.Mode != AdvertiseMode.Child);
@@ -158,6 +158,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (adtype > 0)
             {
                 model = model.Where(a => a.TypeID == (AdvertiseType)adtype);
+            }
+            if (hygieneProtocolStatus > -1)
+            {
+                var st = (Advertise.HygieneProtocolStatus)hygieneProtocolStatus;
+                model = model.Where(w => w.HygieneProtocol == st);
             }
             if (instantReserveStatus > -1)
             {
@@ -2174,7 +2179,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return advertises.OrderByDescending(o => o.AdvertiseScore).Take(count).ToList();
         }
 
-        public void SetHygieneProtocol(long id, bool value)
+        public void SetHygieneProtocol(long id, HygieneProtocolStatus value)
         {
             var acc = Repository.Find(id);
             acc.HygieneProtocol = value;

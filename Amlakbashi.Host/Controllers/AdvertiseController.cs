@@ -68,7 +68,8 @@ namespace Amlakbashi.Host.Controllers
         public ActionResult Index(int? page, int status = -1,
             int adtype = -1, int userid = -1, string sort = "score",
             long id = -1, int instantReserveStatus = -1, string minReserveNorouzFromDate = "",
-            int imageCountMin = 0, int imageCountMax = 0, int province = -1, int city = -1, int area = -1)
+            int imageCountMin = 0, int imageCountMax = 0, int hygieneProtocolStatus = -1,
+            int province = -1, int city = -1, int area = -1)
         {
             try
             {
@@ -81,7 +82,7 @@ namespace Amlakbashi.Host.Controllers
                 }
 
                 var model = advertiseService.Filter((AdvertiseStatus)status, adtype, userid, sort, id, instantReserveStatus,
-                    unixDate, imageCountMin, imageCountMax, province, city, area);
+                    unixDate, imageCountMin, imageCountMax, province, city, area, hygieneProtocolStatus);
 
                 ViewBag.status = status;
                 ViewBag.adtype = adtype;
@@ -92,6 +93,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.sort = sort;
                 ViewBag.id = id;
                 ViewBag.instantReserveStatus = instantReserveStatus;
+                ViewBag.hygieneProtocolStatus = hygieneProtocolStatus;
                 ViewBag.minReserveNorouzFromDate = minReserveNorouzFromDate;
                 ViewBag.imageCountMin = imageCountMin;
                 ViewBag.imageCountMax = imageCountMax;
