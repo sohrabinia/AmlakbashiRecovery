@@ -99,6 +99,19 @@
                         }
                     </select>
                 </td>
+                <td class="label">وضعیت پروتکل بهداشتی :</td>
+                <td class="minw">
+                    <select name="hygieneProtocolStatus" style="width:120px;">
+                        <option value="-1">همه وضعیت ها</option>
+                        @{
+                            var hygieneProtocolStatusArr = (Advertise.HygieneProtocolStatus[])Enum.GetValues(typeof(Advertise.HygieneProtocolStatus));
+                        }
+                        @foreach (var st in hygieneProtocolStatusArr)
+                        {
+                            <option is-selected="@((int)st == (int)ViewBag.hygieneProtocolStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetHygieneProtocolStatusText(st)</option>
+                        }
+                    </select>
+                </td>
             </tr>
             <tr>
                 <td><input type="submit" class="filter" value="فیلتر" /></td>
@@ -132,7 +145,7 @@
                     امتیاز آگهی
                 </th>
                 <th>
-                     کلیک
+                    کلیک
                 </th>
                 <th>
                     رزرو نوروز از
@@ -140,6 +153,12 @@
                 <th>
                     توضیحات کارشناس
                 </th>
+                @if (ViewBag.hygieneProtocolStatus == 1)
+                {
+                    <th>
+                        پروتکل بهداشتی
+                    </th>
+                }
                 <th>
                     عملیات
                 </th>
@@ -205,6 +224,13 @@
                         <i onclick="showInfo(@(item.Advertise.Id))" class="fa fa-eye" style="color:#242424;cursor:pointer;" title="نمایش توضیحات"></i>
                         <span class="js-info-count">(@(infoCount) توضیح)</span>
                     </td>
+                    @if (ViewBag.hygieneProtocolStatus == 1)
+                    {
+                        <td style="white-space:nowrap;">
+                            <i onclick="confirmHygieneProtocol(@item.Advertise.Id, this)" class="fa fa-check" style="color:green;cursor:pointer;margin-left:10px;"></i>
+                            <i onclick="rejectHygieneProtocol(@item.Advertise.Id, this)" class="fa fa-times" style="color:red;cursor:pointer;"></i>
+                        </td>
+                    }
                     <td style="white-space:nowrap;">
                         <a style="margin-left:5px;" href="/accomodation/adminbasicform?id=@item.Advertise.Id"><i class="fa-icon fa fa-user-plus"></i></a>
                         <a href="@Url.Action("Edit",new {id = item.Advertise.Id})"><span class="editicon" title="ویرایش"></span></a>
@@ -229,7 +255,7 @@
 
 }
 <div class="mypagelist">
-    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Advertise", new { page, status = (int)ViewBag.status, adtype = (int)ViewBag.adtype, userid = (int)ViewBag.userid, Province = (int)ViewBag.province, City = (int)ViewBag.city, Area = (int)ViewBag.area, sort = (string)ViewBag.sort, instantReserveStatus = (int)ViewBag.instantReserveStatus, minReserveNorouzFromDate = ViewBag.minReserveNorouzFromDate, imageCountMin = (int)ViewBag.imageCountMin, imageCountMax = (int)ViewBag.imageCountMax }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Advertise", new { page, status = (int)ViewBag.status, adtype = (int)ViewBag.adtype, userid = (int)ViewBag.userid, Province = (int)ViewBag.province, City = (int)ViewBag.city, Area = (int)ViewBag.area, sort = (string)ViewBag.sort, instantReserveStatus = (int)ViewBag.instantReserveStatus, hygieneProtocolStatus = (int)ViewBag.hygieneProtocolStatus, minReserveNorouzFromDate = ViewBag.minReserveNorouzFromDate, imageCountMin = (int)ViewBag.imageCountMin, imageCountMax = (int)ViewBag.imageCountMax }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
 </div>
 
 @section ScriptBlock
@@ -242,6 +268,26 @@
                 myajax("Advertise/Delete", "id=" + $id , function (ret) {
                     if (ret.status==1) {
                         $(obj).parent().parent().remove() ;
+                    }
+                });
+            }
+        }
+
+        function confirmHygieneProtocol($id, obj) {
+            if (confirm("آیا رعایت پروتکل بهداشتی در این اقامتگاه مورد تایید است؟")) {
+                myajax("accomodation/sethygieneprotocoladmin", "id=" + $id + "&value=2", function (ret) {
+                    if (ret.status == 1) {
+                        $(obj).parent().parent().remove();
+                    }
+                });
+            }
+        }
+
+        function rejectHygieneProtocol($id, obj) {
+            if (confirm("آیا از عدم تایید پروتکل های بهداشتی این اقامتگاه مطمئن هستید؟")) {
+                myajax("accomodation/sethygieneprotocoladmin", "id=" + $id + "&value=3", function (ret) {
+                    if (ret.status == 1) {
+                        $(obj).parent().parent().remove();
                     }
                 });
             }

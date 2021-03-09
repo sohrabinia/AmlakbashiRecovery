@@ -1,12 +1,13 @@
 ﻿using Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts;
 using System;
+using static Amlakbashi.Core.Entities.Advertise;
 
 namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
 {
     [Serializable]
     public class HygieneProtocolInputDTO
     {
-        public bool? HygieneProtocol { get; set; }
+        public HygieneProtocolStatus? HygieneProtocol { get; set; }
 
         public static implicit operator HygieneProtocolInputDTO(HygieneProtocolPart part)
         {

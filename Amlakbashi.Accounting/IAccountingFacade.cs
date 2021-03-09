@@ -40,6 +40,8 @@ namespace Amlakbashi.Accounting
         bool ReserveShouldRefund(long reserveId, Reserve.ReserveStatus status, out bool refundDone);
         bool ReserveCanClear(long reserveId);
         // DiscountCoupon Functions
+        DiscountCoupon FindDiscountCoupon(long id);
+        DiscountCoupon FindDiscountCoupon(int userId, DiscountCoupon.DiscountCouponType type);
         DiscountCoupon InsertDiscountCoupon(int userId, DiscountCoupon.DiscountCouponType type,
             int percent, int presentorUserID = 0);
         void UseDiscountCouponForReserve(long couponId, long reserveId);
@@ -106,11 +108,11 @@ namespace Amlakbashi.Accounting
         Dictionary<string, object> GeneratePaymentData(BanksEnum bank, int pid, string redirectAddress);
         GuestPayResult GuestPayReserve(int userId, long reserveId,
             int payReserveType, out long payment_id, int doerUserId,
-            ActionSourceEnum actionSource, bool useCoupon, bool usePrize);
+            ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId);
 
         GuestPayResult GuestPayReserveWithCredit(int userId, long reserveId,
             int payReserveType, out long paymentId, int doerUserId,
-            ActionSourceEnum actionSource, bool useCoupon, bool usePrize);
+            ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId);
         void GenerateReserveFinanceChart(int year, int month,
             out PaymentChartDTO TotalReservePriceChart,
             out PaymentChartDTO SitePortionChart,

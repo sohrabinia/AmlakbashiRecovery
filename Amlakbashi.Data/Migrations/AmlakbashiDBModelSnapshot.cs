@@ -168,8 +168,8 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<int>("HolidayPrice")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("HygieneProtocol")
-                        .HasColumnType("bit");
+                    b.Property<int?>("HygieneProtocol")
+                        .HasColumnType("int");
 
                     b.Property<int>("ImageThumbGenerateStatus")
                         .HasColumnType("int");
@@ -1086,7 +1086,7 @@ namespace Amlakbashi.Data.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<long?>("ExtrinsicReserveID")
                         .HasColumnType("bigint");
@@ -2494,7 +2494,7 @@ namespace Amlakbashi.Data.Migrations
                         .WithMany()
                         .HasForeignKey("DynamicCategory_Id")
                         .HasConstraintName("FK_dbo.DynamicCategoryAdvertises_dbo.DynamicCategories_DynamicCategory_Id")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2504,7 +2504,7 @@ namespace Amlakbashi.Data.Migrations
                         .WithMany()
                         .HasForeignKey("Advertise_Id")
                         .HasConstraintName("FK_dbo.FileAdvertises_dbo.Advertises_Advertise_Id")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Amlakbashi.Core.Entities.File", null)

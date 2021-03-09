@@ -27,6 +27,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                 case ReserveStatus.CancelRequestByHost:
                 case ReserveStatus.CanceledByGuest:
                 case ReserveStatus.CanceledByHost:
+                case ReserveStatus.Reserved:
                     return true;
                 default:
                     return false;

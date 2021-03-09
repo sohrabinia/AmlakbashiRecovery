@@ -53,19 +53,19 @@
     <div class="home-page__category-container home-page_category-dwelling">
         <a target="_blank" href="/ایران/ویلا" class="home-page__category-item-container js-category-link" title="اجاره ویلا" data-title="اجاره روزانه ویلا">
             <h3 class="header-label">اجاره ویلا</h3>
-            <img class="home-page__category-type-image" src="~/Resource/img/_villa.jpg" width="70" height="70" alt="اجاره روزانه ویلا" />
+            <img class="home-page__category-type-image" src="~/resource/img/_villa.jpg" width="70" height="70" alt="اجاره روزانه ویلا" />
         </a>
         <a target="_blank" href="/ایران/آپارتمان" class="home-page__category-item-container js-category-link" title="آپارتمان مبله و سوئیت" data-title="اجاره روزانه آپارتمان مبله - اجاره روزانه سوئیت">
             <h3 class="header-label">آپارتمان مبله و سوئیت</h3>
-            <img class="home-page__category-type-image" src="~/Resource/img/_apartment.jpg" width="70" height="70" alt="اجاره روزانه آپارتمان مبله | اجاره روزانه سوئیت" />
+            <img class="home-page__category-type-image" src="~/resource/img/_apartment.jpg" width="70" height="70" alt="اجاره روزانه آپارتمان مبله | اجاره روزانه سوئیت" />
         </a>
         <a target="_blank" href="/ایران/بومگردی" class="home-page__category-item-container js-category-link" title="رزرو اقامتگاه بومگردی" data-title="رزرو اقامتگاه بومگردی">
             <h3 class="header-label">اقامتگاه بومگردی</h3>
-            <img class="home-page__category-type-image" src="~/Resource/img/_dailyrent.jpg" width="70" height="70" alt="رزرو اقامتگاه بومگردی" />
+            <img class="home-page__category-type-image" src="~/resource/img/_dailyrent.jpg" width="70" height="70" alt="رزرو اقامتگاه بومگردی" />
         </a>
         <a target="_blank" href="/ایران/رزرو-هتل" class="home-page__category-item-container js-category-link" title="هتل و اقامتگاه بومگردی" data-title="رزرو هتل آپارتمان">
             <h3 class="header-label">هتل</h3>
-            <img class="home-page__category-type-image" src="~/Resource/img/_hotel.jpg" width="70" height="70" alt="رزرو هتل، مسافرخانه و هتل آپارتمان" />
+            <img class="home-page__category-type-image" src="~/resource/img/_hotel.jpg" width="70" height="70" alt="رزرو هتل، مسافرخانه و هتل آپارتمان" />
         </a>
     </div>
     <div class="home-page-visited-box home-page_style-box">
@@ -119,116 +119,173 @@
             <p class="home-page__feature-label">نماد اعتماد الکترونیکی</p>
         </a>
     </div>
-    <section class="home-page_style-box">
-        <a target="_blank" href="/ایران?norouz_special=1" class="home-page__link text-border-bottom_style"><h2><img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32">ویژه نوروز</h2>مشاهده همه</a>
-        <div class="home-page__category-container">
-            @await Html.PartialAsync("_AdvertiseList", norouzAdvertises, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "all_images_lazy", true } })
-        </div>
-    </section>
-@foreach (var category in homePageCategories)
-{
-    <section class="home-page_style-box">
-        @*<div class="home-page__category-label-container">
-                <h2><a target="_blank" href="@(category.categoryUrl)" class="home-page__link">@category.categoryH1Title</a></h2>
-                <a target="_blank" href="@CategoryUrlLocalization.CategoryToUrl(category.category)" class="home-page__category-link home-page__link">نمایش همه  (@(category.category.CountAdvertise))<i class="fa fa-chevron-left"></i></a>
-            </div>*@
-        <a target="_blank" href="@(category.categoryUrl)" class="home-page__link text-border-bottom_style"><h2>@category.categoryH1Title (@(category.category.CountAdvertise))</h2>مشاهده همه</a>
-        <div class="home-page__category-container" data-url="/advertise/mostviewadvertisebycity?city_id=@(category.category.City)&province_id=@(category.category.Province)&type_id=@(category.category.Type)&count=5">
-            @await Html.PartialAsync("_AdvertiseList", category.AdvertiseItems, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "all_images_lazy", true } })
-            @*<img src="/file/loading" style="margin: auto;" />*@
-        </div>
-    </section>
-    counterBox = counterBox + 1;
-    if (counterBox == 1)
-    {
-        <section class="home-page__boyd-banner">
-            <div class="home-page__banner-container home-page__banner-discount">
-                @if (mostDiscountAdvertise.Count > 0)
+    @*<section class="home-page_style-box">
+            <a target="_blank" href="/ایران?norouz_special=1" class="home-page__link text-border-bottom_style"><h2><img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32">ویژه نوروز</h2>مشاهده همه</a>
+            <div class="home-page__category-container">
+                @Html.Partial("_AdvertiseList", norouzAdvertises, new ViewDataDictionary { { "all_images_lazy", true } })
+            </div>
+        </section>*@
+    <section class="home-page__boyd-banner">
+        <div class="home-page__banner-container home-page__banner-norouz">
+            @if (mostDiscountAdvertise.Count > 0)
+            {
+                var counter = 0;
+                foreach (var item in norouzAdvertises)
                 {
-                    var counter = 0;
-                    foreach (var item in mostDiscountAdvertise)
-                    {
-                        counter++;
-                        var img_src = item.PhotoID > 0 ? string.Format("/file/accthumbxlarge?accid={0}&fileid={1}", item.AdvertiseID, item.PhotoID) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
-                        //var initial_loaded_img = !all_images_lazy && counter <= (Request.Browser.IsMobileDevice ? 1 : 4);
-                        var initial_loaded_img = true;
-                        var img_src_to_show = initial_loaded_img ? img_src : "/file/resourceimagepng?file_name=lazy-16_9";
-                        var img_data_source = initial_loaded_img ? "" : " data-src=" + img_src;
-                        var url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(item.Slug);
-                        <div class="banner-Slides box">
-                            <div class="bg"></div>
-                            <div class="details">
-                                @if (item.DiscountPercent > 0)
-                                {
-                                    <div class="home-page_banner-offer">
-                                        <p class="present"><i class="fa fa-percent"></i>@(item.DiscountPercent)</p>
-                                        <p> تخفیف </p>
-                                        <p>@item.DiscountDateString</p>
-                                    </div>
-                                }
-                                <h3 class="js-animate-text"><a class="title-banner-overflow" target="_blank" href="@url">@item.Title</a></h3>
-                                <h4 class="js-animate-text"><i class="fa fa-map-marker-alt"></i>@(item.RegionString)</h4>
-                                @if (item.HasChild)
-                                {
-                                    <p class="js-animate-text"> @(item.AdvertiseTypeString)</p>
-                                }
-                                else
-                                {
-                                    <p class="js-animate-text"><i class="fa fa-bed"></i> @(item.Room > 0 ? item.Room + " خوابه" : "بدون اتاق")&nbsp;&nbsp;&nbsp;</p>
-                                    <p class="js-animate-text"><i class="fa fa-users"></i> ظرفیت  @(item.MinCapacity == item.MaxCapacity ? item.MinCapacity + " نفر" : item.MinCapacity + "-" + item.MaxCapacity + " نفر")</p>
-                                }
-                                <p class="desktop-change-text-price js-animate-text">شروع قیمت:@(string.Format("{0:n0}", item.DailyPrice))  تومان</p>
-                                <p class="mobile-change-text-price js-animate-text">  قیمت از: @(string.Format("{0:n0}", item.DailyPrice))  تومان</p>
-                                <a class="banner-button" target="_blank" href="@url">رزرو اقامتگاه<i class="fas fa-caret-left"></i></a>
-                                <a class="view-all-Discounts" href="/ایران?discount_homes=1"> مشاهده همه تخفیف ها <i class="fa fa-chevron-left"></i></a>
+                    counter++;
+                    var img_src = item.PhotoID > 0 ? string.Format("/file/accthumbxlarge?accid={0}&fileid={1}", item.AdvertiseID, item.PhotoID) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
+                    //var initial_loaded_img = !all_images_lazy && counter <= (Request.Browser.IsMobileDevice ? 1 : 4);
+                    var initial_loaded_img = true;
+                    var img_src_to_show = initial_loaded_img ? img_src : "/file/resourceimagepng?file_name=lazy-16_9";
+                    var img_data_source = initial_loaded_img ? "" : " data-src=" + img_src;
+                    var url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(item.Slug);
+                    <div class="banner-Slides box">
+                        <div class="bg"></div>
+                        <div class="details">
+                            <div class="img-norouz-style">
+                                <img src="~/resource/img/noroz-roban.png" />
                             </div>
-                            <a target="_blank" href="@url" class="box-img-banner">
-                                <img src="@img_src_to_show" @img_data_source alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")'>
-                                @if (!initial_loaded_img)
-                                {
-                                    <noscript>
-                                        <img class="home-page__advertise-image" src="@img_src" width="240" height="144" alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")'>
-                                    </noscript>
-                                }
-                            </a>
+                            <h3 class="js-animate-text"><a class="title-banner-overflow" target="_blank" href="@url">@item.Title</a></h3>
+                            <h4 class="js-animate-text"><i class="fa fa-map-marker-alt"></i>@(item.RegionString)</h4>
+                            @if (item.HasChild)
+                            {
+                                <p class="js-animate-text"> @(item.AdvertiseTypeString)</p>
+                            }
+                            else
+                            {
+                                <p class="js-animate-text"><i class="fa fa-bed"></i> @(item.Room > 0 ? item.Room + " خوابه" : "بدون اتاق")&nbsp;&nbsp;&nbsp;</p>
+                                <p class="js-animate-text"><i class="fa fa-users"></i> ظرفیت  @(item.MinCapacity == item.MaxCapacity ? item.MinCapacity + " نفر" : item.MinCapacity + "-" + item.MaxCapacity + " نفر")</p>
+                            }
+                            <p class="desktop-change-text-price js-animate-text"> قیمت نوروزی:@(string.Format("{0:n0}", item.NorouzPrice))  تومان</p>
+                            <a class="banner-button" target="_blank" href="@url">رزرو اقامتگاه<i class="fas fa-caret-left"></i></a>
+                            <a target="_blank" class="view-all-Discounts" href="/ایران?norouz_special=1"> مشاهده همه <i class="fa fa-chevron-left"></i></a>
                         </div>
-                    }
+                        <a target="_blank" href="@url" class="box-img-banner">
+                            <img src="@img_src_to_show" @img_data_source alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")'>
+                            @if (!initial_loaded_img)
+                            {
+                                <noscript>
+                                    <img class="home-page__advertise-image" src="@img_src" width="240" height="144" alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")'>
+                                </noscript>
+                            }
+                        </a>
+                    </div>
                 }
-            </div>
-            <p class="prev"><i class="fas fa-angle-right"></i></p>
-            <p class="next"><i class="fas fa-angle-left"></i></p>
-        </section>
-    }
-    if (counterBox == 2)
-    {
-        <a target="_blank" href="/ایران?instant_reserve=1" class="home-page__instant-reserve-banner__text-root">
-            <div class="home-page__instant-reserve-banner__text-parent">
-                <div class="home-page__instant-reserve-banner__head-text"><i style="color:#DF7549" class="fa fa-bolt"></i> رزرو آنی</div>
-                <div class="home-page__instant-reserve-banner__sub-text">بدون استعلام از میزبان</div>
-            </div>
-        </a>
-        <div class="home-page__category home-page__instant-reserve-banner__img-parent">
-            <a target="_blank" href="/ایران?instant_reserve=1">
-                <picture>
-                    <source media="(max-width: 680px)" srcset="/file/resourceimagewebp?file_name=instant-reserve-banner-small">
-                    <img class="home-page__instant-reserve-banner__img lazy" alt='@category.Title' data-src="/file/resourceimagewebp?file_name=instant-reserve-banner" src="/file/resourceimagepng?file_name=instant-reserve-banner-lazy">
-                </picture>
-                <div class="home-page__instant-reserve-banner__text-parent-s">
-                    <div class="home-page__instant-reserve-banner__head-text-s"><i style="color:#DF7549" class="fa fa-bolt"></i> رزرو آنی</div>
-                    <div class="home-page__instant-reserve-banner__sub-text-s">بدون استعلام از میزبان</div>
-                </div>
-            </a>
+            }
         </div>
-    }
-    @*<div class="home-page__category js-category-link initialPartialContents" data-url="/category/categorylist?category_id=@(category.CategoryID)" data-title="@category.Title">
-        <img src="/file/loading" style="margin: auto;" />
-        </div>*@}
-
-@await Html.PartialAsync("_NewsLinkContainer")
-@await Html.PartialAsync("_HomePageBlogNews", (IEnumerable<BlogPost>)ViewBag.BlogPostNews)
-<p class="box-text-style">
-    املاک باشی وبسایت رزرو آنلاین است که در زمینه اجاره روزانه خانه،  آپارتمان مبله، اجاره سوئیت ، اجاره ویلا و رزرو اقامتگاه بوم گردی فعالیت دارد.<br />املاک باشی مجموعه‌ای از سوئیت تهران ، آپارتمان مبله تهران ، ویلا شمال، ویلا کردان ، سوئیت اصفهان ، سوئیت یزد ، سوئیت شیراز ، سوئیت مشهد ، سوئیت کیش ، اقامتگاه‌های بوم گردی و ویلا اطراف تهران را در دسته بندی های مختلف گرد هم آورده است تا خدمات آنلاین اجاره ویلا و اجاره روزانه خانه را برای مسافران ساده‌تر کند.<br />خدمات املاک باشی  شامل : <a target="_blank" href="/s/2/تهران">اجاره روزانه خانه در تهران</a>، <a target="_blank" href="/s/2/تهران">اجاره سوئیت تهران</a>، <a target="_blank" href="/شمال">اجاره ویلا شمال</a>، <a target="_blank" href="/s/448/کردان">اجاره ویلا کردان</a>، <a target="_blank" href="/s/1583/رامسر">اجاره ویلا رامسر</a>، <a target="_blank" href="/s/1053/ماسال">اجاره ویلا ماسال</a> ، <a target="_blank" href="/s/1558/نوشهر">اجاره ویلا در نوشهر</a> ، <a target="_blank" href="/s/1562/چالوس">اجاره ویلا در چالوس</a> ،  <a target="_blank" href="/s/1580/سلمان-شهر">اجاره ویلا متل قو</a>، <a target="_blank" href="/s/1/استان-تهران/ویلا">اجاره ویلا اطراف تهران</a>، <a target="_blank" href="/ایران">اجاره ویلا و سوئیت</a> ، <a target="_blank" href="/ایران/ویلا?t=83&pool=1">اجاره ویلاهای استخردار</a> ، <a target="_blank" href="/ایران/ویلا?t=83&region=1">اجاره ویلا ساحلی</a> ، <a target="_blank" href="/ایران/ویلا?t=83&region=2">اجاره ویلا جنگلی</a> ، <a target="_blank" href="/ایران/بومگردی">رزرو اقامتگاه بوم گردی</a> ، <a target="_blank" href="/s/794/اصفهان">اجاره سوئیت اصفهان</a> ، <a target="_blank" href="/s/1532/یزد">اجاره سوئیت یزد</a> ، <a target="_blank" href="/s/451/مشهد">اجاره سوئیت مشهد</a> ، <a target="_blank" href="/s/1279/کیش">اجاره سوئیت کیش</a> و <a target="_blank" href="/s/1622/شیراز">اجاره سوئیت شیراز</a> و در سایر شهرهای توریستی ایران می باشد.
-</p>
+        <p class="prev"><i class="fas fa-angle-right"></i></p>
+        <p class="next"><i class="fas fa-angle-left"></i></p>
+    </section>
+    @foreach (var category in homePageCategories)
+    {
+        <section class="home-page_style-box">
+            @*<div class="home-page__category-label-container">
+                    <h2><a target="_blank" href="@(category.categoryUrl)" class="home-page__link">@category.categoryH1Title</a></h2>
+                    <a target="_blank" href="@CategoryUrlLocalization.CategoryToUrl(category.category)" class="home-page__category-link home-page__link">نمایش همه  (@(category.category.CountAdvertise))<i class="fa fa-chevron-left"></i></a>
+                </div>*@
+            <a target="_blank" href="@(category.categoryUrl)" class="home-page__link text-border-bottom_style"><h2>@category.categoryH1Title (@(category.category.CountAdvertise))</h2>مشاهده همه</a>
+            <div class="home-page__category-container" data-url="/advertise/mostviewadvertisebycity?city_id=@(category.category.City)&province_id=@(category.category.Province)&type_id=@(category.category.Type)&count=5">
+                @await Html.PartialAsync("_AdvertiseList", category.AdvertiseItems, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "all_images_lazy", true } })
+                @*<img src="/file/loading" style="margin: auto;" />*@
+            </div>
+        </section>
+        counterBox = counterBox + 1;
+        if (counterBox == 1)
+        {
+            <section class="home-page__boyd-banner">
+                <div class="home-page__banner-container home-page__banner-discount">
+                    @if (mostDiscountAdvertise.Count > 0)
+                    {
+                        var counter = 0;
+                        foreach (var item in mostDiscountAdvertise)
+                        {
+                            counter++;
+                            var img_src = item.PhotoID > 0 ? string.Format("/file/accthumbxlarge?accid={0}&fileid={1}", item.AdvertiseID, item.PhotoID) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
+                            //var initial_loaded_img = !all_images_lazy && counter <= (Request.Browser.IsMobileDevice ? 1 : 4);
+                            var initial_loaded_img = true;
+                            var img_src_to_show = initial_loaded_img ? img_src : "/file/resourceimagepng?file_name=lazy-16_9";
+                            var img_data_source = initial_loaded_img ? "" : " data-src=" + img_src;
+                            var url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(item.Slug);
+                            <div class="banner-Slides box">
+                                <div class="bg"></div>
+                                <div class="details">
+                                    @if (item.DiscountPercent > 0)
+                                    {
+                                        <div class="home-page_banner-offer">
+                                            <p class="present"><i class="fa fa-percent"></i>@(item.DiscountPercent)</p>
+                                            <p> تخفیف </p>
+                                            <p>@item.DiscountDateString</p>
+                                        </div>
+                                    }
+                                    <h3 class="js-animate-text"><a class="title-banner-overflow" target="_blank" href="@url">@item.Title</a></h3>
+                                    <h4 class="js-animate-text"><i class="fa fa-map-marker-alt"></i>@(item.RegionString)</h4>
+                                    @if (item.HasChild)
+                                    {
+                                        <p class="js-animate-text"> @(item.AdvertiseTypeString)</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="js-animate-text"><i class="fa fa-bed"></i> @(item.Room > 0 ? item.Room + " خوابه" : "بدون اتاق")&nbsp;&nbsp;&nbsp;</p>
+                                        <p class="js-animate-text"><i class="fa fa-users"></i> ظرفیت  @(item.MinCapacity == item.MaxCapacity ? item.MinCapacity + " نفر" : item.MinCapacity + "-" + item.MaxCapacity + " نفر")</p>
+                                    }
+                                    <p class="desktop-change-text-price js-animate-text">شروع قیمت:@(string.Format("{0:n0}", item.DailyPrice))  تومان</p>
+                                    <a class="banner-button" target="_blank" href="@url">رزرو اقامتگاه<i class="fas fa-caret-left"></i></a>
+                                    <a target="_blank" class="view-all-Discounts" href="/ایران?discount_homes=1"> مشاهده همه تخفیف ها <i class="fa fa-chevron-left"></i></a>
+                                </div>
+                                <a target="_blank" href="@url" class="box-img-banner">
+                                    <img src="@img_src_to_show" @img_data_source alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")'>
+                                    @if (!initial_loaded_img)
+                                    {
+                                        <noscript>
+                                            <img class="home-page__advertise-image" src="@img_src" width="240" height="144" alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")'>
+                                        </noscript>
+                                    }
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+                <p class="prev"><i class="fas fa-angle-right"></i></p>
+                <p class="next"><i class="fas fa-angle-left"></i></p>
+            </section>
+        }
+        if (counterBox == 2)
+        {
+            <section class="home-page_box-banner">
+                <a target="_blank" href="/ایران?instant_reserve=1" class="home-page_item-banner">
+                    <img src="~/resource/img/reserve-fast.jpg" width="642" height="250" />
+                </a>
+                <a target="_blank" href="/ایران?hygieneProtocol=1" class="home-page_item-banner">
+                    <img src="~/resource/img/corona.jpg" width="642" height="250" />
+                </a>
+            </section>
+            @*<a target="_blank" href="/ایران?instant_reserve=1" class="home-page__instant-reserve-banner__text-root">
+                    <div class="home-page__instant-reserve-banner__text-parent">
+                        <div class="home-page__instant-reserve-banner__head-text"><i style="color:#DF7549" class="fa fa-bolt"></i> رزرو آنی</div>
+                        <div class="home-page__instant-reserve-banner__sub-text">بدون استعلام از میزبان</div>
+                    </div>
+                </a>
+                <div class="home-page__category home-page__instant-reserve-banner__img-parent">
+                    <a target="_blank" href="/ایران?instant_reserve=1">
+                        <picture>
+                            <source media="(max-width: 680px)" srcset="/file/resourceimagewebp?file_name=instant-reserve-banner-small">
+                            <img class="home-page__instant-reserve-banner__img lazy" alt='@category.Title' data-src="/file/resourceimagewebp?file_name=instant-reserve-banner" src="/file/resourceimagepng?file_name=instant-reserve-banner-lazy">
+                        </picture>
+                        <div class="home-page__instant-reserve-banner__text-parent-s">
+                            <div class="home-page__instant-reserve-banner__head-text-s"><i style="color:#DF7549" class="fa fa-bolt"></i> رزرو آنی</div>
+                            <div class="home-page__instant-reserve-banner__sub-text-s">بدون استعلام از میزبان</div>
+                        </div>
+                    </a>
+                </div>*@
+        }
+        @*<div class="home-page__category js-category-link initialPartialContents" data-url="/category/categorylist?category_id=@(category.CategoryID)" data-title="@category.Title">
+            <img src="/file/loading" style="margin: auto;" />
+            </div>*@}
+    @await Html.PartialAsync("_NewsLinkContainer")
+    @await Html.PartialAsync("_HomePageBlogNews", (IEnumerable<BlogPost>)ViewBag.BlogPostNews)
+    <p class="box-text-style">
+        املاک باشی وبسایت رزرو آنلاین است که در زمینه اجاره روزانه خانه،  آپارتمان مبله، اجاره سوئیت ، اجاره ویلا و رزرو اقامتگاه بوم گردی فعالیت دارد.<br />املاک باشی مجموعه‌ای از سوئیت تهران ، آپارتمان مبله تهران ، ویلا شمال، ویلا کردان ، سوئیت اصفهان ، سوئیت یزد ، سوئیت شیراز ، سوئیت مشهد ، سوئیت کیش ، اقامتگاه‌های بوم گردی و ویلا اطراف تهران را در دسته بندی های مختلف گرد هم آورده است تا خدمات آنلاین اجاره ویلا و اجاره روزانه خانه را برای مسافران ساده‌تر کند.<br />خدمات املاک باشی  شامل : <a target="_blank" href="/s/2/تهران">اجاره روزانه خانه در تهران</a>، <a target="_blank" href="/s/2/تهران">اجاره سوئیت تهران</a>، <a target="_blank" href="/شمال">اجاره ویلا شمال</a>، <a target="_blank" href="/s/448/کردان">اجاره ویلا کردان</a>، <a target="_blank" href="/s/1583/رامسر">اجاره ویلا رامسر</a>، <a target="_blank" href="/s/1053/ماسال">اجاره ویلا ماسال</a> ، <a target="_blank" href="/s/1558/نوشهر">اجاره ویلا در نوشهر</a> ، <a target="_blank" href="/s/1562/چالوس">اجاره ویلا در چالوس</a> ،  <a target="_blank" href="/s/1580/سلمان-شهر">اجاره ویلا متل قو</a>، <a target="_blank" href="/s/1/استان-تهران/ویلا">اجاره ویلا اطراف تهران</a>، <a target="_blank" href="/ایران">اجاره ویلا و سوئیت</a> ، <a target="_blank" href="/ایران/ویلا?t=83&pool=1">اجاره ویلاهای استخردار</a> ، <a target="_blank" href="/ایران/ویلا?t=83&region=1">اجاره ویلا ساحلی</a> ، <a target="_blank" href="/ایران/ویلا?t=83&region=2">اجاره ویلا جنگلی</a> ، <a target="_blank" href="/ایران/بومگردی">رزرو اقامتگاه بوم گردی</a> ، <a target="_blank" href="/s/794/اصفهان">اجاره سوئیت اصفهان</a> ، <a target="_blank" href="/s/1532/یزد">اجاره سوئیت یزد</a> ، <a target="_blank" href="/s/451/مشهد">اجاره سوئیت مشهد</a> ، <a target="_blank" href="/s/1279/کیش">اجاره سوئیت کیش</a> و <a target="_blank" href="/s/1622/شیراز">اجاره سوئیت شیراز</a> و در سایر شهرهای توریستی ایران می باشد.
+    </p>
 </div>
 @section HeaderAddition
 {

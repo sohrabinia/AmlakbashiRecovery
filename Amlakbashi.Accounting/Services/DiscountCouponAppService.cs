@@ -23,10 +23,17 @@ namespace Amlakbashi.Accounting.Services
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
         }
 
+        public DiscountCoupon Find(int userId, DiscountCoupon.DiscountCouponType type)
+        {
+            return Repository.Query(q => q.FirstOrDefault(f => f.UserID == userId &&
+                f.Type == type));
+        }
+
         public DiscountCoupon GetMostValuableCouponIfAny(int userId)
         {
             var coupons = Repository.Query(q => q.Where(x => x.UserID == userId &&
-                  x.Status == DiscountCoupon.StatusEnum.NotUsed));
+                x.Status == DiscountCoupon.StatusEnum.NotUsed && x.Type != DiscountCoupon.DiscountCouponType.Moupon
+                && x.Type != DiscountCoupon.DiscountCouponType.Instagram));
             if (!coupons.Any())
             {
                 return null;

@@ -28,6 +28,8 @@ namespace Amlakbashi.Core.Entities
             Unset = 0,
             Present = 1,
             Appreciate = 2,
+            Moupon = 3,
+            Instagram = 4
         }
         public enum StatusEnum
         {

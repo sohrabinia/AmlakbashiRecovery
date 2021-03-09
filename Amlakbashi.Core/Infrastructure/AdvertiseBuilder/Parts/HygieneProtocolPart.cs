@@ -2,12 +2,13 @@
 using Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Base;
 using System.Collections.Generic;
 using System.Linq;
+using static Amlakbashi.Core.Entities.Advertise;
 
 namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
 {
     public class HygieneProtocolPart : IPart, IValidator
     {
-        public bool? HygieneProtocol { get; set; }
+        public HygieneProtocolStatus? HygieneProtocol { get; set; }
         public bool Validate(out Dictionary<string, string> errors, out string msg)
         {
             errors = new Dictionary<string, string>();

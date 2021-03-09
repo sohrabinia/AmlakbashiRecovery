@@ -364,7 +364,7 @@ a {
     right: 0;
 }
 .box-min-max-night.home-page__advertise-bottom-container {
-    margin-top: -14px;
+    margin-top: 0;
     margin-bottom: 25px;
     height:22px;
 }
@@ -427,13 +427,13 @@ a {
 
 .home-page__advertise-city {
     width: 100%;
-    font: 13px Miransans;
-    color: #242424;
+    font: 12px Liransans;
+    color: #8e8e8e;
     margin: 2px;
 }
 
 .home-page__advertise-title {
-    font: 13px Liransans;
+    font: 13px Miransans;
     color: #484848;
     overflow: hidden;
     white-space: nowrap;
@@ -445,7 +445,20 @@ a {
     background: none;
     margin: 2px;
 }
-
+p.home-page__advertise-capacity {
+    margin: 5px 0;
+    font: 12px Liransans;
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+    color: #2f3c46;
+}
+p.home-page__advertise-capacity i{
+    margin-left:5px;
+}
+p.home-page__advertise-capacity .fa-users {
+    margin-right: 15px;
+}
 .home-page__advertise-price {
     width: 100%;
     font: 13px Liransans;
@@ -459,7 +472,7 @@ a {
 
 .home-page__advertise-no-comment {
     color: #5d5d5d;
-    font: 13px Miransans;
+    font: 12px Miransans;
     width: 50%;
 }
 

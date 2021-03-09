@@ -204,6 +204,17 @@ namespace Amlakbashi.Accounting
         }
 
         // DiscountCoupon Functions
+
+        public DiscountCoupon FindDiscountCoupon(long id)
+        {
+            return discountCouponService.Find(id);
+        }
+
+        public DiscountCoupon FindDiscountCoupon(int userId, DiscountCoupon.DiscountCouponType type)
+        {
+            return discountCouponService.Find(userId, type);
+        }
+
         public DiscountCoupon InsertDiscountCoupon(int userId, DiscountCoupon.DiscountCouponType type,
             int percent, int presentorUserID = 0)
         {
@@ -561,7 +572,7 @@ namespace Amlakbashi.Accounting
 
         public GuestPayResult GuestPayReserve(int userId, long reserveId,
             int payReserveType, out long payment_id, int doerUserId,
-            ActionSourceEnum actionSource, bool useCoupon, bool usePrize)
+            ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId)
         {
             var payType = (ReservePaymentType)payReserveType;
             switch (payType)
@@ -570,7 +581,8 @@ namespace Amlakbashi.Accounting
                 case ReservePaymentType.GuestClearing:
                     bool already_payed;
                     long price;
-                    payment_id = (long)PayGuest(userId, reserveId, payType, out already_payed, out price, ReservePaymentMethod.EPay, doerUserId, actionSource, useCoupon, usePrize);
+                    payment_id = (long)PayGuest(userId, reserveId, payType, out already_payed,
+                        out price, ReservePaymentMethod.EPay, doerUserId, actionSource, useCoupon, usePrize, couponId);
                     if (already_payed)
                     {
                         var reserve = repository.FindReserve(reserveId);
@@ -609,7 +621,7 @@ namespace Amlakbashi.Accounting
 
         public GuestPayResult GuestPayReserveWithCredit(int userId, long reserveId,
             int payReserveType, out long paymentId, int doerUserId,
-            ActionSourceEnum actionSource, bool useCoupon, bool usePrize)
+            ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId)
         {
             var payType = (ReservePaymentType)payReserveType;
             switch (payType)
@@ -618,7 +630,9 @@ namespace Amlakbashi.Accounting
                 case ReservePaymentType.GuestClearing:
                     bool already_payed;
                     long price;
-                    paymentId = PayGuest(userId, reserveId, payType, out already_payed, out price, ReservePaymentMethod.AmlakbashiCredit, doerUserId, actionSource, useCoupon, usePrize);
+                    paymentId = PayGuest(userId, reserveId, payType, out already_payed,
+                        out price, ReservePaymentMethod.AmlakbashiCredit, doerUserId,
+                        actionSource, useCoupon, usePrize, couponId);
                     if (already_payed)
                     {
                         var reserve = repository.FindReserve(reserveId);
@@ -957,8 +971,8 @@ namespace Amlakbashi.Accounting
         }
 
         private long PayGuest(int userId, long reserveId, ReservePaymentType payType,
-    out bool alreadyPaid, out long price, ReservePaymentMethod paymentMethod,
-    int doerUseId, ActionSourceEnum actionSource, bool useCoupon, bool usePrize)
+            out bool alreadyPaid, out long price, ReservePaymentMethod paymentMethod,
+            int doerUseId, ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId)
         {
             price = 0;
             var reserve = repository.FindReserve(reserveId);
@@ -969,7 +983,12 @@ namespace Amlakbashi.Accounting
             var paidAmount = reservePaymentService.GetPaidAmount(reserveId, StatusStringType.Guest);
             long couponAvailable = 0, prizeAvailable = 0;
             DiscountCoupon coupon = null;
-            if (useCoupon)
+            if (couponId > 0)
+            {
+                coupon = discountCouponService.Find(couponId);
+                couponAvailable = coupon != null && coupon.UserID == userId ? CalculateDiscountCouponPrice(coupon.Percent, reserve.CouponCalculationPrice) : 0;
+            }
+            else if (useCoupon)
             {
                 coupon = discountCouponService.GetMostValuableCouponIfAny(reserve.UserID);
                 couponAvailable = coupon != null ? discountCouponService.CalculateCouponPrice(coupon.Percent, reserve.CouponCalculationPrice) : 0;

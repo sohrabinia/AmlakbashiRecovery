@@ -1,4 +1,7 @@
 ﻿@model Amlakbashi.Core.DTOs.PaymentDTOs.ReservePaymentDTO
+@{
+    var alreadyUsedDiscount = Model.CouponId > 0 || Model.PrizePrice > 0;
+}
 
 <div style="font-family: Liransans;display:flex;flex-flow:column;width:fit-content;max-width: 90%;margin: auto;">
     <div style="margin:5px 0;align-items: center;">
@@ -97,6 +100,16 @@
             }
         }
     </div>
+    @if (!alreadyUsedDiscount && Model.PaidAmount + Model.PrizePrice + Model.CouponPrice < 1)
+    {
+        <div style="border-top: 1px solid lightgray; padding-top: 7px;">
+            <label style="font:12px Miransans;margin-right:3px;">کد تخفیف: </label>
+            <input type="text" name="discountCodeInput" id="discountCodeInput" style="width: 100px; height: 25px; border-radius: 3px; text-align:center;" />
+            <button id="discountCodeBtn" onclick="submitDiscountCode()" style="font-size: 12px; width: 50px; height: 25px; background-color: dodgerblue; border: 0; color: white; border-radius:3px;">ثبت</button>
+            <p style="font-size: 12px;" id="submitDiscountResult"></p>
+        </div>
+    }
+    <hr />
 </div>
 
 <script type="text/javascript">
@@ -120,6 +133,50 @@
         payType: 1,
         payMethod: 0
     };
+
+    function submitDiscountCode() {
+        var attr = $('#discountCodeInput').attr('disabled');
+        if (typeof attr !== typeof undefined && attr !== false) {
+            $("#submitDiscountResult").html('تنها از یک گزینه تخفیف می توان استفاده کرد');
+            $("#submitDiscountResult").css("color", "red");
+            return;
+        }
+        var code = $("#discountCodeInput").val();
+        $.ajax({
+            type: "post",
+            url: "/reserve/submitdiscountcode",
+            data: { code: code, reserveId: reservePaymentData.reserveId },
+            beforeSend: function () {
+                $("#paidInfo").css("opacity", "0.5");
+            },
+            success: function (response) {
+                $("#paidInfo").css("opacity", "1");
+                if (response.status == 0) {
+                    $("#submitDiscountResult").html(response.msg);
+                    $("#submitDiscountResult").css("color", "red");
+                }
+                else {
+                    $("#submitDiscountResult").html(response.msg);
+                    $("#submitDiscountResult").css("color", "green");
+                    reservePaymentData.discountCouponId = response.couponId;
+                    var discountPrice = response.discountPrice;
+                    reservePaymentData.totalPrice = reservePaymentData.totalPrice - discountPrice;
+                    reservePaymentData.depositePrice = reservePaymentData.depositePrice - discountPrice;
+                    $("#js-payment-type-discount").css("display", "flex");
+                    $("#js-final-discount-price-label").html(discountPrice);
+                    $("#js-final-total-price-label").html(reservePaymentData.totalPrice);
+                    $("#js-final-deposite-price-label").html(reservePaymentData.depositePrice);
+                    $("#js-use-discount-coupon").attr("disabled", "disabled");
+                    $("#js-use-prize-credit").attr("disabled", "disabled");
+                    $("#discountCodeBtn").attr("disabled", "disabled");
+                }
+            },
+            error: function () {
+                $("#paidInfo").css("opacity", "1");
+                alert("error");
+            }
+        });
+    }
 
     updatePaymentPrice();
     $('input[type=radio][name=payType]').change(function() {

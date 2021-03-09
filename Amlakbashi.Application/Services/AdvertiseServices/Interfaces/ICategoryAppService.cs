@@ -41,6 +41,7 @@ namespace Amlakbashi.Application.Services.Category.Interfaces
           int sort = 0,
           List<int> roomList = null,
           string phrase = "",
+          bool hygieneProtocol = false,
           bool forceIncludeChildren = false,
           bool forceIncludeDiscounts = false
       );
