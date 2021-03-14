@@ -118,7 +118,7 @@ namespace Amlakbashi.Core.Entities
         public ImageThumbStatusEnum ImageThumbGenerateStatus { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        public bool? HygieneProtocol { get; set; }
+        public HygieneProtocolStatus? HygieneProtocol { get; set; }
 
         [JsonIgnore]
         [ForeignKey("Province")]
@@ -1328,6 +1328,7 @@ namespace Amlakbashi.Core.Entities
         }
         public enum OccupiedSelectType { All, ForFrom, ForTo }
         public enum OccupiedSource { All, Reserves, Tables }
+        public enum HygieneProtocolStatus { NotConsider = 0, Consider = 1, Verified = 2, NotVerified = 3 }
 
         #endregion
     }

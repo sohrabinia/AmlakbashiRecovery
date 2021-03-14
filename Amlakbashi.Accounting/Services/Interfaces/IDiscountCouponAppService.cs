@@ -11,6 +11,7 @@ namespace Amlakbashi.Accounting.Services.Interfaces
     internal interface IDiscountCouponAppService : IAppService<ReservePayment, long>
     {
         DiscountCoupon Find(long id);
+        DiscountCoupon Find(int userId, DiscountCoupon.DiscountCouponType type);
         DiscountCoupon GetMostValuableCouponIfAny(int userId);
         DiscountCoupon Insert(int userId, DiscountCoupon.DiscountCouponType type, int percent,
             int presentorUserID = 0);

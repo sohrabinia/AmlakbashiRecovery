@@ -28,7 +28,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         List<long> GetAdvertisesPhotoIds();
         void AddSupporterInfo(long id, string text, User supporter);
         IList<Advertise> Filter(AdvertiseStatus status, int adtype, int userid, string sort, long id, int instantReserveStatus,
-            long unixDate, int imageCountMin, int imageCountMax, int province, int city, int area);
+            long unixDate, int imageCountMin, int imageCountMax, int province, int city, int area, int hygieneProtocolStatus);
         IList<Advertise> Filter(string statusString, int userid, long id);
         IList<Advertise> FilterAdmin(int province = 0, int city = 0, int area = 0, int adtype = 0,
             bool defaultProvince = false, int adStatus = -1);
@@ -120,6 +120,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         bool ReserveRequest(long advertiseId, int userId, string startDate,
             string endDate, int guestCount, bool instantReserve, out string msg, out long reserveId);
         IList<Advertise> GetNorouzAdvertises(int count);
-        void SetHygieneProtocol(long id, bool value);
+        void SetHygieneProtocol(long id, HygieneProtocolStatus value);
     }
 }

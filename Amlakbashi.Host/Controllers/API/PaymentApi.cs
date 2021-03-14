@@ -51,7 +51,7 @@ namespace Amlakbashi.Host.Controllers.API
                     return null;
                 }
                 long payment_id;
-                var result = accounting.GuestPayReserve(user.Id, reserve_id, pay_reserve_type, out payment_id, user.Id, ActionLog.ActionSourceEnum.Application, useCoupon, usePrize);
+                var result = accounting.GuestPayReserve(user.Id, reserve_id, pay_reserve_type, out payment_id, user.Id, ActionLog.ActionSourceEnum.Application, useCoupon, usePrize, 0);
                 switch (result)
                 {
                     case GuestPayResult.ReadyToPay:
@@ -90,7 +90,7 @@ namespace Amlakbashi.Host.Controllers.API
                     });
                 }
                 long payment_id;
-                var result = accounting.GuestPayReserveWithCredit(user.Id, reserve_id, pay_reserve_type, out payment_id, user.Id, ActionLog.ActionSourceEnum.Application, useCoupon, usePrize);
+                var result = accounting.GuestPayReserveWithCredit(user.Id, reserve_id, pay_reserve_type, out payment_id, user.Id, ActionLog.ActionSourceEnum.Application, useCoupon, usePrize, 0);
                 switch (result)
                 {
                     case GuestPayResult.NotEnoughCredit:
@@ -147,7 +147,7 @@ namespace Amlakbashi.Host.Controllers.API
                 }
                 string msg;
                 var done = reserveService.CashPay(reserve_id, out msg,
-                    ActionLog.ActionSourceEnum.Application ,user.Id);
+                    user.Id, ActionLog.ActionSourceEnum.Application ,user.Id);
                 return GenerateJsonResult(new
                 {
                     done = done,
@@ -183,7 +183,7 @@ namespace Amlakbashi.Host.Controllers.API
                 }
                 string msg;
                 var done = reserveService.ConfirmCashPay(reserve_id, paid, out msg,
-                    ActionLog.ActionSourceEnum.Application, user.Id);
+                    user.Id, ActionLog.ActionSourceEnum.Application, user.Id);
                 return GenerateJsonResult(new
                 {
                     done = done,

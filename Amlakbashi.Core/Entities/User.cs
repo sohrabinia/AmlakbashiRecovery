@@ -10,70 +10,71 @@ namespace Amlakbashi.Core.Entities
 {
     public class User : Entity<int>, ISoftDelete
     {
+        #region User
         [Column("UserID")]
         public override int Id { get; set; }
-        public string MainMobile { get; set; }
-        public int LoginPriority { get; set; }
         public string FName { get; set; }
         public string LName { get; set; }
+        public string MainMobile { get; set; }
         public string Email { get; set; }
-        public string Tell { get; set; }
-        public string ThirdPersonTell { get; set; }
+        public int State { get; set; }
+        public int LoginPriority { get; set; }
+        public int UserGeneralType { get; set; }
+        public string ForgetCode { get; set; }
+        public string Code { get; set; }
+        public DateTime? CreateDate { get; set; }
+        public DateTime? SendVerification { get; set; }
+        public int AccessType { get; set; }
+        [NotMapped]
+        public string FullName
+        {
+            get
+            {
+                return (!string.IsNullOrEmpty(FName) ? FName + " " : "") +
+                    (!string.IsNullOrEmpty(LName) ? LName : "");
+            }
+        }
+        #endregion
+        #region User Contact
         public string Mobile { get; set; }
         public string Mobile2 { get; set; }
-        public string Address { get; set; }//Description
-        public string ForgetCode { get; set; }
-        public string AdminLoginCode { get; set; }
-        public DateTime? CreateDate { get; set; }
-        public int State { get; set; }
-        public string Code { get; set; }
-        public DateTime? SendVerification { get; set; }
+        public string Tell { get; set; }
+        public string ThirdPersonTell { get; set; }
         public int ResponseFrom { get; set; }
         public int ResponseTo { get; set; }
-        public long? PhotoID { get; set; }
-        public string ContactPhone { get; set; }
-        public int OwnerShip { get; set; }
-        public int AmlakbashiScore { get; set; }
-        public long UserScore { get; set; }
-        public int PhotoStatus { get; set; }
-        public long Credit { get; set; }
-        public long PrizeCredit { get; set; }
-        public int UserGeneralType { get; set; }
-        public int AccessType { get; set; }
         public string NotificationToken { get; set; }
         public string AppNotificationToken { get; set; }
         public string FcmAppNotificationToken { get; set; }
         public long LastNotifPermitionTicks { get; set; }
-        public int PresentorUserID { get; set; }
-        public bool PresentorPrizeGiven { get; set; }
-        public bool RecieveAppreciateDiscount { get; set; }
+        #endregion
+        #region Hostler
+        public int OwnerShip { get; set; }
+        public int AmlakbashiScore { get; set; }
+        public long UserScore { get; set; }
         public int CancelInstantReserveLimit { get; set; } = 3;
         public InstantReserveAccessEnum InstantReserveAccess { get; set; }
-        public bool IsDeleted { get; set; }
-        [JsonIgnore]
-        [ForeignKey("PhotoID")]
-        public virtual File Photo { get; set; }
-
-        [JsonIgnore]
-        public virtual ICollection<UserFavorite> Favorite { get; set; }
-
-        [JsonIgnore]
-        [InverseProperty("GuestUser")]
-        public virtual ICollection<Reserve> Reserves { get; set; }
-
         [JsonIgnore]
         [InverseProperty("HostUser")]
         public virtual ICollection<Reserve> HostReserves { get; set; }
-
+        [JsonIgnore]
+        public virtual ICollection<Advertise> Advertises { get; set; }
+        #endregion
+        #region User Profile
+        public long? PhotoID { get; set; }
+        public int PhotoStatus { get; set; }
+        [JsonIgnore]
+        [ForeignKey("PhotoID")]
+        public virtual File Photo { get; set; }
+        public string Address { get; set; }//Description
+        [JsonIgnore]
+        public virtual ICollection<UserFavorite> Favorite { get; set; }
+        public long Credit { get; set; }
+        public long PrizeCredit { get; set; }
         [JsonIgnore]
         public virtual ICollection<CreditTransaction> CreditTransactions { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<PrizeCreditTransaction> PrizeCreditTransactions { get; set; }
-
-        [JsonIgnore]
-        public virtual ICollection<Advertise> Advertises { get; set; }
-
         [JsonIgnore]
         public virtual ICollection<DiscountCoupon> DiscountCoupons { get; set; }
 
@@ -97,15 +98,35 @@ namespace Amlakbashi.Core.Entities
         [JsonIgnore]
         [InverseProperty("Supporter")]
         public virtual ICollection<ReserveSupport> ReserveSupportsAsSupporter { get; set; }
-        [NotMapped]
-        public string FullName
-        {
-            get
-            {
-                return (!string.IsNullOrEmpty(FName) ? FName + " " : "") +
-                    (!string.IsNullOrEmpty(LName) ? LName : "");
-            }
-        }
+        public int PresentorUserID { get; set; }
+        public bool PresentorPrizeGiven { get; set; }
+        public bool RecieveAppreciateDiscount { get; set; }
+        [JsonIgnore]
+        [InverseProperty("GuestUser")]
+        public virtual ICollection<Reserve> Reserves { get; set; }
+        #endregion
+        #region To Delete
+        public string AdminLoginCode { get; set; }
+        public string ContactPhone { get; set; }
+        #endregion
+
+
+        
+        public bool IsDeleted { get; set; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public enum InstantReserveAccessEnum
         {

@@ -358,7 +358,8 @@
                         payWithCredit(reservePaymentData.payType, reserve_id, reservePaymentData.finalPriceTotal, reservePaymentData.finalPriceDeposite, reservePaymentData.userId, reservePaymentData.paidPrice, reservePaymentData.useCoupon, reservePaymentData.usePrize,
                             (reservePaymentData.useCoupon ? reservePaymentData.couponId : 0),
                             (reservePaymentData.usePrize ? reservePaymentData.prizePrice : 0),
-                            (reservePaymentData.useCoupon ? reservePaymentData.couponPrice : 0));
+                            (reservePaymentData.useCoupon ? reservePaymentData.couponPrice : 0),
+                            reservePaymentData.discountCouponId);
                         break;
                     case 3:
                         cashPay(reserve_id);
@@ -397,7 +398,8 @@
                         var url = '/reserve/guestpayreserve?reserve_id=' + reserve_id +
                             '&pay_reserve_type=' + reservePaymentData.payType +
                             '&useCoupon=' + reservePaymentData.useCoupon +
-                            '&usePrize=' + reservePaymentData.usePrize;
+                            '&usePrize=' + reservePaymentData.usePrize +
+                            '&couponId=' + reservePaymentData.discountCouponId;
                         window.location.href = url;
                         break;
                 }
@@ -460,7 +462,7 @@
             });
         }
 
-        function payWithCredit(pay_type, reserve_id, total_price, deposite_price, user_id, payed_price, useCoupon, usePrize, couponId, prizePrice, couponPrice) {
+        function payWithCredit(pay_type, reserve_id, total_price, deposite_price, user_id, payed_price, useCoupon, usePrize, couponId, prizePrice, couponPrice, discountCouponId) {
             if (useCoupon == undefined){
                 useCoupon = false;
             }
@@ -500,7 +502,8 @@
                             var url = '/Reserve/GuestPayReserveWithCredit?reserve_id=' + reserve_id +
                                 '&pay_reserve_type=' + pay_type +
                                 '&useCoupon=' + useCoupon +
-                                '&usePrize=' + usePrize;
+                                '&usePrize=' + usePrize +
+                                '&couponId=' + discountCouponId;
                             window.location.href = url;
                         }
                     }
@@ -524,7 +527,8 @@
                             var url = '/Reserve/GuestPayReserveWithCredit?reserve_id=' + reserve_id +
                                 '&pay_reserve_type=' + pay_type +
                                 '&useCoupon=' + useCoupon +
-                                '&usePrize=' + usePrize;
+                                '&usePrize=' + usePrize +
+                                '&couponId=' + discountCouponId;
                             window.location.href = url;
                         }
                     }

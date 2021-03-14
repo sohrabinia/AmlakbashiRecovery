@@ -17,6 +17,7 @@ function SetAdvertiseFilterForm(newData) {
     $('#advertise-filter-form input[name="instant_reserve"]').attr('value', newData.instantReserve);
     $('#advertise-filter-form input[name="today_empty_homes"]').attr('value', newData.todayEmptyHomes);
     $('#advertise-filter-form input[name="norouz_special"]').attr('value', newData.norouzSpecial);
+    $('#advertise-filter-form input[name="hygieneProtocol"]').attr('value', newData.hygieneProtocol);
     $('#advertise-filter-form input[name="country_direction"]').attr('value', newData.countryDirection);
     $('#advertise-filter-form input[name="Province"]').attr('value', newData.province);
     $('#advertise-filter-form input[name="City"]').attr('value', newData.city);

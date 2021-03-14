@@ -381,20 +381,21 @@ span.js-area-select{
     height:100%;
 }
 
-.advertise-list__pin-filter-item { 
-    display:flex;
-    align-items:center;
-    border:1px solid #ccc;
-    border-radius:9px;
-    width:130px;
-    min-width:130px;
-    padding:5px 5px 5px 2px;
-    margin:10px;
-    cursor:pointer;
-    background-color:white;
-    color:#242424;
+.advertise-list__pin-filter-item {
+    display: flex;
+    align-items: center;
+    border-radius: 9px;
+    width: 130px;
+    min-width: 130px;
+    padding: 5px 5px 5px 2px;
+    margin: 10px;
+    cursor: pointer;
+    background-color: white;
+    color: #242424;
     max-height: 35px;
-    box-shadow: 1px 2px 3px 0 rgba(0,0,0,.1);
+    align-items: center;
+    border: 1px solid #e5e5e5;
+    box-shadow: 1px 2px 3px 0 rgba(0, 0, 0 , 0.2);
 }
 .advertise-list__pin-filter-item:hover {
     background-color:#ffeca0 !important;
@@ -430,9 +431,7 @@ span.js-area-select{
     white-space: nowrap;
 }
 
-.advertise-list__pin-filter-left::-webkit-scrollbar
-/*,.advertise-list__pin-filter-right::-webkit-scrollbar*/
- {
+.advertise-list__pin-filter-left::-webkit-scrollbar{
     display: none;
 }
 
@@ -459,16 +458,6 @@ span.js-area-select{
 #js-capacity-filter-item {
     right:170px;
 }
-
-/*#js-pricerange-filter-item {
-    right:320px;
-    width:410px;
-}*/
-
-/*#js-acctype-filter-item {
-    right:320px;
-    width:410px;
-}*/
 
 #js-region-filter-item {
     width:fit-content;
@@ -754,7 +743,6 @@ input[type=number] {
 
     .advertise-list__pin-filter-list-bottom {
         display: flex;
-/*        height:35px;*/
         border: none;
         margin: 0;
         padding: 0;
@@ -844,6 +832,65 @@ input[type=number] {
     .advertise-list__sort-popup-parent {
         margin-right: -91px;
         margin-top: -2px;
+    }
+}
+@media (max-width:760px) {
+    .advertise-filter__inpage-filter {
+        flex-flow: column wrap;
+    }
+
+    .advertise-list__pin-filter-container {
+        height: auto;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.09);
+        background: #fff;
+    }
+
+    .advertise-list__pin-filter-list-bottom {
+        display: none;
+    }
+
+    .advertise-filter__extra-filter-container {
+        margin: 10px auto;
+        overflow-x: scroll;
+        margin: 10px auto;
+        white-space: nowrap;
+        display: block;
+        width: 100%;
+        -ms-overflow-style: none !important; /* IE and Edge */
+        scrollbar-width: none !important; /* Firefox */
+    }
+
+    .advertise-filter__extra-filter-container::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .advertise-filter__inpage-filter .advertise-filter__extra-filter-container .advertise-list__pin-filter-item {
+        width: 19.5% !important;
+        width: 70px;
+        display: inline-block;
+        text-align: center;
+        min-width: 70px;
+        padding: 3px;
+        margin: 3px;
+        height: 32px;
+        padding: 0px 0;
+        vertical-align: middle;
+    }
+
+    .advertise-list__pin-filter-top {
+        height: 50px;
+    }
+
+    .advertise-list__pin-filter-top .advertise-list__pin-filter-item i {
+        display: none;
+    }
+    .advertise-list__pin-filter-item img{
+        margin-top:5px;
+    }
+    div#sort-filter-button {
+        width: 128px !important;
+        margin-right: 0;
+        background: #efefef;
     }
 }
 @media (max-width: 720px){
@@ -1003,9 +1050,6 @@ input[type=number] {
         width:100%;
     }
 
-    .advertise-list__filter-close-btn {
-    }
-
     .advertise-list__filter-close-btn i {
         font-size:25px;
         color:#424242;
@@ -1034,24 +1078,7 @@ input[type=number] {
     }
 }
 
-@media (max-width:550px) {
-    .advertise-filter__inpage-filter {
-        flex-flow: column wrap;
-    }
-
-    .advertise-filter__extra-filter-container {
-        margin: 10px auto;
-    }
-}
-
 @media (max-width: 420px) {
-    .advertise-list__pin-filter-item { 
-        width:82px;
-        min-width:82px;
-        padding:3px;
-        margin:3px;
-    }
-
     .advertise-list__pin-filter-item span {
         width:100%;
         text-align:center;
@@ -1078,11 +1105,11 @@ input[type=number] {
         padding-right: 3px;
     }
 
-    .advertise-filter__extra-filter-container .advertise-list__pin-filter-item {
+/*    .advertise-filter__extra-filter-container .advertise-list__pin-filter-item {
         width:88px;
         min-width:88px;
     }
-
+*/
     .advertise-filter__extra-filter-container .advertise-list__pin-filter-item i {
         display: unset;
     }
@@ -1108,10 +1135,10 @@ input[type=number] {
         margin-left: -10px;
     }
 
-    #today-empty-filter-button {
+/*    #today-empty-filter-button {
         width: 82px;
         min-width: 82px;
-    }
+    }*/
 
     #discount-homes-filter-button span {
         margin-left: -10px;
@@ -1134,15 +1161,16 @@ input[type=number] {
     #today-empty-filter-button span {
         margin-left: -10px;
     }
+    .advertise-filter__inpage-filter .advertise-filter__extra-filter-container .advertise-list__pin-filter-item {
+        width: 36.3% !important;
+    }
+    .advertise-list__pin-filter-item {
+        width: 66px;
+        min-width: 66px;
+    }
 }
 
 @media (max-width: 370px) {
-      .advertise-list__pin-filter-item { 
-        width:70px;
-        min-width:70px;
-        padding:3px;
-        margin:3px;
-    }
 
     .advertise-list__pin-filter-item span {
         width:100%;
@@ -1150,12 +1178,12 @@ input[type=number] {
         font: 11px Liransans;
     }
 
-    .advertise-list__pin-filter-item i {
+    /*.advertise-list__pin-filter-item i , .advertise-list__pin-filter-item img{*/
         /*width:9%;
         margin-right:2%;
         font-size:11px;*/
-        display:none;
-    }
+        /*display:none;
+    }*/
 
     #instant-reserve-filter-button {
         width: 48px;
@@ -1192,14 +1220,14 @@ input[type=number] {
     #norouz-special-filter-button span {
         margin-left : 0;
     }
-
+/*
 
     #today-empty-filter-button i,
     #discount-homes-filter-button i,
     #instant-reserve-filter-button i,
     #norouz-special-filter-button i{
         display: none;
-    }
+    }*/
 }
 
 @media(max-width: 320px) {

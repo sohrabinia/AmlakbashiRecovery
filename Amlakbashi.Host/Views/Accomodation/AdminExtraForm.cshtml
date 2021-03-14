@@ -61,7 +61,15 @@
             @if (Model.hygieneProtocol != null)
             {
                 <div class="static-advertise advetise-form__part">
-                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccHygieneProtocolInput.cshtml", Model.hygieneProtocol)
+                    @*@Html.Partial("~/Views/Accomodation/AddEditFormInputs/_AccHygieneProtocolInput.cshtml", Model.hygieneProtocol)*@
+                    <p class="static-advertise__title">رعایت پروتکل های بهداشتی</p>
+                    <select name="HygieneProtocol">
+                        <option is-selected="@(Model.hygieneProtocol.HygieneProtocol == null)" value="null">نامشخص</option>
+                        @foreach (var hygieneProtocolStatus in Enum.GetValues(typeof(Amlakbashi.Core.Entities.Advertise.HygieneProtocolStatus)) as Amlakbashi.Core.Entities.Advertise.HygieneProtocolStatus[])
+                        {
+                            <option is-selected="@(hygieneProtocolStatus == Model.hygieneProtocol.HygieneProtocol)" value="@((int)hygieneProtocolStatus)">@AdvertiseMainLocalization.GetHygieneProtocolStatusText(hygieneProtocolStatus)</option>
+                        }
+                    </select>
                 </div>
             }
             @if (hasBuildingPart == true)

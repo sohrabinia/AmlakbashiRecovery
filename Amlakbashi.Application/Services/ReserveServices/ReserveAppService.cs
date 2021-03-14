@@ -681,10 +681,10 @@ namespace Amlakbashi.Application.Services.ReserveServices
         }
 
         public bool CashPay(long reserveId, out string msg,
-            ActionSourceEnum actionSource, int doerUserId)
+            int userId, ActionSourceEnum actionSource, int doerUserId)
         {
             var reserve = Repository.Find(reserveId);
-            if (reserve.UserID != doerUserId ||
+            if (reserve.UserID != userId ||
                 reserve.Status != ReserveStatus.Reserved)
             {
                 msg = "شما مجوز این کار را ندارید";
@@ -705,11 +705,11 @@ namespace Amlakbashi.Application.Services.ReserveServices
         }
 
         public bool ConfirmCashPay(long reserveId, bool paid, out string msg,
-            ActionSourceEnum actionSource, int doerUserId)
+            int userId, ActionSourceEnum actionSource, int doerUserId)
         {
             var reserve = Repository.Find(reserveId);
             var advertise = reserve.Advertise;
-            if (advertise.UserID != doerUserId || reserve.Status != ReserveStatus.CashPay)
+            if (advertise.UserID != userId || reserve.Status != ReserveStatus.CashPay)
             {
                 msg = "شما مجوز این کار را ندارید";
                 return false;
@@ -720,7 +720,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 if (reserve.CanReserveStarted(out canStartTime))
                 {
                     mediator.Send(new SetReserveStatusCommand(reserveId,
-                        ReserveStatus.Started, true, actionSource, doerUserId));
+                        ReserveStatus.Started, true, actionSource, doerUserId, true));
                 }
                 msg = "شما پراخت نقدی مهمان را تایید کردید";
             }

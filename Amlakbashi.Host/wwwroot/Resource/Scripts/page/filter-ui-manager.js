@@ -2,6 +2,7 @@
 filterSubject.addListener(updateTodayEmptyUI);
 filterSubject.addListener(updateDiscountUI);
 filterSubject.addListener(updateNorouzUI);
+filterSubject.addListener(updateHygieneProtocolUI);
 filterSubject.addListener(updateDateUI);
 filterSubject.addListener(updateCapacityUI);
 filterSubject.addListener(updateSortUI);
@@ -24,6 +25,15 @@ function updateTodayEmptyUI(newData) {
     }
     else {
         $('#today-empty-filter-button').css("background-color", "white");
+    }
+}
+
+function updateHygieneProtocolUI(newData) {
+    if (newData.hygieneProtocol == true) {
+        $('#corona-special-filter-button').css("background-color", "#fdd835");
+    }
+    else {
+        $('#corona-special-filter-button').css("background-color", "white");
     }
 }
 

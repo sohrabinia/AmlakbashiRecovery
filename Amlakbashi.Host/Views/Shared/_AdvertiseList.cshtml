@@ -132,19 +132,19 @@
                     {
                         <h3 class="home-page__advertise-title">@item.Title</h3>
                     }
-                    <p id="js-daily-price" class="home-page__advertise-price">شروع قیمت: @(string.Format("{0:n0}", item.DailyPrice)) تومان</p>
-                    <pre class="home-page__advertise-price">قیمت نوروز: @(item.NorouzPrice > 0 ? string.Format("{0:n0} تومان", item.NorouzPrice) : "تعیین نشده")
-کد آگهی: @(item.AdvertiseID)
-    @if (!isParent)
-    {
-<i class="fa fa-bed"></i> @(item.Room > 0 ? item.Room + " خوابه" : "بدون اتاق")     <i class="fa fa-users"></i> @:ظرفیت @capacity
-    }
-    else
-    {
-@:
-    }
+                <p id="js-daily-price" class="home-page__advertise-price">شروع قیمت: @(string.Format("{0:n0}", item.DailyPrice)) تومان</p>
+                <p class="home-page__advertise-price">قیمت نوروز: @(item.NorouzPrice > 0 ? string.Format("{0:n0} تومان", item.NorouzPrice) : "تعیین نشده")</p>
+                <p class="home-page__advertise-capacity">
+                    @if (!isParent)
+                    {
+                        <i class="fa fa-bed"></i> @(item.Room > 0 ? item.Room + " خوابه" : "بدون اتاق")     <i class="fa fa-users"></i> @:ظرفیت @capacity
+                    }
+                    else
+                    {
+                        @:
+                    }
 
-</pre>
+                </p>
                     <!--<p class="home-page__advertise-price">کد آگهی: @(item.AdvertiseID)</p>
                     <div class="home-page_details-advertise">
                         @if (item.HasChild)

@@ -32,6 +32,13 @@ function initializeFilterData() {
     else {
         filterInputData.norouzSpecial = false;
     }
+    tempFilter = $('#advertise-filter-form input[name="hygieneProtocol"]').attr('value');
+    if (tempFilter == 'True') {
+        filterInputData.hygieneProtocol = true;
+    }
+    else {
+        filterInputData.hygieneProtocol = false;
+    }
     filterInputData.countryDirection = $('#advertise-filter-form input[name="country_direction"]').attr('value');
     filterInputData.province = $('#advertise-filter-form input[name="Province"]').attr('value');
     filterInputData.city = $('#advertise-filter-form input[name="City"]').attr('value');
@@ -102,6 +109,13 @@ function toggleTodayEmpty() {
     filterInputData.page = 1;
     filterInputData.ajax = true;
     filterInputData.todayEmptyHomes = !filterInputData.todayEmptyHomes;
+    sendNewFilterData();
+}
+
+function toggleHygieneProtocol() {
+    filterInputData.page = 1;
+    filterInputData.ajax = true;
+    filterInputData.hygieneProtocol = !filterInputData.hygieneProtocol;
     sendNewFilterData();
 }
 

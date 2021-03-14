@@ -2664,7 +2664,27 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Auth]
-        public JsonResult SetHygieneProtocol(long id, bool value)
+        public JsonResult SetHygieneProtocol(long id, HygieneProtocolStatus value)
+        {
+            try
+            {
+                var acc = advertiseService.Find(id);
+                if (acc.UserID != userAccessor.CurrentUser.Id)
+                {
+                    return GenerateJsonResult(new { status = 0 });
+                }
+                advertiseService.SetHygieneProtocol(id, value);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Accomodation.SetHygieneProtocol", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Auth(UserRoles.Admin)]
+        public JsonResult SetHygieneProtocolAdmin(long id, HygieneProtocolStatus value)
         {
             try
             {
@@ -2673,7 +2693,7 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("Accomodation.SetHygieneProtocol", exc);
+                logger.Error("Accomodation.SetHygieneProtocolAdmin", exc);
                 return GenerateJsonResult(new { status = 0 });
             }
         }
