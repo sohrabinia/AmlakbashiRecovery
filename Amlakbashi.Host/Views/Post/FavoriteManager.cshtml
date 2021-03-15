@@ -14,11 +14,9 @@
 <input type="hidden" value="20" id="skipsize" />
 <input type="hidden" value="@userAccessor.CurrentUser.Id" id="userid" />
 
-<div>
-    <div class="row" style="font:18px Miransans;text-align:right;padding: 0 30px 30px 30px;color:#222; "><h1>علاقه مندی ها</h1></div>
-    <div class="row accommodationList">
-        @await Html.PartialAsync("_AdvertiseList", Model)
-    </div>
+<h1 class="dashboard-box-favorite">علاقه مندی های من</h1>
+<div class="accommodationList dashboard-favorite-item">
+    @await Html.PartialAsync("_AdvertiseList", Model)
 </div>
 
 @section ScriptBlock

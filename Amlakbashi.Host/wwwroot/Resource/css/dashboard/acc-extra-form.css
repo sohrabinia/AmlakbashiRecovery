@@ -48,7 +48,7 @@
     border-radius: 5px;
     border: 1px solid #e2e2e2;
     padding: 8px 5px;
-    box-shadow: 0 1px 0px 0 rgb(0 0 0 / 8%), 0 7px 2px 0 rgb(204 204 204 / 10%);
+    box-shadow: 0 1px 0px 0 rgba(0, 0, 0 , 0.08), 0 7px 2px 0 rgba(204, 204 ,204 , 0.1);
 }
 .static-advertise__item{
     width : 30%;
@@ -204,17 +204,20 @@ button#form-submit-button {
     align-items: center;
     padding: 10px;
 }
+.acc-avalible-input-style.div-unset.acc-amenities__box-button{
+    width:34%;
+}
 .acc-amenities__box-button p {
-    font:14px Miransans;
-    margin-left:auto;
-    margin-bottom:0;
+    font: 14px Miransans;
+    margin-left: auto;
+    margin-bottom: 0;
 }
 .acc-amenities__box-button .acc-amenities__label-style {
     position: relative;
     padding-left: 27px;
     cursor: pointer;
     user-select: none;
-    margin:0 10px;
+    margin:0 3px;
     font-size:12px;
 }
 .acc-amenities__box-button .acc-amenities__label-style input {
@@ -315,19 +318,24 @@ button#form-submit-button {
 
 /*responsive*/
 @media screen and ( max-width : 1252px ) {
-    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style{
-        margin:0 5px;
-        padding-left: 25px;
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style {
+        margin: 0 3px;
+        padding-left: 18px;
     }
-    .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button p{
-        font-size:13px;
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button p {
+        font-size: 13px;
     }
     .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button .acc-amenities__label-style .checkmark{
         width:15px;
         height:15px;
     }
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style {
+        margin: 0 10px;
+        padding-left: 22px;
+    }
+
     .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button{
-        width:32%;
+        width:49%;
     }
 }
 @media screen and ( max-width : 1120px ) {
@@ -344,16 +352,16 @@ button#form-submit-button {
     }
 
 }
-@media screen and ( max-width : 948px) {
+@media screen and ( max-width : 960px) {
     .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button {
-        width: 49%;
+        width: 32%;
     }
 
-    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style {
+/*    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style {
         margin: 0 10px;
         padding-left: 22px;
     }
-
+*/
     .static-advertise__label {
         font: 12px Miransans;
     }
@@ -378,6 +386,16 @@ button#form-submit-button {
     }
 
     .static-advertise.advetise-form__part.advertise-form_part-details .static-advertise__item.static-advertise_details-item {
+        width: 49%;
+    }
+}
+@media screen and (max-width : 760px){
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style {
+        margin: 0 10px;
+        padding-left: 22px;
+    }
+
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button {
         width: 49%;
     }
 }

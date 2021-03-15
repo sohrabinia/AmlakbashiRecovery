@@ -81,60 +81,61 @@
         <div class="ui active large loader loading-icon"></div>
     </div>
     <div class="page">
-        <div class="header_container">
-            <div class="header__container">
-                <div class="hamberger" onclick="open_menu()">
-                    <i class="open-menu-dashboard fa fa-bars"></i>
-                    <span>حساب من</span>
-                </div>
-
-                <a href="/" class="header__logo"></a>
-                <div class="header__extra">
-                    @*<a href="@string.Format("/Ticket/Inbox?user_id={0}", User.GetUser().Id)" class="header__messages-button">
-                            <i class="fa fa-envelope"></i>
-                            <span>@(ViewBag.MessageCount == 0 ? "پیام ها" : ViewBag.MessageCount + " پیام جدید")</span>
-                        </a>*@
-                    <a href="/accomodation/accbasicform" class="header__add">
-                        <i class="fa fa-plus"></i>
-                        <span>افزودن آگهی</span>
-                    </a>
-                    <span class="header__user">
-                        <i class="fa fa-user"></i>
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            if (string.IsNullOrEmpty(userAccessor.CurrentUser.FullName))
-                            {
-                                <span> کاربر @userAccessor.CurrentUser.Id</span>
-                            }
-                            else
-                            {
-                                <span> @userAccessor.CurrentUser.FullName </span>
-                            }
-                        }
-                        else
-                        {
-                            <span> حساب کاربری </span>
-                        }
-                    </span>
-                </div>
+        <div class="js-bg"></div>
+        <header class="dashboard_header-style">
+            <div class="account-box-style">
+                <!--<p class="account-icon-style">-->
+                @*@if (User.Identity.IsAuthenticated)
+                {
+                    if (string.IsNullOrEmpty(userAccessor.CurrentUser.FullName))
+                    {
+                        @:  کاربر @userAccessor.CurrentUser.Id
+                    }
+                    else
+                    {
+                        @userAccessor.CurrentUser.FullName
+                    }
+                }
+                else
+                {
+                    @: حساب کاربری
+                }*@
+                <!--<i class="fas fa-user"></i>
+            </p>-->
+                @*<i class="fa fa-bars fast-menu-desktop"></i>*@
+                <i class="fas fa-bars js-berger-menu"></i>
             </div>
-        </div>
+            <a class="header-logo-style" href="/">
+                <img srcset="~/Resource/img/amlakbashi-logo-900w.png 900w,
+                ~/Resource/img/amlakbashi-logo-680w.png 680w"
+                     sizes="(max-width: 500px) 680px,
+                    900px"
+                     src="~/Resource/img/amlakbashi-logo-900w.png"
+                     alt="logo">
+            </a>
+            @*<div class="header-search-style">
+                <i class="fa fa-search"></i>
+                <input name="search" type="text" class="search-style" placeholder="جستجو در املاک باشی">
+            </div>*@
+        <a href="@(userAccessor.CurrentUser.UserGeneralType != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id): string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id))" class="add-advertise-box">
+            <p class="add-advertise-style"> رزرو های من </p>
+        </a>
+        </header>
         <div class="body">
-            <div class="menu menu--close">
-                <div class="menu__top bg-yellow">
-                    <i class="close-menu-dashboard fa fa-times-circle" onclick="close_menu()"></i>
-                    <span class="menu__user">
+            <nav class="dashboard__navigatoin js-show-menu">
+                <ul class="dashboard-main-navigation_list">
+                    <li class="main-navigation_list-item list-item__account-style">
                         @if (User.Identity.IsAuthenticated &&
-                           userAccessor.CurrentUser.PhotoID > 0)
+                          userAccessor.CurrentUser.PhotoID > 0)
                         {
-                            <img style="width: 66px;height: 66px;border-radius: 50px;margin-left: 5px;" src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=200", userAccessor.CurrentUser.PhotoID)' />
+                            <img width="48" height="48" src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=200", userAccessor.CurrentUser.PhotoID)' alt="avatar" class="list-item__avatar">
                         }
                         else
                         {
-                            <i class="fa fa-user-circle">
-                            </i>
+                            <i class="fa fa-user-circle list-item__avatar"> </i>
                         }
-                        <span>
+                        @*<i class="fa fa-plus-circle  add-profile" aria-hidden="true"></i>*@
+                        <P>
                             @if (User.Identity.IsAuthenticated)
                             {
                                 if (string.IsNullOrEmpty(userAccessor.CurrentUser.FullName))
@@ -150,118 +151,56 @@
                             {
                                 @:حساب کاربری
                             }
-                        </span>
-                    </span>
-                </div>
-                <div class="menu__container">
-                    <a href="/" class="menu__item">
-                        <i class="fa fa-home"></i>
-                        <span>صفحه اصلی سایت</span>
-                    </a>
-
-                    <a href="/dashboard" class="menu__item @(ViewBag.dashboard != null ? "menu__item--active" : "") ">
-                        <i class="fa fa-tachometer-alt"></i>
-                        <span>حساب کاربری</span>
-                    </a>
-
-                    @*<a href="@string.Format("/Ticket/Inbox?user_id={0}", User.GetUser().Id)" class="menu__item @(ViewBag.inbox != null ? "menu__item--active" : "") ">
-                            <i class="fa fa-envelope"></i>
-                            <span style="width:35%">پیام ها</span>
-                            <span id="message-counter-label" style="@(ViewBag.MessageCount > 0 ? "" : "display: none")">@(ViewBag.MessageCount == 0 ? "" : ViewBag.MessageCount + " پیام جدید")</span>
-                        </a>*@
-
-                    <a href="/accomodation/accbasicform" class="menu__item @(ViewBag.advertise!=null ? "menu__item--active" : "") ">
-                        <i class="fa fa-plus"></i>
-                        <span>افزودن آگهی</span>
-                    </a>
+                        </P>
+                    </li>
+                    <li class="main-navigation_list-item"><a href="/"><i class="fa fa-home"></i> صفحه اصلی سایت</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.dashboard != null ? "menu__item--active" : "")"><a href="/dashboard"><i class="fa fa-tachometer-alt"></i> حساب کاربری</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.advertise!=null ? "menu__item--active" : "")"><a href="/accomodation/accbasicform"><i class="fa fa-plus"></i> افزودن آگهی</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <a href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)" class="menu__item @(ViewBag.personal != null ? "menu__item--active" : "") ">
-                            <i class="fa fa-th-list"></i>
-                            <span>آگهی های من</span>
-                        </a>
-                        if (userAccessor.CurrentUser.UserGeneralType !=
-                            (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
+                        if (userAccessor.CurrentUser.UserGeneralType != (int)Entities.User.UserGeneralTypeEnum.Guest)
                         {
-                            <a href="/comment/advertisecommentmanager" class="menu__item @(ViewBag.advertise_comment != null ? "menu__item--active" : "") ">
-                                <i class="fa fa-comments"></i>
-                                <span>نظرات آگهی ها</span>
-                                @*<span style="background-color:#4485F2;border-radius:10px;font:12px Liransans;margin-right:3px;padding:3px;text-align:center;color:white">جدید</span>*@
-                                <vc:not-seen-comment-count></vc:not-seen-comment-count>
-                            </a>
+                            <li class="main-navigation_list-item @(ViewBag.personal != null ? "menu__item--active" : "")"><a href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)"><i class="fas fa-list-alt"></i> آگهی های من</a></li>
+                            <li class="main-navigation_list-item @(ViewBag.advertise_comment != null ? "menu__item--active" : "")"><a href="/comment/advertisecommentmanager"><i class="fa fa-th-list"></i> نظرات آگهی ها <vc:not-seen-comment-count></vc:not-seen-comment-count></a></li>
                         }
                         if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
                         {
-                            <a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id)" class="menu__item @(ViewBag.reserveGuest != null ? "menu__item--active" : "") ">
-                                <i class="fa fa-book"></i>
-                                <span>رزرو ها</span>
-                            </a>
+                            <li class="main-navigation_list-item @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id)"><i class="fa fa-book"></i> رزرو ها</a></li>
                         }
                         else
                         {
-                            <a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id)" class="menu__item @(ViewBag.reserveHost != null ? "menu__item--active" : "") ">
-                                <i class="fa fa-book"></i>
-                                <span> رزرو بعنوان میزبان  </span>
-                            </a>
-                            <a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id)" class="menu__item @(ViewBag.reserveGuest != null ? "menu__item--active" : "") ">
-                                <i class="fa fa-book"></i>
-                                <span> رزرو بعنوان مهمان</span>
-                            </a>
+                            <li class="main-navigation_list-item @(ViewBag.reserveHost != null ? "menu__item--active" : "")"><a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id)"><i class="fa fa-book"></i> رزرو بعنوان میزبان </li>
+                            <li class="main-navigation_list-item  @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id)"><i class="fa fa-book"></i> رزرو به عنوان مهمان</a></li>
                         }
                         if (userAccessor.CurrentUser.UserGeneralType > 0)
                         {
-                            <a href="/reserve/invoice" class="menu__item @(ViewBag.Invoice != null ? "menu__item--active" : "") ">
-                                <i class="fa fa-list"></i>
-                                <span>صورت حساب رزرو ها</span>
-                            </a>
+                            <li class="main-navigation_list-item @(ViewBag.Invoice != null ? "menu__item--active" : "")"><a href="/reserve/invoice"><i class="fa fa-list"></i> صورت حساب رزرو ها</a></li>
                         }
-                        <a href='@string.Format("/post/presentandprize?userid={0}", userAccessor.CurrentUser.Id)' class="menu__item @(ViewBag.presentandprize != null ? "menu__item--active " : "") ">
-                            <i class="fa fa-gift"></i>
-                            <span> هدیه سفر </span>
-                        </a>
-                        <a href='@string.Format("/post/profilemanager")' class='menu__item @(ViewBag.profile != null ? "menu__item--active " : "")'>
-                            <i class="fa fa-user"></i>
-                            <span> پروفایل من </span>
-                        </a>
-
-                        <a href="/user/usercreditmanager" class='menu__item @(ViewBag.UserCredit != null ? "menu__item--active " : "")'>
-                            <i class="fa fa-money-bill-alt"></i>
-                            <span> کیف پول </span>
-                        </a>
-
-                        @*<a href="/cart/cart" class="menu__item @(ViewBag.cart != null ? "menu__item--active" : "") ">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span>سبد خرید</span>
-                            </a>*@
-
-                        <a href="@string.Format("/post/favoritemanager")" class="menu__item @(ViewBag.favorite != null ? "menu__item--active" : "") ">
-                            <i class="fa fa-heart"></i>
-                            <span>علاقه مندی های من</span>
-                        </a>
-
-                        <a href="/user/signout" class="menu__item">
-                            <i class="fa fa-sign-out-alt"></i>
-                            <span>خروج از حساب کاربری</span>
-                        </a>
+                        <li class="main-navigation_list-item @(ViewBag.presentandprize != null ? "menu__item--active " : "")"><a href="@string.Format("/post/presentandprize?userid={0}", userAccessor.CurrentUser.Id)"><i class="fas fa-gift"></i> هدیه سفر</a></li>
+                        <li class="main-navigation_list-item @(ViewBag.profile != null ? "menu__item--active " : "")"><a href="@string.Format("/post/profilemanager")"><i class="fas fa-user"></i>پروفایل من</a></li>
+                        <li class="main-navigation_list-item @(ViewBag.UserCredit != null ? "menu__item--active " : "")"><a href="/user/usercreditmanager"><i class="fa fa-money-bill-alt"></i> کیف پول</a></li>
+                        <li class="main-navigation_list-item @(ViewBag.favorite != null ? "menu__item--active" : "")"><a href="@string.Format("/post/favoritemanager")"><i class="fas fa-heart"></i> علاقه مندی های من</a></li>
+                        if (userAccessor.CurrentUser.UserGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
+                        {
+                            <li class="main-navigation_list-item @(ViewBag.advertise!=null ? "menu__item--active" : "")"><a href="/accomodation/accbasicform"><i class="fa fa-plus"></i> میزبان شوید</a></li>
+                        }
+                        <li class="main-navigation_list-item"><a href="/user/signout"><i class="fas fa-sign-out-alt"></i>خروج از حساب کاربری</a></li>
                     }
                     else
                     {
-                        <a href="/user/Mobilelogin" class="menu__item">
-                            <i class="fa fa-sign-in-alt"></i>
-                            <span>ورود به حساب کاربری</span>
-                        </a>
+                        <li class="main-navigation_list-item"><a href="/user/Mobilelogin"><i class="fas fa-sign-out-alt"></i>خروج از حساب کاربری</a></li>
                     }
-                </div>
-            </div>
-            <div class="main">
+                </ul>
+            </nav>
+            <main class="main">
                 <div class="main-top-space" style="height:10px; width:100% ;">
-                    @*<a href="@string.Format("/Ticket/Inbox?user_id={0}", User.GetUser().Id)" class="main__messages-button">
-                            <i class="fa fa-envelope"></i>
-                            <span>@(ViewBag.MessageCount == 0 ? "پیام ها" : ViewBag.MessageCount + " پیام جدید")</span>
-                        </a>*@
+                    @*<a href="@string.Format("/Ticket/Inbox?user_id={0}", userAccessor.CurrentUser.Id)" class="main__messages-button">
+                        <i class="fa fa-envelope"></i>
+                        <span>@(ViewBag.MessageCount == 0 ? "پیام ها" : ViewBag.MessageCount + " پیام جدید")</span>
+                    </a>*@
                 </div>
                 @RenderBody()
-            </div>
+            </main>
         </div>
         <div class="footer">
         </div>

@@ -289,11 +289,12 @@ a {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 auto;
     flex: 0 0 auto;
-    -webkit-box-shadow: 0 1px 5px 0 rgba(0,0,0,.2), 0 2px 5px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 5px 0 rgba(0,0,0,.2), 0 2px 5px 0 rgba(0,0,0,.1);
+    -webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15), 0 2px 2px 0 rgba(0, 0, 0, 0.16) !important;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15), 0 2px 2px 0 rgba(0, 0, 0, 0.16) !important;
     position: relative;
     overflow: hidden;
     display: inline;
+    border:none;
     transition: all .1s ease-in-out;
 }
 
@@ -449,6 +450,7 @@ p.home-page__advertise-capacity {
     margin: 5px 0;
     font: 12px Liransans;
     display: flex;
+    height: 15px;
     /* justify-content: space-between; */
     align-items: center;
     color: #2f3c46;

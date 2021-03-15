@@ -127,7 +127,8 @@
       "wwwroot/resource/scripts/general/user-rating.js",
       "wwwroot/resource/scripts/general/message-popup.js",
       "wwwroot/resource/scripts/general/confirm-alert-helper.js",
-      "wwwroot//scripts/jquery.unobtrusive-ajax.min.js"
+      "wwwroot//scripts/jquery.unobtrusive-ajax.min.js",
+      "wwwroot/resource/Scripts/dashboard/dashboard-navigation.js"
     ]
   },
   {
