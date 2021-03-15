@@ -92,7 +92,7 @@
                     <div class="icons-style quick-access-desktop" style="text-align:left;display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
                         @*<a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>*@
                         @*<a style="opacity:@(item.mainType == AccMainType.Single ?  "1" : "0" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>*@
-                        <a title="نوروز" class="icons-item icons-desktop" @*onclick="showNorouzPopup(@item.id)"*@ href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img class="noroz-style-icon" width="30" height="30" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>
+                        <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item icons-desktop" @*onclick="showNorouzPopup(@item.id)"*@ href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img class="noroz-style-icon" width="30" height="30" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
                         <a title="حذف" onclick="deleteButton(@item.id ,this)" class="icons-item trash-icon icons-desktop"><i class="fa fa-trash"></i></a>
                         <a href="@item.editUrl" class="icons-item edit-icon-banner icons-desktop" target="_blank"><i class="fas fa-pencil-alt"></i></a>
@@ -115,8 +115,8 @@
                 </form>
                 <div class="icons div-unset" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
                     <div>
-                        <a title="نوروز" class="icons-item noroz-mobile-s" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="30" height="30" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>
-                        <a title="نوروز" class="icons-item noroz-mobile-xs" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="24" height="24" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_24x24" /></a>
+                        <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-s" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="30" height="30" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>
+                        <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-xs" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="24" height="24" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_24x24" /></a>
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
                         <a title="حذف " class="icons-item trash-icon" onclick="deleteButton(@item.id , this)"><i class="fa fa-trash"></i></a>
                         <a href="@item.editUrl" class="icons-item edit-icon-banner" target="_blank"><i class="fas fa-pencil-alt"></i></a>
@@ -190,7 +190,7 @@
                                         <div class="roomCard">
                                             @foreach (var apartmentUnit in item.apartmentUnits)
                                             {
-                                                @await Html.PartialAsync("_RoomComplex", apartmentUnit)
+                                                @await Html.PartialAsync("_RoomComplex", apartmentUnit, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "parentid", item.id } })
                                             }
                                         </div>
                                     </div>
@@ -204,7 +204,7 @@
                                         <div class="roomCard">
                                             @foreach (var suitUnit in item.suitUnits)
                                             {
-                                                @await Html.PartialAsync("_RoomComplex", suitUnit)
+                                                @await Html.PartialAsync("_RoomComplex", suitUnit, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "parentid", item.id } })
                                             }
                                         </div>
                                     </div>
@@ -218,7 +218,7 @@
                                         <div class="roomCard">
                                             @foreach (var villaUnit in item.villaUnits)
                                             {
-                                                @await Html.PartialAsync("_RoomComplex", villaUnit)
+                                                @await Html.PartialAsync("_RoomComplex", villaUnit, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "parentid", item.id } })
                                             }
                                         </div>
                                     </div>
@@ -232,7 +232,7 @@
                                         <div class="roomCard">
                                             @foreach (var houseUnit in item.houseUnits)
                                             {
-                                                @await Html.PartialAsync("_RoomComplex", houseUnit)
+                                                @await Html.PartialAsync("_RoomComplex", houseUnit, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "parentid", item.id } })
                                             }
                                         </div>
                                     </div>
@@ -246,7 +246,7 @@
                                         <div class="roomCard">
                                             @foreach (var hutUnit in item.hutUnits)
                                             {
-                                                @await Html.PartialAsync("_RoomComplex", hutUnit)
+                                                @await Html.PartialAsync("_RoomComplex", hutUnit, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "parentid", item.id } })
                                             }
                                         </div>
                                     </div>

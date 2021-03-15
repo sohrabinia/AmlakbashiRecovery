@@ -218,7 +218,8 @@ a.home-page__category-link.home-page__link i {
 .home-page__category-container .home-page__category-item-container-large {
     margin: 10px 4px;
     overflow: hidden;
-    border: 1px solid #cacaca;
+    -webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15), 0 2px 2px 0 rgba(0, 0, 0, 0.16) !important;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15), 0 2px 2px 0 rgba(0, 0, 0, 0.16) !important;
 }
 .home-page_details-advertise{
     display:flex;
@@ -412,7 +413,7 @@ a.home-page__category-link.home-page__link i {
     /*background-image: linear-gradient(to left bottom, #fdd007, #fdd215, #fdd31f, #fdd526, #fdd62d, #fdd737, #fcd93f, #fcda47, #fbdc53, #fade5e, #fadf68, #f9e172);*/
     /*background-image: linear-gradient(to left bottom, #ffd518, #ffd724, #ffd82d, #ffda36, #ffdb3d, #ffdd46, #ffde4e, #ffe056, #ffe261, #ffe46c, #ffe676, #ffe880);*/
     background-image: linear-gradient(to left bottom, #fdd51f, #fdd939, #fddc4c, #fee05c, #fee36c, #fee36c, #fee36c, #fee36c, #fee05c, #fddc4c, #fdd939, #fdd51f);
-    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .07), 0 6px 8px 0 rgba(0,0,0,.1);
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.07), 0 6px 8px 0 rgba(0,0,0,.1);
 }
 
 .home-page__instant-reserve-banner__head-text {
@@ -1101,8 +1102,7 @@ section.home-page__boyd-banner.discount-banner-container {
     -webkit-box-shadow:none !important;
 }
 .home-page__category-item-container-large:hover {
-    -webkit-box-shadow: 0 0 10px 0 rgba(0,0,0,0.1) !important;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0 , 0.1) !important;
+    transform: scale(1.01);
 }
 .show-desktop-title {
     display: flex !important;
@@ -1853,8 +1853,8 @@ section.home-page_box-banner a.home-page_item-banner img {
     .home-page__category-container .home-page__category-item-container-large {
         background: white;
         margin: 10px;
-        -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0 , 0.09) !important;
-        box-shadow: 0 2px 4px 0 rgba(0,0,0, 0.09) !important;
+        -webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15), 0 2px 2px 0 rgba(0, 0, 0, 0.16) !important;
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15), 0 2px 2px 0 rgba(0, 0, 0, 0.16) !important;
     }
     .home-page_amlakbashi-medium.carousel-container .carousel__slider__item.carousel-item.slide-item img {
         height: 60px;
