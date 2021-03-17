@@ -1754,26 +1754,12 @@ namespace Amlakbashi.Host.Controllers
         [HttpGet]
         public ActionResult GenerateGuestReceipt(long reserve_id)
         {
-            var reserve = reserveService.Find(reserve_id);
-            if (reserve.UserID != userAccessor.CurrentUser.Id)
+            var model = reserveService.GenerateVoucher(reserve_id, userAccessor.CurrentUser.Id);
+            if (model == null)
             {
                 return RedirectToAction("AccessDenied", "Errors");
             }
-            var payedPrice = accounting.GetReservePaidAmount(
-                reserve.Id, Reserve.StatusStringType.Guest);
-            var payablePrice = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, payedPrice,
-                reserve.CouponPrice, reserve.PrizePrice);
-            ReserveGuestReceiptDTO dto = new ReserveGuestReceiptDTO()
-            {
-                Reserve = reserve,
-                ProvinceName = regionService.GetRegionName(reserve.Advertise.Province == null ? 0 : (int)reserve.Advertise.City),
-                CityName = regionService.GetRegionName(reserve.Advertise.City == null ? 0 : (int)reserve.Advertise.City),
-                AreaName = reserve.Advertise.Area == null ? null : regionService.GetRegionName((int)reserve.Advertise.Area),
-                PayedPrice = payedPrice,
-                PayablePrice = payablePrice
-            };
-
-            return View("GuestReceipt", dto);
+            return View("Voucher", model);
         }
 
         public JsonResult GetReserveInfo(long accommodation_id)

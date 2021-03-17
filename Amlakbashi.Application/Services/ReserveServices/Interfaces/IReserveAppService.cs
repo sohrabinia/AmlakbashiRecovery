@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Amlakbashi.Core.DTOs.ReserveDTOs;
 using static Amlakbashi.Core.Entities.ActionLog;
 using static Amlakbashi.Core.Entities.Reserve;
 using static Amlakbashi.Core.Entities.ReservePayment;
@@ -88,5 +89,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         void SetHangfireSchedules_HostCall();
         void SetHangfireSchedules_ReservedState();
         void SetHangfireSchedules_StartedState();
+        VoucherDTO GenerateVoucher(long reserveId, int currentUserId);
     }
 }
