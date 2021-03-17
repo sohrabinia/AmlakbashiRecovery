@@ -403,7 +403,7 @@ namespace Amlakbashi.Host.Controllers
             ViewBag.amp_version = amp_version;
             return View();
         }
-
+        [Auth]
         public ActionResult dashboard()
         {
             var userId = userAccessor.CurrentUser.Id;

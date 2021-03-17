@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Mediator.Events.UserEvents;
 using Amlakbashi.Core.Common.Extensions;
+using Amlakbashi.Core.DTOs.ReserveDTOs;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
@@ -1020,6 +1021,26 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return Repository.Query(q =>
                 q.Where(f => ids.Contains(f.Id))
                 .Include("GuestUser.ReserveSupportsAsGuest"));
+        }
+
+        public VoucherDTO GenerateVoucher(long reserveId, int currentUserId)
+        {
+            var reserve = Repository.Find(reserveId);
+            if (reserve.UserID != currentUserId)
+            {
+                return null;
+            }
+            var notReserved = (reserve.GetStateCategory() != ReserveCategory.Reserved &&
+                reserve.GetStateCategory() != ReserveCategory.Finished) ||
+                reserve.Status == ReserveStatus.CancelRequestByGuest ||
+                reserve.Status == ReserveStatus.CancelRequestByHost;
+            if (notReserved == true && reserve.Status != Reserve.ReserveStatus.WaitForReserve)
+            {
+                return null;
+            }
+            var paidAmount = notReserved == false ? accounting.GetReserveGuestPaidAmount(reserve.ReservePayments)
+                + reserve.CouponPrice + reserve.PrizePrice : 0;
+            return VoucherDTO.Generate(reserve, paidAmount, notReserved == true);
         }
     }
 }

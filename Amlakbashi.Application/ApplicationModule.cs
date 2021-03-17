@@ -61,6 +61,7 @@ namespace Amlakbashi.Application
             // - pre/post-processors as scoped/per-request, i.e. InstancePerLifetimeScope()
             // - behaviors as transient, i.e. InstancePerDependency()
             builder.RegisterAssemblyTypes(typeof(ApplicationModule).Assembly).AsImplementedInterfaces(); // via assembly scan
+            builder.RegisterAssemblyTypes(typeof(AccountingModule).Assembly).AsImplementedInterfaces();
             //builder.RegisterType<MyHandler>().AsImplementedInterfaces().InstancePerDependency();          // or individuall
             #endregion
             //data module

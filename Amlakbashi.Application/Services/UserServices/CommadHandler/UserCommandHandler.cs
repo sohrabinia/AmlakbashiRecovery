@@ -69,12 +69,20 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
             var user = repository.Query(q => q.FirstOrDefault(f => f.Id == request.userId));
             var shallowUser = user.ShallowCopy();
             user.InstantReserveAccess = request.instantReserveAccess;
-            repository.Update(user);
-            repository.Save();
             if (request.doerUserId > 0)
             {
                 mediator.Publish(new UserUpdateEvent(shallowUser, user, request.actionSource, request.doerUserId));
             }
+            if (request.instantReserveAccess == User.InstantReserveAccessEnum.Banned)
+            {
+                var accs = user.Advertises;
+                foreach (var item in accs)
+                {
+                    item.InstantReserveStatus = Advertise.InstantReserveStatusEnum.None;
+                }
+            }
+            repository.Update(user);
+            repository.Save();
             return Task.FromResult(Unit.Value);
         }
 
