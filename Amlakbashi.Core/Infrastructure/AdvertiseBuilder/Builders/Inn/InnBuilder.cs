@@ -25,7 +25,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Inn
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<ReservePart>();
             BuildAdvertisePart<TitleDescPart>();
-            BuildAdvertisePart<NorouzPart>();
+            //BuildAdvertisePart<NorouzPart>();
             BuildAdvertisePart<PhotoPart>();
             BuildAdvertisePart<MetaTitleDescPart>();
             BuildAdvertisePart<AmenitiesPart>();

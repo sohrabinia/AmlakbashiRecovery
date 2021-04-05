@@ -125,7 +125,9 @@ function getJalaliMonthDays(jDate) {
     var dayList = [];
     var gPrevDay = new Date(gDate.getTime());
     var gNextDay = new Date(gDate.getTime());
-    gNextDay.addHours(1);
+    if (getJalaliToday().month > 6) {
+        gNextDay.addHours(1);
+    }
     if (jDate.day > 1) {
         while (true) {
             gPrevDay.setDate(gPrevDay.getDate() - 1);

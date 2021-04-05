@@ -429,6 +429,17 @@ namespace Amlakbashi.Core.Entities
 
         public List<DateTime> OccupiedDates()
         {
+            if (IsForbidden)
+            {
+                var result = new List<DateTime>();
+                var d = DateTime.Now.Date;
+                for (int i = 0; i < 100; i++)
+                {
+                    result.Add(d);
+                    d = d.AddDays(1);
+                }
+                return result;
+            }
             var yesterday = DateTime.Now.Date.AddDays(-1);
             if (Count > 1)
             {
@@ -464,6 +475,20 @@ namespace Amlakbashi.Core.Entities
                 return new List<DateTime>();
             return list.Select(s => s.Date).Distinct().ToList();
         }
+
+        private static List<AdvertiseType> IsfahanForbiddenTypes =
+            new List<AdvertiseType>() { AdvertiseType.Apartment,
+                AdvertiseType.SuitAndRoom, AdvertiseType.House,
+                AdvertiseType.Villa, AdvertiseType.Complex };
+
+        public bool IsForbidden
+        {
+            get
+            {
+                return Province == 793 && IsfahanForbiddenTypes.Contains(ParentOrSelf.TypeID);
+            }
+        }
+
         #endregion
 
         #region Static Functions

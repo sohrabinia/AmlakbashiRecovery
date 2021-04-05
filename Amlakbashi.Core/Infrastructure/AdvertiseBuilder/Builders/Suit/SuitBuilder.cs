@@ -21,7 +21,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Suit
             BuildAdvertisePart<ReservePart>();
             BuildAdvertisePart<TitleDescPart>();
             BuildAdvertisePart<MetaTitleDescPart>();
-            BuildAdvertisePart<NorouzPart>();
+            //BuildAdvertisePart<NorouzPart>();
             BuildAdvertisePart<AmenitiesPart>();
             BuildAdvertisePart<ElevatorPart>();
             BuildAdvertisePart<PhotoPart>();

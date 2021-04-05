@@ -170,13 +170,13 @@
     }
     }
     .advertise-list__filter-location-box .dynamic-filter_box-items {
-        display: flex;
-        margin-top: -15px;
-        margin-bottom: 5px;
+    display: flex;
+    margin-top: -15px;
+    margin-bottom: 5px;
     }
 }
 @section StyleLink {
-   <link rel="stylesheet" href="/css/cat-item.min.css" />
+    <link rel="stylesheet" href="/css/cat-item.min.css" />
 }
 @section TopPin {
     <div class="advertise-list__pin-filter-container">
@@ -754,22 +754,25 @@
 @await Html.PartialAsync("_AdvertiseFilter", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "dcategory", category }, { "norouz_special", norouz_special }, { "discount_homes", discount_homes }, { "today_empty_homes", today_empty_homes }, { "instant_reserve", instant_reserve }, { "hygieneProtocol", hygieneProtocol }, { "ViewBag", ViewBag } })
 
 
-@*@if (category == null || (category.Province != 1 && category.Province != 352))
-    {
-        <div style="font: 12px Miransans;
+@if (category != null && category.Province == 793)
+{
+    <div style="font: 12px Miransans;
         margin: 10px 5% 0 5%;
         padding: 5px;
         /*border-top: 1px solid #242424;
         border-bottom: 1px solid #242424;*/
-        background-image: url(/resource/img/corona-stay-home-pattern.png);
+        /*background-image: url(/resource/img/corona-stay-home-pattern.png);*/
         background-color: #fffaed;
         background-repeat:repeat;
         box-shadow:0 2px 4px 0 rgba(0,0,0,.3), 0 2px 8px 0 rgba(0,0,0,.1);
         text-align: center;">
-            <div>کاربر عزیز املاک باشی !</div>
-            <div>جهت جلوگیری از شیوع و قطع زنجیره کرونا ، از سفرهای غیر ضروری خودداری کنید</div>
+        <div>کاربر گرامی رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است</div>
+        <div style="display:flex;justify-content:space-evenly;">
+            <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/794/اصفهان/رزرو-هتل">هتل</a>
+            <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/794/اصفهان/بومگردی">اقامتگاه بومگردی</a>
         </div>
-    }*@
+    </div>
+}
 @*<div class="advertise-category__special-filter-container" style="width:90%;margin:auto;">*@
 @*<a class="advertise-category__norouz_button" href="/category/category?type=@(category.Type)&a_m_p_version=false&province=@(category.Province)&city=@(category.City)&area=@(ViewBag.area)&norouz_special=@(norouz_special ? "false" : "true")&today_empty_homes=@(today_empty_homes ? "true" : "false")&discount_homes=@(discount_homes ? "true" : "false")">
         <img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32" />
@@ -879,10 +882,10 @@
                 <i class="fa fa-percent"></i>
                 <span>تخفیف دار</span>
             </div>
-            <div id="norouz-special-filter-button" onclick="toggleNorouz()" style="background-color:@(norouz_special ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+            @*<div id="norouz-special-filter-button" onclick="toggleNorouz()" style="background-color:@(norouz_special ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
                 <img width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
                 <span>ویژه نوروز</span>
-            </div>
+            </div>*@
             <div id="corona-special-filter-button" onclick="toggleHygieneProtocol()" style="background-color:@(hygieneProtocol ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
                 <img width="16" height="16" rel="ضدعفونی شده" title="ضدعفونی شده" src="/file/resourceimagepng?file_name=no-virus" />
                 <span>ضدعفونی شده</span>
@@ -953,7 +956,7 @@
     </div>
 </div>
 @if (category != null && !string.IsNullOrEmpty(category.CategoryPostTitle) &&
-    !string.IsNullOrEmpty(category.CategoryPostText))
+   !string.IsNullOrEmpty(category.CategoryPostText))
 {
     <div class="advertise-category__description" style="white-space:unset;border-radius: 5px;">
         <header>

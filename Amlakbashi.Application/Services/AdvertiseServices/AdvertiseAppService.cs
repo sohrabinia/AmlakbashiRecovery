@@ -141,7 +141,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public IList<Advertise> Filter(AdvertiseStatus status, int adtype, int userid, string sort, long id, int instantReserveStatus,
-            long unixDate, int imageCountMin, int imageCountMax, int province, int city, int area, int hygieneProtocolStatus)
+            long minReserveNorouzDateUnix, int imageCountMin, int imageCountMax, int province, int city, int area, int hygieneProtocolStatus)
         {
             IQueryable<Advertise> model = Repository.Query(q => q);
             model = model.Where(w => w.Mode != AdvertiseMode.Child);
@@ -168,9 +168,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 model = model.Where(x => x.InstantReserveStatus == (Advertise.InstantReserveStatusEnum)instantReserveStatus);
             }
-            if (unixDate != 0)
+            if (minReserveNorouzDateUnix != 0)
             {
-                model = model.Where(x => x.unixNorouzMinRequestDate >= unixDate);
+                model = model.Where(x => x.unixNorouzMinRequestDate >= minReserveNorouzDateUnix);
             }
             if (area > -1)
             {
@@ -1818,6 +1818,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             string startDate, string endDate, out string msg)
         {
             var advertise = Repository.Find(advertiseId);
+            if (advertise.IsForbidden)
+            {
+                msg = "";
+                return false;
+            }
             if (advertise.Status != AdvertiseStatus.Published)
             {
                 msg = "متاسفانه این اقامتگاه در حال حاضر از دسترس خارج است. لطفا اقامتگاه دیگری انتخاب نمایید.";
