@@ -35,7 +35,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             PropertyCopier<AddressPart, AddressDTO>.Copy(director.GetAdvertisePart<AddressPart>(), dto.Address);
             PropertyCopier<BedPart, BedDTO>.Copy(director.GetAdvertisePart<BedPart>(), dto.Bed);
             PropertyCopier<CapacityPart, CapacityDTO>.Copy(director.GetAdvertisePart<CapacityPart>(), dto.Capacity);
-            PropertyCopier<NorouzPart, NorouzDTO>.Copy(director.GetAdvertisePart<NorouzPart>(), dto.Norouz);
+            dto.Norouz = new NorouzDTO();//PropertyCopier<NorouzPart, NorouzDTO>.Copy(director.GetAdvertisePart<NorouzPart>(), dto.Norouz);
             PropertyCopier<PositionPart, PositionDTO>.Copy(director.GetAdvertisePart<PositionPart>(), dto.Position);
             PropertyCopier<PricePart, PriceDTO>.Copy(director.GetAdvertisePart<PricePart>(), dto.Price);
             PropertyCopier<ReservePart, ReserveDTO>.Copy(director.GetAdvertisePart<ReservePart>(), dto.Reserve);

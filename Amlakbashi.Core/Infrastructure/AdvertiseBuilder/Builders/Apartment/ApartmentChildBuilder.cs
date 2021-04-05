@@ -29,7 +29,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Apartment
             BuildAdvertisePart<PhotoPart>();
             BuildAdvertisePart<PricePart>();
             BuildAdvertisePart<RoomPart>();
-            BuildAdvertisePart<NorouzPart>();
+            //BuildAdvertisePart<NorouzPart>();
             BuildAdvertisePart<ElevatorPart>();
         }
     }

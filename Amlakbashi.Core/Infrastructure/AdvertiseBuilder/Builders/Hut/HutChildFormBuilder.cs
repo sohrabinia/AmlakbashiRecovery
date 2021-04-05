@@ -17,7 +17,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Hut
             BuildAdvertisePart<AdvertiseTypePart>();
             BuildAdvertisePart<TitleDescPart>();
             BuildAdvertisePart<MetaTitleDescPart>();
-            BuildAdvertisePart<NorouzPart>();
+            //BuildAdvertisePart<NorouzPart>();
             BuildAdvertisePart<AmenitiesPart>();
             BuildAdvertisePart<BedPart>();
             BuildAdvertisePart<BuildingSizePart>();

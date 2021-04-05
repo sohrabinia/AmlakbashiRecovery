@@ -54,8 +54,8 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
             dto.title = advertise.Title;
             dto.image = advertise.PhotoID == null ? 0 : (int)advertise.PhotoID;
             dto.price = advertise.BasePrice;
-            dto.norouzPrice = norouzPrice;
-            dto.norouzSpecial = norouzPrice > 0;
+            //dto.norouzPrice = norouzPrice;
+            //dto.norouzSpecial = norouzPrice > 0;
             dto.room = advertise.Room;
             dto.minCapacity = advertise.Childs.Any() ?
                 advertise.Childs.Min(x => x.Capacity) :

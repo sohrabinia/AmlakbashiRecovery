@@ -20,7 +20,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.House
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<ReservePart>();
             BuildAdvertisePart<TitleDescPart>();
-            BuildAdvertisePart<NorouzPart>();
+            //BuildAdvertisePart<NorouzPart>();
             BuildAdvertisePart<MetaTitleDescPart>();
             BuildAdvertisePart<PhotoPart>();
             BuildAdvertisePart<AmenitiesPart>();
