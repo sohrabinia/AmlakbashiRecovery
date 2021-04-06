@@ -64,12 +64,12 @@ namespace Amlakbashi.Host
             services.AddAuthentication()
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
-                    var key = Encoding.ASCII.GetBytes("ijurkbdlhmklqacwqzdxmkkhvqowlyqa");
+                    var key = Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"]);
                     options.SaveToken = true;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuerSigningKey = true, // this will validate the 3rd part of the jwt token using the secret that we added in the appsettings and verify we have generated the jwt token
-                        IssuerSigningKey = new SymmetricSecurityKey(key), // Add the secret key to our Jwt encryption
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         RequireExpirationTime = false,
@@ -91,16 +91,7 @@ namespace Amlakbashi.Host
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("AllAdmins", policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireRole("Admin", "SuperAdmin");
-                });
-                options.AddPolicy("SuperAdmins", policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireRole("SuperAdmin");
-                });
+                PolicyConfig.Config(options);
             });
 
             services.AddHangfire(configuration => configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)

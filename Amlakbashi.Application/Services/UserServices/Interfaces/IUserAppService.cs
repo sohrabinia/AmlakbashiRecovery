@@ -59,9 +59,9 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         bool VerifyLogin(string mobile, string code, out int user_id, string presentorCode, out string errorMsg);
         void SendMessage(UserContactDTO userContact);
         void SendSms(UserContactDTO userContact);
-        Task<AppUser> GetActivatedUserIdentity(string phrase, bool isEmail = false);
-        Task<AppUser> GetUserIdentity(string phrase, bool isEmail = false);
-        Task AddIdentityUser(AppUser user);
+        AppUser GetActivatedIdentityUser(string phrase, bool isEmail = false);
+        AppUser GetIdentityUser(string phrase, bool isEmail = false);
+        void AddIdentityUser(AppUser user);
         void UpdateIdentityUser(AppUser user);
         bool VerifyLoginCode(string mobileInternational, string code);
     }

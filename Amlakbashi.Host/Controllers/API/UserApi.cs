@@ -44,7 +44,7 @@ namespace Amlakbashi.Host.Controllers.API
                 var international_mobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var number_is_for_iran = PhoneUtility.IsNumberForIran(international_mobile);
                 var user = userService.GetActivatedUserByMainMobile(international_mobile);
-                var identityUser = userService.GetActivatedUserIdentity(international_mobile).Result;
+                var identityUser = userService.GetActivatedIdentityUser(international_mobile);
                 if (user != null && user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
                 {
                     return GenerateJsonResult(new
@@ -57,7 +57,7 @@ namespace Amlakbashi.Host.Controllers.API
                 if (identityUser == null)
                 {
                     user = userService.GetByMainMobile(international_mobile);
-                    identityUser = userService.GetUserIdentity(international_mobile).Result;
+                    identityUser = userService.GetIdentityUser(international_mobile);
                     if (identityUser == null)
                     {
                         string failReason;
@@ -150,7 +150,7 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var internationalMobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
-                var identityUser = userService.GetUserIdentity(internationalMobile).Result;
+                var identityUser = userService.GetIdentityUser(internationalMobile);
                 if (identityUser.Code == code)
                 {
                     var userRoles = userManager.GetRolesAsync(identityUser).Result;
@@ -159,7 +159,7 @@ namespace Amlakbashi.Host.Controllers.API
                     {
                         authClaims.Add(new Claim(ClaimTypes.Role, role));
                     }
-                    var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ijurkbdlhmklqacwqzdxmkkhvqowlyqa"));
+                    var authSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
                     var token = new JwtSecurityToken(
                             expires: DateTime.Now.AddHours(1440),
                             claims: authClaims,
@@ -191,13 +191,13 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult Test()
         {
             return GenerateJsonResult("verify auth");
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "SuperAdmins")]
+        [Authorize(AuthenticationSchemes = bearerScheme, Policy = "SuperAdmins")]
         public JsonResult TestAdmin()
         {
             return GenerateJsonResult("verify auth");

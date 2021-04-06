@@ -64,31 +64,10 @@ namespace Amlakbashi.Host.Controllers
             this.signInManager = signInManager;
         }
 
-        public IActionResult GenerateJWTToken()
-        {
-            var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, "Reza Najmi"),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(ClaimTypes.Role, "SuperAdmin")
-                };
-
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ijurkbdlhmklqacwqzdxmkkhvqowlyqa"));
-            var token = new JwtSecurityToken(
-                    expires: DateTime.Now.AddHours(3),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
-
-            return Ok(new
-            {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = token.ValidTo
-            });
-        }
-
         [Authorize]
         public string TestUser()
         {
+            var guid = Guid.NewGuid();
             return "test authenticated users";
         }
 
@@ -697,11 +676,11 @@ namespace Amlakbashi.Host.Controllers
 
                     banned = false;
                     user = userService.GetActivatedUserByEmail(email);
-                    identityUser = userService.GetActivatedUserIdentity(email, true).Result;
+                    identityUser = userService.GetActivatedIdentityUser(email, true);
                     if (user == null)
                     {
                         user = userService.GetByEmail(email);
-                        identityUser = userService.GetUserIdentity(email, true).Result;
+                        identityUser = userService.GetIdentityUser(email, true);
                         if (identityUser == null)
                         {
                             user = new User();
@@ -791,11 +770,11 @@ namespace Amlakbashi.Host.Controllers
                     banned = false;
 
                     user = userService.GetActivatedUserByMainMobile(international_mobile);
-                    identityUser = userService.GetActivatedUserIdentity(international_mobile).Result;
+                    identityUser = userService.GetActivatedIdentityUser(international_mobile);
                     if (identityUser == null)
                     {
                         user = userService.GetByMainMobile(international_mobile);
-                        identityUser = userService.GetUserIdentity(international_mobile).Result;
+                        identityUser = userService.GetIdentityUser(international_mobile);
                         if (user == null)
                         {
                             user = new User();
@@ -1017,7 +996,7 @@ namespace Amlakbashi.Host.Controllers
                 int user_id;
                 string errorMsg;
                 bool verify = userService.VerifyLogin(mobile_international, code, out user_id, presentorCode, out errorMsg);
-                var identityUser = userService.GetUserIdentity(mobile_international).Result;
+                var identityUser = userService.GetIdentityUser(mobile_international);
                 if (identityUser.Code == code)
                 {
                     var user = userService.GetByMainMobile(mobile_international);

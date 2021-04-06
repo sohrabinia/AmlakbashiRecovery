@@ -643,16 +643,16 @@ namespace Amlakbashi.Application.Services.UserServices
             mediator.Enqueue(new SendSmsCommand(userContact));
         }
 
-        public async Task<AppUser> GetActivatedUserIdentity(string phrase, bool isEmail = false)
+        public AppUser GetActivatedIdentityUser(string phrase, bool isEmail = false)
         {
             AppUser user;
             if (isEmail)
             {
-                user = await userManager.FindByEmailAsync(phrase);
+                user = userManager.FindByEmailAsync(phrase).Result;
             }
             else
             {
-                user = await userManager.FindByNameAsync(phrase);
+                user = userManager.FindByNameAsync(phrase).Result;
             }
             if (user != null && user.State == User.UserState.Acticved)
             {
@@ -661,28 +661,28 @@ namespace Amlakbashi.Application.Services.UserServices
             return null;
         }
 
-        public async Task<AppUser> GetUserIdentity(string phrase, bool isEmail = false)
+        public AppUser GetIdentityUser(string phrase, bool isEmail = false)
         {
             AppUser user;
             if (isEmail)
             {
-                user = await userManager.FindByEmailAsync(phrase);
+                user = userManager.FindByEmailAsync(phrase).Result;
             }
             else
             {
-                user = await userManager.FindByNameAsync(phrase);
+                user = userManager.FindByNameAsync(phrase).Result;
             }
             return user;
         }
 
-        public async Task AddIdentityUser(AppUser user)
+        public void AddIdentityUser(AppUser user)
         {
-            await userManager.CreateAsync(user);
+            userManager.CreateAsync(user).Wait();
         }
 
         public void UpdateIdentityUser(AppUser user)
         {
-            var result = userManager.UpdateAsync(user).Result;
+            userManager.UpdateAsync(user).Wait();
         }
 
         public bool VerifyLoginCode(string mobileInternational, string code)
