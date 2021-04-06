@@ -32,11 +32,11 @@ namespace Amlakbashi.Host.Authentication
                 return;
             }
             User user;
-            if (PhoneUtility.ValidateLocalNumber(context.User.Identity.Name))
+            if (PhoneUtility.ValidateInternationalNumber(context.User.Identity.Name))
             {
-                var international_mobile = PhoneUtility.LocalNumberToInternational(
-                        context.User.Identity.Name, 98);
-                user = userService.GetActivatedUserByMainMobile(international_mobile);
+                //var international_mobile = PhoneUtility.LocalNumberToInternational(
+                //        context.User.Identity.Name, 98);
+                user = userService.GetActivatedUserByMainMobile(context.User.Identity.Name);
             }
             else
             {

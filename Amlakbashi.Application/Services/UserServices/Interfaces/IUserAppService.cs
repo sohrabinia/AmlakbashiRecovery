@@ -2,9 +2,11 @@
 using Amlakbashi.Core.DTOs.UserDTOs;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
+using Amlakbashi.Data.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.UserServices.Interfaces
 {
@@ -57,5 +59,10 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         bool VerifyLogin(string mobile, string code, out int user_id, string presentorCode, out string errorMsg);
         void SendMessage(UserContactDTO userContact);
         void SendSms(UserContactDTO userContact);
+        Task<AppUser> GetActivatedUserIdentity(string phrase, bool isEmail = false);
+        Task<AppUser> GetUserIdentity(string phrase, bool isEmail = false);
+        Task AddIdentityUser(AppUser user);
+        void UpdateIdentityUser(AppUser user);
+        bool VerifyLoginCode(string mobileInternational, string code);
     }
 }

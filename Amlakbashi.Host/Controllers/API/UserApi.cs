@@ -10,6 +10,13 @@ using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
+using Amlakbashi.Data.Identity;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Amlakbashi.Host.Controllers.API
 {
@@ -37,6 +44,7 @@ namespace Amlakbashi.Host.Controllers.API
                 var international_mobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var number_is_for_iran = PhoneUtility.IsNumberForIran(international_mobile);
                 var user = userService.GetActivatedUserByMainMobile(international_mobile);
+                var identityUser = userService.GetActivatedUserIdentity(international_mobile).Result;
                 if (user != null && user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
                 {
                     return GenerateJsonResult(new
@@ -46,10 +54,11 @@ namespace Amlakbashi.Host.Controllers.API
                     });
                 }
                 var isNew = false;
-                if (user == null)
+                if (identityUser == null)
                 {
                     user = userService.GetByMainMobile(international_mobile);
-                    if (user == null)
+                    identityUser = userService.GetUserIdentity(international_mobile).Result;
+                    if (identityUser == null)
                     {
                         string failReason;
                         user = new User();
@@ -60,6 +69,16 @@ namespace Amlakbashi.Host.Controllers.API
                         user.ResponseTo = 2;
                         user.AmlakbashiScore = 1000;
                         userService.Insert(user);
+
+                        identityUser = new AppUser()
+                        {
+                            UserName = international_mobile,
+                            PhoneNumber = international_mobile,
+                            CreateDate = DateTime.Now,
+                            State = Entities.User.UserState.Acticved
+                        };
+                        userService.AddIdentityUser(identityUser);
+
                         failReason = null;
                         isNew = true;
                         if (user == null)
@@ -83,9 +102,11 @@ namespace Amlakbashi.Host.Controllers.API
                     {
                         code = new Random().Next(1111, 9999).ToString();
                         user.Code = code;
+                        identityUser.Code = code;
                     }
                     user.SendVerification = DateTime.Now;
-                    userService.UpdateSendVerification(user.Id, DateTime.Now);
+                    userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                    userService.UpdateIdentityUser(identityUser);
                     var local_number = PhoneUtility.InternationalNumberToLocal(international_mobile);
                     userService.SendVerificationSms(local_number, code);
                     return GenerateJsonResult(new
@@ -122,6 +143,64 @@ namespace Amlakbashi.Host.Controllers.API
                     msg = "متاسفانه خطایی رخ داده است"
                 });
             }
+        }
+
+        public JsonResult VerifySigninCode(string mobile, string code)
+        {
+            try
+            {
+                var internationalMobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                var identityUser = userService.GetUserIdentity(internationalMobile).Result;
+                if (identityUser.Code == code)
+                {
+                    var userRoles = userManager.GetRolesAsync(identityUser).Result;
+                    var authClaims = new List<Claim>();
+                    foreach (var role in userRoles)
+                    {
+                        authClaims.Add(new Claim(ClaimTypes.Role, role));
+                    }
+                    var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ijurkbdlhmklqacwqzdxmkkhvqowlyqa"));
+                    var token = new JwtSecurityToken(
+                            expires: DateTime.Now.AddHours(1440),
+                            claims: authClaims,
+                            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
+                    return GenerateJsonResult(new
+                    {
+                        status = (int)Entities.User.SignInFirstStepStatus.MobileLogin,
+                        mobile = mobile,
+                        token = new JwtSecurityTokenHandler().WriteToken(token)
+                    });
+                }
+                else
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = (int)Entities.User.SignInFirstStepStatus.Error,
+                        msg = "کد وارد شده اشتباه است"
+                    });
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new
+                {
+                    status = (int)Entities.User.SignInFirstStepStatus.Error,
+                    msg = "متاسفانه خطایی رخ داده است"
+                });
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public JsonResult Test()
+        {
+            return GenerateJsonResult("verify auth");
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "SuperAdmins")]
+        public JsonResult TestAdmin()
+        {
+            return GenerateJsonResult("verify auth");
         }
 
         public JsonResult SignInEmail(string email, string mobile, string cid)
