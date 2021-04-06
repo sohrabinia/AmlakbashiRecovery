@@ -73,16 +73,16 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                long unixDate = 0;
+                long minReserveNorouzDateUnix = 0;
                 if (!string.IsNullOrEmpty(minReserveNorouzFromDate))
                 {
                     var gregorianDate = DateTimeUtility.PersianDateToGregorian(
                         StringUtility.PersianNumberToEnglish(minReserveNorouzFromDate).Replace('/', ','));
-                    unixDate = DateTimeUtility.DateValueOfJS(gregorianDate);
+                    minReserveNorouzDateUnix = DateTimeUtility.DateValueOfJS(gregorianDate);
                 }
 
                 var model = advertiseService.Filter((AdvertiseStatus)status, adtype, userid, sort, id, instantReserveStatus,
-                    unixDate, imageCountMin, imageCountMax, province, city, area, hygieneProtocolStatus);
+                    minReserveNorouzDateUnix, imageCountMin, imageCountMax, province, city, area, hygieneProtocolStatus);
 
                 ViewBag.status = status;
                 ViewBag.adtype = adtype;

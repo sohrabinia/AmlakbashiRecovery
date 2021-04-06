@@ -347,7 +347,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
                 websiteUrl = isHotelItem ? null : GeneralData.WebsiteUrl + _rawUrl,
                 instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed,
                 maxInstantReserveStart = advertise.MaxInstantReserveStart,
-                norouzOverCapacityPrice = advertise.NorouzOverCapacityPrice,
+                //norouzOverCapacityPrice = advertise.NorouzOverCapacityPrice,
                 latitude = lat,
                 longitude = lng,
                 rulesHeaderText = _rulesHeaderText,

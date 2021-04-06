@@ -411,8 +411,11 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 &&
                 reserve.DepositPrice > 0)
             {
-                msg = "مبلغ بیعانه هنوز پرداخت نشده، تغییر به وضعیت " + ReserveLocalization.GetStatusString((int)reserve.Status, Reserve.StatusStringType.Site) + " امکان پذیر نیست";
-                return false;
+                if (accounting.GetReservePaidAmount(objReserve.Id, StatusStringType.Guest) < objReserve.DepositPrice - objReserve.CouponPrice - objReserve.PrizePrice)
+                {
+                    msg = "مبلغ بیعانه هنوز پرداخت نشده، تغییر به وضعیت " + ReserveLocalization.GetStatusString((int)reserve.Status, Reserve.StatusStringType.Site) + " امکان پذیر نیست";
+                    return false;
+                }
             }
             if (start_date != null)
             {

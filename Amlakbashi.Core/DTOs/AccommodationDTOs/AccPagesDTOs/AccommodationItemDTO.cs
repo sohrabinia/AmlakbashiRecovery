@@ -93,7 +93,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             var room = director.GetAdvertisePart<RoomPart>();
             PropertyCopier<RoomPart, RoomDTO>.Copy(room == null ? new RoomPart() : room, dto.Room);
 
-            PropertyCopier<NorouzPart, NorouzDTO>.Copy(director.GetAdvertisePart<NorouzPart>(), dto.Norouz);
+            dto.Norouz = new NorouzDTO();//PropertyCopier<NorouzPart, NorouzDTO>.Copy(director.GetAdvertisePart<NorouzPart>(), dto.Norouz);
             PropertyCopier<PositionPart, PositionDTO>.Copy(director.GetAdvertisePart<PositionPart>(), dto.Position);
             PropertyCopier<AdvertiseTypePart, AdvertiseTypeDTO>.Copy(director.GetAdvertisePart<AdvertiseTypePart>(), dto.AdvertiseType);
             PropertyCopier<AddressPart, AddressDTO>.Copy(director.GetAdvertisePart<AddressPart>(), dto.Address);

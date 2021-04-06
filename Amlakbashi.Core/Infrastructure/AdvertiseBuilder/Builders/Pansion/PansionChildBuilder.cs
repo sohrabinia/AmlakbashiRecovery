@@ -20,7 +20,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Pansion
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<ReservePart>();
             BuildAdvertisePart<TitleDescPart>();
-            BuildAdvertisePart<NorouzPart>();
+            //BuildAdvertisePart<NorouzPart>();
             BuildAdvertisePart<HotelUnitSpecificPart>();
             BuildAdvertisePart<PricePart>();
             BuildAdvertisePart<CapacityPart>();

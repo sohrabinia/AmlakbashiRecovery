@@ -345,10 +345,10 @@ namespace Amlakbashi.Host.Controllers.API
                         },
                         stayDuration = new StayDurationDTO() { id = advertise.Id, min = advertise.MinReserveDays, max = advertise.MaxReserveDays },
                         maxInstantReserveStart = advertise.MaxInstantReserveStart,
-                        norouzPrice = advertise.NorouzPrice,
-                        norouzPriceString = string.Format("{0:n0}", advertise.NorouzPrice),
-                        norouzMinReserveDateString = advertise.unixNorouzMinRequestDate < 1 ? null : DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate)).Replace(",", "/"),
-                        norouzOverCapacityPrice = advertise.NorouzOverCapacityPrice
+                        //norouzPrice = advertise.NorouzPrice,
+                        //norouzPriceString = string.Format("{0:n0}", advertise.NorouzPrice),
+                        //norouzMinReserveDateString = advertise.unixNorouzMinRequestDate < 1 ? null : DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate)).Replace(",", "/"),
+                        //norouzOverCapacityPrice = advertise.NorouzOverCapacityPrice
                     });
                 }
                 var result = output;
