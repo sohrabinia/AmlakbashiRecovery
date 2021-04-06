@@ -16,6 +16,9 @@ using Amlakbashi.Mediator.Events.UserEvents;
 using Amlakbashi.Core.DTOs.UserDTOs;
 using Microsoft.EntityFrameworkCore;
 using log4net;
+using Microsoft.AspNetCore.Identity;
+using Amlakbashi.Data.Identity;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
@@ -23,14 +26,17 @@ namespace Amlakbashi.Application.Services.UserServices
     {
         private readonly IMediator mediator;
         private readonly IUserContactFacade userContact;
+        private readonly UserManager<AppUser> userManager;
         private readonly ILog logger;
         public UserAppService(IRepository<User, int> repository, ICacheManager<User> cache,
             IUserContactFacade userContact,
             IMediator mediator,
+            UserManager<AppUser> userManager,
             ILog logger) : base(repository, cache)
         {
             this.mediator = mediator;
             this.userContact = userContact;
+            this.userManager = userManager;
             this.logger = logger;
         }
 
@@ -342,6 +348,8 @@ namespace Amlakbashi.Application.Services.UserServices
             user.CreateDate = time;
             Repository.Update(user);
             Repository.Save();
+
+            
         }
 
         public void UpdateAdminLoginCode(int userId, string code)
@@ -633,6 +641,58 @@ namespace Amlakbashi.Application.Services.UserServices
         public void SendSms(UserContactDTO userContact)
         {
             mediator.Enqueue(new SendSmsCommand(userContact));
+        }
+
+        public AppUser GetActivatedIdentityUser(string phrase, bool isEmail = false)
+        {
+            AppUser user;
+            if (isEmail)
+            {
+                user = userManager.FindByEmailAsync(phrase).Result;
+            }
+            else
+            {
+                user = userManager.FindByNameAsync(phrase).Result;
+            }
+            if (user != null && user.State == User.UserState.Acticved)
+            {
+                return user;
+            }
+            return null;
+        }
+
+        public AppUser GetIdentityUser(string phrase, bool isEmail = false)
+        {
+            AppUser user;
+            if (isEmail)
+            {
+                user = userManager.FindByEmailAsync(phrase).Result;
+            }
+            else
+            {
+                user = userManager.FindByNameAsync(phrase).Result;
+            }
+            return user;
+        }
+
+        public void AddIdentityUser(AppUser user)
+        {
+            userManager.CreateAsync(user).Wait();
+        }
+
+        public void UpdateIdentityUser(AppUser user)
+        {
+            userManager.UpdateAsync(user).Wait();
+        }
+
+        public bool VerifyLoginCode(string mobileInternational, string code)
+        {
+            var user = userManager.FindByNameAsync(mobileInternational).Result;
+            if (user.Code == code)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

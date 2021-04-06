@@ -25,6 +25,13 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Amlakbashi.Data.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -37,12 +44,14 @@ namespace Amlakbashi.Host.Controllers
         private readonly IUserContactFacade userContact;
         private readonly IAdvertiseAppService advertiseService;
         private readonly IUserAccessor userAccessor;
+        private readonly SignInManager<AppUser> signInManager;
         public UserController(IUserAppService userService,
             IBankCardAppService bankCardService,
             IAccountingFacade accounting,
             IUserContactFacade userContact,
             IAdvertiseAppService advertiseService,
             IUserAccessor userAccessor,
+            SignInManager<AppUser> signInManager,
             ILog logger)
         {
             this.userService = userService;
@@ -52,6 +61,44 @@ namespace Amlakbashi.Host.Controllers
             this.advertiseService = advertiseService;
             this.logger = logger;
             this.userAccessor = userAccessor;
+            this.signInManager = signInManager;
+        }
+
+        [Authorize]
+        public string TestUser()
+        {
+            var guid = Guid.NewGuid();
+            return "test authenticated users";
+        }
+
+        [Authorize(Policy ="AllAdmins")]
+        public string TestAdmin()
+        {
+            return "test all admins (Admin, SuperAdmin)";
+        }
+
+        [Authorize(Policy = "SuperAdmins")]
+        public string TestSuperAdmin()
+        {
+            return "test super admins (just SuperAdmin)";
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult TestApiUser()
+        {
+            return GenerateJsonResult("test authenticated users");
+        }
+
+        [Authorize(Policy = "AllAdmins", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult TestApiAdmin()
+        {
+            return  GenerateJsonResult("test all admins (Admin, SuperAdmin)");
+        }
+
+        [Authorize(Policy = "SuperAdmins", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult TestApiSuperAdmin()
+        {
+            return GenerateJsonResult("test super admins (just SuperAdmin)");
         }
 
         [Auth(UserRoles.Admin)]
@@ -618,6 +665,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var isEmail = !number_is_for_iran;
                 User user;
+                AppUser identityUser;
                 bool banned = false;
                 if (isEmail)
                 {
@@ -628,10 +676,12 @@ namespace Amlakbashi.Host.Controllers
 
                     banned = false;
                     user = userService.GetActivatedUserByEmail(email);
+                    identityUser = userService.GetActivatedIdentityUser(email, true);
                     if (user == null)
                     {
                         user = userService.GetByEmail(email);
-                        if (user == null)
+                        identityUser = userService.GetIdentityUser(email, true);
+                        if (identityUser == null)
                         {
                             user = new User();
                             user.Mobile = mobile;
@@ -645,15 +695,29 @@ namespace Amlakbashi.Host.Controllers
                             user.ResponseTo = 2;
                             user.AmlakbashiScore = 1000;
                             userService.Insert(user);
+
+                            identityUser = new AppUser()
+                            {
+                                UserName = mobile,
+                                PhoneNumber = mobile,
+                                Email = email,
+                                CreateDate = DateTime.Now,
+                                State = Entities.User.UserState.InActived
+                            };
+                            userService.AddIdentityUser(identityUser);
                         }
                         user.State = (int)Entities.User.UserState.InActived;
                         userService.UpdateState(user.Id, false);
+                        identityUser.State = Entities.User.UserState.InActived;
+                        userService.UpdateIdentityUser(identityUser);
                     }
 
-                    if (user.CreateDate == null)
+                    if (identityUser.CreateDate == null)
                     {
                         user.CreateDate = DateTime.Now;
                         userService.UpdateCreateDate(user.Id, DateTime.Now);
+                        identityUser.CreateDate = DateTime.Now;
+                        userService.UpdateIdentityUser(identityUser);
                     }
 
                     if (user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
@@ -685,6 +749,8 @@ namespace Amlakbashi.Host.Controllers
                                     msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message });
                             }
                             user.SendVerification = DateTime.Now;
+                            identityUser.SendVerification = DateTime.Now;
+                            userService.UpdateIdentityUser(identityUser);
                             userService.UpdateForgetCode(user.Id, user.ForgetCode);
                             userService.UpdateSendVerification(user.Id, DateTime.Now);
                         }
@@ -702,10 +768,13 @@ namespace Amlakbashi.Host.Controllers
                     bool loginDone = false;
 
                     banned = false;
+
                     user = userService.GetActivatedUserByMainMobile(international_mobile);
-                    if (user == null)
+                    identityUser = userService.GetActivatedIdentityUser(international_mobile);
+                    if (identityUser == null)
                     {
                         user = userService.GetByMainMobile(international_mobile);
+                        identityUser = userService.GetIdentityUser(international_mobile);
                         if (user == null)
                         {
                             user = new User();
@@ -724,13 +793,31 @@ namespace Amlakbashi.Host.Controllers
                             userService.Insert(user);
                             failReason = null;
                             user = userService.GetByMainMobile(international_mobile);
+
+                            identityUser = new AppUser()
+                            {
+                                UserName = international_mobile,
+                                PhoneNumber = international_mobile,
+                                CreateDate = DateTime.Now,
+                                State = Entities.User.UserState.InActived
+                            };
+                            if (!string.IsNullOrEmpty(email))
+                            {
+                                identityUser.Email = email;
+                            }
+                            userService.AddIdentityUser(identityUser);
                         }
+                        user.State = (int)Entities.User.UserState.InActived;
                         userService.UpdateState(user.Id, false);
+                        identityUser.State = Entities.User.UserState.InActived;
+                        userService.UpdateIdentityUser(identityUser);
                     }
 
-                    if (user.CreateDate == null)
+                    if (identityUser.CreateDate == null)
                     {
                         userService.UpdateCreateDate(user.Id, DateTime.Now);
+                        identityUser.CreateDate = DateTime.Now;
+                        userService.UpdateIdentityUser(identityUser);
                     }
 
                     if (user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
@@ -746,7 +833,10 @@ namespace Amlakbashi.Host.Controllers
                         userService.SendVerificationSms(PhoneUtility.InternationalNumberToLocal(international_mobile), code);
                         user.Code = code;
                         user.SendVerification = DateTime.Now;
+                        identityUser.Code = code;
+                        identityUser.SendVerification = DateTime.Now;
                         userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                        userService.UpdateIdentityUser(identityUser);
                         loginDone = true;
                     }
                     failReason = null;
@@ -906,7 +996,8 @@ namespace Amlakbashi.Host.Controllers
                 int user_id;
                 string errorMsg;
                 bool verify = userService.VerifyLogin(mobile_international, code, out user_id, presentorCode, out errorMsg);
-                if (verify)
+                var identityUser = userService.GetIdentityUser(mobile_international);
+                if (identityUser.Code == code)
                 {
                     var user = userService.GetByMainMobile(mobile_international);
                     if (user != null)
@@ -952,12 +1043,13 @@ namespace Amlakbashi.Host.Controllers
                 string str = PhoneUtility.InternationalNumberToLocal(mobile_international);
                 //FormsAuthentication.SetAuthCookie(str, true);
 
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, str)
-                };
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                //var claims = new List<Claim>
+                //{
+                //    new Claim(ClaimTypes.Name, str)
+                //};
+                //var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                //HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                signInManager.SignInAsync(identityUser, true).Wait();
 
                 //Session["SGUID"] = Guid.NewGuid();
                 //Session["UID"] = user_id;
@@ -976,11 +1068,7 @@ namespace Amlakbashi.Host.Controllers
             bool verify = false;
             try
             {
-                if (string.IsNullOrEmpty(activactioncode))
-                {
-                    verify = false;
-                }
-                else
+                if (string.IsNullOrEmpty(activactioncode) == false)
                 {
                     int id = int.Parse(activactioncode.Substring(0, activactioncode.IndexOf('_')));
                     string ac = activactioncode.Substring(activactioncode.IndexOf('_') + 1);

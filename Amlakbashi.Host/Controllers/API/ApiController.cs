@@ -16,12 +16,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using Amlakbashi.Host.Hubs.Dashboard.HubServers;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
+using Microsoft.AspNetCore.Identity;
+using Amlakbashi.Data.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 
 namespace Amlakbashi.Host.Controllers.API
 {
     public partial class ApiController : BaseController
     {
         private string client_id = "7e1dff94-4f78-4eba-af9f-e54605925e5c";
+        private const string bearerScheme = JwtBearerDefaults.AuthenticationScheme;
         private readonly IReportItemAppService reportItemService;
         private readonly ICommentAppService commentService;
         private readonly IUserAppService userService;
@@ -45,6 +50,9 @@ namespace Amlakbashi.Host.Controllers.API
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IReserveDashboardHubServer reserveDashboardHubServer;
         private readonly IReserveAdminHubServer reserveAdminHubServer;
+        private readonly IConfiguration configuration;
+        private readonly UserManager<AppUser> userManager;
+        private readonly RoleManager<AppRole> roleManager;
         public ApiController(ICommentAppService commentService,
             IReportItemAppService reportItemService,
             IBankCardAppService bankCardService,
@@ -67,6 +75,9 @@ namespace Amlakbashi.Host.Controllers.API
             IWebHostEnvironment webHostEnvironment,
             IReserveDashboardHubServer reserveDashboardHubServer,
             IReserveAdminHubServer reserveAdminHubServer,
+            IConfiguration configuration,
+            UserManager<AppUser> userManager,
+            RoleManager<AppRole> roleManager,
             ILog logger)
         {
             this.accounting = accounting;
@@ -92,6 +103,9 @@ namespace Amlakbashi.Host.Controllers.API
             this.webHostEnvironment = webHostEnvironment;
             this.reserveDashboardHubServer = reserveDashboardHubServer;
             this.reserveAdminHubServer = reserveAdminHubServer;
+            this.userManager = userManager;
+            this.roleManager = roleManager;
+            this.configuration = configuration;
         }
 
         private bool ClientAuthenticate(string client_id)

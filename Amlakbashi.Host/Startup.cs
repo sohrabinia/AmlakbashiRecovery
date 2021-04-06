@@ -1,8 +1,6 @@
 using Amlakbashi.Application;
+using Amlakbashi.Data.Identity;
 using Amlakbashi.Host.Configurations;
-using Amlakbashi.Host.Hubs.Admin;
-using Amlakbashi.Host.Hubs.Dashboard;
-using Amlakbashi.Host.Hubs.Portal;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using FirebaseAdmin;
@@ -10,15 +8,20 @@ using Google.Apis.Auth.OAuth2;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using System.Threading.Tasks;
@@ -34,7 +37,7 @@ namespace Amlakbashi.Host
                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                .AddEnvironmentVariables();
-                Configuration = builder.Build();
+            Configuration = builder.Build();
         }
 
         public IConfigurationRoot Configuration { get; private set; }
@@ -46,17 +49,49 @@ namespace Amlakbashi.Host
         // called by the runtime before the ConfigureContainer method, below.
         public void ConfigureServices(IServiceCollection services)
         {
-
-            //Added for session state
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(2);
             });
 
-            // TODO: match authentication with previous system
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options=> {
-                options.Cookie.MaxAge = new TimeSpan(60, 0, 0, 0);
+            services.AddDbContext<IdentityDB>(options => options.UseSqlServer(Configuration.GetConnectionString("IdentityDB")));
+            services.AddIdentity<AppUser, AppRole>(options =>
+            {
+                options.User.AllowedUserNameCharacters = "+ 0123456789";
+            }).AddRoles<AppRole>().AddEntityFrameworkStores<IdentityDB>().AddDefaultTokenProviders();
+
+            services.AddAuthentication()
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    var key = Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"]);
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        RequireExpirationTime = false,
+                        ValidateLifetime = true
+                    };
+                });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.AccessDeniedPath = "/errors/accessdenied";
+                options.LoginPath = string.Empty;
+                options.ExpireTimeSpan = TimeSpan.FromDays(60);
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.Redirect("/errors/accessdenied");
+                    return Task.CompletedTask;
+                };
+            });
+
+            services.AddAuthorization(options =>
+            {
+                PolicyConfig.Config(options);
             });
 
             services.AddHangfire(configuration => configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
@@ -107,6 +142,7 @@ namespace Amlakbashi.Host
             app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseCookiePolicy();
             app.UseResponseCaching();
 
             UrlRewriteConfig.Config(app);
@@ -129,6 +165,8 @@ namespace Amlakbashi.Host
             {
                 Credential = GoogleCredential.FromFile(env.ContentRootPath + "/amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json")
             });
+
+            DatabaseInitializer.SeedData(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
         }
     }
 }
