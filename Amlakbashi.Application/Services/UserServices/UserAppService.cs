@@ -19,6 +19,7 @@ using log4net;
 using Microsoft.AspNetCore.Identity;
 using Amlakbashi.Data.Identity;
 using System.Threading.Tasks;
+using Amlakbashi.Core.Identity.Entities;
 
 namespace Amlakbashi.Application.Services.UserServices
 {

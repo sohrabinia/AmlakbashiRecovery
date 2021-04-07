@@ -1,4 +1,5 @@
 using Amlakbashi.Application;
+using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Data.Identity;
 using Amlakbashi.Host.Configurations;
 using Autofac;

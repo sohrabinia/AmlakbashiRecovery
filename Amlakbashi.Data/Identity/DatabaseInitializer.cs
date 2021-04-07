@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Amlakbashi.Core.Identity;
+using Amlakbashi.Core.Identity.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -23,20 +25,19 @@ namespace Amlakbashi.Data.Identity
             identityContext.Database.Migrate();
             var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
             var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
-
-            if (roleManager.Roles.Any() == false)
+            var roleManagerRoles = roleManager.Roles.Select(s => s.Name).ToList();
+            if (roleManagerRoles.Count < Roles.AllEmployeeRoles.Length)
             {
-                var role = new AppRole()
+                var rolesToCreate =
+                    Roles.AllEmployeeRoles.Where(w => roleManagerRoles.Contains(w) == false);
+                foreach (var roleName in rolesToCreate)
                 {
-                    Name = "Admin"
-                };
-                roleManager.CreateAsync(role).Wait();
-
-                role = new AppRole()
-                {
-                    Name = "SuperAdmin"
-                };
-                roleManager.CreateAsync(role).Wait();
+                    var role = new AppRole()
+                    {
+                        Name = roleName
+                    };
+                    roleManager.CreateAsync(role).Wait();
+                }
             }
 
             if (userManager.Users.Any() == false)
@@ -84,12 +85,11 @@ namespace Amlakbashi.Data.Identity
                 }
 
                 CreateRange(appUserList);
-
-                var superAdminUser = userManager.FindByNameAsync("+98 9356172126").Result;
-                userManager.AddToRoleAsync(superAdminUser, "SuperAdmin").Wait();
-
-                var adminUser = userManager.FindByNameAsync("+98 9107447535").Result;
-                userManager.AddToRoleAsync(adminUser, "Admin").Wait();
+                foreach (var userRole in Roles.InitialUserRoles)
+                {
+                    var user = userManager.FindByNameAsync(userRole.Key).Result;
+                    userManager.AddToRoleAsync(user, userRole.Value).Wait();
+                }
             }
         }
 

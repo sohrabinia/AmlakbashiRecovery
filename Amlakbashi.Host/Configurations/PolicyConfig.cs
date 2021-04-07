@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Amlakbashi.Core.Identity;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +11,14 @@ namespace Amlakbashi.Host.Configurations
     {
         public static void Config(AuthorizationOptions options)
         {
-            options.AddPolicy("AllAdmins", policy =>
+            foreach (var item in PolicyData.AllPolicies)
             {
-                policy.RequireAuthenticatedUser();
-                policy.RequireRole("Admin", "SuperAdmin");
-            });
-            options.AddPolicy("SuperAdmins", policy =>
-            {
-                policy.RequireAuthenticatedUser();
-                policy.RequireRole("SuperAdmin");
-            });
+                options.AddPolicy(item.Key, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole(item.Value);
+                });
+            }
         }
     }
 }
