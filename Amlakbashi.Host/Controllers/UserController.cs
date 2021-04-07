@@ -32,6 +32,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Amlakbashi.Core.Identity.Entities;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -89,13 +91,13 @@ namespace Amlakbashi.Host.Controllers
             return GenerateJsonResult("test authenticated users");
         }
 
-        [Authorize(Policy = "AllAdmins", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Policy = Policies.Statistics_View, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult TestApiAdmin()
         {
             return  GenerateJsonResult("test all admins (Admin, SuperAdmin)");
         }
 
-        [Authorize(Policy = "SuperAdmins", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Policy = Policies.Roles_View, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult TestApiSuperAdmin()
         {
             return GenerateJsonResult("test super admins (just SuperAdmin)");

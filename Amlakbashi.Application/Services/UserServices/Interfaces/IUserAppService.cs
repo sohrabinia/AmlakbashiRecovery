@@ -1,6 +1,7 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.DTOs.UserDTOs;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Data.Identity;
 using System;

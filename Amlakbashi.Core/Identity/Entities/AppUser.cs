@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using static Amlakbashi.Core.Entities.User;
 
-namespace Amlakbashi.Data.Identity
+namespace Amlakbashi.Core.Identity.Entities
 {
     public class AppUser : IdentityUser
     {

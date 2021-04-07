@@ -17,6 +17,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Amlakbashi.Core.Identity;
+using Amlakbashi.Core.Identity.Entities;
 
 namespace Amlakbashi.Host.Controllers.API
 {
@@ -197,7 +199,7 @@ namespace Amlakbashi.Host.Controllers.API
             return GenerateJsonResult("verify auth");
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme, Policy = "SuperAdmins")]
+        [Authorize(AuthenticationSchemes = bearerScheme, Policy = Policies.Roles_View)]
         public JsonResult TestAdmin()
         {
             return GenerateJsonResult("verify auth");
