@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.DTOs.UserDTOs;
+using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +19,14 @@ namespace Amlakbashi.Host.Controllers
             this.userService = userService;
         }
 
-        [Authorize(Policy = "SuperAdmins")]
+        [Authorize(Policy = Policies.Roles_View)]
         public IActionResult Index()
         {
             var roles = userService.GetAllRoles();
             return View(roles);
         }
 
-        [Authorize(Policy = "SuperAdmins")]
+        [Authorize(Policy = Policies.Roles_Edit)]
         [HttpGet]
         public IActionResult EditUserRole(int userId)
         {
@@ -43,7 +44,7 @@ namespace Amlakbashi.Host.Controllers
             return View(dto);
         }
 
-        [Authorize(Policy = "SuperAdmins")]
+        [Authorize(Policy = Policies.Roles_Edit)]
         [HttpPost]
         public IActionResult EditUserRole(string mainMobile, List<string> selectedRoles)
         {
@@ -51,7 +52,7 @@ namespace Amlakbashi.Host.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Policy = "SuperAdmins")]
+        [Authorize(Policy = Policies.Roles_View)]
         public IActionResult RoleUserList(string roleName)
         {
             ViewBag.roleName = roleName;

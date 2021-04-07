@@ -32,6 +32,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Amlakbashi.Core.Identity.Entities;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -62,25 +64,6 @@ namespace Amlakbashi.Host.Controllers
             this.logger = logger;
             this.userAccessor = userAccessor;
             this.signInManager = signInManager;
-        }
-
-        [Authorize]
-        public string TestUser()
-        {
-            var claims = User.Claims;
-            return "test authenticated users";
-        }
-
-        [Authorize(Policy ="AllAdmins")]
-        public string TestAdmin()
-        {
-            return "test all admins (Admin, SuperAdmin)";
-        }
-
-        [Authorize(Policy = "SuperAdmins")]
-        public string TestSuperAdmin()
-        {
-            return "test super admins (just SuperAdmin)";
         }
 
         [Authorize(Policy = "SuperAdmins")]

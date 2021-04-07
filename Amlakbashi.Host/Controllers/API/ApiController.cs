@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Identity;
 using Amlakbashi.Data.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
+using Amlakbashi.Core.Identity.Entities;
 
 namespace Amlakbashi.Host.Controllers.API
 {
