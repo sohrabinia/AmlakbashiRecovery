@@ -27,16 +27,19 @@ namespace Amlakbashi.Application.Services.UserServices
         private readonly IMediator mediator;
         private readonly IUserContactFacade userContact;
         private readonly UserManager<AppUser> userManager;
+        private readonly RoleManager<AppRole> roleManager;
         private readonly ILog logger;
         public UserAppService(IRepository<User, int> repository, ICacheManager<User> cache,
             IUserContactFacade userContact,
             IMediator mediator,
             UserManager<AppUser> userManager,
+            RoleManager<AppRole> roleManager,
             ILog logger) : base(repository, cache)
         {
             this.mediator = mediator;
             this.userContact = userContact;
             this.userManager = userManager;
+            this.roleManager = roleManager;
             this.logger = logger;
         }
 
@@ -173,7 +176,16 @@ namespace Amlakbashi.Application.Services.UserServices
                 }
             }
             if (user.GetLoginProperty() != User.LoginPriorites.Email && string.IsNullOrEmpty(user.Email) || !string.IsNullOrEmpty(dto.email))
+            {
                 user.Email = dto.email;
+                var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+                if (dto.email != identityUser.Email)
+                {
+                    identityUser.Email = dto.email;
+                    identityUser.EmailConfirmed = false;
+                    userManager.UpdateAsync(identityUser);
+                }
+            }
             if (!string.IsNullOrEmpty(dto.tell))
             {
                 if (dto.tell.Substring(0, 2) == "00")
@@ -287,15 +299,19 @@ namespace Amlakbashi.Application.Services.UserServices
             ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
+            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
             var shallowUser = user.ShallowCopy();
             if (state)
             {
                 user.State = (int)User.UserState.Acticved;
+                identityUser.State = User.UserState.Acticved;
             }
             else
             {
                 user.State = (int)User.UserState.InActived;
+                identityUser.State = User.UserState.InActived;
             }
+            userManager.UpdateAsync(identityUser).Wait();
             Repository.Update(user);
             Repository.Save();
             if (currentUserId > 0)
@@ -346,12 +362,14 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
             user.CreateDate = time;
+            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            identityUser.CreateDate = time;
+            userManager.UpdateAsync(identityUser).Wait();
             Repository.Update(user);
             Repository.Save();
-
-            
         }
 
+        // TODO: remove this, UpdateLoginCode do same thing
         public void UpdateAdminLoginCode(int userId, string code)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
@@ -371,11 +389,15 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateSendVerification(int userId, DateTime time, string code = null)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
+            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
             user.SendVerification = time;
+            identityUser.SendVerification = time;
             if (code != null)
             {
                 user.Code = code;
+                identityUser.Code = code;
             }
+            userManager.UpdateAsync(identityUser).Wait();
             Repository.Update(user);
             Repository.Save();
         }
@@ -693,6 +715,42 @@ namespace Amlakbashi.Application.Services.UserServices
                 return true;
             }
             return false;
+        }
+
+        public IList<AppRole> GetAllRoles()
+        {
+            var roles = roleManager.Roles;
+            return roles.ToList();
+        }
+
+        public IList<string> GetAllRoleNames()
+        {
+            var roles = roleManager.Roles.Select(s => s.Name);
+            return roles.ToList();
+        }
+
+        public IList<string> GetUserRoles(string username)
+        {
+            var user = userManager.FindByNameAsync(username).Result;
+            var roles = userManager.GetRolesAsync(user).Result;
+            return roles;
+        }
+
+        public void UpdateUserRoles(string username, IList<string> selectedRoles)
+        {
+            var user = userManager.FindByNameAsync(username).Result;
+            var allUserRoles = userManager.GetRolesAsync(user).Result;
+            var addedRoles = selectedRoles.Where(s => allUserRoles.Contains(s) == false);
+            var removedRoles = allUserRoles.Where(w => selectedRoles.Contains(w) == false);
+            var addResult = userManager.AddToRolesAsync(user, addedRoles).Result;
+            var removeResult = userManager.RemoveFromRolesAsync(user, removedRoles).Result;
+        }
+
+        public IList<User> GetRoleUserList(string roleName)
+        {
+            var identityUsers = userManager.GetUsersInRoleAsync(roleName).Result.Select(s => s.UserName);
+            var userList = Repository.Query(q => q.Where(w => identityUsers.Contains(w.MainMobile)));
+            return userList.ToList();
         }
     }
 }

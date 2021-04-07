@@ -67,7 +67,7 @@ namespace Amlakbashi.Host.Controllers
         [Authorize]
         public string TestUser()
         {
-            var guid = Guid.NewGuid();
+            var claims = User.Claims;
             return "test authenticated users";
         }
 
@@ -83,43 +83,27 @@ namespace Amlakbashi.Host.Controllers
             return "test super admins (just SuperAdmin)";
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult TestApiUser()
-        {
-            return GenerateJsonResult("test authenticated users");
-        }
-
-        [Authorize(Policy = "AllAdmins", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult TestApiAdmin()
-        {
-            return  GenerateJsonResult("test all admins (Admin, SuperAdmin)");
-        }
-
-        [Authorize(Policy = "SuperAdmins", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult TestApiSuperAdmin()
-        {
-            return GenerateJsonResult("test super admins (just SuperAdmin)");
-        }
-
-        [Auth(UserRoles.Admin)]
-        public ActionResult Impersonate(int userId, string url)
+        [Authorize(Policy = "SuperAdmins")]
+        public IActionResult Impersonate(int userId, string url)
         {
             if (HttpContext.Session.GetObjectFromJson<User>("impersonateUser") != null)
             {
                 return Redirect("/errors/accessdenied");
             }
+
             var user = userService.Find(userId, true);
-            if (user.AccessType == 2)
-            {
-                return Redirect("/errors/accessdenied");
-            }
+            var identityUser = userService.GetIdentityUser(user.MainMobile);
             var admin = userAccessor.CurrentUser;
-            if (TempRoles.AdminMobiles.Contains(PhoneUtility.InternationalNumberToLocal(user.MainMobile)))
-            {
-                return Redirect("/errors/accessdenied");
-            }
+
+            var userPrincipal =  signInManager.CreateUserPrincipalAsync(identityUser).Result;
+            userPrincipal.Identities.First().AddClaim(new Claim("AdminUsername", User.Identity.Name));
+            userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonated", "true"));
+            signInManager.SignOutAsync().Wait();
+            signInManager.SignInWithClaimsAsync(identityUser, false, userPrincipal.Claims).Wait();
+
             HttpContext.Session.SetObjectAsJson("impersonateUser", user);
             HttpContext.Session.SetObjectAsJson("impersonateAdmin", admin);
+
             logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
                 user.FullName + "(" + user.Id + ").");
 
@@ -130,9 +114,21 @@ namespace Amlakbashi.Host.Controllers
             return Redirect("/dashboard");
         }
 
-        public ActionResult ImpersonateLogout()
+        public IActionResult ImpersonateLogout()
         {
+            if (User.FindFirst("IsImpersonated").Value != "true")
+            {
+                return NotFound();
+            }
+
+            var adminUsername = User.FindFirst("AdminUsername").Value;
+            var admin = userService.GetIdentityUser(adminUsername);
+
+            signInManager.SignOutAsync().Wait();
+            signInManager.SignInAsync(admin, true).Wait();
+
             HttpContext.Session.Clear();
+
             return Redirect("/user/index");
         }
 
@@ -708,16 +704,12 @@ namespace Amlakbashi.Host.Controllers
                         }
                         user.State = (int)Entities.User.UserState.InActived;
                         userService.UpdateState(user.Id, false);
-                        identityUser.State = Entities.User.UserState.InActived;
-                        userService.UpdateIdentityUser(identityUser);
                     }
 
                     if (identityUser.CreateDate == null)
                     {
                         user.CreateDate = DateTime.Now;
                         userService.UpdateCreateDate(user.Id, DateTime.Now);
-                        identityUser.CreateDate = DateTime.Now;
-                        userService.UpdateIdentityUser(identityUser);
                     }
 
                     if (user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
@@ -749,8 +741,6 @@ namespace Amlakbashi.Host.Controllers
                                     msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message });
                             }
                             user.SendVerification = DateTime.Now;
-                            identityUser.SendVerification = DateTime.Now;
-                            userService.UpdateIdentityUser(identityUser);
                             userService.UpdateForgetCode(user.Id, user.ForgetCode);
                             userService.UpdateSendVerification(user.Id, DateTime.Now);
                         }
@@ -775,7 +765,7 @@ namespace Amlakbashi.Host.Controllers
                     {
                         user = userService.GetByMainMobile(international_mobile);
                         identityUser = userService.GetIdentityUser(international_mobile);
-                        if (user == null)
+                        if (identityUser == null)
                         {
                             user = new User();
                             user.Mobile = international_mobile;
@@ -809,15 +799,11 @@ namespace Amlakbashi.Host.Controllers
                         }
                         user.State = (int)Entities.User.UserState.InActived;
                         userService.UpdateState(user.Id, false);
-                        identityUser.State = Entities.User.UserState.InActived;
-                        userService.UpdateIdentityUser(identityUser);
                     }
 
                     if (identityUser.CreateDate == null)
                     {
                         userService.UpdateCreateDate(user.Id, DateTime.Now);
-                        identityUser.CreateDate = DateTime.Now;
-                        userService.UpdateIdentityUser(identityUser);
                     }
 
                     if (user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
@@ -833,10 +819,7 @@ namespace Amlakbashi.Host.Controllers
                         userService.SendVerificationSms(PhoneUtility.InternationalNumberToLocal(international_mobile), code);
                         user.Code = code;
                         user.SendVerification = DateTime.Now;
-                        identityUser.Code = code;
-                        identityUser.SendVerification = DateTime.Now;
                         userService.UpdateSendVerification(user.Id, DateTime.Now, code);
-                        userService.UpdateIdentityUser(identityUser);
                         loginDone = true;
                     }
                     failReason = null;
@@ -1041,18 +1024,8 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new { status = 0, msg = errorMsg });
                 }
                 string str = PhoneUtility.InternationalNumberToLocal(mobile_international);
-                //FormsAuthentication.SetAuthCookie(str, true);
-
-                //var claims = new List<Claim>
-                //{
-                //    new Claim(ClaimTypes.Name, str)
-                //};
-                //var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                //HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
                 signInManager.SignInAsync(identityUser, true).Wait();
 
-                //Session["SGUID"] = Guid.NewGuid();
-                //Session["UID"] = user_id;
                 return GenerateJsonResult(new { status = 1 });
             }
             catch (Exception exc)
@@ -1122,19 +1095,14 @@ namespace Amlakbashi.Host.Controllers
 
         public ActionResult Signout()
         {
-            // TODO: check this
-            //HttpContext.Session.SetString("mobile", null);
-            //FormsAuthentication.SignOut();
-            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            signInManager.SignOutAsync();
             HttpContext.Session.Clear();
             return Redirect("/");
         }
 
         public ActionResult LogOff()
         {
-            //HttpContext.Session.SetString("mobile", null);
-            //FormsAuthentication.SignOut();
-            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            signInManager.SignOutAsync();
             HttpContext.Session.Clear();
             return Redirect("/");
         }
@@ -1636,7 +1604,6 @@ namespace Amlakbashi.Host.Controllers
                     msg = "عملیات با خطای فنی مواجه شد" });
             }
         }
-
     }
 }
 

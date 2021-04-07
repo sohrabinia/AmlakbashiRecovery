@@ -77,6 +77,8 @@ namespace Amlakbashi.Host
                     };
                 });
 
+            services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
+
             services.ConfigureApplicationCookie(options =>
             {
                 options.AccessDeniedPath = "/errors/accessdenied";

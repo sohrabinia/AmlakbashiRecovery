@@ -106,7 +106,6 @@ namespace Amlakbashi.Host.Controllers.API
                     }
                     user.SendVerification = DateTime.Now;
                     userService.UpdateSendVerification(user.Id, DateTime.Now, code);
-                    userService.UpdateIdentityUser(identityUser);
                     var local_number = PhoneUtility.InternationalNumberToLocal(international_mobile);
                     userService.SendVerificationSms(local_number, code);
                     return GenerateJsonResult(new

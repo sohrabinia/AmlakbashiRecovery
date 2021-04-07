@@ -54,7 +54,7 @@
                 <td class="label">وضعیت شماره موبایل :</td>
                 <td class="minw">
                     <select name="mobile_status">
-                        <option value="-1"is-selected="@((int)data.MobileStatus == -1)">همه</option>
+                        <option value="-1" is-selected="@((int)data.MobileStatus == -1)">همه</option>
                         <option value="0" is-selected="@((int)data.MobileStatus == 0)">شماره موبایل اشتباه</option>
                         <option value="1" is-selected="@((int)data.MobileStatus == 1)">شماره موبایل تکراری</option>
                     </select>
@@ -237,7 +237,7 @@
                     <th>شماره شبا</th>
                 }
                 @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ||
-                    data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
+                   data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
                 {
                     <th>
                         رزرو آنی
@@ -254,104 +254,106 @@
             {
                 Idx++;
 
-        <tr id="js-row-@item.User.Id">
-            <td>
-                @Idx
-            </td>
-            <td>@item.User.Id</td>
-            <td style="direction:ltr">
-                @Html.DisplayFor(modelItem => item.User.MainMobile)
-            </td>
-            <td style="direction:ltr">
-                @Html.DisplayFor(modelItem => item.User.Mobile)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.FullName)
-            </td>
-            @if (data.UserFilterType != Entities.User.UserFilterType.Staff)
-            {
-                <td>
-                    <span onclick="changeUserStatus(@item.User.Id,this)" class="imgstatus @(item.User.State==(int)Entities.User.UserState.Acticved ? "enable" : "disable")"></span>
-                </td>
-                <td>
-                    <span onclick="changeCompleteProfileContact(@item.User.Id,this)" class="imgstatus @(!string.IsNullOrEmpty(item.User.ContactPhone) && item.User.ContactPhone == "1" ? "enable" : "disable")"></span>
-                </td>
-                if (data.UserFilterType != Entities.User.UserFilterType.Guest)
-                {
+                <tr id="js-row-@item.User.Id">
                     <td>
-                        @item.User.UserScore
+                        @Idx
                     </td>
+                    <td>@item.User.Id</td>
+                    <td style="direction:ltr">
+                        @Html.DisplayFor(modelItem => item.User.MainMobile)
+                    </td>
+                    <td style="direction:ltr">
+                        @Html.DisplayFor(modelItem => item.User.Mobile)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.User.FullName)
+                    </td>
+                    @if (data.UserFilterType != Entities.User.UserFilterType.Staff)
+                    {
+                        <td>
+                            <span onclick="changeUserStatus(@item.User.Id,this)" class="imgstatus @(item.User.State==(int)Entities.User.UserState.Acticved ? "enable" : "disable")"></span>
+                        </td>
+                        <td>
+                            <span onclick="changeCompleteProfileContact(@item.User.Id,this)" class="imgstatus @(!string.IsNullOrEmpty(item.User.ContactPhone) && item.User.ContactPhone == "1" ? "enable" : "disable")"></span>
+                        </td>
+                        if (data.UserFilterType != Entities.User.UserFilterType.Guest)
+                        {
+                            <td>
+                                @item.User.UserScore
+                            </td>
 
-                }
-                <td class="credit_label">
-                    @(string.Format("{0:n0}", item.User.Credit)) تومان
-                </td>
-                <td>
-                    <span class="general_type_label" style="color:@(Entities.User.GetUserGeneralTypeColor(item.User.UserGeneralType))">@(Entities.User.GetUserGeneralTypeString(item.User.UserGeneralType))</span>
-                </td>
-            }
-            @if (data.UserFilterType == Entities.User.UserFilterType.Staff)
-            {
-                var bankCard = item.BankCard;
-                <td>
-                    @(bankCard != null && !string.IsNullOrEmpty(bankCard.BankCardNumber) ? bankCard.BankCardNumber : "-")
-                </td>
-                <td>
-                    @(bankCard != null && !string.IsNullOrEmpty(bankCard.ShabaNumber) ? bankCard.ShabaNumber : "-")
-                </td>
-            }
-            @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest)
-            {
-                <td>
-                    <div onclick="showInstantReserveMsg(@item.User.Id)" style="cursor:pointer;border-radius:5px;background-color:#fdd835;padding:5px;">تایید درخواست</div>
-                </td>
-            }
-            @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
-            {
-                <td>
-                    <div style="display:flex;flex-flow:row;">
-                        <div style="margin:0 10px;color:@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "red" : "#34A853")">@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "ممنوع" : "فعال")</div>
-                        <div>تعداد لغو:‌ @item.InstantReserveCancel</div>
-                    </div>
-                </td>
-            }
-            @if (item.User.AccessType < 2)
-            {
-                <td>
-                    <a href="@Url.Action("Edit",new {uid= item.User.Id})"><span class="editicon" title="ویرایش"></span></a>
-                    <span class="deleteicon" onclick="deleteItem(@item.User.Id,this)" title="حذف"></span>
-                    <a title="آگهی های کاربر" class="adminicon fa fa-home" href='/user/impersonate?userId=@(item.User.Id)&url=/post/accomodationmanager' target="_blank"></a>
-                    <a title="کیف پول" class="adminicon fa fa-money-bill-alt" style="margin: 0 5px;" href='/user/impersonate?userId=@(item.User.Id)&url=/user/usercreditmanager' target="_blank"></a>
-                    <a class="adminicon fa fa-heart" href="/user/impersonate?userId=@(item.User.Id)&url=/post/favoritemanager?userid=@item.User.Id" target="_blank"></a>
-                    <a class="adminicon fa fa-eye" href="/user/impersonate?userId=@(item.User.Id)&url=/post/profilemanager" target="_blank"></a>
-                    <span class="adminicon fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></span>
-                    <span class="adminicon fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></span>
-                    <i onclick="incDecCredit(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="واریز/برداشت کیف پول"></i>
-                    <a href="/user/impersonate?userId=@item.User.Id" class="fa fa-sign-in-alt" style="color:#242424; cursor:pointer;" title="ورود به عنوان کاربر" target="_blank"></a>
-                    <a title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/index?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id">
-                        <i style="color:#242424" class="fa fa-book"></i>
-                    </a>
-                </td>
-            }
-            else
-            {
-                <td>
-                    <a href="@Url.Action("Edit",new {uid= item.User.Id})"><span class="editicon" title="ویرایش"></span></a>
-                    <span class="deleteicon" onclick="deleteItem(@item.User.Id,this)" title="حذف"></span>
-                    <a class="adminicon fa fa-home impersonateDenied" href='#' style="color:grey;"></a>
-                    <a title="کیف پول" class="adminicon fa fa-money-bill-alt impersonateDenied" style="margin: 0 5px; color: grey;" href='#'></a>
-                    <a class="adminicon fa fa-heart impersonateDenied" href="#" style="color: grey;"></a>
-                    <a class="adminicon fa fa-eye impersonateDenied" href="#" style="color:grey;"></a>
-                    <span class="adminicon fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></span>
-                    <span class="adminicon fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></span>
-                    <i onclick="incDecCredit(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="واریز/برداشت کیف پول"></i>
-                    <a href="#" class="fa fa-sign-in-alt impersonateDenied" style="color:grey;" title="ورود به عنوان کاربر"></a>
-                    <a title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/index?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id">
-                        <i style="color:#242424" class="fa fa-book"></i>
-                    </a>
-                </td>
-            }
-        </tr>
+                        }
+                        <td class="credit_label">
+                            @(string.Format("{0:n0}", item.User.Credit)) تومان
+                        </td>
+                        <td>
+                            <span class="general_type_label" style="color:@(Entities.User.GetUserGeneralTypeColor(item.User.UserGeneralType))">@(Entities.User.GetUserGeneralTypeString(item.User.UserGeneralType))</span>
+                        </td>
+                    }
+                    @if (data.UserFilterType == Entities.User.UserFilterType.Staff)
+                    {
+                        var bankCard = item.BankCard;
+                        <td>
+                            @(bankCard != null && !string.IsNullOrEmpty(bankCard.BankCardNumber) ? bankCard.BankCardNumber : "-")
+                        </td>
+                        <td>
+                            @(bankCard != null && !string.IsNullOrEmpty(bankCard.ShabaNumber) ? bankCard.ShabaNumber : "-")
+                        </td>
+                    }
+                    @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest)
+                    {
+                        <td>
+                            <div onclick="showInstantReserveMsg(@item.User.Id)" style="cursor:pointer;border-radius:5px;background-color:#fdd835;padding:5px;">تایید درخواست</div>
+                        </td>
+                    }
+                    @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
+                    {
+                        <td>
+                            <div style="display:flex;flex-flow:row;">
+                                <div style="margin:0 10px;color:@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "red" : "#34A853")">@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "ممنوع" : "فعال")</div>
+                                <div>تعداد لغو:‌ @item.InstantReserveCancel</div>
+                            </div>
+                        </td>
+                    }
+                    @if (item.User.AccessType < 2)
+                    {
+                        <td>
+                            <a href="@Url.Action("Edit",new {uid= item.User.Id})"><span class="editicon" title="ویرایش"></span></a>
+                            <span class="deleteicon" onclick="deleteItem(@item.User.Id,this)" title="حذف"></span>
+                            <a title="آگهی های کاربر" class="adminicon fa fa-home" href='/user/impersonate?userId=@(item.User.Id)&url=/post/accomodationmanager' target="_blank"></a>
+                            <a title="کیف پول" class="adminicon fa fa-money-bill-alt" style="margin: 0 5px;" href='/user/impersonate?userId=@(item.User.Id)&url=/user/usercreditmanager' target="_blank"></a>
+                            <a class="adminicon fa fa-heart" href="/user/impersonate?userId=@(item.User.Id)&url=/post/favoritemanager?userid=@item.User.Id" target="_blank"></a>
+                            <a class="adminicon fa fa-eye" href="/user/impersonate?userId=@(item.User.Id)&url=/post/profilemanager" target="_blank"></a>
+                            <span class="adminicon fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></span>
+                            <span class="adminicon fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></span>
+                            <i onclick="incDecCredit(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="واریز/برداشت کیف پول"></i>
+                            <a href="/user/impersonate?userId=@item.User.Id" class="fa fa-sign-in-alt" style="color:#242424; cursor:pointer;" title="ورود به عنوان کاربر" target="_blank"></a>
+                            <a title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/index?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id">
+                                <i style="color:#242424" class="fa fa-book"></i>
+                            </a>
+                            <a asp-controller="role" asp-action="edituserrole" asp-route-userId="@item.User.Id" class="fa fa-universal-access" title="مدیریت رول ها"></a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <a href="@Url.Action("Edit",new {uid= item.User.Id})"><span class="editicon" title="ویرایش"></span></a>
+                            <span class="deleteicon" onclick="deleteItem(@item.User.Id,this)" title="حذف"></span>
+                            <a class="adminicon fa fa-home impersonateDenied" href='#' style="color:grey;"></a>
+                            <a title="کیف پول" class="adminicon fa fa-money-bill-alt impersonateDenied" style="margin: 0 5px; color: grey;" href='#'></a>
+                            <a class="adminicon fa fa-heart impersonateDenied" href="#" style="color: grey;"></a>
+                            <a class="adminicon fa fa-eye impersonateDenied" href="#" style="color:grey;"></a>
+                            <span class="adminicon fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></span>
+                            <span class="adminicon fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></span>
+                            <i onclick="incDecCredit(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="واریز/برداشت کیف پول"></i>
+                            <a href="#" class="fa fa-sign-in-alt impersonateDenied" style="color:grey;" title="ورود به عنوان کاربر"></a>
+                            <a title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/index?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id">
+                                <i style="color:#242424" class="fa fa-book"></i>
+                            </a>
+                            <a asp-controller="role" asp-action="edituserrole" asp-route-userId="@item.User.Id" class="fa fa-universal-access" title="مدیریت رول ها"></a>
+                        </td>
+                    }
+                </tr>
             }
         </table>
     </div>

@@ -64,5 +64,10 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void AddIdentityUser(AppUser user);
         void UpdateIdentityUser(AppUser user);
         bool VerifyLoginCode(string mobileInternational, string code);
+        IList<AppRole> GetAllRoles();
+        IList<string> GetAllRoleNames();
+        IList<string> GetUserRoles(string username);
+        void UpdateUserRoles(string username, IList<string> selectedRoles);
+        IList<User> GetRoleUserList(string roleName);
     }
 }

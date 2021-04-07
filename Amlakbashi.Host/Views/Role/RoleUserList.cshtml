@@ -1,0 +1,22 @@
+﻿@model IList<User>
+
+@{
+    ViewBag.Title = "مدیریت کاربری";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<div class="title">لیست کاربران رول @ViewBag.roleName</div>
+
+<div style="margin:30px;">
+    <table style="width:300px; border: 1px solid black; margin: 30px;">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.FullName</td>
+                <td>@item.MainMobile</td>
+                <td><a asp-action="edituserrole" asp-route-userId="@item.Id" class="fa fa-user-edit" title="ویرایش رول های کاربر"></a></td>
+            </tr>
+        }
+    </table>
+</div>
