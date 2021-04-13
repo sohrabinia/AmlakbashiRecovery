@@ -10,5 +10,10 @@ namespace Amlakbashi.Core.Identity.Entities
         public DateTime? CreateDate { get; set; }
         public DateTime? SendVerification { get; set; }
         public UserState State { get; set; }
+
+        public AppUser ShallowCopy()
+        {
+            return (AppUser)this.MemberwiseClone();
+        }
     }
 }

@@ -1,0 +1,31 @@
+﻿@model Amlakbashi.Core.DTOs.UserDTOs.UserRoleManagementDTO
+@{
+    ViewBag.Title = "مدیریت کاربری";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<div class="title">ویرایش رول های کاربر</div>
+
+<div style="margin:30px;">
+    <div>
+        <p>نام کاربر: @Model.Fullname</p>
+        <p>شناسه کاربر: @Model.UserId</p>
+        <p>موبایل کاربر: @Model.MainMobile</p>
+    </div>
+
+    <form asp-action="edituserrole" method="post">
+        <input type="hidden" name="mainMobile" value="@Model.MainMobile" />
+        <table style="width:300px; border: 1px solid black; margin: 30px;">
+            @foreach (var item in Model.AllRoles)
+            {
+                <tr>
+                    <td>@item</td>
+                    <td>
+                        <input type="checkbox" name="selectedRoles" value="@item" @(Model.CurrentRoles.Contains(item) ? "checked" : "") />
+                    </td>
+                </tr>
+            }
+        </table>
+        <button type="submit" style="width: 100px; height:30px; background-color: orange;">ذخیره</button>
+    </form>
+</div>

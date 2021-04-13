@@ -37,10 +37,10 @@
                 switch ((Entities.User.UserPhotoState)ViewBag.photoStatus)
                 {
                     case Entities.User.UserPhotoState.not_verified:
-                            <span style="color: red">این عکس پروفایل مورد تایید نیست. لطفا عکس پرسنلی از خودتان آپلود کنید.</span>
+                        <span style="color: red">این عکس پروفایل مورد تایید نیست. لطفا عکس پرسنلی از خودتان آپلود کنید.</span>
                         break;
                     case Entities.User.UserPhotoState.ready_publish:
-                            <span style="color: #ffbb00">عکس پروفایل شما بعد از تایید کارشناس نمایش داده خواهد شد</span>
+                        <span style="color: #ffbb00">عکس پروفایل شما بعد از تایید کارشناس نمایش داده خواهد شد</span>
                         break;
                     default:
                         <span style="color: red">عکس پرسنلی از خودتان</span>
@@ -53,7 +53,7 @@
                 <img id="blah" src="#" alt="your image" style="display:none" />
                 <div style="margin-top:20px;">
                     <label for="file" class="btn-photo">افزودن عکس</label>
-                    <input  id="file" style="visibility:hidden;" name="photoid" type="file" />
+                    <input id="file" style="visibility:hidden;" name="photoid" type="file" />
                     <span class="filename"></span>
                 </div>
             }
@@ -72,25 +72,20 @@
             <span class="profile__label">نام :<span style="color:red">*</span></span>
             <span class="profile__text">
                 <input type="text" id="profile_fname" placeholder="نام" name="fname" title="نام" class="mandatory"
-                 @{
-                     if (!string.IsNullOrEmpty(Model.fname))
-                     {
-                         @: value="@(Model.fname)" 
-                     }
-                 }>
+                       @{ if (!string.IsNullOrEmpty(Model.fname)) { @: value="@(Model.fname)"
+                       } }>
             </span>
         </div>
         <div class="profile__item ">
             <span class="profile__label">نام خانوادگی :<span style="color:red">*</span></span>
             <span class="profile__text">
                 <input type="text" id="profile_lname" placeholder="نام خانوادگی" name="lname" title="نام خانوادگی" class="mandatory"
-                @{
-                     if (!string.IsNullOrEmpty(Model.lname))
-                     {
-                         @: value="@(Model.lname)"
-                     }
-                 }>
+                       @{ if (!string.IsNullOrEmpty(Model.lname)) { @: value="@(Model.lname)"
+                       } }>
             </span>
+        </div>
+        <div class="profile__item ">
+            <a asp-controller="user" asp-action="changepassword" class="profile__submit">تغییر رمز عبور</a>
         </div>
         <div class="profile__title">اطلاعات تماس</div>
         if (Model.userGeneralType != (int)Entities.User.UserGeneralTypeEnum.Guest)
@@ -107,7 +102,7 @@
                         <option value="7" is-selected="@(7 == Model.responseFrom)">۷ صبح</option>
                         <option value="8" is-selected="@(8 == Model.responseFrom)">۸ صبح</option>
                         <option value="9" is-selected="@(9 == Model.responseFrom)">۹ صبح</option>
-                        <option value="10" is-selected="@(10 == Model.responseFrom)")>۱۰ صبح</option>
+                        <option value="10" is-selected="@(10 == Model.responseFrom)" )>۱۰ صبح</option>
                         <option value="11" is-selected="@(11 == Model.responseFrom)">۱۱ صبح</option>
                         <option value="12" is-selected="@(12 == Model.responseFrom)">۱۲ ظهر</option>
                         <option value="13" is-selected="@(13 == Model.responseFrom)">۱ بعد از ظهر</option>
@@ -130,12 +125,13 @@
                 </span>
             </div>
         }
-        else {
+        else
+        {
             <input type="hidden" name="responseFrom" value="@Model.responseFrom" />
             <input type="hidden" name="responseTo" value="@Model.responseTo" />
         }
         <div class="profile__item ">
-            <span class="profile__label">                
+            <span class="profile__label">
                 شماره موبایل :
                 <span style="color:red">*</span>
             </span>
@@ -263,7 +259,7 @@
                 </span>
                 <span class="profile__text" style="display:flex">
                     <input id="ShabaNumber" type="text" placeholder="شماره شبا"
-                           name="shabaNumber"  class="mandatory" title="شماره شبا" onkeyup="validateNumber(this);"
+                           name="shabaNumber" class="mandatory" title="شماره شبا" onkeyup="validateNumber(this);"
                            onchange="validateNumber(this)" value="@Model.shabaNumber"
                            style="text-align:left;"><span style="margin:auto 5px">IR</span>
                 </span>

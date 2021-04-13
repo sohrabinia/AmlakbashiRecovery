@@ -15,6 +15,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Amlakbashi.Core.Identity.Entities;
 
 namespace Amlakbashi.Application.Services.UserServices.CommadHandler
 {
@@ -30,15 +32,18 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
         private readonly IUserContactFacade userContact;
         private readonly IMediator mediator;
         private readonly ILog logger;
+        private readonly UserManager<AppUser> userManager;
         public UserCommandHandler(IMediator mediator,
             IUserContactFacade userContact,
             IRepository<User, int> repository,
+            UserManager<AppUser> userManager,
             ILog logger)
         {
             this.userContact = userContact;
             this.mediator = mediator;
             this.repository = repository;
             this.logger = logger;
+            this.userManager = userManager;
         }
 
         public Task<Unit> Handle(ScheduleSendCustomSms request, CancellationToken cancellationToken)
@@ -90,10 +95,12 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
         {
             try
             {
+                var identityUserList = userManager.Users.Where(w => w.State != User.UserState.Deleted).Select(s => s.UserName);
                 IQueryable<User> all_user = repository.Query(q => q
                     .Include(i => i.HostReserves)
                     .Where(x => (request.UserId < 1 ? true : x.Id == request.UserId) &&
-                    x.State != 3 && x.UserGeneralType > 0));
+                        x.UserGeneralType > 0 && identityUserList.Contains(x.MainMobile)));
+
                 all_user = all_user.Where(w => w.Advertises.Any());
                 long score_item;
                 Dictionary<int, long> result = new Dictionary<int, long>();
