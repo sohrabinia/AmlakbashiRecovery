@@ -114,27 +114,9 @@ namespace Amlakbashi.Host.Controllers.API
             return this.client_id == client_id;
         }
 
-        private User GetUser(string user_auth)
+        private User GetUser()
         {
-            User user = null;
-            if (!string.IsNullOrEmpty(user_auth) && user_auth != "null")
-            {
-                long n;
-                var isNumeric = long.TryParse(user_auth, out n);
-                if (isNumeric)
-                {
-                    if (PhoneUtility.ValidateLocalNumber(user_auth))
-                    {
-                        user_auth = PhoneUtility.LocalNumberToInternational(user_auth, 98);
-                    }
-                    user = userService.GetByMainMobile(user_auth);
-                }
-                else
-                {
-                    user = userService.GetByEmail(user_auth);
-                }
-            }
-            return user != null ? user : new User();
+            return userService.GetByMainMobile(User.Identity.Name);
         }
 
         public JsonResult CheckAndroidAppVersion(string cid, string version, int buildNumber)

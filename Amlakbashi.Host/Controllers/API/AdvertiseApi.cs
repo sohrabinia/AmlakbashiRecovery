@@ -21,6 +21,7 @@ using Amlakbashi.Core.DTOs.FileDTOs;
 using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers.API
 {
@@ -181,7 +182,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetFavouriteAdvertises(string cid, string token)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetFavouriteAdvertises(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -189,7 +191,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -215,7 +217,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetHostAdvertises(string cid, string token)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetHostAdvertises(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -223,7 +226,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -469,7 +472,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetAdvertiseDetail(long id, string cid, string token, bool getAllComments = false)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetAdvertiseDetail(long id, string cid, bool getAllComments = false)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -479,7 +483,7 @@ namespace Amlakbashi.Host.Controllers.API
             {
                 bool favourited = false;
                 string commentNotVerifyReason = "";
-                var user = GetUser(token);
+                var user = GetUser();
                 IQueryable<Comment> comments = commentService.GetAllAsIQueryable();
                 var advertise = advertiseService.FindIncludingDeleted(id);
                 if (user.Id > 0)
@@ -567,7 +571,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult AdvertiseToggleFavourite(long id, string cid, string token)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult AdvertiseToggleFavourite(long id, string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -575,7 +580,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { status = 2 });
@@ -749,7 +754,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetAdvertiseRatingInfo(string cid, string token, long advertise_id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetAdvertiseRatingInfo(string cid, long advertise_id)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -757,7 +763,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -798,7 +804,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SendAdvertiseComment(string cid, string token, long advertise_id, string text)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SendAdvertiseComment(string cid, long advertise_id, string text)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -806,7 +813,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -835,7 +842,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SubmitAdvertiseScore(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SubmitAdvertiseScore(string cid,
             long advertise_id, int report_id, int score)
         {
             if (!ClientAuthenticate(cid))
@@ -844,7 +852,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -871,7 +879,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetAdvertisePrices(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetAdvertisePrices(string cid,
             long id, bool is_group, int group_id)
         {
             if (!ClientAuthenticate(cid))
@@ -880,7 +889,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -918,7 +927,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        public JsonResult EditAdvertisePrice(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult EditAdvertisePrice(string cid,
             PriceInputDTO data, int targetStatus = -1)
         {
             if (!ClientAuthenticate(cid))
@@ -927,7 +937,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -964,7 +974,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetAdvertisePhotos(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetAdvertisePhotos(string cid,
             long id)
         {
             if (!ClientAuthenticate(cid))
@@ -973,7 +984,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1014,7 +1025,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        public JsonResult EditAdvertisePhotos(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult EditAdvertisePhotos(string cid,
             ApiPhotoDTO data, int targetStatus = -1)
         {
             if (!ClientAuthenticate(cid))
@@ -1023,7 +1035,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1060,7 +1072,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetAdvertiseAmenities(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetAdvertiseAmenities(string cid,
             long id, bool is_group, int group_id)
         {
             if (!ClientAuthenticate(cid))
@@ -1069,7 +1082,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1107,7 +1120,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        public JsonResult EditAdvertiseAmenities(string cid = null, string token = null,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult EditAdvertiseAmenities(string cid = null,
             ApiAmenitiesDTO data = null, int targetStatus = -1)
         {
             if (!ClientAuthenticate(cid))
@@ -1116,7 +1130,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1156,8 +1170,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetAdvertisePosition(string cid, string token,
-            long id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetAdvertisePosition(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -1165,7 +1179,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1202,7 +1216,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        public JsonResult EditAdvertisePosition(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult EditAdvertisePosition(string cid,
             string data_string, int targetStatus = -1, int buildNumber = 0)
         {
             var data = JsonConvert.DeserializeObject<ApiPositionDTO>(data_string);
@@ -1212,7 +1227,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1266,8 +1281,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetAdvertiseRules(string cid, string token,
-            long id)
+        [Authorize(AuthenticationSchemes = bearerScheme)] 
+        public JsonResult GetAdvertiseRules(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -1275,7 +1290,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1310,8 +1325,10 @@ namespace Amlakbashi.Host.Controllers.API
                 });
             }
         }
+
         [HttpPost]
-        public JsonResult EditAdvertiseRules(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult EditAdvertiseRules(string cid,
             string data_string, int targetStatus = -1)
         {
             var data = JsonConvert.DeserializeObject<ApiRulesDTO>(data_string);
@@ -1321,7 +1338,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1358,7 +1375,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetAdvertiseSpecifics(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetAdvertiseSpecifics(string cid,
             long id, bool is_group, int group_id)
         {
             if (!ClientAuthenticate(cid))
@@ -1367,7 +1385,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1404,7 +1422,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        public JsonResult EditAdvertiseSpecifics(string cid = null, string token = null,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult EditAdvertiseSpecifics(string cid = null,
             string data_string = null, int targetStatus = -1)
         {
             var data = JsonConvert.DeserializeObject<ApiSpecificDTO>(data_string);
@@ -1414,7 +1433,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1452,7 +1471,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetAdvertiseDiscounts(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetAdvertiseDiscounts(string cid,
             long id)
         {
             if (!ClientAuthenticate(cid))
@@ -1461,7 +1481,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1512,7 +1532,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        public JsonResult EditAdvertiseDiscounts(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult EditAdvertiseDiscounts(string cid,
             DiscountTableDTO data)
         {
             if (!ClientAuthenticate(cid))
@@ -1521,7 +1542,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1572,7 +1593,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetHotelUnitData(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetHotelUnitData(string cid,
             long id)
         {
             if (!ClientAuthenticate(cid))
@@ -1581,7 +1603,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1618,8 +1640,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        public JsonResult EditHotelUnitData(string cid = null, string token = null,
-            string data_string = null)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult EditHotelUnitData(string cid = null, string data_string = null)
         {
             var data = JsonConvert.DeserializeObject<ApiHotelUnitDTO>(data_string);
             if (!ClientAuthenticate(cid))
@@ -1628,7 +1650,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1691,7 +1713,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult CheckSetAsOccupiedDateRange(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult CheckSetAsOccupiedDateRange(string cid,
            long id, string from_date, string to_date)
         {
             if (!ClientAuthenticate(cid))
@@ -1700,7 +1723,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1737,7 +1760,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SetAsOccupiedDateRange(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SetAsOccupiedDateRange(string cid,
            long id, string from_date, string to_date)
         {
             if (!ClientAuthenticate(cid))
@@ -1746,7 +1770,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1793,7 +1817,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult RemoveFromOccupiedDateRange(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult RemoveFromOccupiedDateRange(string cid,
             long id, string from_date, string to_date)
         {
             if (!ClientAuthenticate(cid))
@@ -1802,7 +1827,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1850,7 +1875,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SetPriceForDateRange(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SetPriceForDateRange(string cid,
             long id, string from_date, string to_date, int price)
         {
             if (!ClientAuthenticate(cid))
@@ -1859,7 +1885,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1896,8 +1922,9 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult AdvertiseSuspendToggle(string cid, string token,
-            long id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+
+        public JsonResult AdvertiseSuspendToggle(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -1905,7 +1932,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -1944,7 +1971,9 @@ namespace Amlakbashi.Host.Controllers.API
                 });
             }
         }
-        public JsonResult AdvertiseSetAsTodayEmpty(string cid, string token,
+
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult AdvertiseSetAsTodayEmpty(string cid,
             long id)
         {
             if (!ClientAuthenticate(cid))
@@ -1953,7 +1982,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -2007,7 +2036,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult AdvertiseUnsetTodayEmpty(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult AdvertiseUnsetTodayEmpty(string cid,
             long id)
         {
             if (!ClientAuthenticate(cid))
@@ -2016,7 +2046,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -2052,14 +2082,16 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult InstantReserveRequest(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+
+        public JsonResult InstantReserveRequest(string cid,
             long id, bool ignoreMsg)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2121,14 +2153,13 @@ namespace Amlakbashi.Host.Controllers.API
             return GenerateJsonResult(result);
         }
 
-        public JsonResult InstantReserveCancel(string cid,
-            string token, long id)
+        public JsonResult InstantReserveCancel(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2171,14 +2202,14 @@ namespace Amlakbashi.Host.Controllers.API
             return GenerateJsonResult(result);
         }
 
-        public JsonResult GetInstnatReserveBanReason(string cid,
-            string token, long id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetInstnatReserveBanReason(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2192,13 +2223,14 @@ namespace Amlakbashi.Host.Controllers.API
                 GetInstantReserveBanReason(id));
         }
 
-        public JsonResult GetStayDuration(string cid, string token, long id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetStayDuration(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2241,14 +2273,15 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SetStayDuration(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SetStayDuration(string cid,
             long id, string minStr = "0", string maxStr = "0")
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2333,13 +2366,14 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetInstantReserveStart(string cid, string token, long id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetInstantReserveStart(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2381,14 +2415,14 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SetInstantReserveStart(string cid, string token,
-            long id, int maxStart)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SetInstantReserveStart(string cid, long id, int maxStart)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2438,13 +2472,14 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetNorouzPrice(string cid, string token, long id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetNorouzPrice(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2482,7 +2517,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SetNorouzPrice(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SetNorouzPrice(string cid,
             long id, int norouzPrice, int overCapacityPrice = 0,
             int buildNumber = 0)
         {
@@ -2490,7 +2526,7 @@ namespace Amlakbashi.Host.Controllers.API
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2546,13 +2582,14 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetNorouzMinReserve(string cid, string token, long id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetNorouzMinReserve(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2594,14 +2631,15 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SetNorouzMinReserve(string cid, string token,
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SetNorouzMinReserve(string cid,
             long id, string minReserveDate)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -2659,7 +2697,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        public JsonResult AddAdvertiseReport(string cid, string token, AdvertiseReportDTO data)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult AddAdvertiseReport(string cid, AdvertiseReportDTO data)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -2667,7 +2706,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new

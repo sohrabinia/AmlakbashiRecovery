@@ -8,12 +8,15 @@ using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers.API
 {
     public partial class ApiController : BaseController
     {
-        public JsonResult GetReserveChats(string cid, string token, long reserveId)
+
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetReserveChats(string cid, long reserveId)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -21,7 +24,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { });
@@ -74,7 +77,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SendReserveChatMessage(string cid, string token, long reserveId, string text)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SendReserveChatMessage(string cid, long reserveId, string text)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -82,7 +86,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { status = 0 });

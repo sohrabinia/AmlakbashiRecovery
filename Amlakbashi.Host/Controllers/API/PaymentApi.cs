@@ -5,16 +5,19 @@ using static Amlakbashi.Core.Entities.Reserve;
 using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers.API
 {
     public partial class ApiController : BaseController
     {
+
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public ActionResult UserIncreaseCredit(string token, long price, string redirectUrl)
         {
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return null;
@@ -40,12 +43,13 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public ActionResult GuestPayReserve(string token, long reserve_id, int pay_reserve_type, string redirectUrl,
             bool useCoupon = false, bool usePrize = false)
         {
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return null;
@@ -71,6 +75,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult GuestPayReserveWithCredit(string cid, string token, long reserve_id, int pay_reserve_type,
             bool useCoupon = false, bool usePrize = false)
         {
@@ -80,7 +85,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -128,6 +133,8 @@ namespace Amlakbashi.Host.Controllers.API
                 });
             }
         }
+
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult GuestCashPay(string cid, string token, long reserve_id)
         {
             if (!ClientAuthenticate(cid))
@@ -136,7 +143,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -164,6 +171,8 @@ namespace Amlakbashi.Host.Controllers.API
                 });
             }
         }
+
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult HostConfirmCashPay(string cid, string token, long reserve_id, bool paid)
         {
             if (!ClientAuthenticate(cid))
@@ -172,7 +181,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new

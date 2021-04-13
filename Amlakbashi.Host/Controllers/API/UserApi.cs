@@ -39,7 +39,7 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     return GenerateJsonResult(new
                     {
-                        status = (int)Entities.User.SignInFirstStepStatus.Error,
+                        status = (int)Entities.User.SignInFirstStepResult.Error,
                         msg = "شماره موبایل وارد شده صحیح نیست. لطفا پس از بررسی مجدد شماره درست را وارد کنید."
                     });
                 }
@@ -51,7 +51,7 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     return GenerateJsonResult(new
                     {
-                        status = (int)Entities.User.SignInFirstStepStatus.Error,
+                        status = (int)Entities.User.SignInFirstStepResult.Error,
                         msg = "امکان ورود به سایت برای شما مسدود شده است, جهت فعالسازی با پشتیبانی تماس بگیرید"
                     });
                 }
@@ -70,6 +70,7 @@ namespace Amlakbashi.Host.Controllers.API
                         user.ResponseFrom = 2;
                         user.ResponseTo = 2;
                         user.AmlakbashiScore = 1000;
+                        user.State = (int)Entities.User.UserState.InActived;
                         userService.Insert(user);
 
                         identityUser = new AppUser()
@@ -77,7 +78,7 @@ namespace Amlakbashi.Host.Controllers.API
                             UserName = international_mobile,
                             PhoneNumber = international_mobile,
                             CreateDate = DateTime.Now,
-                            State = Entities.User.UserState.Acticved
+                            State = Entities.User.UserState.InActived
                         };
                         userService.AddIdentityUser(identityUser);
 
@@ -87,15 +88,14 @@ namespace Amlakbashi.Host.Controllers.API
                         {
                             return GenerateJsonResult(new
                             {
-                                status = (int)Entities.User.SignInFirstStepStatus.Error,
+                                status = (int)Entities.User.SignInFirstStepResult.Error,
                                 msg = failReason
                             });
                         }
-                        user.State = (int)Entities.User.UserState.Acticved;
                     }
                 }
-                if (number_is_for_iran)
-                {
+                //if (number_is_for_iran)
+                //{
                     var code = user.Code;
                     if (string.IsNullOrEmpty(user.Code) ||
                         user.SendVerification == null ||
@@ -108,12 +108,15 @@ namespace Amlakbashi.Host.Controllers.API
                     }
                     user.SendVerification = DateTime.Now;
                     userService.UpdateSendVerification(user.Id, DateTime.Now, code);
-                    userService.UpdateIdentityUser(identityUser);
-                    var local_number = PhoneUtility.InternationalNumberToLocal(international_mobile);
+                    var local_number = number_is_for_iran ?
+                        PhoneUtility.InternationalNumberToLocal(international_mobile) :
+                        PhoneUtility.InternationalNumberToCallable(international_mobile);
                     userService.SendVerificationSms(local_number, code);
                     return GenerateJsonResult(new
                     {
-                        status = (int)Entities.User.SignInFirstStepStatus.MobileLogin,
+                        status = identityUser.PhoneNumberConfirmed ?
+                            (int)Entities.User.SignInFirstStepResult.EnterPassword :
+                            (int)Entities.User.SignInFirstStepResult.MobileConfirm,
                         code = code,
                         mobile = local_number,
                         user_id = user.Id,
@@ -122,26 +125,26 @@ namespace Amlakbashi.Host.Controllers.API
                         notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
                         isNew = isNew
                     });
-                }
-                else
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = (int)Entities.User.SignInFirstStepStatus.EmailLogin,
-                        user_id = user.Id,
-                        fname = string.IsNullOrEmpty(user.FName) ? "" : user.FName,
-                        lname = string.IsNullOrEmpty(user.LName) ? "" : user.LName,
-                        mobile = international_mobile,
-                        notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
-                    });
-                }
+                //}
+                //else
+                //{
+                //    return GenerateJsonResult(new
+                //    {
+                //        status = (int)Entities.User.SignInFirstStepStatus.EmailLogin,
+                //        user_id = user.Id,
+                //        fname = string.IsNullOrEmpty(user.FName) ? "" : user.FName,
+                //        lname = string.IsNullOrEmpty(user.LName) ? "" : user.LName,
+                //        mobile = international_mobile,
+                //        notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
+                //    });
+                //}
             }
             catch (Exception exc)
             {
                 logger.Error("", exc);
                 return GenerateJsonResult(new
                 {
-                    status = (int)Entities.User.SignInFirstStepStatus.Error,
+                    status = (int)Entities.User.SignInFirstStepResult.Error,
                     msg = "متاسفانه خطایی رخ داده است"
                 });
             }
@@ -157,6 +160,7 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     var userRoles = userManager.GetRolesAsync(identityUser).Result;
                     var authClaims = new List<Claim>();
+                    authClaims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
                     foreach (var role in userRoles)
                     {
                         authClaims.Add(new Claim(ClaimTypes.Role, role));
@@ -168,7 +172,7 @@ namespace Amlakbashi.Host.Controllers.API
                             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
                     return GenerateJsonResult(new
                     {
-                        status = (int)Entities.User.SignInFirstStepStatus.MobileLogin,
+                        status = (int)Entities.User.SignInMobileConfirmResult.Correct,
                         mobile = mobile,
                         token = new JwtSecurityTokenHandler().WriteToken(token)
                     });
@@ -177,7 +181,7 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     return GenerateJsonResult(new
                     {
-                        status = (int)Entities.User.SignInFirstStepStatus.Error,
+                        status = (int)Entities.User.SignInMobileConfirmResult.Error,
                         msg = "کد وارد شده اشتباه است"
                     });
                 }
@@ -187,128 +191,116 @@ namespace Amlakbashi.Host.Controllers.API
                 logger.Error("", exc);
                 return GenerateJsonResult(new
                 {
-                    status = (int)Entities.User.SignInFirstStepStatus.Error,
+                    status = (int)Entities.User.SignInFirstStepResult.Error,
                     msg = "متاسفانه خطایی رخ داده است"
                 });
             }
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
-        public JsonResult Test()
-        {
-            return GenerateJsonResult("verify auth");
-        }
+        //public JsonResult SignInEmail(string email, string mobile, string cid)
+        //{
+        //    if (!ClientAuthenticate(cid))
+        //    {
+        //        return null;
+        //    }
+        //    try
+        //    {
+        //        var first_two_numbers = mobile.Substring(2, 2);
+        //        mobile = mobile.Remove(0, 4).Insert(0, "+" + first_two_numbers + " ");
+        //        var user = userService.GetActivatedUserByEmail(email);
+        //        if (user == null)
+        //        {
+        //            user = userService.GetByEmail(email);
+        //            if (user == null)
+        //            {
+        //                string failReason;
+        //                user = new User();
+        //                user.Mobile = mobile;
+        //                if (!string.IsNullOrEmpty(email))
+        //                {
+        //                    user.Email = email;
+        //                }
+        //                user.MainMobile = mobile;
+        //                user.CreateDate = DateTime.Now;
+        //                user.ResponseFrom = 2;
+        //                user.ResponseTo = 2;
+        //                user.AmlakbashiScore = 1000;
+        //                userService.Insert(user);
+        //                failReason = null;
+        //                if (user == null)
+        //                {
+        //                    return GenerateJsonResult(new
+        //                    {
+        //                        status = (int)Entities.User.SignInEmailStatus.Error,
+        //                        msg = failReason
+        //                    });
+        //                }
+        //            }
+        //            user.State = (int)Entities.User.UserState.Acticved;
+        //            userService.UpdateState(user.Id, true);
+        //        }
 
-        [Authorize(AuthenticationSchemes = bearerScheme, Policy = Policies.Roles_View)]
-        public JsonResult TestAdmin()
-        {
-            return GenerateJsonResult("verify auth");
-        }
+        //        if (user.CreateDate == null)
+        //        {
+        //            user.CreateDate = DateTime.Now;
+        //            userService.UpdateCreateDate(user.Id, DateTime.Now);
+        //        }
 
-        public JsonResult SignInEmail(string email, string mobile, string cid)
-        {
-            if (!ClientAuthenticate(cid))
-            {
-                return null;
-            }
-            try
-            {
-                var first_two_numbers = mobile.Substring(2, 2);
-                mobile = mobile.Remove(0, 4).Insert(0, "+" + first_two_numbers + " ");
-                var user = userService.GetActivatedUserByEmail(email);
-                if (user == null)
-                {
-                    user = userService.GetByEmail(email);
-                    if (user == null)
-                    {
-                        string failReason;
-                        user = new User();
-                        user.Mobile = mobile;
-                        if (!string.IsNullOrEmpty(email))
-                        {
-                            user.Email = email;
-                        }
-                        user.MainMobile = mobile;
-                        user.CreateDate = DateTime.Now;
-                        user.ResponseFrom = 2;
-                        user.ResponseTo = 2;
-                        user.AmlakbashiScore = 1000;
-                        userService.Insert(user);
-                        failReason = null;
-                        if (user == null)
-                        {
-                            return GenerateJsonResult(new
-                            {
-                                status = (int)Entities.User.SignInEmailStatus.Error,
-                                msg = failReason
-                            });
-                        }
-                    }
-                    user.State = (int)Entities.User.UserState.Acticved;
-                    userService.UpdateState(user.Id, true);
-                }
+        //        if (user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
+        //        {
+        //            return GenerateJsonResult(new
+        //            {
+        //                status = (int)Entities.User.SignInEmailStatus.Error,
+        //                msg = "امکان ورود به سایت برای شما مسدود شده است, جهت فعالسازی با پشتیبانی تماس بگیرید"
+        //            });
+        //        }
+        //        var code = user.Code;
+        //        if (string.IsNullOrEmpty(user.Code) ||
+        //            user.SendVerification == null ||
+        //            (DateTime.Now - user.SendVerification) >
+        //            new TimeSpan(0, 0, 30, 0, 0))
+        //        {
+        //            code = new Random().Next(1111, 9999).ToString();
+        //            user.Code = code;
+        //        }
+        //        user.SendVerification = DateTime.Now;
+        //        userService.UpdateSendVerification(user.Id, DateTime.Now);
+        //        string strbody = "<div style='direction:rtl;text-align:right;'><div>برای تایید ایمیل خود و ورود به اپلیکیشن املاک باشی کد زیر را در اپلیکیشن وارد کنید:</div>"
+        //        + "<div style='direction:rtl;text-align:right;font-size:25'>" + code + "</div>"
+        //        + "</div>";
+        //        try
+        //        {
+        //            EmailUtility.SendEmail(EmailSenderDepartment.Verification,
+        //            new List<string>() { email },
+        //            "املاک باشی - تایید ایمیل ورود",
+        //            strbody
+        //            );
+        //        }
+        //        catch (Exception exc)
+        //        {
+        //            logger.Error("", exc);
+        //        }
 
-                if (user.CreateDate == null)
-                {
-                    user.CreateDate = DateTime.Now;
-                    userService.UpdateCreateDate(user.Id, DateTime.Now);
-                }
-
-                if (user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = (int)Entities.User.SignInEmailStatus.Error,
-                        msg = "امکان ورود به سایت برای شما مسدود شده است, جهت فعالسازی با پشتیبانی تماس بگیرید"
-                    });
-                }
-                var code = user.Code;
-                if (string.IsNullOrEmpty(user.Code) ||
-                    user.SendVerification == null ||
-                    (DateTime.Now - user.SendVerification) >
-                    new TimeSpan(0, 0, 30, 0, 0))
-                {
-                    code = new Random().Next(1111, 9999).ToString();
-                    user.Code = code;
-                }
-                user.SendVerification = DateTime.Now;
-                userService.UpdateSendVerification(user.Id, DateTime.Now);
-                string strbody = "<div style='direction:rtl;text-align:right;'><div>برای تایید ایمیل خود و ورود به اپلیکیشن املاک باشی کد زیر را در اپلیکیشن وارد کنید:</div>"
-                + "<div style='direction:rtl;text-align:right;font-size:25'>" + code + "</div>"
-                + "</div>";
-                try
-                {
-                    EmailUtility.SendEmail(EmailSenderDepartment.Verification,
-                    new List<string>() { email },
-                    "املاک باشی - تایید ایمیل ورود",
-                    strbody
-                    );
-                }
-                catch (Exception exc)
-                {
-                    logger.Error("", exc);
-                }
-
-                user = userService.GetByEmail(email);
-                user.SendVerification = DateTime.Now;
-                userService.UpdateSendVerification(user.Id, DateTime.Now);
-                return GenerateJsonResult(new
-                {
-                    status = (int)Entities.User.SignInEmailStatus.Done,
-                    code = code,
-                    mobile = mobile
-                });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("", exc);
-                return GenerateJsonResult(new
-                {
-                    status = (int)Entities.User.SignInEmailStatus.Error,
-                    msg = "متاسفانه خطایی رخ داده است"
-                });
-            }
-        }
+        //        user = userService.GetByEmail(email);
+        //        user.SendVerification = DateTime.Now;
+        //        userService.UpdateSendVerification(user.Id, DateTime.Now);
+        //        return GenerateJsonResult(new
+        //        {
+        //            status = (int)Entities.User.SignInEmailStatus.Done,
+        //            code = code,
+        //            mobile = mobile
+        //        });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("", exc);
+        //        return GenerateJsonResult(new
+        //        {
+        //            status = (int)Entities.User.SignInEmailStatus.Error,
+        //            msg = "متاسفانه خطایی رخ داده است"
+        //        });
+        //    }
+        //}
 
         public JsonResult SetPresentorCode(string cid, string mobile, string presentorCode)
         {
@@ -346,13 +338,14 @@ namespace Amlakbashi.Host.Controllers.API
             {
                 return GenerateJsonResult(new
                 {
-                    status = (int)Entities.User.SignInFirstStepStatus.Error,
+                    status = (int)Entities.User.SignInFirstStepResult.Error,
                     msg = "کد معرف اشتباه است. لطفا بررسی کنید."
                 });
             }
         }
 
-        public JsonResult GetUserCreditData(string cid, string token)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetUserCreditData(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -360,7 +353,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { credit = 0, creditTransactions = new List<ApiCreditTransactionDTO>() });
@@ -400,7 +393,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetUserProfileData(string cid, string token)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetUserProfileData(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -408,7 +402,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -537,7 +531,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        public JsonResult EditUser(string cid, string token, UserDTO userItem)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult EditUser(string cid, UserDTO userItem)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -545,7 +540,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -584,7 +579,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult UpdateUserNotificationToken(string cid, string token, string notificationToken, bool fcm_notification = false)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult UpdateUserNotificationToken(string cid, string notificationToken, bool fcm_notification = false)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -592,7 +588,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -656,7 +652,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetReservePrizeData(string cid, string token)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetReservePrizeData(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -664,7 +661,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new

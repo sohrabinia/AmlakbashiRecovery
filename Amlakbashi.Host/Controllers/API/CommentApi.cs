@@ -8,11 +8,14 @@ using static Amlakbashi.Core.Entities.Advertise;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers.API
 {
     public partial class ApiController : BaseController
     {
+
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult GetAdvertiseCommentsOverview(string cid, string token)
         {
             if (!ClientAuthenticate(cid))
@@ -21,7 +24,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -122,6 +125,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult GetAdvertiseCommentsDetail(string cid, string token, long advertiseId)
         {
             if (!ClientAuthenticate(cid))
@@ -130,7 +134,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -321,7 +325,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult CheckUserRatingAvailable(string cid, string token)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult CheckUserRatingAvailable(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -329,7 +334,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -375,7 +380,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SetReserveRatingAsDone(string cid, string token)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SetReserveRatingAsDone(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -383,7 +389,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -429,11 +435,12 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        public JsonResult AddHostReplyComment(string cid, string token, HostReplyDTO data)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult AddHostReplyComment(string cid, HostReplyDTO data)
         {
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
