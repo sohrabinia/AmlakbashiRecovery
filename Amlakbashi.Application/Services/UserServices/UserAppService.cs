@@ -63,11 +63,11 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             if (userList == null)
             {
-                return Repository.Query(q => q.Where(u => u.CreateDate >= fromDate &&
-                    u.CreateDate <= toDate).Count());
+                return userManager.Users.Where(w => w.CreateDate >= fromDate && w.CreateDate <= toDate).Count();
             }
-            return Repository.Query(q => q.Where(u => u.CreateDate >= fromDate &&
-                u.CreateDate <= toDate && userList.Contains(u.Id)).Count());
+            var usersMainMobile = Repository.Query(q => q.Where(u => userList.Contains(u.Id)).Select(s=>s.MainMobile));
+            return userManager.Users.Where(w => w.CreateDate >= fromDate && w.CreateDate <= toDate)
+                .Select(s => usersMainMobile.Contains(s.UserName)).Count();
         }
 
         public User Find(int id, bool includeFavorite = false)
@@ -105,27 +105,34 @@ namespace Amlakbashi.Application.Services.UserServices
 
         public User GetActivatedUserByMainMobile(string mainMobile, bool includeFavorite = false)
         {
-            if (includeFavorite)
+            var identityUser = userManager.FindByNameAsync(mainMobile).Result;
+            if (identityUser != null && identityUser.State == User.UserState.Acticved)
             {
-                return Repository.Query(q => q.Include(i => i.Favorite).FirstOrDefault(
-                    f => f.MainMobile == mainMobile &&
-                    f.State == (int)User.UserState.Acticved));
+                if (includeFavorite)
+                {
+                    return Repository.Query(q => q.Include(i => i.Favorite).FirstOrDefault(
+                        f => f.MainMobile == mainMobile));
+                }
+                return Repository.Query(q => q.FirstOrDefault(
+                    f => f.MainMobile == mainMobile));
             }
-            return Repository.Query(q => q.FirstOrDefault(
-                f => f.MainMobile == mainMobile &&
-                f.State == (int)User.UserState.Acticved));
+            return null;
         }
 
         public User GetActivatedUserByEmail(string email, bool includeFavorite = false)
         {
-            if (includeFavorite)
+            var identityUser = userManager.FindByEmailAsync(email).Result;
+            if (identityUser != null && identityUser.State == User.UserState.Acticved)
             {
-                return Repository.Query(q => q.Include(i => i.Favorite)
-                .FirstOrDefault(f => f.Email == email &&
-                f.State == (int)User.UserState.Acticved));
+                if (includeFavorite)
+                {
+                    return Repository.Query(q => q.Include(i => i.Favorite).FirstOrDefault(
+                        f => f.MainMobile == identityUser.UserName));
+                }
+                return Repository.Query(q => q.FirstOrDefault(
+                    f => f.MainMobile == identityUser.UserName));
             }
-            return Repository.Query(q => q.FirstOrDefault(f => f.Email == email &&
-                f.State == (int)User.UserState.Acticved));
+            return null;
         }
 
         public void Insert(User user, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel)
@@ -301,24 +308,24 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
             var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
-            var shallowUser = user.ShallowCopy();
+            //var shallowUser = user.ShallowCopy();
             if (state)
             {
-                user.State = (int)User.UserState.Acticved;
+                //user.State = (int)User.UserState.Acticved;
                 identityUser.State = User.UserState.Acticved;
             }
             else
             {
-                user.State = (int)User.UserState.InActived;
+                //user.State = (int)User.UserState.InActived;
                 identityUser.State = User.UserState.InActived;
             }
             userManager.UpdateAsync(identityUser).Wait();
-            Repository.Update(user);
-            Repository.Save();
-            if (currentUserId > 0)
-            {
-                mediator.Publish(new UserUpdateEvent(shallowUser, user, source, currentUserId));
-            }
+            //Repository.Update(user);
+            //Repository.Save();
+            //if (currentUserId > 0)
+            //{
+            //    mediator.Publish(new UserUpdateEvent(shallowUser, user, source, currentUserId));
+            //}
         }
 
         public void UpdateContactPhone(int userId, bool state)
@@ -362,22 +369,19 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateCreateDate(int userId, DateTime time)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.CreateDate = time;
             var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
             identityUser.CreateDate = time;
             userManager.UpdateAsync(identityUser).Wait();
-            Repository.Update(user);
-            Repository.Save();
         }
 
         // TODO: remove this, UpdateLoginCode do same thing
-        public void UpdateAdminLoginCode(int userId, string code)
-        {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.AdminLoginCode = code;
-            Repository.Update(user);
-            Repository.Save();
-        }
+        //public void UpdateAdminLoginCode(int userId, string code)
+        //{
+        //    var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
+        //    user.AdminLoginCode = code;
+        //    Repository.Update(user);
+        //    Repository.Save();
+        //}
 
         public void UpdateForgetCode(int userId, string code)
         {
@@ -391,16 +395,12 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
             var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
-            user.SendVerification = time;
             identityUser.SendVerification = time;
             if (code != null)
             {
-                user.Code = code;
                 identityUser.Code = code;
             }
             userManager.UpdateAsync(identityUser).Wait();
-            Repository.Update(user);
-            Repository.Save();
         }
 
         public void UpdatePresentorUser(int userId, int pid)
@@ -599,15 +599,13 @@ namespace Amlakbashi.Application.Services.UserServices
             mediator.Enqueue(new ScheduleSendGroupNotificationCommand(tokens, title, body, clickAction));
         }
 
-        public bool VerifyLogin(string mobile, string code, out int user_id, string presentorCode, out string errorMsg)
+        public bool VerifyLogin(string mobile, out int user_id, string presentorCode, out string errorMsg)
         {
-            var user = Repository.Query(q => q.FirstOrDefault(u => u.MainMobile == mobile && u.State == (int)User.UserState.Acticved));
-            if (user == null)
-                user = Repository.Query(q => q.OrderBy(u => u.Id).FirstOrDefault(u => u.MainMobile == mobile));
-
-            if (user != null && code == user.Code)
+            var identityUser = userManager.FindByNameAsync(mobile).Result;
+            if (identityUser != null)
             {
-                if (user.State != (int)User.UserState.Acticved)
+                var user = Repository.Query(q => q.OrderBy(u => u.Id).FirstOrDefault(u => u.MainMobile == mobile));
+                if (identityUser.State == User.UserState.InActived)
                 {
                     user.AmlakbashiScore = 1000;
                     if (!string.IsNullOrEmpty(presentorCode))
@@ -638,13 +636,12 @@ namespace Amlakbashi.Application.Services.UserServices
                         }
                         catch
                         {
-                            errorMsg = "کد معرف اشتباه است. لطفا بررسی کنید";
+                            errorMsg = "کد معرف اشتباه است";
                             user_id = 0;
                             return false;
                         }
                     }
                 }
-                user.State = (int)User.UserState.Acticved;
                 user.MainMobile = mobile;
                 Repository.Update(user);
                 Repository.Save();
@@ -664,6 +661,11 @@ namespace Amlakbashi.Application.Services.UserServices
         public void SendSms(UserContactDTO userContact)
         {
             mediator.Enqueue(new SendSmsCommand(userContact));
+        }
+
+        public IList<string> GetAllIdentityUsernamesByState(User.UserState state = User.UserState.Acticved)
+        {
+            return userManager.Users.Where(w=>w.State == state).Select(s=>s.UserName).ToList();
         }
 
         public AppUser GetActivatedIdentityUser(string phrase, bool isEmail = false)
@@ -706,6 +708,25 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateIdentityUser(AppUser user)
         {
             userManager.UpdateAsync(user).Wait();
+        }
+
+        public void AddIdentityUserPassword(string username, string password)
+        {
+            var user = userManager.FindByNameAsync(username).Result;
+            userManager.AddPasswordAsync(user, password).Wait();
+        }
+
+        public void ChangeIdentityUserPassword(string username, string password)
+        {
+            var user = userManager.FindByNameAsync(username).Result;
+            userManager.RemovePasswordAsync(user).Wait();
+            userManager.AddPasswordAsync(user, password).Wait();
+        }
+
+        public IdentityResult ChangeIdentityUserPassword(string username, string currentPassword, string newPassword)
+        {
+            var user = userManager.FindByNameAsync(username).Result;
+            return userManager.ChangePasswordAsync(user, currentPassword, newPassword).Result;
         }
 
         public bool VerifyLoginCode(string mobileInternational, string code)

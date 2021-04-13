@@ -15,7 +15,7 @@
 @using (Html.BeginForm("Index", "User", FormMethod.Post, new { id = "js-filter-form" }))
 {
     <input type="hidden" name="userFilterType" id="userFilterType" value="@((int)data.UserFilterType)" />
-    <a href="/User/Edit" class="add">افزودن کاربر</a>
+    @*<a href="/User/Edit" class="add">افزودن کاربر</a>*@
     <div style="overflow: auto;">
         <table>
             <tr>
@@ -271,7 +271,7 @@
                     @if (data.UserFilterType != Entities.User.UserFilterType.Staff)
                     {
                         <td>
-                            <span onclick="changeUserStatus(@item.User.Id,this)" class="imgstatus @(item.User.State==(int)Entities.User.UserState.Acticved ? "enable" : "disable")"></span>
+                            <span onclick="changeUserStatus(@item.User.Id,this)" class="imgstatus @(item.State == Entities.User.UserState.Acticved ? "enable" : "disable")"></span>
                         </td>
                         <td>
                             <span onclick="changeCompleteProfileContact(@item.User.Id,this)" class="imgstatus @(!string.IsNullOrEmpty(item.User.ContactPhone) && item.User.ContactPhone == "1" ? "enable" : "disable")"></span>
