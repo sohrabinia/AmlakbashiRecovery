@@ -60,6 +60,11 @@ namespace Amlakbashi.Host
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.User.AllowedUserNameCharacters = "+ 0123456789";
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 3;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
             }).AddRoles<AppRole>().AddEntityFrameworkStores<IdentityDB>().AddDefaultTokenProviders();
 
             services.AddAuthentication()
@@ -77,6 +82,8 @@ namespace Amlakbashi.Host
                         ValidateLifetime = true
                     };
                 });
+
+            services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
 
             services.ConfigureApplicationCookie(options =>
             {

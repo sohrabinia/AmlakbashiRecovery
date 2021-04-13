@@ -66,62 +66,27 @@ namespace Amlakbashi.Host.Controllers
             this.signInManager = signInManager;
         }
 
-        [Authorize]
-        public string TestUser()
-        {
-            var guid = Guid.NewGuid();
-            return "test authenticated users";
-        }
-
-        [Authorize(Policy ="AllAdmins")]
-        public string TestAdmin()
-        {
-            return "test all admins (Admin, SuperAdmin)";
-        }
-
         [Authorize(Policy = "SuperAdmins")]
-        public string TestSuperAdmin()
-        {
-            return "test super admins (just SuperAdmin)";
-        }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult TestApiUser()
-        {
-            return GenerateJsonResult("test authenticated users");
-        }
-
-        [Authorize(Policy = Policies.Statistics_View, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult TestApiAdmin()
-        {
-            return  GenerateJsonResult("test all admins (Admin, SuperAdmin)");
-        }
-
-        [Authorize(Policy = Policies.Roles_View, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult TestApiSuperAdmin()
-        {
-            return GenerateJsonResult("test super admins (just SuperAdmin)");
-        }
-
-        [Auth(UserRoles.Admin)]
-        public ActionResult Impersonate(int userId, string url)
+        public IActionResult Impersonate(int userId, string url)
         {
             if (HttpContext.Session.GetObjectFromJson<User>("impersonateUser") != null)
             {
                 return Redirect("/errors/accessdenied");
             }
+
             var user = userService.Find(userId, true);
-            if (user.AccessType == 2)
-            {
-                return Redirect("/errors/accessdenied");
-            }
+            var identityUser = userService.GetIdentityUser(user.MainMobile);
             var admin = userAccessor.CurrentUser;
-            if (TempRoles.AdminMobiles.Contains(PhoneUtility.InternationalNumberToLocal(user.MainMobile)))
-            {
-                return Redirect("/errors/accessdenied");
-            }
+
+            var userPrincipal = signInManager.CreateUserPrincipalAsync(identityUser).Result;
+            userPrincipal.Identities.First().AddClaim(new Claim("AdminUsername", User.Identity.Name));
+            userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonated", "true"));
+            signInManager.SignOutAsync().Wait();
+            signInManager.SignInWithClaimsAsync(identityUser, false, userPrincipal.Claims).Wait();
+
             HttpContext.Session.SetObjectAsJson("impersonateUser", user);
             HttpContext.Session.SetObjectAsJson("impersonateAdmin", admin);
+
             logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
                 user.FullName + "(" + user.Id + ").");
 
@@ -132,9 +97,21 @@ namespace Amlakbashi.Host.Controllers
             return Redirect("/dashboard");
         }
 
-        public ActionResult ImpersonateLogout()
+        public IActionResult ImpersonateLogout()
         {
+            if (User.FindFirst("IsImpersonated").Value != "true")
+            {
+                return NotFound();
+            }
+
+            var adminUsername = User.FindFirst("AdminUsername").Value;
+            var admin = userService.GetIdentityUser(adminUsername);
+
+            signInManager.SignOutAsync().Wait();
+            signInManager.SignInAsync(admin, true).Wait();
+
             HttpContext.Session.Clear();
+
             return Redirect("/user/index");
         }
 
@@ -212,7 +189,9 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (status != -1)
                 {
-                    model = model.Where(x => x.State == status);
+
+                    var identityUserList = userService.GetAllIdentityUsernamesByState(Entities.User.UserState.Acticved);
+                    model = model.Where(x => identityUserList.Contains(x.MainMobile));
                 }
                 if (userFilterType > -1)
                 {
@@ -367,7 +346,7 @@ namespace Amlakbashi.Host.Controllers
 
                 model = model.OrderByDescending(u => u.UserScore);
                 if (sort_order == 0)//By Advertise Count
-                {                    
+                {
                     model = model.OrderByDescending(u => u.Advertises.Count);
                 }
                 else if (sort_order == 1)//By User Credit
@@ -449,7 +428,8 @@ namespace Amlakbashi.Host.Controllers
                     {
                         User = item,
                         BankCard = bankCardService.GetByUserId(item.Id),
-                        InstantReserveCancel = advertiseService.GetInstantReserveCancelCount(item.Id)
+                        InstantReserveCancel = advertiseService.GetInstantReserveCancelCount(item.Id),
+                        State = userService.GetIdentityUser(item.MainMobile).State
                     };
                     userListDTO.UserItems.Add(itemDTO);
                 }
@@ -506,31 +486,29 @@ namespace Amlakbashi.Host.Controllers
                     TempData["msg"] = "شماره تلفن باید با کد کشوری باشد. مثال: +98 9102222222 .";
                     return Redirect(Request.Headers["referer"].ToString());
                 }
-                if (user.Id == -1)
-                {
-                    if (string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.MainMobile)))
-                    {
-                        TempData["msg"] = "لطفا نام کاربری را وارد کنید .";
-                        return RedirectToAction("Edit");
-                    }
-                    var userdb = userService.GetByMainMobile(user.MainMobile);
-                    if (userdb != null)
-                    {
-                        TempData["msg"] = "این نام کاربری قبلا انتخاب شده است، لطفا نام کاربری دیگری انتخاب کنید .";
-                        return RedirectToAction("Edit");
-                    }
-                }
-                if (user.Id == -1)
-                {
-                    user.CreateDate = DateTime.Now;
-                    user.State = (int)Entities.User.UserState.InActived;
-                    userService.Insert(user, userAccessor.DoerUser.Id);
-                }
-                else
-                {
-                    List<string> errors;
-                    userService.Update((UserDTO)user, userAccessor.DoerUser.Id, false, ActionLog.ActionSourceEnum.AdminPanel, out errors, user.CancelInstantReserveLimit);
-                }
+                //if (user.Id == -1)
+                //{
+                //    if (string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.MainMobile)))
+                //    {
+                //        TempData["msg"] = "لطفا نام کاربری را وارد کنید .";
+                //        return RedirectToAction("Edit");
+                //    }
+                //    var userdb = userService.GetByMainMobile(user.MainMobile);
+                //    if (userdb != null)
+                //    {
+                //        TempData["msg"] = "این نام کاربری قبلا انتخاب شده است، لطفا نام کاربری دیگری انتخاب کنید .";
+                //        return RedirectToAction("Edit");
+                //    }
+                //    user.CreateDate = DateTime.Now;
+                //    user.State = (int)Entities.User.UserState.InActived;
+                //    userService.Insert(user, userAccessor.DoerUser.Id);
+
+                //}
+                //else
+                //{
+                List<string> errors;
+                userService.Update((UserDTO)user, userAccessor.DoerUser.Id, false, ActionLog.ActionSourceEnum.AdminPanel, out errors, user.CancelInstantReserveLimit);
+                //}
                 return RedirectToAction("Index");
             }
             catch (Exception exc)
@@ -552,6 +530,52 @@ namespace Amlakbashi.Host.Controllers
             {
                 logger.Error("User.Delete", exc);
                 return GenerateJsonResult(new { status = 0, val = "" });
+            }
+        }
+
+        [Auth]
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            try
+            {
+                return View();
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return Redirect(Request.Headers["referer"].ToString());
+            }
+        }
+
+        [Auth]
+        [HttpPost]
+        public IActionResult ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+        {
+            try
+            {
+                var result = userService.ChangeIdentityUserPassword(User.Identity.Name, currentPassword, newPassword);
+                if (result.Succeeded)
+                {
+                    //var user = userService.GetByMainMobile(User.Identity.Name);
+                    //return RedirectToRoute(new
+                    //{
+                    //    controller = "post",
+                    //    action = "profilemanager",
+                    //    userid = user.Id
+                    //});
+                    ViewBag.suc = true;
+                }
+                else
+                {
+                    ViewBag.errors = result.Errors.Select(s => s.Description).ToList();
+                }
+                return View();
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return Redirect(Request.Headers["referer"].ToString());
             }
         }
 
@@ -665,231 +689,99 @@ namespace Amlakbashi.Host.Controllers
                         return GenerateJsonResult(new { status = 0, msg = "ایمیل اجباری میباشد" });
                     }
                 }
-                var isEmail = !number_is_for_iran;
-                User user;
-                AppUser identityUser;
-                bool banned = false;
-                if (isEmail)
+
+                if (!PhoneUtility.ValidateInternationalNumber(international_mobile))
                 {
-                    if (!EmailUtility.ValidateEmail(email))
+                    return GenerateJsonResult(new
                     {
-                        return GenerateJsonResult(new { status = 0, msg = "آدرس ایمیل نامعتبر است" });
-                    }
-
-                    banned = false;
-                    user = userService.GetActivatedUserByEmail(email);
-                    identityUser = userService.GetActivatedIdentityUser(email, true);
-                    if (user == null)
-                    {
-                        user = userService.GetByEmail(email);
-                        identityUser = userService.GetIdentityUser(email, true);
-                        if (identityUser == null)
-                        {
-                            user = new User();
-                            user.Mobile = mobile;
-                            if (!string.IsNullOrEmpty(email))
-                            {
-                                user.Email = email;
-                            }
-                            user.MainMobile = mobile;
-                            user.CreateDate = DateTime.Now;
-                            user.ResponseFrom = 2;
-                            user.ResponseTo = 2;
-                            user.AmlakbashiScore = 1000;
-                            userService.Insert(user);
-
-                            identityUser = new AppUser()
-                            {
-                                UserName = mobile,
-                                PhoneNumber = mobile,
-                                Email = email,
-                                CreateDate = DateTime.Now,
-                                State = Entities.User.UserState.InActived
-                            };
-                            userService.AddIdentityUser(identityUser);
-                        }
-                        user.State = (int)Entities.User.UserState.InActived;
-                        userService.UpdateState(user.Id, false);
-                        identityUser.State = Entities.User.UserState.InActived;
-                        userService.UpdateIdentityUser(identityUser);
-                    }
-
-                    if (identityUser.CreateDate == null)
-                    {
-                        user.CreateDate = DateTime.Now;
-                        userService.UpdateCreateDate(user.Id, DateTime.Now);
-                        identityUser.CreateDate = DateTime.Now;
-                        userService.UpdateIdentityUser(identityUser);
-                    }
-
-                    if (user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
-                    {
-                        banned = true;
-                    }
-                    if (!banned)
-                    {
-                        if (send_verification)
-                        {
-                            user = userService.GetByEmail(email);
-                            user.ForgetCode = HashUtility.GetMd5Hash(email + "@li#$%S0hR@b!");
-                            string strbody = "<div style='direction:rtl;text-align:right;'><div>برای تایید ایمیل خود و ورود به سایت املاک باشی روی لینک زیر کلیک کیند .</div><a style='display:block;' href='activation'>activation</a></div>";
-                            string strlink = GeneralData.WebsiteUrl + "/user/verifyemail/?activactioncode=" + user.Id + "_" + user.ForgetCode;
-                            strbody = strbody.Replace("activation", strlink);
-
-                            try
-                            {
-                                EmailUtility.SendEmail(EmailSenderDepartment.Verification,
-                                new List<string>() { email },
-                                "تایید ایمیل ثبت نام",
-                                strbody
-                                );
-                            }
-                            catch (Exception exc)
-                            {
-                                logger.Error("", exc);
-                                return GenerateJsonResult(new { status = 0,
-                                    msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message });
-                            }
-                            user.SendVerification = DateTime.Now;
-                            identityUser.SendVerification = DateTime.Now;
-                            userService.UpdateIdentityUser(identityUser);
-                            userService.UpdateForgetCode(user.Id, user.ForgetCode);
-                            userService.UpdateSendVerification(user.Id, DateTime.Now);
-                        }
-                    }
-                    user = userService.GetByEmail(email);
+                        status = 0,
+                        msg = "شماره موبایل اشتباه است"
+                    });
                 }
-                else
+
+                var user = userService.GetByMainMobile(international_mobile);
+                var identityUser = userService.GetIdentityUser(international_mobile);
+
+                if (identityUser == null)
                 {
-                    if (!PhoneUtility.ValidateInternationalNumber(international_mobile))
+                    user = new User();
+                    user.Mobile = international_mobile;
+                    if (!string.IsNullOrEmpty(email))
                     {
-                        return GenerateJsonResult(new { status = 0,
-                            msg = "شماره موبایل اشتباه است" });
+                        user.Email = email;
                     }
-                    string failReason;
-                    bool loginDone = false;
+                    user.MainMobile = international_mobile;
+                    user.ResponseFrom = 2;
+                    user.ResponseTo = 2;
+                    user.FName = null;
+                    user.LName = null;
+                    user.AmlakbashiScore = 1000;
+                    userService.Insert(user);
+                    user = userService.GetByMainMobile(international_mobile);
 
-                    banned = false;
-
-                    user = userService.GetActivatedUserByMainMobile(international_mobile);
-                    identityUser = userService.GetActivatedIdentityUser(international_mobile);
-                    if (identityUser == null)
+                    identityUser = new AppUser()
                     {
-                        user = userService.GetByMainMobile(international_mobile);
-                        identityUser = userService.GetIdentityUser(international_mobile);
-                        if (user == null)
-                        {
-                            user = new User();
-                            user.Mobile = international_mobile;
-                            if (!string.IsNullOrEmpty(email))
-                            {
-                                user.Email = email;
-                            }
-                            user.MainMobile = international_mobile;
-                            user.CreateDate = DateTime.Now;
-                            user.ResponseFrom = 2;
-                            user.ResponseTo = 2;
-                            user.FName = null;
-                            user.LName = null;
-                            user.AmlakbashiScore = 1000;
-                            userService.Insert(user);
-                            failReason = null;
-                            user = userService.GetByMainMobile(international_mobile);
+                        UserName = international_mobile,
+                        PhoneNumber = international_mobile,
+                        CreateDate = DateTime.Now,
+                        PhoneNumberConfirmed = false,
+                        State = Entities.User.UserState.InActived
+                    };
+                    userService.AddIdentityUser(identityUser);
 
-                            identityUser = new AppUser()
-                            {
-                                UserName = international_mobile,
-                                PhoneNumber = international_mobile,
-                                CreateDate = DateTime.Now,
-                                State = Entities.User.UserState.InActived
-                            };
-                            if (!string.IsNullOrEmpty(email))
-                            {
-                                identityUser.Email = email;
-                            }
-                            userService.AddIdentityUser(identityUser);
-                        }
-                        user.State = (int)Entities.User.UserState.InActived;
-                        userService.UpdateState(user.Id, false);
-                        identityUser.State = Entities.User.UserState.InActived;
-                        userService.UpdateIdentityUser(identityUser);
-                    }
+                    var code = new Random().Next(1111, 9999).ToString();
+                    userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                    userService.SendVerificationSms(PhoneUtility.InternationalNumberToLocal(international_mobile), code);
 
-                    if (identityUser.CreateDate == null)
+                    return GenerateJsonResult(new
                     {
-                        userService.UpdateCreateDate(user.Id, DateTime.Now);
-                        identityUser.CreateDate = DateTime.Now;
-                        userService.UpdateIdentityUser(identityUser);
-                    }
-
-                    if (user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
-                    {
-                        banned = true;
-                        failReason = null;
-                        loginDone = true;
-                    }
-
-                    if (send_verification)
-                    {
-                        var code = new Random().Next(1111, 9999).ToString();
-                        userService.SendVerificationSms(PhoneUtility.InternationalNumberToLocal(international_mobile), code);
-                        user.Code = code;
-                        user.SendVerification = DateTime.Now;
-                        identityUser.Code = code;
-                        identityUser.SendVerification = DateTime.Now;
-                        userService.UpdateSendVerification(user.Id, DateTime.Now, code);
-                        userService.UpdateIdentityUser(identityUser);
-                        loginDone = true;
-                    }
-                    failReason = null;
-
-                    if (!loginDone)
-                    {
-                        return GenerateJsonResult(new { status = 0, msg = failReason });
-                    }
+                        status = 1,
+                        mobile = mobile
+                    });
                 }
-                if (banned)
+
+                if (identityUser.PhoneNumberConfirmed == false || identityUser.State == Entities.User.UserState.InActived)
                 {
-                    return GenerateJsonResult(new { status = 2 });
-                }
-                var user_fname = "";
-                var user_lname = "";
-                if (user != null)
-                {
-                    if (!string.IsNullOrEmpty(user.FName))
-                    {
-                        user_fname = user.FName;
-                    }
-                    if (!string.IsNullOrEmpty(user.LName))
-                    {
-                        user_lname = user.LName;
-                    }
-                }
-                ViewBag.mobile = mobile;
-                if (!TempData.ContainsKey("mobile"))
-                    TempData.Add("mobile", mobile);
+                    var code = new Random().Next(1111, 9999).ToString();
+                    userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                    userService.SendVerificationSms(PhoneUtility.InternationalNumberToLocal(international_mobile), code);
 
-                if (string.IsNullOrEmpty(HttpContext.Session.GetString("mobile")))
-                    HttpContext.Session.SetString("mobile", mobile);
+                    return GenerateJsonResult(new
+                    {
+                        status = 1,
+                        mobile = mobile
+                    });
+                }
 
-                ViewBag.msg = TempData["msg"];
-                ViewBag.mobile = HttpContext.Session.GetString("mobile");
-                if (isEmail)
+                if (identityUser.State == Entities.User.UserState.Suspend ||
+                    user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
                 {
-                    return GenerateJsonResult(new { status = 3, email = email });
+                    return GenerateJsonResult(new
+                    {
+                        status = 2,
+                        mobile = mobile
+                    });
                 }
-                else
+
+                if (identityUser.CreateDate == null)
                 {
-                    return GenerateJsonResult(new { status = 1, fname = user_fname,
-                        lname = user_lname, mobile = mobile,
-                        isNew = user.State == (int)Entities.User.UserState.InActived });
+                    userService.UpdateCreateDate(user.Id, DateTime.Now);
                 }
+
+                return GenerateJsonResult(new
+                {
+                    status = 3,
+                    mobile = mobile
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("", exc);
-                return GenerateJsonResult(new { status = 0,
-                    msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message });
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message
+                });
             }
         }
 
@@ -906,35 +798,37 @@ namespace Amlakbashi.Host.Controllers
             return GenerateJsonResult(new { status = 1 });
         }
 
-        public JsonResult PopupResendEmail(string email)
-        {
-            var user = userService.GetByEmail(email);
-            user.ForgetCode = HashUtility.GetMd5Hash(email + "@li#$%S0hR@b!");
-            string strbody = "<div style='direction:rtl;text-align:right;'><div>برای تایید ایمیل خود و ورود به سایت املاک باشی روی لینک زیر کلیک کیند .</div><a style='display:block;' href='activation'>activation</a></div>";
-            string strlink = GeneralData.WebsiteUrl + "/user/verifyemail/?activactioncode=" + user.Id + "_" + user.ForgetCode;
-            strbody = strbody.Replace("activation", strlink);
+        //public JsonResult PopupResendEmail(string email)
+        //{
+        //    var user = userService.GetByEmail(email);
+        //    user.ForgetCode = HashUtility.GetMd5Hash(email + "@li#$%S0hR@b!");
+        //    string strbody = "<div style='direction:rtl;text-align:right;'><div>برای تایید ایمیل خود و ورود به سایت املاک باشی روی لینک زیر کلیک کیند .</div><a style='display:block;' href='activation'>activation</a></div>";
+        //    string strlink = GeneralData.WebsiteUrl + "/user/verifyemail/?activactioncode=" + user.Id + "_" + user.ForgetCode;
+        //    strbody = strbody.Replace("activation", strlink);
 
-            try
-            {
-                EmailUtility.SendEmail(EmailSenderDepartment.Verification,
-                new List<string>() { email },
-                "تایید ایمیل ثبت نام",
-                strbody
-                );
-            }
-            catch (Exception exc)
-            {
-                logger.Error("", exc);
-                return GenerateJsonResult(new { status = 0,
-                    msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message });
-            }
+        //    try
+        //    {
+        //        EmailUtility.SendEmail(EmailSenderDepartment.Verification,
+        //        new List<string>() { email },
+        //        "تایید ایمیل ثبت نام",
+        //        strbody
+        //        );
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("", exc);
+        //        return GenerateJsonResult(new
+        //        {
+        //            status = 0,
+        //            msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message
+        //        });
+        //    }
 
-            user.SendVerification = DateTime.Now;
-            userService.UpdateForgetCode(user.Id, user.ForgetCode);
-            userService.UpdateSendVerification(user.Id, DateTime.Now);
-            ViewBag.msg = TempData["msg"];
-            return GenerateJsonResult(new { status = 1 });
-        }
+        //    userService.UpdateForgetCode(user.Id, user.ForgetCode);
+        //    userService.UpdateSendVerification(user.Id, DateTime.Now);
+        //    ViewBag.msg = TempData["msg"];
+        //    return GenerateJsonResult(new { status = 1 });
+        //}
 
         public JsonResult PopupSendSmsAgain(string mobile)
         {
@@ -943,21 +837,35 @@ namespace Amlakbashi.Host.Controllers
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 if (!PhoneUtility.ValidateInternationalNumber(mobile_international))
                 {
-                    return GenerateJsonResult(new { status = 0,
-                        msg = "شماره موبایل وارد شده صحیح نمی باشد" });
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "شماره موبایل وارد شده صحیح نمی باشد"
+                    });
                 }
                 if (!PhoneUtility.IsNumberForIran(mobile_international))
                 {
-                    return GenerateJsonResult(new { status = 0,
-                        msg = "ارسال پیامک فقط برای کاربران داخل ایران امکان پذیر است" });
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "ارسال پیامک فقط برای کاربران داخل ایران امکان پذیر است"
+                    });
                 }
                 var user = userService.GetActivatedUserByMainMobile(mobile_international);
-                if (user == null)
-                    user = userService.GetByMainMobile(mobile_international);
-                var local_number = PhoneUtility.InternationalNumberToLocal(mobile_international);
-                userService.SendVerificationSms(local_number, user.Code);
-                ViewBag.msg = TempData["msg"];
-                return GenerateJsonResult(new { status = 1 });
+                var identityUser = userService.GetIdentityUser(mobile_international);
+                if (identityUser != null)
+                {
+                    var code = new Random().Next(1111, 9999).ToString();
+                    userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                    userService.SendVerificationSms(PhoneUtility.InternationalNumberToLocal(mobile_international), code);
+                    ViewBag.msg = TempData["msg"];
+                    return GenerateJsonResult(new { status = 1 });
+                }
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "شماره موبایل وارد شده اشتباه است"
+                });
             }
             catch (Exception exc)
             {
@@ -970,15 +878,37 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
+        public JsonResult SaveNewPass(string mobile, string password, string confirmPassword)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(password) || password != confirmPassword)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "رمز عبور و تاییدیه آن را به درستی وارد کنید" });
+                }
+                var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                userService.ChangeIdentityUserPassword(mobile_international, password);
+                var identityUser = userService.GetIdentityUser(mobile_international);
+                signInManager.SignInAsync(identityUser, true).Wait();
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
         public JsonResult PopupVerifyCode(string mobile, string code)
         {
             try
             {
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
-                var user = userService.GetActivatedUserByMainMobile(mobile_international);
-                if (user == null)
+                var user = userService.GetIdentityUser(mobile_international);
+                if (code == user.Code)
                 {
-                    user = userService.GetByMainMobile(mobile_international);
+                    user.PhoneNumberConfirmed = true;
+                    userService.UpdateIdentityUser(user);
                 }
                 var correct = user != null && code == user.Code;
                 return GenerateJsonResult(new { status = 1, correct = correct });
@@ -990,72 +920,17 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        public JsonResult PopupLoginVerification(string mobile, string code, string fname = null, string lname = null, string presentorCode = "")
+        public JsonResult PopupLoginPass(string mobile, string password)
         {
             try
             {
-                var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
-                int user_id;
-                string errorMsg;
-                bool verify = userService.VerifyLogin(mobile_international, code, out user_id, presentorCode, out errorMsg);
-                var identityUser = userService.GetIdentityUser(mobile_international);
-                if (identityUser.Code == code)
+                var mobileInternational = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                var result = signInManager.PasswordSignInAsync(mobileInternational, password, true, false).Result;
+                if (result.Succeeded)
                 {
-                    var user = userService.GetByMainMobile(mobile_international);
-                    if (user != null)
-                    {
-                        user.SetLoginPriority(Entities.User.LoginPriorites.Mobile);
-                        userService.UpdateLoginPriority(user.Id, Entities.User.LoginPriorites.Mobile);
-                        if (!string.IsNullOrEmpty(fname))
-                        {
-                            if (user.State != (int)Entities.User.UserState.Acticved &&
-                                StringUtility.ContainsNumber(fname))
-                            {
-                                return GenerateJsonResult(new { status = 0,
-                                    msg = "نام نمیتواند شامل عدد باشد" });
-                            }
-                            userService.UpdateFName(user_id, fname);
-                        }
-                        else
-                        {
-                            return GenerateJsonResult(new { status = 0,
-                                msg = "لطفا نام خود را وارد کنید" });
-                        }
-                        if (!string.IsNullOrEmpty(lname))
-                        {
-                            if (user.State != (int)Entities.User.UserState.Acticved &&
-                                StringUtility.ContainsNumber(lname))
-                            {
-                                return GenerateJsonResult(new { status = 0,
-                                    msg = "نام خانوادگی نمیتواند شامل عدد باشد" });
-                            }
-                            userService.UpdateLName(user_id, lname);
-                        }
-                        else
-                        {
-                            return GenerateJsonResult(new { status = 0,
-                                msg = "لطفا نام خانوادگی خود را وارد کنید" });
-                        }
-                    }
+                    return GenerateJsonResult(new { status = 1 });
                 }
-                else
-                {
-                    return GenerateJsonResult(new { status = 0, msg = errorMsg });
-                }
-                string str = PhoneUtility.InternationalNumberToLocal(mobile_international);
-                //FormsAuthentication.SetAuthCookie(str, true);
-
-                //var claims = new List<Claim>
-                //{
-                //    new Claim(ClaimTypes.Name, str)
-                //};
-                //var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                //HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-                signInManager.SignInAsync(identityUser, true).Wait();
-
-                //Session["SGUID"] = Guid.NewGuid();
-                //Session["UID"] = user_id;
-                return GenerateJsonResult(new { status = 1 });
+                return GenerateJsonResult(new { status = 0, msg = "رمز وارد شده اشتباه است" });
             }
             catch (Exception exc)
             {
@@ -1064,55 +939,157 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        public ActionResult VerifyEmail(string activactioncode)
+        public JsonResult PopupLoginVerification(string mobile, string code, string fname = null, string lname = null,
+            string password = null, string confirmPassword = null, string presentorCode = "")
         {
-            int user_id = 0;
-            bool verify = false;
             try
             {
-                if (string.IsNullOrEmpty(activactioncode) == false)
+                var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                int user_id;
+                string errorMsg;
+                var identityUser = userService.GetIdentityUser(mobile_international);
+                if (identityUser != null && identityUser.Code == code)
                 {
-                    int id = int.Parse(activactioncode.Substring(0, activactioncode.IndexOf('_')));
-                    string ac = activactioncode.Substring(activactioncode.IndexOf('_') + 1);
-                    var user = userService.Find(id);
-                    if (user == null || user.ForgetCode != ac)
+                    if (identityUser.State == Entities.User.UserState.Suspend ||
+                        identityUser.State == Entities.User.UserState.Deleted)
                     {
-                        user_id = 0;
+                        return GenerateJsonResult(new { status = 0, msg = "حساب کاربری شما معلق شده است. لطفا با پشتیبان تماس بگیرید" });
                     }
-                    if (user.State != (int)Entities.User.UserState.Acticved)
-                        user.AmlakbashiScore = 1000;
-                    user.State = (int)Entities.User.UserState.Acticved;
-                    userService.UpdateState(user.Id, true);
-                    user_id = user.Id;
-                    verify = true;
+                    var verify = userService.VerifyLogin(mobile_international, out user_id, presentorCode, out errorMsg);
+                    if (verify == false)
+                    {
+                        return GenerateJsonResult(new { status = 0, msg = errorMsg });
+                    }
+                    if (identityUser.State == Entities.User.UserState.InActived)
+                    {
+                        userService.UpdateLoginPriority(user_id, Entities.User.LoginPriorites.Mobile);
+                        if (!string.IsNullOrEmpty(fname))
+                        {
+                            if (StringUtility.ContainsNumber(fname))
+                            {
+                                return GenerateJsonResult(new
+                                {
+                                    status = 0,
+                                    msg = "نام نمیتواند شامل عدد باشد"
+                                });
+                            }
+                            userService.UpdateFName(user_id, fname);
+                        }
+                        else
+                        {
+                            return GenerateJsonResult(new
+                            {
+                                status = 0,
+                                msg = "لطفا نام خود را وارد کنید"
+                            });
+                        }
+                        if (!string.IsNullOrEmpty(lname))
+                        {
+                            if (StringUtility.ContainsNumber(lname))
+                            {
+                                return GenerateJsonResult(new
+                                {
+                                    status = 0,
+                                    msg = "نام خانوادگی نمیتواند شامل عدد باشد"
+                                });
+                            }
+                            userService.UpdateLName(user_id, lname);
+                        }
+                        else
+                        {
+                            return GenerateJsonResult(new
+                            {
+                                status = 0,
+                                msg = "لطفا نام خانوادگی خود را وارد کنید"
+                            });
+                        }
+                        if (password != confirmPassword)
+                        {
+                            return GenerateJsonResult(new
+                            {
+                                status = 0,
+                                msg = "رمز وارد شده و تاییدیه آن یکسان نمی باشند"
+                            });
+                        }
+                        if (string.IsNullOrEmpty(password) == false)
+                        {
+
+                            userService.AddIdentityUserPassword(identityUser.UserName, password);
+                        }
+                        else
+                        {
+                            return GenerateJsonResult(new
+                            {
+                                status = 0,
+                                msg = "لطفا رمز عبور خود را وارد کنید"
+                            });
+                        }
+                        userService.UpdateState(user_id, true);
+                    }
+                    signInManager.SignInAsync(identityUser, true).Wait();
+                    return GenerateJsonResult(new { status = 1 });
+                }
+                else
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "کد وارد شده صحیح نیست" });
                 }
             }
             catch (Exception exc)
             {
                 logger.Error("", exc);
-                user_id = 0;
-            }
-            if (verify)
-            {
-                var user = userService.Find(user_id);
-                userService.UpdateLoginPriority(user_id, Entities.User.LoginPriorites.Email);
-                //FormsAuthentication.SetAuthCookie(user.Email, true);
-
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.Email)
-                };
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
-                TempData["MessageShowOnReady"] = "ثبت نام شما با موفقیت انجام شد";
-                return Redirect("/");
-            }
-            else
-            {
-                return Redirect("/errors/http404");
+                return GenerateJsonResult(new { status = 0 });
             }
         }
+
+        //public ActionResult VerifyEmail(string activactioncode)
+        //{
+        //    int user_id = 0;
+        //    bool verify = false;
+        //    try
+        //    {
+        //        if (string.IsNullOrEmpty(activactioncode) == false)
+        //        {
+        //            int id = int.Parse(activactioncode.Substring(0, activactioncode.IndexOf('_')));
+        //            string ac = activactioncode.Substring(activactioncode.IndexOf('_') + 1);
+        //            var user = userService.Find(id);
+        //            if (user == null || user.ForgetCode != ac)
+        //            {
+        //                user_id = 0;
+        //            }
+        //            if (user.State != (int)Entities.User.UserState.Acticved)
+        //                user.AmlakbashiScore = 1000;
+        //            user.State = (int)Entities.User.UserState.Acticved;
+        //            userService.UpdateState(user.Id, true);
+        //            user_id = user.Id;
+        //            verify = true;
+        //        }
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("", exc);
+        //        user_id = 0;
+        //    }
+        //    if (verify)
+        //    {
+        //        var user = userService.Find(user_id);
+        //        userService.UpdateLoginPriority(user_id, Entities.User.LoginPriorites.Email);
+        //        //FormsAuthentication.SetAuthCookie(user.Email, true);
+
+        //        var claims = new List<Claim>
+        //        {
+        //            new Claim(ClaimTypes.Name, user.Email)
+        //        };
+        //        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        //        HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+        //        TempData["MessageShowOnReady"] = "ثبت نام شما با موفقیت انجام شد";
+        //        return Redirect("/");
+        //    }
+        //    else
+        //    {
+        //        return Redirect("/errors/http404");
+        //    }
+        //}
 
         [HttpGet]
         public ActionResult PublicLogin(string returnUrl = "/dashboard")
@@ -1124,19 +1101,14 @@ namespace Amlakbashi.Host.Controllers
 
         public ActionResult Signout()
         {
-            // TODO: check this
-            //HttpContext.Session.SetString("mobile", null);
-            //FormsAuthentication.SignOut();
-            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            signInManager.SignOutAsync();
             HttpContext.Session.Clear();
             return Redirect("/");
         }
 
         public ActionResult LogOff()
         {
-            //HttpContext.Session.SetString("mobile", null);
-            //FormsAuthentication.SignOut();
-            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            signInManager.SignOutAsync();
             HttpContext.Session.Clear();
             return Redirect("/");
         }
@@ -1221,9 +1193,11 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (transaction_id < 1 && string.IsNullOrEmpty(transaction_cause))
                 {
-                    return GenerateJsonResult(new {
+                    return GenerateJsonResult(new
+                    {
                         status = 0,
-                        msg = "لطفا یکی از فیلدهای دلیل افزودن مبلغ و شماره تراکنش را پر کنید" });
+                        msg = "لطفا یکی از فیلدهای دلیل افزودن مبلغ و شماره تراکنش را پر کنید"
+                    });
                 }
                 var cause = string.IsNullOrEmpty(transaction_cause) ? Entities.User.CreditTransactionCause.Charge : Entities.User.CreditTransactionCause.Other;
                 long newCredit;
@@ -1233,7 +1207,7 @@ namespace Amlakbashi.Host.Controllers
                 var price_string = string.Format("{0:n0}", amount) + " تومان";
                 var new_credit_string = string.Format("{0:n0}", newCredit) + " تومان";
                 if (send_sms)
-                {                   
+                {
                     var user = userService.Find(user_id);
                     userService.SendMessage(new UserContactDTO()
                     {
@@ -1249,16 +1223,21 @@ namespace Amlakbashi.Host.Controllers
                         CauseString = Entities.User.GetCreditTransactionCauseString((int)cause, transaction_cause)
                     });
                 }
-                return GenerateJsonResult(new {
+                return GenerateJsonResult(new
+                {
                     status = 1,
                     msg = "مبلغ " + price_string + " اضافه شد",
-                    new_credit = new_credit_string });
+                    new_credit = new_credit_string
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("User.AdminIncreaseCredit", exc);
-                return GenerateJsonResult(new { status = 0,
-                    msg = "متاسفانه عملیات با خطا مواجه شد" });
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
             }
         }
 
@@ -1273,8 +1252,11 @@ namespace Amlakbashi.Host.Controllers
                     userAccessor.CurrentUser.Id != 2122 &&
                     userAccessor.CurrentUser.Id != 19076)
                 {
-                    return GenerateJsonResult(new { status = 0,
-                        msg = "شما مجوز انجام این کار را ندارید" });
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "شما مجوز انجام این کار را ندارید"
+                    });
                 }
                 if (user_id < 1)
                 {
@@ -1313,8 +1295,12 @@ namespace Amlakbashi.Host.Controllers
                             (int)cause, transaction_cause)
                     });
                 }
-                return GenerateJsonResult(new { status = 1,
-                    msg = "مبلغ " + price_string + " کسر شد", new_credit = new_credit_string });
+                return GenerateJsonResult(new
+                {
+                    status = 1,
+                    msg = "مبلغ " + price_string + " کسر شد",
+                    new_credit = new_credit_string
+                });
             }
             catch (Exception exc)
             {
@@ -1362,7 +1348,8 @@ namespace Amlakbashi.Host.Controllers
             {
                 full_name = "ثبت نشده";
             }
-            return GenerateJsonResult(new {
+            return GenerateJsonResult(new
+            {
                 status = 1,
                 main_mobile = main_mobile,
                 mobile_1 = mobile_1,
@@ -1408,17 +1395,22 @@ namespace Amlakbashi.Host.Controllers
         public JsonResult IsUserAuthenticated()
         {
             var impersonatedUser = HttpContext.Session.GetObjectFromJson<User>("impersonateUser");
-            return GenerateJsonResult(new {
+            return GenerateJsonResult(new
+            {
                 val = User.Identity.IsAuthenticated,
-                impersonateData = new { state = impersonatedUser != null,
-                    fullName = impersonatedUser != null ? impersonatedUser.FullName : "" }
+                impersonateData = new
+                {
+                    state = impersonatedUser != null,
+                    fullName = impersonatedUser != null ? impersonatedUser.FullName : ""
+                }
             });
         }
 
         public JsonResult IsUserLoginBanned()
         {
             return GenerateJsonResult(
-                new {
+                new
+                {
                     val = userAccessor.CurrentUser.AccessType ==
                         (int)Entities.User.AccessTypeEnum.LoginBanned,
                     user_id = userAccessor.CurrentUser.Id
@@ -1588,8 +1580,11 @@ namespace Amlakbashi.Host.Controllers
             {
                 if (id < 1)
                 {
-                    return GenerateJsonResult(new { status = 0,
-                        msg = "کد کاربر انتخاب نشده است" });
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "کد کاربر انتخاب نشده است"
+                    });
                 }
                 if (amount < 1)
                 {
@@ -1597,22 +1592,31 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (string.IsNullOrEmpty(title))
                 {
-                    return GenerateJsonResult(new { status = 0,
-                        msg = "لطفا دلیل شارژ کیف هدیه را وارد کنید" });
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "لطفا دلیل شارژ کیف هدیه را وارد کنید"
+                    });
                 }
                 accounting.IncreasePrizeCredit(id, amount,
                     PrizeCreditTransaction.PrizeTransactionType.Custom,
                     0, title, userAccessor.CurrentUser.Id,
                     ActionLog.ActionSourceEnum.AdminPanel);
-                return GenerateJsonResult(new { status = 1,
+                return GenerateJsonResult(new
+                {
+                    status = 1,
                     msg = "کیف هدیه کد کاربر " + id + " مبلغ " + amount +
-                    " به دلیل " + title + " شارژ شد." });
+                    " به دلیل " + title + " شارژ شد."
+                });
             }
             catch (Exception exc)
             {
                 logger.Error("", exc);
-                return GenerateJsonResult(new { status = 0,
-                    msg = "عملیات با خطای فنی مواجه شد" });
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد"
+                });
             }
         }
 
@@ -1624,8 +1628,11 @@ namespace Amlakbashi.Host.Controllers
                 var targetUser = userService.Find(id);
                 if (TempRoles.AdminMobiles.Select(s => PhoneUtility.LocalNumberToInternational(s, 98)).Contains(targetUser.MainMobile))
                 {
-                    return GenerateJsonResult(new { status = 0,
-                        msg = "کاربر مورد نظر جزو کارکنان است و امکان ورود از طرف کارکنان وجود ندارد" });
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "کاربر مورد نظر جزو کارکنان است و امکان ورود از طرف کارکنان وجود ندارد"
+                    });
                 }
                 var token = HashUtility.GetMd5Hash(id + "#li#$%S0hR@b!@ml@kb@$h!");
                 userService.UpdateLoginCode(id, token);
@@ -1634,11 +1641,13 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("", exc);
-                return GenerateJsonResult(new { status = 0,
-                    msg = "عملیات با خطای فنی مواجه شد" });
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد"
+                });
             }
         }
-
     }
 }
 

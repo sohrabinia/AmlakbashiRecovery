@@ -1,0 +1,20 @@
+﻿@model IList<Amlakbashi.Core.Identity.Entities.AppRole>
+
+@{
+    ViewBag.Title = "مدیریت کاربری";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<div class="title">مدیریت رول ها</div>
+
+<div style="margin:30px;">
+    <table style="width:300px; border: 1px solid black; margin: 30px;">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td><a asp-action="roleuserlist" asp-route-rolename="@item.Name" class="fa fa-users" title="لیست کاربران"></a></td>
+            </tr>
+        }
+    </table>
+</div>

@@ -412,6 +412,7 @@ div#edit_mail_button {
 #login-box-details {
     text-transform: uppercase;
     text-align:center;
+    overflow-y: scroll;
 }
 
 @keyframes shake {

@@ -51,7 +51,7 @@ namespace Portal.Controllers
             {
                 extra_filter = true;
             }
-            List<int> user_list = advertiseService.FilterAdmin(province, city, area, adtype).Select(s=>s.UserID).ToList();
+            List<int> user_list = advertiseService.FilterAdmin(province, city, area, adtype).Select(s => s.UserID).ToList();
             if (type == "monthly")
             {
                 var toDate = DateTime.Today.AddDays(1);
@@ -256,7 +256,8 @@ namespace Portal.Controllers
                         var receiverUsers = recievers.ToList();
                         foreach (var recieverUser in receiverUsers)
                         {
-                            userService.SendSms(new Amlakbashi.Core.Infrastructure.UserContact.UserContactDTO() {
+                            userService.SendSms(new Amlakbashi.Core.Infrastructure.UserContact.UserContactDTO()
+                            {
                                 UserMainMobile = recieverUser.MainMobile,
                                 Type = Amlakbashi.Core.Infrastructure.UserContact.UserContactType.HostUpdatePrice,
                                 Extra1 = !string.IsNullOrEmpty(recieverUser.LName) ? recieverUser.LName : "-"
@@ -325,7 +326,7 @@ namespace Portal.Controllers
                     {
                         long payment_amount1 = 0;
                         long payment_amount2 = 0;
-                        
+
                         if (extra_filter)
                         {
                             payment_amount1 = accounting.GetPaymentRange(fromDate, toDate, 1, user_list).
@@ -510,7 +511,7 @@ namespace Portal.Controllers
                         break;
                     case 1:
                         users = users.Where(x => x.UserGeneralType > 0);
-                        var userIds = advertiseService.FilterAdmin(province, city, area).Select(s=>s.UserID).Distinct().ToList();
+                        var userIds = advertiseService.FilterAdmin(province, city, area).Select(s => s.UserID).Distinct().ToList();
                         users = users.Where(w => userIds.Contains(w.Id));
                         break;
                 }
@@ -585,9 +586,11 @@ namespace Portal.Controllers
             {
                 return null;
             }
+
+            var identityUsers = userService.GetAllIdentityUsernamesByState();
             IQueryable<User> users = userService.GetAllAsIQueryable();
             users = users.Where(x => x.MainMobile != null && x.MainMobile.Length > 0 && x.MainMobile.StartsWith("+"));
-            users = users.OrderByDescending(x => x.State == (int)Entities.User.UserState.Acticved).
+            users = users.OrderByDescending(x => identityUsers.Contains(x.MainMobile)).
                 ThenByDescending(x => x.Id);
             var result = new List<WaCoronaAdvMsgHelper>();
             foreach (var user in users)

@@ -537,7 +537,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     return GenerateJsonResult(new { val = 2 });
                 }
-                if (userAccessor.CurrentUser.AccessType == (int)Entities.User.AccessTypeEnum.ReserveBanned || userAccessor.CurrentUser.State == (int)Entities.User.AccessTypeEnum.LoginBanned)
+                if (userAccessor.CurrentUser.AccessType == (int)Entities.User.AccessTypeEnum.ReserveBanned || userAccessor.CurrentUser.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
                 {
                     return GenerateJsonResult(new { val = 3 });
                 }
@@ -2390,7 +2390,8 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
             }
             var startDate = DateTime.Parse("10/28/2020");
-            if (userAccessor.CurrentUser.CreateDate.Value.Date < startDate.Date)
+            var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+            if (identityUser.CreateDate.Value.Date < startDate.Date)
             {
                 return GenerateJsonResult(new { status = 0, msg = "شما مجوز استفاده از کد تخفیف را ندارید" });
             }

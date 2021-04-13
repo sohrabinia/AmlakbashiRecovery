@@ -37,6 +37,7 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
     public class UserIndexItemDTO
     {
         public User User { get; set; }
+        public User.UserState State { get; set; }
         public int InstantReserveCancel { get; set; }
         public BankCard BankCard { get; set; }
     }
