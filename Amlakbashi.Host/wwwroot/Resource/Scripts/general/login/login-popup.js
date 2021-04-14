@@ -318,7 +318,7 @@ function login_verification() {
     var passConfirm = $("#confirmPassword").val();
     var presentorCode = $('#presentorcode').val();
     login_in_progress = true;
-    myajax("user/popuploginverification", "mobile=" + mobile + "&code=" +
+    myajax("user/popuploginregister", "mobile=" + mobile + "&code=" +
         code + "&fname=" + fname + "&lname=" + lname + "&password=" + pass +
         "&confirmPassword=" + passConfirm + "&presentorcode=" + presentorCode,
         function (ret) {

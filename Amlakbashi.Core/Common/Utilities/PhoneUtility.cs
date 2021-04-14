@@ -34,6 +34,14 @@ namespace Amlakbashi.Core.Common.Utilities
             {
                 number = number.Insert(3, " ");
             }
+            if (number.Substring(0, 1) != "+")
+            {
+                number = "+" + number;
+            }
+            if (number.Contains("  "))
+            {
+                number = number.Replace("  ", " ");
+            }
             return number;
         }
 

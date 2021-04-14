@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Identity.Entities;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 
 namespace Amlakbashi.Host.Controllers.API
 {
@@ -94,9 +95,13 @@ namespace Amlakbashi.Host.Controllers.API
                         }
                     }
                 }
+
                 //if (number_is_for_iran)
                 //{
-                    var code = user.Code;
+                var code = user.Code;
+                if (identityUser.State != Entities.User.UserState.Acticved ||
+                    identityUser.PhoneNumberConfirmed == false)
+                {
                     if (string.IsNullOrEmpty(user.Code) ||
                         user.SendVerification == null ||
                         (DateTime.Now - user.SendVerification) >
@@ -108,23 +113,25 @@ namespace Amlakbashi.Host.Controllers.API
                     }
                     user.SendVerification = DateTime.Now;
                     userService.UpdateSendVerification(user.Id, DateTime.Now, code);
-                    var local_number = number_is_for_iran ?
+                    var callableNumber = number_is_for_iran ?
                         PhoneUtility.InternationalNumberToLocal(international_mobile) :
                         PhoneUtility.InternationalNumberToCallable(international_mobile);
-                    userService.SendVerificationSms(local_number, code);
-                    return GenerateJsonResult(new
-                    {
-                        status = identityUser.PhoneNumberConfirmed ?
-                            (int)Entities.User.SignInFirstStepResult.EnterPassword :
-                            (int)Entities.User.SignInFirstStepResult.MobileConfirm,
-                        code = code,
-                        mobile = local_number,
-                        user_id = user.Id,
-                        fname = string.IsNullOrEmpty(user.FName) ? "" : user.FName,
-                        lname = string.IsNullOrEmpty(user.LName) ? "" : user.LName,
-                        notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
-                        isNew = isNew
-                    });
+                    userService.SendVerificationSms(callableNumber, code);
+                }
+                return GenerateJsonResult(new
+                {
+                    status = identityUser.PhoneNumberConfirmed &&
+                        identityUser.State == Entities.User.UserState.Acticved ?
+                        (int)Entities.User.SignInFirstStepResult.EnterPassword :
+                        (int)Entities.User.SignInFirstStepResult.MobileConfirm,
+                    code = code,
+                    mobile = international_mobile,
+                    user_id = user.Id,
+                    fname = string.IsNullOrEmpty(user.FName) ? "" : user.FName,
+                    lname = string.IsNullOrEmpty(user.LName) ? "" : user.LName,
+                    notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
+                    isNew = isNew
+                });
                 //}
                 //else
                 //{
@@ -158,30 +165,17 @@ namespace Amlakbashi.Host.Controllers.API
                 var identityUser = userService.GetIdentityUser(internationalMobile);
                 if (identityUser.Code == code)
                 {
-                    var userRoles = userManager.GetRolesAsync(identityUser).Result;
-                    var authClaims = new List<Claim>();
-                    authClaims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
-                    foreach (var role in userRoles)
-                    {
-                        authClaims.Add(new Claim(ClaimTypes.Role, role));
-                    }
-                    var authSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
-                    var token = new JwtSecurityToken(
-                            expires: DateTime.Now.AddHours(1440),
-                            claims: authClaims,
-                            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
                     return GenerateJsonResult(new
                     {
-                        status = (int)Entities.User.SignInMobileConfirmResult.Correct,
-                        mobile = mobile,
-                        token = new JwtSecurityTokenHandler().WriteToken(token)
+                        status = 1,
+                        mobile = mobile
                     });
                 }
                 else
                 {
                     return GenerateJsonResult(new
                     {
-                        status = (int)Entities.User.SignInMobileConfirmResult.Error,
+                        status = 0,
                         msg = "کد وارد شده اشتباه است"
                     });
                 }
@@ -191,9 +185,162 @@ namespace Amlakbashi.Host.Controllers.API
                 logger.Error("", exc);
                 return GenerateJsonResult(new
                 {
-                    status = (int)Entities.User.SignInFirstStepResult.Error,
+                    status = 0,
                     msg = "متاسفانه خطایی رخ داده است"
                 });
+            }
+        }
+
+        public JsonResult SendSmsAgain(string mobile)
+        {
+            try
+            {
+                var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                if (!PhoneUtility.ValidateInternationalNumber(mobile_international))
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "شماره موبایل وارد شده صحیح نمی باشد"
+                    });
+                }
+                var user = userService.GetActivatedUserByMainMobile(mobile_international);
+                var identityUser = userService.GetIdentityUser(mobile_international);
+                if (identityUser != null)
+                {
+                    var code = new Random().Next(1111, 9999).ToString();
+                    userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                    var mobileNumber = PhoneUtility.IsNumberForIran(mobile_international) ?
+                        PhoneUtility.InternationalNumberToLocal(mobile_international) :
+                        PhoneUtility.InternationalNumberToCallable(mobile_international);
+                    userService.SendVerificationSms(mobileNumber, code);
+                    return GenerateJsonResult(new { status = 1 });
+                }
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "شماره موبایل وارد شده اشتباه است"
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
+            }
+        }
+
+        public JsonResult SignInRegister(string mobile, string code, string fname = null, string lname = null,
+            string password = null, string confirmPassword = null, string presentorCode = "")
+        {
+            try
+            {
+                var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                int user_id;
+                string errorMsg;
+                var identityUser = userService.GetIdentityUser(mobile_international);
+                if (identityUser != null && identityUser.Code == code)
+                {
+                    if (identityUser.State == Entities.User.UserState.Suspend ||
+                        identityUser.State == Entities.User.UserState.Deleted)
+                    {
+                        return GenerateJsonResult(new
+                        {
+                            status = 0,
+                            errors = new Dictionary<string, string>() { { "suspend", "حساب کاربری شما معلق شده است. لطفا با پشتیبان تماس بگیرید" } }
+                        });
+                    }
+                    var verify = userService.VerifyLogin(mobile_international, out user_id, presentorCode, out errorMsg);
+                    if (verify == false)
+                    {
+                        return GenerateJsonResult(new
+                        {
+                            status = 0,
+                            errors = new Dictionary<string, string>() { { "login", errorMsg } }
+                        });
+                    }
+                    if (identityUser.State == Entities.User.UserState.InActived)
+                    {
+                        userService.UpdateLoginPriority(user_id,
+                            PhoneUtility.IsNumberForIran(mobile_international) ?
+                            Entities.User.LoginPriorites.Mobile : Entities.User.LoginPriorites.Email);
+                        Dictionary<string, string> errors;
+                        if (userService.SignInRegister(user_id, fname, lname, password,
+                            confirmPassword, out errors))
+                        {
+                            userService.UpdateState(user_id, true);
+                        }
+                        else
+                        {
+                            return GenerateJsonResult(new
+                            {
+                                status = 0,
+                                errors = errors
+                            });
+                        }
+                    }
+                    var jwtToken = userService.JwtSignIn(identityUser, Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
+                    return GenerateJsonResult(new { status = 1, token = new JwtSecurityTokenHandler().WriteToken(jwtToken) });
+                }
+                else
+                {
+                    return GenerateJsonResult(new { status = 0, errors =
+                        new Dictionary<string, string>() { { "code", "کد وارد شده صحیح نیست" } } });
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("UserApi/SignInRegister", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    errors = new Dictionary<string, string>() { { "exception", GeneralLocalization.GetExceptionMessage(exc) } }
+                });
+            }
+        }
+
+        public JsonResult SaveNewPass(string mobile, string password, string confirmPassword)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(password) || password != confirmPassword)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "رمز عبور و تاییدیه آن را به درستی وارد کنید" });
+                }
+                var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                userService.ChangeIdentityUserPassword(mobile_international, password);
+                var identityUser = userService.GetIdentityUser(mobile_international);
+                var jwtToken = userService.JwtSignIn(identityUser, Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
+                return GenerateJsonResult(new { status = 1, token = new JwtSecurityTokenHandler().WriteToken(jwtToken) });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        public JsonResult LoginPass(string mobile, string password)
+        {
+            try
+            {
+                var mobileInternational = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                var identityUser = userService.GetIdentityUser(mobileInternational);
+                var passwordOK = userManager.CheckPasswordAsync(identityUser, password).Result;
+                if (passwordOK)
+                {
+                    var jwtToken = userService.JwtSignIn(identityUser, Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
+                    return GenerateJsonResult(new { status = 1, token = new JwtSecurityTokenHandler().WriteToken(jwtToken) });
+                }
+                return GenerateJsonResult(new { status = 0, msg = "رمز وارد شده اشتباه است" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
             }
         }
 
@@ -338,7 +485,7 @@ namespace Amlakbashi.Host.Controllers.API
             {
                 return GenerateJsonResult(new
                 {
-                    status = (int)Entities.User.SignInFirstStepResult.Error,
+                    status = 0,
                     msg = "کد معرف اشتباه است. لطفا بررسی کنید."
                 });
             }

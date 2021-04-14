@@ -20,6 +20,10 @@ using Microsoft.AspNetCore.Identity;
 using Amlakbashi.Data.Identity;
 using System.Threading.Tasks;
 using Amlakbashi.Core.Identity.Entities;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
@@ -710,17 +714,17 @@ namespace Amlakbashi.Application.Services.UserServices
             userManager.UpdateAsync(user).Wait();
         }
 
-        public void AddIdentityUserPassword(string username, string password)
+        public IdentityResult AddIdentityUserPassword(string username, string password)
         {
             var user = userManager.FindByNameAsync(username).Result;
-            userManager.AddPasswordAsync(user, password).Wait();
+            return userManager.AddPasswordAsync(user, password).Result;
         }
 
-        public void ChangeIdentityUserPassword(string username, string password)
+        public IdentityResult ChangeIdentityUserPassword(string username, string password)
         {
             var user = userManager.FindByNameAsync(username).Result;
             userManager.RemovePasswordAsync(user).Wait();
-            userManager.AddPasswordAsync(user, password).Wait();
+            return userManager.AddPasswordAsync(user, password).Result;
         }
 
         public IdentityResult ChangeIdentityUserPassword(string username, string currentPassword, string newPassword)
@@ -773,6 +777,86 @@ namespace Amlakbashi.Application.Services.UserServices
             var identityUsers = userManager.GetUsersInRoleAsync(roleName).Result.Select(s => s.UserName);
             var userList = Repository.Query(q => q.Where(w => identityUsers.Contains(w.MainMobile)));
             return userList.ToList();
+        }
+
+        public bool SignInRegister(int user_id, string fname, string lname,
+            string password, string confirmPassword, out Dictionary<string, string> errors)
+        {
+            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == user_id));
+            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            errors = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(fname))
+            {
+                if (StringUtility.ContainsNumber(fname))
+                {
+                    errors.Add(nameof(fname), "نام نمیتواند شامل عدد باشد");
+                }
+                else
+                {
+                    user.FName = fname;
+                    Repository.Update(user);
+                    Repository.Save();
+                }
+            }
+            else
+            {
+                errors.Add(nameof(fname), "لطفا نام خود را وارد کنید");
+            }
+            if (!string.IsNullOrEmpty(lname))
+            {
+                if (StringUtility.ContainsNumber(lname))
+                {
+                    errors.Add(nameof(lname), "نام خانوادگی نمیتواند شامل عدد باشد");
+                }
+                else
+                {
+                    user.LName = lname;
+                    Repository.Update(user);
+                    Repository.Save();
+                }
+            }
+            else
+            {
+                errors.Add(nameof(lname), "لطفا نام خانوادگی خود را وارد کنید");
+            }
+            if (password != confirmPassword)
+            {
+                errors.Add(nameof(confirmPassword), "رمز وارد شده و تاییدیه آن یکسان نمی باشند");
+            }
+            if (string.IsNullOrEmpty(password) == false)
+            {
+                var addPasswordResult = userManager.AddPasswordAsync(identityUser, password).Result;
+                if (addPasswordResult.Succeeded == false)
+                {
+                    foreach (var addPasswordError in addPasswordResult.Errors)
+                    {
+                        errors.Add(nameof(password), UserLocalization.GetIdentityPasswordErrorString(addPasswordError.Code,
+                            addPasswordError.Description));
+                    }
+                }
+            }
+            else
+            {
+                errors.Add(nameof(password), "لطفا رمز عبور خود را وارد کنید");
+            }
+            return errors.Any() == false;
+        }
+
+        public JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key)
+        {
+            var userRoles = userManager.GetRolesAsync(identityUser).Result;
+            var authClaims = new List<Claim>();
+            authClaims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
+            foreach (var role in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, role));
+            }
+            var authSigningKey = new SymmetricSecurityKey(key);
+            var token = new JwtSecurityToken(
+                    expires: DateTime.Now.AddHours(1440),
+                    claims: authClaims,
+                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
+            return token;
         }
     }
 }
