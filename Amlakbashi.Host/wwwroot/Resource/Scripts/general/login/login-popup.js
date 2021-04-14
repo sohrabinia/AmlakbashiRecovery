@@ -156,11 +156,11 @@ function login(step) {
                     }
                     $("#code").on('keypress', function (e) {
                         if (e.which == 13) {
-                            login_success(ret.fname, ret.lname, ret.mobile, ret.isNew);
+                            login_success(ret.mobile, ret.isNew);
                         }
                     });
                     $("#success__code").click(function () {
-                        login_success(ret.fname, ret.lname, ret.mobile, ret.isNew);
+                        login_success(ret.mobile, ret.isNew);
                     });
                     setTimeout(function () { $("#code").focus() }, 1000);
                 }
@@ -216,12 +216,8 @@ function showCodeForm() {
                 $("#login_form").find('.login__please-enter-mobile').html("");
                 var mobileNumber = mobile.replace("00989", "09");
                 $("#login_form").find('.login__please-enter-mobile').append(`<div class="login__please-enter-mobile">کد تایید به شماره موبایل ${mobileNumber} ارسال شد. </div><div>برای ورود کد تایید را وارد نمایید.</div>`);
-                //$(".iti").css('margin', '15px auto 0 auto')
-                //$("#mobile").prop("disabled", true).css({ 'cursor': 'no-drop', 'opacity': '0.3' });
-                //$(".iti__flag-container").prop("disabled", true).css({ 'cursor': 'no-drop', 'opacity': '0.3' });
                 $("div#selectRoot").css('margin-top', '-23px');
                 $("#login_form .login__please-enter-mobile").css('margin', '35px auto 8px auto');
-                //$("#mobile_label").html(mobileNumber);
                 if (can_send_login_message) {
                     can_send_login_message = false;
                     startCountDown($("#count_down_timer")[0], function () {
@@ -234,13 +230,7 @@ function showCodeForm() {
                         })
                     });
                 }
-                //$("#code").on('keypress', function (e) {
-                //    if (e.which == 13) {
-                //        login_success(ret.fname, ret.lname, ret.mobile, ret.isNew);
-                //    }
-                //});
                 $("#success__code").click(function () {
-                    //login_success(ret.fname, ret.lname, ret.mobile, ret.isNew);
                     loginForgotSuccess();
                 });
                 setTimeout(function () { $("#code").focus() }, 1000);
@@ -252,11 +242,12 @@ function showCodeForm() {
 }
 
 function saveNewPass() {
+    var code = $('#code').val();
     var number = intl.getNumber();
     var mobile = number.replace("+", "00");
     var pass = $("#forgotPass").val();
     var confPass = $("#forgotConfirmPass").val();
-    myajax("user/savenewpass", "mobile=" + mobile + "&password=" + pass + "&confirmPassword=" + confPass,
+    myajax("user/savenewpass", "mobile=" + mobile + "&code=" + code + "&password=" + pass + "&confirmPassword=" + confPass,
         function (ret) {
             login_in_progress = false;
             if (ret.status == 1) {
@@ -315,7 +306,7 @@ function login_verification() {
     var fname = $("#fname").val();
     var lname = $("#lname").val();
     var pass = $("#pass").val();
-    var passConfirm = $("#confirmPassword").val();
+    var passConfirm = $("#confirmPass").val();
     var presentorCode = $('#presentorcode').val();
     login_in_progress = true;
     myajax("user/popuploginverification", "mobile=" + mobile + "&code=" +
@@ -407,18 +398,28 @@ function restart_login() {
     $("#login_form").show();
 
 }
-function login_success(fname, lname, mobile, isNew) {
-    $("#fname").val(fname == null ? "" : fname);
-    $("#lname").val(lname == null ? "" : lname);
+function login_success(mobile, isNew) {
+    //$("#fname").val(fname == null ? "" : fname);
+    //$("#lname").val(lname == null ? "" : lname);
     var code = $('#code').val();
     var number = intl.getNumber();
     var mobile = number.replace("+", "00");
-    myajax("user/popupverifycode", "mobile=" + mobile + "&code=" + code, function (ret) {
-        if (ret.correct) {
-            $(".login_form").hide();
-            show_verification_form();
-        } else {
-            alertify.error('کد وارد شده اشتباه است');
+    $.ajax({
+        url: "user/popupverifycode",
+        type: "post",
+        data: {
+            mobile: mobile,
+            code: code
+        },
+        success: function (ret) {
+            if (ret.correct) {
+                $(".login_form").hide();
+                show_verification_form(ret.fname, ret.lname, isNew);
+            } else {
+                alertify.error('کد وارد شده اشتباه است');
+            };
+        },
+        error: function (jqXhr, textStatus, errorMessage) {
         }
     });
 }
@@ -427,9 +428,15 @@ function login_success_email(email, onDone) {
     show_email_verification_form(email, onDone);
 }
 
-function show_verification_form(isNew) {
+function show_verification_form(fname, lname, isNew) {
     if (isNew == undefined) {
         isNew = false;
+    }
+    if (fname != undefined) {
+        $("#fname").val(fname);
+    }
+    if (lname != undefined) {
+        $("#lname").val(lname);
     }
     $(".login__box-button").css('background', '#e2e2e2');
     //checked_mobile_current = true;
@@ -442,6 +449,7 @@ function show_verification_form(isNew) {
     $("#check-number").hide()
     if (isNew) {
         $('#js-presentor-code-container').show();
+        $('#presentorCodeContainer').show();
     }
     if (onDone != undefined && onDone != null) {
         onDone();

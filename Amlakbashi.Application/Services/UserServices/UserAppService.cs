@@ -65,7 +65,7 @@ namespace Amlakbashi.Application.Services.UserServices
             {
                 return userManager.Users.Where(w => w.CreateDate >= fromDate && w.CreateDate <= toDate).Count();
             }
-            var usersMainMobile = Repository.Query(q => q.Where(u => userList.Contains(u.Id)).Select(s=>s.MainMobile));
+            var usersMainMobile = Repository.Query(q => q.Where(u => userList.Contains(u.Id)).Select(s => s.MainMobile));
             return userManager.Users.Where(w => w.CreateDate >= fromDate && w.CreateDate <= toDate)
                 .Select(s => usersMainMobile.Contains(s.UserName)).Count();
         }
@@ -475,7 +475,7 @@ namespace Amlakbashi.Application.Services.UserServices
             {
                 token = null;
             }
-            if (user.NotificationToken != token)
+            if (user != null && user.NotificationToken != token)
             {
                 if (!string.IsNullOrEmpty(token))
                 {
@@ -610,36 +610,30 @@ namespace Amlakbashi.Application.Services.UserServices
                     user.AmlakbashiScore = 1000;
                     if (!string.IsNullOrEmpty(presentorCode))
                     {
-                        try
-                        {
-                            var prId = int.Parse(presentorCode);
-                            var prUser = Repository.Find(prId);
-                            user.PresentorUserID = prUser.Id;
-                            if (user.PresentorUserID > 0)
-                            {
-                                mediator.Send(new AddDiscountCouponCommand(user.Id, user.PresentorUserID,
-                                    5, DiscountCoupon.DiscountCouponType.Present));
-                                var contact = new UserContactDTO()
-                                {
-                                    UserLoginPriority = user.LoginPriority,
-                                    UserMainMobile = user.MainMobile,
-                                    UserAppNotificationToken = user.AppNotificationToken,
-                                    UserEmail = user.Email,
-                                    UserFcmAppNotificationToken = user.FcmAppNotificationToken,
-                                    UserNotificationToken = user.NotificationToken,
-                                    Type = UserContactType.CouponPresent,
-                                    Extra1 = prUser.FullName,
-                                    Extra2 = "5%"
-                                };
-                                mediator.Enqueue(new SendMessageCommand(contact));
-                            }
-                        }
-                        catch
+                        var prId = int.Parse(presentorCode);
+                        var prUser = Repository.Find(prId);
+                        if (prUser == null)
                         {
                             errorMsg = "کد معرف اشتباه است";
-                            user_id = 0;
+                            user_id = user.Id;
                             return false;
                         }
+                        user.PresentorUserID = prUser.Id;
+                        mediator.Send(new AddDiscountCouponCommand(user.Id, user.PresentorUserID,
+                            5, DiscountCoupon.DiscountCouponType.Present));
+                        var contact = new UserContactDTO()
+                        {
+                            UserLoginPriority = user.LoginPriority,
+                            UserMainMobile = user.MainMobile,
+                            UserAppNotificationToken = user.AppNotificationToken,
+                            UserEmail = user.Email,
+                            UserFcmAppNotificationToken = user.FcmAppNotificationToken,
+                            UserNotificationToken = user.NotificationToken,
+                            Type = UserContactType.CouponPresent,
+                            Extra1 = prUser.FullName,
+                            Extra2 = "5%"
+                        };
+                        mediator.Enqueue(new SendMessageCommand(contact));
                     }
                 }
                 user.MainMobile = mobile;
@@ -665,7 +659,7 @@ namespace Amlakbashi.Application.Services.UserServices
 
         public IList<string> GetAllIdentityUsernamesByState(User.UserState state = User.UserState.Acticved)
         {
-            return userManager.Users.Where(w=>w.State == state).Select(s=>s.UserName).ToList();
+            return userManager.Users.Where(w => w.State == state).Select(s => s.UserName).ToList();
         }
 
         public AppUser GetActivatedIdentityUser(string phrase, bool isEmail = false)

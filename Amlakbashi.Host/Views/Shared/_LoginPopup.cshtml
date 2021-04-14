@@ -9,99 +9,83 @@
             <img class="logo-login" width="120" height="100" src="~/Resource/img/logo.svg" alt="لوگوی املاک باشی" title="املاک باشی" />
             <p class="login__message-container">@Html.Raw(ViewBag.msg)</p>
             @*<div class="login_form" id="login-error-container" style="font:13px Miransans;text-align: center;color:red;padding: 0 5px;"></div>*@
-        <div id="selectRoot">
-            <div id="login_form" class="login_form">
-                @*<div class="title-login">  املاک باشی</div>*@
-                <p class="login__please-enter-mobile">
-                    برای ورود یا ثبت نام، شماره موبایل خود را وارد کنید
-                </p>
-                <input type="tel" name="mobile" class="active-input deactive-input" id="mobile" autocomplete="on">
-                @*<div id="check-number" class="box-reset-style" style="display:none;">
-                <a id="number_resend" class="login__resend-button">
-                        ویرایش شماره
-                    <span id="id_count_down_timer" style="display:none !important;"> ویرایش شماره</span>
-                </a>
-            </div>*@
+            <div id="selectRoot">
+                <div id="login_form" class="login_form">
+                    @*<div class="title-login">  املاک باشی</div>*@
+                    <p class="login__please-enter-mobile">
+                        برای ورود یا ثبت نام، شماره موبایل خود را وارد کنید
+                    </p>
+                    <input type="tel" name="mobile" class="active-input deactive-input" id="mobile" autocomplete="on">
+                    @*<div id="check-number" class="box-reset-style" style="display:none;">
+                            <a id="number_resend" class="login__resend-button">
+                                    ویرایش شماره
+                                <span id="id_count_down_timer" style="display:none !important;"> ویرایش شماره</span>
+                            </a>
+                        </div>*@
 
-                @*<span id="valid-msg" class="hide">درسته</span>
-            <span id="error-msg" class="hide"></span>*@
-                @*<input class="login__box-input" onkeypress="onMobileKeyPress" onkeyup="validateNumber(this);" onchange="validateNumber(this)" placeholder="تلفن همراه" type="text" name="mobile" id="mobile" value="">*@
-                <div class="button-get-number">
-                    <p class="login__box-button" onclick="login()">ادامه</p>
+                    @*<span id="valid-msg" class="hide">درسته</span>
+                        <span id="error-msg" class="hide"></span>*@
+                    @*<input class="login__box-input" onkeypress="onMobileKeyPress" onkeyup="validateNumber(this);" onchange="validateNumber(this)" placeholder="تلفن همراه" type="text" name="mobile" id="mobile" value="">*@
+                    <div class="button-get-number">
+                        <p class="login__box-button" onclick="login()">ادامه</p>
+                    </div>
+                    <div class="input-code">
+                        @*<div class="login-confirm-message">
+                            کد فعالسازی 4 رقمی به شماره <span id="mobile_label" class="login-confirm-message-red-label"></span> پیامک شد
+                                 </div>
+                                <div>برای ورود لطفا کد تایید را وارد نمایید</div>*@
+                        @*<div class="edit-number-login">ویرایش شماره </div>
+                            @*برای تایید و ورود کد ارسال شده از طریق پیامک را وارد کنید*@
+                        @*</div>*@
+                        <input class="login__box-input" onkeyup="validateNumber(this);" onchange="validateNumber(this)" type="text" name="code" id="code" value="">
+                        @await Html.PartialAsync("_resend-form-login", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "resend_form" }, { "title", "درخواست ارسال مجدد" }, { "id_resend", "resend_button" }, { "id_count_down_timer", "count_down_timer" } })
+                        <input type="submit" onkeypress="onMobileKeyPress" value="تایید کد" id="success__code" class="login__box-button" />
+                    </div>
                 </div>
-                <div class="input-code">
-                    @*<div class="login-confirm-message">
-                کد فعالسازی 4 رقمی به شماره <span id="mobile_label" class="login-confirm-message-red-label"></span> پیامک شد
-                     </div>
-                    <div>برای ورود لطفا کد تایید را وارد نمایید</div>*@
-                    @*<div class="edit-number-login">ویرایش شماره </div>
-                @*برای تایید و ورود کد ارسال شده از طریق پیامک را وارد کنید*@
-                    @*</div>*@
-                    <input class="login__box-input" onkeyup="validateNumber(this);" onchange="validateNumber(this)" type="text" name="code" id="code" value="">
-                    @await Html.PartialAsync("_resend-form-login", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "resend_form" }, { "title", "درخواست ارسال مجدد" }, { "id_resend", "resend_button" }, { "id_count_down_timer", "count_down_timer" } })
-                    <input type="submit" onkeypress="onMobileKeyPress" value="تایید کد" id="success__code" class="login__box-button" />
+                <div id="loginPasswordForm" class="login_form" style="display:none">
+                    <p class="login__please-enter-mobile">لطفا رمز عبور خود را وارد کنید</p>
+                    <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="passLogin" id="passLogin" value="">
+                    <input type="submit" onkeyup="SignUp_button()" onclick="loginPassword()" value="ورود" class="login__box-button" />
+                    <input type="button" onclick="showCodeForm()" value="بازیابی رمز عبور" class="" style="margin-top:50px; border:0px; color:deepskyblue;" />
                 </div>
-            </div>
-            <div id="loginPasswordForm" class="login_form" style="display:none">
-                @*<p class="login__please-enter-mobile">لطفا ایمیل خود را وارد کنید</p>
-            <input class="login__box-input" placeholder="amlakbashi@gmail.com" type="text" name="email" id="email" value="">
-            <p class="login__box-button" onclick="login('email')">ثبت</p>*@
-                <p class="login__please-enter-mobile">لطفا رمز عبور خود را وارد کنید</p>
-                <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="passLogin" id="passLogin" value="">
-                <input type="submit" onkeypress="onMobileKeyPress" onclick="loginPassword()" value="ورود" class="login__box-button" />
-                <input type="button" onclick="showCodeForm()" value="بازیابی رمز عبور" class="" />
-            </div>
-            <div id="login_form_email" class="login_form" style="display:none">
-                <p class="login__please-enter-mobile">لطفا ایمیل خود را وارد کنید</p>
-                <input class="login__box-input" placeholder="amlakbashi@gmail.com" type="text" name="email" id="email" value="">
-                <p class="login__box-button" onclick="login('email')">ثبت</p>
-            </div>
-            <div id="loginForgotPasswordForm" class="login_form" style="display:none">
-                <p class="login__please-enter-mobile">لطفا رمز عبور جدید خود را وارد کنید</p>
-                <label class="lname-style" style="color:black;">رمز عبور</label>
-                <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="forgotPass" id="forgotPass" value="">
-                <label class="lname-style" style="color:black;">تایید رمز عبور</label>
-                <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="forgotConfirmPass" id="forgotConfirmPass" value="">
-                <input type="button" onclick="saveNewPass()" value="ذخیره رمز عبور" class="" />
-            </div>
-            <div id="verification_form" class="login_form">
-                <label class="fname-style">نام </label>
-                <input class="login__box-input" type="text" name="fname" id="fname" value="">
-                <label class="lname-style">نام خانوادگی</label>
-                <input onkeyup="SignUp_button()" class="login__box-input" type="text" name="lname" id="lname" value="">
-                <label class="lname-style">رمز عبور</label>
-                <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="pass" id="pass" value="">
-                <label class="lname-style">تایید رمز عبور</label>
-                <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="confirmPassword" id="confirmPassword" value="">
-                @*<input class="login__box-button g-recaptcha" type="submit" value="ورود" style="display:none; "data-sitekey="6LdH6T4UAAAAAMzxLp-gBmZ3Q0KRwux0IlY3deWW">*@
-                @*<input  class="login__box-button" type="submit" value="ورود" style="display:none;">*@
-                <label id="js-presentor-code-container">کد معرف (اختیاری) </label>
-                <input class="login__box-input" placeholder="" type="text" name="presentorcode" id="presentorcode" value="">
-                @*<div id="js-presentor-code-container" style="display:none;">
-            @*<div class="login__please-enter-mobile" style="padding-top:0">
-                @if (ViewBag.presentor == null)
-                {
-                    @:اگر کد معرف دارید وارد کنید ( اجباری نیست)
-                }
-                else
-                {
-                    @:کد معرف
-                }
-                کد معرف
-            </div>*@
-                @*</div>*@
-                <input type="submit" onkeypress="onMobileKeyPress" onclick="login_verification()" value="ثبت اطلاعات" class="login__box-button" />
-            </div>
-            <div id="email_verification_form" class="login_form" style="display:none;">
-                <div class="login-confirm-message">
-                    لینک فعال سازی به ایمیل <span id="email_label" class="login-confirm-message-red-label"></span> ارسال شد
-                    <div id="edit_mail_button">ویرایش ایمیل</div>
+                @*<div id="login_form_email" class="login_form" style="display:none">
+                        <p class="login__please-enter-mobile">لطفا ایمیل خود را وارد کنید</p>
+                        <input class="login__box-input" placeholder="amlakbashi@gmail.com" type="text" name="email" id="email" value="">
+                        <p class="login__box-button" onclick="login('email')">ثبت</p>
+                    </div>*@
+                <div id="loginForgotPasswordForm" class="login_form" style="display:none">
+                    <p class="login__please-enter-mobile">لطفا رمز عبور جدید خود را وارد کنید</p>
+                    <label class="lname-style" style="color:black;">رمز عبور</label>
+                    <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="forgotPass" id="forgotPass" value="">
+                    <label class="lname-style" style="color:black;">تایید رمز عبور</label>
+                    <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="forgotConfirmPass" id="forgotConfirmPass" value="">
+                    <input type="button" onclick="saveNewPass()" value="ذخیره رمز عبور" class="login__box-button" />
                 </div>
-                <p class="login__resend-message">ابتدا پوشه inbox و spam ایمیل خود را چک کنید. </p>
-                <p class="login__resend-message">  اگر ایمیلی ارسال نشده بود,پس از گذشت 2 دقیقه بر روی دکمه زیر کلیک کنید</p>
+                <div id="verification_form" class="login_form">
+                    <label class="fname-style">نام </label>
+                    <input class="login__box-input" type="text" name="fname" id="fname" value="">
+                    <label class="lname-style">نام خانوادگی</label>
+                    <input onkeyup="SignUp_button()" class="login__box-input" type="text" name="lname" id="lname" value="">
+                    <label class="lname-style">رمز عبور</label>
+                    <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="pass" id="pass" value="">
+                    <label class="lname-style">تایید رمز عبور</label>
+                    <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="confirmPassword" id="confirmPass" value="">
+                    <div id="presentorCodeContainer" style="display: none;">
+                        <label id="js-presentor-code-container">کد معرف (اختیاری) </label>
+                        <input class="login__box-input" placeholder="" type="text" name="presentorcode" id="presentorcode" value="">
+                    </div>
+                    <input type="submit" onkeypress="onMobileKeyPress" onclick="login_verification()" value="ثبت اطلاعات" class="login__box-button" style="margin-bottom: 20px;" />
+                </div>
+                @*<div id="email_verification_form" class="login_form" style="display:none;">
+                        <div class="login-confirm-message">
+                            لینک فعال سازی به ایمیل <span id="email_label" class="login-confirm-message-red-label"></span> ارسال شد
+                            <div id="edit_mail_button">ویرایش ایمیل</div>
+                        </div>
+                        <p class="login__resend-message">ابتدا پوشه inbox و spam ایمیل خود را چک کنید. </p>
+                        <p class="login__resend-message">  اگر ایمیلی ارسال نشده بود,پس از گذشت 2 دقیقه بر روی دکمه زیر کلیک کنید</p>
+                    </div>*@
+                @await Html.PartialAsync("_resend-form-login", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "resend_form_email" }, { "title", "درخواست ارسال مجدد" }, { "id_resend", "email_resend_button" }, { "id_count_down_timer", "email_count_down_timer" } })
             </div>
-            @await Html.PartialAsync("_resend-form-login", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "resend_form_email" }, { "title", "درخواست ارسال مجدد" }, { "id_resend", "email_resend_button" }, { "id_count_down_timer", "email_count_down_timer" } })
-        </div>
         </div>
     </div>
 </div>
