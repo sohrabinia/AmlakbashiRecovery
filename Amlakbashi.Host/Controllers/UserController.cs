@@ -555,22 +555,20 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(newPassword) || newPassword != confirmPassword)
+                {
+                    ViewBag.errors = new List<string>()
+                    {
+                        "لطفا رمز عبور و تکرار آن را به درستی وارد کنید"
+                    };
+                    return View();
+                }
                 var result = userService.ChangeIdentityUserPassword(User.Identity.Name, currentPassword, newPassword);
                 if (result.Succeeded)
                 {
-                    //var user = userService.GetByMainMobile(User.Identity.Name);
-                    //return RedirectToRoute(new
-                    //{
-                    //    controller = "post",
-                    //    action = "profilemanager",
-                    //    userid = user.Id
-                    //});
-                    ViewBag.suc = true;
+                    return Redirect("/");
                 }
-                else
-                {
-                    ViewBag.errors = result.Errors.Select(s => s.Description).ToList();
-                }
+                ViewBag.errors = result.Errors.Select(s => s.Description).ToList();
                 return View();
             }
             catch (Exception exc)
@@ -668,8 +666,7 @@ namespace Amlakbashi.Host.Controllers
             return Redirect("/user/mobilelogin?returnrl=/&presentorcode=" + c);
         }
 
-        public JsonResult PopupLogin(string mobile = null, string email = null,
-            string step = "mobile", bool send_verification = true)
+        public JsonResult PopupLogin(string mobile = null, bool send_verification = true)
         {
             try
             {
@@ -679,17 +676,17 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var international_mobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var number_is_for_iran = PhoneUtility.IsNumberForIran(international_mobile);
-                if (!number_is_for_iran)
-                {
-                    if (step == "mobile")
-                    {
-                        return GenerateJsonResult(new { status = 4 });
-                    }
-                    if (string.IsNullOrEmpty(email))
-                    {
-                        return GenerateJsonResult(new { status = 0, msg = "ایمیل اجباری میباشد" });
-                    }
-                }
+                //if (!number_is_for_iran)
+                //{
+                //    if (step == "mobile")
+                //    {
+                //        return GenerateJsonResult(new { status = 4 });
+                //    }
+                //    if (string.IsNullOrEmpty(email))
+                //    {
+                //        return GenerateJsonResult(new { status = 0, msg = "ایمیل اجباری میباشد" });
+                //    }
+                //}
 
                 if (!PhoneUtility.ValidateInternationalNumber(international_mobile))
                 {
@@ -707,10 +704,10 @@ namespace Amlakbashi.Host.Controllers
                 {
                     user = new User();
                     user.Mobile = international_mobile;
-                    if (!string.IsNullOrEmpty(email))
-                    {
-                        user.Email = email;
-                    }
+                    //if (!string.IsNullOrEmpty(email))
+                    //{
+                    //    user.Email = email;
+                    //}
                     user.MainMobile = international_mobile;
                     user.ResponseFrom = 2;
                     user.ResponseTo = 2;
@@ -737,7 +734,8 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new
                     {
                         status = 1,
-                        mobile = mobile
+                        mobile = mobile,
+                        isNew = true
                     });
                 }
 
@@ -874,7 +872,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        public JsonResult SaveNewPass(string mobile, string password, string confirmPassword)
+        public JsonResult SaveNewPass(string mobile, string code, string password, string confirmPassword)
         {
             try
             {
@@ -883,10 +881,14 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new { status = 0, msg = "رمز عبور و تاییدیه آن را به درستی وارد کنید" });
                 }
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
-                userService.ChangeIdentityUserPassword(mobile_international, password);
                 var identityUser = userService.GetIdentityUser(mobile_international);
-                signInManager.SignInAsync(identityUser, true).Wait();
-                return GenerateJsonResult(new { status = 1 });
+                if (identityUser.Code == code)
+                {
+                    userService.ChangeIdentityUserPassword(mobile_international, password);
+                    signInManager.SignInAsync(identityUser, true).Wait();
+                    return GenerateJsonResult(new { status = 1 });
+                }
+                return GenerateJsonResult(new { status = 0 });
             }
             catch (Exception exc)
             {
@@ -900,14 +902,21 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
-                var user = userService.GetIdentityUser(mobile_international);
-                if (code == user.Code)
+                var identityUser = userService.GetIdentityUser(mobile_international);
+                var correct = identityUser != null && code == identityUser.Code;
+                if (correct)
                 {
-                    user.PhoneNumberConfirmed = true;
-                    userService.UpdateIdentityUser(user);
+                    identityUser.PhoneNumberConfirmed = true;
+                    userService.UpdateIdentityUser(identityUser);
                 }
-                var correct = user != null && code == user.Code;
-                return GenerateJsonResult(new { status = 1, correct = correct });
+                var user = userService.GetByMainMobile(mobile_international);
+                return GenerateJsonResult(new 
+                { 
+                    status = 1, 
+                    correct = correct,
+                    fname = user.FName,
+                    lname = user.LName
+                });
             }
             catch (Exception exc)
             {

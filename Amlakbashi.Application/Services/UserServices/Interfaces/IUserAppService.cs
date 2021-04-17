@@ -3,13 +3,11 @@ using Amlakbashi.Core.DTOs.UserDTOs;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
-using Amlakbashi.Data.Identity;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.UserServices.Interfaces
 {

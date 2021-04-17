@@ -43,7 +43,7 @@ namespace Amlakbashi.Data.Identity
             if (userManager.Users.Any() == false)
             {
                 string connectionString = "Server=.;Database=amlakbas_db;Trusted_Connection=True;User Id=sa;Password=Omid@123;MultipleActiveResultSets=true;";
-                string query = "select MainMobile, Email, CreateDate, State from Users";
+                string query = "select MainMobile, Email, CreateDate, State, LoginPriority from Users";
                 List<AppUser> appUserList = new List<AppUser>();
 
                 using (SqlConnection connection = new SqlConnection(connectionString))
@@ -53,13 +53,17 @@ namespace Amlakbashi.Data.Identity
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
+                        var state = (UserState)reader[3];
+                        var loginPriority = (LoginPriorites)reader[4];
                         var appUser = new AppUser()
                         {
                             UserName = reader[0].ToString(),
                             Email = reader[1].ToString(),
+                            EmailConfirmed = loginPriority == LoginPriorites.Email && state == UserState.Acticved 
+                                && string.IsNullOrEmpty(reader[1].ToString()) == false ? true : false,
                             PhoneNumber = reader[0].ToString(),
-                            PhoneNumberConfirmed = true,
-                            State = (UserState)reader[3],
+                            PhoneNumberConfirmed = false,
+                            State = state == UserState.Acticved ? UserState.InActived : state,
                         };
 
                         appUser.NormalizedUserName = appUser.UserName.ToUpper();
@@ -73,10 +77,6 @@ namespace Amlakbashi.Data.Identity
                         {
                             appUser.CreateDate = DateTime.Now;
                         }
-
-                        appUser.EmailConfirmed = string.IsNullOrEmpty(appUser.Email) &&
-                            appUser.State == UserState.Acticved ? false : true;
-                        appUser.PhoneNumberConfirmed = true;
 
                         appUserList.Add(appUser);
                     }
