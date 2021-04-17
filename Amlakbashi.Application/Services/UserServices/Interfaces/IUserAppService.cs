@@ -6,6 +6,7 @@ using Amlakbashi.Core.Infrastructure.UserContact;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 
 namespace Amlakbashi.Application.Services.UserServices.Interfaces
@@ -63,8 +64,8 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         AppUser GetActivatedIdentityUser(string phrase, bool isEmail = false);
         AppUser GetIdentityUser(string phrase, bool isEmail = false);
         void AddIdentityUser(AppUser user);
-        void AddIdentityUserPassword(string username, string password);
-        void ChangeIdentityUserPassword(string username, string password);
+        IdentityResult AddIdentityUserPassword(string username, string password);
+        IdentityResult ChangeIdentityUserPassword(string username, string password);
         IdentityResult ChangeIdentityUserPassword(string username, string currentPassword, string newPassword);
         void UpdateIdentityUser(AppUser user);
         bool VerifyLoginCode(string mobileInternational, string code);
@@ -73,5 +74,8 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         IList<string> GetUserRoles(string username);
         void UpdateUserRoles(string username, IList<string> selectedRoles);
         IList<User> GetRoleUserList(string roleName);
+        bool SignInRegister(int user_id, string fname, string lname,
+            string password, string confirmPassword, out Dictionary<string, string> errors);
+        JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key);
     }
 }

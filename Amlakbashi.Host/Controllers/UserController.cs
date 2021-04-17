@@ -34,6 +34,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Identity;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -841,21 +842,16 @@ namespace Amlakbashi.Host.Controllers
                         msg = "شماره موبایل وارد شده صحیح نمی باشد"
                     });
                 }
-                if (!PhoneUtility.IsNumberForIran(mobile_international))
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = 0,
-                        msg = "ارسال پیامک فقط برای کاربران داخل ایران امکان پذیر است"
-                    });
-                }
                 var user = userService.GetActivatedUserByMainMobile(mobile_international);
                 var identityUser = userService.GetIdentityUser(mobile_international);
                 if (identityUser != null)
                 {
                     var code = new Random().Next(1111, 9999).ToString();
                     userService.UpdateSendVerification(user.Id, DateTime.Now, code);
-                    userService.SendVerificationSms(PhoneUtility.InternationalNumberToLocal(mobile_international), code);
+                    var mobileNumber = PhoneUtility.IsNumberForIran(mobile_international) ?
+                        PhoneUtility.InternationalNumberToLocal(mobile_international) :
+                        PhoneUtility.InternationalNumberToCallable(mobile_international);
+                    userService.SendVerificationSms(mobileNumber, code);
                     ViewBag.msg = TempData["msg"];
                     return GenerateJsonResult(new { status = 1 });
                 }
@@ -948,7 +944,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        public JsonResult PopupLoginVerification(string mobile, string code, string fname = null, string lname = null,
+        public JsonResult PopupLoginRegister(string mobile, string code, string fname = null, string lname = null,
             string password = null, string confirmPassword = null, string presentorCode = "")
         {
             try
@@ -972,68 +968,19 @@ namespace Amlakbashi.Host.Controllers
                     if (identityUser.State == Entities.User.UserState.InActived)
                     {
                         userService.UpdateLoginPriority(user_id, Entities.User.LoginPriorites.Mobile);
-                        if (!string.IsNullOrEmpty(fname))
+                        Dictionary<string, string> errors;
+                        if (userService.SignInRegister(user_id, fname, lname, password,
+                            confirmPassword, out errors))
                         {
-                            if (StringUtility.ContainsNumber(fname))
-                            {
-                                return GenerateJsonResult(new
-                                {
-                                    status = 0,
-                                    msg = "نام نمیتواند شامل عدد باشد"
-                                });
-                            }
-                            userService.UpdateFName(user_id, fname);
+                            userService.UpdateState(user_id, true);
                         }
                         else
                         {
-                            return GenerateJsonResult(new
-                            {
+                            return GenerateJsonResult(new {
                                 status = 0,
-                                msg = "لطفا نام خود را وارد کنید"
+                                msg = errors.First().Value
                             });
                         }
-                        if (!string.IsNullOrEmpty(lname))
-                        {
-                            if (StringUtility.ContainsNumber(lname))
-                            {
-                                return GenerateJsonResult(new
-                                {
-                                    status = 0,
-                                    msg = "نام خانوادگی نمیتواند شامل عدد باشد"
-                                });
-                            }
-                            userService.UpdateLName(user_id, lname);
-                        }
-                        else
-                        {
-                            return GenerateJsonResult(new
-                            {
-                                status = 0,
-                                msg = "لطفا نام خانوادگی خود را وارد کنید"
-                            });
-                        }
-                        if (password != confirmPassword)
-                        {
-                            return GenerateJsonResult(new
-                            {
-                                status = 0,
-                                msg = "رمز وارد شده و تاییدیه آن یکسان نمی باشند"
-                            });
-                        }
-                        if (string.IsNullOrEmpty(password) == false)
-                        {
-
-                            userService.AddIdentityUserPassword(identityUser.UserName, password);
-                        }
-                        else
-                        {
-                            return GenerateJsonResult(new
-                            {
-                                status = 0,
-                                msg = "لطفا رمز عبور خود را وارد کنید"
-                            });
-                        }
-                        userService.UpdateState(user_id, true);
                     }
                     signInManager.SignInAsync(identityUser, true).Wait();
                     return GenerateJsonResult(new { status = 1 });
@@ -1045,8 +992,9 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
-                return GenerateJsonResult(new { status = 0 });
+                logger.Error("User/PopupLoginRegister", exc);
+                return GenerateJsonResult(new { status = 0,
+                    msg = GeneralLocalization.GetExceptionMessage(exc) });
             }
         }
 
