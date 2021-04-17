@@ -21,6 +21,7 @@ using Amlakbashi.Host.Extensions;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using System.Dynamic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -190,7 +191,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
 
-        [Auth]
+        [Authorize]
         public ActionResult PerformPay(int payment_id)
         {
             var objpay = accounting.FindPayment(payment_id);

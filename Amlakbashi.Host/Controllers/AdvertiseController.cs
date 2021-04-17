@@ -11,6 +11,7 @@ using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using log4net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -343,7 +344,7 @@ namespace Amlakbashi.Host.Controllers
             return AdvertisePage("اجاره-ویلا-سوئیت-آپارتمان", "", amp_version);
         }
 
-        [Auth]
+        [Authorize]
         [HttpPost]
         public JsonResult AddComment(long advertiseID, string text, int user_id = 0, long parentID = 0)
         {
@@ -379,7 +380,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult AddHostReplyComment(long advertiseID, string text, int user_id, long parentID = 0)
         {
             try
@@ -412,7 +413,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult AddScore(long advertiseID, int ReportID, int value, int user_id = 0)
         {
             try

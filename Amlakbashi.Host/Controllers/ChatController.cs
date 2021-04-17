@@ -9,6 +9,7 @@ using Amlakbashi.Host.Controllers.Base;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Amlakbashi.Host.Hubs.Dashboard.HubServers;
 using log4net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -135,7 +136,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult GetGuestChatPopup(long reserve_id)
         {
             var reserve = reserveService.Find(reserve_id);
@@ -144,7 +145,7 @@ namespace Amlakbashi.Host.Controllers
             return GetChatPopup(reserve_id);
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult GetHostChatPopup(long reserve_id)
         {
             var reserve = reserveService.Find(reserve_id);

@@ -76,6 +76,16 @@
                     </div>
                     <input type="submit" onkeypress="onMobileKeyPress" onclick="login_verification()" value="ثبت اطلاعات" class="login__box-button" style="margin-bottom: 20px;" />
                 </div>
+                <div id="registerEmailForm" class="login_form" style="display:none">
+                    <p class="login__please-enter-mobile">لطفا ایمیل خود را وارد کنید</p>
+                    <input type="email" name="email" class="active-input deactive-input" id="email" autocomplete="on">
+                    <input type="button" onkeyup="SignUp_button()" onclick="registerEmail()" value="ثبت ایمیل" class="login__box-button" />
+                </div>
+                <div id="confirmEmailForm" class="login_form" style="display:none">
+                    <p class="login__please-enter-mobile">لطفا کد ارسال شده به ایمیل خود را وارد کنید</p>
+                    <input type="text" name="emailCode" class="active-input deactive-input" id="emailCode" autocomplete="on">
+                    <input type="button" onkeyup="SignUp_button()" onclick="confirmEmail()" value="تایید ایمیل" class="login__box-button" />
+                </div>
                 @*<div id="email_verification_form" class="login_form" style="display:none;">
                         <div class="login-confirm-message">
                             لینک فعال سازی به ایمیل <span id="email_label" class="login-confirm-message-red-label"></span> ارسال شد

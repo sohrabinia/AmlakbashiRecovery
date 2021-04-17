@@ -2,6 +2,7 @@
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using log4net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -50,7 +51,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult GuestCancelDiscussionPopup(long reserve_id)
         {
             var reserve = reserveService.Find(reserve_id);
@@ -59,7 +60,7 @@ namespace Amlakbashi.Host.Controllers
             return CancelDiscussionPopup(reserve_id);
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult HostCancelDiscussionPopup(long reserve_id)
         {
             var reserve = reserveService.Find(reserve_id);
