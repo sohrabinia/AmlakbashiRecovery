@@ -7,6 +7,7 @@ using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers.API
 {
@@ -138,8 +139,10 @@ namespace Amlakbashi.Host.Controllers.API
         {
             return GetImage(id, 40, 40, cid);
         }
+
         [HttpPost]
-        public JsonResult SetProfileImage(string cid, string token, IFormFile image)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SetProfileImage(string cid, IFormFile image)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -147,7 +150,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -222,6 +225,7 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult UploadAdvertiseImage(string cid, string token, IFormFile image)
         {
             if (!ClientAuthenticate(cid))
@@ -230,7 +234,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new

@@ -393,17 +393,11 @@ namespace Amlakbashi.Core.Entities
             return false;
         }
 
-        public enum SignInFirstStepStatus
+        public enum SignInFirstStepResult
         {
             Error = 0,
-            MobileLogin = 1,
-            EmailLogin = 2,
-        }
-
-        public enum SignInEmailStatus
-        {
-            Error = 0,
-            Done = 1,
+            MobileConfirm = 1,
+            EnterPassword = 2
         }
     }
 }

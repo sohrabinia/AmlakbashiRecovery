@@ -9,15 +9,18 @@ using Amlakbashi.Core.DTOs.ReserveDTOs.ApiDTOs;
 using static Amlakbashi.Core.Entities.Reserve;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers.API
 {
     public partial class ApiController : BaseController
     {
+
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult CheckReserve(int advertise_id, string from_date, string to_date,
             int number_of_guests, string cid, string token)
         {
-            var user = GetUser(token);
+            var user = GetUser();
             if (!ClientAuthenticate(cid))
             {
                 return null;
@@ -105,11 +108,12 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult ReserveRequest(int advertise_id, string from_date, string to_date,
             int number_of_guests, string cid, string token,
             int buildNumber = 0)
         {
-            var user = GetUser(token);
+            var user = GetUser();
             if (!ClientAuthenticate(cid))
             {
                 return null;
@@ -175,13 +179,14 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult ReserveResponse(string cid, string token, int reserve_id, int host_response)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             try
             {
                 if (user.Id < 1)
@@ -233,6 +238,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult ReserveHostOrGuest(string cid, string token)
         {
             if (!ClientAuthenticate(cid))
@@ -241,7 +247,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { isHost = false, hasHostReserve = false, hasGuestReserve = false });
@@ -266,7 +272,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         //categories: 0=waitforresponse 1=waitforpayment 2=reserved 3=finished 4=failed
-        public JsonResult GetHostReserves(string cid, string token, int category)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetHostReserves(string cid, int category)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -274,7 +281,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { items = new List<ApiReserveItemDTO>() });
@@ -316,7 +323,8 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         //categories: 0=waitforresponse 1=waitforpayment 2=reserved 3=finished 4=failed
-        public JsonResult GetGuestReserves(string cid, string token, int category)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetGuestReserves(string cid, int category)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -324,7 +332,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { items = new List<ApiReserveItemDTO>() });
@@ -365,7 +373,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult GetHostReserveBoxes(string cid, string token)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetHostReserveBoxes(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -373,7 +382,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { });
@@ -451,6 +460,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult GetGuestReserveBoxes(string cid, string token)
         {
             if (!ClientAuthenticate(cid))
@@ -459,7 +469,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { });
@@ -542,7 +552,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult ReserveStartStay(string cid, string token, long reserve_id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult ReserveStartStay(string cid, long reserve_id)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -550,7 +561,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
@@ -575,7 +586,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult ReserveFinishStay(string cid, string token, long reserve_id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult ReserveFinishStay(string cid, long reserve_id)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -583,7 +595,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
@@ -608,7 +620,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult CancelReserve(string cid, string token, long reserve_id, int cancel_reason_code, string cancel_reason_string, bool is_host)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult CancelReserve(string cid, long reserve_id, int cancel_reason_code, string cancel_reason_string, bool is_host)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -616,7 +629,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -658,7 +671,9 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult RefuseCancelReserve(string cid, string token, long reserve_id, bool is_host)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+
+        public JsonResult RefuseCancelReserve(string cid, long reserve_id, bool is_host)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -666,7 +681,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -708,13 +723,14 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public ActionResult GuestCancelDiscussionMessages(string cid, string token, long reserve_id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public ActionResult GuestCancelDiscussionMessages(string cid, long reserve_id)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -740,13 +756,14 @@ namespace Amlakbashi.Host.Controllers.API
             });
         }
 
-        public ActionResult HostCancelDiscussionMessages(string cid, string token, long reserve_id)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public ActionResult HostCancelDiscussionMessages(string cid, long reserve_id)
         {
             if (!ClientAuthenticate(cid))
             {
                 return null;
             }
-            var user = GetUser(token);
+            var user = GetUser();
             if (user.Id < 1)
             {
                 return GenerateJsonResult(new
@@ -772,6 +789,7 @@ namespace Amlakbashi.Host.Controllers.API
             });
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult SendCancelDiscussionText(string cid, string token, long reserve_id, string text)
         {
             if (!ClientAuthenticate(cid))
@@ -780,7 +798,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new
@@ -820,6 +838,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult GetReservePaymentData(string cid, string token, long reserve_id)
         {
             if (!ClientAuthenticate(cid))
@@ -828,7 +847,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                var user = GetUser(token);
+                var user = GetUser();
                 if (user.Id < 1)
                 {
                     return GenerateJsonResult(new { status = 0, msg = "ابتدا با حساب کاربری خود وارد شوید" });
