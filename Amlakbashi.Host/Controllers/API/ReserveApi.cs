@@ -16,7 +16,6 @@ namespace Amlakbashi.Host.Controllers.API
     public partial class ApiController : BaseController
     {
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult CheckReserve(int advertise_id, string from_date, string to_date,
             int number_of_guests, string cid, string token)
         {
@@ -108,7 +107,6 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult ReserveRequest(int advertise_id, string from_date, string to_date,
             int number_of_guests, string cid, string token,
             int buildNumber = 0)
@@ -179,7 +177,6 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult ReserveResponse(string cid, string token, int reserve_id, int host_response)
         {
             if (!ClientAuthenticate(cid))
@@ -238,7 +235,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
+        
         public JsonResult ReserveHostOrGuest(string cid, string token)
         {
             if (!ClientAuthenticate(cid))

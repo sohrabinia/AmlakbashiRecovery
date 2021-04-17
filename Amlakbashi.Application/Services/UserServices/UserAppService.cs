@@ -99,7 +99,12 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             if (PhoneUtility.ValidateLocalNumber(mainMobile))
                 mainMobile = PhoneUtility.LocalNumberToInternational(mainMobile, 98);
-            return Repository.Query(q => q.FirstOrDefault(f => f.MainMobile == mainMobile));
+            var user = Repository.Query(q => q.FirstOrDefault(f => f.MainMobile == mainMobile));
+            if (user == null)
+            {
+                user = new User();
+            }
+            return user;
         }
 
         public User GetByEmail(string email)

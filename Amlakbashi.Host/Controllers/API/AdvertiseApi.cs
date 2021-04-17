@@ -91,7 +91,8 @@ namespace Amlakbashi.Host.Controllers.API
                         items = dto
                     });
                 }
-                var norouzAccs = advertiseService.GetMostViewedNorouzAdvertises(8);
+                //var norouzAccs = advertiseService.GetMostViewedNorouzAdvertises(8);
+                var norouzAccs = new List<Advertise>();
                 ApiHomePageCarouselDTO norouzCarouselItem = null;
                 if (norouzAccs.Any() == true)
                 {
@@ -472,7 +473,6 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult GetAdvertiseDetail(long id, string cid, bool getAllComments = false)
         {
             if (!ClientAuthenticate(cid))
