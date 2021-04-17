@@ -44,10 +44,13 @@ namespace Amlakbashi.Host.Authentication
             }
             if (user == null)
             {
-                CurrentUser = DoerUser = new User();
+                user = CurrentUser = DoerUser = new User();
+            }
+            else
+            {
+                CurrentUser = DoerUser = user;
             }
             context.Items.Add("userinfo", user);
-            CurrentUser = DoerUser = user;
         }
     }
 }
