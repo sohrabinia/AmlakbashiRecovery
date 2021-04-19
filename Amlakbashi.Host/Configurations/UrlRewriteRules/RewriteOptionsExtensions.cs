@@ -12,5 +12,10 @@ namespace Amlakbashi.Host.Configurations.UrlRewriteRules
         {
             rewriteOptions.Rules.Add(new RedirectLowerCaseRule());
         }
+
+        public static void AddWebapiSubdomain(this RewriteOptions rewriteOptions)
+        {
+            rewriteOptions.Rules.Add(new WebapiSubdomainRule());
+        }
     }
 }

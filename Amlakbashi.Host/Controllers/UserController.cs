@@ -67,6 +67,23 @@ namespace Amlakbashi.Host.Controllers
             this.signInManager = signInManager;
         }
 
+        public string test()
+        {
+            var claims = User.Claims;
+            var name = User.Identity.Name;
+            var test = User.Identities;
+            return "check claims";
+        }
+
+        [Authorize]
+        public string testauth()
+        {
+            var claims = User.Claims;
+            var name = User.Identity.Name;
+            var test = User.Identities;
+            return "check claims";
+        }
+
         [Authorize(Policy = "Admins")]
         public IActionResult Impersonate(int userId, string url)
         {
