@@ -22,6 +22,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -76,10 +77,12 @@ namespace Amlakbashi.Host
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
+                        RequireSignedTokens = true,
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         RequireExpirationTime = false,
-                        ValidateLifetime = true
+                        ValidateLifetime = true,
+                        NameClaimType = "name",
                     };
                 });
 

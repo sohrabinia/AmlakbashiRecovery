@@ -21,6 +21,9 @@ using Amlakbashi.Data.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Amlakbashi.Core.Identity.Entities;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 
 namespace Amlakbashi.Host.Controllers.API
 {
@@ -119,7 +122,21 @@ namespace Amlakbashi.Host.Controllers.API
 
         private User GetUser()
         {
-            return userService.GetByMainMobile(User.Identity.Name);
+            var auth = HttpContext.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(auth) || auth == "null")
+            {
+                return new User();
+            }
+            auth = auth.Remove(0,7);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(auth);
+            var tokenS = jsonToken as JwtSecurityToken;
+            var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+            if (string.IsNullOrEmpty(mainMobile))
+            {
+                return new User();
+            }
+            return userService.GetByMainMobile(mainMobile);
         }
 
         public JsonResult CheckAndroidAppVersion(string cid, string version, int buildNumber)

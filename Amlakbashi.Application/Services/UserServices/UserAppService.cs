@@ -99,7 +99,12 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             if (PhoneUtility.ValidateLocalNumber(mainMobile))
                 mainMobile = PhoneUtility.LocalNumberToInternational(mainMobile, 98);
-            return Repository.Query(q => q.FirstOrDefault(f => f.MainMobile == mainMobile));
+            var user = Repository.Query(q => q.FirstOrDefault(f => f.MainMobile == mainMobile));
+            if (user == null)
+            {
+                user = new User();
+            }
+            return user;
         }
 
         public User GetByEmail(string email)
@@ -839,12 +844,12 @@ namespace Amlakbashi.Application.Services.UserServices
         public JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key)
         {
             var userRoles = userManager.GetRolesAsync(identityUser).Result;
-            var authClaims = new List<Claim>();
-            authClaims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
+            var authClaims = new List<Claim>();            
             foreach (var role in userRoles)
             {
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
             }
+            authClaims.Add(new Claim("name", identityUser.UserName));
             var authSigningKey = new SymmetricSecurityKey(key);
             var token = new JwtSecurityToken(
                     expires: DateTime.Now.AddHours(1440),

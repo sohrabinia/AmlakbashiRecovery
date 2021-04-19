@@ -25,10 +25,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new { });
-                }
                 var all_chats = chatService.GetReserveChats(reserveId).ToList();
                 var party_chats = all_chats.Where(x => x.UserID != user.Id).ToList();
                 bool any_change = false;
@@ -87,10 +83,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new { status = 0 });
-                }
                 var reserve = reserveService.Find(reserveId);
                 var user_id = user.Id;
                 var guest_user_id = reserve.UserID;

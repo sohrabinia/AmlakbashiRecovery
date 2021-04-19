@@ -13,15 +13,11 @@ namespace Amlakbashi.Host.Controllers.API
     {
 
         [Authorize(AuthenticationSchemes = bearerScheme)]
-        public ActionResult UserIncreaseCredit(string token, long price, string redirectUrl)
+        public ActionResult UserIncreaseCredit(long price, string redirectUrl)
         {
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return null;
-                }
                 var payment = new Payment()
                 {
                     UserID = user.Id,
@@ -44,16 +40,12 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [Authorize(AuthenticationSchemes = bearerScheme)]
-        public ActionResult GuestPayReserve(string token, long reserve_id, int pay_reserve_type, string redirectUrl,
+        public ActionResult GuestPayReserve(long reserve_id, int pay_reserve_type, string redirectUrl,
             bool useCoupon = false, bool usePrize = false)
         {
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return null;
-                }
                 long payment_id;
                 var result = accounting.GuestPayReserve(user.Id, reserve_id, pay_reserve_type, out payment_id, user.Id, ActionLog.ActionSourceEnum.Application, useCoupon, usePrize, 0);
                 switch (result)
@@ -75,8 +67,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
-        public JsonResult GuestPayReserveWithCredit(string cid, string token, long reserve_id, int pay_reserve_type,
+        public JsonResult GuestPayReserveWithCredit(string cid, long reserve_id, int pay_reserve_type,
             bool useCoupon = false, bool usePrize = false)
         {
             if (!ClientAuthenticate(cid))
@@ -134,8 +125,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
-        public JsonResult GuestCashPay(string cid, string token, long reserve_id)
+        public JsonResult GuestCashPay(string cid, long reserve_id)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -173,7 +163,7 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [Authorize(AuthenticationSchemes = bearerScheme)]
-        public JsonResult HostConfirmCashPay(string cid, string token, long reserve_id, bool paid)
+        public JsonResult HostConfirmCashPay(string cid, long reserve_id, bool paid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -182,14 +172,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 string msg;
                 var done = reserveService.ConfirmCashPay(reserve_id, paid, out msg,
                     user.Id, ActionLog.ActionSourceEnum.Application, user.Id);
