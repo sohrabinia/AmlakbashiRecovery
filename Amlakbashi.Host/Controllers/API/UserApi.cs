@@ -165,6 +165,8 @@ namespace Amlakbashi.Host.Controllers.API
                 var identityUser = userService.GetIdentityUser(internationalMobile);
                 if (identityUser.Code == code)
                 {
+                    identityUser.PhoneNumberConfirmed = true;
+                    userService.UpdateIdentityUser(identityUser);
                     return GenerateJsonResult(new
                     {
                         status = 1,
@@ -501,10 +503,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new { credit = 0, creditTransactions = new List<ApiCreditTransactionDTO>() });
-                }
                 var model = accounting.GetCreditListByUserId(user.Id);
                 var dtoList = new List<ApiCreditTransactionDTO>();
                 foreach (var item in model)
@@ -550,14 +548,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 UserDTO user_data = user;
                 var bankCard = bankCardService.GetByUserId(user.Id);
                 if (bankCard != null)
@@ -688,14 +678,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 string msg;
                 List<string> errors;
                 var userHasRefund = reserveService.UserHasRefundInProgress(userItem.id);
@@ -736,13 +718,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false
-                    });
-                }
                 if (notificationToken == "null")
                 {
                     notificationToken = null;
@@ -809,14 +784,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 return GenerateJsonResult(new
                 {
                     done = true,

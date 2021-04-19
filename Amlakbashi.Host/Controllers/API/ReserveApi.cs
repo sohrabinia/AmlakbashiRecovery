@@ -17,7 +17,7 @@ namespace Amlakbashi.Host.Controllers.API
     {
 
         public JsonResult CheckReserve(int advertise_id, string from_date, string to_date,
-            int number_of_guests, string cid, string token)
+            int number_of_guests, string cid)
         {
             var user = GetUser();
             if (!ClientAuthenticate(cid))
@@ -108,8 +108,7 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         public JsonResult ReserveRequest(int advertise_id, string from_date, string to_date,
-            int number_of_guests, string cid, string token,
-            int buildNumber = 0)
+            int number_of_guests, string cid, int buildNumber = 0)
         {
             var user = GetUser();
             if (!ClientAuthenticate(cid))
@@ -135,7 +134,7 @@ namespace Amlakbashi.Host.Controllers.API
                     });
                 }
                 var checkResult = CheckReserve(advertise_id, from_date, to_date,
-                    number_of_guests, cid, token);
+                    number_of_guests, cid);
                 dynamic data = checkResult.Value;
                 if (data.status == 0)
                 {
@@ -177,7 +176,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult ReserveResponse(string cid, string token, int reserve_id, int host_response)
+        public JsonResult ReserveResponse(string cid, int reserve_id, int host_response)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -236,7 +235,7 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         
-        public JsonResult ReserveHostOrGuest(string cid, string token)
+        public JsonResult ReserveHostOrGuest(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -279,10 +278,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new { items = new List<ApiReserveItemDTO>() });
-                }
                 var all_reserves = reserveService.GetListByUserId(user.Id, category, true);
                 List<ApiReserveItemDTO> dtoList = new List<ApiReserveItemDTO>();
                 foreach (var item in all_reserves)
@@ -330,10 +325,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new { items = new List<ApiReserveItemDTO>() });
-                }
                 var all_reserves = reserveService.GetListByUserId(user.Id, category, false);
                 List<ApiReserveItemDTO> dtoList = new List<ApiReserveItemDTO>();
                 foreach (var item in all_reserves)
@@ -380,10 +371,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new { });
-                }
                 var all_reserves = reserveService.GetListByUserId(user.Id, true).AsQueryable();
                 List<long> reserve_ids = all_reserves.Select(x => x.Id).ToList();
                 var all_chats = chatService.GetListAgainstUserId(user.Id, Chat.ChatStatusEnum.Sent,
@@ -458,7 +445,7 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [Authorize(AuthenticationSchemes = bearerScheme)]
-        public JsonResult GetGuestReserveBoxes(string cid, string token)
+        public JsonResult GetGuestReserveBoxes(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -467,10 +454,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new { });
-                }
                 var all_reserves = reserveService.GetListByUserId(user.Id, false).AsQueryable();
                 var deleted_state = (int)Reserve.ReserveStatus.Deleted;
                 var user_id = user.Id;
@@ -559,10 +542,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
-                }
                 string msg;
                 var started = reserveService.StartStay(reserve_id,
                     user.Id, out msg, ActionLog.ActionSourceEnum.Application,user.Id);
@@ -593,10 +572,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
-                }
                 string msg;
                 var done = reserveService.FinishStay(reserve_id, user.Id, out msg, ActionLog.ActionSourceEnum.Application,
                     user.Id, true);
@@ -627,14 +602,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var reserve = reserveService.Find(reserve_id);
                 var advertise = reserve.Advertise;
                 if (!(is_host && advertise.UserID == user.Id) &&
@@ -679,14 +646,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var reserve = reserveService.Find(reserve_id);
                 var advertsie = reserve.Advertise;
                 if ((is_host ? advertsie.UserID != user.Id :
@@ -728,14 +687,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    done = false,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             var reserve = reserveService.Find(reserve_id);
             if (user.Id != reserve.UserID)
             {
@@ -761,14 +712,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    done = false,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             var reserve = reserveService.Find(reserve_id);
             if (user.Id != reserve.Advertise.UserID)
             {
@@ -787,7 +730,7 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [Authorize(AuthenticationSchemes = bearerScheme)]
-        public JsonResult SendCancelDiscussionText(string cid, string token, long reserve_id, string text)
+        public JsonResult SendCancelDiscussionText(string cid, long reserve_id, string text)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -796,14 +739,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var reserve = reserveService.Find(reserve_id);
                 var user_id = user.Id;
                 var guest_user_id = reserve.UserID;
@@ -836,7 +771,7 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [Authorize(AuthenticationSchemes = bearerScheme)]
-        public JsonResult GetReservePaymentData(string cid, string token, long reserve_id)
+        public JsonResult GetReservePaymentData(string cid, long reserve_id)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -845,10 +780,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new { status = 0, msg = "ابتدا با حساب کاربری خود وارد شوید" });
-                }
                 var reserve = reserveService.Find(reserve_id);
                 if (reserve.UserID != user.Id)
                 {

@@ -16,7 +16,7 @@ namespace Amlakbashi.Host.Controllers.API
     {
 
         [Authorize(AuthenticationSchemes = bearerScheme)]
-        public JsonResult GetAdvertiseCommentsOverview(string cid, string token)
+        public JsonResult GetAdvertiseCommentsOverview(string cid)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -25,14 +25,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
 
                 AdvertiseCommentOverviewDataDTO dto = new AdvertiseCommentOverviewDataDTO();
 
@@ -126,7 +118,7 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [Authorize(AuthenticationSchemes = bearerScheme)]
-        public JsonResult GetAdvertiseCommentsDetail(string cid, string token, long advertiseId)
+        public JsonResult GetAdvertiseCommentsDetail(string cid, long advertiseId)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -135,14 +127,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
 
                 AdvertiseCommentDetailDTO dto = new AdvertiseCommentDetailDTO();
 
@@ -335,13 +319,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false
-                    });
-                }
                 long advertiseId = 0;
                 bool ratingAvailable = false;
                 var reserves = reserveService.GetListByUserId(user.Id, Reserve.ReserveStatus.Completed, false).AsQueryable();
@@ -390,13 +367,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false
-                    });
-                }
                 var reserves = reserveService.GetListByUserId(user.Id, Reserve.ReserveStatus.Completed, false).AsQueryable();
                 var comments = commentService.GetListBySenderUserId(user.Id);
                 var reportItems = reportItemService.GetListByUserId(user.Id);
@@ -441,14 +411,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise = advertiseService.Find(data.advertiseID);
                 if (advertise.UserID != user.Id)
                 {

@@ -30,7 +30,7 @@ namespace Amlakbashi.Host.Controllers.API
         private int[] categories = new int[]
             { 55593, 55574, 74214, 55894, 55944, 55962, 55957, 55861, 55953, 55952, 55961, 55960 };
 
-        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
+        //[ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
         public JsonResult GetHomePageCarousels(string cid)
         {
             if (!ClientAuthenticate(cid))
@@ -118,7 +118,6 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        //[OutputCache(Duration = 60 * 60, Location = System.Web.UI.OutputCacheLocation.Server, VaryByParam = "*")]
         public JsonResult GetFilteredAdvertises(string cid, int region_id, string start_date = null,
             string end_date = null)
         {
@@ -193,14 +192,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise_ids = user.Favorite.OrderByDescending(f => f.SetDate).Select(f => f.AdvertiseID).Take(100).ToList();
                 var advertises = advertiseService.GetAccListByIds(advertise_ids, AdvertiseStatus.Published);
                 var now = DateTime.Now.Date;
@@ -228,14 +219,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertises = advertiseService.GetNotChildAdvertisesByUserId(user.Id);
                 var output = new List<ApiHostAdvertiseDTO>();
                 bool _isComplex;
@@ -364,7 +347,7 @@ namespace Amlakbashi.Host.Controllers.API
                 return GenerateJsonResult(new { done = false, msg = "متاسفانه عملیات با خطا مواجه شد" });
             }
         }
-        [ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "*" })]
+        //[ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "*" })]
         public JsonResult GetCategoryAdvertises(int id, string cid,
             string start_date = null, string end_date = null)
         {
@@ -409,7 +392,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
+        //[ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
         public JsonResult GetAllAvailableAdvertises(string cid, string start_date = null,
             string end_date = null, bool for_discount = false, bool for_instant_reserve = false,
             bool for_norouz_special = false)
@@ -441,7 +424,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
+        //[ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
         public JsonResult GetVillaShomalAdvertises(string cid, string start_date = null,
             string end_date = null)
         {
@@ -571,7 +554,6 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult AdvertiseToggleFavourite(long id, string cid)
         {
             if (!ClientAuthenticate(cid))
@@ -733,7 +715,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "text" })]
+        //[ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "text" })]
         public JsonResult SearchRegion(string text, string cid)
         {
             if (!ClientAuthenticate(cid))
@@ -764,14 +746,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise = advertiseService.FindIncludingDeleted(advertise_id);
                 var currentComment = commentService.GetByAccSenderUser(advertise_id, user.Id);
                 var userRatings = new ApiUserRatingItemDTO()
@@ -814,14 +788,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 string cannotAddReason;
                 var canAdd = advertiseService.AddAdvertiseComment(user.Id,
                     advertise_id, text, out cannotAddReason);
@@ -853,14 +819,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 reportItemService.SubmitAdvertiseScore(user.Id,
                     advertise_id, report_id, score);
                 return GenerateJsonResult(new
@@ -890,14 +848,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != user.Id)
                 {
@@ -938,14 +888,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        errors = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 var acc = advertiseService.Find(data.id);
                 if (acc.UserID != user.Id)
                 {
@@ -985,14 +927,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 int accUserId = 0;
                 var data = advertiseService.GetPhotoDTO(id, out accUserId);
                 if (data != null && accUserId != user.Id)
@@ -1036,14 +970,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        errors = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 var advertise = advertiseService.Find(data.id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1083,14 +1009,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 int userId = 0;
                 var data = advertiseService.GetAmenitiesDTO(id, out userId);
                 if (userId != user.Id)
@@ -1131,14 +1049,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        errors = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 var advertise = advertiseService.Find(data.id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1180,14 +1090,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        errors = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 int userId = 0;
                 var data = advertiseService.GetPositionDTO(id, out userId);
                 if (userId != user.Id)
@@ -1228,14 +1130,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        errors = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 var advertise = advertiseService.Find(data.id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1291,14 +1185,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        errors = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 int userId = 0;
                 var data = advertiseService.GetRulesDTO(id, out userId);
                 if (userId != user.Id)
@@ -1339,14 +1225,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        errors = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 var advertise = advertiseService.Find(data.id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1386,14 +1264,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 int userId = 0;
                 var data = advertiseService.GetSpecificDTO(id, out userId);
                 if (userId != user.Id)
@@ -1434,14 +1304,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        errors = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 var advertise = advertiseService.Find(data.id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1482,14 +1344,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1543,14 +1397,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        errors = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 var advertise = advertiseService.Find(data.id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1604,14 +1450,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 int userId = 0;
                 var data = advertiseService.GetHotelUnitDTO(id, out userId);
                 if (userId != user.Id)
@@ -1651,14 +1489,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        errors = new List<string>() { "ابتدا با حساب کاربری خود وارد شوید" }
-                    });
-                }
                 var advertise = advertiseService.Find(data.id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1724,14 +1554,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1771,14 +1593,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1828,14 +1642,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1886,14 +1692,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1923,7 +1721,6 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [Authorize(AuthenticationSchemes = bearerScheme)]
-
         public JsonResult AdvertiseSuspendToggle(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
@@ -1933,14 +1730,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != user.Id)
                 {
@@ -1983,14 +1772,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != user.Id)
                 {
@@ -2047,14 +1828,6 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                if (user.Id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = "ابتدا با حساب کاربری خود وارد شوید"
-                    });
-                }
                 var advertise = advertiseService.Find(id);
                 if (advertise.UserID != user.Id)
                 {
@@ -2083,7 +1856,6 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [Authorize(AuthenticationSchemes = bearerScheme)]
-
         public JsonResult InstantReserveRequest(string cid,
             long id, bool ignoreMsg)
         {
@@ -2092,14 +1864,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = false,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             var acc = advertiseService.Find(id);
             if (acc.UserID != user.Id)
             {
@@ -2153,6 +1917,7 @@ namespace Amlakbashi.Host.Controllers.API
             return GenerateJsonResult(result);
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult InstantReserveCancel(string cid, long id)
         {
             if (!ClientAuthenticate(cid))
@@ -2160,14 +1925,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = false,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             var acc = advertiseService.Find(id);
             if (acc.UserID != user.Id)
             {
@@ -2210,14 +1967,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = false,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             return GenerateJsonResult(
                 advertiseService.
                 GetInstantReserveBanReason(id));
@@ -2231,14 +1980,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             try
             {
                 var acc = advertiseService.Find(id);
@@ -2282,14 +2023,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             try
             {
                 var acc = advertiseService.Find(id);
@@ -2374,14 +2107,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             try
             {
                 var acc = advertiseService.Find(id);
@@ -2423,14 +2148,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             try
             {
                 var acc = advertiseService.Find(id);
@@ -2480,14 +2197,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             try
             {
                 int userId = 0;
@@ -2527,14 +2236,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             try
             {
                 var acc = advertiseService.Find(id);
@@ -2590,14 +2291,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             try
             {
                 var acc = advertiseService.Find(id);
@@ -2640,14 +2333,6 @@ namespace Amlakbashi.Host.Controllers.API
                 return null;
             }
             var user = GetUser();
-            if (user.Id < 1)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "ابتدا با حساب کاربری خود وارد شوید"
-                });
-            }
             try
             {
                 var acc = advertiseService.Find(id);
@@ -2697,7 +2382,6 @@ namespace Amlakbashi.Host.Controllers.API
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult AddAdvertiseReport(string cid, AdvertiseReportDTO data)
         {
             if (!ClientAuthenticate(cid))
