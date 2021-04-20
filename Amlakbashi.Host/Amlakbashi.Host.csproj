@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <UserSecretsId>650a60af-ab80-4c56-8f3c-56ea962c44c1</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

@@ -21,6 +21,7 @@ using Amlakbashi.Host.Authentication;
 using X.PagedList;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Portal.Controllers
 {
@@ -836,7 +837,7 @@ namespace Portal.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult RemoveExtraPhoto()
         {
             try
@@ -1141,7 +1142,7 @@ namespace Portal.Controllers
 
         private static System.Threading.Thread minifyThread;
 
-        [Auth]
+        [Authorize]
         public JsonResult MinifyAdvertiseImages()
         {
             // TODO: find alternative for this
@@ -1170,7 +1171,7 @@ namespace Portal.Controllers
             });
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult StopMinifyAdvertiseImages()
         {
             // TODO: find alternative for this
@@ -1187,7 +1188,7 @@ namespace Portal.Controllers
             });
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult StopQueue()
         {
             // TODO: find alternative for this

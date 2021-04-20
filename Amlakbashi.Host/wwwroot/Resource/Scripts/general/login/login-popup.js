@@ -120,8 +120,12 @@ function login(step) {
         "&step=" + step + "&send_verification=" + can_send_login_message,
         function (ret) {
             login_in_progress = false;
+            if (ret.isNumberForIran == true) {
+                isNumberForIran = ret.isNumberForIran;
+            }
             if (ret.status == 0) {
-                $("#login-error-container").html(ret.msg);
+                //$("#login-error-container").html(ret.msg);
+                alertify.error(ret.msg);
             }
             else if (ret.status == 1) {
                 checked_mobile_current = true;
@@ -324,6 +328,41 @@ function login_verification() {
         });
 }
 
+function registerEmail() {
+    var email = $("#email").val();
+    myajax("user/PopupRegisterEmail", "email=" + email,
+        function (ret) {
+            if (ret.status == 1) {
+                $('.login_form').hide();
+                $("#confirmEmailForm").show();
+            }
+            else {
+                alertify.error(ret.msg);
+            }
+        });
+}
+
+function confirmEmail() {
+    var emailCode = $("#emailCode").val();
+    myajax("user/PopupConfirmEmail", "emailcode=" + emailCode,
+        function (ret) {
+            if (ret.status == 1) {
+                //toggle_login();
+                $('.login__container').hide();
+                $('.login__bg').hide();
+                onLoginFinish();
+                alertify.success("ایمیل شما با موفقیت ثبت شد");
+                verifyEmail = true;
+                //if (typeof on_login !== "undefined") {
+                //    on_login();
+                //}
+            }
+            else {
+                alertify.error("کد وارد شده اشتباه است");
+            }
+        });
+}
+
 function resend_login_sms() {
     if (login_in_progress) {
         return;
@@ -405,7 +444,7 @@ function login_success(mobile, isNew) {
     var number = intl.getNumber();
     var mobile = number.replace("+", "00");
     $.ajax({
-        url: "user/popupverifycode",
+        url: "/user/popupverifycode",
         type: "post",
         data: {
             mobile: mobile,

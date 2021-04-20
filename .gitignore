@@ -443,4 +443,6 @@ $RECYCLE.BIN/
 
 ## Project Specific files
 /Amlakbashi.Host/wwwroot/Content/*
+/Amlakbashi.Host/wwwroot/js/*.min.js
+/Amlakbashi.Host/wwwroot/css/*
 

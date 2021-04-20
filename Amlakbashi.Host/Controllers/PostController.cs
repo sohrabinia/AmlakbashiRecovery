@@ -32,6 +32,7 @@ using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using Amlakbashi.Host.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -404,7 +405,8 @@ namespace Amlakbashi.Host.Controllers
             ViewBag.amp_version = amp_version;
             return View();
         }
-        [Auth]
+
+        [Authorize]
         public ActionResult dashboard()
         {
             var userId = userAccessor.CurrentUser.Id;
@@ -471,19 +473,19 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult Personal(int? page, int UserID = -1, string type = "all", long id = -1)
         {
             return RedirectPermanent("/post/accomodationmanager?page=" + page + "&userid=" + UserID + "&type=" + type + "&id=" + id);
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult AdvertiseManager(int? page, int UserID = -1, string type = "all", long id = -1)
         {
             return RedirectPermanent("/post/accomodationmanager?page=" + page + "&userid=" + UserID + "&type=" + type + "&id=" + id);
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult AccomodationManager(int? page,
             string type = "all", string id = "-1")
         {
@@ -578,7 +580,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult AddReplyComment(int commentID, string replyComment, int currentFilterType)
         {
             try
@@ -619,7 +621,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult SendComment()
         {
@@ -634,7 +636,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult DeleteComment(int id)
         {
             try
@@ -654,7 +656,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult ProfileManager()
         {
@@ -684,7 +686,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult ProfileManager(UserDTO user)
@@ -871,7 +873,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_DownloadAppPopup");
         }
 
-        //[Auth]
+        //[Authorize]
         public ActionResult PresentAndPrize(int userId = 0)
         {
             var user = userId > 0 ? userService.Find(userId) : userAccessor.CurrentUser;

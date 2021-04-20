@@ -665,7 +665,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_SupportChatUser");
         }
 
-        //[Auth]
+        //[Authorize]
         //public JsonResult GetSupporterName(long id)
         //{
         //    var supportChat = _db.SupportChats.Find(id);
