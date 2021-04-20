@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Amlakbashi.Host.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -277,7 +278,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult Chat(long reserve_id)
         {
@@ -373,7 +374,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [HttpGet]
-        [Auth]
+        [Authorize]
         public ActionResult ReserveDashboardFiltered(int user_id = -1, string reserve_id = "", int status = -1, int category = -1)
         {
             try
@@ -388,7 +389,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [HttpGet]
-        [Auth]
+        [Authorize]
         public ActionResult ReserveItemManager(string reserve_id = "", string user_id = "", int status = -1, int category = -1,
             long initialPayId = 0, ReserveManagerSelectType selectType = ReserveManagerSelectType.All,
             string msg = "")
@@ -659,7 +660,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult ConfirmCashPayByNotif(int reserve_id, bool payed)
         {
             try
@@ -726,7 +727,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult ReserveResponse(int reserve_id, int host_response)
         {
             try
@@ -773,7 +774,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult ReserveResponseByNotif(int reserve_id, int host_response)
         {
             try
@@ -898,7 +899,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult GuestPayReserve(long reserve_id,
             int pay_reserve_type, bool useCoupon = false, bool usePrize = false, long couponId = 0
             )
@@ -925,7 +926,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult GuestPayReserveWithCredit(long reserve_id,
             int pay_reserve_type, bool useCoupon = false, bool usePrize = false, long couponId = 0)
         {
@@ -1527,7 +1528,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [HttpGet]
-        [Auth]
+        [Authorize]
         public ActionResult ReserveManager(int user_id = -1, string msg = "",
             ReserveManagerSelectType selectType = ReserveManagerSelectType.All)
         {
@@ -1587,7 +1588,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetHostCallDate(long reserve_id)
         {
             try
@@ -1602,7 +1603,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetGuestCallDate(long reserve_id)
         {
             try
@@ -1618,7 +1619,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [HttpGet]
-        [Auth]
+        [Authorize]
         public ActionResult Invoice(int? page)
         {
             int user_id = userAccessor.CurrentUser.Id;
@@ -1750,7 +1751,7 @@ namespace Amlakbashi.Host.Controllers
             return View(onePageOfModel);
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult GenerateGuestReceipt(long reserve_id)
         {
@@ -1949,7 +1950,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult GetReserveItemPartial(long reserve_id, int index,
             bool is_guest, bool is_host)
@@ -1977,7 +1978,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_ReserveItem", model);
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetAsPaymentRegistered(long reserve_id)
         {
             try
@@ -2146,7 +2147,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public PartialViewResult ReservePaymentDialog(long id)
         {
             var reserve = reserveService.Find(id);

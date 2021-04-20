@@ -67,7 +67,24 @@ namespace Amlakbashi.Host.Controllers
             this.signInManager = signInManager;
         }
 
-        [Authorize(Policy = "SuperAdmins")]
+        public string test()
+        {
+            var claims = User.Claims;
+            var name = User.Identity.Name;
+            var test = User.Identities;
+            return "check claims";
+        }
+
+        [Authorize]
+        public string testauth()
+        {
+            var claims = User.Claims;
+            var name = User.Identity.Name;
+            var test = User.Identities;
+            return "check claims";
+        }
+
+        [Authorize(Policy = "Admins")]
         public IActionResult Impersonate(int userId, string url)
         {
             if (HttpContext.Session.GetObjectFromJson<User>("impersonateUser") != null)
@@ -470,7 +487,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpPost]
         public ActionResult Edit(User user)
         {
@@ -534,7 +551,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public IActionResult ChangePassword()
         {
@@ -549,7 +566,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpPost]
         public IActionResult ChangePassword(string currentPassword, string newPassword, string confirmPassword)
         {
@@ -675,18 +692,7 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new { status = 0, msg = "شماره موبایل اجباری میباشد" });
                 }
                 var international_mobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
-                var number_is_for_iran = PhoneUtility.IsNumberForIran(international_mobile);
-                //if (!number_is_for_iran)
-                //{
-                //    if (step == "mobile")
-                //    {
-                //        return GenerateJsonResult(new { status = 4 });
-                //    }
-                //    if (string.IsNullOrEmpty(email))
-                //    {
-                //        return GenerateJsonResult(new { status = 0, msg = "ایمیل اجباری میباشد" });
-                //    }
-                //}
+                var isNumberForIran = PhoneUtility.IsNumberForIran(international_mobile);
 
                 if (!PhoneUtility.ValidateInternationalNumber(international_mobile))
                 {
@@ -735,7 +741,8 @@ namespace Amlakbashi.Host.Controllers
                     {
                         status = 1,
                         mobile = mobile,
-                        isNew = true
+                        isNew = true,
+                        isNumberForIran = isNumberForIran
                     });
                 }
 
@@ -748,7 +755,8 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new
                     {
                         status = 1,
-                        mobile = mobile
+                        mobile = mobile,
+                        isNumberForIran = isNumberForIran
                     });
                 }
 
@@ -758,7 +766,8 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new
                     {
                         status = 2,
-                        mobile = mobile
+                        mobile = mobile,
+                        isNumberForIran = isNumberForIran
                     });
                 }
 
@@ -770,7 +779,8 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new
                 {
                     status = 3,
-                    mobile = mobile
+                    mobile = mobile,
+                    isNumberForIran = isNumberForIran
                 });
             }
             catch (Exception exc)
@@ -998,6 +1008,50 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
+        [Authorize]
+        public JsonResult PopupRegisterEmail(string email)
+        {
+            try
+            {
+                var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+                var code = new Random().Next(1111, 9999).ToString();
+                identityUser.EmailCode = code;
+                identityUser.Email = email;
+                userService.UpdateIdentityUser(identityUser);
+                string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
+                EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
+                    "تایید ایمیل ثبت نام", strbody);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                // TODO: change status to 0
+                return GenerateJsonResult(new { status = 1 });
+            }
+        }
+
+        [Authorize]
+        public JsonResult PopupConfirmEmail(string emailCode)
+        {
+            try
+            {
+                var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+                if (identityUser.EmailCode == emailCode)
+                {
+                    identityUser.EmailConfirmed = true;
+                    userService.UpdateIdentityUser(identityUser);
+                    return GenerateJsonResult(new { status = 1 });
+                }
+                return GenerateJsonResult(new { status = 0 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
         //public ActionResult VerifyEmail(string activactioncode)
         //{
         //    int user_id = 0;
@@ -1078,7 +1132,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [HttpGet]
-        [Auth]
+        [Authorize]
         public ActionResult UserCreditManager()
         {
             var user = userAccessor.CurrentUser;
@@ -1095,7 +1149,7 @@ namespace Amlakbashi.Host.Controllers
 
         #endregion
 
-        [Auth]
+        [Authorize]
         public JsonResult IncreaseCredit(long price, long? reserveId = null,
             long couponId = 0, long prizePrice = 0, long reservePrice = 0)
         {
@@ -1266,7 +1320,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult GetCurrentCredit()
         {
             try
@@ -1391,7 +1445,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult UpdateUserNotificationToken(string token)
         {
             try
@@ -1406,7 +1460,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetPermissionRequestDate(long ticks)
         {
             try
@@ -1421,7 +1475,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult GetPermissionRequestDate()
         {
             try
@@ -1451,7 +1505,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult FetchUserId()
         {
             return GenerateJsonResult(new { status = 1, userId = userAccessor.CurrentUser.Id });

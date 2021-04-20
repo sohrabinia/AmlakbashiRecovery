@@ -16,6 +16,7 @@ using X.PagedList;
 using static Amlakbashi.Core.Entities.Advertise;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Core.Common.Utilities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -182,7 +183,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult AdvertiseCommentManager()
         {
             try
@@ -291,7 +292,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult AdvertiseCommentDetail(int id)
         {
             var adv = advertiseService.Find(id);

@@ -28,6 +28,7 @@ using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -692,14 +693,14 @@ namespace Amlakbashi.Host.Controllers
 
         #region Add/Edit Accomodation
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult AddOrEditAccomodation()
         {
             return RedirectPermanent("/accomodation/accbasicform");
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult AccBasicForm(long id = -1)
         {
@@ -726,7 +727,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpPost]
         public ActionResult AccBasicForm(Advertise data, bool isEdit = false, int tab = 0)
         {
@@ -796,7 +797,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult AccGeneralForm(long id)
         {
@@ -823,7 +824,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpPost]
         public ActionResult AccGeneralForm(Advertise data, bool isEdit = false, int tab = 0)
         {
@@ -902,7 +903,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult AccExtraForm(long id)
         {
@@ -929,7 +930,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpPost]
         public ActionResult AccExtraForm(Advertise data, bool isEdit = false, int tab = 0)
         {
@@ -1032,7 +1033,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult AccHotelForm(long parentId, long id = 0)
         {
@@ -1075,7 +1076,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpPost]
         public ActionResult AccHotelForm(Advertise data, bool isEdit = false, bool saveAndNewRoom = false, int tab = -1)
         {
@@ -1144,7 +1145,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult AccComplexForm(long parentId, long id = 0)
         {
@@ -1189,7 +1190,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpPost]
         public ActionResult AccComplexForm(Advertise data, bool isEdit = false, bool saveAndNewRoom = false, int tab = -1)
         {
@@ -1265,7 +1266,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpGet]
         public ActionResult AccComplexTypeForm(long parentId, int childType)
         {
@@ -1291,7 +1292,7 @@ namespace Amlakbashi.Host.Controllers
         }
         #endregion
 
-        [Auth]
+        [Authorize]
         public JsonResult SetPriceForDateRange(long advertise_id,
             string from_date, string to_date, int price)
         {
@@ -1330,7 +1331,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult CheckSetAsOccupiedForDateRange(long advertise_id,
             string from_date, string to_date, bool forRemove = false)
         {
@@ -1370,7 +1371,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult GetOccupiedDates(long id)
         {
             try
@@ -1386,7 +1387,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetAsOccupiedForDateRange(long advertise_id,
             string from_date, string to_date)
         {
@@ -1430,7 +1431,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult RemoveFromOccupiedForDateRange(long advertise_id,
             string from_date, string to_date)
         {
@@ -1480,7 +1481,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetNorouzMinReserveDate(long id,
             long dateUnix)
         {
@@ -1512,7 +1513,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         [HttpPost]
         public JsonResult Available(long id, bool isAvailable)
         {
@@ -1582,7 +1583,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult ToggleActive(long id, bool? active)
         {
             try
@@ -1659,7 +1660,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult AddDiscount(long id, string from, string to, int discount)
         {
             try
@@ -1749,7 +1750,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult Preview(long id, string capacity = null,
             string empty_range_from = null, string empty_range_to = null)
         {
@@ -1821,7 +1822,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult GetDiscounts(long id)
         {
             try
@@ -1853,7 +1854,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult RemoveDiscount(int discount_id)
         {
             try
@@ -1887,7 +1888,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetAsTodayEmpty(long id)
         {
             try
@@ -1936,7 +1937,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult UnsetTodayEmpty(long id)
         {
             var acc = advertiseService.Find(id);
@@ -2202,7 +2203,16 @@ namespace Amlakbashi.Host.Controllers
                 rules_string += "<br/>" + item.Key + ": " + item.Value;
                 ii++;
             }
+
             var currentUser = userAccessor.CurrentUser;
+            bool verifyEmail = false;
+            bool isNumberForIran = false;
+            if (currentUser != null && string.IsNullOrEmpty(currentUser.MainMobile) == false)
+            {
+                var identityUser = userService.GetIdentityUser(currentUser.MainMobile);
+                verifyEmail = identityUser.EmailConfirmed;
+                isNumberForIran = PhoneUtility.IsNumberForIran(currentUser.MainMobile);
+            }
             var is_favourited = currentUser.Id > 0 &&
                 currentUser.Favorite != null &&
                 currentUser.Favorite.Any(f => f.AdvertiseID == id);
@@ -2224,7 +2234,9 @@ namespace Amlakbashi.Host.Controllers
                 maxReserveStartDate = DateTimeUtility.GregorianToPersianDate(maxInstantReserveDate).Replace(",", "/").Substring(2),
                 maxInstantReserveStartUnix = DateTimeUtility.DateValueOfJS(maxInstantReserveDate),
                 occupiedList = occupiedList,
-                priceDict = priceDict
+                priceDict = priceDict,
+                verifyEmail = verifyEmail,
+                isNumberForIran = isNumberForIran
             };
             //return GenerateJsonResult(new
             //{
@@ -2244,7 +2256,7 @@ namespace Amlakbashi.Host.Controllers
             });
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult InstantReserveRequest(long id,
             bool ignoreMsg, int userId)
         {
@@ -2301,7 +2313,7 @@ namespace Amlakbashi.Host.Controllers
             return GenerateJsonResult(result);
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult InstantReserveCancel(long id, int userId)
         {
             var acc = advertiseService.Find(id);
@@ -2348,7 +2360,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_UserRatingDetail", reportItemService.GetAccUserRatings(id, userid));
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult GetStayDuration(long id)
         {
             try
@@ -2376,7 +2388,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetStayDuration(long id,
             string minStr = "0", string maxStr = "0")
         {
@@ -2443,7 +2455,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetNorouzPrice(long id,
             int price, int overCapacityPrice = 0)
         {
@@ -2477,7 +2489,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult GetInstantReserveStart(long id)
         {
             try
@@ -2512,7 +2524,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetInstantReserveStart(long id, int maxStart)
         {
             try
@@ -2552,7 +2564,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult GetSetPricePopup(long id)
         {
             var user = userAccessor.CurrentUser;
@@ -2566,7 +2578,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_AccSetPrice", acc);
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult GetSetMinNorouzReservePopup(long id)
         {
             var user = userAccessor.CurrentUser;
@@ -2578,7 +2590,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_AccSetMinNorouzReserve", acc);
         }
 
-        [Auth]
+        [Authorize]
         public ActionResult GetSetOccupiedPopup(long id)
         {
             var user = userAccessor.CurrentUser;
@@ -2622,7 +2634,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult Delete(long id)
         {
             try
@@ -2663,7 +2675,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_AccBlogNews", model);
         }
 
-        [Auth]
+        [Authorize]
         public JsonResult SetHygieneProtocol(long id, HygieneProtocolStatus value)
         {
             try

@@ -19,7 +19,7 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.2");
 
-            modelBuilder.Entity("Amlakbashi.Data.Identity.AppRole", b =>
+            modelBuilder.Entity("Amlakbashi.Core.Identity.Entities.AppRole", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -46,7 +46,7 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("Amlakbashi.Data.Identity.AppUser", b =>
+            modelBuilder.Entity("Amlakbashi.Core.Identity.Entities.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -67,6 +67,9 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("EmailCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -229,7 +232,7 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Amlakbashi.Data.Identity.AppRole", null)
+                    b.HasOne("Amlakbashi.Core.Identity.Entities.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -238,7 +241,7 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Amlakbashi.Data.Identity.AppUser", null)
+                    b.HasOne("Amlakbashi.Core.Identity.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -247,7 +250,7 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Amlakbashi.Data.Identity.AppUser", null)
+                    b.HasOne("Amlakbashi.Core.Identity.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -256,13 +259,13 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Amlakbashi.Data.Identity.AppRole", null)
+                    b.HasOne("Amlakbashi.Core.Identity.Entities.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Amlakbashi.Data.Identity.AppUser", null)
+                    b.HasOne("Amlakbashi.Core.Identity.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -271,7 +274,7 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Amlakbashi.Data.Identity.AppUser", null)
+                    b.HasOne("Amlakbashi.Core.Identity.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

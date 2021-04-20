@@ -98,21 +98,18 @@ namespace Amlakbashi.Host.Controllers.API
 
                 //if (number_is_for_iran)
                 //{
-                var code = user.Code;
+                var code = identityUser.Code;
                 if (identityUser.State != Entities.User.UserState.Acticved ||
                     identityUser.PhoneNumberConfirmed == false)
                 {
-                    if (string.IsNullOrEmpty(user.Code) ||
+                    if (string.IsNullOrEmpty(code) ||
                         user.SendVerification == null ||
                         (DateTime.Now - user.SendVerification) >
                         new TimeSpan(0, 0, 30, 0, 0))
                     {
                         code = new Random().Next(1111, 9999).ToString();
-                        user.Code = code;
-                        identityUser.Code = code;
+                        userService.UpdateSendVerification(user.Id, DateTime.Now, code);
                     }
-                    user.SendVerification = DateTime.Now;
-                    userService.UpdateSendVerification(user.Id, DateTime.Now, code);
                     var callableNumber = number_is_for_iran ?
                         PhoneUtility.InternationalNumberToLocal(international_mobile) :
                         PhoneUtility.InternationalNumberToCallable(international_mobile);

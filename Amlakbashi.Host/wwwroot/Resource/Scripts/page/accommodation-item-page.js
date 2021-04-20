@@ -1,4 +1,6 @@
 ﻿var user_is_autenticated = false;
+var isNumberForIran = false;
+var verifyEmail = false;
 if (!(new Date().getHours() > 3)) {
     pastDayOffset = -1;
 }
@@ -121,25 +123,25 @@ function fillReserveInfo(id, occupiedList, priceDict, rules_str, onDone) {
         onDone();
     }
     updateDatePicker([$('#main-date-picker')[0]], jalaliCurrentMonth,
-    {
-        priceDict: priceDict,
-        occupiedList: occupiedList,
-        monthOffset: 0,
-        selectionType: 'multi',
-        occupiedSelectEnabled: false,
-        fromDateLabel: $('#js-from-date-label')[0],
-        toDateLabel: $('#js-to-date-label')[0],
-        onUpdateDate: function () {
-            if (firstSelectedDay != undefined && secondSelectedDay != undefined) {
-                $('#main-date-picker').hide();
-                var guestCount = $("#guest_count").val();
-                if (guestCount < 1) {
-                    showGuestCountSelect();
+        {
+            priceDict: priceDict,
+            occupiedList: occupiedList,
+            monthOffset: 0,
+            selectionType: 'multi',
+            occupiedSelectEnabled: false,
+            fromDateLabel: $('#js-from-date-label')[0],
+            toDateLabel: $('#js-to-date-label')[0],
+            onUpdateDate: function () {
+                if (firstSelectedDay != undefined && secondSelectedDay != undefined) {
+                    $('#main-date-picker').hide();
+                    var guestCount = $("#guest_count").val();
+                    if (guestCount < 1) {
+                        showGuestCountSelect();
+                    }
                 }
+                onUpdateDate();
             }
-            onUpdateDate();
-        }
-    });
+        });
 }
 
 function showGuestCountSelect() {
@@ -147,6 +149,7 @@ function showGuestCountSelect() {
 }
 
 function checkReserve(confirm_required) {
+    debugger;
     if (firstSelectedDay == undefined ||
         secondSelectedDay == undefined) {
         showDatePicker();
@@ -163,8 +166,8 @@ function checkReserve(confirm_required) {
         "&number_of_guests=" + guestCount, function (ret) {
             if (ret.val == 1) {
                 var date_string = 'از ' + firstSelectedDay.date +
-                                  ' تا ' + secondSelectedDay.date +
-                                  ' به مدت ' + diffDaysMs(firstSelectedDay.value, secondSelectedDay.value) + ' شب';
+                    ' تا ' + secondSelectedDay.date +
+                    ' به مدت ' + diffDaysMs(firstSelectedDay.value, secondSelectedDay.value) + ' شب';
                 var guest_number_string = 'تعداد نفرات: ' + $("#guest_count").val() + ' نفر';
                 price_string = $("#reserve_price_label").html();
                 var time_string = 'ساعت ورود: 2 بعداز ظهر - ساعت خروج: 12 ظهر';
@@ -188,36 +191,48 @@ function checkReserve(confirm_required) {
                     //'<div>بعد از 72 ساعت: هزینه یک شب به میزبان پرداخت میشود</div>' +
                     //'<br/>' +
                     '<div style={{fontSize:16}}>آیا قوانین سایت و قوانین اقامتگاه را قبول دارید؟</div>';
-                    //ret.msg;
+                //ret.msg;
                 if (!confirm_required) {
                     //if ($('#rules_accept_checkbox').is(':checked')) {
-                        if (!user_is_autenticated) {
-                            showNoYesMessage('ورود به سایت',
-                                'برای ثبت درخواست رزرو ابتدا باید وارد سایت شوید',
-                                function () {
-                                    reserve_wait_for_login = true;
-                                    $('.login__root').appendTo('body');
-                                    toggle_login();
-                                }, undefined, {yesText: 'ورود', noText: 'بستن'});
-                            return false;
-                        }
-                        reserve_wait_for_login = false;
-                        myajax("reserve/reserverequest", "advertise_id=" + advertise_id +
+                    if (!user_is_autenticated) {
+                        showNoYesMessage('ورود به سایت',
+                            'برای ثبت درخواست رزرو ابتدا باید وارد سایت شوید',
+                            function () {
+                                reserve_wait_for_login = true;
+                                $('.login__root').appendTo('body');
+                                toggle_login();
+                            }, undefined, { yesText: 'ورود', noText: 'بستن' });
+                        return false;
+                    }
+                    if (isNumberForIran == false && verifyEmail == false) {
+                        showNoYesMessage('ورود به سایت',
+                            'برای ثبت درخواست رزرو، ابتدا باید ایمیل خود را ثبت و تایید کنید',
+                            function () {
+                                reserve_wait_for_login = true;
+                                $('.login__root').appendTo('body');
+                                toggle_login();
+                                $('.login_form').hide();
+                                $("#registerEmailForm").show();
+                            }, undefined, { yesText: 'ثبت ایمیل', noText: 'بستن' });
+                        return false;
+                    }
+                    reserve_wait_for_login = false;
+                    myajax("reserve/reserverequest", "advertise_id=" + advertise_id +
                         "&from_date=" + from_date + "&to_date=" + to_date +
                         "&number_of_guests=" + $("#guest_count").val() +
                         "&instant_reserve=" + (instantReserveAvailable && instantReserveActivated).toString(), function (ret) {
                             if (ret.val == 1) {
                                 gtag('event', 'book', {
                                     "items": [
-                                      {
-                                          "id": advertise_id.toString(),
-                                          "name": advertiseTitle,
-                                          "category": provinceName + "/" + cityName,
-                                          "price": last_reserve_price,
-                                          "label": advertiseTitle,
-                                          "title": advertiseTitle,
-                                          "value": last_reserve_price
-                                      }
+                                        {
+                                            "id": advertise_id.toString(),
+                                            "name": advertiseTitle,
+                                            "category": provinceName + "/" + cityName,
+                                            "price": last_reserve_price,
+                                            "label": advertiseTitle,
+                                            "title": advertiseTitle,
+                                            "value": last_reserve_price
+                                        }
                                     ]
                                 });
                                 $("#guest_count").val(0);
@@ -236,19 +251,19 @@ function checkReserve(confirm_required) {
                             }
                             else if (ret.val == 2) {
                                 showNoYesMessage('ورود به سایت',
-                                'برای ثبت درخواست رزرو ابتدا باید وارد سایت شوید',
-                                function () {
-                                    reserve_wait_for_login = true;
-                                    $('.login__root').appendTo('body');
-                                    toggle_login();
-                                }, undefined, { yesText: 'ورود', noText: 'بستن' });
+                                    'برای ثبت درخواست رزرو ابتدا باید وارد سایت شوید',
+                                    function () {
+                                        reserve_wait_for_login = true;
+                                        $('.login__root').appendTo('body');
+                                        toggle_login();
+                                    }, undefined, { yesText: 'ورود', noText: 'بستن' });
                             }
                             else if (ret.val == 3) {
                                 showErrorMessage('مسدود', 'امکان درخواست رزرو برای شما مسدود شده است, جهت فعالسازی با پشتیبانی تماس بگیرید: ' +
-                                        '<a href="/contact">تماس با پشتیبانی</a>');
+                                    '<a href="/contact">تماس با پشتیبانی</a>');
                             }
                         }
-                        );
+                    );
                     //}
                     //else {
                     //    showErrorMessage('', 'لطفا تیک تایید قوانین را بزنید');
@@ -261,33 +276,45 @@ function checkReserve(confirm_required) {
                     content_msg,
                     function () {
                         //if ($('#rules_accept_checkbox').is(':checked')) {
-                            if (!user_is_autenticated) {
-                                showNoYesMessage('ورود به سایت',
-                                    'برای ثبت درخواست رزرو ابتدا باید وارد سایت شوید',
-                                    function () {
-                                        reserve_wait_for_login = true;
-                                        $('.login__root').appendTo('body');
-                                        toggle_login();
-                                    }, undefined, { yesText: 'ورود', noText: 'بستن' });
-                                return false;
-                            }
-                            reserve_wait_for_login = false;
-                            myajax("reserve/reserverequest", "advertise_id=" + advertise_id +
+                        if (!user_is_autenticated) {
+                            showNoYesMessage('ورود به سایت',
+                                'برای ثبت درخواست رزرو ابتدا باید وارد سایت شوید',
+                                function () {
+                                    reserve_wait_for_login = true;
+                                    $('.login__root').appendTo('body');
+                                    toggle_login();
+                                }, undefined, { yesText: 'ورود', noText: 'بستن' });
+                            return false;
+                        }
+                        if (isNumberForIran == false && verifyEmail == false) {
+                            showNoYesMessage('ورود به سایت',
+                                'برای ثبت درخواست رزرو، ابتدا باید ایمیل خود را ثبت و تایید کنید',
+                                function () {
+                                    reserve_wait_for_login = true;
+                                    $('.login__root').appendTo('body');
+                                    toggle_login();
+                                    $('.login_form').hide();
+                                    $("#registerEmailForm").show();
+                                }, undefined, { yesText: 'ثبت ایمیل', noText: 'بستن' });
+                            return false;
+                        }
+                        reserve_wait_for_login = false;
+                        myajax("reserve/reserverequest", "advertise_id=" + advertise_id +
                             "&from_date=" + from_date + "&to_date=" + to_date +
                             "&number_of_guests=" + $("#guest_count").val() +
                             "&instant_reserve=" + (instantReserveAvailable && instantReserveActivated).toString(), function (ret) {
                                 if (ret.val == 1) {
                                     gtag('event', 'book', {
                                         "items": [
-                                          {
-                                              "id": advertise_id.toString(),
-                                              "name": advertiseTitle,
-                                              "category": provinceName + "/" + cityName,
-                                              "price": last_reserve_price,
-                                              "label": advertiseTitle,
-                                              "title": advertiseTitle,
-                                              "value": last_reserve_price
-                                          }
+                                            {
+                                                "id": advertise_id.toString(),
+                                                "name": advertiseTitle,
+                                                "category": provinceName + "/" + cityName,
+                                                "price": last_reserve_price,
+                                                "label": advertiseTitle,
+                                                "title": advertiseTitle,
+                                                "value": last_reserve_price
+                                            }
                                         ]
                                     });
                                     $("#guest_count").val(0);
@@ -296,10 +323,10 @@ function checkReserve(confirm_required) {
                                     //$("#to_date_label").hide();
                                     $("#reserve_price_label").hide();
                                     window.location.href = (instantReserveAvailable && instantReserveActivated) ?
-                                    '/reserve/reserveitemmanager?selecttype=1&reserve_id=' + ret.reserveId +
-                                    '&initialPayId=' + ret.reserveId
-                                    :
-                                    '/Reserve/reserveitemmanager?selecttype=1&msg=' + 'reserve_request';
+                                        '/reserve/reserveitemmanager?selecttype=1&reserve_id=' + ret.reserveId +
+                                        '&initialPayId=' + ret.reserveId
+                                        :
+                                        '/Reserve/reserveitemmanager?selecttype=1&msg=' + 'reserve_request';
                                 }
                                 else if (ret.val == 0) {
                                     showErrorMessage('خطا', ret.msg);
@@ -315,10 +342,10 @@ function checkReserve(confirm_required) {
                                 }
                                 else if (ret.val == 3) {
                                     showErrorMessage('مسدود', 'امکان درخواست رزرو برای شما مسدود شده است, جهت فعالسازی با پشتیبانی تماس بگیرید: ' +
-                                            '<a href="/contact">تماس با پشتیبانی</a>');
+                                        '<a href="/contact">تماس با پشتیبانی</a>');
                                 }
                             }
-                            );
+                        );
                         //}
                         //else {
                         //    showErrorMessage('', 'لطفا تیک تایید قوانین را بزنید');
@@ -338,7 +365,7 @@ function checkReserve(confirm_required) {
                         },
                         autoClose: false
                     }
-                    );
+                );
                 //$.confirm({
                 //    title: 'اطلاعات رزرو',
                 //    content: content_msg,
@@ -509,7 +536,7 @@ function updateReserveLabels() {
     var to_date = secondSelectedDay.date.slice(2);
     var from_hour = '2 بعد از ظهر';
     var to_hour = '12 ظهر';
-    $("#from_date_label").html("از " + from_date + " تا " + to_date );
+    $("#from_date_label").html("از " + from_date + " تا " + to_date);
     //$("#to_date_label").html("تا " + to_date + " " + to_hour);
     $("#days_label").show();
     $("#from_date_label").show();

@@ -11,6 +11,7 @@ namespace Amlakbashi.Host.Configurations
             var options = new RewriteOptions();
             options.AddRedirectToWww();
             options.AddRedirectToLowerCase();
+            options.AddWebapiSubdomain();
             app.UseRewriter(options);
         }
     }
