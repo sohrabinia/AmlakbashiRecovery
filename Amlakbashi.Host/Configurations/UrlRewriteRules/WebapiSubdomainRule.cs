@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +16,10 @@ namespace Amlakbashi.Host.Configurations.UrlRewriteRules
             HttpRequest request = context.HttpContext.Request;
             PathString path = request.Path;
             HostString host = request.Host;
-            var routes = context.HttpContext.Request.RouteValues;
-            if (host.HasValue && (host.Value.ToLower().Contains("webapi.")))
+            if (host.HasValue && host.Value.ToLower().Contains("webapi.") && path.Value.StartsWith("/api/") == false)
             {
                 HttpResponse response = context.HttpContext.Response;
-                //context.HttpContext.Request.RouteValues["controller"] = "api";
-                context.Result = RuleResult.ContinueRules;
+                response.Redirect("/errors/http404");
             }
             else
             {
