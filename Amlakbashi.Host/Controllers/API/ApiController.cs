@@ -150,11 +150,12 @@ namespace Amlakbashi.Host.Controllers.API
                 int AndroidApp_MinBuildNumber = 1;
                 int AndroidApp_LastBuildNumber = 56;
 
-                var newFeatures = new string[] {
-                    "امکان تعیین موقعیت اقامتگاه در نقشه",
-                    "رفع ایرادات برنامه",
-                    "اصلاح قوانین و مقررات رزرو"
-                };
+                //var newFeatures = new string[] {
+                //    "امکان تعیین موقعیت اقامتگاه در نقشه",
+                //    "رفع ایرادات برنامه",
+                //    "اصلاح قوانین و مقررات رزرو"
+                //};
+                var newFeatures = new string[] { };
 
                 var forceUpdate = buildNumber < AndroidApp_MinBuildNumber;
                 var updateSuggestion = buildNumber < AndroidApp_LastBuildNumber;
@@ -164,6 +165,22 @@ namespace Amlakbashi.Host.Controllers.API
                     forceUpdate = forceUpdate,
                     updateSuggestion = updateSuggestion,
                     newFeatures = newFeatures
+                    //,
+                    //customBlock = true,
+                    //customBlockTitle = "تست عنوان",
+                    //customBlockDesc = "تست متن",
+                    //customBlockUrls = new dynamic[] {
+                    //    new {
+                    //        id = 0,
+                    //        title = "دانلود از گوگل پلی",
+                    //        url = "https://cafebazaar.ir/app/com.amlakbashi.app"
+                    //    },
+                    //    new {
+                    //        id = 1,
+                    //        title = "دانلود از کافه بازار",
+                    //        url = "https://cafebazaar.ir/app/com.amlakbashi.app"
+                    //    }
+                    //}
                 });
             }
             catch (Exception exc)
