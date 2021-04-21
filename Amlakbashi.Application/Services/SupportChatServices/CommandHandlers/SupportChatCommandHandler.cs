@@ -14,11 +14,6 @@ namespace Amlakbashi.Application.Services.SupportChatServices.CommandHandlers
 {
     public class SupportChatCommandHandler : IRequestHandler<SendSupporterMessageCommand>
     {
-        //public static int[] admin_ids = new int[] { 3, 12, 1667, 8851, 2122, 39297, 42640, 40915, 36657,
-        //19076, 17244, 48018, 78931 };
-        public static int[] admin_ids = new int[] { 3, 12, 1667, 8851, 2122, 19076, 17244, 36657, 42640,
-            58503, 68453, 68327, 71271, 71082, 6931, 76022, 78931 };
-
         private readonly IMediator mediator;
         private readonly IRepository<SupportChat, long> Repository;
         public SupportChatCommandHandler(IRepository<SupportChat, long> repository,
@@ -70,16 +65,7 @@ namespace Amlakbashi.Application.Services.SupportChatServices.CommandHandlers
 
                 if (tokens.Count == 0)
                 {
-                    var ids = admin_ids.ToList();
-                    ids.Remove(1667);
-                    ids.Remove(3);
-                    ids.Remove(19076);
-                    ids.Remove(17244);
-                    foreach (var item in ids)
-                    {
-                        var user = Repository.Find<User, int>(item);
-                        tokens.Add(user.NotificationToken);
-                    }
+                    tokens.Concat(request.SupportersNotifToken);
                 }
 
                 for (int i = 0; i < tokens.Count; i++)

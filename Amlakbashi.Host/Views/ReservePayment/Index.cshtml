@@ -1,6 +1,4 @@
-﻿@inject IUserAccessor userAccessor;
-
-@{
+﻿@{
     ViewBag.Title = "مدیریت پرداخت های رزرو";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
@@ -8,14 +6,7 @@
 
 @using (Html.BeginForm("Index", "ReservePayment", FormMethod.Post))
 {
-    if (userAccessor.CurrentUser.Id == 3 ||
-        userAccessor.CurrentUser.Id == 1667 ||
-        userAccessor.CurrentUser.Id == 12 ||
-        userAccessor.CurrentUser.Id == 2122 ||
-        userAccessor.CurrentUser.Id == 82119)
-    {
-        <a href="/ReservePayment/AddEdit" class="add">افزودن پرداخت</a>
-    }
+    <a href="/ReservePayment/AddEdit" class="add">افزودن پرداخت</a>
     <div>
         <table>
             <tr>
@@ -145,15 +136,11 @@
                 <td>@string.Format("{0:n0}", item.Price) تومان</td>
                 <td>@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.CreateDate)</td>
                 <td>
-                    @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667)
-                    {
-                        <a href="@Url.Action("AddEdit",new {reserve_payment_id = item.Id})"><span class="editicon" title="ویرایش"></span></a>
-                            <span class="deleteicon" onclick="deleteItem(@item.Id,this)" title="حذف"></span>
-                    }
+                    <a href="@Url.Action("AddEdit",new {reserve_payment_id = item.Id})"><span class="editicon" title="ویرایش"></span></a>
+                    <span class="deleteicon" onclick="deleteItem(@item.Id,this)" title="حذف"></span>
                 </td>
             </tr>
-                        }
-
+            }
     </table>
                         }
 <div class="mypagelist">

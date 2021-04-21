@@ -12,6 +12,8 @@ using Amlakbashi.Host.Controllers.Base;
 using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
+using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -38,7 +40,7 @@ namespace Amlakbashi.Host.Controllers
             this.logger = logger;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         public ActionResult Index(int? page, long reserve_payment_id = -1, long reserve_id = -1,
             long advertise_id = -1,int user_id = -1, int operator_id = -1,
             int payment_type = -1, long transaction_id = -1, int status = 0)
@@ -67,7 +69,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [HttpGet]
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         public ActionResult AddEdit(long reserve_payment_id = 0)
         {
             ReservePayment model;
@@ -86,7 +88,7 @@ namespace Amlakbashi.Host.Controllers
             return View(model);
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Edit)]
         public JsonResult CheckAddEdit(long reserve_payment_id, long reserve_id, int user_id, int payment_type, long price, long transaction_id, int method_id, bool confirmed = false, bool? send_sms = null)
         {
             try
@@ -182,7 +184,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [HttpPost]
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Edit)]
         public ActionResult AddEdit(ReservePayment reserve_payment)
         {
             try
@@ -276,7 +278,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Edit)]
         public JsonResult Delete(long reserve_payment_id)
         {
             try

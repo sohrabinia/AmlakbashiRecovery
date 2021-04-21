@@ -3,6 +3,7 @@ using Amlakbashi.Application.Services.ReserveServices.Interfaces;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.DTOs.ReserveChatDTOs;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
@@ -46,7 +47,7 @@ namespace Amlakbashi.Host.Controllers
             this.reserveAdminHubServer = reserveAdminHubServer;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         public ActionResult Index(int? page, long chat_id = -1, long reserve_id = -1,
             int user_id = -1, int chat_status = -1)
         {
@@ -72,7 +73,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         [HttpGet]
         public ActionResult Edit(int chat_id = -1)
         {
@@ -89,7 +90,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Edit_Normal)]
         [HttpPost]
         public ActionResult Edit(Chat chat)
         {
@@ -113,7 +114,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Edit_Normal)]
         public JsonResult Delete(long chat_id)
         {
             try

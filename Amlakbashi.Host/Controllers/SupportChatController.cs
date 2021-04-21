@@ -20,6 +20,8 @@ using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Amlakbashi.Host.Hubs.Portal.HubServers;
+using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -64,7 +66,7 @@ namespace Amlakbashi.Host.Controllers
             this.mapper = mapper;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Support_Chat)]
         public ActionResult Index(long id = 0)
         {
             var model = supportChatService.GetLastItems(10);
@@ -196,7 +198,10 @@ namespace Amlakbashi.Host.Controllers
                 {
                     if (questionNumber < 0)
                     {
-                        supportChatService.ScheduleSendSupporterNewMsgNotif(3, messageId, supportChat.Id);
+                        var allSupportEmployees = userService.GetAllSupportEmployees();
+                        var supporterNotifs = userService.IdentityUsersToUsers(allSupportEmployees)
+                            .Select(s => s.NotificationToken).ToArray();
+                        supportChatService.ScheduleSendSupporterNewMsgNotif(3, messageId, supportChat.Id, supporterNotifs);
                     }
                 }
                 else
@@ -226,7 +231,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Support_Chat)]
         [HttpPost]
         public JsonResult SendTextSupporter(long id, string text)
         {

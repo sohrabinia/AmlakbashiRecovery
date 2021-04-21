@@ -12,6 +12,8 @@ using Amlakbashi.Core.DTOs.PaymentDTOs.PaymentStatisticsDTOs;
 using Amlakbashi.Host.Controllers.Base;
 using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Portal.Controllers
 {
@@ -35,13 +37,13 @@ namespace Portal.Controllers
             this.userAccessor = userAccessor;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Admin_General)]
         public ActionResult Home()
         {
             return View();
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Statistics_View)]
         public ActionResult UserChart(string type = "daily", int province = 0, int city = 0,
             int area = 0, int adtype = 0)
         {
@@ -98,7 +100,7 @@ namespace Portal.Controllers
             return View(model);
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Statistics_View)]
         public ActionResult AdvertiseChart(string type = "daily", int province = 0, int userid = 0,
             int city = 0, int area = 0, int adtype = 0)
         {
@@ -161,14 +163,14 @@ namespace Portal.Controllers
             return View(model);
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Statistics_View)]
         public ActionResult AdminStatistic()
         {
             return View();
         }
 
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Send_Message_To_Users)]
         public ActionResult Email()
         {
             try
@@ -183,7 +185,7 @@ namespace Portal.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Send_Message_To_Users)]
         public ActionResult Sms()
         {
             try
@@ -198,7 +200,7 @@ namespace Portal.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Send_Message_To_Users)]
         public JsonResult SendSms(string template, int recieverUserID = 0,
             int ownership = 0, int province = 0, int city = 0, int area = 0,
             int adtype = 0, int tradeid = 0, int special = 0, int adstatus = 0,
@@ -282,7 +284,7 @@ namespace Portal.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Statistics_View)]
         public ActionResult PaymentChart(string type = "daily", int province = 0, int city = 0,
             int area = 0, int adtype = 0)
         {
@@ -377,7 +379,7 @@ namespace Portal.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Statistics_View)]
         public ActionResult PaymentComparisonChart(int province = 0, int city = 0,
             int area = 0, int adtype = 0, int first_year = 0, int first_month = 0,
             int second_year = 0, int second_month = 0)
@@ -424,17 +426,12 @@ namespace Portal.Controllers
         }
 
 
-        [Auth]
+        [Authorize(Policy = Policies.Statistics_View)]
         public ActionResult ReserveFinanceChart(int selected_year = 0,
             int selected_month = 0)
         {
             try
             {
-                if (userAccessor.CurrentUser.Id != 3 &&
-                    userAccessor.CurrentUser.Id != 1667)
-                {
-                    return RedirectToAction("AccessDenied", "Errors");
-                }
                 if (selected_year <= 0)
                 {
                     DateTimeUtility.GetCurrentPersianMonth(out selected_year, out selected_month);
@@ -463,15 +460,9 @@ namespace Portal.Controllers
             }
         }
 
-        [Auth]
+        [Authorize(Policy = Policies.Send_Message_To_Users)]
         public ActionResult SendGroupNotification()
         {
-            if (userAccessor.CurrentUser.Id != 3 && userAccessor.CurrentUser.Id != 1667 &&
-                userAccessor.CurrentUser.Id != 12 && userAccessor.CurrentUser.Id != 2122 &&
-                userAccessor.CurrentUser.Id != 19076)
-            {
-                return Redirect("/");
-            }
             ViewBag.msg = "";
             ViewBag.user_type = 1;
             ViewBag.province = -1;
@@ -480,15 +471,11 @@ namespace Portal.Controllers
             return View();
         }
 
-        [Auth]
+        [Authorize(Policy = Policies.Send_Message_To_Users)]
         [HttpPost]
         public ActionResult SendGroupNotification(string title, string body, string click_action,
             int user_type = 1, int province = -1, int city = -1, int area = -1)
         {
-            if (userAccessor.CurrentUser.Id != 3 && userAccessor.CurrentUser.Id != 1667)
-            {
-                return Redirect("/");
-            }
             ViewBag.user_type = user_type;
             ViewBag.province = province;
             ViewBag.city = city;
@@ -528,25 +515,15 @@ namespace Portal.Controllers
             return View();
         }
 
-        [Auth]
+        [Authorize(Policy = Policies.Send_Message_To_Users)]
         public ActionResult SendWhatsappCoronaAdvMsg()
         {
-            if (userAccessor.CurrentUser.Id != 1667 &&
-                userAccessor.CurrentUser.Id != 3)
-            {
-                return null;
-            }
             return View();
         }
 
-        [Auth]
+        [Authorize(Policy = Policies.Send_Message_To_Users)]
         public JsonResult GetWaCoronaAdvMsgs()
         {
-            if (userAccessor.CurrentUser.Id != 1667 &&
-                userAccessor.CurrentUser.Id != 3)
-            {
-                return GenerateJsonResult(new { status = 0, msg = "شما مجوز انجام این کار را ندارید" });
-            }
             try
             {
                 var result = GetWaCoronaAdvData();
@@ -559,14 +536,9 @@ namespace Portal.Controllers
             }
         }
 
-        [Auth]
+        [Authorize(Policy = Policies.Send_Message_To_Users)]
         public JsonResult GetWaCoronaAdvTestMsgs()
         {
-            if (userAccessor.CurrentUser.Id != 1667 &&
-                userAccessor.CurrentUser.Id != 3)
-            {
-                return GenerateJsonResult(new { status = 0, msg = "شما مجوز انجام این کار را ندارید" });
-            }
             try
             {
                 var result = GetWaCoronaAdvTestData();
@@ -581,12 +553,6 @@ namespace Portal.Controllers
 
         private WaCoronaAdvMsgHelper[] GetWaCoronaAdvData()
         {
-            if (userAccessor.CurrentUser.Id != 1667 &&
-                userAccessor.CurrentUser.Id != 3)
-            {
-                return null;
-            }
-
             var identityUsers = userService.GetAllIdentityUsernamesByState();
             IQueryable<User> users = userService.GetAllAsIQueryable();
             users = users.Where(x => x.MainMobile != null && x.MainMobile.Length > 0 && x.MainMobile.StartsWith("+"));
@@ -610,11 +576,6 @@ namespace Portal.Controllers
 
         private WaCoronaAdvMsgHelper[] GetWaCoronaAdvTestData()
         {
-            if (userAccessor.CurrentUser.Id != 1667 &&
-                userAccessor.CurrentUser.Id != 3)
-            {
-                return null;
-            }
             var user1 = userService.Find(3);
             var user2 = userService.Find(17244);
             return new WaCoronaAdvMsgHelper[] {

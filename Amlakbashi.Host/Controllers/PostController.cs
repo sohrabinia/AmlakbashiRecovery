@@ -33,6 +33,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -95,7 +96,7 @@ namespace Amlakbashi.Host.Controllers
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_View)]
         public ActionResult Index(int? page,
             PostStatus status = PostStatus.Suspend,
             int service = 43)
@@ -137,7 +138,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_Edit)]
         [HttpGet]
         public ActionResult Edit(long id = -1)
         {
@@ -181,7 +182,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_Edit)]
         [HttpPost]
         public ActionResult Edit(Post post, List<int> Services = null)
         {
@@ -214,7 +215,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_Publish)]
         public JsonResult Delete(long id)
         {
             try
@@ -229,7 +230,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_Publish)]
         public JsonResult Suspend(long id)
         {
             try
@@ -244,7 +245,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_Publish)]
         public JsonResult Publish(long id)
         {
             try

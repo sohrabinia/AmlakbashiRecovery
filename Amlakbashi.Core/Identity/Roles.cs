@@ -50,6 +50,16 @@ namespace Amlakbashi.Core.Identity
                     UserSenior,
                     UserJunior
                 };
+
+        public static string[] SupportRoles =
+            new string[]
+            {
+                ReserveManager,
+                ReserveSenior,
+                ReserveJunior,
+                AdvertiseJunior,
+                UserJunior
+            };
         public static Dictionary<string, string> InitialUserRoles
         {
             get
