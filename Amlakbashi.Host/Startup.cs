@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -122,6 +123,12 @@ namespace Amlakbashi.Host
             services.AddResponseCaching();
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddSignalR();
+
+            services.Configure<FormOptions>(x =>
+            {
+                x.ValueLengthLimit = 502400;
+                x.MultipartBodyLengthLimit = 502400;
+            });
         }
 
         // ConfigureContainer is where you can register things directly
@@ -145,7 +152,8 @@ namespace Amlakbashi.Host
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/errors/http500");
+                app.UseStatusCodePagesWithReExecute("/errors/http404");
             }
 
             app.UseStaticFiles();

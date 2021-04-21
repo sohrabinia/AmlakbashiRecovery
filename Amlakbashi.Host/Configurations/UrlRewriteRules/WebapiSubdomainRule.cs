@@ -18,8 +18,11 @@ namespace Amlakbashi.Host.Configurations.UrlRewriteRules
             HostString host = request.Host;
             if (host.HasValue && host.Value.ToLower().Contains("webapi.") && path.Value.StartsWith("/api/") == false)
             {
+                var domainSections = host.Value.Split('.');
+                var mainDomain = domainSections.ElementAt(domainSections.Length - 2) + "." + domainSections.Last();
+                var redirectUrl = $"{request.Scheme}://{mainDomain}/errors/http404";
                 HttpResponse response = context.HttpContext.Response;
-                response.Redirect("/errors/http404");
+                response.Redirect(redirectUrl);
             }
             else
             {

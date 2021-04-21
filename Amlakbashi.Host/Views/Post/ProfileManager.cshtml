@@ -22,7 +22,6 @@
         <input type="hidden" name="id" value="@Model.id" />
         <input type="hidden" name="mainMobile" value="@Model.mainMobile" />
         <input type="hidden" name="userGeneralType" value="@Model.userGeneralType" />
-        <input type="hidden" name="loginPriority" value="@Model.loginPriority" />
 
         <div class="profile__photo">
             @if (ViewBag.photoId > 0)
@@ -189,17 +188,8 @@
         <div class="profile__item ">
             <span class="profile__label">ایمیل  :</span>
             <span class="profile__text">
-                @if (Model.loginPriority == (int)Entities.User.LoginPriorites.Email)
-                {
-                    <input type="text" readonly style="background-color:#efefef"
-                           placeholder="ایمیل" id="email" name="email" title="ایمیل"
-                           value="@Model.email" />
-                }
-                else
-                {
-                    <input type="text" placeholder="ایمیل" id="email" name="email"
-                           title="ایمیل" value="@Model.email">
-                }
+                <input type="email" placeholder="ایمیل" id="email" name="email"
+                       title="ایمیل" value="@Model.email">
             </span>
         </div>
         if (Model.userGeneralType > (int)Entities.User.UserGeneralTypeEnum.Guest ||

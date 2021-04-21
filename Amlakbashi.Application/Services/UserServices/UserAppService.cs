@@ -192,7 +192,7 @@ namespace Amlakbashi.Application.Services.UserServices
                     user.SetLocalPhoneNumber(User.PhoneType.OtherMobile2, dto.mobile2, 98);
                 }
             }
-            if (user.GetLoginProperty() != User.LoginPriorites.Email && string.IsNullOrEmpty(user.Email) || !string.IsNullOrEmpty(dto.email))
+            if (string.IsNullOrEmpty(user.Email) || !string.IsNullOrEmpty(dto.email))
             {
                 user.Email = dto.email;
                 var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
@@ -420,14 +420,6 @@ namespace Amlakbashi.Application.Services.UserServices
             Repository.Save();
         }
 
-        public void UpdateLoginPriority(int userId, User.LoginPriorites loginPriorites)
-        {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.SetLoginPriority(loginPriorites);
-            Repository.Update(user);
-            Repository.Save();
-        }
-
         public void UpdateFName(int userId, string newFName)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
@@ -632,7 +624,6 @@ namespace Amlakbashi.Application.Services.UserServices
                             5, DiscountCoupon.DiscountCouponType.Present));
                         var contact = new UserContactDTO()
                         {
-                            UserLoginPriority = user.LoginPriority,
                             UserMainMobile = user.MainMobile,
                             UserAppNotificationToken = user.AppNotificationToken,
                             UserEmail = user.Email,

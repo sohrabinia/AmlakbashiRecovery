@@ -525,7 +525,7 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.CheckReserve", exc);
-                return GenerateJsonResult(new { val = 0, msg = "متاسفانه درخواست رزرو با خطا مواجه شد" } );
+                return GenerateJsonResult(new { val = 0, msg = "متاسفانه درخواست رزرو با خطا مواجه شد" });
             }
         }
 
@@ -582,14 +582,17 @@ namespace Amlakbashi.Host.Controllers
                 bool isPending;
                 reserveService.CancelReserve(userAccessor.CurrentUser,
                     reserve_id, cancel_reason_code, cancel_reason_string,
-                    is_host, out msg, out isPending, ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id) ;
+                    is_host, out msg, out isPending, ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
                 return GenerateJsonResult(new { val = 1, msg = msg, isPending = isPending });
             }
             catch (Exception exc)
             {
                 logger.Error("Reserve.CancelReserve", exc);
-                return GenerateJsonResult(new { val = 0,
-                    msg = "متاسفانه درخواست لغو رزرو با خطا مواجه شد" });
+                return GenerateJsonResult(new
+                {
+                    val = 0,
+                    msg = "متاسفانه درخواست لغو رزرو با خطا مواجه شد"
+                });
             }
         }
 
@@ -615,8 +618,11 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.RefuseCancelReserve", exc);
-                return GenerateJsonResult(new { val = 0,
-                    msg = "متاسفانه درخواست انصراف از لغو رزرو با خطا مواجه شد" });
+                return GenerateJsonResult(new
+                {
+                    val = 0,
+                    msg = "متاسفانه درخواست انصراف از لغو رزرو با خطا مواجه شد"
+                });
             }
         }
 
@@ -633,8 +639,11 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.CachPay", exc);
-                return GenerateJsonResult(new { val = 0,
-                    msg = "متاسفانه عملیات با خطا مواجه شد. مجددا تلاش کنید" });
+                return GenerateJsonResult(new
+                {
+                    val = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد. مجددا تلاش کنید"
+                });
             }
         }
 
@@ -655,8 +664,11 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.ConfirmCashPay", exc);
-                return GenerateJsonResult(new { val = 0,
-                    msg = "متاسفانه عملیات با خطا مواجه شد. مجددا تلاش کنید" });
+                return GenerateJsonResult(new
+                {
+                    val = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد. مجددا تلاش کنید"
+                });
             }
         }
 
@@ -722,8 +734,11 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.Start", exc);
-                return GenerateJsonResult(new { val = 0,
-                    msg = "متاسفانه عملیات با خطا مواجه شد. مجددا تلاش کنید" });
+                return GenerateJsonResult(new
+                {
+                    val = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد. مجددا تلاش کنید"
+                });
             }
         }
 
@@ -769,8 +784,11 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.ReserveResponse", exc);
-                return GenerateJsonResult(new { val = 0,
-                    msg = "متاسفانه جواب درخواست رزرو با خطا مواجه شد" });
+                return GenerateJsonResult(new
+                {
+                    val = 0,
+                    msg = "متاسفانه جواب درخواست رزرو با خطا مواجه شد"
+                });
             }
         }
 
@@ -1059,7 +1077,7 @@ namespace Amlakbashi.Host.Controllers
                 if (reserve.Status == ReserveStatus.WaitForResponse)
                 {
                     var user = userService.Find(reserve.Advertise.UserID);
-                    if (user.GetLoginProperty() == Entities.User.LoginPriorites.Mobile)
+                    if (PhoneUtility.IsNumberForIran(user.MainMobile))
                     {
                         userContact.SendReserveRequestCall(user, reserve.AdvertiseID);
                     }
@@ -1087,7 +1105,7 @@ namespace Amlakbashi.Host.Controllers
                 if (reserve.Status == ReserveStatus.WaitForReserve)
                 {
                     var guest_user = reserve.GuestUser;
-                    if (guest_user.GetLoginProperty() == Entities.User.LoginPriorites.Mobile)
+                    if (PhoneUtility.IsNumberForIran(guest_user.MainMobile))
                     {
                         userContact.SendPayReserveCall(guest_user, reserve.AdvertiseID);
                     }
@@ -1220,7 +1238,6 @@ namespace Amlakbashi.Host.Controllers
                 {
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserLoginPriority = host_user.LoginPriority,
                         UserMainMobile = host_user.MainMobile,
                         UserAppNotificationToken = host_user.AppNotificationToken,
                         UserEmail = host_user.Email,
@@ -1406,7 +1423,6 @@ namespace Amlakbashi.Host.Controllers
                 {
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserLoginPriority = guest_user.LoginPriority,
                         UserMainMobile = guest_user.MainMobile,
                         UserAppNotificationToken = guest_user.AppNotificationToken,
                         UserEmail = guest_user.Email,
@@ -1506,7 +1522,6 @@ namespace Amlakbashi.Host.Controllers
                 var user = userService.Find(reserve.Advertise.UserID);
                 userService.SendMessage(new UserContactDTO()
                 {
-                    UserLoginPriority = user.LoginPriority,
                     UserMainMobile = user.MainMobile,
                     UserAppNotificationToken = user.AppNotificationToken,
                     UserEmail = user.Email,
@@ -1520,7 +1535,7 @@ namespace Amlakbashi.Host.Controllers
                 });
                 return GenerateJsonResult(new { status = 1 });
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 logger.Error("SendSiteClearingWithCreditSms", exc);
                 return GenerateJsonResult(new { status = 0 });
@@ -1536,7 +1551,7 @@ namespace Amlakbashi.Host.Controllers
             if (!string.IsNullOrEmpty(msg))
             {
                 queryString = HtmlUtility.AddToQueryString(queryString, "msg", msg);
-            }            
+            }
             queryString = HtmlUtility.AddToQueryString(queryString, "selecttype", ((int)selectType).ToString());
             queryString = HtmlUtility.AddToQueryString(queryString, "category", "0");
             var url = "/reserve/reserveitemmanager" + queryString;

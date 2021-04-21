@@ -35,7 +35,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                 {
                     mediator.Enqueue(new SendMessageCommand(new Core.Infrastructure.UserContact.UserContactDTO()
                     {
-                        UserLoginPriority = user.LoginPriority,
                         UserMainMobile = user.MainMobile,
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = user.Email,

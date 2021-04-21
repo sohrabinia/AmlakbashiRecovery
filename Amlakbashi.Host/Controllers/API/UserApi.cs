@@ -67,11 +67,9 @@ namespace Amlakbashi.Host.Controllers.API
                         user = new User();
                         user.Mobile = international_mobile;
                         user.MainMobile = international_mobile;
-                        user.CreateDate = DateTime.Now;
                         user.ResponseFrom = 2;
                         user.ResponseTo = 2;
                         user.AmlakbashiScore = 1000;
-                        user.State = (int)Entities.User.UserState.InActived;
                         userService.Insert(user);
 
                         identityUser = new AppUser()
@@ -103,8 +101,8 @@ namespace Amlakbashi.Host.Controllers.API
                     identityUser.PhoneNumberConfirmed == false)
                 {
                     if (string.IsNullOrEmpty(code) ||
-                        user.SendVerification == null ||
-                        (DateTime.Now - user.SendVerification) >
+                        identityUser.SendVerification == null ||
+                        (DateTime.Now - identityUser.SendVerification) >
                         new TimeSpan(0, 0, 30, 0, 0))
                     {
                         code = new Random().Next(1111, 9999).ToString();
@@ -263,9 +261,6 @@ namespace Amlakbashi.Host.Controllers.API
                     }
                     if (identityUser.State == Entities.User.UserState.InActived)
                     {
-                        userService.UpdateLoginPriority(user_id,
-                            PhoneUtility.IsNumberForIran(mobile_international) ?
-                            Entities.User.LoginPriorites.Mobile : Entities.User.LoginPriorites.Email);
                         Dictionary<string, string> errors;
                         if (userService.SignInRegister(user_id, fname, lname, password,
                             confirmPassword, out errors))
@@ -469,7 +464,6 @@ namespace Amlakbashi.Host.Controllers.API
                         UserId = user.Id.ToString(),
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                         UserMainMobile = user.MainMobile,
-                        UserLoginPriority = user.LoginPriority,
                         Type = UserContactType.CouponPresent,
                         Extra1 = prUser.FullName,
                         Extra2 = "5%"

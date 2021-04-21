@@ -74,7 +74,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             var hostlerUser = reserveRepository.Find<User, int>(reserve.Advertise.UserID);
             var contact = new UserContactDTO()
             {
-                UserLoginPriority = hostlerUser.LoginPriority,
                 UserMainMobile = hostlerUser.MainMobile,
                 UserAppNotificationToken = hostlerUser.AppNotificationToken,
                 UserEmail = hostlerUser.Email,
@@ -116,7 +115,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                 var guestUser = reserve.GuestUser;
                 var contact = new UserContactDTO()
                 {
-                    UserLoginPriority = guestUser.LoginPriority,
                     UserMainMobile = guestUser.MainMobile,
                     UserAppNotificationToken = guestUser.AppNotificationToken,
                     UserEmail = guestUser.Email,
@@ -344,7 +342,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             {
                 var advertise = reserve.Advertise;
                 var hostlerUser = reserveRepository.Find<User, int>(advertise.UserID);
-                if (hostlerUser.GetLoginProperty() == User.LoginPriorites.Mobile)
+                if (PhoneUtility.IsNumberForIran(hostlerUser.MainMobile))
                 {
                     userContact.SendReserveRequestCall(hostlerUser, reserve.AdvertiseID);
                 }
@@ -358,7 +356,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             if (reserve.Status == ReserveStatus.WaitForReserve)
             {
                 var guestUser = reserve.GuestUser;
-                if (guestUser.GetLoginProperty() == User.LoginPriorites.Mobile)
+                if (PhoneUtility.IsNumberForIran(guestUser.MainMobile))
                 {
                     userContact.SendPayReserveCall(guestUser, reserve.AdvertiseID);
                 }
