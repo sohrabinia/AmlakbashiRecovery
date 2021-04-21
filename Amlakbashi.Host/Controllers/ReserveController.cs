@@ -27,6 +27,7 @@ using X.PagedList;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -89,13 +90,13 @@ namespace Amlakbashi.Host.Controllers
             this.reserveAdminHubServer = reserveAdminHubServer;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         public ActionResult Admin()
         {
             return View();
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         public ActionResult Index(int? page, long reserve_id = -1, long advertise_id = -1,
             int host_user_id = -1, int guest_user_id = -1, int reserve_status = -1,
             int host_response_status = -1, int general_status = -1,
@@ -215,10 +216,11 @@ namespace Amlakbashi.Host.Controllers
                 var onePageOfModel = finalModel.ToPagedList(PageNumber, itemPerPage);
 
                 var supporterList = new List<UserFullNameDTO>();
-                var supporters = TempRoles.AdminMobiles;
+                var supporters = userService.GetAllEmployees().Select(s => s.PhoneNumber);
                 foreach (var item in supporters)
                 {
                     var supporter = userService.GetByMainMobile(item);
+                    
                     if (supporter != null)
                         supporterList.Add(new UserFullNameDTO() { id = supporter.Id, fullName = supporter.FullName });
                 }
@@ -302,7 +304,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         [HttpGet]
         public ActionResult Edit(int reserve_id = -1)
         {
@@ -319,7 +321,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Edit_Normal)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Reserve reserve,
@@ -328,15 +330,27 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var objReserve = reserveService.Find(reserve.Id);
-                if (objReserve.Status > ReserveStatus.Rejected && !(userAccessor.CurrentUser.Id == 3 ||
-                    userAccessor.CurrentUser.Id == 1667 ||
-                    userAccessor.CurrentUser.Id == 12 ||
-                    userAccessor.CurrentUser.Id == 2122 ||
-                    userAccessor.CurrentUser.Id == 19076 ||
-                    userAccessor.CurrentUser.Id == 82119))
+                var currentIdentityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+                var userAllowEdit = objReserve.Status < ReserveStatus.Reserved ||
+                    userService.UserAllowPolicy(currentIdentityUser, Policies.Reserve_Edit_Reserved);
+                if (userAllowEdit == false)
                 {
                     ViewBag.errorMsg = "شما مجوز ویرایش ندارید";
                     return View();
+                }
+                var originalReserve = reserveService.Find(reserve.Id);
+                if (originalReserve.TotalPrice != reserve.TotalPrice ||
+                    originalReserve.DepositPrice != reserve.DepositPrice)
+                {
+                    userAllowEdit = userService.UserAllowPolicy(currentIdentityUser, Policies.Reserve_Edit_Price);
+                    if (userAllowEdit == false)
+                    {
+                        if (userAllowEdit == false)
+                        {
+                            ViewBag.errorMsg = "شما مجوز ویرایش مبلغ ندارید";
+                            return View();
+                        }
+                    }
                 }
                 string msg;
                 if (reserveService.Update(reserve, start_date,
@@ -357,7 +371,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Roles = Roles.SuperAdmin)]
         public JsonResult Delete(long reserve_id)
         {
             try
@@ -782,7 +796,7 @@ namespace Amlakbashi.Host.Controllers
                 var reserve = reserveService.Find(reserve_id);
                 var advertise = reserve.Advertise;
                 var userId = userAccessor.CurrentUser.Id;
-                if (advertise.UserID != userId && userId != 1667)
+                if (advertise.UserID != userId)
                 {
                     return RedirectToAction("PublicLogin", "User",
                         new
@@ -960,7 +974,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         public JsonResult PayReserveWithCreditHost(long reserve_id, int pay_reserve_type)
         {
             try
@@ -1049,7 +1063,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Support_Actions)]
         public JsonResult CallForRequest(long reserve_id)
         {
             try
@@ -1077,7 +1091,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Support_Actions)]
         public JsonResult CallForPayment(long reserve_id)
         {
             try
@@ -1105,7 +1119,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Support_Actions)]
         public JsonResult CancelBySystem(long reserve_id)
         {
             try
@@ -1123,7 +1137,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         public JsonResult SiteClearingHost(long reserve_id, bool confirmed = false,
             int? user_id = null, long transaction_id = 0, long ref_id = 0,
             int method_id = 0, long price = 0, bool? send_sms = null)
@@ -1263,7 +1277,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         public JsonResult SiteRefundGuest(long reserve_id, bool confirmed = false, int? user_id = null,
             long transaction_id = 0, long ref_id = 0, int method_id = 0, long price = 0,
             bool? send_sms = null, string new_bank_card_number = null,
@@ -1448,7 +1462,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         public JsonResult SiteClearingWithCredit(long reserve_id)
         {
             try
@@ -1497,7 +1511,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         public JsonResult SendSiteClearingWithCreditSms(long reserve_id, long payable_price, long transaction_id)
         {
             try
@@ -1543,7 +1557,7 @@ namespace Amlakbashi.Host.Controllers
             return Redirect(url);
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         public JsonResult SiteRefundGuestWithCredit(long reserve_id)
         {
             try
@@ -1787,7 +1801,7 @@ namespace Amlakbashi.Host.Controllers
             });
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Support_Actions)]
         public JsonResult AddSupporterInfoToReserve(long reserve_id, string text)
         {
             try
@@ -1802,7 +1816,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Support_Actions)]
         public JsonResult ToggleShouldFollow(long reserve_id, string text)
         {
             try
@@ -1818,11 +1832,9 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (reserve.shouldFollow)
                 {
-                    var my_user_id = userAccessor.CurrentUser.Id;
-                    if (userAccessor.CurrentUser.Id != 3 &&
-                        userAccessor.CurrentUser.Id != 12 &&
-                        userAccessor.CurrentUser.Id != 1667 &&
-                        userAccessor.CurrentUser.Id != 2122)
+                    var currentUserIdentity = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+                    var editAllowed = userService.UserAllowPolicy(currentUserIdentity, Policies.Reserve_Edit_Reserved);
+                    if (editAllowed == false)
                     {
                         return GenerateJsonResult(new
                         {
@@ -1849,7 +1861,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         public JsonResult GetShouldFollowState(long reserve_id)
         {
             try
@@ -1872,7 +1884,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Support_Actions)]
         public JsonResult NextCallState(long reserve_id, string hostOrGuest)
         {
             try
@@ -1897,7 +1909,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         public ActionResult GetReserveSupporterInfo(long reserve_id)
         {
             try
@@ -1912,7 +1924,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Support_Actions)]
         public JsonResult ToggleDisableAutoCancel(long id, bool active)
         {
             try
@@ -1931,7 +1943,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Support_Actions)]
         public JsonResult ToggleAccVisited(long id, bool active)
         {
             try
@@ -1998,7 +2010,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Support_Actions)]
         public JsonResult DoSupport(long reserve_id,
             bool force = false, string transfer_reason = null)
         {
@@ -2165,7 +2177,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_ReservePayment", model);
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         public PartialViewResult AddGuestPaymentPopup(long id)
         {
             var reserve = reserveService.Find(id);
@@ -2292,7 +2304,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_InvoicePopup", model);
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         public JsonResult AddGuestPayment(long id, int type,
             int method, long price, long transactionId)
         {

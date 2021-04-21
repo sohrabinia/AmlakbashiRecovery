@@ -1,5 +1,4 @@
 ﻿@model Reserve
-@inject IUserAccessor userAccessor;
 
 @{
     ViewBag.Title = "رزرو";
@@ -38,16 +37,7 @@
                     تاریخ شروع :
                 </td>
                 <td>
-                    @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667 ||
-                        userAccessor.CurrentUser.Id == 12 || userAccessor.CurrentUser.Id == 2122 ||
-                        userAccessor.CurrentUser.Id == 19076)
-                    {
-                        <input name="start_date" type="text" value="@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.StartDate)" />
-                    }
-                    else
-                    {
-                        <span>@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.StartDate)</span>
-                    }
+                    <input name="start_date" type="text" value="@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.StartDate)" />
                 </td>
                 <td></td>
             </tr>
@@ -56,16 +46,7 @@
                     تاریخ پایان :
                 </td>
                 <td>
-                    @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667 ||
-                        userAccessor.CurrentUser.Id == 12 || userAccessor.CurrentUser.Id == 2122 ||
-                        userAccessor.CurrentUser.Id == 19076)
-                    {
-                        <input name="end_date" type="text" value="@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.EndDate)" />
-                    }
-                    else
-                    {
-                        <span>@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.EndDate)</span>
-                    }
+                    <input name="end_date" type="text" value="@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.EndDate)" />
                 </td>
                 <td></td>
             </tr>

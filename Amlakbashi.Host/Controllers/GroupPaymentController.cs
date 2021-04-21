@@ -5,12 +5,14 @@ using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using log4net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -51,7 +53,7 @@ namespace Amlakbashi.Host.Controllers
             this.userAccessor = userAccessor;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Payment_View)]
         public ActionResult Index(int? page, int status = -1)
         {
             try
@@ -78,7 +80,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Add)]
         public JsonResult GenerateGroupPay()
         {
             try
@@ -162,7 +164,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Add)]
         public JsonResult DownloadGroupPaymentFile(int id, bool confirm = false)
         {
             try
@@ -211,7 +213,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Add)]
         public JsonResult CancelPayment(int id)
         {
             try
@@ -251,7 +253,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Add)]
         public JsonResult ExcludeFromGroupPayment(int reserveId)
         {
             try
@@ -273,7 +275,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Add)]
         public JsonResult IncludeToGroupPayment(int reserveId)
         {
             try
@@ -295,7 +297,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Add)]
         public JsonResult ErrorResolved(int reserveId)
         {
             try
@@ -354,7 +356,7 @@ namespace Amlakbashi.Host.Controllers
             return RedirectToAction("index");
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Add)]
         public ActionResult Download(string path)
         {
             string file = Path.Combine(host.WebRootPath, path);
@@ -471,7 +473,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Add)]
         public ActionResult GetPaymentsListPopup()
         {
             List<Reserve> todayPayments, paymentsWithError, excludingPayments;
@@ -545,7 +547,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_GroupPaymentList", model);
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Payment_Add)]
         public ActionResult GetPaymentDetailPopup(long id)
         {
             GroupPaymentDetailsDTO dto = new GroupPaymentDetailsDTO();

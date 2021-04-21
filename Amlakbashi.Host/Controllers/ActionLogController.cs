@@ -1,7 +1,9 @@
 ﻿using Amlakbashi.Application.Services.ActionLogServices.Interfaces;
+using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using log4net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using X.PagedList;
@@ -19,7 +21,7 @@ namespace Amlakbashi.Host.Controllers
             this.actionLogService = actionLogService;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.ActionLog_View)]
         public ActionResult Index(int? page, int user_id = -1, int action_type = -1,
             int action_source = -1, long related_id = -1)
         {
@@ -45,7 +47,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.ActionLog_View)]
         public ActionResult Detail(long id)
         {
             try

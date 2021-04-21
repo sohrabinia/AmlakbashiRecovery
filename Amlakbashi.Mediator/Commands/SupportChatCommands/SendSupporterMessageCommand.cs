@@ -7,11 +7,13 @@ namespace Amlakbashi.Mediator.Commands.SupportChatCommands
         public int Delay { get; set; }
         public long SupportChatId { get; set; }
         public long MessageId { get; set; }
-        public SendSupporterMessageCommand(int delay, long messageId, long supportChatId)
+        public string[] SupportersNotifToken { get; set; }
+        public SendSupporterMessageCommand(int delay, long messageId, long supportChatId, string[] supportersNotifToken)
         {
             Delay = delay;
             SupportChatId = supportChatId;
             MessageId = messageId;
+            SupportersNotifToken = supportersNotifToken;
         }
     }
 }

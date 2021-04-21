@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Mvc;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -79,7 +80,7 @@ namespace Amlakbashi.Host.Controllers
 
         #region Admin Add/Edit Accommodation
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpGet]
         public ActionResult AdminBasicForm(long id)
         {
@@ -105,7 +106,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
         public ActionResult AdminBasicForm(Advertise data, bool forceSave = false, int tab = 0)
         {
@@ -173,7 +174,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpGet]
         public ActionResult AdminGeneralForm(long id)
         {
@@ -194,7 +195,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
         public ActionResult AdminGeneralForm(Advertise data, bool forceSave = false, int tab = 0)
         {
@@ -278,7 +279,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpGet]
         public ActionResult AdminExtraForm(long id)
         {
@@ -298,7 +299,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
         public ActionResult AdminExtraForm(Advertise data, bool forceSave = false, int tab = 0)
         {
@@ -386,7 +387,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpGet]
         public ActionResult AdminComplexForm(long parentId, long id = 0)
         {
@@ -426,7 +427,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
         public ActionResult AdminComplexForm(Advertise data, bool forceSave = false, int tab = 0)
         {
@@ -514,7 +515,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpGet]
         public ActionResult AdminHotelForm(long parentId, long id = 0)
         {
@@ -554,7 +555,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
         public ActionResult AdminHotelForm(Advertise data, bool forceSave = false, int tab = 0)
         {
@@ -639,7 +640,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpGet]
         public ActionResult AdminStatusForm(long id)
         {
@@ -658,7 +659,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Advertise_Publish)]
         [HttpPost]
         public ActionResult AdminStatusForm(long id, bool status, List<NotVerifyReasonsEnum> notVerifyReasons)
         {
@@ -1537,7 +1538,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_Publish)]
         public JsonResult Publish(long id)
         {
             try
@@ -1560,7 +1561,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_Publish)]
         public JsonResult Suspend(long id)
         {
             try
@@ -1788,7 +1789,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_View)]
         public ActionResult AdminPreview(long id, string capacity = null,
             string empty_range_from = null, string empty_range_to = null)
         {
@@ -2695,7 +2696,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         public JsonResult SetHygieneProtocolAdmin(long id, HygieneProtocolStatus value)
         {
             try

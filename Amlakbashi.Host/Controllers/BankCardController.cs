@@ -6,6 +6,8 @@ using Amlakbashi.Host.Controllers.Base;
 using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
+using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -21,7 +23,7 @@ namespace Amlakbashi.Host.Controllers
             this.mapper = mapper;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Bank_Info)]
         public ActionResult Index(int? page, int user_id = -1, string bank_card_number = null,
             string shaba_number = null, int bank_card_status = -1, int shaba_status = -1)
         {
@@ -47,7 +49,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Bank_Info)]
         public JsonResult ToggleBankCardStatus(int id)
         {
             try
@@ -62,7 +64,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Bank_Info)]
         public JsonResult ToggleShabaStatus(int id)
         {
             try

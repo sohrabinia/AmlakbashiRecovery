@@ -1,5 +1,4 @@
-﻿@inject IUserAccessor userAccessor;
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <!-- Global Site Tag (gtag.js) - Google Analytics -->
@@ -67,30 +66,17 @@
                     <a href="/bankcard/index" style="background-image:url(/resource/img/bankCard.png)" class="item">حساب بانکی</a>
                     <a href="/supportchat/index" style="background-image:url(/resource/img/Message-icon-grey.png)" class="item">چت پشتیبانی</a>
                     <a href="/cart/admin" style="background-image:url(/resource/img/buy.png)" class="item">مالی</a>
-                    @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667 || userAccessor.CurrentUser.Id == 12 || userAccessor.CurrentUser.Id == 2122)
-                    {
-                        <a href="/grouppayment/index" style="background-image:url(/resource/img/credit_card_multi-512.png)" class="item">پرداخت گروهی</a>
-                    }
-                    @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667 || userAccessor.CurrentUser.Id == 12 || userAccessor.CurrentUser.Id == 19076 || userAccessor.CurrentUser.Id == 71082)
-                    {
-                        <a href="/blogpost/index" style="background-image:url(/resource/img/post.png)" class="item">پست وبلاگ</a>
-                        @*<a href="/categorypost/index" style="background-image:url(/resource/img/post.png)" class="item">پست دسته بندی</a>*@
-                    }
-                    <a href="/admin/adminstatistic" style="background-image:url(/resource/img/statistic.png)" class="item">آمار</a>                    
+                    <a href="/grouppayment/index" style="background-image:url(/resource/img/credit_card_multi-512.png)" class="item">پرداخت گروهی</a>
+                    <a href="/blogpost/index" style="background-image:url(/resource/img/post.png)" class="item">پست وبلاگ</a>
+                    @*<a href="/categorypost/index" style="background-image:url(/resource/img/post.png)" class="item">پست دسته بندی</a>*@
+                    <a href="/admin/adminstatistic" style="background-image:url(/resource/img/statistic.png)" class="item">آمار</a>
                     <a href="/file/index" style="background-image:url(/resource/img/file.png)" class="item">فایل ها</a>
                     <a href="/post/index" style="background-image:url(/resource/img/post.png)" class="item">پست ها</a>
-                    @*<a href="/service/index" style="background-image:url(/resource/img/service.png)" class="item">مدیریت سرویس ها</a>*@                    
+                    @*<a href="/service/index" style="background-image:url(/resource/img/service.png)" class="item">مدیریت سرویس ها</a>*@
                     @*<a href="/admin/email" style="background-image: url(/resource/img/email2.png)" class="item">مدیریت ارسال ایمیل</a>*@
                     <a href="/admin/sms" style="background-image: url(/resource/img/Message-icon-grey.png)" class="item">ارسال اس ام اس</a>
                     <a href="/actionlog/index" style="background-image:url(/resource/img/log.png)" class="item">لاگ تغییرات</a>
-                    @{
-                        if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 1667 ||
-                            userAccessor.CurrentUser.Id == 12 || userAccessor.CurrentUser.Id == 2122 ||
-                            userAccessor.CurrentUser.Id == 19076)
-                        {
-                            <a href="/admin/SendGroupNotification" style="background-image: url(/resource/img/Message-icon-grey.png)" class="item">نوتیفیکیشن گروهی</a>
-                        }
-                    }
+                    <a href="/admin/SendGroupNotification" style="background-image: url(/resource/img/Message-icon-grey.png)" class="item">نوتیفیکیشن گروهی</a>
                 </div>
                 <div class="zonl">
                     @RenderBody()

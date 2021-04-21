@@ -5,10 +5,12 @@ using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.AccommodationDTOs;
 using Amlakbashi.Core.DTOs.CategoryDTOs;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using log4net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -39,7 +41,7 @@ namespace Amlakbashi.Host.Controllers
             this.userAccessor = userAccessor;
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Category_View)]
         public ActionResult DynamicIndex(int? page, int Type = 0, int Province = -1, int City = -1, int Area = -1,
             string sort = "viewcount", string q = "")
         {
@@ -64,7 +66,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Category_Edit)]
         public JsonResult DynamicDelete(int id)
         {
             try
@@ -87,7 +89,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Category_View)]
         [HttpGet]
         public ActionResult DynamicEdit(int id = -1)
         {
@@ -112,7 +114,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Category_Edit)]
         [HttpPost]
         public ActionResult DynamicEdit(DynamicCategory c)
         {

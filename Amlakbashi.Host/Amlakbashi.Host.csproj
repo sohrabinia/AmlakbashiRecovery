@@ -15,6 +15,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\dashboard.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\dashboard.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAddressInput.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAmenitiesInput.cshtml" />
@@ -158,6 +166,7 @@
     <None Include="Views\User\MobileLogin.cshtml" />
     <None Include="Views\User\UserCreditManager.cshtml" />
     <None Include="Views\User\_InstantReserveConfirm.cshtml" />
+    <None Include="wwwroot\js\dashboard.min.js" />
   </ItemGroup>
 
   <ItemGroup>

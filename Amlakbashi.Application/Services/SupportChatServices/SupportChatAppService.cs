@@ -52,10 +52,10 @@ namespace Amlakbashi.Application.Services.SupportChatServices
             return supportChat;
         }
 
-        public void ScheduleSendSupporterNewMsgNotif(int delay, long messageId, long supportChatId)
+        public void ScheduleSendSupporterNewMsgNotif(int delay, long messageId, long supportChatId, string[] supportersNotifToken)
         {
             var delayTimeSpan = new TimeSpan(0, 0, delay);
-            mediator.Schedule(new SendSupporterMessageCommand(delay, messageId, supportChatId), delayTimeSpan);
+            mediator.Schedule(new SendSupporterMessageCommand(delay, messageId, supportChatId, supportersNotifToken), delayTimeSpan);
         }
     }
 }

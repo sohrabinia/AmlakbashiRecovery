@@ -77,5 +77,9 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         bool SignInRegister(int user_id, string fname, string lname,
             string password, string confirmPassword, out Dictionary<string, string> errors);
         JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key);
+        IEnumerable<User> IdentityUsersToUsers(IEnumerable<AppUser> identityUsers);
+        IEnumerable<AppUser> GetAllSupportEmployees();
+        IEnumerable<AppUser> GetAllEmployees();
+        bool UserAllowPolicy(AppUser identityUser, string policy);
     }
 }

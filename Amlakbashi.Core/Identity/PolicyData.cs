@@ -11,6 +11,18 @@ namespace Amlakbashi.Core.Identity
                 return new Dictionary<string, string[]>
                 {
                     {
+                        Policies.Admin_General,
+                        Roles.AllEmployeeRoles
+                    },
+                    {
+                        Policies.Reserve_View,
+                        Roles.AllEmployeeRoles
+                    },
+                    {
+                        Policies.Post_View,
+                        Roles.AllEmployeeRoles
+                    },
+                    {
                         Policies.Roles_View,
                         new string[]
                         {
@@ -186,6 +198,29 @@ namespace Amlakbashi.Core.Identity
                             Roles.AdvertiseManager,
                             Roles.AdvertiseSenior,
                             Roles.UserManager
+                        }
+                    },
+                    {
+                        Policies.User_General_Edit,
+                        new string[]
+                        {
+                            Roles.SuperAdmin,
+                            Roles.Admin,
+                            Roles.TechnicalManager,
+                            Roles.TechnicalEmployee,
+                            Roles.UserManager,
+                            Roles.UserSenior,
+                            Roles.UserJunior,
+                            Roles.ReserveSenior,
+                            Roles.ReserveManager,
+                            Roles.FinanceManager,
+                            Roles.FinanceSenior,
+                            Roles.ContentManager,
+                            Roles.ContentSenior,
+                            Roles.CommunicationManager,
+                            Roles.CommunicationSenior,
+                            Roles.AdvertiseManager,
+                            Roles.AdvertiseSenior
                         }
                     },
                     {

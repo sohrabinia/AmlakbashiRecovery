@@ -2,6 +2,7 @@
 {
     public static class Policies
     {
+        public const string Admin_General = "Admin_General";
         public const string Roles_View = "Roles_View";
         public const string Roles_Edit = "Roles_Edit";
         public const string Advertise_View = "Advertise_View";
@@ -18,6 +19,7 @@
         public const string Reserve_Payment_Actions = "Reserve_Payment_Actions";
         public const string Reserve_Payment_Edit = "Reserve_Payment_Edit";
         public const string Reserve_Payment_Add = "Reserve_Payment_Add";
+        public const string User_General_Edit = "User_General_Edit";
         public const string User_Host_Support = "User_Host_Support";
         public const string User_Identity_Edit = "User_Identity_Edit";
         public const string User_Contact_Edit = "User_Contact_Edit";

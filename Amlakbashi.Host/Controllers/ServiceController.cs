@@ -9,6 +9,8 @@ using Amlakbashi.Host.Controllers.Base;
 using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
+using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -27,7 +29,7 @@ namespace Amlakbashi.Host.Controllers
             this.serviceService = serviceService;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_Publish)]
         public JsonResult Delete(int id)
         {
             try
@@ -42,7 +44,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_Publish)]
         [HttpGet]
         public ActionResult Edit(int id = -1)
         {
@@ -77,7 +79,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_Publish)]
         [HttpPost]
         public ActionResult Edit(Service Service)
         {
@@ -106,7 +108,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_View)]
         public ActionResult Index(int? page)
         {
             try
