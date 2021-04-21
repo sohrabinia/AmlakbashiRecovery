@@ -9,7 +9,6 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
         public string UserEmail { get; set; }
         public string UserNotificationToken { get; set; }
         public string UserMainMobile { get; set; }
-        public int UserLoginPriority { get; set; }
         public Reserve.ReserveStatus ReserveStatus { get; set; }
         public UserContactType Type { get; set; } = UserContactType.Unset;
         public string AdvertiseId { get; set; } = null;

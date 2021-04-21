@@ -67,24 +67,7 @@ namespace Amlakbashi.Host.Controllers
             this.signInManager = signInManager;
         }
 
-        public string test()
-        {
-            var claims = User.Claims;
-            var name = User.Identity.Name;
-            var test = User.Identities;
-            return "check claims";
-        }
-
-        [Authorize]
-        public string testauth()
-        {
-            var claims = User.Claims;
-            var name = User.Identity.Name;
-            var test = User.Identities;
-            return "check claims";
-        }
-
-        [Authorize(Policy = "Admins")]
+        [Authorize(Policy = Policies.User_Impersonate)]
         public IActionResult Impersonate(int userId, string url)
         {
             if (HttpContext.Session.GetObjectFromJson<User>("impersonateUser") != null)
@@ -96,11 +79,15 @@ namespace Amlakbashi.Host.Controllers
             var identityUser = userService.GetIdentityUser(user.MainMobile);
             var admin = userAccessor.CurrentUser;
 
-            var userPrincipal = signInManager.CreateUserPrincipalAsync(identityUser).Result;
-            userPrincipal.Identities.First().AddClaim(new Claim("AdminUsername", User.Identity.Name));
-            userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonated", "true"));
-            signInManager.SignOutAsync().Wait();
-            signInManager.SignInWithClaimsAsync(identityUser, false, userPrincipal.Claims).Wait();
+            //var userPrincipal = signInManager.CreateUserPrincipalAsync(identityUser).Result;
+            var claims = new List<Claim>
+            {
+                new Claim("AdminUsername", User.Identity.Name),
+                new Claim("IsImpersonated", "true"),
+            };
+            //userPrincipal.AddIdentity(new ClaimsIdentity(claims));
+            //signInManager.SignOutAsync().Wait();
+            signInManager.SignInWithClaimsAsync(identityUser, false, claims).Wait();
 
             HttpContext.Session.SetObjectAsJson("impersonateUser", user);
             HttpContext.Session.SetObjectAsJson("impersonateAdmin", admin);
@@ -108,16 +95,18 @@ namespace Amlakbashi.Host.Controllers
             logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
                 user.FullName + "(" + user.Id + ").");
 
-            if (!string.IsNullOrEmpty(url))
-            {
-                return Redirect(url);
-            }
-            return Redirect("/dashboard");
+            return View("/Views/Errors/Http404.cshtml");
+            //if (!string.IsNullOrEmpty(url))
+            //{
+            //    return Redirect(url);
+            //}
+            //return Redirect("/dashboard");
         }
 
         public IActionResult ImpersonateLogout()
         {
-            if (User.FindFirst("IsImpersonated").Value != "true")
+            var IsImpersonatedClaim = User.FindFirst("IsImpersonated");
+            if (IsImpersonatedClaim == null || IsImpersonatedClaim.Value != "true")
             {
                 return NotFound();
             }
@@ -977,7 +966,6 @@ namespace Amlakbashi.Host.Controllers
                     }
                     if (identityUser.State == Entities.User.UserState.InActived)
                     {
-                        userService.UpdateLoginPriority(user_id, Entities.User.LoginPriorites.Mobile);
                         Dictionary<string, string> errors;
                         if (userService.SignInRegister(user_id, fname, lname, password,
                             confirmPassword, out errors))
@@ -1222,7 +1210,6 @@ namespace Amlakbashi.Host.Controllers
                     var user = userService.Find(user_id);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserLoginPriority = user.LoginPriority,
                         UserMainMobile = user.MainMobile,
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = user.Email,
@@ -1293,7 +1280,6 @@ namespace Amlakbashi.Host.Controllers
                     var user = userService.Find(user_id);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserLoginPriority = user.LoginPriority,
                         UserMainMobile = user.MainMobile,
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = user.Email,

@@ -69,7 +69,7 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                     user.GetLocalPhoneNumber(User.PhoneType.ThirdPerson) :
                 user.GetCallablePhoneNumber(User.PhoneType.ThirdPerson);
 
-            dto.loginPriority = user.LoginPriority;
+            dto.loginPriority = user.LoginPriority; // TODO: delete this
             dto.userGeneralType = user.UserGeneralType;
             dto.responseFrom = user.ResponseFrom;
             dto.responseTo = user.ResponseTo;

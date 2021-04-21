@@ -44,7 +44,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             {
                 var contact = new UserContactDTO()
                 {
-                    UserLoginPriority = reserve.GuestUser.LoginPriority,
                     UserMainMobile = reserve.GuestUser.MainMobile,
                     UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
                     UserEmail = reserve.GuestUser.Email,

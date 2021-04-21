@@ -452,7 +452,6 @@ namespace Amlakbashi.Host.Controllers
                         {
                             UserEmail = hostUser.Email,
                             UserMainMobile = hostUser.MainMobile,
-                            UserLoginPriority = hostUser.LoginPriority,
                             Type = UserContactType.SiteClearingHost,
                             Price = reservePayment.Price.ToString(),
                             AdvertiseId = targetReserve.AdvertiseID.ToString(),

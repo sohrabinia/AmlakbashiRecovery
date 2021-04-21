@@ -843,7 +843,7 @@ a.dashboard__item_account:hover {
     width: 250px;
 }
 
-.profile__item input[type=text], input[type=password], select, option {
+.profile__item input[type=text], input[type=password], input[type=email], select, option {
     background-color: #fff;
     padding: 7px;
     border: none;

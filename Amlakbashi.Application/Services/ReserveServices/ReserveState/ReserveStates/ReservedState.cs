@@ -66,7 +66,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                 {
                     var guestContact = new UserContactDTO()
                     {
-                        UserLoginPriority = guestUser.LoginPriority,
                         UserMainMobile = guestUser.MainMobile,
                         UserAppNotificationToken = guestUser.AppNotificationToken,
                         UserEmail = guestUser.Email,
@@ -82,7 +81,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
 
                     var hostContact = new UserContactDTO()
                     {
-                        UserLoginPriority = hostlerUser.LoginPriority,
                         UserMainMobile = hostlerUser.MainMobile,
                         UserAppNotificationToken = hostlerUser.AppNotificationToken,
                         UserEmail = hostlerUser.Email,
@@ -105,7 +103,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                 {
                     var guestContact = new UserContactDTO()
                     {
-                        UserLoginPriority = guestUser.LoginPriority,
                         UserMainMobile = guestUser.MainMobile,
                         UserAppNotificationToken = guestUser.AppNotificationToken,
                         UserEmail = guestUser.Email,
@@ -124,7 +121,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
 
                     var hostContact = new UserContactDTO()
                     {
-                        UserLoginPriority = hostlerUser.LoginPriority,
                         UserMainMobile = hostlerUser.MainMobile,
                         UserAppNotificationToken = hostlerUser.AppNotificationToken,
                         UserEmail = hostlerUser.Email,

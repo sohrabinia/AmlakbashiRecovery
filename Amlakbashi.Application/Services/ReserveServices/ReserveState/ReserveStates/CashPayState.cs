@@ -46,7 +46,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                 var hostlerUser = Repository.Find<User, int>(reserve.Advertise.UserID);
                 var contact = new UserContactDTO()
                 {
-                    UserLoginPriority = hostlerUser.LoginPriority,
                     UserMainMobile = hostlerUser.MainMobile,
                     UserAppNotificationToken = hostlerUser.AppNotificationToken,
                     UserEmail = hostlerUser.Email,
