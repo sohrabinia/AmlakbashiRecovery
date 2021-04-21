@@ -6,6 +6,7 @@ using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.AccommodationDTOs;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Host.Authentication;
@@ -59,13 +60,13 @@ namespace Amlakbashi.Host.Controllers
             this.userAccessor = userAccessor;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_View)]
         public ActionResult Admin()
         {
             return View();
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_View)]
         public ActionResult Index(int? page, int status = -1,
             int adtype = -1, int userid = -1, string sort = "score",
             long id = -1, int instantReserveStatus = -1, string minReserveNorouzFromDate = "",
@@ -126,7 +127,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_View)]
         [HttpGet]
         public ActionResult Edit(long id)
         {
@@ -143,7 +144,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
         public ActionResult Edit(Advertise ad)
         {
@@ -168,7 +169,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_Publish)]
         public JsonResult Delete(long id)
         {
             try
@@ -183,7 +184,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_Publish)]
         public JsonResult NotVerify(long id)
         {
             try
@@ -444,7 +445,7 @@ namespace Amlakbashi.Host.Controllers
                 });
             }
         }
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Support_Actions)]
         public JsonResult AddScoreAdmin(long advertiseID, int ReportID, int value, int user_id = 0)
         {
             try
@@ -499,7 +500,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         public JsonResult AddSupporterInfoToAdvertise(long advertise_id, string text)
         {
             try
@@ -520,7 +521,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_View)]
         public ActionResult GetAdvertiseSupporterInfo(long advertise_id)
         {
             try

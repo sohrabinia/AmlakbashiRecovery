@@ -1,5 +1,4 @@
-﻿@inject IUserAccessor userAccessor;
-@{
+﻿@{
     ViewBag.Title = "مدیریت آمار";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
@@ -22,27 +21,23 @@
             </tr>
         </table>
     </div>
-    @if (userAccessor.CurrentUser.Id == 3 ||
-                userAccessor.CurrentUser.Id == 1667)
-    {
-        <div class="adminitem">
-            <table cellpadding="0" cellspacing="0">
-                <tr>
-                    <td width="80">
-                        <div class="adminicon" style="background-image:url('/resource/img/siteicon.png')"></div>
-                    </td>
-                    <td>
-                        <div style="padding:10px;">
-                            <a href="/admin/ReserveFinanceChart" class="admintitle">آمار مالی رزروها</a>
-                            <div class="adminabstract">
-                                در این قسمت شما می توانید ، آمار رزرو ها را مشاهده کنید .
-                            </div>
+    <div class="adminitem">
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="80">
+                    <div class="adminicon" style="background-image:url('/resource/img/siteicon.png')"></div>
+                </td>
+                <td>
+                    <div style="padding:10px;">
+                        <a href="/admin/ReserveFinanceChart" class="admintitle">آمار مالی رزروها</a>
+                        <div class="adminabstract">
+                            در این قسمت شما می توانید ، آمار رزرو ها را مشاهده کنید .
                         </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    }
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
     <div class="adminitem">
         <table cellpadding="0" cellspacing="0">
             <tr>

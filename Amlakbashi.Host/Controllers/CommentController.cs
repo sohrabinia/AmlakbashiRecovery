@@ -17,6 +17,7 @@ using static Amlakbashi.Core.Entities.Advertise;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Core.Common.Utilities;
 using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -45,7 +46,7 @@ namespace Amlakbashi.Host.Controllers
             this.userAccessor = userAccessor;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         public ActionResult Index(int? page, int status = (int)Comment.CommentStatus.ready,
             int comment_type = -1, int comment_id = -1, int sender_user_id = -1, long advertise_id = -1)
         {
@@ -83,7 +84,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         [HttpGet]
         public ActionResult Edit(long id = -1)
         {
@@ -98,7 +99,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Edit_Normal)]
         [HttpPost]
         public ActionResult Edit(Comment cm)
         {
@@ -114,7 +115,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Edit_Normal)]
         public JsonResult Delete(long id)
         {
             try
@@ -137,7 +138,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Edit_Normal)]
         public JsonResult Suspend(long id, string reason)
         {
             try
@@ -160,7 +161,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_Edit_Normal)]
         public JsonResult Publish(long id)
         {
             try

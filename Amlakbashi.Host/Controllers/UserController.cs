@@ -124,13 +124,13 @@ namespace Amlakbashi.Host.Controllers
 
         #region [ admin ]
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Admin_General)]
         public ActionResult Admin()
         {
             return View();
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Admin_General)]
         public ActionResult Index(int? page, string uname = "", int photo = -1,
             string username = "", string mobile = "", int code = -1, int ownership = -1, int sort_order = -1,
             int mobile_status = -1, int status = -1, int advertise_count = -1,
@@ -217,7 +217,7 @@ namespace Amlakbashi.Host.Controllers
                             model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Host);
                             break;
                         case Entities.User.UserFilterType.Staff:
-                            var staffMobiles = TempRoles.AdminMobiles.Select(
+                            var staffMobiles = userService.GetAllEmployees().Select(s => s.PhoneNumber).Select(
                                 s => PhoneUtility.LocalNumberToInternational(s, 98)).ToList();
                             model = model.Where(x => staffMobiles.Contains(x.MainMobile));
                             break;
@@ -286,7 +286,8 @@ namespace Amlakbashi.Host.Controllers
                 if (area > -1 || city > -1 || province > -1)
                 {
                     model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Host);
-                    var adminMobiles = TempRoles.AdminMobiles.Select(s => PhoneUtility.LocalNumberToInternational(s, 98)).ToList();
+                    var adminMobiles = userService.GetAllEmployees().Select(s => s.PhoneNumber)
+                        .Select(s => PhoneUtility.LocalNumberToInternational(s, 98)).ToList();
                     model = model.Where(x => !adminMobiles.Contains(x.MainMobile));
                     if (area > -1)
                     {
@@ -450,7 +451,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_General_Edit)]
         [HttpGet]
         public ActionResult Edit(int uid = -1)
         {
@@ -525,7 +526,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Roles = Roles.SuperAdmin)]
         public JsonResult Delete(int uid)
         {
             try
@@ -584,7 +585,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Identity_Edit)]
         public JsonResult ChangeUserStatus(int uid, bool status)
         {
             try
@@ -599,7 +600,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_General_Edit)]
         public JsonResult changeCompleteProfileContactStatus(int uid, bool status)
         {
             try
@@ -614,7 +615,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_PFP_Edit)]
         public JsonResult PhotoPublish(int uid)
         {
             try
@@ -629,7 +630,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_PFP_Edit)]
         public JsonResult PhotoDisapprove(int uid)
         {
             try
@@ -1165,23 +1166,11 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Credit)]
         public JsonResult AdminIncreaseCredit(int user_id, long amount, string transaction_cause, long transaction_id, bool send_sms = false)
         {
             try
             {
-                if (userAccessor.CurrentUser.Id != 1667 &&
-                    userAccessor.CurrentUser.Id != 3 &&
-                    userAccessor.CurrentUser.Id != 12 &&
-                    userAccessor.CurrentUser.Id != 2122 &&
-                    userAccessor.CurrentUser.Id != 19076)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = 0,
-                        msg = "شما مجوز انجام این کار را ندارید"
-                    });
-                }
                 if (user_id < 1)
                 {
                     return GenerateJsonResult(new { status = 0, msg = "نام کاربری اشتباه است" });
@@ -1239,23 +1228,11 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Credit)]
         public JsonResult AdminDecreaseCredit(int user_id, long amount, string transaction_cause, long transaction_id, bool send_sms = false)
         {
             try
             {
-                if (userAccessor.CurrentUser.Id != 1667 &&
-                    userAccessor.CurrentUser.Id != 3 &&
-                    userAccessor.CurrentUser.Id != 12 &&
-                    userAccessor.CurrentUser.Id != 2122 &&
-                    userAccessor.CurrentUser.Id != 19076)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = 0,
-                        msg = "شما مجوز انجام این کار را ندارید"
-                    });
-                }
                 if (user_id < 1)
                 {
                     return GenerateJsonResult(new { status = 0, msg = "نام کاربری اشتباه است" });
@@ -1326,7 +1303,7 @@ namespace Amlakbashi.Host.Controllers
             HttpContext.Session.SetBool("first_visit", true);
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Admin_General)]
         public JsonResult GetAllPhoneNumbers(int user_id)
         {
             var user = userService.Find(user_id);
@@ -1357,7 +1334,7 @@ namespace Amlakbashi.Host.Controllers
             });
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Roles = Roles.TechnicalManager + "," + Roles.TechnicalEmployee)]
         public void SendTestEmail()
         {
             try
@@ -1476,7 +1453,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Roles = Roles.TechnicalManager + "," + Roles.TechnicalEmployee)]
         public void TestAppNotification(string target_action = "", string target_id = "0")
         {
             try
@@ -1502,7 +1479,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_LoginPopup");
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Host_Support)]
         public ActionResult GetInstantReserveAccs(int userid)
         {
             var model = advertiseService.GetInstantReserveAdvertisesByUserId(userid, InstantReserveStatusEnum.Requested);
@@ -1518,7 +1495,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_InstantReserveConfirm", model);
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Host_Support)]
         public JsonResult ConfirmInstantReserve(long id)
         {
             try
@@ -1536,7 +1513,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Host_Support)]
         public JsonResult ConfirmAllInstantReserves(long userid)
         {
             try
@@ -1553,7 +1530,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Host_Support)]
         public JsonResult CancellAllInstantReserves(long userid)
         {
             try
@@ -1570,7 +1547,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.User_Credit)]
         public JsonResult IncreasePrizeCreditCustom(int id, long amount, string title)
         {
             try
@@ -1617,13 +1594,14 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Roles = Roles.TechnicalManager)]
         public JsonResult LoginUserDirectly(int id)
         {
             try
             {
                 var targetUser = userService.Find(id);
-                if (TempRoles.AdminMobiles.Select(s => PhoneUtility.LocalNumberToInternational(s, 98)).Contains(targetUser.MainMobile))
+                if (userService.GetAllEmployees().Select(s => s.PhoneNumber).
+                    Select(s => PhoneUtility.LocalNumberToInternational(s, 98)).Contains(targetUser.MainMobile))
                 {
                     return GenerateJsonResult(new
                     {

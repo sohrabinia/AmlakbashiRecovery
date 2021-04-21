@@ -1,5 +1,4 @@
 ﻿@using Amlakbashi.Core.DTOs.BlogPostDTOs;
-@inject IUserAccessor userAccessor; 
 @{
     ViewBag.Title = "مدیریت پست های وبلاگ";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
@@ -177,11 +176,7 @@
                     <td>
                         <div style="display:flex;justify-content:space-between">
                             <div style="cursor:pointer" onclick="editItem(@item.BlogPost.Id)"><span class="editicon" title="ویرایش"></span></div>
-                            @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 12 ||
-                                userAccessor.CurrentUser.Id == 1667 || userAccessor.CurrentUser.Id == 2122 ||
-                                userAccessor.CurrentUser.Id == 19076)
-                            {
-                                switch (item.BlogPost.Status)
+                                @switch (item.BlogPost.Status)
                                 {
                                     case BlogPost.BlogPostStatus.Draft:
                                     case BlogPost.BlogPostStatus.Published:
@@ -192,7 +187,6 @@
                                         <i class="fa fa-trash-alt" style="font-size:20px;cursor:pointer;color:red;" onclick="removeItem(@item.BlogPost.Id)" title="حذف"></i>
                                         break;
                                 }
-                            }
                         </div>
                     </td>
                 </tr>

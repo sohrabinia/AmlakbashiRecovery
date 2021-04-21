@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<Reserve>
-@inject IUserAccessor userAccessor;
 
 @{
     ViewBag.Title = "مدیریت رزرو ها";
@@ -119,17 +118,9 @@
                 <td class="minw">
                     <select name="supporter_id">
                         <option value="-1">همه</option>
-                        @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 12 ||
-                  userAccessor.CurrentUser.Id == 1667 || userAccessor.CurrentUser.Id == 2122)
+                        @foreach (var supp in ViewBag.supporterList)
                         {
-                            foreach (var supp in ViewBag.supporterList)
-                            {
-                                <option is-selected="@(ViewBag.supporter_id == supp.id)" value="@(supp.id)">@(supp.fullName)</option>
-                            }
-                        }
-                        else
-                        {
-                            <option is-selected="@(ViewBag.supporter_id == userAccessor.CurrentUser.Id)" value="@(userAccessor.CurrentUser.Id)">@(userAccessor.CurrentUser.FullName)</option>
+                            <option is-selected="@(ViewBag.supporter_id == supp.id)" value="@(supp.id)">@(supp.fullName)</option>
                         }
                     </select>
                 </td>
@@ -447,11 +438,6 @@
                         }
                         <i class="fas fa-comments-dollar" style="cursor:pointer" onclick="showCancelDiscussion(@item.id)" title="مذاکره لغو"></i>
                         <i class="fa fa-bullseye should-follow-button" style="font-size:18px;cursor:pointer; color:@(item.shouldFollow ? "#34A853" : "#242424")" onclick="toggleShouldFollow(@item.id)" title="@(item.shouldFollow ? "حذف" : "افزودن") در حال پیگیری"></i>
-                        @if (userAccessor.CurrentUser.Id == 3 || userAccessor.CurrentUser.Id == 12 ||
-                      userAccessor.CurrentUser.Id == 1667 || userAccessor.CurrentUser.Id == 2122)
-                        {
-                            <span class="deleteicon" onclick="deleteItem(@item.id,this)" title="حذف"></span>
-                        }
                         <a style="text-decoration:none;" title="رزرو های این مهمان" href="~/reserve/index?guest_user_id=@(item.guestUserId)"><i class="fa fa-book" style="font-size:18px;color:#242424"></i></a>
                         <span style="cursor:pointer;vertical-align:-webkit-baseline-middle" title="افزودن پرداخت مهمان" onclick="addGuestPayment(@item.id)"><img width="24" height="24" src="/file/resourceimagepng?file_name=add-guest-pay" /></span>
                         <span style="cursor:pointer;vertical-align:-webkit-baseline-middle;" title="عدم لغو سیستم" onclick="toggleDisableAutoCancel(@item.id, this)" data-value="@item.disableAutoCancel.ToString().ToLower()"><img width="18" height="18" style="padding: 5px;background-color:@(item.disableAutoCancel ? "#34A853" : "none");border-radius:60px;" src="/file/resourceimagepng?file_name=no-gear" /></span>
@@ -1634,12 +1620,6 @@
         }
 
         function addGuestPayment(id) {
-            var allowedUsers = [3,12,2122,19076,1667];
-            var allowed = allowedUsers.includes(@userAccessor.CurrentUser.Id);
-            if (!allowed) {
-                showErrorMessage('خطا', 'شما دسترسی انجام این کار را ندارید');
-                return;
-            }
             addGuestPaymentMsg = showInfoMessage(
                 'افزودن پرداخت مهمان', '', {contentUrl: '/reserve/addguestpaymentpopup?id=' + id});
         }

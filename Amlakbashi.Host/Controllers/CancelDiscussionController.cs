@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Application.Services.ReserveServices.Interfaces;
+using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using log4net;
@@ -22,7 +23,7 @@ namespace Amlakbashi.Host.Controllers
             this.userAccessor = userAccessor;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         public ActionResult Index(long reserve_id)
         {
             try
@@ -36,7 +37,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Reserve_View)]
         public ActionResult GetReserveCancelDiscussion(long reserve_id)
         {
             try

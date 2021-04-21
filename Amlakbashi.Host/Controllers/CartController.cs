@@ -22,6 +22,7 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using System.Dynamic;
 using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -49,7 +50,7 @@ namespace Amlakbashi.Host.Controllers
             this.logger = logger;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Payment_View)]
         public ActionResult Admin()
         {
             try
@@ -62,7 +63,7 @@ namespace Amlakbashi.Host.Controllers
             return RedirectToAction("AccessDenied", "Errors");
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Payment_View)]
         public ActionResult Index(int? page, int status = -1, int uid = -1, long refid = -1)
         {
             try
@@ -95,7 +96,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Payment_View)]
         public ActionResult PaymentIndex(int? page, long refid = 0, int status = -1, int uid = -1,
             string from_str = "", string to_str = "")
         {
@@ -283,7 +284,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
 #if DEBUG
-        [Auth(UserRoles.Admin)]
+        [Authorize(Roles = Roles.TechnicalManager + "," + Roles.TechnicalEmployee)]
         public ActionResult TestVerifyPasargad(int pid)
         {
             try

@@ -3,10 +3,12 @@ using Amlakbashi.Application.Services.BlogPostServices.Interfaces;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.DTOs.BlogPostDTOs;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using AutoMapper;
 using log4net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -35,7 +37,7 @@ namespace Amlakbashi.Host.Controllers
             this.logger = logger;
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Post_View)]
         public ActionResult Index(int? page, int id = 0,
             int sortOrder = 0, int status = -1,
             int showingPlace = -1, string postTitle = null,
@@ -87,13 +89,13 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Post_Add)]
         public ActionResult AddBlogPostPopup()
         {
             return PartialView("_AddBlogPost");
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Post_Edit)]
         public ActionResult EditBlogPostPopup(int id)
         {
             try
@@ -108,7 +110,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Post_Add)]
         public ActionResult AddEdit(int redirectStatus, int id = 0)
         {
             var model = blogPostService.Find(id);
@@ -116,7 +118,7 @@ namespace Amlakbashi.Host.Controllers
             return View(model);
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Post_Add)]
         [HttpPost]
         public JsonResult AddEditBlogPost(BlogPost data)
         {
@@ -150,7 +152,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Post_Publish)]
         public JsonResult ToRecycleBin(int id)
         {
             try
@@ -173,7 +175,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.MasterAdmin)]
+        [Authorize(Policy = Policies.Post_Publish)]
         public JsonResult RecycleItem(int id)
         {
             try
@@ -196,18 +198,9 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Post_Publish)]
         public JsonResult Remove(int id)
         {
-            if (userAccessor.CurrentUser.Id != 3 &&
-                userAccessor.CurrentUser.Id != 1667)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "شما مجوز این کار را ندارید"
-                });
-            }
             try
             {
                 blogPostService.Delete(id);

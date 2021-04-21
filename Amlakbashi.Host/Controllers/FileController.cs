@@ -22,6 +22,7 @@ using X.PagedList;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Identity;
 
 namespace Portal.Controllers
 {
@@ -58,7 +59,7 @@ namespace Portal.Controllers
             this.logger = logger;
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Admin_General)]
         public ActionResult Index(int? page)
         {
             try
@@ -76,7 +77,7 @@ namespace Portal.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         public ActionResult Edit(int fid = -1)
         {
             try
@@ -101,7 +102,7 @@ namespace Portal.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
         public ActionResult Edit(Entities.File nfile)
         {
@@ -182,7 +183,7 @@ namespace Portal.Controllers
             }
         }
 
-        [Auth(UserRoles.Admin)]
+        [Authorize(Policy = Policies.Advertise_Edit)]
         public JsonResult Delete(int id)
         {
             try
@@ -837,15 +838,11 @@ namespace Portal.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Roles = Roles.TechnicalManager)]
         public JsonResult RemoveExtraPhoto()
         {
             try
             {
-                if (userAccessor.CurrentUser.Id != 1667)
-                {
-                    return null;
-                }
                 var stopWatch = new Stopwatch();
                 stopWatch.Start();
                 IQueryable<User> all_users = userService.GetAllAsIQueryable();
@@ -1142,15 +1139,11 @@ namespace Portal.Controllers
 
         private static System.Threading.Thread minifyThread;
 
-        [Authorize]
+        [Authorize(Roles = Roles.TechnicalManager)]
         public JsonResult MinifyAdvertiseImages()
         {
             // TODO: find alternative for this
             //System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
-            if (userAccessor.CurrentUser.Id != 1667)
-            {
-                return null;
-            }
             //var path = "/content/advertise";
             //path = Server.MapPath(path);
             //var d = new DirectoryInfo(path);
@@ -1171,15 +1164,11 @@ namespace Portal.Controllers
             });
         }
 
-        [Authorize]
+        [Authorize(Roles = Roles.TechnicalManager)]
         public JsonResult StopMinifyAdvertiseImages()
         {
             // TODO: find alternative for this
             //System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
-            if (userAccessor.CurrentUser.Id != 1667)
-            {
-                return null;
-            }
             minifyThread.Abort();
             return GenerateJsonResult(new
             {
@@ -1188,15 +1177,11 @@ namespace Portal.Controllers
             });
         }
 
-        [Authorize]
+        [Authorize(Roles = Roles.TechnicalManager)]
         public JsonResult StopQueue()
         {
             // TODO: find alternative for this
             //System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
-            if (userAccessor.CurrentUser.Id != 1667)
-            {
-                return null;
-            }
             fileService.StopQueuedJob();
             return GenerateJsonResult(new
             {

@@ -24,6 +24,7 @@ using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
@@ -847,6 +848,42 @@ namespace Amlakbashi.Application.Services.UserServices
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
             return token;
+        }
+
+        public IEnumerable<User> IdentityUsersToUsers(IEnumerable<AppUser> identityUsers)
+        {
+            var mainMobiles = identityUsers.Select(s => s.PhoneNumber).ToList();
+            return Repository.Query(q => q.Where(w => mainMobiles.Contains(w.MainMobile)));
+        }
+
+        public IEnumerable<AppUser> GetAllSupportEmployees()
+        {
+            var supportRoles = Roles.SupportRoles;
+            IEnumerable<AppUser> result = new List<AppUser>();
+            foreach (var role in supportRoles)
+            {
+                result = result.Concat(userManager.GetUsersInRoleAsync(role).Result);
+            }
+            result = result.Distinct();
+            return result;
+        }
+        public IEnumerable<AppUser> GetAllEmployees()
+        {
+            var employeeRoles = Roles.AllEmployeeRoles;
+            IEnumerable<AppUser> result = new List<AppUser>();
+            foreach (var role in employeeRoles)
+            {
+                result = result.Concat(userManager.GetUsersInRoleAsync(role).Result);
+            }
+            result = result.Distinct();
+            return result;
+        }
+
+        public bool UserAllowPolicy(AppUser identityUser, string policy)
+        {
+            var roles = userManager.GetRolesAsync(identityUser).Result;
+            var allowPolicy = PolicyData.AllPolicies[policy].ToList().Intersect(roles).Any();
+            return allowPolicy;
         }
     }
 }
