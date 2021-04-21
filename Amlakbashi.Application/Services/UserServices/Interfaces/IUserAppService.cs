@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 
 namespace Amlakbashi.Application.Services.UserServices.Interfaces
 {
@@ -63,6 +64,8 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         AppUser GetActivatedIdentityUser(string phrase, bool isEmail = false);
         AppUser GetIdentityUser(string phrase, bool isEmail = false);
         void AddIdentityUser(AppUser user);
+        void AddClaimsToUser(string username, IList<Claim> claims);
+        void RemoveClaimsFromUser(string username, IList<Claim> claims);
         IdentityResult AddIdentityUserPassword(string username, string password);
         IdentityResult ChangeIdentityUserPassword(string username, string password);
         IdentityResult ChangeIdentityUserPassword(string username, string currentPassword, string newPassword);

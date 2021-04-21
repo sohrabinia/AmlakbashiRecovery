@@ -79,15 +79,13 @@ namespace Amlakbashi.Host.Controllers
             var identityUser = userService.GetIdentityUser(user.MainMobile);
             var admin = userAccessor.CurrentUser;
 
-            //var userPrincipal = signInManager.CreateUserPrincipalAsync(identityUser).Result;
             var claims = new List<Claim>
             {
                 new Claim("AdminUsername", User.Identity.Name),
                 new Claim("IsImpersonated", "true"),
             };
-            //userPrincipal.AddIdentity(new ClaimsIdentity(claims));
-            //signInManager.SignOutAsync().Wait();
-            signInManager.SignInWithClaimsAsync(identityUser, false, claims).Wait();
+            userService.AddClaimsToUser(user.MainMobile, claims);
+            signInManager.SignInAsync(identityUser, false).Wait();
 
             HttpContext.Session.SetObjectAsJson("impersonateUser", user);
             HttpContext.Session.SetObjectAsJson("impersonateAdmin", admin);
@@ -95,12 +93,11 @@ namespace Amlakbashi.Host.Controllers
             logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
                 user.FullName + "(" + user.Id + ").");
 
-            return View("/Views/Errors/Http404.cshtml");
-            //if (!string.IsNullOrEmpty(url))
-            //{
-            //    return Redirect(url);
-            //}
-            //return Redirect("/dashboard");
+            if (!string.IsNullOrEmpty(url))
+            {
+                return Redirect(url);
+            }
+            return Redirect("/dashboard");
         }
 
         public IActionResult ImpersonateLogout()
@@ -114,9 +111,14 @@ namespace Amlakbashi.Host.Controllers
             var adminUsername = User.FindFirst("AdminUsername").Value;
             var admin = userService.GetIdentityUser(adminUsername);
 
-            signInManager.SignOutAsync().Wait();
-            signInManager.SignInAsync(admin, true).Wait();
+            var claims = new List<Claim>
+            {
+                new Claim("AdminUsername", User.Identity.Name),
+                new Claim("IsImpersonated", "true"),
+            };
+            userService.RemoveClaimsFromUser(User.Identity.Name, claims);
 
+            signInManager.SignInAsync(admin, true).Wait();
             HttpContext.Session.Clear();
 
             return Redirect("/user/index");

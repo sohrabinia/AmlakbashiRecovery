@@ -752,6 +752,18 @@ namespace Amlakbashi.Application.Services.UserServices
             return roles;
         }
 
+        public void AddClaimsToUser(string username, IList<Claim> claims)
+        {
+            var user = userManager.FindByNameAsync(username).Result;
+            userManager.AddClaimsAsync(user, claims).Wait();
+        }
+
+        public void RemoveClaimsFromUser(string username, IList<Claim> claims)
+        {
+            var user = userManager.FindByNameAsync(username).Result;
+            userManager.RemoveClaimsAsync(user, claims).Wait();
+        }
+
         public void UpdateUserRoles(string username, IList<string> selectedRoles)
         {
             var user = userManager.FindByNameAsync(username).Result;
