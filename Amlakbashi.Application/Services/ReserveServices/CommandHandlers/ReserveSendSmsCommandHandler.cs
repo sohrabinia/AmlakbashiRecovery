@@ -35,7 +35,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                     null;
                 userContact.SendMessageClassic(item.initial, new UserContactDTO()
                 {
-                    UserLoginPriority = user.LoginPriority,
                     UserMainMobile = user.MainMobile,
                     UserAppNotificationToken = user.AppNotificationToken,
                     UserEmail = user.Email,

@@ -162,7 +162,6 @@ namespace Amlakbashi.Host.Controllers
                 {
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserLoginPriority = user.LoginPriority,
                         UserMainMobile = user.MainMobile,
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = user.Email,

@@ -368,7 +368,6 @@ namespace Amlakbashi.Accounting
             mediator.Publish(new PresentorPrizeGivenEvent(user.Id, actionSource, doerUserId));
             var contact = new UserContactDTO()
             {
-                UserLoginPriority = user.LoginPriority,
                 UserMainMobile = user.MainMobile,
                 UserAppNotificationToken = user.AppNotificationToken,
                 UserEmail = user.Email,
@@ -396,7 +395,6 @@ namespace Amlakbashi.Accounting
                 discountCouponService.Insert(guestUser.Id, DiscountCoupon.DiscountCouponType.Appreciate, 5);
                 var contact = new UserContactDTO()
                 {
-                    UserLoginPriority = guestUser.LoginPriority,
                     UserMainMobile = guestUser.MainMobile,
                     UserAppNotificationToken = guestUser.AppNotificationToken,
                     UserEmail = guestUser.Email,
@@ -910,7 +908,6 @@ namespace Amlakbashi.Accounting
                 var user = repository.FindUser(user_id);
                 var contact = new UserContactDTO()
                 {
-                    UserLoginPriority = user.LoginPriority,
                     UserMainMobile = user.MainMobile,
                     UserAppNotificationToken = user.AppNotificationToken,
                     UserEmail = user.Email,

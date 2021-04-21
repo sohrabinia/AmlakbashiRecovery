@@ -125,7 +125,7 @@ namespace Amlakbashi.Host.Controllers.API
                         msg = "برای درخواست رزرو ابتدا باید با حساب کاربری خود وارد شوید",
                     });
                 }
-                if (user.AccessType == (int)Entities.User.AccessTypeEnum.ReserveBanned || user.State == (int)Entities.User.AccessTypeEnum.LoginBanned)
+                if (user.AccessType == (int)Entities.User.AccessTypeEnum.ReserveBanned || user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
                 {
                     return GenerateJsonResult(new
                     {

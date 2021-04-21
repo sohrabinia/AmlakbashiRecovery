@@ -109,24 +109,8 @@ namespace Amlakbashi.Core.Entities
         public string AdminLoginCode { get; set; }
         public string ContactPhone { get; set; }
         #endregion
-
-
         
         public bool IsDeleted { get; set; }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         public enum InstantReserveAccessEnum
         {
@@ -135,26 +119,7 @@ namespace Amlakbashi.Core.Entities
             Banned = 2,
             Requested = 3
         }
-        public void SetLoginPriority(LoginPriorites priority)
-        {
-            LoginPriority = (int)priority;
-        }
-        public LoginPriorites GetLoginProperty()
-        {
-            return (LoginPriorites)LoginPriority;
-        }
-        public string GetUserName()
-        {
-            switch ((LoginPriorites)LoginPriority)
-            {
-                case LoginPriorites.Mobile:
-                    return PhoneUtility.InternationalNumberToLocal(MainMobile);
-                case LoginPriorites.Email:
-                    return Email;
-                default:
-                    return null;
-            }
-        }
+
         public string GetPhoneNumber(PhoneType type)
         {
             switch (type)
@@ -173,14 +138,17 @@ namespace Amlakbashi.Core.Entities
                     return "";
             }
         }
+
         public string GetLocalPhoneNumber(PhoneType type)
         {
             return PhoneUtility.InternationalNumberToLocal(GetPhoneNumber(type));
         }
+
         public string GetCallablePhoneNumber(PhoneType type)
         {
             return PhoneUtility.InternationalNumberToCallable(GetPhoneNumber(type));
         }
+
         public void SetPhoneNumber(PhoneType type, string international_number)
         {
             switch (type)
@@ -202,6 +170,7 @@ namespace Amlakbashi.Core.Entities
                     break;
             }
         }
+
         public void SetLocalPhoneNumber(PhoneType type, string local_number,
             int country_code)
         {

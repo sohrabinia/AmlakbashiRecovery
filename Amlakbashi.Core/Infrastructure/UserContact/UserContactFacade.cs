@@ -10,6 +10,7 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
 
     public class UserContactFacade : IUserContactFacade
     {
+#if DEBUG
         private static List<string> AdminMobiles = new List<string>()
         {
             "09191613134",
@@ -25,6 +26,7 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
             "09199075074",
             "09365966647"
         };
+#endif
 
         private readonly ISmsContact sms;
         private readonly INotificationContact notification;
@@ -110,7 +112,7 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
             }
             if (initial || isMessageRequired)
             {
-                if ((User.LoginPriorites)contactDTO.UserLoginPriority == User.LoginPriorites.Mobile)
+                if (PhoneUtility.IsNumberForIran(contactDTO.UserMainMobile))
                 {
                     sms.SendMessage(contactDTO);
                 }
@@ -125,8 +127,8 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
         {
 #if DEBUG
             var mobile = PhoneUtility.InternationalNumberToLocal(user.MainMobile);
-                if (AdminMobiles.Contains(mobile) == false)
-                    return;
+            if (AdminMobiles.Contains(mobile) == false)
+                return;
 #endif
             sms.SendReserveRequestCall(user, advertiseId);
         }
@@ -159,7 +161,7 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
         {
 #if DEBUG
             if (AdminMobiles.Contains(mobile) == false)
-                    return;
+                return;
 #endif
             sms.SendTemplate(mobile, template);
         }

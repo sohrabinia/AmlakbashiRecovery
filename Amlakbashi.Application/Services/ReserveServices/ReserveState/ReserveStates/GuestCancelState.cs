@@ -49,7 +49,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             {
                 var guestContact = new UserContactDTO()
                 {
-                    UserLoginPriority = reserve.GuestUser.LoginPriority,
                     UserMainMobile = reserve.GuestUser.MainMobile,
                     UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
                     UserEmail = reserve.GuestUser.Email,
@@ -64,7 +63,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                 var user = Repository.Find<User, int>(reserve.HostUserID);
                 var hostContact = new UserContactDTO()
                 {
-                    UserLoginPriority = user.LoginPriority,
                     UserMainMobile = user.MainMobile,
                     UserAppNotificationToken = user.AppNotificationToken,
                     UserEmail = user.Email,

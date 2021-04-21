@@ -2150,7 +2150,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Save();
             var contact = new UserContactDTO()
             {
-                UserLoginPriority = advertise.User.LoginPriority,
                 UserMainMobile = advertise.User.MainMobile,
                 UserAppNotificationToken = advertise.User.AppNotificationToken,
                 UserEmail = advertise.User.Email,

@@ -33,7 +33,6 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void UpdateProfilePhoto(int userId, long photoId, User.UserPhotoState state);
         void UpdatePhotoStatus(int userId, User.UserPhotoState state, int currentUserId = 0,
             ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
-        void UpdateLoginPriority(int userId, User.LoginPriorites loginPriorites);
         void UpdateCreateDate(int userId, DateTime time);
         void UpdateSendVerification(int userId, DateTime time, string code = null);
         void UpdatePresentorUser(int userId, int pid);
