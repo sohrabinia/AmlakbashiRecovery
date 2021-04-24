@@ -42,6 +42,10 @@ namespace Amlakbashi.Core.Common.Utilities
             {
                 number = number.Replace("  ", " ");
             }
+            if (number.Contains(" ") == false)
+            {
+                number = number.Substring(0, 3) + " " + number.Substring(3);
+            }
             return number;
         }
 
