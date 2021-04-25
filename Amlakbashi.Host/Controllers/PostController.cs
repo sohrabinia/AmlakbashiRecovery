@@ -664,7 +664,8 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var user = userAccessor.CurrentUser;
-                UserDTO model = user;
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var model = UserDTO.Generate(user, identityUser);
                 var bankCard = bankCardService.GetByUserId(user.Id);
                 if (bankCard != null)
                 {

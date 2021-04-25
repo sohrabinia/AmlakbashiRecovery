@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,13 +37,13 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
         public int AmlakbashiScore { get; set; }
         public string Address { get; set; }
 
-        public static implicit operator UserDTO(User user)
+        public static UserDTO Generate(User user, AppUser identityUser)
         {
             UserDTO dto = new UserDTO();
             dto.id = user.Id;
             dto.fname = user.FName;
             dto.lname = user.LName;
-            dto.email = user.Email;
+            dto.email = identityUser.Email;
 
             dto.mainMobile = PhoneUtility.IsNumberForIran(
                 user.GetPhoneNumber(User.PhoneType.MainMobile)) ?

@@ -144,6 +144,15 @@ namespace Amlakbashi.Host.Controllers.API
                         msg = data.msg,
                     });
                 }
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                if (PhoneUtility.IsNumberForIran(identityUser.PhoneNumber) == false &&
+                    identityUser.EmailConfirmed == false)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 2 //status 2 means email must be confirmed
+                    });
+                }
                 var advertise = advertiseService.Find(advertise_id);
                 bool instantReserve = false;
                 instantReserve = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed;

@@ -523,7 +523,8 @@ namespace Amlakbashi.Host.Controllers
                 //else
                 //{
                 List<string> errors;
-                userService.Update((UserDTO)user, userAccessor.DoerUser.Id, false, ActionLog.ActionSourceEnum.AdminPanel, out errors, user.CancelInstantReserveLimit);
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                userService.Update(UserDTO.Generate(user, identityUser), userAccessor.DoerUser.Id, false, ActionLog.ActionSourceEnum.AdminPanel, out errors, user.CancelInstantReserveLimit);
                 //}
                 return RedirectToAction("Index");
             }
@@ -1034,6 +1035,10 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
                 var code = new Random().Next(111111, 999999).ToString();
                 identityUser.EmailCode = code;
+                if (identityUser.Email != email)
+                {
+                    identityUser.EmailConfirmed = false;
+                }
                 identityUser.Email = email;
                 identityUser.EmailConfirmed = false;
                 userService.UpdateIdentityUser(identityUser);
