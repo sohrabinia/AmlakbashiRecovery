@@ -23,7 +23,7 @@ using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 
 namespace Amlakbashi.Host.Controllers.API
 {
-    public partial class ApiController : BaseController
+    public partial class ApiController : Controller
     {
         public JsonResult SignInFirstStep(string mobile, string cid, bool fcm_notification = false)
         {
@@ -539,7 +539,8 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                UserDTO user_data = user;
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var user_data = UserDTO.Generate(user, identityUser);
                 var bankCard = bankCardService.GetByUserId(user.Id);
                 if (bankCard != null)
                 {
@@ -787,6 +788,71 @@ namespace Amlakbashi.Host.Controllers.API
             {
                 logger.Error("", exc);
                 return GenerateJsonResult(new { done = false, msg = "متاسفانه بارگذاری با خطا مواجه شد" });
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult SetEmailAddress(string email)
+        {
+            try
+            {
+                var identityUser = userService.GetIdentityUser(GetUser().MainMobile);
+                var code = new Random().Next(1111, 9999).ToString();
+                identityUser.EmailCode = code;
+                if (identityUser.Email != email)
+                {
+                    identityUser.EmailConfirmed = false;
+                }
+                identityUser.Email = email;
+                userService.UpdateIdentityUser(identityUser);
+#if !DEBUG
+                string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
+                EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
+                    "تایید ایمیل ثبت نام", strbody);
+#endif
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0, msg = "خطا در ارسال کد تایید" });
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult VerifyEmailConfirmCode(string code)
+        {
+            try
+            {
+                var identityUser = userService.GetIdentityUser(GetUser().MainMobile);
+                if (identityUser.EmailCode == code)
+                {
+                    identityUser.EmailConfirmed = true;
+                    userService.UpdateIdentityUser(identityUser);
+                    return GenerateJsonResult(new { status = 1 });
+                }
+                return GenerateJsonResult(new { status = 0 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        public JsonResult GetCurrentEmail()
+        {
+            try
+            {
+                var user = GetUser();
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                return GenerateJsonResult(new { status = 1, email = identityUser.Email });
+            }
+            catch(Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0 });
             }
         }
     }

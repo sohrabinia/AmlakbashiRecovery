@@ -515,7 +515,8 @@ namespace Amlakbashi.Host.Controllers
                 //else
                 //{
                 List<string> errors;
-                userService.Update((UserDTO)user, userAccessor.DoerUser.Id, false, ActionLog.ActionSourceEnum.AdminPanel, out errors, user.CancelInstantReserveLimit);
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                userService.Update(UserDTO.Generate(user, identityUser), userAccessor.DoerUser.Id, false, ActionLog.ActionSourceEnum.AdminPanel, out errors, user.CancelInstantReserveLimit);
                 //}
                 return RedirectToAction("Index");
             }
@@ -1005,6 +1006,10 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
                 var code = new Random().Next(1111, 9999).ToString();
                 identityUser.EmailCode = code;
+                if (identityUser.Email != email)
+                {
+                    identityUser.EmailConfirmed = false;
+                }
                 identityUser.Email = email;
                 userService.UpdateIdentityUser(identityUser);
                 string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";

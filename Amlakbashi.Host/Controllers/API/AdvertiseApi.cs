@@ -25,7 +25,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers.API
 {
-    public partial class ApiController : BaseController
+    public partial class ApiController : Controller
     {
         private int[] categories = new int[]
             { 55593, 55574, 74214, 55894, 55944, 55962, 55957, 55861, 55953, 55952, 55961, 55960 };

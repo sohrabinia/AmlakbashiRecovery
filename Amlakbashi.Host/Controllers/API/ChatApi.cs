@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers.API
 {
-    public partial class ApiController : BaseController
+    public partial class ApiController : Controller
     {
 
         [Authorize(AuthenticationSchemes = bearerScheme)]

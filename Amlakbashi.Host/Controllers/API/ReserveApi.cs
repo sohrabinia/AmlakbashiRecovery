@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers.API
 {
-    public partial class ApiController : BaseController
+    public partial class ApiController : Controller
     {
 
         public JsonResult CheckReserve(int advertise_id, string from_date, string to_date,
@@ -142,6 +142,15 @@ namespace Amlakbashi.Host.Controllers.API
                     {
                         status = 0,
                         msg = data.msg,
+                    });
+                }
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                if (PhoneUtility.IsNumberForIran(identityUser.PhoneNumber) == false &&
+                    identityUser.EmailConfirmed == false)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 2 //status 2 means email must be confirmed
                     });
                 }
                 var advertise = advertiseService.Find(advertise_id);
