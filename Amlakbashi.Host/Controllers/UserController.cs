@@ -74,10 +74,15 @@ namespace Amlakbashi.Host.Controllers
             {
                 return Redirect("/errors/accessdenied");
             }
-
             var user = userService.Find(userId, true);
             var identityUser = userService.GetIdentityUser(user.MainMobile);
             var admin = userAccessor.CurrentUser;
+
+            var employeesNumber = userService.GetAllEmployees().Select(s => s.PhoneNumber).ToList();
+            if (employeesNumber.Contains(identityUser.PhoneNumber))
+            {
+                return Redirect("/errors/accessdenied");
+            }
 
             var claims = new List<Claim>
             {
@@ -118,6 +123,7 @@ namespace Amlakbashi.Host.Controllers
             };
             userService.RemoveClaimsFromUser(User.Identity.Name, claims);
 
+            signInManager.SignOutAsync().Wait();
             signInManager.SignInAsync(admin, true).Wait();
             HttpContext.Session.Clear();
 
@@ -1000,31 +1006,54 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize]
-        public JsonResult PopupRegisterEmail(string email)
+        [HttpGet]
+        public IActionResult PopupRegisterEmail()
         {
             try
             {
-                var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
-                var code = new Random().Next(1111, 9999).ToString();
-                identityUser.EmailCode = code;
-                identityUser.Email = email;
-                userService.UpdateIdentityUser(identityUser);
-                string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
-                EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
-                    "تایید ایمیل ثبت نام", strbody);
-                return GenerateJsonResult(new { status = 1 });
+                return PartialView("/Views/User/_PopupRegisterEmail.cshtml");
             }
             catch (Exception exc)
             {
                 logger.Error("", exc);
-                // TODO: change status to 0
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public IActionResult PopupRegisterEmail(string email)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email) ||
+                    Regex.IsMatch(email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase) == false)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "لطفا آدرس ایمیل خود را به درستی وارد کنید" });
+                }
+                var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+                var code = new Random().Next(111111, 999999).ToString();
+                identityUser.EmailCode = code;
+                identityUser.Email = email;
+                identityUser.EmailConfirmed = false;
+                userService.UpdateIdentityUser(identityUser);
+                string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
+#if !DEBUG
+                EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
+                    "تایید ایمیل ثبت نام", strbody);
+#endif
                 return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.PopupRegisterEmail", exc);
+                return GenerateJsonResult(new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" });
             }
         }
 
         [Authorize]
         public JsonResult PopupConfirmEmail(string emailCode)
-        {
+         {
             try
             {
                 var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
@@ -1602,8 +1631,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var targetUser = userService.Find(id);
-                if (userService.GetAllEmployees().Select(s => s.PhoneNumber).
-                    Select(s => PhoneUtility.LocalNumberToInternational(s, 98)).Contains(targetUser.MainMobile))
+                if (userService.GetAllEmployees().Select(s => s.PhoneNumber).Contains(targetUser.MainMobile))
                 {
                     return GenerateJsonResult(new
                     {
