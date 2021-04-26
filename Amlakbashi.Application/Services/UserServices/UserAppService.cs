@@ -109,11 +109,6 @@ namespace Amlakbashi.Application.Services.UserServices
             return user;
         }
 
-        public User GetByEmail(string email)
-        {
-            return Repository.Query(q => q.FirstOrDefault(f => f.Email == email));
-        }
-
         public User GetActivatedUserByMainMobile(string mainMobile, bool includeFavorite = false)
         {
             var identityUser = userManager.FindByNameAsync(mainMobile).Result;
@@ -628,7 +623,7 @@ namespace Amlakbashi.Application.Services.UserServices
                         {
                             UserMainMobile = user.MainMobile,
                             UserAppNotificationToken = user.AppNotificationToken,
-                            UserEmail = user.Email,
+                            UserEmail = identityUser.Email,
                             UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                             UserNotificationToken = user.NotificationToken,
                             Type = UserContactType.CouponPresent,
@@ -638,7 +633,6 @@ namespace Amlakbashi.Application.Services.UserServices
                         mediator.Enqueue(new SendMessageCommand(contact));
                     }
                 }
-                user.MainMobile = mobile;
                 Repository.Update(user);
                 Repository.Save();
                 user_id = user.Id;

@@ -2208,11 +2208,13 @@ namespace Amlakbashi.Host.Controllers
             var currentUser = userAccessor.CurrentUser;
             bool verifyEmail = false;
             bool isNumberForIran = false;
+            string userEmailAddress = "";
             if (currentUser != null && string.IsNullOrEmpty(currentUser.MainMobile) == false)
             {
                 var identityUser = userService.GetIdentityUser(currentUser.MainMobile);
                 verifyEmail = identityUser.EmailConfirmed;
                 isNumberForIran = PhoneUtility.IsNumberForIran(currentUser.MainMobile);
+                userEmailAddress = identityUser.Email;
             }
             var is_favourited = currentUser.Id > 0 &&
                 currentUser.Favorite != null &&
@@ -2237,7 +2239,8 @@ namespace Amlakbashi.Host.Controllers
                 occupiedList = occupiedList,
                 priceDict = priceDict,
                 verifyEmail = verifyEmail,
-                isNumberForIran = isNumberForIran
+                isNumberForIran = isNumberForIran,
+                userEmailAddress = userEmailAddress
             };
             //return GenerateJsonResult(new
             //{

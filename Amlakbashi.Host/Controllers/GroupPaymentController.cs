@@ -449,10 +449,10 @@ namespace Amlakbashi.Host.Controllers
                         var reservePayment = reservePayments[i];
                         var targetReserve = reserveService.Find(reservePayment.ReserveID);
                         var hostUser = userService.Find(targetReserve.Advertise.UserID);
-
+                        var hostIdentityUser = userService.GetIdentityUser(hostUser.MainMobile);
                         accounting.ScheduleSendMessageGroupPayment(new UserContactDTO()
                         {
-                            UserEmail = hostUser.Email,
+                            UserEmail = hostIdentityUser.Email,
                             UserMainMobile = hostUser.MainMobile,
                             Type = UserContactType.SiteClearingHost,
                             Price = reservePayment.Price.ToString(),

@@ -1250,11 +1250,12 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if ((bool)send_sms)
                 {
+                    var identityUser = userService.GetIdentityUser(host_user.MainMobile);
                     userService.SendMessage(new UserContactDTO()
                     {
                         UserMainMobile = host_user.MainMobile,
                         UserAppNotificationToken = host_user.AppNotificationToken,
-                        UserEmail = host_user.Email,
+                        UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = host_user.FcmAppNotificationToken,
                         UserNotificationToken = host_user.NotificationToken,
                         Type = UserContactType.SiteClearingHost,
@@ -1435,11 +1436,12 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if ((bool)send_sms)
                 {
+                    var identityUser = userService.GetIdentityUser(guest_user.MainMobile);
                     userService.SendMessage(new UserContactDTO()
                     {
                         UserMainMobile = guest_user.MainMobile,
                         UserAppNotificationToken = guest_user.AppNotificationToken,
-                        UserEmail = guest_user.Email,
+                        UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = guest_user.FcmAppNotificationToken,
                         UserNotificationToken = guest_user.NotificationToken,
                         Type = UserContactType.SiteRefundGuest,
@@ -1534,11 +1536,12 @@ namespace Amlakbashi.Host.Controllers
             {
                 var reserve = reserveService.Find(reserve_id);
                 var user = userService.Find(reserve.Advertise.UserID);
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
                 userService.SendMessage(new UserContactDTO()
                 {
                     UserMainMobile = user.MainMobile,
                     UserAppNotificationToken = user.AppNotificationToken,
-                    UserEmail = user.Email,
+                    UserEmail = identityUser.Email,
                     UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                     UserNotificationToken = user.NotificationToken,
                     Type = UserContactType.SiteClearingHostWithCredit,

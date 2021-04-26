@@ -4,6 +4,7 @@ using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
@@ -11,6 +12,7 @@ using Amlakbashi.Mediator.Commands.ReserveCommands;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using log4net;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -41,12 +43,14 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         private readonly IReserveStateContext reserveState;
         private readonly IMediator mediator;
         private readonly IAccountingFacade accounting;
+        private readonly UserManager<AppUser> userManager;
         private readonly ILog logger;
         public ReserveCommandHandler(
             IRepository<Reserve, long> reserveRepository,
             IUserContactFacade userContact,
             IReserveStateContext reserveState,
             IMediator mediator,
+            UserManager<AppUser> userManager,
             IAccountingFacade accounting,
             ILog logger)
         {
@@ -54,6 +58,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             this.userContact = userContact;
             this.reserveState = reserveState;
             this.mediator = mediator;
+            this.userManager = userManager;
             this.accounting = accounting;
             this.logger = logger;
         }
@@ -72,11 +77,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         {
             var reserve = reserveRepository.Find(request.reserveId);
             var hostlerUser = reserveRepository.Find<User, int>(reserve.Advertise.UserID);
+            var hostlerIdentityUser = userManager.FindByNameAsync(hostlerUser.MainMobile).Result;
             var contact = new UserContactDTO()
             {
                 UserMainMobile = hostlerUser.MainMobile,
                 UserAppNotificationToken = hostlerUser.AppNotificationToken,
-                UserEmail = hostlerUser.Email,
+                UserEmail = hostlerIdentityUser.Email,
                 UserFcmAppNotificationToken = hostlerUser.FcmAppNotificationToken,
                 UserNotificationToken = hostlerUser.NotificationToken,
                 Type = UserContactType.HostReserveRejectedForReserved,
@@ -113,11 +119,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                     return Task.FromResult(Unit.Value);
                 }
                 var guestUser = reserve.GuestUser;
+                var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
                 var contact = new UserContactDTO()
                 {
                     UserMainMobile = guestUser.MainMobile,
                     UserAppNotificationToken = guestUser.AppNotificationToken,
-                    UserEmail = guestUser.Email,
+                    UserEmail = guestIdentityUser.Email,
                     UserFcmAppNotificationToken = guestUser.FcmAppNotificationToken,
                     UserNotificationToken = guestUser.NotificationToken,
                     Type = UserContactType.FinishStay,

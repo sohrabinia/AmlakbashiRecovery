@@ -22,7 +22,6 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         User Find(int? id);
         User GetByAdminLoginCode(string code);
         User GetByMainMobile(string mainMobile);
-        User GetByEmail(string email);
         User GetActivatedUserByMainMobile(string mainMobile, bool includeFavorite = false);
         User GetActivatedUserByEmail(string email, bool includeFavorite = false);
         void Insert(User user, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);

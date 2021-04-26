@@ -128,7 +128,8 @@
       "wwwroot/resource/scripts/general/message-popup.js",
       "wwwroot/resource/scripts/general/confirm-alert-helper.js",
       "wwwroot//scripts/jquery.unobtrusive-ajax.min.js",
-      "wwwroot/resource/Scripts/dashboard/dashboard-navigation.js"
+      "wwwroot/resource/Scripts/dashboard/dashboard-navigation.js",
+      "wwwroot/resource/Scripts/dashboard/registerEmail.js"
     ]
   },
   {
@@ -161,7 +162,8 @@
       "wwwroot/resource/scripts/general/price-string-generator.js",
       "wwwroot/resource/scripts/page/accommodation-item-page.js",
       "wwwroot/resource/scripts/general/detail-button.js",
-      "wwwroot/resource/scripts/general/increase-decrease-button.js"
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/Scripts/dashboard/registerEmail.js"
     ]
   },
   {

@@ -2,9 +2,11 @@
 using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using System;
 using static Amlakbashi.Core.Entities.Reserve;
 
@@ -14,14 +16,17 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
     {
         private readonly IMediator mediator;
         private readonly IReserveSupportManager reserveSupportManager;
+        private readonly UserManager<AppUser> userManager;
         public HostCancelRequestState(IRepository<Reserve, long> Repository,
             IMediator mediator,
+            UserManager<AppUser> userManager,
             IReserveSupportManager reserveSupportManager
             ) :
             base(Repository)
         {
             this.reserveSupportManager = reserveSupportManager;
             this.mediator = mediator;
+            this.userManager = userManager;
         }
 
         public override bool CanTransitTo(ReserveStatus status)
@@ -52,11 +57,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             Repository.Save();
             if (sendSms)
             {
+                var identityUser = userManager.FindByNameAsync(reserve.GuestUser.MainMobile).Result;
                 var contact = new UserContactDTO()
                 {
                     UserMainMobile = reserve.GuestUser.MainMobile,
                     UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
-                    UserEmail = reserve.GuestUser.Email,
+                    UserEmail = identityUser.Email,
                     UserFcmAppNotificationToken = reserve.GuestUser.FcmAppNotificationToken,
                     UserNotificationToken = reserve.GuestUser.NotificationToken,
                     Type = UserContactType.GuestCancelRequestSent,

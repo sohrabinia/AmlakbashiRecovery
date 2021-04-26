@@ -1,6 +1,7 @@
 ﻿var user_is_autenticated = false;
 var isNumberForIran = false;
 var verifyEmail = false;
+var userEmailAddress = "";
 if (!(new Date().getHours() > 3)) {
     pastDayOffset = -1;
 }
@@ -208,11 +209,10 @@ function checkReserve(confirm_required) {
                         showNoYesMessage('ورود به سایت',
                             'برای ثبت درخواست رزرو، ابتدا باید ایمیل خود را ثبت و تایید کنید',
                             function () {
+                                debugger;
                                 reserve_wait_for_login = true;
-                                $('.login__root').appendTo('body');
-                                toggle_login();
-                                $('.login_form').hide();
-                                $("#registerEmailForm").show();
+                                showRegisterEmailForm();
+                                $('#profileEmail').val(userEmailAddress);
                             }, undefined, { yesText: 'ثبت ایمیل', noText: 'بستن' });
                         return false;
                     }
@@ -291,10 +291,8 @@ function checkReserve(confirm_required) {
                                 'برای ثبت درخواست رزرو، ابتدا باید ایمیل خود را ثبت و تایید کنید',
                                 function () {
                                     reserve_wait_for_login = true;
-                                    $('.login__root').appendTo('body');
-                                    toggle_login();
-                                    $('.login_form').hide();
-                                    $("#registerEmailForm").show();
+                                    showRegisterEmailForm();
+                                    $('#profileEmail').val(userEmailAddress);
                                 }, undefined, { yesText: 'ثبت ایمیل', noText: 'بستن' });
                             return false;
                         }

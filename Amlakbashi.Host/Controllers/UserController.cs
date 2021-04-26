@@ -90,6 +90,7 @@ namespace Amlakbashi.Host.Controllers
                 new Claim("IsImpersonated", "true"),
             };
             userService.AddClaimsToUser(user.MainMobile, claims);
+            signInManager.SignOutAsync().Wait();
             signInManager.SignInAsync(identityUser, false).Wait();
 
             HttpContext.Session.SetObjectAsJson("impersonateUser", user);
@@ -582,9 +583,17 @@ namespace Amlakbashi.Host.Controllers
                 var result = userService.ChangeIdentityUserPassword(User.Identity.Name, currentPassword, newPassword);
                 if (result.Succeeded)
                 {
-                    return Redirect("/");
+                    var user = userService.GetIdentityUser(User.Identity.Name);
+                    signInManager.SignOutAsync().Wait();
+                    signInManager.SignInAsync(user, true).Wait();
+                    return Redirect("/post/profilemanager?userid=" + userAccessor.CurrentUser.Id);
                 }
-                ViewBag.errors = result.Errors.Select(s => s.Description).ToList();
+                var errorList = new List<string>();
+                foreach (var item in result.Errors)
+                {
+                    errorList.Add(UserLocalization.GetIdentityPasswordErrorString(item.Code, item.Description));
+                }
+                ViewBag.errors = errorList;
                 return View();
             }
             catch (Exception exc)
@@ -1027,18 +1036,13 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(email) ||
-                    Regex.IsMatch(email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase) == false)
+                if (string.IsNullOrEmpty(email) || EmailUtility.ValidateEmail(email) == false)
                 {
                     return GenerateJsonResult(new { status = 0, msg = "لطفا آدرس ایمیل خود را به درستی وارد کنید" });
                 }
                 var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
                 var code = new Random().Next(111111, 999999).ToString();
                 identityUser.EmailCode = code;
-                if (identityUser.Email != email)
-                {
-                    identityUser.EmailConfirmed = false;
-                }
                 identityUser.Email = email;
                 identityUser.EmailConfirmed = false;
                 userService.UpdateIdentityUser(identityUser);
@@ -1233,11 +1237,12 @@ namespace Amlakbashi.Host.Controllers
                 if (send_sms)
                 {
                     var user = userService.Find(user_id);
+                    var identityUser = userService.GetIdentityUser(user.MainMobile);
                     userService.SendMessage(new UserContactDTO()
                     {
                         UserMainMobile = user.MainMobile,
                         UserAppNotificationToken = user.AppNotificationToken,
-                        UserEmail = user.Email,
+                        UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                         UserNotificationToken = user.NotificationToken,
                         Type = UserContactType.UserCreditIncrease,
@@ -1291,11 +1296,12 @@ namespace Amlakbashi.Host.Controllers
                 if (send_sms)
                 {
                     var user = userService.Find(user_id);
+                    var identityUser = userService.GetIdentityUser(user.MainMobile);
                     userService.SendMessage(new UserContactDTO()
                     {
                         UserMainMobile = user.MainMobile,
                         UserAppNotificationToken = user.AppNotificationToken,
-                        UserEmail = user.Email,
+                        UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                         UserNotificationToken = user.NotificationToken,
                         Type = UserContactType.UserCreditDecrease,
