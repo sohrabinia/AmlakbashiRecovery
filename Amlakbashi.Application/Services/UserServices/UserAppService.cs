@@ -25,6 +25,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Amlakbashi.Core.Identity;
+using System.Text.RegularExpressions;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
@@ -193,17 +194,17 @@ namespace Amlakbashi.Application.Services.UserServices
                     user.SetLocalPhoneNumber(User.PhoneType.OtherMobile2, dto.mobile2, 98);
                 }
             }
-            if (string.IsNullOrEmpty(user.Email) || !string.IsNullOrEmpty(dto.email))
-            {
-                user.Email = dto.email;
-                var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
-                if (dto.email != identityUser.Email)
-                {
-                    identityUser.Email = dto.email;
-                    identityUser.EmailConfirmed = false;
-                    userManager.UpdateAsync(identityUser);
-                }
-            }
+            //if (string.IsNullOrEmpty(user.Email) || !string.IsNullOrEmpty(dto.email))
+            //{
+            //    user.Email = dto.email;
+            //    var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            //    if (dto.email != identityUser.Email)
+            //    {
+            //        identityUser.Email = dto.email;
+            //        identityUser.EmailConfirmed = false;
+            //        userManager.UpdateAsync(identityUser);
+            //    }
+            //}
             if (!string.IsNullOrEmpty(dto.tell))
             {
                 if (dto.tell.Substring(0, 2) == "00")
@@ -753,6 +754,18 @@ namespace Amlakbashi.Application.Services.UserServices
             return roles;
         }
 
+        public void AddClaimsToUser(string username, IList<Claim> claims)
+        {
+            var user = userManager.FindByNameAsync(username).Result;
+            userManager.AddClaimsAsync(user, claims).Wait();
+        }
+
+        public void RemoveClaimsFromUser(string username, IList<Claim> claims)
+        {
+            var user = userManager.FindByNameAsync(username).Result;
+            userManager.RemoveClaimsAsync(user, claims).Wait();
+        }
+
         public void UpdateUserRoles(string username, IList<string> selectedRoles)
         {
             var user = userManager.FindByNameAsync(username).Result;
@@ -810,6 +823,10 @@ namespace Amlakbashi.Application.Services.UserServices
             {
                 errors.Add(nameof(lname), "لطفا نام خانوادگی خود را وارد کنید");
             }
+            if (Regex.IsMatch(password, "[^\u0000-\u0080]+"))
+            {
+                errors.Add(nameof(password) + 0, "رمز عبور نباید شامل حروف فارسی باشد");
+            }
             if (password != confirmPassword)
             {
                 errors.Add(nameof(confirmPassword), "رمز وارد شده و تاییدیه آن یکسان نمی باشند");
@@ -819,9 +836,11 @@ namespace Amlakbashi.Application.Services.UserServices
                 var addPasswordResult = userManager.AddPasswordAsync(identityUser, password).Result;
                 if (addPasswordResult.Succeeded == false)
                 {
+                    int i = 0;
                     foreach (var addPasswordError in addPasswordResult.Errors)
                     {
-                        errors.Add(nameof(password), UserLocalization.GetIdentityPasswordErrorString(addPasswordError.Code,
+                        i++;
+                        errors.Add(nameof(password) + i, UserLocalization.GetIdentityPasswordErrorString(addPasswordError.Code,
                             addPasswordError.Description));
                     }
                 }

@@ -347,15 +347,11 @@ function confirmEmail() {
     myajax("user/PopupConfirmEmail", "emailcode=" + emailCode,
         function (ret) {
             if (ret.status == 1) {
-                //toggle_login();
                 $('.login__container').hide();
                 $('.login__bg').hide();
                 onLoginFinish();
                 alertify.success("ایمیل شما با موفقیت ثبت شد");
                 verifyEmail = true;
-                //if (typeof on_login !== "undefined") {
-                //    on_login();
-                //}
             }
             else {
                 alertify.error("کد وارد شده اشتباه است");
