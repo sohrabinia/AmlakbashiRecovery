@@ -4,12 +4,14 @@ using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using Amlakbashi.Mediator.Commands.ReserveCommands;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using System;
 using static Amlakbashi.Core.Entities.Reserve;
 
@@ -20,15 +22,18 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
         private readonly IAccountingFacade accounting;
         private readonly IReserveSupportManager reserveSupportManager;
         private readonly IMediator mediator;
+        private readonly UserManager<AppUser> userManager;
         public ReservedState(
             IAccountingFacade accounting,
             IReserveSupportManager reserveSupportManager,
             IMediator mediator,
+            UserManager<AppUser> userManager,
             IRepository<Reserve, long> Repository) : base(Repository)
         {
             this.accounting = accounting;
             this.reserveSupportManager = reserveSupportManager;
             this.mediator = mediator;
+            this.userManager = userManager;
         }
 
         public override bool CanTransitTo(Reserve.ReserveStatus status)
@@ -64,11 +69,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             {
                 if (sendSms)
                 {
+                    var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
                     var guestContact = new UserContactDTO()
                     {
                         UserMainMobile = guestUser.MainMobile,
                         UserAppNotificationToken = guestUser.AppNotificationToken,
-                        UserEmail = guestUser.Email,
+                        UserEmail = guestIdentityUser.Email,
                         UserFcmAppNotificationToken = guestUser.FcmAppNotificationToken,
                         Type = UserContactType.GuestReservedTotalPayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
@@ -79,11 +85,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     };
                     mediator.Enqueue(new SendMessageCommand(guestContact));
 
+                    var hostIdentityUser = userManager.FindByNameAsync(hostlerUser.MainMobile).Result;
                     var hostContact = new UserContactDTO()
                     {
                         UserMainMobile = hostlerUser.MainMobile,
                         UserAppNotificationToken = hostlerUser.AppNotificationToken,
-                        UserEmail = hostlerUser.Email,
+                        UserEmail = hostIdentityUser.Email,
                         UserFcmAppNotificationToken = hostlerUser.FcmAppNotificationToken,
                         UserNotificationToken = hostlerUser.NotificationToken,
                         Type = UserContactType.HostReservedTotalPayed,
@@ -101,11 +108,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             {
                 if (sendSms)
                 {
+                    var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
                     var guestContact = new UserContactDTO()
                     {
                         UserMainMobile = guestUser.MainMobile,
                         UserAppNotificationToken = guestUser.AppNotificationToken,
-                        UserEmail = guestUser.Email,
+                        UserEmail = guestIdentityUser.Email,
                         UserFcmAppNotificationToken = guestUser.FcmAppNotificationToken,
                         Type = UserContactType.GuestReservedDepositePayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
@@ -119,11 +127,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     };
                     mediator.Enqueue(new SendMessageCommand(guestContact));
 
+                    var hostIdentityUser = userManager.FindByNameAsync(hostlerUser.MainMobile).Result;
                     var hostContact = new UserContactDTO()
                     {
                         UserMainMobile = hostlerUser.MainMobile,
                         UserAppNotificationToken = hostlerUser.AppNotificationToken,
-                        UserEmail = hostlerUser.Email,
+                        UserEmail = hostIdentityUser.Email,
                         UserFcmAppNotificationToken = hostlerUser.FcmAppNotificationToken,
                         UserNotificationToken = hostlerUser.NotificationToken,
                         Type = UserContactType.HostReservedDepositePayed,

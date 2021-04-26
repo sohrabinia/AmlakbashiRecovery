@@ -31,19 +31,23 @@ using static Amlakbashi.Core.Entities.ActionLog;
 using log4net;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Amlakbashi.Core.Identity.Entities;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
     internal class AdvertiseAppService : AppServiceBase<Advertise, long>, IAdvertiseAppService
     {
         private readonly IPriceCalculator priceCalculator;
+        private readonly UserManager<AppUser> userManager;
         private readonly IMediator mediator;
         public AdvertiseAppService(IRepository<Advertise, long> repository,
             IMediator mediator, ICacheManager<Advertise> cache,
-            IPriceCalculator priceCalculator) : base(repository, cache)
+            IPriceCalculator priceCalculator, UserManager<AppUser> userManager) : base(repository, cache)
         {
             this.mediator = mediator;
             this.priceCalculator = priceCalculator;
+            this.userManager = userManager;
         }
 
         public IQueryable<Advertise> GetAllAsIQueriable()
@@ -2148,11 +2152,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             advertise.Reserves.Add(reserve);
             Repository.Update(advertise);
             Repository.Save();
+            var identityUser = userManager.FindByNameAsync(advertise.User.MainMobile).Result;
             var contact = new UserContactDTO()
             {
                 UserMainMobile = advertise.User.MainMobile,
                 UserAppNotificationToken = advertise.User.AppNotificationToken,
-                UserEmail = advertise.User.Email,
+                UserEmail = identityUser.Email,
                 UserFcmAppNotificationToken = advertise.User.FcmAppNotificationToken,
                 UserNotificationToken = advertise.User.NotificationToken,
                 Type = UserContactType.ReserveRequest,

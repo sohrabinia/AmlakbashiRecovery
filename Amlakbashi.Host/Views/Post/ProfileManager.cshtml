@@ -84,7 +84,7 @@
             </span>
         </div>
         <div class="profile__item ">
-            <a asp-controller="user" asp-action="changepassword" class="profile__submit">تغییر رمز عبور</a>
+            <a asp-controller="user" asp-action="changepassword" style="margin-top:20px;" class="btn-photo">تغییر رمز عبور</a>
         </div>
         <div class="profile__title">اطلاعات تماس</div>
         if (Model.userGeneralType != (int)Entities.User.UserGeneralTypeEnum.Guest)
@@ -199,24 +199,13 @@
                     <button type="button" onclick="showRegisterEmailForm()" class="profile__submit">ثبت ایمیل</button>
                 }
             </div>*@
-        @if (string.IsNullOrEmpty(Model.email) == false)
-        {
-            <div class="profile__item ">
-                <span class="profile__label">ایمیل :</span>
-                <span class="profile__text">
-                    @Model.email
-                </span>
-            </div>
-            <div class="profile__item ">
-                <button type="button" onclick="showRegisterEmailForm()" class="profile__submit">تغییر ایمیل</button>
-            </div>
-        }
-        else
-        {
-            <div class="profile__item ">
-                <button type="button" onclick="showRegisterEmailForm()" class="profile__submit">ثبت ایمیل</button>
-            </div>
-        }
+        <div class="profile__item ">
+            <span class="profile__label">ایمیل :</span>
+            <span>
+                <span class="profile__text" id="emailSpan">@(string.IsNullOrEmpty(Model.email) ? "آدرس ایمیل ثبت نشده است" : Model.email)</span>
+                <button type="button" onclick="showRegisterEmailForm()" style="border:0; margin-right: 20px;" class="btn-photo">@(string.IsNullOrEmpty(Model.email) ? "ثبت ایمیل" : "تغییر ایمیل")</button>
+            </span>
+        </div>
         if (Model.userGeneralType > (int)Entities.User.UserGeneralTypeEnum.Guest ||
         !string.IsNullOrEmpty(Model.bankCardNumber) ||
         !string.IsNullOrEmpty(Model.shabaNumber) ||
@@ -429,83 +418,5 @@
 
             return true;
         });
-
-        var emailEditMessage = undefined;
-        var emailSent = false;
-
-        function showRegisterEmailForm() {
-            emailSent = false;
-            emailEditMessage = showInfoMessage(
-                'ثبت ایمیل', '', {
-                    contentUrl: '/user/popupregisteremail', buttons: [{
-                        title: 'انصراف',
-                        color: 'white',
-                        bgColor: '#EA4335'
-                    },
-                    {
-                        title: 'تایید',
-                        color: 'white',
-                        bgColor: '#34A853',
-                        onclick: doRegisterEmailAction
-                    }], autoClose: false });
-        }
-
-        function doRegisterEmailAction() {
-            if (emailSent) {
-                profileConfirmEmail();
-            }
-            else {
-                profileRegisterEmail();
-            }
-        }
-
-        function profileRegisterEmail() {
-            var email = $("#profileEmail").val();
-            $.ajax({
-                url: "/user/PopupRegisterEmail",
-                type: "post",
-                data: { email: email },
-                success: function (ret) {
-                    if (ret.status == 1) {
-                        emailSent = true;
-                        $("#profileRegisterEmailForm").hide();
-                        $("#profileConfirmEmailForm").show();
-                    }
-                    else {
-                        alertify.error(ret.msg);
-                    }
-                },
-                error: function (ret) {
-                    alertify.error(ret.msg);
-                }
-            });
-        }
-
-        function profileConfirmEmail() {
-            var emailCode = $("#profileEmailCode").val();
-            if (emailCode == '') {
-                alertify.error("لطفا کد تایید ارسال شده به ایمیل خود را وارد کنید");
-                return;
-            }
-            $.ajax({
-                url: "/user/PopupConfirmEmail",
-                type: "post",
-                data: { emailCode: emailCode },
-                success: function (ret) {
-                    if (ret.status == 1) {
-                        alertify.success("ایمیل شما با موفقیت ثبت شد");
-                        emailSent = false;
-                        emailEditMessage.close();
-                    }
-                    else {
-                        alertify.error("کد وارد شده اشتباه است");
-                    }
-                },
-                error: function (ret) {
-                    alertify.error(ret.msg);
-                }
-            });
-        }
-
     </script>
 }

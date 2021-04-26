@@ -160,11 +160,12 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if ((bool)send_sms)
                 {
+                    var identityUser = userService.GetIdentityUser(user.MainMobile);
                     userService.SendMessage(new UserContactDTO()
                     {
                         UserMainMobile = user.MainMobile,
                         UserAppNotificationToken = user.AppNotificationToken,
-                        UserEmail = user.Email,
+                        UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                         UserNotificationToken = user.NotificationToken,
                         Type = UserContactType.SiteClearingHost,

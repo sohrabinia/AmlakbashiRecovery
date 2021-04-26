@@ -2,11 +2,13 @@
 using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using System;
 using static Amlakbashi.Core.Entities.Reserve;
 
@@ -16,12 +18,15 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
     {
         private readonly IMediator mediator;
         private readonly IAccountingFacade accounting;
+        private readonly UserManager<AppUser> userManager;
         public GuestCancelState(IRepository<Reserve, long> Repository,
             IAccountingFacade accounting,
+            UserManager<AppUser> userManager,
             IMediator mediator) : base(Repository)
         {
             this.mediator = mediator;
             this.accounting = accounting;
+            this.userManager = userManager;
         }
 
         public override bool CanTransitTo(ReserveStatus status)
@@ -47,11 +52,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             accounting.RefundPrizeCreditIfAny(reserve.Id);
             if (sendSms)
             {
+                var guestIdentityUser = userManager.FindByNameAsync(reserve.GuestUser.MainMobile).Result;
                 var guestContact = new UserContactDTO()
                 {
                     UserMainMobile = reserve.GuestUser.MainMobile,
                     UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
-                    UserEmail = reserve.GuestUser.Email,
+                    UserEmail = guestIdentityUser.Email,
                     UserFcmAppNotificationToken = reserve.GuestUser.FcmAppNotificationToken,
                     UserNotificationToken = reserve.GuestUser.NotificationToken,
                     Type = UserContactType.GuestReserveCanceled,
@@ -61,11 +67,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                 mediator.Enqueue(new SendMessageCommand(guestContact));
 
                 var user = Repository.Find<User, int>(reserve.HostUserID);
+                var hostIdentityUser = userManager.FindByNameAsync(user.MainMobile).Result;
                 var hostContact = new UserContactDTO()
                 {
                     UserMainMobile = user.MainMobile,
                     UserAppNotificationToken = user.AppNotificationToken,
-                    UserEmail = user.Email,
+                    UserEmail = hostIdentityUser.Email,
                     UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                     UserNotificationToken = user.NotificationToken,
                     Type = UserContactType.HostReserveCanceled,

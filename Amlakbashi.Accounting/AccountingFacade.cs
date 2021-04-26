@@ -24,6 +24,8 @@ using Amlakbashi.Mediator.Commands.AccountingCommands;
 using Amlakbashi.Mediator.Events.AccountingEvents;
 using log4net;
 using Amlakbashi.Mediator.Commands.UserCommands;
+using Microsoft.AspNetCore.Identity;
+using Amlakbashi.Core.Identity.Entities;
 
 namespace Amlakbashi.Accounting
 {
@@ -38,8 +40,8 @@ namespace Amlakbashi.Accounting
         private readonly IGroupPaymentAppService groupPaymentService;
         private readonly IAccountingRepository repository;
         private readonly IMediator mediator;
-        private readonly IUserContactFacade userContact;
         private readonly IPaymentOperator paymentOperator;
+        private readonly UserManager<AppUser> userManager;
         private readonly ILog logger;
         public AccountingFacade(IReservePaymentAppService reservePaymentService,
             IDiscountCouponAppService discountCouponService,
@@ -50,8 +52,8 @@ namespace Amlakbashi.Accounting
             IGroupPaymentAppService groupPaymentService,
             IAccountingRepository repository,
             IMediator mediator,
-            IUserContactFacade userContact,
             IPaymentOperator paymentOperator,
+            UserManager<AppUser> userManager,
             ILog logger)
         {
             this.reservePaymentService = reservePaymentService;
@@ -63,8 +65,8 @@ namespace Amlakbashi.Accounting
             this.groupPaymentService = groupPaymentService;
             this.repository = repository;
             this.mediator = mediator;
-            this.userContact = userContact;
             this.paymentOperator = paymentOperator;
+            this.userManager = userManager;
             this.logger = logger;
         }
 
@@ -356,6 +358,7 @@ namespace Amlakbashi.Accounting
         {
             var reserve = repository.FindReserve(reserveId);
             var user = repository.FindUser(reserve.UserID);
+            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
             if (user.PresentorUserID < 1 ||
                 user.PresentorPrizeGiven)
             {
@@ -370,7 +373,7 @@ namespace Amlakbashi.Accounting
             {
                 UserMainMobile = user.MainMobile,
                 UserAppNotificationToken = user.AppNotificationToken,
-                UserEmail = user.Email,
+                UserEmail = identityUser.Email,
                 UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                 UserNotificationToken = user.NotificationToken,
                 Type = UserContactType.PrizeCharge,
@@ -384,6 +387,7 @@ namespace Amlakbashi.Accounting
         {
             var reserve = repository.FindReserve(reserveId);
             var guestUser = reserve.GuestUser;
+            var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
             if (guestUser.RecieveAppreciateDiscount)
             {
                 return;
@@ -397,7 +401,7 @@ namespace Amlakbashi.Accounting
                 {
                     UserMainMobile = guestUser.MainMobile,
                     UserAppNotificationToken = guestUser.AppNotificationToken,
-                    UserEmail = guestUser.Email,
+                    UserEmail = guestIdentityUser.Email,
                     UserFcmAppNotificationToken = guestUser.FcmAppNotificationToken,
                     UserNotificationToken = guestUser.NotificationToken,
                     Type = UserContactType.CouponAppreciate,
@@ -906,11 +910,12 @@ namespace Amlakbashi.Accounting
                 objpay.PayDate = DateTime.Now;
                 paymentService.Update(objpay);
                 var user = repository.FindUser(user_id);
+                var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
                 var contact = new UserContactDTO()
                 {
                     UserMainMobile = user.MainMobile,
                     UserAppNotificationToken = user.AppNotificationToken,
-                    UserEmail = user.Email,
+                    UserEmail = identityUser.Email,
                     UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                     UserNotificationToken = user.NotificationToken,
                     Type = UserContactType.payment,

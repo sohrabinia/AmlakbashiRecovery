@@ -11,6 +11,8 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             {
                 case "PasswordTooShort":
                     return "رمز عبور باید حداقل شامل 5 کاراکتر باشد";
+                case "PasswordMismatch":
+                    return "رمز عبور فعلی اشتباه است";
                 default:
                     return "اشکال در رمز عبور";
             }

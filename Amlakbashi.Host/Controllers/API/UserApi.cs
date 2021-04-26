@@ -451,6 +451,7 @@ namespace Amlakbashi.Host.Controllers.API
             {
                 var prId = int.Parse(presentorCode);
                 var prUser = userService.Find(prId);
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
                 user.PresentorUserID = prUser.Id;
                 userService.UpdatePresentorUser(user.Id, prUser.Id);
                 if (user.PresentorUserID > 0)
@@ -460,7 +461,7 @@ namespace Amlakbashi.Host.Controllers.API
                     {
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserNotificationToken = user.NotificationToken,
-                        UserEmail = user.Email,
+                        UserEmail = identityUser.Email,
                         UserId = user.Id.ToString(),
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                         UserMainMobile = user.MainMobile,

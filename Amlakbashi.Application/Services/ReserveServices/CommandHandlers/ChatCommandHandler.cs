@@ -1,10 +1,12 @@
 ﻿using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Mediator.Commands.ReserveCommands;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using System.Threading;
 using System.Threading.Tasks;
 using static Amlakbashi.Core.Entities.Chat;
@@ -15,11 +17,14 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
     {
         private readonly IUserContactFacade userContact;
         private readonly IRepository<Chat, long> repository;
+        private readonly UserManager<AppUser> userManager;
         private readonly IMediator mediator;
-        public ChatCommandHandler(IRepository<Chat, long> repository, IUserContactFacade userContact, IMediator mediator)
+        public ChatCommandHandler(IRepository<Chat, long> repository, IUserContactFacade userContact,
+            UserManager<AppUser> userManager, IMediator mediator)
         {
             this.userContact = userContact;
             this.repository = repository;
+            this.userManager = userManager;
             this.mediator = mediator;
         }
 
@@ -29,6 +34,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             if (chat.ReadStatus == (int)ReadStatusEnum.NotRead)
             {
                 var user = repository.Find<User, int>(request.TargetUserId);
+                var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
                 if (!string.IsNullOrEmpty(user.FcmAppNotificationToken) ||
                     !string.IsNullOrEmpty(user.AppNotificationToken) ||
                     !string.IsNullOrEmpty(user.NotificationToken))
@@ -37,7 +43,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                     {
                         UserMainMobile = user.MainMobile,
                         UserAppNotificationToken = user.AppNotificationToken,
-                        UserEmail = user.Email,
+                        UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                         UserNotificationToken = user.NotificationToken,
                         Type = request.IsGuest ? Core.Infrastructure.UserContact.UserContactType.NewReserveChatGuest :

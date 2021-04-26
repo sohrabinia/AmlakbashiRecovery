@@ -1,9 +1,11 @@
 ﻿using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
 using System.Threading;
@@ -16,11 +18,13 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
     {
         private readonly IRepository<ReserveSendSms, long> repository;
         private readonly IUserContactFacade userContact;
+        private readonly UserManager<AppUser> userManager;
         public ReserveSendSmsCommandHandler(IRepository<ReserveSendSms, long> repository,
-            IUserContactFacade userContact)
+            IUserContactFacade userContact, UserManager<AppUser> userManager)
         {
             this.repository = repository;
             this.userContact = userContact;
+            this.userManager = userManager;
         }
 
         public Task<Unit> Handle(RefreshReserveSendSmsCommand request, CancellationToken cancellationToken)
@@ -30,6 +34,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             foreach (var item in queue)
             {
                 var user = repository.Find<User, int>(item.userId);
+                var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
                 var reserve = !string.IsNullOrEmpty(item.reserve_id) ?
                     repository.Find<Reserve, long>(long.Parse(item.reserve_id)) :
                     null;
@@ -37,7 +42,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                 {
                     UserMainMobile = user.MainMobile,
                     UserAppNotificationToken = user.AppNotificationToken,
-                    UserEmail = user.Email,
+                    UserEmail = identityUser.Email,
                     UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                     UserNotificationToken = user.NotificationToken,
                     ReserveStatus = reserve == null ? Reserve.ReserveStatus.Default :
