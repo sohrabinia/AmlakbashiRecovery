@@ -44,6 +44,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                         UserMainMobile = user.MainMobile,
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = identityUser.Email,
+                        EmailConfirmed = identityUser.EmailConfirmed,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                         UserNotificationToken = user.NotificationToken,
                         Type = request.IsGuest ? Core.Infrastructure.UserContact.UserContactType.NewReserveChatGuest :

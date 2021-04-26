@@ -11,6 +11,10 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
     {
         public void SendMessage(UserContactDTO contactDTO)
         {
+            if (contactDTO.EmailConfirmed == false)
+            {
+                return;
+            }
             switch (contactDTO.Type)
             {
                 case UserContactType.confirm:

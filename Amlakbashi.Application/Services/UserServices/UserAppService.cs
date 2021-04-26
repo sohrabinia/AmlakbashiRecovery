@@ -624,6 +624,7 @@ namespace Amlakbashi.Application.Services.UserServices
                             UserMainMobile = user.MainMobile,
                             UserAppNotificationToken = user.AppNotificationToken,
                             UserEmail = identityUser.Email,
+                            EmailConfirmed = identityUser.EmailConfirmed,
                             UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                             UserNotificationToken = user.NotificationToken,
                             Type = UserContactType.CouponPresent,

@@ -54,6 +54,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     UserMainMobile = hostlerUser.MainMobile,
                     UserAppNotificationToken = hostlerUser.AppNotificationToken,
                     UserEmail = identityUser.Email,
+                    EmailConfirmed = identityUser.EmailConfirmed,
                     UserFcmAppNotificationToken = hostlerUser.FcmAppNotificationToken,
                     UserNotificationToken = hostlerUser.NotificationToken,
                     Type = UserContactType.HostReserveCashPay,

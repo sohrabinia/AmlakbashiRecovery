@@ -7,6 +7,7 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
         public string UserFcmAppNotificationToken { get; set; }
         public string UserAppNotificationToken { get; set; }
         public string UserEmail { get; set; }
+        public bool EmailConfirmed { get; set; }
         public string UserNotificationToken { get; set; }
         public string UserMainMobile { get; set; }
         public Reserve.ReserveStatus ReserveStatus { get; set; }

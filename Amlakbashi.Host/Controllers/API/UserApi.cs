@@ -152,8 +152,12 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult VerifySigninCode(string mobile, string code)
+        public JsonResult VerifySigninCode(string mobile, string code, string cid)
         {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
             try
             {
                 var internationalMobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
@@ -188,8 +192,12 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SendSmsAgain(string mobile)
+        public JsonResult SendSmsAgain(string mobile, string cid)
         {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
             try
             {
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
@@ -230,9 +238,13 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SignInRegister(string mobile, string code, string fname = null, string lname = null,
+        public JsonResult SignInRegister(string cid, string mobile, string code, string fname = null, string lname = null,
             string password = null, string confirmPassword = null, string presentorCode = "")
         {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
             try
             {
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
@@ -296,8 +308,12 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult SaveNewPass(string mobile, string password, string confirmPassword)
+        public JsonResult SaveNewPass(string mobile, string code, string password, string confirmPassword, string cid)
         {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
             try
             {
                 if (string.IsNullOrEmpty(password) || password != confirmPassword)
@@ -305,8 +321,18 @@ namespace Amlakbashi.Host.Controllers.API
                     return GenerateJsonResult(new { status = 0, msg = "رمز عبور و تاییدیه آن را به درستی وارد کنید" });
                 }
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
-                userService.ChangeIdentityUserPassword(mobile_international, password);
                 var identityUser = userService.GetIdentityUser(mobile_international);
+                if (identityUser.Code != code)
+                {
+                    return GenerateJsonResult(
+                    new
+                    {
+                        status = 0,
+                        errors = "کد وارد شده صحیح نیست"
+                    });
+                }
+                userService.ChangeIdentityUserPassword(mobile_international, password);
+                identityUser = userService.GetIdentityUser(mobile_international);
                 var jwtToken = userService.JwtSignIn(identityUser, Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
                 return GenerateJsonResult(new { status = 1, token = new JwtSecurityTokenHandler().WriteToken(jwtToken) });
             }
@@ -317,8 +343,55 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        public JsonResult LoginPass(string mobile, string password)
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        [HttpPost]
+        public JsonResult ChangePassword(ChangePasswordDTO data, string cid)
         {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
+            try
+            {
+                if (string.IsNullOrEmpty(data.newPassword) || data.newPassword != data.confirmPassword)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "لطفا رمز عبور و تکرار آن را به درستی وارد کنید" });
+                }
+                var result = userService.ChangeIdentityUserPassword(User.Identity.Name, data.currentPassword, data.newPassword);
+                if (result.Succeeded)
+                {
+                    var identityUser = userService.GetIdentityUser(User.Identity.Name);
+                    var jwtToken = userService.JwtSignIn(identityUser, Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
+                    return GenerateJsonResult(new { status = 1, token = new JwtSecurityTokenHandler().WriteToken(jwtToken), msg = "رمز عبور با موفقیت تغییر کرد" });
+                }
+                var errorList = new List<string>();
+                foreach (var item in result.Errors)
+                {
+                    errorList.Add(UserLocalization.GetIdentityPasswordErrorString(item.Code, item.Description));
+                }
+                return GenerateJsonResult(new { status = 0, msg = errorList.FirstOrDefault() });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0, msg = GeneralLocalization.GetExceptionMessage(exc) });
+            }
+        }
+
+        [Serializable]
+        public class ChangePasswordDTO
+        {
+            public string currentPassword { get; set; }
+            public string newPassword { get; set; }
+            public string confirmPassword { get; set; }
+        }
+
+        public JsonResult LoginPass(string cid, string mobile, string password)
+        {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
             try
             {
                 var mobileInternational = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
@@ -445,6 +518,10 @@ namespace Amlakbashi.Host.Controllers.API
 
         public JsonResult SetPresentorCode(string cid, string mobile, string presentorCode)
         {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
             var internationalMobile = PhoneUtility.LocalNumberToInternational(mobile, 98);
             var user = userService.GetByMainMobile(internationalMobile);
             try
