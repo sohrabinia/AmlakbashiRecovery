@@ -855,6 +855,12 @@ namespace Amlakbashi.Application.Services.UserServices
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
             }
             authClaims.Add(new Claim("name", identityUser.UserName));
+            authClaims.Add(new Claim(ClaimTypes.NameIdentifier, identityUser.Id));
+            authClaims.Add(new Claim(ClaimTypes.Email, identityUser.Email));
+            authClaims.Add(new Claim("AspNet.Identity.SecurityStamp",
+                userManager.GetSecurityStampAsync(identityUser).Result));
+            authClaims.Add(new Claim(JwtRegisteredClaimNames.Sub, identityUser.UserName));
+
             var authSigningKey = new SymmetricSecurityKey(key);
             var token = new JwtSecurityToken(
                     expires: DateTime.Now.AddHours(1440),

@@ -23,7 +23,7 @@ using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 
 namespace Amlakbashi.Host.Controllers.API
 {
-    public partial class ApiController : BaseController
+    public partial class ApiController : Controller
     {
         public JsonResult SignInFirstStep(string mobile, string cid, bool fcm_notification = false)
         {
