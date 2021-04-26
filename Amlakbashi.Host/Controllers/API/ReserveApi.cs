@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Amlakbashi.Host.Controllers.API
 {
-    public partial class ApiController : BaseController
+    public partial class ApiController : Controller
     {
 
         public JsonResult CheckReserve(int advertise_id, string from_date, string to_date,

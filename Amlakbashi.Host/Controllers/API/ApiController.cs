@@ -24,10 +24,12 @@ using Amlakbashi.Core.Identity.Entities;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using Microsoft.AspNetCore.Routing;
+using System.Collections.Generic;
 
 namespace Amlakbashi.Host.Controllers.API
 {
-    public partial class ApiController : BaseController
+    public partial class ApiController : Controller
     {
         private string client_id = "7e1dff94-4f78-4eba-af9f-e54605925e5c";
         private const string bearerScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -118,25 +120,6 @@ namespace Amlakbashi.Host.Controllers.API
         private bool ClientAuthenticate(string client_id)
         {
             return this.client_id == client_id;
-        }
-
-        private User GetUser()
-        {
-            var auth = HttpContext.Request.Headers["Authorization"].ToString();
-            if (string.IsNullOrEmpty(auth) || auth == "null")
-            {
-                return new User();
-            }
-            auth = auth.Remove(0,7);
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(auth);
-            var tokenS = jsonToken as JwtSecurityToken;
-            var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
-            if (string.IsNullOrEmpty(mainMobile))
-            {
-                return new User();
-            }
-            return userService.GetByMainMobile(mainMobile);
         }
 
         public JsonResult CheckAndroidAppVersion(string cid, string version, int buildNumber)
@@ -230,6 +213,49 @@ namespace Amlakbashi.Host.Controllers.API
                     updateSuggestion = false
                 });
             }
+        }
+
+        private User GetUser()
+        {
+            var auth = HttpContext.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(auth) || auth == "null")
+            {
+                return new User();
+            }
+            auth = auth.Remove(0, 7);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(auth);
+            var tokenS = jsonToken as JwtSecurityToken;
+            var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+            if (string.IsNullOrEmpty(mainMobile))
+            {
+                return new User();
+            }
+            return userService.GetByMainMobile(mainMobile);
+        }
+
+        private JsonResult GenerateJsonResult(dynamic obj)
+        {
+            var auth = HttpContext.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(auth) == false && auth != "null")
+            {
+                auth = auth.Remove(0, 7);
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(auth);
+                var tokenS = jsonToken as JwtSecurityToken;
+                var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+                var securityStamp = tokenS.Claims.FirstOrDefault(claim => claim.Type == "AspNet.Identity.SecurityStamp").Value;
+                var identityUser = userService.GetIdentityUser(mainMobile);
+                var objDict = new RouteValueDictionary(obj);
+                var dict = new Dictionary<string, object>();
+                foreach (var key in objDict.Keys)
+                {
+                    dict.Add(key, objDict[key]);
+                }
+                dict.Add("securityStampMismatch", identityUser.SecurityStamp != securityStamp);
+                return new JsonResult(dict);
+            }
+            return new JsonResult(obj);
         }
     }
 }
