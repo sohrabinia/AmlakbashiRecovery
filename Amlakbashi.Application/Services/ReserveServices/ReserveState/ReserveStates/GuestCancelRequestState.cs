@@ -58,6 +58,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                 UserMainMobile = user.MainMobile,
                 UserAppNotificationToken = user.AppNotificationToken,
                 UserEmail = identityUser.Email,
+                EmailConfirmed = identityUser.EmailConfirmed,
                 UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                 UserNotificationToken = user.NotificationToken,
                 Type = UserContactType.HostCancelRequestSent,

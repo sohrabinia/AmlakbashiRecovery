@@ -612,6 +612,7 @@ namespace Amlakbashi.Application.Services.UserServices
                             UserMainMobile = user.MainMobile,
                             UserAppNotificationToken = user.AppNotificationToken,
                             UserEmail = identityUser.Email,
+                            EmailConfirmed = identityUser.EmailConfirmed,
                             UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                             UserNotificationToken = user.NotificationToken,
                             Type = UserContactType.CouponPresent,
@@ -844,7 +845,6 @@ namespace Amlakbashi.Application.Services.UserServices
             }
             authClaims.Add(new Claim("name", identityUser.UserName));
             authClaims.Add(new Claim(ClaimTypes.NameIdentifier, identityUser.Id));
-            authClaims.Add(new Claim(ClaimTypes.Email, identityUser.Email));
             authClaims.Add(new Claim("AspNet.Identity.SecurityStamp",
                 userManager.GetSecurityStampAsync(identityUser).Result));
             authClaims.Add(new Claim(JwtRegisteredClaimNames.Sub, identityUser.UserName));
