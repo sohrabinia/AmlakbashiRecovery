@@ -548,11 +548,12 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                if (!User.Identity.IsAuthenticated)
+                if (User.Identity.IsAuthenticated == false)
                 {
                     return GenerateJsonResult(new { val = 2 });
                 }
-                if (userAccessor.CurrentUser.AccessType == (int)Entities.User.AccessTypeEnum.ReserveBanned || userAccessor.CurrentUser.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
+                var identityUser = userService.GetIdentityUser(User.Identity.Name);
+                if (identityUser.State != Entities.User.UserState.Acticved)
                 {
                     return GenerateJsonResult(new { val = 3 });
                 }

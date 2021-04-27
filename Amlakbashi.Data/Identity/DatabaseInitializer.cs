@@ -43,7 +43,7 @@ namespace Amlakbashi.Data.Identity
             if (userManager.Users.Any() == false)
             {
                 string connectionString = "Server=.;Database=amlakbas_db;Trusted_Connection=True;User Id=sa;Password=Omid@123;MultipleActiveResultSets=true;";
-                string query = "select MainMobile, Email, CreateDate, State, LoginPriority from Users";
+                string query = "select MainMobile, Email, CreateDate, State, LoginPriority, AccessType from Users";
                 List<AppUser> appUserList = new List<AppUser>();
 
                 using (SqlConnection connection = new SqlConnection(connectionString))
@@ -55,16 +55,21 @@ namespace Amlakbashi.Data.Identity
                     {
                         var state = (UserState)reader[3];
                         var loginPriority = (LoginPriorites)reader[4];
+                        var accessType = (AccessTypeEnum)reader[5];
                         var appUser = new AppUser()
                         {
                             UserName = reader[0].ToString(),
                             Email = reader[1].ToString(),
-                            EmailConfirmed = loginPriority == LoginPriorites.Email && state == UserState.Acticved 
+                            EmailConfirmed = loginPriority == LoginPriorites.Email && state == UserState.Acticved
                                 && string.IsNullOrEmpty(reader[1].ToString()) == false ? true : false,
                             PhoneNumber = reader[0].ToString(),
                             PhoneNumberConfirmed = false,
-                            State = state == UserState.Acticved ? UserState.InActived : state,
+                            State = state == UserState.Suspend || state == UserState.InActived ? state :
+                                accessType == AccessTypeEnum.ReserveBanned ? UserState.ReserveBanned :
+                                accessType == AccessTypeEnum.LoginBanned ? UserState.Suspend :
+                                UserState.InActived
                         };
+
 
                         appUser.NormalizedUserName = appUser.UserName.ToUpper();
                         appUser.NormalizedEmail = appUser.Email.ToUpper();

@@ -10,9 +10,8 @@ namespace Amlakbashi.Core.Entities
         public override long Id { get; set; }
         public long AdvertiseID { get; set; }
 
-        // TODO: fix this
         [ForeignKey("AdvertiseID")]
-        public Advertise Advertise;
+        public virtual Advertise Advertise { get; set; }
         public long? ReserveID { get; set; }
         [ForeignKey("ReserveID")]
         public virtual Reserve Reserve { get; set; }

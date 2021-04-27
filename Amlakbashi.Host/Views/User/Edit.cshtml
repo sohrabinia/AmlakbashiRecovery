@@ -16,36 +16,36 @@
 <input type="hidden" name="ContactPhone" id="complete_profile_contact" value="" />
 <table>
     @*@if (Model.UserID == -1)
-    {*@
-        <tr>
-            <td class="label">
-                نام کاربری :
-            </td>
-            <td style="direction:ltr">
-                @Html.EditorFor(model => model.MainMobile)
-            </td>
-            <td></td>
-        </tr>
+        {*@
+    <tr>
+        <td class="label">
+            نام کاربری :
+        </td>
+        <td style="direction:ltr">
+            @Html.EditorFor(model => model.MainMobile)
+        </td>
+        <td></td>
+    </tr>
     @*}
-    else
-    {
-        <tr>
-            <td class="label">
-                نام کاربری :
-            </td>
-            <td style="padding-right:18px; color: #444; font: 15px bnassim; text-align: right; vertical-align: middle;">
-                @Model.UserName
-            </td>
-            <td></td>
-        </tr>
-    }*@
+        else
+        {
+            <tr>
+                <td class="label">
+                    نام کاربری :
+                </td>
+                <td style="padding-right:18px; color: #444; font: 15px bnassim; text-align: right; vertical-align: middle;">
+                    @Model.UserName
+                </td>
+                <td></td>
+            </tr>
+        }*@
 
     <tr>
         <td class="label">  عکس پروفایل :</td>
         <td class="value">
             @if (Model.PhotoID > 0)
             {
-                    <img height="350" src='@string.Format("/file/imgThumbOld?FileID={0}&h=500", Model.PhotoID)' />
+                <img height="350" src='@string.Format("/file/imgThumbOld?FileID={0}&h=500", Model.PhotoID)' />
             }
         </td>
         <td>
@@ -85,14 +85,14 @@
         <td></td>
     </tr>
     @*<tr>
-        <td class="label">
-            آدرس پست الکترونیک :
-        </td>
-        <td >
-            @Html.EditorFor(model => model.Email)
-        </td>
-        <td></td>
-    </tr>*@
+            <td class="label">
+                آدرس پست الکترونیک :
+            </td>
+            <td >
+                @Html.EditorFor(model => model.Email)
+            </td>
+            <td></td>
+        </tr>*@
     <tr>
         <td class="label">
             موبایل 1 :
@@ -160,22 +160,22 @@
             </select>
         </td>
         <td></td>
-    </tr> 
+    </tr>
     <tr>
         <td class="label">
-            وضعیت دسترسی :
+            وضعیت کاربر :
         </td>
         <td style="width:300px;">
-            @{ var access_types = (Entities.User.AccessTypeEnum[])Enum.GetValues(typeof(Entities.User.AccessTypeEnum)); }
-            <select name="AccessType">
-                @foreach (var access_type in access_types)
+            @{ var states = (Entities.User.UserState[])Enum.GetValues(typeof(Entities.User.UserState)); }
+            <select name="userState">
+                @foreach (var item in states)
                 {
-                    <option is-selected="@((int)access_type == Model.AccessType)" value="@((int)access_type)">@(Entities.User.GetAccessTypeString(access_type))</option>
+                    <option is-selected="@(item == ViewBag.userState)" value="@((int)item)">@(Entities.User.GetStateTitle((int)item))</option>
                 }
             </select>
         </td>
         <td></td>
-    </tr> 
+    </tr>
     <tr>
         <td class="label">
             اعتبار کیف پول :
