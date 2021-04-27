@@ -130,18 +130,18 @@ namespace Portal.Controllers
                         return RedirectToAction("Edit", "File");
                     }
 
-                    filepath = string.Format("/content/files/file{0}{1}", Guid.NewGuid(), ext);
-                    if (!Directory.Exists(Path.Combine(host.WebRootPath, "/content/files")))
-                        Directory.CreateDirectory(Path.Combine(host.WebRootPath, "/content/files"));
+                    filepath = string.Format("~/content/files/file{0}{1}", Guid.NewGuid(), ext);
+                    if (!Directory.Exists(Path.Combine(host.WebRootPath, "content/files")))
+                        Directory.CreateDirectory(Path.Combine(host.WebRootPath, "content/files"));
 
-                    using (Stream writer = new FileStream(Path.Combine(host.WebRootPath, filepath), FileMode.Create))
+                    using (Stream writer = new FileStream(Path.Combine(host.WebRootPath, filepath.Replace("~/", "")), FileMode.Create))
                     {
                         uploadfile.CopyTo(writer);
                     }
 
                     lock (objlock)
                     {
-                        DirectoryInfo IOdirectory = new DirectoryInfo(Path.Combine(host.WebRootPath, "/content/imgcache"));
+                        DirectoryInfo IOdirectory = new DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
                         foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
                         {
                             IOfile.Delete();
@@ -240,16 +240,16 @@ namespace Portal.Controllers
                 string path = "", strFormat = "image/jpeg";
                 try
                 {
-                    using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePath)))
+                    using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
                     {
                         if (tmpImage.RawFormat.Equals(ImageFormat.Png))
                         {
-                            path = string.Format("~/content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
+                            path = string.Format("content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
                             strFormat = "image/png";
                         }
                         else
                         {
-                            path = string.Format("~/content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
+                            path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
                         }
                     }
                 }
@@ -264,7 +264,7 @@ namespace Portal.Controllers
                 //}
                 if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
                 {
-                    string OrginalPath = objFile.FilePath;
+                    string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
 
                     //if (objFile.FileType != (int)FileDepend.FileTypes.Image || !System.IO.File.Exists(Server.MapPath(OrginalPath)))
                     //    OrginalPath = "~/Resource/img/img202_500_300.png";
@@ -314,7 +314,7 @@ namespace Portal.Controllers
                 }
                 //Response.AddHeader("Content-Type", strFormat);
                 //Server.Transfer(path.Replace("~",""));
-                return File(path.Replace("~", ""), strFormat);
+                return File("/" + path.Replace("~/", ""), strFormat);
             }
             catch (Exception exc)
             {
@@ -336,19 +336,19 @@ namespace Portal.Controllers
             try
             {
                 string path = "", strFormat = "image/jpeg";
-                var file_path = "/resource/img/" + file_name + ".png";
+                var file_path = "resource/img/" + file_name + ".png";
                 try
                 {
                     using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, file_path)))
                     {
                         if (tmpImage.RawFormat.Equals(ImageFormat.Png))
                         {
-                            path = string.Format("~/content/imgcache/img{0}_{1}_{2}.png", file_name, w, h);
+                            path = string.Format("content/imgcache/img{0}_{1}_{2}.png", file_name, w, h);
                             strFormat = "image/png";
                         }
                         else
                         {
-                            path = string.Format("~/content/imgcache/img{0}_{1}_{2}.jpg", file_name, w, h);
+                            path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", file_name, w, h);
                         }
                     }
                 }
@@ -374,7 +374,7 @@ namespace Portal.Controllers
                         }
                     }
                 }
-                return File(path.Replace("~", ""), strFormat);
+                return File("/" + path.Replace("~/", ""), strFormat);
             }
             catch (Exception exc)
             {
@@ -393,16 +393,16 @@ namespace Portal.Controllers
                 string path = "", strFormat = "image/jpeg";
                 try
                 {
-                    using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePath)))
+                    using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
                     {
                         if (tmpImage.RawFormat.Equals(ImageFormat.Png))
                         {
-                            path = string.Format("~/content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
+                            path = string.Format("content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
                             strFormat = "image/png";
                         }
                         else
                         {
-                            path = string.Format("~/content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
+                            path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
                         }
                     }
                 }
@@ -417,7 +417,7 @@ namespace Portal.Controllers
                 //}
                 if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
                 {
-                    string OrginalPath = objFile.FilePath;
+                    string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
                     //if (objFile.FileType != (int)FileDepend.FileTypes.Image || !System.IO.File.Exists(Server.MapPath(OrginalPath)))
                     //    OrginalPath = "~/Resource/img/img202_500_300.png";
 
@@ -462,7 +462,7 @@ namespace Portal.Controllers
                 }
                 //Response.AddHeader("Content-Type", strFormat);
                 //Server.Transfer(path.Replace("~",""));
-                return File(path.Replace("~", ""), strFormat);
+                return File("/" + path.Replace("~/", ""), strFormat);
             }
             catch (Exception exc)
             {
@@ -489,16 +489,16 @@ namespace Portal.Controllers
                 string path = "", strFormat = "image/jpeg";
                 try
                 {
-                    using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePath)))
+                    using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
                     {
                         if (tmpImage.RawFormat.Equals(ImageFormat.Png))
                         {
-                            path = string.Format("~/content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
+                            path = string.Format("content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
                             strFormat = "image/png";
                         }
                         else
                         {
-                            path = string.Format("~/content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
+                            path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
                         }
                     }
                 }
@@ -510,9 +510,9 @@ namespace Portal.Controllers
 
                 if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
                 {
-                    string OrginalPath = objFile.FilePath;
+                    string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
                     if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, OrginalPath)))
-                        OrginalPath = "~/Resource/img/noimage.jpg";
+                        OrginalPath = "resource/img/noimage.jpg";
 
                     using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, OrginalPath)))
                     {
@@ -586,17 +586,17 @@ namespace Portal.Controllers
                     return Redirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h));
                 }
                 var objFile = fileService.Find(advertise.PhotoID == null ? 0 : (long)advertise.PhotoID);
-                if (objFile == null || !System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.FilePath)))
+                if (objFile == null || !System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
                 {
                     return Redirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h));
                 }
                 var image_extension = Path.GetExtension(objFile.FilePath).Replace(".", "");
-                var path = string.Format("~/content/imgcache/img{0}_{1}_{2}." + image_extension, advertise.PhotoID, w, h);
+                var path = string.Format("content/imgcache/img{0}_{1}_{2}." + image_extension, advertise.PhotoID, w, h);
                 var strFormat = "image/" + image_extension;
 
                 if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
                 {
-                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePath)))
+                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
                     {
                         //float scaleHeight = (float)h / (float)OriginalImage.Height;
                         //float scaleWidth = (float)w / (float)OriginalImage.Width;
@@ -608,7 +608,7 @@ namespace Portal.Controllers
                             using (var result = (Bitmap)ImageUtility.ResizeImageKeepAspectRatio(OriginalImage, (int)w, (int)h))
                             {
                                 result.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
-                                return File(path.Replace("~", ""), strFormat);
+                                return File("/" + path.Replace("~/", ""), strFormat);
                             }
                             //using (Bitmap thumbnailBitmap = new Bitmap((int)w, (int)h))
                             //{
@@ -702,7 +702,7 @@ namespace Portal.Controllers
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
 
-                using (Image image = Image.FromFile(Path.Combine(host.WebRootPath,file.FilePath)))
+                using (Image image = Image.FromFile(Path.Combine(host.WebRootPath,file.FilePathWithoutTildeAndSlash)))
                 {
                     if (image.Width > 1500)
                         ViewBag.BigImage = true;
@@ -726,7 +726,7 @@ namespace Portal.Controllers
                     lock (objlock)
                     {
                         Entities.File ObjFile = fileService.Find(id).Clone();
-                        string directory_path = ObjFile.FilePath.Substring(0, ObjFile.FilePath.LastIndexOf('/') + 1);
+                        string directory_path = ObjFile.FilePathWithoutTildeAndSlash.Substring(0, ObjFile.FilePathWithoutTildeAndSlash.LastIndexOf('/') + 1);
                         string ext = ".jpg", filepath = "";
                         var uploadfile = Request.Form.Files[0];
                         string filename = string.Format("edited{0}{1}", Guid.NewGuid(), ext);
@@ -763,7 +763,7 @@ namespace Portal.Controllers
                         fileService.Update(ObjFile, host.ContentRootPath);
                         try
                         {
-                            System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "/content/imgcache"));
+                            System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
                             foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
                             {
                                 IOfile.Delete();
@@ -813,7 +813,7 @@ namespace Portal.Controllers
                 {
                     lock (objlock)
                     {
-                        System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "/content/imgcache"));
+                        System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
                         foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
                         {
                             IOfile.Delete();
@@ -861,7 +861,7 @@ namespace Portal.Controllers
 
                 lock (objlock)
                 {
-                    System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "/content/advertise"));
+                    System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "content/advertise"));
                     var IOFiles = IOdirectory.GetFiles();
                     var max = IOFiles.Length;
                     System.IO.FileInfo IOfile;
@@ -968,12 +968,12 @@ namespace Portal.Controllers
         [ResponseCache(Duration = 86400)]
         public ActionResult AccThumb(long accid, long fileid, string filename)
         {
-            var path = "/content/accthumb/" + accid + "/" + fileid + "/" + filename + ".jpg";
+            var path = "content/accthumb/" + accid + "/" + fileid + "/" + filename + ".jpg";
             if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
             {
                 return File("/resource/img/img202_500_300.png", "image/png");
             }
-            return File(path, "image/jpeg");
+            return File("/" + path, "image/jpeg");
         }
 
         [ResponseCache(Duration = 2592000, Location = ResponseCacheLocation.Client)]
@@ -1096,10 +1096,10 @@ namespace Portal.Controllers
                     });
                 }
                 file_path += (Guid.NewGuid() + ext);
-                if (!Directory.Exists(Path.Combine(host.WebRootPath, "/content/blogpost")))
-                    Directory.CreateDirectory(Path.Combine(host.WebRootPath, "/content/blogpost"));
+                if (!Directory.Exists(Path.Combine(host.WebRootPath, "content/blogpost")))
+                    Directory.CreateDirectory(Path.Combine(host.WebRootPath, "content/blogpost"));
 
-                using (Stream stream = new FileStream(Path.Combine(host.WebRootPath, file_path), FileMode.Create))
+                using (Stream stream = new FileStream(Path.Combine(host.WebRootPath, file_path.Replace("~/", "")), FileMode.Create))
                 {
                     image.CopyTo(stream);
                 }

@@ -56,6 +56,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     UserMainMobile = guestUser.MainMobile,
                     UserAppNotificationToken = guestUser.AppNotificationToken,
                     UserEmail = identityUser.Email,
+                    EmailConfirmed = identityUser.EmailConfirmed,
                     UserFcmAppNotificationToken = guestUser.FcmAppNotificationToken,
                     UserNotificationToken = guestUser.NotificationToken,
                     Type = UserContactType.GuestPayReserve,

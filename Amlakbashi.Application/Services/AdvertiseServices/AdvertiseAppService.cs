@@ -2158,6 +2158,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 UserMainMobile = advertise.User.MainMobile,
                 UserAppNotificationToken = advertise.User.AppNotificationToken,
                 UserEmail = identityUser.Email,
+                EmailConfirmed = identityUser.EmailConfirmed,
                 UserFcmAppNotificationToken = advertise.User.FcmAppNotificationToken,
                 UserNotificationToken = advertise.User.NotificationToken,
                 Type = UserContactType.ReserveRequest,
