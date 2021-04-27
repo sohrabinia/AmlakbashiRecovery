@@ -190,7 +190,8 @@ namespace Amlakbashi.Core.Entities
             Suspend = 0,
             Acticved = 1,
             InActived = 2,
-            Deleted = 3,
+            ReserveBanned = 3,
+            Deleted = 4
         }
 
         public enum AccessTypeEnum
@@ -303,11 +304,18 @@ namespace Amlakbashi.Core.Entities
                 case UserState.InActived:
                     return "غیرفعال";
                 case UserState.Deleted:
-                    return "پاک شده";
+                    return "حذف شده";
+                case UserState.ReserveBanned:
+                    return "ممنوعیت رزرو";
                 default:
                     return "";
             }
         }
+
+        //public static UserState[] GetAdminStateEnum()
+        //{
+        //    return Enum.GetValues(typeof(UserState));
+        //}
 
         public static string GetCreditTransactionCauseString(int transaction, string transactionCauseString = "")
         {

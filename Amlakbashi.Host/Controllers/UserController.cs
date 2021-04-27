@@ -144,7 +144,7 @@ namespace Amlakbashi.Host.Controllers
             string username = "", string mobile = "", int code = -1, int ownership = -1, int sort_order = -1,
             int mobile_status = -1, int status = -1, int advertise_count = -1,
             int complete_profile_status = -1, int complete_profile_contact_status = -1,
-            int user_general_type = -1, int access_type = -1,
+            int user_general_type = -1,
             int userFilterType = -1, int card_status = -1, string minReserveNorouzFromDate = "",
             string Province = "-1", string City = "-1", string Area = "-1",
             string advertiseId = "-1")
@@ -205,7 +205,6 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (status != -1)
                 {
-
                     var identityUserList = userService.GetAllIdentityUsernamesByState(Entities.User.UserState.Acticved);
                     model = model.Where(x => identityUserList.Contains(x.MainMobile));
                 }
@@ -240,10 +239,6 @@ namespace Amlakbashi.Host.Controllers
                             model = model.Where(x => x.PhotoStatus == (int)Entities.User.UserPhotoState.ready_publish);
                             break;
                     }
-                }
-                if (access_type != -1)
-                {
-                    model = model.Where(x => x.AccessType == access_type);
                 }
                 if (user_general_type != -1)
                 {
@@ -426,7 +421,6 @@ namespace Amlakbashi.Host.Controllers
                     AdvertiseCount = advertise_count,
                     CompleteProfileStatus = complete_profile_status,
                     CompleteProfileContactStatus = complete_profile_contact_status,
-                    AccessType = access_type,
                     UserGeneralType = user_general_type,
                     Province = province,
                     City = city,
@@ -476,6 +470,8 @@ namespace Amlakbashi.Host.Controllers
                 else
                 {
                     var model = userService.Find(uid);
+                    var identityUser = userService.GetIdentityUser(model.MainMobile);
+                    ViewBag.userState = identityUser.State;
                     return View(model);
                 }
             }
@@ -488,7 +484,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult Edit(User user)
+        public ActionResult Edit(User user, int userState)
         {
             try
             {
@@ -525,7 +521,13 @@ namespace Amlakbashi.Host.Controllers
                 //{
                 List<string> errors;
                 var identityUser = userService.GetIdentityUser(user.MainMobile);
-                userService.Update(UserDTO.Generate(user, identityUser), userAccessor.DoerUser.Id, false, ActionLog.ActionSourceEnum.AdminPanel, out errors, user.CancelInstantReserveLimit);
+                if (identityUser.State != (User.UserState)userState)
+                {
+                    identityUser.State = (User.UserState)userState;
+                    userService.UpdateIdentityUser(identityUser);
+                }
+                userService.Update(UserDTO.Generate(user, identityUser), userAccessor.DoerUser.Id,
+                    false, ActionLog.ActionSourceEnum.AdminPanel, out errors, user.CancelInstantReserveLimit);
                 //}
                 return RedirectToAction("Index");
             }
@@ -586,6 +588,7 @@ namespace Amlakbashi.Host.Controllers
                     var user = userService.GetIdentityUser(User.Identity.Name);
                     signInManager.SignOutAsync().Wait();
                     signInManager.SignInAsync(user, true).Wait();
+                    TempData["suc"] = "تغییر رمز عبور با موفقیت انجام شد";
                     return Redirect("/post/profilemanager?userid=" + userAccessor.CurrentUser.Id);
                 }
                 var errorList = new List<string>();
@@ -768,8 +771,7 @@ namespace Amlakbashi.Host.Controllers
                     });
                 }
 
-                if (identityUser.State == Entities.User.UserState.Suspend ||
-                    user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
+                if (identityUser.State == Entities.User.UserState.Suspend)
                 {
                     return GenerateJsonResult(new
                     {
@@ -902,16 +904,20 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(mobile_international);
                 if (identityUser.Code == code)
                 {
-                    userService.ChangeIdentityUserPassword(mobile_international, password);
-                    signInManager.SignInAsync(identityUser, true).Wait();
-                    return GenerateJsonResult(new { status = 1 });
+                    var result = userService.ChangeIdentityUserPassword(mobile_international, password);
+                    if (result.Succeeded)
+                    {
+                        signInManager.SignInAsync(identityUser, true).Wait();
+                        return GenerateJsonResult(new { status = 1 });
+                    }
+
                 }
-                return GenerateJsonResult(new { status = 0 });
+                return GenerateJsonResult(new { status = 0, msg="عملیات با خطا مواجه شد" });
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
-                return GenerateJsonResult(new { status = 0 });
+                logger.Error("User.SaveNewPass", exc);
+                return GenerateJsonResult(new { status = 0, msg = "عملیات با خطا مواجه شد" });
             }
         }
 
@@ -928,9 +934,9 @@ namespace Amlakbashi.Host.Controllers
                     userService.UpdateIdentityUser(identityUser);
                 }
                 var user = userService.GetByMainMobile(mobile_international);
-                return GenerateJsonResult(new 
-                { 
-                    status = 1, 
+                return GenerateJsonResult(new
+                {
+                    status = 1,
                     correct = correct,
                     fname = user.FName,
                     lname = user.LName
@@ -947,6 +953,10 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(password))
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "لطفا رمز خود را وارد کنید" });
+                }
                 var mobileInternational = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var result = signInManager.PasswordSignInAsync(mobileInternational, password, true, false).Result;
                 if (result.Succeeded)
@@ -958,7 +968,7 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("", exc);
-                return GenerateJsonResult(new { status = 0 });
+                return GenerateJsonResult(new { status = 0, msg = "عملیات با خطا مواجه شد" });
             }
         }
 
@@ -973,8 +983,7 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(mobile_international);
                 if (identityUser != null && identityUser.Code == code)
                 {
-                    if (identityUser.State == Entities.User.UserState.Suspend ||
-                        identityUser.State == Entities.User.UserState.Deleted)
+                    if (identityUser.State == Entities.User.UserState.Suspend)
                     {
                         return GenerateJsonResult(new { status = 0, msg = "حساب کاربری شما معلق شده است. لطفا با پشتیبان تماس بگیرید" });
                     }
@@ -993,7 +1002,8 @@ namespace Amlakbashi.Host.Controllers
                         }
                         else
                         {
-                            return GenerateJsonResult(new {
+                            return GenerateJsonResult(new
+                            {
                                 status = 0,
                                 msg = errors.First().Value
                             });
@@ -1010,8 +1020,11 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("User/PopupLoginRegister", exc);
-                return GenerateJsonResult(new { status = 0,
-                    msg = GeneralLocalization.GetExceptionMessage(exc) });
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = GeneralLocalization.GetExceptionMessage(exc)
+                });
             }
         }
 
@@ -1062,7 +1075,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize]
         public JsonResult PopupConfirmEmail(string emailCode)
-         {
+        {
             try
             {
                 var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
@@ -1424,11 +1437,11 @@ namespace Amlakbashi.Host.Controllers
 
         public JsonResult IsUserLoginBanned()
         {
+            var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
             return GenerateJsonResult(
                 new
                 {
-                    val = userAccessor.CurrentUser.AccessType ==
-                        (int)Entities.User.AccessTypeEnum.LoginBanned,
+                    val = identityUser.State == Entities.User.UserState.Suspend,
                     user_id = userAccessor.CurrentUser.Id
                 });
         }

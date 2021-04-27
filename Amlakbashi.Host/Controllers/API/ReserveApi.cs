@@ -111,6 +111,7 @@ namespace Amlakbashi.Host.Controllers.API
             int number_of_guests, string cid, int buildNumber = 0)
         {
             var user = GetUser();
+            var identityUser = userService.GetIdentityUser(user.MainMobile);
             if (!ClientAuthenticate(cid))
             {
                 return null;
@@ -125,7 +126,7 @@ namespace Amlakbashi.Host.Controllers.API
                         msg = "برای درخواست رزرو ابتدا باید با حساب کاربری خود وارد شوید",
                     });
                 }
-                if (user.AccessType == (int)Entities.User.AccessTypeEnum.ReserveBanned || user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
+                if (identityUser.State != Entities.User.UserState.Acticved)
                 {
                     return GenerateJsonResult(new
                     {
@@ -144,7 +145,6 @@ namespace Amlakbashi.Host.Controllers.API
                         msg = data.msg,
                     });
                 }
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
                 if (PhoneUtility.IsNumberForIran(identityUser.PhoneNumber) == false &&
                     identityUser.EmailConfirmed == false)
                 {

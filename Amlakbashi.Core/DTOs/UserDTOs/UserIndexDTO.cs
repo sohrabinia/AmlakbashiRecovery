@@ -22,7 +22,7 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
         public int AdvertiseCount { get; set; }
         public int CompleteProfileStatus { get; set; }
         public int CompleteProfileContactStatus { get; set; }
-        public int AccessType { get; set; }
+        //public int AccessType { get; set; }
         public int UserGeneralType { get; set; }
         public int Province { get; set; }
         public int City { get; set; }

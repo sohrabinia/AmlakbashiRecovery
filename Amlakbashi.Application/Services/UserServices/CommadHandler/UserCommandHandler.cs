@@ -95,7 +95,7 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
         {
             try
             {
-                var identityUserList = userManager.Users.Where(w => w.State != User.UserState.Deleted).Select(s => s.UserName);
+                var identityUserList = userManager.Users.Select(s => s.UserName);
                 IQueryable<User> all_user = repository.Query(q => q
                     .Include(i => i.HostReserves)
                     .Where(x => (request.UserId < 1 ? true : x.Id == request.UserId) &&

@@ -23,6 +23,8 @@ using Newtonsoft.Json;
 using System.Dynamic;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
+using System.IO;
+using System.Text;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -234,8 +236,8 @@ namespace Amlakbashi.Host.Controllers
             }
             if (invalidInput)
             {
-                // TODO: check this on test
-                //Response.Write("Invalid Input");
+                var bytes = Encoding.UTF8.GetBytes("Invalid Input");
+                HttpContext.Response.Body.WriteAsync(bytes, 0, bytes.Length);
             }
             if (useCustomRedirect)
             {

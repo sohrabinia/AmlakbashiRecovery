@@ -89,7 +89,7 @@ namespace Amlakbashi.Host.Controllers
                 var urlReferrer = Request.Headers["Referer"].ToString();
                 if (!string.IsNullOrEmpty(urlReferrer))
                 {
-                    HttpContext.Session.SetObjectAsJson("urlReferrer", urlReferrer);//TODO: Probably needs to use an absolute url
+                    HttpContext.Session.SetObjectAsJson("urlReferrer", urlReferrer);
                 }
                 AdvertiseType parentType;
                 AdvertiseStatus status;

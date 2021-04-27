@@ -44,11 +44,13 @@ namespace Amlakbashi.Host.Controllers.API
                         msg = "شماره موبایل وارد شده صحیح نیست. لطفا پس از بررسی مجدد شماره درست را وارد کنید."
                     });
                 }
+
                 var international_mobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var number_is_for_iran = PhoneUtility.IsNumberForIran(international_mobile);
-                var user = userService.GetActivatedUserByMainMobile(international_mobile);
-                var identityUser = userService.GetActivatedIdentityUser(international_mobile);
-                if (user != null && user.AccessType == (int)Entities.User.AccessTypeEnum.LoginBanned)
+                var user = userService.GetByMainMobile(international_mobile);
+                var identityUser = userService.GetIdentityUser(international_mobile);
+
+                if (identityUser != null && identityUser.State == Entities.User.UserState.Suspend)
                 {
                     return GenerateJsonResult(new
                     {
@@ -56,48 +58,42 @@ namespace Amlakbashi.Host.Controllers.API
                         msg = "امکان ورود به سایت برای شما مسدود شده است, جهت فعالسازی با پشتیبانی تماس بگیرید"
                     });
                 }
+
                 var isNew = false;
                 if (identityUser == null)
                 {
-                    user = userService.GetByMainMobile(international_mobile);
-                    identityUser = userService.GetIdentityUser(international_mobile);
-                    if (identityUser == null)
+                    string failReason;
+                    user = new User();
+                    user.Mobile = international_mobile;
+                    user.MainMobile = international_mobile;
+                    user.ResponseFrom = 2;
+                    user.ResponseTo = 2;
+                    user.AmlakbashiScore = 1000;
+                    userService.Insert(user);
+
+                    identityUser = new AppUser()
                     {
-                        string failReason;
-                        user = new User();
-                        user.Mobile = international_mobile;
-                        user.MainMobile = international_mobile;
-                        user.ResponseFrom = 2;
-                        user.ResponseTo = 2;
-                        user.AmlakbashiScore = 1000;
-                        userService.Insert(user);
+                        UserName = international_mobile,
+                        PhoneNumber = international_mobile,
+                        CreateDate = DateTime.Now,
+                        State = Entities.User.UserState.InActived
+                    };
+                    userService.AddIdentityUser(identityUser);
 
-                        identityUser = new AppUser()
+                    failReason = null;
+                    isNew = true;
+                    if (user == null)
+                    {
+                        return GenerateJsonResult(new
                         {
-                            UserName = international_mobile,
-                            PhoneNumber = international_mobile,
-                            CreateDate = DateTime.Now,
-                            State = Entities.User.UserState.InActived
-                        };
-                        userService.AddIdentityUser(identityUser);
-
-                        failReason = null;
-                        isNew = true;
-                        if (user == null)
-                        {
-                            return GenerateJsonResult(new
-                            {
-                                status = (int)Entities.User.SignInFirstStepResult.Error,
-                                msg = failReason
-                            });
-                        }
+                            status = (int)Entities.User.SignInFirstStepResult.Error,
+                            msg = failReason
+                        });
                     }
                 }
 
-                //if (number_is_for_iran)
-                //{
                 var code = identityUser.Code;
-                if (identityUser.State != Entities.User.UserState.Acticved ||
+                if (identityUser.State == Entities.User.UserState.InActived ||
                     identityUser.PhoneNumberConfirmed == false)
                 {
                     if (string.IsNullOrEmpty(code) ||
@@ -127,19 +123,6 @@ namespace Amlakbashi.Host.Controllers.API
                     notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
                     isNew = isNew
                 });
-                //}
-                //else
-                //{
-                //    return GenerateJsonResult(new
-                //    {
-                //        status = (int)Entities.User.SignInFirstStepStatus.EmailLogin,
-                //        user_id = user.Id,
-                //        fname = string.IsNullOrEmpty(user.FName) ? "" : user.FName,
-                //        lname = string.IsNullOrEmpty(user.LName) ? "" : user.LName,
-                //        mobile = international_mobile,
-                //        notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
-                //    });
-                //}
             }
             catch (Exception exc)
             {
@@ -253,8 +236,7 @@ namespace Amlakbashi.Host.Controllers.API
                 var identityUser = userService.GetIdentityUser(mobile_international);
                 if (identityUser != null && identityUser.Code == code)
                 {
-                    if (identityUser.State == Entities.User.UserState.Suspend ||
-                        identityUser.State == Entities.User.UserState.Deleted)
+                    if (identityUser.State == Entities.User.UserState.Suspend)
                     {
                         return GenerateJsonResult(new
                         {
@@ -293,8 +275,12 @@ namespace Amlakbashi.Host.Controllers.API
                 }
                 else
                 {
-                    return GenerateJsonResult(new { status = 0, errors =
-                        new Dictionary<string, string>() { { "code", "کد وارد شده صحیح نیست" } } });
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        errors =
+                        new Dictionary<string, string>() { { "code", "کد وارد شده صحیح نیست" } }
+                    });
                 }
             }
             catch (Exception exc)
@@ -927,7 +913,7 @@ namespace Amlakbashi.Host.Controllers.API
                 var identityUser = userService.GetIdentityUser(user.MainMobile);
                 return GenerateJsonResult(new { status = 1, email = identityUser.Email });
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 logger.Error("", exc);
                 return GenerateJsonResult(new { status = 0 });

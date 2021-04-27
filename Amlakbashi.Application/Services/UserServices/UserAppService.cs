@@ -162,7 +162,6 @@ namespace Amlakbashi.Application.Services.UserServices
             user.ResponseTo = dto.responseTo;
             user.FName = dto.fname;
             user.LName = dto.lname;
-            user.AccessType = dto.accessType;
             user.OwnerShip = dto.OwnerShip;
             user.CancelInstantReserveLimit = dto.CancelInstantReserveLimit;
             user.ContactPhone = dto.ContactPhone;
@@ -317,12 +316,10 @@ namespace Amlakbashi.Application.Services.UserServices
             //var shallowUser = user.ShallowCopy();
             if (state)
             {
-                //user.State = (int)User.UserState.Acticved;
                 identityUser.State = User.UserState.Acticved;
             }
             else
             {
-                //user.State = (int)User.UserState.InActived;
                 identityUser.State = User.UserState.InActived;
             }
             userManager.UpdateAsync(identityUser).Wait();
@@ -379,15 +376,6 @@ namespace Amlakbashi.Application.Services.UserServices
             identityUser.CreateDate = time;
             userManager.UpdateAsync(identityUser).Wait();
         }
-
-        // TODO: remove this, UpdateLoginCode do same thing
-        //public void UpdateAdminLoginCode(int userId, string code)
-        //{
-        //    var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-        //    user.AdminLoginCode = code;
-        //    Repository.Update(user);
-        //    Repository.Save();
-        //}
 
         public void UpdateForgetCode(int userId, string code)
         {

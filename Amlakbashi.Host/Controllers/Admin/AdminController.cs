@@ -489,8 +489,9 @@ namespace Portal.Controllers
             try
             {
                 IQueryable<User> users = userService.GetAllAsIQueryable();
+                var identityUserList = userService.GetAllIdentityUsernamesByState();
                 users = users.Where(x => x.NotificationToken != null &&
-                    x.AccessType == (int)Entities.User.AccessTypeEnum.Full);
+                    identityUserList.Contains(x.MainMobile));
                 switch (user_type)
                 {
                     case 0:

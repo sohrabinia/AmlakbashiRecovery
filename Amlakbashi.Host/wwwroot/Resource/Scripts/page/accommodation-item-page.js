@@ -209,10 +209,8 @@ function checkReserve(confirm_required) {
                         showNoYesMessage('ورود به سایت',
                             'برای ثبت درخواست رزرو، ابتدا باید ایمیل خود را ثبت و تایید کنید',
                             function () {
-                                debugger;
-                                reserve_wait_for_login = true;
-                                showRegisterEmailForm();
-                                $('#profileEmail').val(userEmailAddress);
+                                showRegisterEmailForm(setEmailToInput);
+                                //$("#profileEmail").val(userEmailAddress);
                             }, undefined, { yesText: 'ثبت ایمیل', noText: 'بستن' });
                         return false;
                     }
@@ -290,9 +288,7 @@ function checkReserve(confirm_required) {
                             showNoYesMessage('ورود به سایت',
                                 'برای ثبت درخواست رزرو، ابتدا باید ایمیل خود را ثبت و تایید کنید',
                                 function () {
-                                    reserve_wait_for_login = true;
-                                    showRegisterEmailForm();
-                                    $('#profileEmail').val(userEmailAddress);
+                                    showRegisterEmailForm(setEmailToInput);
                                 }, undefined, { yesText: 'ثبت ایمیل', noText: 'بستن' });
                             return false;
                         }
@@ -515,6 +511,9 @@ $(document).on("click", ".occupied_day_label", function () {
 $(document).on("change", "#guest_count", function () {
     onChangeGuestCount(this);
 });
+function setEmailToInput() {
+    $("#profileEmail").val(userEmailAddress);
+}
 function updateReserveLabels() {
     var data_is_incorrect = false;
     if ($("#guest_count").val() == 0 || $("#guest_count").val() == '') {

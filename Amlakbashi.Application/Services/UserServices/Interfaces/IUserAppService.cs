@@ -47,7 +47,6 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void UpdateFcmNotificationToken(int userId, string token);
         void UpdateAppNotificationToken(int userId, string token);
         void UpdateUserGeneralType(int userId, User.UserGeneralTypeEnum userGeneralType);
-        //void UpdateAdminLoginCode(int userId, string code);
         void UpdateForgetCode(int userId, string code);
         void Delete(int userId, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         void AddFavorite(int userId, long advertiseId);

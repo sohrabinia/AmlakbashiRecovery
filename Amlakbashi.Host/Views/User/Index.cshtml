@@ -125,7 +125,7 @@
                 </td>
             </tr>
             <tr>
-                <td class="label">وضعیت دسترسی :</td>
+                @*<td class="label">وضعیت دسترسی :</td>
                 <td class="minw">
                     <select name="access_type">
                         <option value="-1" is-selected="@((int)data.AccessType == -1)">همه وضعیت ها</option>
@@ -137,7 +137,7 @@
                             }
                         }
                     </select>
-                </td>
+                </td>*@
                 <td class="label">مرتب سازی :</td>
                 <td class="minw">
                     <select name="sort_order">
@@ -315,7 +315,7 @@
                             </div>
                         </td>
                     }
-                    @if (item.User.AccessType < 2)
+                    @if (item.User.State == 1 || item.User.State == 3)
                     {
                         <td>
                             <a href="@Url.Action("Edit",new {uid= item.User.Id})"><span class="editicon" title="ویرایش"></span></a>
@@ -372,7 +372,6 @@
     complete_profile_status = data.CompleteProfileStatus,
         complete_profile_contact_status = data.CompleteProfileContactStatus,
     user_general_type = data.UserGeneralType,
-        access_type = data.AccessType,
         Province = data.Province,
     City = data.City,
         Area = data.Area,

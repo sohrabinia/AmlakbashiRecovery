@@ -747,18 +747,6 @@ namespace Amlakbashi.Host.Controllers
                 regionId = location != null ? location.Id : 0;
                 name = locationString;
             }
-            // TODO: check this
-            //var frompaypernight = Request.Query["frompaypernight"];
-            //var topaypernight = Request.Query["topaypernight"];
-            //var fromMetrazh = Request.Query["fromMetrazh"];
-            //var toMetrazh = Request.Query["toMetrazh"];
-            //var region = Request.Query["region"];
-            //var capacity = Request.Query["capacity"];
-            //var room = Request.Query["room"];
-            //var elevator = Request.Query["elevator"];
-            //var pool = Request.Query["pool"];
-            //var empty_range_from = Request.Query["empty_range_from"];
-            //var empty_range_to = Request.Query["empty_range_to"];
             string query_string = "";
             if (page > 1)
             {
