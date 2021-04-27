@@ -110,7 +110,7 @@ namespace Amlakbashi.Host.Controllers
                     reserves.Add(item);
                     if (i >= todayPayments.Count - 1 || currentPrice + nextPayablePrice > maxPrice)
                     {
-                        System.IO.Directory.CreateDirectory(Path.Combine(host.WebRootPath, "/content/files/PayList"));
+                        System.IO.Directory.CreateDirectory(Path.Combine(host.WebRootPath, "content/files/PayList"));
                         var filepath = string.Format("~/content/files/PayList/file{0}{1}", Guid.NewGuid(), ".txt");
                         var fileLines = new List<string>();
                         foreach (var reserve in reserves)
@@ -135,7 +135,7 @@ namespace Amlakbashi.Host.Controllers
                                 !string.IsNullOrEmpty(bankFullName) ? bankFullName : hostFullName,
                                 "تسویه کد  رزرو: " + reserve.Id));
                         }
-                        using (StreamWriter sw = new StreamWriter(System.IO.File.Open(Path.Combine(host.WebRootPath, filepath), FileMode.Create), Encoding.UTF8))
+                        using (StreamWriter sw = new StreamWriter(System.IO.File.Open(Path.Combine(host.WebRootPath, filepath.Replace("~/", "")), FileMode.Create), Encoding.UTF8))
                         {
                             foreach (var line in fileLines)
                             {
@@ -327,8 +327,8 @@ namespace Amlakbashi.Host.Controllers
                 string extension = System.IO.Path.GetExtension(Request.Form.Files["FileUpload1"].FileName).ToLower();
 
                 string[] validFileTypes = { ".xls", ".xlsx", ".csv" };
-                System.IO.Directory.CreateDirectory(Path.Combine(host.WebRootPath, "/content/files/PayBankResult"));
-                string path1 = string.Format("{0}/{1}", Path.Combine(host.WebRootPath, "/Content/files/PayBankResult"), Request.Form.Files["FileUpload1"].FileName);
+                System.IO.Directory.CreateDirectory(Path.Combine(host.WebRootPath, "content/files/PayBankResult"));
+                string path1 = string.Format("{0}/{1}", Path.Combine(host.WebRootPath, "content/files/PayBankResult"), Request.Form.Files["FileUpload1"].FileName);
                 if (validFileTypes.Contains(extension))
                 {
                     while (System.IO.File.Exists(path1))
@@ -359,7 +359,11 @@ namespace Amlakbashi.Host.Controllers
         [Authorize(Policy = Policies.Reserve_Payment_Add)]
         public ActionResult Download(string path)
         {
-            string file = Path.Combine(host.WebRootPath, path);
+            if (path.StartsWith("/"))
+            {
+                path = path.Substring(1);
+            }
+            string file = Path.Combine(host.WebRootPath, path.Replace("~/", ""));
             string contentType = "text/plain";
             return File(file, contentType, "group_payment_" + DateTime.Now.ToString() + ".txt");
         }
@@ -368,6 +372,10 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
+                if (path.StartsWith("/"))
+                {
+                    path = path.Substring(1);
+                }
                 var groupPayment = accounting.FindGroupPayment(id);
                 if (!string.IsNullOrEmpty(groupPayment.PayResultUrl))
                 {
@@ -376,7 +384,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var reserveIds = groupPayment.GetReserveIds();
                 using (SpreadsheetDocument spreadsheetDocument =
-                    SpreadsheetDocument.Open(Path.Combine(host.WebRootPath, path), false))
+                    SpreadsheetDocument.Open(Path.Combine(host.WebRootPath, path.Replace("~/", "")), false))
                 {
                     WorkbookPart workbookPart = spreadsheetDocument.WorkbookPart;
                     WorksheetPart worksheetPart = workbookPart.WorksheetParts.First();
@@ -557,7 +565,7 @@ namespace Amlakbashi.Host.Controllers
                 !string.IsNullOrEmpty(dto.GroupPayment.PayResultUrl))
             {
                 using (SpreadsheetDocument spreadsheetDocument =
-                    SpreadsheetDocument.Open(Path.Combine(host.WebRootPath, dto.GroupPayment.PayResultUrl), false))
+                    SpreadsheetDocument.Open(Path.Combine(host.WebRootPath, dto.GroupPayment.PayResultUrl.Replace("~/", "")), false))
                 {
                     WorkbookPart workbookPart = spreadsheetDocument.WorkbookPart;
                     WorksheetPart worksheetPart = workbookPart.WorksheetParts.First();

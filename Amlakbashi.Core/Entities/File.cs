@@ -17,6 +17,7 @@ namespace Amlakbashi.Core.Entities
         public DateTime LastModifyDate { get; set; }
         public int UserID { get; set; }
         public string FilePath { get; set; }
+        public string FilePathWithoutTildeAndSlash { get { return FilePath.Replace("~/", ""); } }
         public int MinifyStatusInt { get; set; }
         public int MinifyMaxWidth { get; set; }
         public long MinifyQualityPercent { get; set; }

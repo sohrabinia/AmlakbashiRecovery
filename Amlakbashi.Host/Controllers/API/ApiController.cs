@@ -130,8 +130,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                int AndroidApp_MinBuildNumber = 1;
-                int AndroidApp_LastBuildNumber = 56;
+                int AndroidApp_MinBuildNumber = 58;
+                int AndroidApp_LastBuildNumber = 58;
 
                 //var newFeatures = new string[] {
                 //    "امکان تعیین موقعیت اقامتگاه در نقشه",
