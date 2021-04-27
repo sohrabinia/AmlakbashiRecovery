@@ -24,6 +24,7 @@ var can_send_login_message = true;
 $(".login__bg").click(function () {
     $('#login-box-details').toggleClass('animate');
 });
+
 function toggle_login() {
     if ($(".login__container").css("display") == "none") {
         if (!checked_mobile_current)
@@ -40,22 +41,40 @@ function toggle_login() {
 
 }
 var pressKey = $(document).keypress(function (event) {
-
     var keycode = (event.keyCode ? event.keyCode : event.which);
     if ($(".login__container").length == 0 ||
         $(".login__container").css("display") == "none") {
         return;
     }
     if (keycode == '13') {
-        if ($("#login_form").css("display") != "none" && $(".input-code").css("display") == "none") {
-            login();
+        debugger;
+        switch (currentLoginStep) {
+            case loginStepEnum.enterMobile:
+                login();
+                break;
+            case loginStepEnum.enterCode:
+                break;
+            case loginStepEnum.enterPassword:
+                loginPassword();
+                break;
+            case loginStepEnum.signupUser:
+                login_verification();
+                break;
+            case loginStepEnum.forgetPassword:
+                saveNewPass();
+                break;
+            default:
+                break;
         }
-        else if ($("#login_form_email").css("display") != "none") {
-            login("email");
-        }
-        else if ($("#verification_form").css("display") != "none") {
-            login_verification();
-        }
+        //if ($("#login_form").css("display") != "none" && $(".input-code").css("display") == "none") {
+        //    login();
+        //}
+        //else if ($("#login_form_email").css("display") != "none") {
+        //    login("email");
+        //}
+        //else if ($("#verification_form").css("display") != "none") {
+        //    login_verification();
+        //}
     }
 
 });
@@ -78,31 +97,54 @@ function toggle_login_container(direction, onDone) {
         });
     }
 }
+
 $("#login_form").find("input").keyup(function () {
     if ($(this).val() > 0) {
-        $(".login__box-button").css('background', '#fdd835');
+        $(".login-mobile-code-keyup").css('background', '#fdd835');
     } else {
-        $(".login__box-button").css('background', '#e2e2e2');
-    }
-});
-$("#email").keyup(function () {
-    if ($(this).val() != null && $(this).val() != "") {
-        $(".login__box-button").css('background', '#fdd835');
-    } else {
-        $(".login__box-button").css('background', '#e2e2e2');
+        $(".login-mobile-code-keyup").css('background', '#e2e2e2');
     }
 });
 
-function SignUp_button() {
-    if ($("#lname").val() != null && $("#fname").val() != null && $("#lname").val() != "" && $("#fname").val() != "") {
-        $(".login__box-button").css('background', '#fdd835');
+//$("#email").keyup(function () {
+//    if ($(this).val() != null && $(this).val() != "") {
+//        $(".login__box-button").css('background', '#fdd835');
+//    } else {
+//        $(".login__box-button").css('background', '#e2e2e2');
+//    }
+//});
+
+$("#passLogin").on("keyup", function () {
+    if ($(this).val() != null && $(this).val() != "") {
+        $("#btnLoginPassForm").css('background', '#fdd835');
     } else {
-        $(".login__box-button").css('background', '#e2e2e2');
+        $("#btnLoginPassForm").css('background', '#e2e2e2');
+    }
+})
+
+$(".forgot-pass-input").on("keyup", function () {
+    if ($("#forgotPass").val() != null && $("#forgotConfirmPass").val() != null &&
+        $("#forgotPass").val() != "" && $("#forgotConfirmPass").val() != "") {
+        $("#btnForgotPass").css('background', '#fdd835');
+    } else {
+        $("#btnForgotPass").css('background', '#e2e2e2');
+    }
+})
+
+function SignUp_button() {
+    if ($("#lname").val() != null && $("#fname").val() != null && $("#lname").val() != "" && $("#fname").val() != "" &&
+        $("#pass").val() != null && $("#pass").val() != "" && $("#confirmPass").val() != null && $("#confirmPass").val() != "") {
+        $("#btnSignUp").css('background', '#fdd835');
+    } else {
+        $("#btnSignUp").css('background', '#e2e2e2');
     }
 }
+
 var mobileCurrent
 var login_in_progress = false;
 var checked_mobile_current = false;
+const loginStepEnum = { "none": 0, "enterMobile": 1, "enterPassword": 2, "enterCode": 3, "forgetPassword": 4, "signupUser": 5 }
+var currentLoginStep = loginStepEnum.enterMobile;
 
 function login(step) {
     if (login_in_progress) {
@@ -128,6 +170,7 @@ function login(step) {
                 alertify.error(ret.msg);
             }
             else if (ret.status == 1) {
+                currentLoginStep = loginStepEnum.enterCode;
                 checked_mobile_current = true;
                 mobileCurrent = function () {
                     $(".input-code").show();
@@ -178,20 +221,10 @@ function login(step) {
                     '<a href="/contact">تماس با پشتیبانی</a>');
             }
             else if (ret.status == 3) {
-                //login_success_email(ret.email);
-                //$(".login_form").hide();
-                //$("#code").val(ret.code);
-                //show_verification_form();
                 $(".login_form").hide();
                 $('#loginPasswordForm').show();
+                currentLoginStep = loginStepEnum.enterPassword;
             }
-            //else if (ret.status == 4) {
-            //    $(".login_form").hide();
-            //    //$("#login_form_email").show();
-            //    //$(".login__box-button").css('background', '#e2e2e2');
-            //    //setTimeout(function () { $("#email").focus() }, 1300);
-            //    $('#loginPasswordForm').show();
-            //}
             toggle_login_container(true, function () {
                 $(".login__container").css("display", "flex");
                 if (ret.status == 0) {
@@ -208,6 +241,7 @@ function showCodeForm() {
         function (ret) {
             login_in_progress = false;
             if (ret.status == 1) {
+                currentLoginStep = loginStepEnum.enterCode;
                 $("#login_form").show();
                 $('#loginPasswordForm').hide();
                 $(".input-code").show();
@@ -234,6 +268,11 @@ function showCodeForm() {
                         })
                     });
                 }
+                $("#code").on('keypress', function (e) {
+                    if (e.which == 13) {
+                        loginForgotSuccess();
+                    }
+                });
                 $("#success__code").click(function () {
                     loginForgotSuccess();
                 });
@@ -272,6 +311,7 @@ function loginForgotSuccess() {
         if (ret.correct) {
             $('.login_form').hide();
             $("#loginForgotPasswordForm").show();
+            currentLoginStep = loginStepEnum.forgetPassword;
         } else {
             alertify.error('کد وارد شده اشتباه است');
         }
@@ -328,36 +368,36 @@ function login_verification() {
         });
 }
 
-function registerEmail() {
-    var email = $("#email").val();
-    myajax("user/PopupRegisterEmail", "email=" + email,
-        function (ret) {
-            if (ret.status == 1) {
-                $('.login_form').hide();
-                $("#confirmEmailForm").show();
-            }
-            else {
-                alertify.error(ret.msg);
-            }
-        });
-}
+//function registerEmail() {
+//    var email = $("#email").val();
+//    myajax("user/PopupRegisterEmail", "email=" + email,
+//        function (ret) {
+//            if (ret.status == 1) {
+//                $('.login_form').hide();
+//                $("#confirmEmailForm").show();
+//            }
+//            else {
+//                alertify.error(ret.msg);
+//            }
+//        });
+//}
 
-function confirmEmail() {
-    var emailCode = $("#emailCode").val();
-    myajax("user/PopupConfirmEmail", "emailcode=" + emailCode,
-        function (ret) {
-            if (ret.status == 1) {
-                $('.login__container').hide();
-                $('.login__bg').hide();
-                onLoginFinish();
-                alertify.success("ایمیل شما با موفقیت ثبت شد");
-                verifyEmail = true;
-            }
-            else {
-                alertify.error("کد وارد شده اشتباه است");
-            }
-        });
-}
+//function confirmEmail() {
+//    var emailCode = $("#emailCode").val();
+//    myajax("user/PopupConfirmEmail", "emailcode=" + emailCode,
+//        function (ret) {
+//            if (ret.status == 1) {
+//                $('.login__container').hide();
+//                $('.login__bg').hide();
+//                onLoginFinish();
+//                alertify.success("ایمیل شما با موفقیت ثبت شد");
+//                verifyEmail = true;
+//            }
+//            else {
+//                alertify.error("کد وارد شده اشتباه است");
+//            }
+//        });
+//}
 
 function resend_login_sms() {
     if (login_in_progress) {
@@ -448,6 +488,7 @@ function login_success(mobile, isNew) {
         },
         success: function (ret) {
             if (ret.correct) {
+                currentLoginStep = loginStepEnum.signupUser;
                 $(".login_form").hide();
                 show_verification_form(ret.fname, ret.lname, isNew);
             } else {
@@ -474,9 +515,6 @@ function show_verification_form(fname, lname, isNew) {
         $("#lname").val(lname);
     }
     $(".login__box-button").css('background', '#e2e2e2');
-    //checked_mobile_current = true;
-    //$("#login_form").css("display", "none");
-    //$("#verification_form").css("display", "unset");
     $(".icon-back").css('display', 'none');
     $(".input-code").hide();
     $("#verification_form").show();

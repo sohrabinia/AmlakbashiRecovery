@@ -27,7 +27,7 @@
                         <span id="error-msg" class="hide"></span>*@
                     @*<input class="login__box-input" onkeypress="onMobileKeyPress" onkeyup="validateNumber(this);" onchange="validateNumber(this)" placeholder="تلفن همراه" type="text" name="mobile" id="mobile" value="">*@
                     <div class="button-get-number">
-                        <p class="login__box-button" onclick="login()">ادامه</p>
+                        <p class="login__box-button login-mobile-code-keyup" onclick="login()">ادامه</p>
                     </div>
                     <div class="input-code">
                         @*<div class="login-confirm-message">
@@ -39,14 +39,14 @@
                         @*</div>*@
                         <input class="login__box-input" onkeyup="validateNumber(this);" onchange="validateNumber(this)" type="text" name="code" id="code" value="">
                         @await Html.PartialAsync("_resend-form-login", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "resend_form" }, { "title", "درخواست ارسال مجدد" }, { "id_resend", "resend_button" }, { "id_count_down_timer", "count_down_timer" } })
-                        <input type="submit" onkeypress="onMobileKeyPress" value="تایید کد" id="success__code" class="login__box-button" />
+                        <input type="submit" onkeypress="onMobileKeyPress" value="تایید کد" id="success__code" class="login__box-button login-mobile-code-keyup" />
                     </div>
                 </div>
                 <div id="loginPasswordForm" class="login_form" style="display:none">
                     <p class="login__please-enter-mobile">لطفا رمز عبور خود را وارد کنید</p>
-                    <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="passLogin" id="passLogin" value="">
-                    <input type="submit" onkeyup="SignUp_button()" onclick="loginPassword()" value="ورود" class="login__box-button" />
-                    <input type="button" onclick="showCodeForm()" value="بازیابی رمز عبور" class="" style="margin-top:50px; border:0px; color:deepskyblue;" />
+                    <input class="login__box-input" type="password" name="passLogin" id="passLogin" value="">
+                    <input id="btnLoginPassForm" type="submit" onclick="loginPassword()" value="ورود" class="login__box-button" />
+                    <button type="button" onclick="showCodeForm()" style="margin-top:50px; background-color: white; border:0px; color:deepskyblue; font-size: small;">بازیابی رمز عبور</button>
                 </div>
                 @*<div id="login_form_email" class="login_form" style="display:none">
                         <p class="login__please-enter-mobile">لطفا ایمیل خود را وارد کنید</p>
@@ -55,11 +55,11 @@
                     </div>*@
                 <div id="loginForgotPasswordForm" class="login_form" style="display:none">
                     <p class="login__please-enter-mobile">لطفا رمز عبور جدید خود را وارد کنید</p>
-                    <label class="lname-style" style="color:black;">رمز عبور</label>
-                    <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="forgotPass" id="forgotPass" value="">
-                    <label class="lname-style" style="color:black;">تایید رمز عبور</label>
-                    <input onkeyup="SignUp_button()" class="login__box-input" type="password" name="forgotConfirmPass" id="forgotConfirmPass" value="">
-                    <input type="button" onclick="saveNewPass()" value="ذخیره رمز عبور" class="login__box-button" />
+                    <label class="" style="color:black; font-size:small; margin-bottom:10px;">رمز عبور</label>
+                    <input class="login__box-input forgot-pass-input" type="password" name="forgotPass" id="forgotPass" value="">
+                    <label class="" style="color:black; font-size:small;">تکرار رمز عبور</label>
+                    <input class="login__box-input forgot-pass-input" type="password" name="forgotConfirmPass" id="forgotConfirmPass" value="">
+                    <input id="btnForgotPass" type="button" onclick="saveNewPass()" value="ذخیره رمز عبور" class="login__box-button" />
                 </div>
                 <div id="verification_form" class="login_form">
                     <label class="fname-style">نام </label>
@@ -74,9 +74,9 @@
                         <label id="js-presentor-code-container">کد معرف (اختیاری) </label>
                         <input class="login__box-input" placeholder="" type="text" name="presentorcode" id="presentorcode" value="">
                     </div>
-                    <input type="submit" onkeypress="onMobileKeyPress" onclick="login_verification()" value="ثبت اطلاعات" class="login__box-button" style="margin-bottom: 20px;" />
+                    <input id="btnSignUp" type="submit" onkeypress="onMobileKeyPress" onclick="login_verification()" value="ثبت اطلاعات" class="login__box-button" style="margin-bottom: 20px;" />
                 </div>
-                <div id="registerEmailForm" class="login_form" style="display:none">
+                @*<div id="registerEmailForm" class="login_form" style="display:none">
                     <p class="login__please-enter-mobile">لطفا ایمیل خود را وارد کنید</p>
                     <input type="email" name="email" class="login__box-input" id="email" autocomplete="on">
                     <input type="button" onkeyup="SignUp_button()" onclick="registerEmail()" value="ثبت ایمیل" class="login__box-button" />
@@ -85,7 +85,7 @@
                     <p class="login__please-enter-mobile">لطفا کد ارسال شده به ایمیل خود را وارد کنید</p>
                     <input type="text" name="emailCode" class="login__box-input" id="emailCode" autocomplete="on">
                     <input type="button" onkeyup="SignUp_button()" onclick="confirmEmail()" value="تایید ایمیل" class="login__box-button" />
-                </div>
+                </div>*@
                 @*<div id="email_verification_form" class="login_form" style="display:none;">
                         <div class="login-confirm-message">
                             لینک فعال سازی به ایمیل <span id="email_label" class="login-confirm-message-red-label"></span> ارسال شد

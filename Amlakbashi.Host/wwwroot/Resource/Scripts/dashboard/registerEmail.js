@@ -1,7 +1,7 @@
 ﻿var emailEditMessage = undefined;
 var emailSent = false;
 
-function showRegisterEmailForm() {
+function showRegisterEmailForm(callback) {
     emailSent = false;
     emailEditMessage = showInfoMessage(
         'ثبت ایمیل', '', {
@@ -15,7 +15,7 @@ function showRegisterEmailForm() {
             color: 'white',
             bgColor: '#34A853',
             onclick: doRegisterEmailAction
-        }], autoClose: false
+        }], autoClose: false, onContentReady: callback
     });
 }
 
