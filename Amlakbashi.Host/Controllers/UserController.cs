@@ -205,7 +205,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (status != -1)
                 {
-                    var identityUserList = userService.GetAllIdentityUsernamesByState(Entities.User.UserState.Acticved);
+                    var identityUserList = userService.GetAllIdentityUsernamesByState((Entities.User.UserState)status);
                     model = model.Where(x => identityUserList.Contains(x.MainMobile));
                 }
                 if (userFilterType > -1)
@@ -521,7 +521,7 @@ namespace Amlakbashi.Host.Controllers
                 //{
                 List<string> errors;
                 var identityUser = userService.GetIdentityUser(user.MainMobile);
-                if (identityUser.State != (User.UserState)userState)
+                if (userState != null && identityUser.State != (User.UserState)userState)
                 {
                     identityUser.State = (User.UserState)userState;
                     userService.UpdateIdentityUser(identityUser);
@@ -912,7 +912,7 @@ namespace Amlakbashi.Host.Controllers
                     }
 
                 }
-                return GenerateJsonResult(new { status = 0, msg="عملیات با خطا مواجه شد" });
+                return GenerateJsonResult(new { status = 0, msg = "عملیات با خطا مواجه شد" });
             }
             catch (Exception exc)
             {

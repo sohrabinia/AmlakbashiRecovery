@@ -59,15 +59,16 @@
                         <option value="1" is-selected="@((int)data.MobileStatus == 1)">شماره موبایل تکراری</option>
                     </select>
                 </td>
-                <td class="label">وضعیت کاربر :</td>
+                @*<td class="label">وضعیت کاربر :</td>
                 <td class="minw">
                     <select name="status">
                         <option value="-1" is-selected="@((int)data.Status == -1)">همه وضعیت ها</option>
                         <option value="@((int)Entities.User.UserState.Acticved)" is-selected="@((int)data.Status == (int)Entities.User.UserState.Acticved)">@Entities.User.GetStateTitle((int)Entities.User.UserState.Acticved)</option>
                         <option value="@((int)Entities.User.UserState.InActived)" is-selected="@((int)data.Status == (int)Entities.User.UserState.InActived)">@Entities.User.GetStateTitle((int)Entities.User.UserState.InActived)</option>
                         <option value="@((int)Entities.User.UserState.Suspend)" is-selected="@((int)data.Status == (int)Entities.User.UserState.Suspend)">@Entities.User.GetStateTitle((int)Entities.User.UserState.Suspend)</option>
+                        <option value="@((int)Entities.User.UserState.ReserveBanned)" is-selected="@((int)data.Status == (int)Entities.User.UserState.ReserveBanned)">@Entities.User.GetStateTitle((int)Entities.User.UserState.ReserveBanned)</option>
                     </select>
-                </td>
+                </td>*@
             </tr>
             <tr>
                 <td class="label">تعداد آگهی :</td>
@@ -281,7 +282,6 @@
                             <td>
                                 @item.User.UserScore
                             </td>
-
                         }
                         <td class="credit_label">
                             @(string.Format("{0:n0}", item.User.Credit)) تومان
