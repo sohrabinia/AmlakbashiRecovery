@@ -317,15 +317,23 @@ namespace Amlakbashi.Host.Controllers.API
                         errors = "کد وارد شده صحیح نیست"
                     });
                 }
-                userService.ChangeIdentityUserPassword(mobile_international, password);
-                identityUser = userService.GetIdentityUser(mobile_international);
-                var jwtToken = userService.JwtSignIn(identityUser, Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
-                return GenerateJsonResult(new { status = 1, token = new JwtSecurityTokenHandler().WriteToken(jwtToken) });
+                var result = userService.ChangeIdentityUserPassword(mobile_international, password);
+                if (result.Succeeded)
+                {
+                    identityUser = userService.GetIdentityUser(mobile_international);
+                    var jwtToken = userService.JwtSignIn(identityUser, Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
+                    return GenerateJsonResult(new { status = 1, token = new JwtSecurityTokenHandler().WriteToken(jwtToken) });
+                }
+                else
+                {
+                    var firstError = result.Errors.FirstOrDefault();
+                    return GenerateJsonResult(new { status = 0, msg = UserLocalization.GetIdentityPasswordErrorString(firstError.Code, firstError.Description) });
+                }
             }
             catch (Exception exc)
             {
                 logger.Error("", exc);
-                return GenerateJsonResult(new { status = 0 });
+                return GenerateJsonResult(new { status = 0, msg = GeneralLocalization.GetExceptionMessage(exc) });
             }
         }
 
