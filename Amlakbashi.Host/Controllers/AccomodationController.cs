@@ -1738,9 +1738,6 @@ namespace Amlakbashi.Host.Controllers
                     accDTO.RelatedCategories = new List<DynamicCategory>();
                     accDTO.RelatedCategories.Add(categoryService.GetAccItemLinks(model.Province, model.City, model.Area, model.TypeID).Last());
                 }
-
-                // TODO: conflict with caching
-                advertiseService.AddToAdvertiseVisit(id);
                 ViewBag.amp_version = false;
                 return View(accDTO);
             }
@@ -2242,6 +2239,7 @@ namespace Amlakbashi.Host.Controllers
                 isNumberForIran = isNumberForIran,
                 userEmailAddress = userEmailAddress
             };
+            advertiseService.AddToAdvertiseVisit(id);
             //return GenerateJsonResult(new
             //{
             //    Data = data

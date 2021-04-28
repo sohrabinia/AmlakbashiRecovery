@@ -902,22 +902,32 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var identityUser = userService.GetIdentityUser(mobile_international);
-                if (identityUser.Code == code)
+                if (identityUser.Code != code)
                 {
-                    var result = userService.ChangeIdentityUserPassword(mobile_international, password);
-                    if (result.Succeeded)
+                    return GenerateJsonResult(
+                    new
                     {
-                        signInManager.SignInAsync(identityUser, true).Wait();
-                        return GenerateJsonResult(new { status = 1 });
-                    }
-
+                        status = 0,
+                        errors = "کد وارد شده صحیح نیست"
+                    });
                 }
-                return GenerateJsonResult(new { status = 0, msg="عملیات با خطا مواجه شد" });
+                var result = userService.ChangeIdentityUserPassword(mobile_international, password);
+                if (result.Succeeded)
+                {
+                    identityUser = userService.GetIdentityUser(mobile_international);
+                    signInManager.SignInAsync(identityUser, true).Wait();
+                    return GenerateJsonResult(new { status = 1 });
+                }
+                else
+                {
+                    var firstError = result.Errors.FirstOrDefault();
+                    return GenerateJsonResult(new { status = 0, msg = UserLocalization.GetIdentityPasswordErrorString(firstError.Code, firstError.Description) });
+                }
             }
             catch (Exception exc)
             {
                 logger.Error("User.SaveNewPass", exc);
-                return GenerateJsonResult(new { status = 0, msg = "عملیات با خطا مواجه شد" });
+                return GenerateJsonResult(new { status = 0, msg = GeneralLocalization.GetExceptionMessage(exc) });
             }
         }
 

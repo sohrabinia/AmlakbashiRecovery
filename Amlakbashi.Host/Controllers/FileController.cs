@@ -985,11 +985,11 @@ namespace Portal.Controllers
         [ResponseCache(Duration = 2592000, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult HomePageSlider(int number, string format = "webp")
         {
-            // TODO: find alternative for this
-            //if (Request.Browser.Type.Contains("Chrome") && !Request.UserAgent.Contains("Edge"))
-            //{
-            //    return File("/resource/img/home_page_slider_" + number + "." + format, format);
-            //}
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            if (userAgent.Contains("Chrome") == true && userAgent.Contains("Edge") == false)
+            {
+                return File("/resource/img/home_page_slider_" + number + "." + format, "image/" + format);
+            }
             return File("/resource/img/home_page_slider_" + number + ".jpg", "image/jpeg");
         }
 
@@ -1002,11 +1002,11 @@ namespace Portal.Controllers
         [ResponseCache(Duration = 2592000, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "file_name" })]
         public ActionResult ResourceImageWebp(string file_name)
         {
-            // TODO: find alternative for this
-            //if (Request.Browser.Type.Contains("Chrome") && !Request.UserAgent.Contains("Edge"))
-            //{
-            //    return File("/resource/img/" + file_name + ".webp", "webp");
-            //}
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            if (userAgent.Contains("Chrome") == true && userAgent.Contains("Edge") == false)
+            {
+                return File("/resource/img/" + file_name + ".webp", "image/webp");
+            }
             return ResourceImage(file_name);
         }
 
@@ -1142,12 +1142,6 @@ namespace Portal.Controllers
         [Authorize(Roles = Roles.TechnicalManager)]
         public JsonResult MinifyAdvertiseImages()
         {
-            // TODO: find alternative for this
-            //System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
-            //var path = "/content/advertise";
-            //path = Server.MapPath(path);
-            //var d = new DirectoryInfo(path);
-            //var imagePaths = d.GetFiles().OrderByDescending(fi => fi.Length).Take(3000);
             var fileList = fileService.GetAllAdvertiseFile();
             minifyThread = new System.Threading.Thread(() =>
             {
@@ -1165,23 +1159,8 @@ namespace Portal.Controllers
         }
 
         [Authorize(Roles = Roles.TechnicalManager)]
-        public JsonResult StopMinifyAdvertiseImages()
-        {
-            // TODO: find alternative for this
-            //System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
-            minifyThread.Abort();
-            return GenerateJsonResult(new
-            {
-                status = 1,
-                val = ""
-            });
-        }
-
-        [Authorize(Roles = Roles.TechnicalManager)]
         public JsonResult StopQueue()
         {
-            // TODO: find alternative for this
-            //System.Web.HttpContext.Current.Server.ScriptTimeout = 18000;
             fileService.StopQueuedJob();
             return GenerateJsonResult(new
             {
