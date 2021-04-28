@@ -1,4 +1,4 @@
-﻿@using Entities = Amlakbashi.Core.Entities; 
+﻿@using Entities = Amlakbashi.Core.Entities;
 @model User
 
 @{
@@ -11,205 +11,213 @@
 @using (Html.BeginForm("Edit", "User", FormMethod.Post, new { id = "userManageForm" }))
 {
 
-@Html.HiddenFor(model => model.Id)
-<input type="hidden" name="UserGroups" id="UserGroups" value="" />
-<input type="hidden" name="ContactPhone" id="complete_profile_contact" value="" />
-<table>
-    @*@if (Model.UserID == -1)
-        {*@
-    <tr>
-        <td class="label">
-            نام کاربری :
-        </td>
-        <td style="direction:ltr">
-            @Html.EditorFor(model => model.MainMobile)
-        </td>
-        <td></td>
-    </tr>
-    @*}
-        else
-        {
-            <tr>
-                <td class="label">
-                    نام کاربری :
-                </td>
-                <td style="padding-right:18px; color: #444; font: 15px bnassim; text-align: right; vertical-align: middle;">
-                    @Model.UserName
-                </td>
-                <td></td>
-            </tr>
-        }*@
-
-    <tr>
-        <td class="label">  عکس پروفایل :</td>
-        <td class="value">
-            @if (Model.PhotoID > 0)
-            {
-                <img height="350" src='@string.Format("/file/imgThumbOld?FileID={0}&h=500", Model.PhotoID)' />
-            }
-        </td>
-        <td>
-            @if (Model.PhotoID > 0)
-            {
-                <a class="dz-edit" href="@string.Format("/file/photocropper?id={0}", Model.PhotoID)">ویرایش</a>
-            }
-        </td>
-    </tr>
-
-
-    <tr>
-        <td class="label">
-            امتیاز اصلی کاربر :
-        </td>
-        <td style="width:300px;">
-            @Model.UserScore
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            نام :
-        </td>
-        <td style="width:300px;">
-            @Html.EditorFor(model => model.FName)
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            نام خانوادگی :
-        </td>
-        <td>
-            @Html.EditorFor(model => model.LName)
-        </td>
-        <td></td>
-    </tr>
-    @*<tr>
+    @Html.HiddenFor(model => model.Id)
+    <input type="hidden" name="UserGroups" id="UserGroups" value="" />
+    <input type="hidden" name="ContactPhone" id="complete_profile_contact" value="" />
+    <table>
+        @*@if (Model.UserID == -1)
+            {*@
+        <tr>
             <td class="label">
-                آدرس پست الکترونیک :
+                نام کاربری :
             </td>
-            <td >
-                @Html.EditorFor(model => model.Email)
+            <td style="direction:ltr">
+                @Html.EditorFor(model => model.MainMobile)
             </td>
             <td></td>
-        </tr>*@
-    <tr>
-        <td class="label">
-            موبایل 1 :
-        </td>
-        <td style="direction:ltr">
-            @Html.EditorFor(model => model.Mobile)
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            موبایل 2 :
-        </td>
-        <td style="direction:ltr">
-            @Html.EditorFor(model => model.Mobile2)
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            تلفن ثابت :
-        </td>
-        <td style="direction:ltr">
-            @Html.EditorFor(model => model.Tell)
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            تلفن شخص ثالث :
-        </td>
-        <td style="direction:ltr">
-            @Html.EditorFor(model => model.ThirdPersonTell)
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            توضیحات :
-        </td>
-        <td>
-            @Html.TextAreaFor(model => model.Address)
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            امتیاز املاک باشی :
-        </td>
-        <td>
-            @Html.EditorFor(model => model.AmlakbashiScore)
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            وضعیت مالکیت :
-        </td>
-        <td style="width:300px;">
-            <select name="OwnerShip">
-                <option is-selected="@((int)Entities.User.OwnerType.real_reservation == Model.OwnerShip)" value="0">واسطه‌ی حتمی</option>
-                <option is-selected="@((int)Entities.User.OwnerType.reservation == Model.OwnerShip)" value="1">واسطه‌ی احتمالی</option>
-                <option is-selected="@((int)Entities.User.OwnerType.owner == Model.OwnerShip)" value="3">مالک احتمالی</option>
-                <option is-selected="@((int)Entities.User.OwnerType.real_owner == Model.OwnerShip)" value="10">مالک حتمی</option>
-            </select>
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            وضعیت کاربر :
-        </td>
-        <td style="width:300px;">
-            @{ var states = (Entities.User.UserState[])Enum.GetValues(typeof(Entities.User.UserState)); }
-            <select name="userState">
-                @foreach (var item in states)
-                {
-                    <option is-selected="@(item == ViewBag.userState)" value="@((int)item)">@(Entities.User.GetStateTitle((int)item))</option>
-                }
-            </select>
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            اعتبار کیف پول :
-        </td>
-        <td>
-            @Model.Credit
-        </td>
-        <td></td>
-    </tr>
-    <tr>
-        <td class="label">
-            محدودیت کنسلی رزرو آنی (میزبان) :
-        </td>
-        <td style="direction:ltr">
-            @Html.EditorFor(model => model.CancelInstantReserveLimit)
-        </td>
-        <td></td>
-    </tr>
-    <tr><td colspan="3" class="tablesplit"></td></tr>
-    <tr>
-        <td>
-            <div style="text-align:right">
-                <span>تماس جهت تکمیل پروفایل :</span>
-                <input id="complete_profile_contact_checkbox" type="checkbox" value="1" is-checked="@(!string.IsNullOrEmpty(Model.ContactPhone) && Model.ContactPhone == "1")" />
-            </div>
-        </td>
-        <td></td>
-    </tr>
-</table>
+        </tr>
+        @*}
+            else
+            {
+                <tr>
+                    <td class="label">
+                        نام کاربری :
+                    </td>
+                    <td style="padding-right:18px; color: #444; font: 15px bnassim; text-align: right; vertical-align: middle;">
+                        @Model.UserName
+                    </td>
+                    <td></td>
+                </tr>
+            }*@
 
-<div style="margin-top:20px;">
-    <input class="apply" type="submit" value="ثبت" />
-    <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
-</div>
+        <tr>
+            <td class="label">  عکس پروفایل :</td>
+            <td class="value">
+                @if (Model.PhotoID > 0)
+                {
+                    <img height="350" src='@string.Format("/file/imgThumbOld?FileID={0}&h=500", Model.PhotoID)' />
+                }
+            </td>
+            <td>
+                @if (Model.PhotoID > 0)
+                {
+                    <a class="dz-edit" href="@string.Format("/file/photocropper?id={0}", Model.PhotoID)">ویرایش</a>
+                }
+            </td>
+        </tr>
+
+
+        <tr>
+            <td class="label">
+                امتیاز اصلی کاربر :
+            </td>
+            <td style="width:300px;">
+                @Model.UserScore
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                نام :
+            </td>
+            <td style="width:300px;">
+                @Html.EditorFor(model => model.FName)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                نام خانوادگی :
+            </td>
+            <td>
+                @Html.EditorFor(model => model.LName)
+            </td>
+            <td></td>
+        </tr>
+        @*<tr>
+                <td class="label">
+                    آدرس پست الکترونیک :
+                </td>
+                <td >
+                    @Html.EditorFor(model => model.Email)
+                </td>
+                <td></td>
+            </tr>*@
+        <tr>
+            <td class="label">
+                موبایل 1 :
+            </td>
+            <td style="direction:ltr">
+                @Html.EditorFor(model => model.Mobile)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                موبایل 2 :
+            </td>
+            <td style="direction:ltr">
+                @Html.EditorFor(model => model.Mobile2)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                تلفن ثابت :
+            </td>
+            <td style="direction:ltr">
+                @Html.EditorFor(model => model.Tell)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                تلفن شخص ثالث :
+            </td>
+            <td style="direction:ltr">
+                @Html.EditorFor(model => model.ThirdPersonTell)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                توضیحات :
+            </td>
+            <td>
+                @Html.TextAreaFor(model => model.Address)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                امتیاز املاک باشی :
+            </td>
+            <td>
+                @Html.EditorFor(model => model.AmlakbashiScore)
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                وضعیت مالکیت :
+            </td>
+            <td style="width:300px;">
+                <select name="OwnerShip">
+                    <option is-selected="@((int)Entities.User.OwnerType.real_reservation == Model.OwnerShip)" value="0">واسطه‌ی حتمی</option>
+                    <option is-selected="@((int)Entities.User.OwnerType.reservation == Model.OwnerShip)" value="1">واسطه‌ی احتمالی</option>
+                    <option is-selected="@((int)Entities.User.OwnerType.owner == Model.OwnerShip)" value="3">مالک احتمالی</option>
+                    <option is-selected="@((int)Entities.User.OwnerType.real_owner == Model.OwnerShip)" value="10">مالک حتمی</option>
+                </select>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                وضعیت کاربر :
+            </td>
+            <td style="width:300px;">
+                @{ var states = Entities.User.GetAdminStateEnum(); }
+                @if (ViewBag.userState == Entities.User.UserState.InActived)
+                {
+                    <input type="hidden" name="userState" value="2" />
+                    <span>غیرفعال</span>
+                }
+                else
+                {
+                    <select name="userState">
+                        @foreach (var item in states)
+                        {
+                            <option is-selected="@(item == ViewBag.userState)" value="@((int)item)">@(Entities.User.GetStateTitle((int)item))</option>
+                        }
+                    </select>
+                }
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                اعتبار کیف پول :
+            </td>
+            <td>
+                @Model.Credit
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                محدودیت کنسلی رزرو آنی (میزبان) :
+            </td>
+            <td style="direction:ltr">
+                @Html.EditorFor(model => model.CancelInstantReserveLimit)
+            </td>
+            <td></td>
+        </tr>
+        <tr><td colspan="3" class="tablesplit"></td></tr>
+        <tr>
+            <td>
+                <div style="text-align:right">
+                    <span>تماس جهت تکمیل پروفایل :</span>
+                    <input id="complete_profile_contact_checkbox" type="checkbox" value="1" is-checked="@(!string.IsNullOrEmpty(Model.ContactPhone) && Model.ContactPhone == "1")" />
+                </div>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+
+    <div style="margin-top:20px;">
+        <input class="apply" type="submit" value="ثبت" />
+        <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
+    </div>
 }
 
 <div class="adminmsg">@ViewBag.msg</div>

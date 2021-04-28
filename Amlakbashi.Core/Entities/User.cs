@@ -312,10 +312,14 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        //public static UserState[] GetAdminStateEnum()
-        //{
-        //    return Enum.GetValues(typeof(UserState));
-        //}
+        public static List<UserState> GetAdminStateEnum()
+        {
+            var array = (UserState[])Enum.GetValues(typeof(UserState));
+            var list = array.ToList();
+            list.Remove(UserState.Deleted);
+            list.Remove(UserState.InActived);
+            return list;
+        }
 
         public static string GetCreditTransactionCauseString(int transaction, string transactionCauseString = "")
         {
