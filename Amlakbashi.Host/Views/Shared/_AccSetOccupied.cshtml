@@ -96,7 +96,10 @@
                             showSuccessMessage('انجام شد', 'محدوده انتخاب شده به روز های پر اضافه شد');
                             firstSelectedDay = undefined;
                             secondSelectedDay = undefined;
-                            updateInput();
+                             updateInput();
+                             if (ret.changeToday == true) {
+                                 $('div[data-id=' + @Model.Id + '] input[name="topcpat"].full').prop("checked", true);
+                             }
                             updateDatePicker([$('#main-date-picker')[0]], currentMonth,
                             {
                                 priceDict: {},
@@ -132,6 +135,9 @@
                         showSuccessMessage('انجام شد', 'محدوده انتخاب شده از روز های پر حذف شد');
                         firstSelectedDay = undefined;
                         secondSelectedDay = undefined;
+                        if (ret.changeToday == true) {
+                            $('div[data-id=' + @Model.Id + '] input[name="topcpat"].empty').prop("checked", true);
+                        }
                         updateInput();
                         updateDatePicker([$('#main-date-picker')[0]], currentMonth,
                         {

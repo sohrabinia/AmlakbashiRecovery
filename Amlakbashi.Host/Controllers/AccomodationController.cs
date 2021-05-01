@@ -1095,7 +1095,7 @@ namespace Amlakbashi.Host.Controllers
                     ModelState.Clear();
                     foreach (var item in errors)
                     {
-                        ModelState.AddModelError(item.Key, item.Value);
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
                     }
                     ViewBag.isEdit = isEdit;
                     ViewBag.errors = groupErrors;
@@ -1215,7 +1215,7 @@ namespace Amlakbashi.Host.Controllers
                     ModelState.Clear();
                     foreach (var item in errors)
                     {
-                        ModelState.AddModelError(item.Key, item.Value);
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
                     }
                     ViewBag.isEdit = isEdit;
                     ViewBag.errors = groupErrors;
@@ -1406,10 +1406,22 @@ namespace Amlakbashi.Host.Controllers
                     checkResult.Result == CheckSetOccupiedResult.ContainsReserveRequest)
                 {
                     extrinsicReserveService.Insert(advertise_id, from_date, to_date, ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id, acc.Count);
+                    var todayPersian = DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date);
+                    bool changeToday = false;
+                    if (todayPersian == from_date)
+                    {
+                        advertiseService.UnsetTodayEmpty(advertise_id);
+                        changeToday = true;
+                    }
                     acc = advertiseService.Find(acc.Id, true);
                     occupiedList = acc.OccupiedDates().Select(s =>
                         DateTimeUtility.DateValueOfJS(s)).ToList();
-                    return GenerateJsonResult(new { status = 1, msg = "محدوده انتخاب شده به عنوان روز های پر ثبت شد" });
+                    return GenerateJsonResult(new { 
+                        status = 1, 
+                        msg = "محدوده انتخاب شده به عنوان روز های پر ثبت شد",
+                        occupiedList = occupiedList,
+                        changeToday = changeToday
+                    });
                 }
                 else
                 {
@@ -1453,12 +1465,20 @@ namespace Amlakbashi.Host.Controllers
                 {
                     advertiseService.DeleteExtrinsicReserves(advertise_id, from_date, to_date);
                     advertise = advertiseService.Find(advertise_id, true);
+                    var todayPersian = DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date);
+                    bool changeToday = false;
+                    if (todayPersian == from_date)
+                    {
+                        advertiseService.SetAsTodayEmpty(advertise_id);
+                        changeToday = true;
+                    }
                     var occupiedList = advertise.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
                     return GenerateJsonResult(new
                     {
                         status = 1,
                         msg = checkResult.ToString(),
-                        occupiedList = occupiedList
+                        occupiedList = occupiedList,
+                        changeToday = changeToday
                     });
                 }
                 else

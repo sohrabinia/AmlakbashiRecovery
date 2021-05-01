@@ -690,11 +690,12 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize]
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult ProfileManager(UserDTO user)
         {
             try
             {
+                var test = User;
                 if (user.id != userAccessor.CurrentUser.Id)
                     return Redirect("/errors/http404");
 
@@ -712,7 +713,7 @@ namespace Amlakbashi.Host.Controllers
                         return Redirect(Request.Headers["Referer"].ToString());
                     }
 
-                    filepath = string.Format("~/content/users/user{0}{1}", Guid.NewGuid(), ext);
+                    filepath = string.Format("{0}/content/users/user{1}{2}", webHostEnvironment.WebRootPath, Guid.NewGuid(), ext);
                     if (!System.IO.Directory.Exists(webHostEnvironment.WebRootPath + "/content/users"))
                         System.IO.Directory.CreateDirectory(webHostEnvironment.WebRootPath + "/content/users");
                     using (var stream = System.IO.File.Create(filepath))
@@ -819,10 +820,11 @@ namespace Amlakbashi.Host.Controllers
                             encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, quality);
                             var image = Image.FromStream(uploadfile.OpenReadStream(), true, true);
                             image = ImageUtility.MinifyImage(image, maxWidth);
-                            image.Save(webHostEnvironment.WebRootPath + filepath, format, encoderParameters);
+                            image.Save(webHostEnvironment.WebRootPath + filepath.Replace("~", ""), format, encoderParameters);
                             break;
                         default:
-                            return Json(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
+                            //return Json(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
+                            return GenerateJsonResult(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
                     }
 
                     File ObjFile = new File();
@@ -848,12 +850,14 @@ namespace Amlakbashi.Host.Controllers
                     return Json(new { Status = 0, Message = "خطا در دریافت فایل، لطفا دوباره امتحان کنید" });
                 }
 
-                return Json(new { Status = 1, id = photoID });
+                //return Json(new { Status = 1, id = photoID });
+                return GenerateJsonResult(new { Status = 1, id = photoID });
             }
             catch (Exception exc)
             {
                 logger.Error("Post.SaveUploadedFile", exc);
-                return Json(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
+                //return Json(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
+                return GenerateJsonResult(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
             }
 
         }

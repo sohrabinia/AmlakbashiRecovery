@@ -126,8 +126,8 @@ namespace Amlakbashi.Host
 
             services.Configure<FormOptions>(x =>
             {
-                x.ValueLengthLimit = 502400;
-                x.MultipartBodyLengthLimit = 502400;
+                x.ValueLengthLimit = 20971520;
+                x.MultipartBodyLengthLimit = 20971520;
             });
         }
 

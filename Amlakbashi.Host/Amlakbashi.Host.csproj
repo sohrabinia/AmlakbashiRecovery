@@ -8,13 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\Content\**" />
-    <Content Remove="wwwroot\Content\**" />
-    <EmbeddedResource Remove="wwwroot\Content\**" />
-    <None Remove="wwwroot\Content\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Remove="wwwroot\js\dashboard.min.js" />
   </ItemGroup>
 
@@ -208,6 +201,16 @@
   <ItemGroup>
     <Folder Include="Logs\Logs\" />
     <Folder Include="Logs\HangfireLogs\" />
+    <Folder Include="wwwroot\Content\accthumb\" />
+    <Folder Include="wwwroot\Content\advertise\" />
+    <Folder Include="wwwroot\Content\blogpost\" />
+    <Folder Include="wwwroot\Content\ErrorLog\" />
+    <Folder Include="wwwroot\Content\files\" />
+    <Folder Include="wwwroot\Content\imgcache\" />
+    <Folder Include="wwwroot\Content\logo\" />
+    <Folder Include="wwwroot\Content\webp\" />
+    <Folder Include="wwwroot\Content\users\" />
+    <Folder Include="wwwroot\Content\test\" />
     <Folder Include="wwwroot\css\" />
     <Folder Include="wwwroot\Resource\packages\jquery-mobile\images\" />
   </ItemGroup>
