@@ -90,5 +90,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         void SetHangfireSchedules_ReservedState();
         void SetHangfireSchedules_StartedState();
         VoucherDTO GenerateVoucher(long reserveId, int currentUserId);
+        void SendReserveRequestCall(long reserveId);
+        void SendPayReserveCall(long reserveId);
     }
 }

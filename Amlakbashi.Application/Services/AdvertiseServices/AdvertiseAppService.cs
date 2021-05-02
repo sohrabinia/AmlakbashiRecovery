@@ -2163,7 +2163,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 UserNotificationToken = advertise.User.NotificationToken,
                 Type = UserContactType.ReserveRequest,
                 AdvertiseId = reserve.AdvertiseID.ToString(),
-                UserId = advertise.UserID.ToString(),
+                UserId = user.Id.ToString(),
                 ReserveId = reserve.Id.ToString(),
                 Extra1 = startDate,
                 Extra2 = endDate + Environment.NewLine + "به مدت " + (reserve.EndDate - reserve.StartDate).TotalDays + " شب" +

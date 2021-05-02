@@ -1,9 +1,11 @@
-﻿using Amlakbashi.Core.Common.Repository;
+﻿using Amlakbashi.Core.Common.Extensions;
+using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
+using Amlakbashi.Mediator.Commands.UserCommands;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -19,12 +21,15 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         private readonly IRepository<ReserveSendSms, long> repository;
         private readonly IUserContactFacade userContact;
         private readonly UserManager<AppUser> userManager;
+        private readonly IMediator mediator;
         public ReserveSendSmsCommandHandler(IRepository<ReserveSendSms, long> repository,
-            IUserContactFacade userContact, UserManager<AppUser> userManager)
+            IUserContactFacade userContact, UserManager<AppUser> userManager,
+            IMediator mediator)
         {
             this.repository = repository;
             this.userContact = userContact;
             this.userManager = userManager;
+            this.mediator = mediator;
         }
 
         public Task<Unit> Handle(RefreshReserveSendSmsCommand request, CancellationToken cancellationToken)
@@ -38,7 +43,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                 var reserve = !string.IsNullOrEmpty(item.reserve_id) ?
                     repository.Find<Reserve, long>(long.Parse(item.reserve_id)) :
                     null;
-                userContact.SendMessageClassic(item.initial, new UserContactDTO()
+                mediator.Enqueue(new SendMessageClassicCommand(item.initial, new UserContactDTO()
                 {
                     UserMainMobile = user.MainMobile,
                     UserAppNotificationToken = user.AppNotificationToken,
@@ -62,7 +67,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                     Extra1 = item.extra_1,
                     Extra2 = item.extra_2,
                     Extra3 = item.extra_3
-                });
+                }));
             }
             repository.Delete(q => q.ScheduledTime <= now);
             repository.Save();

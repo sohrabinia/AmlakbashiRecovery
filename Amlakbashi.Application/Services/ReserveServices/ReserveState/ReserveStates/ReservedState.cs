@@ -99,8 +99,8 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
                         AudienceMobile = PhoneUtility.IsNumberForIran(guestUser.GetPhoneNumber(User.PhoneType.OtherMobile1)) ?
-                        guestUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
-                        guestUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1)
+                            guestUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
+                            guestUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1)
                     };
                     mediator.Enqueue(new SendMessageCommand(hostContact));
                 }

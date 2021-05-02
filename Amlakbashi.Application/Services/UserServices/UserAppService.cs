@@ -567,7 +567,7 @@ namespace Amlakbashi.Application.Services.UserServices
 
         public void SendVerificationSms(string localNumber, string code)
         {
-            userContact.SendVerificationSms(localNumber, code);
+            mediator.Enqueue(new SendVerificationSmsCommand(localNumber, code));
         }
 
         public void SendNotificationApplication(string token, string title, string body, string targetAction, string targetId)
