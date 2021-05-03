@@ -8,6 +8,7 @@ using Amlakbashi.Core.Infrastructure.PriceHelpers.Interfaces;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Amlakbashi.Host.Hubs.Dashboard.HubServers;
+using Amlakbashi.Host.Hubs.HubEventHandlers;
 using Amlakbashi.Host.Hubs.Portal.HubServers;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -43,6 +44,8 @@ namespace Amlakbashi.Host.Configurations
                 typeof(AutoMapperModule).Assembly));
             builder.RegisterType<MediatorHangfireBridge>()
                 .As<IMediatorHangfireBridge>();
+
+            builder.RegisterType<ReserveHubEventHandlers>().AsImplementedInterfaces().InstancePerDependency();
 
             // hub servers registration
             builder.RegisterType<ReserveAdminHubServer>().As<IReserveAdminHubServer>();

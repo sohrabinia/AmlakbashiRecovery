@@ -137,7 +137,7 @@ namespace Amlakbashi.Host.Controllers.API
                 var checkResult = CheckReserve(advertise_id, from_date, to_date,
                     number_of_guests, cid);
                 dynamic data = checkResult.Value;
-                if (data.status == 0)
+                if (data["status"] == 0)
                 {
                     return GenerateJsonResult(new
                     {

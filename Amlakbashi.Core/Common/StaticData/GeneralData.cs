@@ -10,7 +10,7 @@ namespace Amlakbashi.Core.Common.StaticData
             get
             {
 #if DEBUG
-                return "http://192.168.0.143:45455";
+                return "http://192.168.0.172:45455";
 #endif
                 return "https://www.amlakbashi.com";
             }

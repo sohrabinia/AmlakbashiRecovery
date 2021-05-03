@@ -6,18 +6,20 @@ using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Amlakbashi.Core.Common.Utilities;
 
 namespace Amlakbashi.Host.Controllers.API
 {
     public partial class ApiController : Controller
     {
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
-        public ActionResult UserIncreaseCredit(long price, string redirectUrl)
+
+        public ActionResult UserIncreaseCredit(long price, string username, string redirectUrl)
         {
             try
             {
-                var user = GetUser();
+                username = PhoneUtility.CorrectPhoneNumberIfPossible(username);
+                var user = userService.GetActivatedUserByMainMobile(username);
                 var payment = new Payment()
                 {
                     UserID = user.Id,
@@ -39,13 +41,13 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme)]
-        public ActionResult GuestPayReserve(long reserve_id, int pay_reserve_type, string redirectUrl,
+        public ActionResult GuestPayReserve(long reserve_id, string username, int pay_reserve_type, string redirectUrl,
             bool useCoupon = false, bool usePrize = false)
         {
             try
             {
-                var user = GetUser();
+                username = PhoneUtility.CorrectPhoneNumberIfPossible(username);
+                var user = userService.GetActivatedUserByMainMobile(username);
                 long payment_id;
                 var result = accounting.GuestPayReserve(user.Id, reserve_id, pay_reserve_type, out payment_id, user.Id, ActionLog.ActionSourceEnum.Application, useCoupon, usePrize, 0);
                 switch (result)

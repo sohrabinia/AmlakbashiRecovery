@@ -12,7 +12,7 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Name</td>
+                <td>@UserLocalization.GetRolePersianTitle(item.Name)</td>
                 <td><a asp-action="roleuserlist" asp-route-rolename="@item.Name" class="fa fa-users" title="لیست کاربران"></a></td>
             </tr>
         }

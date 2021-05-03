@@ -37,25 +37,25 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
         public string otherRules { get; set; }
         public int area { get; set; }
         public int landArea { get; set; }
-        public bool elevator { get; set; }
-        public bool pool { get; set; }
-        public bool sauna { get; set; }
-        public bool jacuzzi { get; set; }
-        public bool bathroom { get; set; }
-        public bool wifi { get; set; }
-        public bool washingMachine { get; set; }
-        public bool microwaveOven { get; set; }
-        public bool soundSystem { get; set; }
-        public bool golf { get; set; }
-        public bool poolTable { get; set; }
-        public bool foosball { get; set; }
-        public bool hairdryer { get; set; }
-        public bool tv { get; set; }
-        public bool oven { get; set; }
-        public bool refrigerator { get; set; }
-        public bool kitchenHood { get; set; }
-        public bool kitchenUtensils { get; set; }
-        public bool teaMaker { get; set; }
+        public bool? elevator { get; set; }
+        public bool? pool { get; set; }
+        public bool? sauna { get; set; }
+        public bool? jacuzzi { get; set; }
+        public bool? bathroom { get; set; }
+        public bool? wifi { get; set; }
+        public bool? washingMachine { get; set; }
+        public bool? microwaveOven { get; set; }
+        public bool? soundSystem { get; set; }
+        public bool? golf { get; set; }
+        public bool? poolTable { get; set; }
+        public bool? foosball { get; set; }
+        public bool? hairdryer { get; set; }
+        public bool? tv { get; set; }
+        public bool? oven { get; set; }
+        public bool? refrigerator { get; set; }
+        public bool? kitchenHood { get; set; }
+        public bool? kitchenUtensils { get; set; }
+        public bool? teaMaker { get; set; }
         public int blanketsAndMattresses { get; set; }
         public string extraBlanketCountString { get; set; }
         public string heatingSystemString { get; set; }
@@ -247,11 +247,11 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
                 title = advertise.Title,
                 favourited = favourited,
                 address = advertise.Address,
-                allowParty = (bool)advertise.AllowParty,
-                allowPets = (bool)advertise.AllowPets,
-                allowSmoking = (bool)advertise.AllowSmoking,
+                allowParty = advertise.AllowParty,
+                allowPets = advertise.AllowPets,
+                allowSmoking = advertise.AllowSmoking,
                 area = advertise.Metrazh,
-                bathroom = (bool)advertise.Bathroom,
+                bathroom = advertise.Bathroom,
                 blanketsAndMattresses = advertise.BlanketsAndMattresses,
                 count = advertise.Count,
                 dailyPrice = advertise.DailyPrice,
@@ -259,18 +259,18 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
                 doubleBed = advertise.DoublesBed,
                 singleBed = advertise.SingleBed,
                 elevator = advertise.Elevator == null ? false : (bool)advertise.Elevator,
-                pool = (bool)advertise.Pool,
-                poolTable = (bool)advertise.PoolTable,
-                golf = (bool)advertise.Golf,
-                foosball = (bool)advertise.Foosball,
-                hairdryer = (bool)advertise.Hairdryer,
-                kitchenHood = (bool)advertise.KitchenHood,
-                kitchenUtensils = (bool)advertise.KitchenUtensils,
+                pool = advertise.Pool,
+                poolTable = advertise.PoolTable,
+                golf = advertise.Golf,
+                foosball = advertise.Foosball,
+                hairdryer = advertise.Hairdryer,
+                kitchenHood = advertise.KitchenHood,
+                kitchenUtensils = advertise.KitchenUtensils,
                 evidenceRequired = advertise.EvidenceRequired,
                 otherRules = advertise.OtherRules,
-                jacuzzi = (bool)advertise.Jacuzzi,
-                sauna = (bool)advertise.Sauna,
-                oven = (bool)advertise.Oven,
+                jacuzzi = advertise.Jacuzzi,
+                sauna = advertise.Sauna,
+                oven = advertise.Oven,
                 landArea = advertise.LandArea,
                 holidayPrice = advertise.HolidayPrice,
                 pikeHolidayPrice = advertise.HolidayPikePrice,
@@ -280,13 +280,13 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
                 //    advertise.NorouzPrice,
                 norouzPrice = 0,
                 rentPrice = advertise.RentPrice,
-                soundSystem = (bool)advertise.SoundSystem,
-                refrigerator = (bool)advertise.Refrigerator,
-                teaMaker = (bool)advertise.TeaMaker,
-                washingMachine = (bool)advertise.WashingMachine,
-                microwaveOven = (bool)advertise.MicrowaveOven,
-                tv = (bool)advertise.TV,
-                wifi = (bool)advertise.Wifi,
+                soundSystem = advertise.SoundSystem,
+                refrigerator = advertise.Refrigerator,
+                teaMaker = advertise.TeaMaker,
+                washingMachine = advertise.WashingMachine,
+                microwaveOven = advertise.MicrowaveOven,
+                tv = advertise.TV,
+                wifi = advertise.Wifi,
                 capacity_string = advertise.Capacity < 1 ? "" : (advertise.MoreThanCapacity > 0 ? advertise.Capacity +
                 " تا " + (advertise.Capacity + advertise.MoreThanCapacity) +
                 " مهمان" : advertise.Capacity + " مهمان"),
