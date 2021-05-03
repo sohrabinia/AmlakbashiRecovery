@@ -225,16 +225,14 @@ namespace Amlakbashi.Host.Controllers
                             model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Host);
                             break;
                         case Entities.User.UserFilterType.Staff:
-                            //var staffMobiles = userService.GetAllEmployees().Select(s => s.PhoneNumber).Select(
-                            //    s => PhoneUtility.LocalNumberToInternational(s, 98)).ToList();
                             var staffMobiles = userService.GetAllEmployees().Select(s => s.UserName).ToList();
                             model = model.Where(x => staffMobiles.Contains(x.MainMobile));
                             break;
                         case Entities.User.UserFilterType.InstantReserveRequest:
-                            model = model.Where(x => x.InstantReserveAccess == Amlakbashi.Core.Entities.User.InstantReserveAccessEnum.Requested);
+                            model = model.Where(x => x.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Requested);
                             break;
                         case Entities.User.UserFilterType.InstantReserveAllow:
-                            model = model.Where(x => x.InstantReserveAccess == Amlakbashi.Core.Entities.User.InstantReserveAccessEnum.Verified);
+                            model = model.Where(x => x.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Verified);
                             break;
                         case Entities.User.UserFilterType.PhotoChangeRequest:
                             model = model.Where(x => x.PhotoStatus == (int)Entities.User.UserPhotoState.ready_publish);
