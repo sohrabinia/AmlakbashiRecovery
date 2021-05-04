@@ -74,7 +74,8 @@ namespace Amlakbashi.Core.Identity
                 };
 #else
                 return new Dictionary<string, string>() {
-                    { "+98 9121197156", SuperAdmin }
+                    { "+98 9121197156", SuperAdmin },
+                    { "+98 9191613134", SuperAdmin }
                 };
 #endif
             }

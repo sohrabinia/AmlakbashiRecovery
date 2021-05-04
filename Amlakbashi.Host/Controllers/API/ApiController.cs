@@ -186,8 +186,8 @@ namespace Amlakbashi.Host.Controllers.API
             }
             try
             {
-                int IOSApp_MinBuildNumber = 1;
-                int IOSApp_LastBuildNumber = 7;
+                int IOSApp_MinBuildNumber = 9;
+                int IOSApp_LastBuildNumber = 9;
 
                 var newFeatures = new string[] {
                     "امکان دریافت تخفیف و هدیه سفر"
