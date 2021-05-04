@@ -171,7 +171,7 @@ namespace Portal.Controllers
                     {
                         nfile.FilePath = filepath;
                     }
-                    fileService.Update(nfile, host.ContentRootPath);
+                    fileService.Update(nfile, host.WebRootPath);
                 }
 
                 return RedirectToAction("Index");
@@ -188,7 +188,7 @@ namespace Portal.Controllers
         {
             try
             {
-                fileService.Delete(id, host.ContentRootPath);
+                fileService.Delete(id, host.WebRootPath);
                 return GenerateJsonResult(new
                 {
                     status = 1,
@@ -692,7 +692,7 @@ namespace Portal.Controllers
             return File("/resource/img/img202_500_300.png", "image/png");
         }
 
-        public ActionResult PhotoCropper(long id)
+        public ActionResult PhotoCropper(long id, long accId)
         {
             try
             {
@@ -707,7 +707,7 @@ namespace Portal.Controllers
                     if (image.Width > 1500)
                         ViewBag.BigImage = true;
                 }
-
+                ViewBag.accId = accId;
                 return View(file);
             }
             catch (Exception exc)
@@ -717,7 +717,7 @@ namespace Portal.Controllers
             }
         }
 
-        public JsonResult SavePhotoCropper(int id)
+        public JsonResult SavePhotoCropper(int id, long accId)
         {
             try
             {
@@ -758,9 +758,10 @@ namespace Portal.Controllers
                         var imageToSave = Image.FromStream(uploadfile.OpenReadStream(), true, true);
                         imageToSave.Save(Path.Combine(host.WebRootPath, filepath), format, encoderParameters);
 
-                        ObjFile.FilePath = filepath;
+                        ObjFile.FilePath = "~/" + filepath;
                         ObjFile.LastModifyDate = DateTime.Now;
-                        fileService.Update(ObjFile, host.ContentRootPath);
+                        fileService.Update(ObjFile, host.WebRootPath);
+                        fileService.GenerateThumbImage(accId, host.WebRootPath);
                         try
                         {
                             System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
@@ -773,12 +774,12 @@ namespace Portal.Controllers
                     }
                 }
 
-                return Json(new { Status = 1 });
+                return GenerateJsonResult(new { status = 1 });
             }
             catch (Exception exc)
             {
                 logger.Error("File.SavePhontoCropper", exc);
-                return Json(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
+                return GenerateJsonResult(new { status = 0, message = "فرمت عکس مورد قبول نمی باشد ." });
             }
 
         }

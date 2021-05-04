@@ -705,7 +705,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     var uploadfile = Request.Form.Files[0];
                     ext = System.IO.Path.GetExtension(uploadfile.FileName).ToLower();
-                    if (ext == ".png" || ext == ".jpg" || ext == ".gif")
+                    if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif")
                         FileType = (int)Entities.File.FileTypes.Image;
                     else
                     {
@@ -713,10 +713,10 @@ namespace Amlakbashi.Host.Controllers
                         return Redirect(Request.Headers["Referer"].ToString());
                     }
 
-                    filepath = string.Format("{0}/content/users/user{1}{2}", webHostEnvironment.WebRootPath, Guid.NewGuid(), ext);
+                    filepath = string.Format("~/content/users/user{0}{1}", Guid.NewGuid(), ext);
                     if (!System.IO.Directory.Exists(webHostEnvironment.WebRootPath + "/content/users"))
                         System.IO.Directory.CreateDirectory(webHostEnvironment.WebRootPath + "/content/users");
-                    using (var stream = System.IO.File.Create(filepath))
+                    using (var stream = System.IO.File.Create(webHostEnvironment.WebRootPath + filepath.Replace("~", "")))
                     {
                         uploadfile.CopyTo(stream);
                     }
