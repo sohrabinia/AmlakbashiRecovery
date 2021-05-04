@@ -23,11 +23,11 @@
         <span class="select-button">
             <select class="selectStyle" name="type">
                 <option value="all" is-selected="@((string)ViewBag.type == "all")">همه ی آگهی ها</option>
-                <option value="enable" is-selected="@((string)ViewBag.type == "enable")">آگهی های فعال</option>
-                <option value="expire" is-selected="@((string)ViewBag.type == "expire")">آگهی های منقضی شده</option>
-                <option value="special" is-selected="@((string)ViewBag.type == "special")">آگهی های ویژه</option>
+                <option value="enable" is-selected="@((string)ViewBag.type == "enable")">تایید شده</option>
                 <option value="disable" is-selected="@((string)ViewBag.type == "disable")">غیر فعال</option>
                 <option value="ready" is-selected="@((string)ViewBag.type == "ready")">در انتظار تایید</option>
+                @*<option value="ready" is-selected="@((string)ViewBag.type == "notcomplete")">تکمیل نشده</option>*@
+                @*<option value="ready" is-selected="@((string)ViewBag.type == "notready")">تایید نشده</option>*@
             </select>
         </span>
     </span>

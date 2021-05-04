@@ -275,7 +275,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
             try
             {
                 var file = fileRepository.Find(request.FileId);
-                var filePath = request.ServerPath + file.FilePath.Replace("~", "").Substring(1);
+                var filePath = request.ServerPath + file.FilePath.Replace("~", "");
                 if (file != null)
                 {
                     lock (objlock)
@@ -284,7 +284,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                         if (!File.Exists(filePath))
                             return Task.FromResult(Unit.Value);
                         using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-                        using (Image watermarkImage = Image.FromFile(request.ServerPath + "resource/img/water_logo.png"))
+                        using (Image watermarkImage = Image.FromFile(request.ServerPath + "/resource/img/water_logo.png"))
                         {
                             Image image = Image.FromStream(stream);
                             int water_width = Convert.ToInt16((double)image.Width / ratio);
@@ -302,7 +302,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                                     new_watermark.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                                     Rectangle imageRectangle = new Rectangle(0, 0, water_width, water_height);
                                     new_watermark.DrawImage(watermarkImage, imageRectangle);
-                                    logo_path = "content/logo/" + string.Format("logo_{0}.png", Guid.NewGuid());
+                                    logo_path = "/content/logo/" + string.Format("logo_{0}.png", Guid.NewGuid());
                                     var extension = System.IO.Path.GetExtension(request.ServerPath + logo_path);
                                     ImageCodecInfo format;
                                     EncoderParameters encoderParameters;
@@ -337,7 +337,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                                 imageGraphics.FillRectangle(watermarkBrush, new Rectangle(new Point(x, y), new Size(water_width + 1, water_height)));
                                 string water_path = "~/content/advertise/" + "watermark_" +
                                     file.FilePath.Substring(file.FilePath.LastIndexOf('/') + 1);
-                                var extension = System.IO.Path.GetExtension(request.ServerPath + water_path.Replace("~/", ""));
+                                var extension = System.IO.Path.GetExtension(request.ServerPath + water_path.Replace("~", ""));
                                 ImageCodecInfo format;
                                 EncoderParameters encoderParameters;
                                 switch (extension)
@@ -357,7 +357,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                                         encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
                                         break;
                                 }
-                                image.Save(request.ServerPath + water_path.Replace("~/", ""), format, encoderParameters);
+                                image.Save(request.ServerPath + water_path.Replace("~", ""), format, encoderParameters);
                                 file.FilePath = water_path;
                                 fileRepository.Update(file);
                                 fileRepository.Save();

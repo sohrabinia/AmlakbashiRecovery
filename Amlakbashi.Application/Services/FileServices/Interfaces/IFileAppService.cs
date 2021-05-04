@@ -21,5 +21,6 @@ namespace Amlakbashi.Application.Services.FileServices.Interfaces
         void MinifyImage(long fileId, string filePath);
         void StopQueuedJob();
         void SetWatermark(long fileId, string serverPath);
+        void GenerateThumbImage(long accId, string rootPath);
     }
 }

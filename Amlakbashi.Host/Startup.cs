@@ -96,7 +96,8 @@ namespace Amlakbashi.Host
                 options.ExpireTimeSpan = TimeSpan.FromDays(60);
                 options.Events.OnRedirectToLogin = context =>
                 {
-                    context.Response.Redirect("/errors/accessdenied");
+                    var refererUrl = context.Request.Path;
+                    context.Response.Redirect("/errors/accessdenied?originUrl=" + refererUrl);
                     return Task.CompletedTask;
                 };
             });

@@ -118,15 +118,15 @@
                 formData.append('croppedImage', blob);
                 $(".bg-loader").removeClass("load-hide");
                 // Use `jQuery.ajax` method
-                $.ajax('/file/SavePhotoCropper?id=' + $("#fileid").val(), {
+                $.ajax('/file/SavePhotoCropper?id=' + $("#fileid").val() + '&accId=' + $("#accid").val(), {
                     method: "POST",
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function (ret) {
                         $(".bg-loader").addClass("load-hide");
-                        if (ret.Status == 1) {
-                            alertify.success("تغییرات ذخیره شد .");
+                        if (ret.status == 1) {
+                            alertify.success("تغییرات ذخیره شد.");
                         }
                         else {
                             alertify.error("خطایی رخ داده است")

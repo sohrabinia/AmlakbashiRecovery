@@ -570,6 +570,7 @@ function verification_success() {
     $(".master_header-account").find("span").html("حساب من");
     $('.login__container').hide();
     $('.login__bg').hide();
+    debugger;
     onLoginFinish();
     if (typeof on_login !== "undefined") {
         on_login();

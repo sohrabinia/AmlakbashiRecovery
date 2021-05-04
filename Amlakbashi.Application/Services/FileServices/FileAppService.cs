@@ -9,6 +9,7 @@ using ServiceStack;
 using MediatR;
 using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Mediator.Commands.FileCommands;
+using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 
 namespace Amlakbashi.Application.Services.FileServices
 {
@@ -52,15 +53,15 @@ namespace Amlakbashi.Application.Services.FileServices
             return newFile.Id;
         }
 
-        public void Update(File editedFile, string serverPath)
+        public void Update(File editedFile, string rootPath)
         {
             var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedFile.Id));
             if (!editedFile.FilePath.IsNullOrEmpty() && editedFile.FilePath != data.FilePath)
             {
-                if (System.IO.File.Exists(serverPath + data.FilePath.Replace("~/", "")))
+                if (System.IO.File.Exists(rootPath + data.FilePath.Replace("~/", "")))
                     lock (objlock)
                     {
-                        System.IO.File.Delete(serverPath + data.FilePath.Replace("~/", ""));
+                        System.IO.File.Delete(rootPath + data.FilePath.Replace("~/", ""));
                     }
                 data.FilePath = editedFile.FilePath;
             }
@@ -112,6 +113,13 @@ namespace Amlakbashi.Application.Services.FileServices
         public void SetWatermark(long fileId, string serverPath)
         {
             mediator.Send(new SetWatermarkCommand(fileId, serverPath));
+        }
+
+        public void GenerateThumbImage(long accId, string rootPath)
+        {
+            var acc = Repository.Find<Advertise, long>(accId);
+            mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID,
+                    acc.Photos.Select(s => s.Id).ToList(), rootPath));
         }
     }
 }
