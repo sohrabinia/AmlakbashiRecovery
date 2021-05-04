@@ -40,6 +40,10 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             {
                 var user = repository.Find<User, int>(item.userId);
                 var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+                if (identityUser == null)
+                {
+                    return Task.FromResult(Unit.Value);
+                }
                 var reserve = !string.IsNullOrEmpty(item.reserve_id) ?
                     repository.Find<Reserve, long>(long.Parse(item.reserve_id)) :
                     null;
