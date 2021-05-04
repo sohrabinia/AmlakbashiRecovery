@@ -336,7 +336,7 @@ namespace Amlakbashi.Host.Controllers
                 if (userAllowEdit == false)
                 {
                     ViewBag.errorMsg = "شما مجوز ویرایش ندارید";
-                    return View();
+                    return View(objReserve);
                 }
                 var originalReserve = reserveService.Find(reserve.Id);
                 if (originalReserve.TotalPrice != reserve.TotalPrice ||
@@ -348,7 +348,7 @@ namespace Amlakbashi.Host.Controllers
                         if (userAllowEdit == false)
                         {
                             ViewBag.errorMsg = "شما مجوز ویرایش مبلغ ندارید";
-                            return View();
+                            return View(objReserve);
                         }
                     }
                 }
@@ -358,7 +358,7 @@ namespace Amlakbashi.Host.Controllers
                     ActionLog.ActionSourceEnum.AdminPanel) == false)
                 {
                     ViewBag.errorMsg = msg;
-                    return View();
+                    return View(objReserve);
                 }
                 if (!reserveService.SetHostResponse(reserve.Id, reserve.HostResponse, true, ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id))
                     reserveService.SetStatus(reserve.Id, reserve.Status, true, ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id);
@@ -1091,11 +1091,7 @@ namespace Amlakbashi.Host.Controllers
                 var reserve = reserveService.Find(reserve_id);
                 if (reserve.Status == ReserveStatus.WaitForResponse)
                 {
-                    var user = userService.Find(reserve.Advertise.UserID);
-                    if (PhoneUtility.IsNumberForIran(user.MainMobile))
-                    {
-                        userContact.SendReserveRequestCall(user, reserve.AdvertiseID);
-                    }
+                    reserveService.SendReserveRequestCall(reserve_id);
                     sent = true;
                 }
                 return GenerateJsonResult(new
@@ -1119,11 +1115,7 @@ namespace Amlakbashi.Host.Controllers
                 var reserve = reserveService.Find(reserve_id);
                 if (reserve.Status == ReserveStatus.WaitForReserve)
                 {
-                    var guest_user = reserve.GuestUser;
-                    if (PhoneUtility.IsNumberForIran(guest_user.MainMobile))
-                    {
-                        userContact.SendPayReserveCall(guest_user, reserve.AdvertiseID);
-                    }
+                    reserveService.SendPayReserveCall(reserve_id);
                     sent = true;
                 }
                 return GenerateJsonResult(new

@@ -53,7 +53,31 @@
         <meta name="description" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
     }
     <meta name="enamad" content="344312021" />
-    <link rel="stylesheet" type="text/css" href="/css/dashboard.min.css">
+    <environment include="Development">
+        <link rel="stylesheet" type="text/css" href="/resource/dailyrent.css">
+        <link rel="stylesheet" type="text/css" href="/resource/tmmegamenu/css/tmmegamenu.css">
+        <link rel="stylesheet" type="text/css" href="/resource/bootstrap/css/bootstrap-rtl.min.css">
+        <link rel="stylesheet" type="text/css" href="/resource/ticker/ticker-style.css">
+        <link rel="stylesheet" type="text/css" href="/resource/chosen_v1.4.2/chosen.css">
+        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.default.css">
+        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.core.css">
+        <link rel="stylesheet" type="text/css" href="/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/intlTelInput.css">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/login-Popup.css">
+        <link rel="stylesheet" type="text/css" href="/resource/dashboard.css">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/chat-popup.css">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/message-popup.css">
+        <link rel="stylesheet" type="text/css" href="/resource/loader.min.css">
+        <link rel="stylesheet" type="text/css" href="/resource/jquery-confirm/jquery-confirm.min.css">
+        <link rel="stylesheet" type="text/css" href="/resource/rating/themes/fontawesome-stars.css">
+        <link rel="stylesheet" type="text/css" href="/resource/star-rating/star-rating.css">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/jalali-date-picker.css">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/dashboardAccount.css">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/popup-calendar.css">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" type="text/css" href="/css/dashboard.min.css">
+    </environment>
     @RenderSection("StyleLink", required: false)
     @RenderSection("StyleBlock", required: false)
 </head>
@@ -86,22 +110,22 @@
             <div class="account-box-style">
                 <!--<p class="account-icon-style">-->
                 @*@if (User.Identity.IsAuthenticated)
-                {
-                    if (string.IsNullOrEmpty(userAccessor.CurrentUser.FullName))
                     {
-                        @:  کاربر @userAccessor.CurrentUser.Id
+                        if (string.IsNullOrEmpty(userAccessor.CurrentUser.FullName))
+                        {
+                            @:  کاربر @userAccessor.CurrentUser.Id
+                        }
+                        else
+                        {
+                            @userAccessor.CurrentUser.FullName
+                        }
                     }
                     else
                     {
-                        @userAccessor.CurrentUser.FullName
-                    }
-                }
-                else
-                {
-                    @: حساب کاربری
-                }*@
+                        @: حساب کاربری
+                    }*@
                 <!--<i class="fas fa-user"></i>
-            </p>-->
+                </p>-->
                 @*<i class="fa fa-bars fast-menu-desktop"></i>*@
                 <i class="fas fa-bars js-berger-menu"></i>
             </div>
@@ -114,19 +138,19 @@
                      alt="logo">
             </a>
             @*<div class="header-search-style">
-                <i class="fa fa-search"></i>
-                <input name="search" type="text" class="search-style" placeholder="جستجو در املاک باشی">
-            </div>*@
-        <a href="@(userAccessor.CurrentUser.UserGeneralType != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id): string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id))" class="add-advertise-box">
-            <p class="add-advertise-style"> رزرو های من </p>
-        </a>
+                    <i class="fa fa-search"></i>
+                    <input name="search" type="text" class="search-style" placeholder="جستجو در املاک باشی">
+                </div>*@
+            <a href="@(userAccessor.CurrentUser.UserGeneralType != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id): string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id))" class="add-advertise-box">
+                <p class="add-advertise-style"> رزرو های من </p>
+            </a>
         </header>
         <div class="body">
             <nav class="dashboard__navigatoin js-show-menu">
                 <ul class="dashboard-main-navigation_list">
                     <li class="main-navigation_list-item list-item__account-style">
                         @if (User.Identity.IsAuthenticated &&
-                          userAccessor.CurrentUser.PhotoID > 0)
+                         userAccessor.CurrentUser.PhotoID > 0)
                         {
                             <img width="48" height="48" src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=200", userAccessor.CurrentUser.PhotoID)' alt="avatar" class="list-item__avatar">
                         }
@@ -195,9 +219,9 @@
             <main class="main">
                 <div class="main-top-space" style="height:10px; width:100% ;">
                     @*<a href="@string.Format("/Ticket/Inbox?user_id={0}", userAccessor.CurrentUser.Id)" class="main__messages-button">
-                        <i class="fa fa-envelope"></i>
-                        <span>@(ViewBag.MessageCount == 0 ? "پیام ها" : ViewBag.MessageCount + " پیام جدید")</span>
-                    </a>*@
+                            <i class="fa fa-envelope"></i>
+                            <span>@(ViewBag.MessageCount == 0 ? "پیام ها" : ViewBag.MessageCount + " پیام جدید")</span>
+                        </a>*@
                 </div>
                 @RenderBody()
             </main>
@@ -235,7 +259,50 @@
             <button onclick="close_alert()" class="alert__btn">بستن</button>
         </div>
     }
-    <script src="/js/dashboard.min.js"></script>
+    <environment include="Development">
+        <script src="/resource/scripts/jquery-2.1.1.min.js"></script>
+        <script src="/lib/dropzone/dropzone.js"></script>
+        <script src="/resource/scripts/jquery.maskedinput.min.js"></script>
+        <script src="/resource/scripts/jquery.nicescroll.min.js"></script>
+        <script src="/resource/ticker/jquery.ticker.js"></script>
+        <script src="/resource/chosen_v1.4.2/chosen.jquery.min.js"></script>
+        <script src="/resource/alertify.js-0.3.11/src/alertify.js"></script>
+        <script src="/resource/scripts/general/lazy-loading.js"></script>
+        <script src="/resource/jquery-confirm/jquery-confirm.min.js"></script>
+        <script src="/resource/persian-date-picker/persian-datepicker.js"></script>
+        <script src="/resource/Scripts/general/jalali-date-converter.js"></script>
+        <script src="/resource/Scripts/general/jalali-date-handler.js"></script>
+        <script src="/resource/Scripts/general/jalali-date-picker.js"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.js"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.plus.js"></script>
+        <script src="/resource/Scripts/jquery.plugin.min.js"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.all.js"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.persian.js"></script>
+        <script src="/resource/Scripts/jquery.onmutate.min.js"></script>
+        <script src="/resource/rating/jquery.barrating.min.js"></script>
+        <script src="/resource/scripts/general/ajax-helper.js"></script>
+        <script src="/resource/scripts/general/client-helper.js"></script>
+        <script src="/resource/scripts/general/detail-button.js"></script>
+        <script src="/resource/scripts/general/increase-decrease-button.js"></script>
+        <script src="/resource/scripts/general/input-validation-helper.js"></script>
+        <script src="/resource/scripts/general/loading-indicator.js"></script>
+        <script src="/resource/Scripts/general/login/intlTelInput.min.js"></script>
+        <script src="/resource/scripts/general/login/login-popup.js"></script>
+        <script src="/resource/scripts/general/more-text-button.js"></script>
+        <script src="/resource/scripts/general/price-string-generator.js"></script>
+        <script src="/resource/scripts/general/rating-detail.js"></script>
+        <script src="/resource/scripts/general/string-replace-all.js"></script>
+        <script src="/resource/scripts/general/textarea-autoexpand.js"></script>
+        <script src="/resource/scripts/general/user-rating.js"></script>
+        <script src="/resource/scripts/general/message-popup.js"></script>
+        <script src="/resource/scripts/general/confirm-alert-helper.js"></script>
+        <script src="/scripts/jquery.unobtrusive-ajax.min.js"></script>
+        <script src="/resource/Scripts/dashboard/dashboard-navigation.js"></script>
+        <script src="/resource/Scripts/dashboard/registerEmail.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/dashboard.min.js"></script>
+    </environment>
     <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-messaging.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-database.js"></script>

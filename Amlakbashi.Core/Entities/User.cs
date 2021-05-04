@@ -35,6 +35,7 @@ namespace Amlakbashi.Core.Entities
             }
         }
         #endregion
+
         #region User Contact
         public string Mobile { get; set; }
         public string Mobile2 { get; set; }
@@ -47,6 +48,7 @@ namespace Amlakbashi.Core.Entities
         public string FcmAppNotificationToken { get; set; }
         public long LastNotifPermitionTicks { get; set; }
         #endregion
+
         #region Hostler
         public int OwnerShip { get; set; }
         public int AmlakbashiScore { get; set; }
@@ -59,6 +61,7 @@ namespace Amlakbashi.Core.Entities
         [JsonIgnore]
         public virtual ICollection<Advertise> Advertises { get; set; }
         #endregion
+
         #region User Profile
         public long? PhotoID { get; set; }
         public int PhotoStatus { get; set; }
@@ -105,6 +108,7 @@ namespace Amlakbashi.Core.Entities
         [InverseProperty("GuestUser")]
         public virtual ICollection<Reserve> Reserves { get; set; }
         #endregion
+
         #region To Delete
         public string AdminLoginCode { get; set; }
         public string ContactPhone { get; set; }

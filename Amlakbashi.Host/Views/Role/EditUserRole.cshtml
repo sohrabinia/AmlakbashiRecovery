@@ -19,7 +19,7 @@
             @foreach (var item in Model.AllRoles)
             {
                 <tr>
-                    <td>@item</td>
+                    <td>@UserLocalization.GetRolePersianTitle(item)</td>
                     <td>
                         <input type="checkbox" name="selectedRoles" value="@item" @(Model.CurrentRoles.Contains(item) ? "checked" : "") />
                     </td>

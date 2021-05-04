@@ -1,7 +1,9 @@
-﻿using Amlakbashi.Core.Common.Repository;
+﻿using Amlakbashi.Core.Common.Extensions;
+using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Mediator.Commands.AccountingCommands;
+using Amlakbashi.Mediator.Commands.UserCommands;
 using MediatR;
 using System;
 using System.Threading;
@@ -14,16 +16,19 @@ namespace Amlakbashi.Accounting.Services.CommandHandlers
     {
         private readonly IUserContactFacade userContact;
         private readonly IRepository<DiscountCoupon, long> discountCouponRepository;
+        private readonly IMediator mediator;
         public AccountingCommandHandler(IUserContactFacade userContact,
-            IRepository<DiscountCoupon, long> discountCouponRepository)
+            IRepository<DiscountCoupon, long> discountCouponRepository,
+            IMediator mediator)
         {
             this.userContact = userContact;
             this.discountCouponRepository = discountCouponRepository;
+            this.mediator = mediator;
         }
 
         public Task<Unit> Handle(ScheduleSendMessageGroupPaymentCommand request, CancellationToken cancellationToken)
         {
-            userContact.SendMessageClassic(true, request.UserContactDTO);
+            mediator.Enqueue(new SendMessageClassicCommand(true, request.UserContactDTO));
             return Task.FromResult(Unit.Value);
         }
 

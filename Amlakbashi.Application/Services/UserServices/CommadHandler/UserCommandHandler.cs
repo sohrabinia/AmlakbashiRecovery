@@ -26,7 +26,9 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
         IRequestHandler<ChangeInstantReserveAccessCommand>,
         IRequestHandler<UpdateUserScoreCommand>,
         IRequestHandler<SendMessageCommand>,
-        IRequestHandler<SendSmsCommand>
+        IRequestHandler<SendSmsCommand>,
+        IRequestHandler<SendMessageClassicCommand>,
+        IRequestHandler<SendVerificationSmsCommand>
     {
         private readonly IRepository<User, int> repository;
         private readonly IUserContactFacade userContact;
@@ -230,6 +232,18 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
         public Task<Unit> Handle(SendSmsCommand request, CancellationToken cancellationToken)
         {
             userContact.SendMessageClassic(true, request.UserContact);
+            return Task.FromResult(Unit.Value);
+        }
+
+        public Task<Unit> Handle(SendMessageClassicCommand request, CancellationToken cancellationToken)
+        {
+            userContact.SendMessageClassic(request.Initial, request.UserContact);
+            return Task.FromResult(Unit.Value);
+        }
+
+        public Task<Unit> Handle(SendVerificationSmsCommand request, CancellationToken cancellationToken)
+        {
+            userContact.SendVerificationSms(request.LocalNumber, request.Code);
             return Task.FromResult(Unit.Value);
         }
     }

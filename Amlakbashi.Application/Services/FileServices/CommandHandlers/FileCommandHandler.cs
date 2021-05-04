@@ -141,7 +141,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
 
         public Task<bool> Handle(GenerateThumbImageCommand request, CancellationToken cancellationToken)
         {
-            var accThumbPath = request.Path + "content/accthumb/" + request.AdvertiseId;
+            var accThumbPath = request.Path + "/content/accthumb/" + request.AdvertiseId;
             if (System.IO.Directory.Exists(accThumbPath))
             {
                 lock (objlock)
@@ -166,7 +166,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 try
                 {
                     var fileThumbPath = accThumbPath + "/" + file.Id;
-                    var origFilePath = request.Path + file.FilePath.Replace("~", "").Substring(1);
+                    var origFilePath = request.Path + "/" + file.FilePath.Replace("~", "").Substring(1);
                     thumbs.Add(new ImageThumbDTO()
                     {
                         directoryPath = fileThumbPath,
