@@ -16,12 +16,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -156,8 +158,18 @@ namespace Amlakbashi.Host
                 app.UseExceptionHandler("/errors/http500");
                 app.UseStatusCodePagesWithReExecute("/errors/http404");
             }
-
             app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                //FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
+                //Set the content-type without restriction. This setting can download all types of files, but it is not recommended because it is not safe.
+                //ServeUnknownFileTypes = true 
+                //The following settings can download files of type apk
+                ContentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>
+                {
+                    { ".apk","application/vnd.android.package-archive"}
+                })
+            });
             app.UseRouting();
             app.UseSession();
             app.UseAuthentication();
