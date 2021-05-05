@@ -4,7 +4,7 @@
     <h1 class="home-page__search-title">اجاره روزانه خانه ، اجاره آنلاین ویلا و سوئیت در سراسر ایران</h1>
     <div class="home-page__search-box">
         @*<i onclick="openFirstSearchResult()" class="home-page__search-icon fa fa-search"></i>*@
-        <input autocomplete="off" id="js-search-input-main" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="مقصد سفر شما کجاست؟" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)" class="home-page__search-input" type="text" />
+        <input autocomplete="off" id="js-search-input-main" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="مقصد سفر شما کجاست؟" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)"  class="home-page__search-input" type="search" />
         <i onclick="clearSearch()" class="home-page__clear-icon fa fa-times"></i>
     </div>
     <div class="home-page__search-list-box">
@@ -37,7 +37,7 @@
         <div style="padding: 0 5.7%">
             <div id="js-search-box-mobile" class="home-page__search-box" style="margin-bottom: 0;">
                 @*<i onclick="openFirstSearchResult()" class="home-page__search-icon fa fa-search"></i>*@
-                <input autocomplete="off" id="js-mobile-region-input" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="مقصد سفر شما کجاست؟" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)" class="home-page__search-input" type="text" />
+                <input autocomplete="off" id="js-mobile-region-input" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="مقصد سفر شما کجاست؟" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)" class="home-page__search-input" type="search" />
                 <i onclick="clearSearch()" class="home-page__clear-icon fa fa-times"></i>
             </div>
             <div class="home-page__search-list-box js-dont-close" style="height: 70%;overflow-y: scroll;padding: 15px 0;display:flex;flex-flow:column;">
