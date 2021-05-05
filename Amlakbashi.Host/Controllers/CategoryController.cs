@@ -251,7 +251,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 var rawUrl = HttpContext.Request.Path.Value;
                 rawUrl = string.IsNullOrEmpty(HttpContext.Request.QueryString.Value) ?
-                    rawUrl : rawUrl + "?" + HttpContext.Request.QueryString.Value;
+                    rawUrl : rawUrl + HttpContext.Request.QueryString.Value;
                 if (ajax == false)
                 {
                     if (rawUrl.Last() == '/')
@@ -984,7 +984,8 @@ namespace Amlakbashi.Host.Controllers
                     path
                 });
             }
-            return Redirect(path);
+            var encodedPath = WebUtility.UrlEncode(path).Replace("%2F", "/").Replace("%3F", "?").Replace("%3D", "=").Replace("%26", "&");
+            return Redirect(encodedPath);
             //var redirectUri = WebUtility.UrlDecode(HttpContext.Request.Host + path);
             //Uri redirectURI = new Uri(HttpContext.Request.Host + path);
             //return Redirect(redirectURI.AbsoluteUri);
