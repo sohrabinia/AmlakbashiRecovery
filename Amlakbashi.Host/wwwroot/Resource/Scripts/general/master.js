@@ -231,7 +231,6 @@ function initializeSupportChat() {
 }
 
 function initializePresentPrize() {
-    debugger;
     var shown = checkPresentShown();
     if (!shown) {
         $('.present-prize__button').css('display', 'flex');
@@ -320,7 +319,6 @@ function checkUserVisited() {
 }
 
 function checkPresentShown() {
-    debugger;
     var shown = getCookie("reserveprizeshown") === "yes";
     return shown;
 }
@@ -369,7 +367,6 @@ function hidePresentPopup() {
 
 function check_user_login() {
     myajax("user/isuserauthenticated", "", function (ret) {
-        debugger;
         if (ret.val) {
             isUserLoggedIn = true;
             if (ret.impersonateData.state) {

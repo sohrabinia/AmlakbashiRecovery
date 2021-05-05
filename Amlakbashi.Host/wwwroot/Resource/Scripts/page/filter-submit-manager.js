@@ -56,16 +56,19 @@ $("#advertise-filter-form").submit(function (e) {
     }
     var form = $(this);
     if ($('#js-ajax-filter').val() == "true") {
+        debugger;
         e.preventDefault();
         $.ajax({
             type: "POST",
             url: "/category/category",
             data: form.serialize(),
             beforeSend: function () {
+                debugger;
                 $images = null;
                 $('img.home-page__advertise-image').attr('src', '/file/resourceimagegif?file_name=lazy-16_9');
             },
             success: function (response) {
+                debugger;
                 if (response.status === 0) {
                     window.location.href = response.url;
                     return;
