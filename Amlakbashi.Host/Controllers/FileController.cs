@@ -918,55 +918,55 @@ namespace Portal.Controllers
             }
         }
 
-        [ResponseCache(Duration = 86400)]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumbCard(long accid, long fileid)
         {
             return AccThumb(accid, fileid, "card");
         }
 
-        [ResponseCache(Duration = 86400)]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumbXSmall(long accid, long fileid)
         {
             return AccThumb(accid, fileid, "xsmall");
         }
 
-        [ResponseCache(Duration = 86400)]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumbSmall(long accid, long fileid)
         {
             return AccThumb(accid, fileid, "small");
         }
 
-        [ResponseCache(Duration = 86400)]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumbMedium(long accid, long fileid)
         {
             return AccThumb(accid, fileid, "medium");
         }
 
-        [ResponseCache(Duration = 86400)]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumbLarge(long accid, long fileid)
         {
             return AccThumb(accid, fileid, "large");
         }
 
-        [ResponseCache(Duration = 86400)]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumbXLarge(long accid, long fileid)
         {
             return AccThumb(accid, fileid, "xlarge");
         }
 
-        [ResponseCache(Duration = 86400)]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumbXXLarge(long accid, long fileid)
         {
             return AccThumb(accid, fileid, "xxlarge");
         }
 
-        [ResponseCache(Duration = 86400)]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumbXXXLarge(long accid, long fileid)
         {
             return AccThumb(accid, fileid, "xxxlarge");
         }
 
-        [ResponseCache(Duration = 86400)]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumb(long accid, long fileid, string filename)
         {
             var path = "content/accthumb/" + accid + "/" + fileid + "/" + filename + ".jpg";

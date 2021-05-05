@@ -120,7 +120,7 @@ namespace Amlakbashi.Host
             }));
             services.AddHangfireServer();
 
-            services.AddSingleton<HtmlEncoder>(HtmlEncoder.Create(allowedRanges: new[] { UnicodeRanges.BasicLatin, UnicodeRanges.Arabic }));
+            services.AddSingleton<HtmlEncoder>(HtmlEncoder.Create(allowedRanges: new[] { UnicodeRanges.All }));
             services.AddResponseCaching();
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddSignalR();
