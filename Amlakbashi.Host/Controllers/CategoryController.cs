@@ -13,9 +13,11 @@ using log4net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using X.PagedList;
 using static Amlakbashi.Core.Entities.Advertise;
@@ -983,6 +985,9 @@ namespace Amlakbashi.Host.Controllers
                 });
             }
             return Redirect(path);
+            //var redirectUri = WebUtility.UrlDecode(HttpContext.Request.Host + path);
+            //Uri redirectURI = new Uri(HttpContext.Request.Host + path);
+            //return Redirect(redirectURI.AbsoluteUri);
         }
 
         [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]

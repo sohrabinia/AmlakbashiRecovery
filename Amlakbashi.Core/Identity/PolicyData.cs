@@ -173,6 +173,7 @@ namespace Amlakbashi.Core.Identity
                             Roles.TechnicalEmployee,
                             Roles.ReserveManager,
                             Roles.ReserveSenior,
+                            Roles.ReserveJunior,
                             Roles.FinanceManager
                         }
                     },
