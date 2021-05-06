@@ -1,6 +1,7 @@
 using Amlakbashi.Application;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Data.Identity;
+using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Configurations;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -64,12 +65,14 @@ namespace Amlakbashi.Host
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.User.AllowedUserNameCharacters = "+ 0123456789";
-                options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 5;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
-            }).AddRoles<AppRole>().AddEntityFrameworkStores<IdentityDB>().AddDefaultTokenProviders();
+                options.Password.RequiredLength = 1;
+                options.Password.RequiredUniqueChars = 1;
+                options.Password.RequireNonAlphanumeric = false;
+            }).AddPasswordValidator<CustomPasswordValidator>()
+            .AddRoles<AppRole>().AddEntityFrameworkStores<IdentityDB>().AddDefaultTokenProviders();
 
             services.AddAuthentication()
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>

@@ -9,13 +9,15 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
         {
             switch (passwordErrorCode)
             {
+                case "PersianCharacterForbidden":
+                    return "رمز عبور نباید شامل حروف فارسی باشد";
                 case "PasswordTooShort":
                     return "رمز عبور باید حداقل شامل 5 کاراکتر باشد";
                 case "PasswordMismatch":
                     return "رمز عبور فعلی اشتباه است";
                 case "PasswordRequiresDigit":
                     return "در رمز عبور باید حداقل از یک عدد استفاده کنید";
-                case "PasswordRequiresLower":
+                case "PasswordRequiresLetter":
                     return "در رمز عبور باید حداقل از یک حرف انگلیسی استفاده کنید";
                 default:
                     return "اشکال در رمز عبور";

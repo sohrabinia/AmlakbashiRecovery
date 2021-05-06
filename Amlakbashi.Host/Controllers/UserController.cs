@@ -745,7 +745,9 @@ namespace Amlakbashi.Host.Controllers
 
                     var code = new Random().Next(1111, 9999).ToString();
                     userService.UpdateSendVerification(user.Id, DateTime.Now, code);
-                    userService.SendVerificationSms(PhoneUtility.InternationalNumberToLocal(international_mobile), code);
+                    var callableNumber = isNumberForIran ? PhoneUtility.InternationalNumberToLocal(international_mobile) :
+                        PhoneUtility.InternationalNumberToCallable(international_mobile);
+                    userService.SendVerificationSms(callableNumber, code);
 
                     return GenerateJsonResult(new
                     {
@@ -760,7 +762,9 @@ namespace Amlakbashi.Host.Controllers
                 {
                     var code = new Random().Next(1111, 9999).ToString();
                     userService.UpdateSendVerification(user.Id, DateTime.Now, code);
-                    userService.SendVerificationSms(PhoneUtility.InternationalNumberToLocal(international_mobile), code);
+                    var callableNumber = isNumberForIran ? PhoneUtility.InternationalNumberToLocal(international_mobile) :
+                        PhoneUtility.InternationalNumberToCallable(international_mobile);
+                    userService.SendVerificationSms(callableNumber, code);
 
                     return GenerateJsonResult(new
                     {
