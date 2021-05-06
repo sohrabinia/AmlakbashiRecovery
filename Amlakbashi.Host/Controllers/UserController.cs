@@ -81,6 +81,7 @@ namespace Amlakbashi.Host.Controllers
             var employeesNumber = userService.GetAllEmployees().Select(s => s.PhoneNumber).ToList();
             if (employeesNumber.Contains(identityUser.PhoneNumber))
             {
+                TempData["userIsEmployees"] = true;
                 return Redirect("/errors/accessdenied");
             }
 
@@ -90,17 +91,20 @@ namespace Amlakbashi.Host.Controllers
                 new Claim("IsImpersonated", "true"),
             };
             var result = userService.AddClaimsToUser(user.MainMobile, claims);
-            if (result)
+            if (result == false)
             {
-                signInManager.SignOutAsync().Wait();
-                signInManager.SignInAsync(identityUser, false).Wait();
-
-                HttpContext.Session.SetObjectAsJson("impersonateUser", user);
-                HttpContext.Session.SetObjectAsJson("impersonateAdmin", admin);
-
-                logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
-                user.FullName + "(" + user.Id + ").");
+                TempData["userIsImpersonated"] = true;
+                return Redirect("/errors/accessdenied");
             }
+
+            signInManager.SignOutAsync().Wait();
+            signInManager.SignInAsync(identityUser, false).Wait();
+
+            HttpContext.Session.SetObjectAsJson("impersonateUser", user);
+            HttpContext.Session.SetObjectAsJson("impersonateAdmin", admin);
+
+            logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
+            user.FullName + "(" + user.Id + ").");
 
             if (!string.IsNullOrEmpty(url))
             {
