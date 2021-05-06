@@ -751,7 +751,6 @@ namespace Amlakbashi.Application.Services.UserServices
         public void RemoveClaimsFromUser(string username, IList<Claim> claims)
         {
             var user = userManager.FindByNameAsync(username).Result;
-            var userClaims = userManager.GetClaimsAsync(user);
             userManager.RemoveClaimsAsync(user, claims).Wait();
         }
 
