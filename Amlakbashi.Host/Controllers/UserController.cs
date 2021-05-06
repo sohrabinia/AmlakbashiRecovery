@@ -86,18 +86,21 @@ namespace Amlakbashi.Host.Controllers
 
             var claims = new List<Claim>
             {
-                new Claim("AdminUsername", User.Identity.Name),
+                new Claim("AdminUsername", admin.MainMobile),
                 new Claim("IsImpersonated", "true"),
             };
-            userService.AddClaimsToUser(user.MainMobile, claims);
-            signInManager.SignOutAsync().Wait();
-            signInManager.SignInAsync(identityUser, false).Wait();
+            var result = userService.AddClaimsToUser(user.MainMobile, claims);
+            if (result)
+            {
+                signInManager.SignOutAsync().Wait();
+                signInManager.SignInAsync(identityUser, false).Wait();
 
-            HttpContext.Session.SetObjectAsJson("impersonateUser", user);
-            HttpContext.Session.SetObjectAsJson("impersonateAdmin", admin);
+                HttpContext.Session.SetObjectAsJson("impersonateUser", user);
+                HttpContext.Session.SetObjectAsJson("impersonateAdmin", admin);
 
-            logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
+                logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
                 user.FullName + "(" + user.Id + ").");
+            }
 
             if (!string.IsNullOrEmpty(url))
             {
@@ -119,7 +122,7 @@ namespace Amlakbashi.Host.Controllers
 
             var claims = new List<Claim>
             {
-                new Claim("AdminUsername", User.Identity.Name),
+                new Claim("AdminUsername", adminUsername),
                 new Claim("IsImpersonated", "true"),
             };
             userService.RemoveClaimsFromUser(User.Identity.Name, claims);

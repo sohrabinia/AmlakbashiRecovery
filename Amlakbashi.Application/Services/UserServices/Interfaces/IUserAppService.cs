@@ -62,7 +62,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         AppUser GetActivatedIdentityUser(string phrase, bool isEmail = false);
         AppUser GetIdentityUser(string phrase, bool isEmail = false);
         void AddIdentityUser(AppUser user);
-        void AddClaimsToUser(string username, IList<Claim> claims);
+        bool AddClaimsToUser(string username, IList<Claim> claims);
         void RemoveClaimsFromUser(string username, IList<Claim> claims);
         IdentityResult AddIdentityUserPassword(string username, string password);
         IdentityResult ChangeIdentityUserPassword(string username, string password);
