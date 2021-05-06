@@ -737,15 +737,21 @@ namespace Amlakbashi.Application.Services.UserServices
             return roles;
         }
 
-        public void AddClaimsToUser(string username, IList<Claim> claims)
+        public bool AddClaimsToUser(string username, IList<Claim> claims)
         {
             var user = userManager.FindByNameAsync(username).Result;
-            userManager.AddClaimsAsync(user, claims).Wait();
+            var userClaims = userManager.GetClaimsAsync(user).Result;
+            if (userClaims != null && userClaims.Where(w => claims.Select(s => s.Type).Contains(w.Type)).Count() > 0)
+            {
+                return false;
+            }
+            return userManager.AddClaimsAsync(user, claims).Result.Succeeded;
         }
 
         public void RemoveClaimsFromUser(string username, IList<Claim> claims)
         {
             var user = userManager.FindByNameAsync(username).Result;
+            var userClaims = userManager.GetClaimsAsync(user);
             userManager.RemoveClaimsAsync(user, claims).Wait();
         }
 
@@ -839,7 +845,7 @@ namespace Amlakbashi.Application.Services.UserServices
         public JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key)
         {
             var userRoles = userManager.GetRolesAsync(identityUser).Result;
-            var authClaims = new List<Claim>();            
+            var authClaims = new List<Claim>();
             foreach (var role in userRoles)
             {
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
