@@ -9,14 +9,25 @@ namespace Amlakbashi.Host.Appenders
 {
     public class HangfireAppender : AppenderSkeleton
     {
-        private const string filePrefix = "Logs/HangfireLogs/HangfireLog-";
+        private const string logDir = "Logs/HangfireLogs";
+        private const string filePrefix = "HangfireLog-";
         private readonly string fileName;
         public HangfireAppender()
         {
-            var rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location.Substring(0, Assembly.GetEntryAssembly().Location.IndexOf("bin\\")));
+            var rootPath = "";
+#if DEBUG
+            rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location.Substring(0, Assembly.GetEntryAssembly().Location.IndexOf("bin\\")));
+#else
+            rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+#endif
             var now = DateTime.Now;
-            fileName = Path.Combine(rootPath, filePrefix + now.Year + "-" +
+            fileName = Path.Combine(rootPath, logDir, filePrefix + now.Year + "-" +
                 now.Month + "-" + now.Day + "-" + now.Hour + ".txt");
+
+            if (Directory.Exists(Path.Combine(rootPath, logDir)) == false)
+            {
+                Directory.CreateDirectory(Path.Combine(rootPath, logDir));
+            }
         }
         protected override void Append(LoggingEvent loggingEvent)
         {

@@ -1,5 +1,6 @@
 ﻿using log4net.Appender;
 using log4net.Core;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
 using System.Reflection;
@@ -8,14 +9,25 @@ namespace Amlakbashi.Host.Appenders
 {
     public class LogAppender : AppenderSkeleton
     {
-        private const string filePrefix = "Logs/Logs/Log-";
+        private const string logDir = "Logs/Logs";
+        private const string filePrefix = "Log-";
         private readonly string fileName;
         public LogAppender()
         {
-            var rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location.Substring(0, Assembly.GetEntryAssembly().Location.IndexOf("bin\\")));
+            var rootPath = "";
+#if DEBUG
+            rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location.Substring(0, Assembly.GetEntryAssembly().Location.IndexOf("bin\\")));
+#else
+            rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+#endif
             var now = DateTime.Now;
-            fileName = Path.Combine(rootPath, filePrefix + now.Year + "-" +
+            fileName = Path.Combine(rootPath, logDir, filePrefix + now.Year + "-" +
                 now.Month + "-" + now.Day + "-" + now.Hour + ".txt");
+
+            if (Directory.Exists(Path.Combine(rootPath, logDir)) == false)
+            {
+                Directory.CreateDirectory(Path.Combine(rootPath, logDir));
+            }
         }
         protected override void Append(LoggingEvent loggingEvent)
         {
