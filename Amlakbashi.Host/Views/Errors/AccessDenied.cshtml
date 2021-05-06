@@ -19,6 +19,14 @@ else
             @:<div>شما از طرف کاربر دیگری وارد شده اید. برای دسترسی به این قسمت، به حساب کاربری ادمین خود بازگردید.</div><br />
             <div><a href="/user/impersonatelogout">بازگشت به حساب کاربری ادمین</a></div>
         }
+        else if (TempData["userIsEmployees"] != null && (bool)TempData["userIsEmployees"] == true)
+        {
+            @:<div>امکان جعل هویت کارمندان شرکت وجود ندارد</div>
+        }
+        else if (TempData["userIsImpersonated"] != null && (bool)TempData["userIsImpersonated"] == true)
+        {
+            @:<div>این کاربر توسط پشتیبان دیگری جعل هویت شده است</div>
+        }
         else
         {
             @:<div>کاربر گرامی، شما مجوز کافی برای دسترسی به این قسمت را ندارید</div>

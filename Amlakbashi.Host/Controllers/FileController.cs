@@ -692,7 +692,7 @@ namespace Portal.Controllers
             return File("/resource/img/img202_500_300.png", "image/png");
         }
 
-        public ActionResult PhotoCropper(long id, long accId)
+        public ActionResult PhotoCropper(long id, long accId = 0)
         {
             try
             {
@@ -761,7 +761,10 @@ namespace Portal.Controllers
                         ObjFile.FilePath = "~/" + filepath;
                         ObjFile.LastModifyDate = DateTime.Now;
                         fileService.Update(ObjFile, host.WebRootPath);
-                        fileService.GenerateThumbImage(accId, host.WebRootPath);
+                        if (accId > 0)
+                        {
+                            fileService.GenerateThumbImage(accId, host.WebRootPath);
+                        }
                         try
                         {
                             System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
