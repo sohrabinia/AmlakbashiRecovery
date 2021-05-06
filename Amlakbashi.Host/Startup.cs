@@ -61,7 +61,7 @@ namespace Amlakbashi.Host
                 options.IdleTimeout = TimeSpan.FromHours(2);
             });
 
-            services.AddDbContext<IdentityDB>(options => options.UseSqlServer(Configuration.GetConnectionString("IdentityDB")));
+            services.AddDbContext<IdentityDB>(options => options.UseSqlServer(Configuration.GetConnectionString("IdentityDB")), ServiceLifetime.Scoped, ServiceLifetime.Scoped);
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.User.AllowedUserNameCharacters = "+ 0123456789";
