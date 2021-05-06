@@ -1,6 +1,7 @@
 using Amlakbashi.Application;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Data.Identity;
+using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Configurations;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -16,12 +17,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -58,16 +61,18 @@ namespace Amlakbashi.Host
                 options.IdleTimeout = TimeSpan.FromHours(2);
             });
 
-            services.AddDbContext<IdentityDB>(options => options.UseSqlServer(Configuration.GetConnectionString("IdentityDB")));
+            services.AddDbContext<IdentityDB>(options => options.UseSqlServer(Configuration.GetConnectionString("IdentityDB")), ServiceLifetime.Scoped, ServiceLifetime.Scoped);
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.User.AllowedUserNameCharacters = "+ 0123456789";
-                options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 5;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
-            }).AddRoles<AppRole>().AddEntityFrameworkStores<IdentityDB>().AddDefaultTokenProviders();
+                options.Password.RequiredLength = 1;
+                options.Password.RequiredUniqueChars = 1;
+                options.Password.RequireNonAlphanumeric = false;
+            }).AddPasswordValidator<CustomPasswordValidator>()
+            .AddRoles<AppRole>().AddEntityFrameworkStores<IdentityDB>().AddDefaultTokenProviders();
 
             services.AddAuthentication()
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -156,8 +161,18 @@ namespace Amlakbashi.Host
                 app.UseExceptionHandler("/errors/http500");
                 app.UseStatusCodePagesWithReExecute("/errors/http404");
             }
-
             app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                //FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
+                //Set the content-type without restriction. This setting can download all types of files, but it is not recommended because it is not safe.
+                //ServeUnknownFileTypes = true 
+                //The following settings can download files of type apk
+                ContentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>
+                {
+                    { ".apk","application/vnd.android.package-archive"}
+                })
+            });
             app.UseRouting();
             app.UseSession();
             app.UseAuthentication();

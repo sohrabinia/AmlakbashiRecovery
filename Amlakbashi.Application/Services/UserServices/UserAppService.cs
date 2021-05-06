@@ -822,6 +822,7 @@ namespace Amlakbashi.Application.Services.UserServices
             }
             if (string.IsNullOrEmpty(password) == false)
             {
+                userManager.RemovePasswordAsync(identityUser).Wait();
                 var addPasswordResult = userManager.AddPasswordAsync(identityUser, password).Result;
                 if (addPasswordResult.Succeeded == false)
                 {

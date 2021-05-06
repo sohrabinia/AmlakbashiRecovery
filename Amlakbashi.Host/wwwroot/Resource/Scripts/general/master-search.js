@@ -144,6 +144,9 @@ function search_catrgories(e) {
     //    return;
     //}
     toggleSearchHolder(false);
+    if (typeof search_string == 'undefined' || search_string == null || search_string == '') {
+        return;
+    }
     if (search_string != '' && /^[A-Za-z]*$/.test(search_string)) {
         //$(".home-page__search-list-result-container").empty();
         $(".home-page__search-input").val(search_string.replace(/[A-Za-z]/g, ""));
