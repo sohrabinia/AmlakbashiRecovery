@@ -1728,7 +1728,7 @@ namespace Amlakbashi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ServicePostItems");
+                    b.ToTable("ServicePosts");
                 });
 
             modelBuilder.Entity("Amlakbashi.Core.Entities.Setting", b =>
@@ -2274,7 +2274,7 @@ namespace Amlakbashi.Data.Migrations
 
             modelBuilder.Entity("Amlakbashi.Core.Entities.OccupiedTable", b =>
                 {
-                    b.HasOne("Amlakbashi.Core.Entities.Advertise", null)
+                    b.HasOne("Amlakbashi.Core.Entities.Advertise", "Advertise")
                         .WithMany("OccupiedTables")
                         .HasForeignKey("AdvertiseID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2287,6 +2287,8 @@ namespace Amlakbashi.Data.Migrations
                     b.HasOne("Amlakbashi.Core.Entities.Reserve", "Reserve")
                         .WithMany()
                         .HasForeignKey("ReserveID");
+
+                    b.Navigation("Advertise");
 
                     b.Navigation("ExtrinsicReserve");
 
