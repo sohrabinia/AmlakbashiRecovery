@@ -188,7 +188,7 @@ namespace Amlakbashi.Host
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
 
             // hangfire
-            GlobalConfiguration.Configuration.UseAutofacActivator(AutofacContainer)
+            GlobalConfiguration.Configuration.UseAutofacActivator(AutofacContainer, false)
                 .UseSerializerSettings(new Newtonsoft.Json.JsonSerializerSettings
                 {
                     TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects

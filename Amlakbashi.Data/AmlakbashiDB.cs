@@ -14,7 +14,7 @@ namespace Amlakbashi.Data
         public DbSet<BlogPost> BlogPosts { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Post> Posts { get; set; }
-        public DbSet<ServicePost> ServicePostItems { get; set; }
+        public DbSet<ServicePost> ServicePosts { get; set; }
         public DbSet<BankCard> BankCards { get; set; }
         public DbSet<SupportChat> SupportChats { get; set; }
         public DbSet<SupportChatMessage> SupportChatMessages { get; set; }
