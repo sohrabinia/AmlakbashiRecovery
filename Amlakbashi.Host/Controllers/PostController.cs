@@ -379,13 +379,13 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [ResponseCache(Duration = 60 * 60)]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult Search()
         {
             return View();
         }
 
-        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "amp_version" })]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult SearchAccID()
         {
             return View();
@@ -395,7 +395,7 @@ namespace Amlakbashi.Host.Controllers
         {
             if (HttpContext.Request.Path.Value.ToLower() == "/post/news")
             {
-                return RedirectPermanent("/اخبار-و-مقالات");
+                return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect("/اخبار-و-مقالات"));
             }
             var postList = new List<IList<Post>>();
             postList.Add(postService.Filter(PostStatus.Published, 23).Take(3).ToList());
@@ -425,7 +425,7 @@ namespace Amlakbashi.Host.Controllers
                     case 6:
                         return RedirectPermanent("/contact");
                     case 4:
-                        return RedirectPermanent("/درباره-ما");
+                        return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect("/درباره-ما"));
                     case 8:
                         return RedirectPermanent("/help");
                     case 24:
@@ -452,15 +452,15 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.amp_version = amp_version;
                 var model = postService.Find(id);
                 if (!string.IsNullOrEmpty(model.Link))
-                    return Redirect(model.Link);
+                    return Redirect(HtmlUtility.EncodeUrlForRedirect(model.Link));
                 var target_title = model.Title.Replace("+", "-").Replace(" ", "-");
                 if (string.IsNullOrEmpty(title) && HttpContext.Request.Path.Value == "/post/newsitem?id=" + id)
                 {
-                    return RedirectPermanent(string.Format("/اخبار-و-مقالات/{0}-{1}", target_title, id));
+                    return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect(string.Format("/اخبار-و-مقالات/{0}-{1}", target_title, id)));
                 }
                 if (HttpContext.Request.Path.Value == "/اخبار-و-مقالات/درباره-ما-5")
                 {
-                    return RedirectPermanent("/درباره-ما");
+                    return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect("/درباره-ما"));
                 }
                 if (target_title != title)
                 {
@@ -764,7 +764,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 if (HttpContext.Request.Path.Value.ToLower() == "/post/frequentlyquestions")
                 {
-                    return RedirectPermanent("/سوالات-متداول");
+                    return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect("/سوالات-متداول"));
                 }
                 ViewBag.amp_version = amp_version;
                 return View();

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 
 namespace Amlakbashi.Core.Common.Utilities
 {
@@ -28,6 +29,11 @@ namespace Amlakbashi.Core.Common.Utilities
                 return result;
             }
             return queryString.Replace("&" + str, "");
+        }
+
+        public static string EncodeUrlForRedirect(string path)
+        {
+            return WebUtility.UrlEncode(path).Replace("%2F", "/").Replace("%3F", "?").Replace("%3D", "=").Replace("%26", "&");
         }
     }
 }

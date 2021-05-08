@@ -213,7 +213,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 if (HttpContext.Request.Path.Value.Last() == '/')
                 {
-                    return RedirectPermanent(HttpContext.Request.Path.Value.Remove(HttpContext.Request.Path.Value.Length - 1));
+                    return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect(HttpContext.Request.Path.Value.Remove(HttpContext.Request.Path.Value.Length - 1)));
                 }
                 if (amp_version)
                 {
@@ -230,13 +230,13 @@ namespace Amlakbashi.Host.Controllers
                     if (category.Province > 0)
                     {
                         var targetUrl = CategoryUrlLocalization.CategoryToUrl(category);
-                        return RedirectPermanent(targetUrl);
+                        return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect(targetUrl));
                     }
                     else
                     {
                         if (category.CountryDirection == CountryDirection.North)
                         {
-                            return RedirectPermanent("/شمال");
+                            return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect("/شمال"));
                         }
                         else
                         {

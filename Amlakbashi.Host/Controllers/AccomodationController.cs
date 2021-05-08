@@ -1728,7 +1728,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 if (HttpContext.Request.Path.Value.Last() == '/')
                 {
-                    return RedirectPermanent(HttpContext.Request.Path.Value.Remove(HttpContext.Request.Path.Value.Length - 1));
+                    return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect(HttpContext.Request.Path.Value.Remove(HttpContext.Request.Path.Value.Length - 1)));
                 }
                 var id = long.Parse(slug.Split('-')[0]);
                 var model = advertiseService.FindIncludingDeleted(id);

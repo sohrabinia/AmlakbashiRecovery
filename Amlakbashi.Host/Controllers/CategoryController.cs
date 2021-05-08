@@ -256,11 +256,11 @@ namespace Amlakbashi.Host.Controllers
                 {
                     if (rawUrl.Last() == '/')
                     {
-                        return RedirectPermanent(rawUrl.Remove(rawUrl.Length - 1));
+                        return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect(rawUrl.Remove(rawUrl.Length - 1)));
                     }
                     if (page == 1 && HttpContext.Request.QueryString.Value.Contains("?page=1"))
                     {
-                        return RedirectPermanent(HtmlUtility.RemoveFromQueryString(rawUrl, "page", "1"));
+                        return RedirectPermanent(HtmlUtility.EncodeUrlForRedirect(HtmlUtility.RemoveFromQueryString(rawUrl, "page", "1")));
                     }
                 }
                 Region targetLocation = null;
@@ -984,8 +984,7 @@ namespace Amlakbashi.Host.Controllers
                     path
                 });
             }
-            var encodedPath = WebUtility.UrlEncode(path).Replace("%2F", "/").Replace("%3F", "?").Replace("%3D", "=").Replace("%26", "&");
-            return Redirect(encodedPath);
+            return Redirect(HtmlUtility.EncodeUrlForRedirect(path));
             //var redirectUri = WebUtility.UrlDecode(HttpContext.Request.Host + path);
             //Uri redirectURI = new Uri(HttpContext.Request.Host + path);
             //return Redirect(redirectURI.AbsoluteUri);
