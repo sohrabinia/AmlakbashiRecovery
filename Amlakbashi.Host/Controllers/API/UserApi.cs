@@ -266,7 +266,7 @@ namespace Amlakbashi.Host.Controllers.API
                             return GenerateJsonResult(new
                             {
                                 status = 0,
-                                errors = errors
+                                errors = errors.Select(s => s.Value).ToList()
                             });
                         }
                     }
@@ -279,7 +279,7 @@ namespace Amlakbashi.Host.Controllers.API
                     {
                         status = 0,
                         errors =
-                        new Dictionary<string, string>() { { "code", "کد وارد شده صحیح نیست" } }
+                        /*new Dictionary<string, string>()*/new List<string>() { /*{*/ /*"code", */"کد وارد شده صحیح نیست" /*}*/ }
                     });
                 }
             }

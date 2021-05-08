@@ -315,7 +315,7 @@
                             </div>
                         </td>
                     }
-                    @if (item.User.State == 1 || item.User.State == 3)
+                    @if (item.State == Entities.User.UserState.Acticved || item.State == Entities.User.UserState.ReserveBanned)
                     {
                         <td>
                             <a href="@Url.Action("Edit",new {uid= item.User.Id})"><span class="editicon" title="ویرایش"></span></a>
