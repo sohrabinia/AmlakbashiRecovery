@@ -67,6 +67,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         IdentityResult AddIdentityUserPassword(string username, string password);
         IdentityResult ChangeIdentityUserPassword(string username, string password);
         IdentityResult ChangeIdentityUserPassword(string username, string currentPassword, string newPassword);
+        IdentityResult ChangePassword(string username, string currentPassword, string newPassword);
         void UpdateIdentityUser(AppUser user);
         bool VerifyLoginCode(string mobileInternational, string code);
         IList<AppRole> GetAllRoles();

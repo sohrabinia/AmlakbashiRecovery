@@ -136,9 +136,18 @@ function on_login() {
     }
 }
 
+checkSignalrFetch();
+
 const portalHubConnection = new signalR.HubConnectionBuilder()
     .withUrl("/portalhub")
     .build();
+
+function checkSignalrFetch() {
+    if (typeof fetch !== "undefined" && typeof AbortController === "undefined") {
+        console.warn("Fetch is supported, but not AbortController.  Dropping default fetch so SignalR can override.");
+        window.fetch = undefined;
+    }
+}
 
 var registered_service_worker;
 
