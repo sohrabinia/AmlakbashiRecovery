@@ -715,7 +715,6 @@ namespace Amlakbashi.Application.Services.UserServices
             {
                 return userManager.ChangePasswordAsync(user, currentPassword, newPassword).Result;
             }
-            userManager.RemovePasswordAsync(user).Wait();
             return userManager.AddPasswordAsync(user, newPassword).Result;
         }
 
