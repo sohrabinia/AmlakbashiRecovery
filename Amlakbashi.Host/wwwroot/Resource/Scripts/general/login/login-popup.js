@@ -169,7 +169,7 @@ function login(step) {
                 //$("#login-error-container").html(ret.msg);
                 alertify.error(ret.msg);
             }
-            else if (ret.status == 1) {
+            else if (ret.status == 1 || ret.status == 4) {
                 currentLoginStep = loginStepEnum.enterCode;
                 checked_mobile_current = true;
                 mobileCurrent = function () {
@@ -203,11 +203,21 @@ function login(step) {
                     }
                     $("#code").on('keypress', function (e) {
                         if (e.which == 13) {
-                            login_success(ret.mobile, ret.isNew);
+                            if (ret.status == 1) {
+                                login_success(ret.mobile, ret.isNew);
+                            }
+                            else if (ret.status == 4) {
+                                loginCode(ret.mobile);
+                            }
                         }
                     });
                     $("#success__code").click(function () {
-                        login_success(ret.mobile, ret.isNew);
+                        if (ret.status == 1) {
+                            login_success(ret.mobile, ret.isNew);
+                        }
+                        else if (ret.status == 4) {
+                            loginCode(ret.mobile);
+                        }
                     });
                     setTimeout(function () { $("#code").focus() }, 1000);
                 }
@@ -349,13 +359,12 @@ function login_verification() {
     var mobile = number.replace("+", "00");
     var fname = $("#fname").val();
     var lname = $("#lname").val();
-    var pass = $("#pass").val();
-    var passConfirm = $("#confirmPass").val();
+    //var pass = $("#pass").val();
+    //var passConfirm = $("#confirmPass").val();
     var presentorCode = $('#presentorcode').val();
     login_in_progress = true;
     myajax("user/popuploginregister", "mobile=" + mobile + "&code=" +
-        code + "&fname=" + fname + "&lname=" + lname + "&password=" + pass +
-        "&confirmPassword=" + passConfirm + "&presentorcode=" + presentorCode,
+        code + "&fname=" + fname + "&lname=" + lname + "&presentorcode=" + presentorCode,
         function (ret) {
             login_in_progress = false;
             if (ret.status == 1) {
@@ -500,6 +509,32 @@ function login_success(mobile, isNew) {
     });
 }
 
+function loginCode(mobile) {
+    var code = $('#code').val();
+    var number = intl.getNumber();
+    var mobile = number.replace("+", "00");
+    $.ajax({
+        url: "/user/popuplogincode",
+        type: "post",
+        data: {
+            mobile: mobile,
+            code: code
+        },
+        success: function (ret) {
+            if (ret.status == 1) {
+                currentLoginStep = loginStepEnum.signupUser;
+                $(".login_form").hide();
+                verification_success();
+            } else {
+                alertify.error('کد وارد شده اشتباه است');
+            };
+        },
+        error: function (jqXhr, textStatus, errorMessage) {
+            alertify.error(errorMessage);
+        }
+    });
+}
+
 function login_success_email(email, onDone) {
     show_email_verification_form(email, onDone);
 }
@@ -570,7 +605,6 @@ function verification_success() {
     $(".master_header-account").find("span").html("حساب من");
     $('.login__container').hide();
     $('.login__bg').hide();
-    debugger;
     onLoginFinish();
     if (typeof on_login !== "undefined") {
         on_login();

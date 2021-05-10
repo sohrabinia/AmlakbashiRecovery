@@ -36,17 +36,26 @@ namespace Amlakbashi.Host.Appenders
                 using (FileStream fs = new FileStream(fileName, FileMode.Append, FileAccess.Write))
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
+                    string log = "";
                     string logDate = loggingEvent.TimeStamp.Year + "-" +
-                    loggingEvent.TimeStamp.Month + "-" +
-                    loggingEvent.TimeStamp.Day + " " +
-                    loggingEvent.TimeStamp.TimeOfDay;
-                    string logMessage = logDate +
+                        loggingEvent.TimeStamp.Month + "-" +
+                        loggingEvent.TimeStamp.Day + " " +
+                        loggingEvent.TimeStamp.TimeOfDay;
+                    string logDetails = logDate +
                         " [" + loggingEvent.ThreadName + "] [" +
                         loggingEvent.Level.Name + "] [" +
-                        loggingEvent.LoggerName + "]\n" +
-                        loggingEvent.RenderedMessage +
-                        "\n--------------------------------------------------------------------------------";
-                    sw.WriteLine(logMessage);
+                        loggingEvent.LoggerName + "]\n";
+                    var logLocation = loggingEvent.LocationInformation != null ?
+                        "Location: " + loggingEvent.LocationInformation.FullInfo + "\n" : "";
+                    var logMessage = "Message: " + loggingEvent.RenderedMessage + "\n";
+                    var exceptionMessage = loggingEvent.ExceptionObject != null ?
+                        "Exception: " + loggingEvent.ExceptionObject.Message + "\n" : "";
+                    var innerExceptionMessage = loggingEvent.ExceptionObject != null &&
+                        loggingEvent.ExceptionObject.InnerException != null ?
+                        "InnerException: " + loggingEvent.ExceptionObject.InnerException.Message + "\n" : "";
+                    var logSeperator = "--------------------------------------------------------------------------------";
+                    log = logDetails + logLocation + logMessage + exceptionMessage + innerExceptionMessage + logSeperator;
+                    sw.WriteLine(log);
                 }
             }
         }

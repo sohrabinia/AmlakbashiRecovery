@@ -161,6 +161,7 @@ namespace Amlakbashi.Host
                 app.UseExceptionHandler("/errors/http500");
                 app.UseStatusCodePagesWithReExecute("/errors/http404");
             }
+
             app.UseResponseCaching();
             app.UseStaticFiles();
             app.UseStaticFiles(new StaticFileOptions
