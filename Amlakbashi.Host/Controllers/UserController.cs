@@ -1049,8 +1049,7 @@ namespace Amlakbashi.Host.Controllers
                     {
                         Dictionary<string, string> errors;
                         // TODO: remove password from signinregister function
-                        if (userService.SignInRegister(user_id, fname, lname, null,
-                            null, out errors))
+                        if (userService.SignInRegister(user_id, fname, lname, out errors))
                         {
                             userService.UpdateState(user_id, true);
                         }

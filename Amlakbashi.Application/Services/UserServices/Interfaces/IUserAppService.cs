@@ -76,6 +76,8 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void UpdateUserRoles(string username, IList<string> selectedRoles);
         IList<User> GetRoleUserList(string roleName);
         bool SignInRegister(int user_id, string fname, string lname,
+            out Dictionary<string, string> errors);
+        bool SignInRegisterOld(int user_id, string fname, string lname,
             string password, string confirmPassword, out Dictionary<string, string> errors);
         JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key);
         IEnumerable<User> IdentityUsersToUsers(IEnumerable<AppUser> identityUsers);
