@@ -54,7 +54,20 @@ namespace Amlakbashi.Host.Appenders
                         loggingEvent.ExceptionObject.InnerException != null ?
                         "InnerException: " + loggingEvent.ExceptionObject.InnerException.Message + "\n" : "";
                     var logSeperator = "--------------------------------------------------------------------------------";
-                    log = logDetails + logLocation + logMessage + exceptionMessage + innerExceptionMessage + logSeperator;
+
+                    log = logDetails + logLocation + logMessage + exceptionMessage + innerExceptionMessage;
+
+                    if (loggingEvent.LoggerName.Contains("ResponseCaching"))
+                    {
+                        var logStack = "StackTrace:\n";
+                        foreach (var item in loggingEvent.LocationInformation.StackFrames)
+                        {
+                            logStack = logStack + item.FullInfo + "\n";
+                        }
+                        log = log + logStack;
+                    }
+
+                    log = log + logSeperator;
                     sw.WriteLine(log);
                 }
             }
