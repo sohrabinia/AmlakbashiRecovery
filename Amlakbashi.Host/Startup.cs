@@ -176,12 +176,13 @@ namespace Amlakbashi.Host
                 })
             });
             app.UseRouting();
+            UrlRewriteConfig.Config(app);
+
             app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseCookiePolicy();
 
-            UrlRewriteConfig.Config(app);
             app.UseEndpoints(endpoints => RouteConfig.Config(endpoints));
 
             // If, for some reason, you need a reference to the built container, you
