@@ -256,8 +256,80 @@ namespace Amlakbashi.Host.Controllers.API
                     if (identityUser.State == Entities.User.UserState.InActived)
                     {
                         Dictionary<string, string> errors;
-                        if (userService.SignInRegister(user_id, fname, lname, password,
+                        if (userService.SignInRegisterOld(user_id, fname, lname, password,
                             confirmPassword, out errors))
+                        {
+                            userService.UpdateState(user_id, true);
+                        }
+                        else
+                        {
+                            return GenerateJsonResult(new
+                            {
+                                status = 0,
+                                errors = errors.Select(s => s.Value).ToList()
+                            });
+                        }
+                    }
+                    var jwtToken = userService.JwtSignIn(identityUser, Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
+                    return GenerateJsonResult(new { status = 1, token = new JwtSecurityTokenHandler().WriteToken(jwtToken) });
+                }
+                else
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        errors =
+                        /*new Dictionary<string, string>()*/new List<string>() { /*{*/ /*"code", */"کد وارد شده صحیح نیست" /*}*/ }
+                    });
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("UserApi/SignInRegister", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    errors = new Dictionary<string, string>() { { "exception", GeneralLocalization.GetExceptionMessage(exc) } }
+                });
+            }
+        }
+
+        public JsonResult SignInRegisterNew(string cid, string mobile, string code,
+            string fname = null, string lname = null, string presentorCode = "")
+        {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
+            try
+            {
+                var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                int user_id;
+                string errorMsg;
+                var identityUser = userService.GetIdentityUser(mobile_international);
+                if (identityUser != null && identityUser.Code == code)
+                {
+                    if (identityUser.State == Entities.User.UserState.Suspend)
+                    {
+                        return GenerateJsonResult(new
+                        {
+                            status = 0,
+                            errors = new Dictionary<string, string>() { { "suspend", "حساب کاربری شما معلق شده است. لطفا با پشتیبان تماس بگیرید" } }
+                        });
+                    }
+                    var verify = userService.VerifyLogin(mobile_international, out user_id, presentorCode, out errorMsg);
+                    if (verify == false)
+                    {
+                        return GenerateJsonResult(new
+                        {
+                            status = 0,
+                            errors = new Dictionary<string, string>() { { "login", errorMsg } }
+                        });
+                    }
+                    if (identityUser.State == Entities.User.UserState.InActived)
+                    {
+                        Dictionary<string, string> errors;
+                        if (userService.SignInRegister(user_id, fname, lname, out errors))
                         {
                             userService.UpdateState(user_id, true);
                         }
@@ -372,10 +444,52 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
+        [HttpPost]
+        public JsonResult CreatePassword(CreatePasswordDTO data, string cid)
+        {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
+            try
+            {
+                if (string.IsNullOrEmpty(data.newPassword) || data.newPassword != data.confirmPassword)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "لطفا رمز عبور و تکرار آن را به درستی وارد کنید" });
+                }
+                var result = userService.ChangeIdentityUserPassword(User.Identity.Name, data.newPassword);
+                if (result.Succeeded)
+                {
+                    var identityUser = userService.GetIdentityUser(User.Identity.Name);
+                    var jwtToken = userService.JwtSignIn(identityUser, Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
+                    return GenerateJsonResult(new { status = 1, token = new JwtSecurityTokenHandler().WriteToken(jwtToken), msg = "رمز عبور با موفقیت تغییر کرد" });
+                }
+                var errorList = new List<string>();
+                foreach (var item in result.Errors)
+                {
+                    errorList.Add(UserLocalization.GetIdentityPasswordErrorString(item.Code, item.Description));
+                }
+                return GenerateJsonResult(new { status = 0, msg = errorList.FirstOrDefault() });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new { status = 0, msg = GeneralLocalization.GetExceptionMessage(exc) });
+            }
+        }
+
         [Serializable]
         public class ChangePasswordDTO
         {
             public string currentPassword { get; set; }
+            public string newPassword { get; set; }
+            public string confirmPassword { get; set; }
+        }
+
+        [Serializable]
+        public class CreatePasswordDTO
+        {
             public string newPassword { get; set; }
             public string confirmPassword { get; set; }
         }

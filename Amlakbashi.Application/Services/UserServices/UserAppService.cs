@@ -782,6 +782,49 @@ namespace Amlakbashi.Application.Services.UserServices
         }
 
         public bool SignInRegister(int user_id, string fname, string lname,
+            out Dictionary<string, string> errors)
+        {
+            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == user_id));
+            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            errors = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(fname))
+            {
+                if (StringUtility.ContainsNumber(fname))
+                {
+                    errors.Add(nameof(fname), "نام نمیتواند شامل عدد باشد");
+                }
+                else
+                {
+                    user.FName = fname;
+                    Repository.Update(user);
+                    Repository.Save();
+                }
+            }
+            else
+            {
+                errors.Add(nameof(fname), "لطفا نام خود را وارد کنید");
+            }
+            if (!string.IsNullOrEmpty(lname))
+            {
+                if (StringUtility.ContainsNumber(lname))
+                {
+                    errors.Add(nameof(lname), "نام خانوادگی نمیتواند شامل عدد باشد");
+                }
+                else
+                {
+                    user.LName = lname;
+                    Repository.Update(user);
+                    Repository.Save();
+                }
+            }
+            else
+            {
+                errors.Add(nameof(lname), "لطفا نام خانوادگی خود را وارد کنید");
+            }
+            return errors.Any() == false;
+        }
+
+        public bool SignInRegisterOld(int user_id, string fname, string lname,
             string password, string confirmPassword, out Dictionary<string, string> errors)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == user_id));
@@ -821,36 +864,36 @@ namespace Amlakbashi.Application.Services.UserServices
             {
                 errors.Add(nameof(lname), "لطفا نام خانوادگی خود را وارد کنید");
             }
-            //if (string.IsNullOrEmpty(password) == false)
-            //{
-            //    if (Regex.IsMatch(password, "[^\u0000-\u0080]+"))
-            //    {
-            //        errors.Add(nameof(password) + 0, "رمز عبور نباید شامل حروف فارسی باشد");
-            //    }
-            //    else if (password != confirmPassword)
-            //    {
-            //        errors.Add(nameof(confirmPassword), "رمز وارد شده و تاییدیه آن یکسان نمی باشند");
-            //    }
-            //    else
-            //    {
-            //        userManager.RemovePasswordAsync(identityUser).Wait();
-            //        var addPasswordResult = userManager.AddPasswordAsync(identityUser, password).Result;
-            //        if (addPasswordResult.Succeeded == false)
-            //        {
-            //            int i = 0;
-            //            foreach (var addPasswordError in addPasswordResult.Errors)
-            //            {
-            //                i++;
-            //                errors.Add(nameof(password) + i, UserLocalization.GetIdentityPasswordErrorString(addPasswordError.Code,
-            //                    addPasswordError.Description));
-            //            }
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    errors.Add(nameof(password), "لطفا رمز عبور خود را وارد کنید");
-            //}
+            if (string.IsNullOrEmpty(password) == false)
+            {
+                if (Regex.IsMatch(password, "[^\u0000-\u0080]+"))
+                {
+                    errors.Add(nameof(password) + 0, "رمز عبور نباید شامل حروف فارسی باشد");
+                }
+                else if (password != confirmPassword)
+                {
+                    errors.Add(nameof(confirmPassword), "رمز وارد شده و تاییدیه آن یکسان نمی باشند");
+                }
+                else
+                {
+                    userManager.RemovePasswordAsync(identityUser).Wait();
+                    var addPasswordResult = userManager.AddPasswordAsync(identityUser, password).Result;
+                    if (addPasswordResult.Succeeded == false)
+                    {
+                        int i = 0;
+                        foreach (var addPasswordError in addPasswordResult.Errors)
+                        {
+                            i++;
+                            errors.Add(nameof(password) + i, UserLocalization.GetIdentityPasswordErrorString(addPasswordError.Code,
+                                addPasswordError.Description));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                errors.Add(nameof(password), "لطفا رمز عبور خود را وارد کنید");
+            }
             return errors.Any() == false;
         }
 

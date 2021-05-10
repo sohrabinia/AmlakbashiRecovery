@@ -36,6 +36,7 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
         public string ContactPhone { get; set; }
         public int AmlakbashiScore { get; set; }
         public string Address { get; set; }
+        public bool hasPassword { get; set; }
 
         public static UserDTO Generate(User user, AppUser identityUser)
         {
@@ -78,6 +79,7 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
             dto.ContactPhone = user.ContactPhone;
             dto.AmlakbashiScore = user.AmlakbashiScore;
             dto.Address = user.Address;
+            dto.hasPassword = identityUser.PasswordHash != null;
             return dto;
         }
 
