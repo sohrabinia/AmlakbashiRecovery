@@ -924,8 +924,6 @@ namespace Portal.Controllers
         [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumbCard(long accid, long fileid)
         {
-            var test = HttpContext.Request.ContentLength;
-            //var test2 = HttpContext.Request.Body.Length;
             return AccThumb(accid, fileid, "card");
         }
 
