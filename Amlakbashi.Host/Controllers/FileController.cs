@@ -1050,6 +1050,42 @@ namespace Portal.Controllers
             return File(file_name, type);
         }
 
+        [ResponseCache(Duration = 2592000, VaryByQueryKeys = new string[] { "*" })]
+        public ActionResult GetPngFile(string file_name)
+        {
+            return File(file_name, "image/png");
+        }
+
+        [ResponseCache(Duration = 2592000, VaryByQueryKeys = new string[] { "*" })]
+        public ActionResult GetWoffFile(string file_name)
+        {
+            return File(file_name, "font/woff");
+        }
+
+        [ResponseCache(Duration = 2592000, VaryByQueryKeys = new string[] { "*" })]
+        public ActionResult GetWoff2File(string file_name)
+        {
+            return File(file_name, "font/woff2");
+        }
+
+        [ResponseCache(Duration = 2592000, VaryByQueryKeys = new string[] { "*" })]
+        public ActionResult GetTtfFile(string file_name)
+        {
+            return File(file_name, "font/ttf");
+        }
+
+        [ResponseCache(Duration = 2592000, VaryByQueryKeys = new string[] { "*" })]
+        public ActionResult GetGifFile(string file_name)
+        {
+            return File(file_name, "image/gif");
+        }
+
+        [ResponseCache(Duration = 2592000, VaryByQueryKeys = new string[] { "*" })]
+        public ActionResult GetEotFile(string file_name)
+        {
+            return File(file_name, "font/eot");
+        }
+
         [ResponseCache(Duration = 2592000, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetCss(string src, int v = 0)
         {
