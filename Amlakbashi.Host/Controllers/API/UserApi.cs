@@ -112,7 +112,8 @@ namespace Amlakbashi.Host.Controllers.API
                 return GenerateJsonResult(new
                 {
                     status = identityUser.PhoneNumberConfirmed &&
-                        identityUser.State == Entities.User.UserState.Acticved ?
+                        identityUser.State == Entities.User.UserState.Acticved &&
+                        string.IsNullOrEmpty(identityUser.PasswordHash) == false ?
                         (int)Entities.User.SignInFirstStepResult.EnterPassword :
                         (int)Entities.User.SignInFirstStepResult.MobileConfirm,
                     code = code,
@@ -121,7 +122,121 @@ namespace Amlakbashi.Host.Controllers.API
                     fname = string.IsNullOrEmpty(user.FName) ? "" : user.FName,
                     lname = string.IsNullOrEmpty(user.LName) ? "" : user.LName,
                     notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
-                    isNew = isNew
+                    isNew = isNew,
+                    phoneConfirmed = identityUser.PhoneNumberConfirmed
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new
+                {
+                    status = (int)Entities.User.SignInFirstStepResult.Error,
+                    msg = "متاسفانه خطایی رخ داده است"
+                });
+            }
+        }
+
+        public JsonResult SignInFirstStepNew(string mobile, string cid, bool fcm_notification = false)
+        {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
+            try
+            {
+                var correct = PhoneUtility.ValidateLocalNumber(mobile) ||
+                    (mobile.Length > 10 &&
+                        (mobile.Substring(0, 1) == "+" || mobile.Substring(0, 2) == "00"));
+                if (!correct)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = (int)Entities.User.SignInFirstStepResult.Error,
+                        msg = "شماره موبایل وارد شده صحیح نیست. لطفا پس از بررسی مجدد شماره درست را وارد کنید."
+                    });
+                }
+
+                var international_mobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                var number_is_for_iran = PhoneUtility.IsNumberForIran(international_mobile);
+                var user = userService.GetByMainMobile(international_mobile);
+                var identityUser = userService.GetIdentityUser(international_mobile);
+
+                if (identityUser != null && identityUser.State == Entities.User.UserState.Suspend)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = (int)Entities.User.SignInFirstStepResult.Error,
+                        msg = "امکان ورود به سایت برای شما مسدود شده است, جهت فعالسازی با پشتیبانی تماس بگیرید"
+                    });
+                }
+
+                var isNew = false;
+                if (identityUser == null)
+                {
+                    string failReason;
+                    user = new User();
+                    user.Mobile = international_mobile;
+                    user.MainMobile = international_mobile;
+                    user.ResponseFrom = 2;
+                    user.ResponseTo = 2;
+                    user.AmlakbashiScore = 1000;
+                    userService.Insert(user);
+
+                    identityUser = new AppUser()
+                    {
+                        UserName = international_mobile,
+                        PhoneNumber = international_mobile,
+                        CreateDate = DateTime.Now,
+                        State = Entities.User.UserState.InActived
+                    };
+                    userService.AddIdentityUser(identityUser);
+
+                    failReason = null;
+                    isNew = true;
+                    if (user == null)
+                    {
+                        return GenerateJsonResult(new
+                        {
+                            status = (int)Entities.User.SignInFirstStepResult.Error,
+                            msg = failReason
+                        });
+                    }
+                }
+
+                var code = identityUser.Code;
+                if (identityUser.State == Entities.User.UserState.InActived ||
+                    identityUser.PhoneNumberConfirmed == false ||
+                    string.IsNullOrEmpty(identityUser.PasswordHash))
+                {
+                    if (string.IsNullOrEmpty(code) ||
+                        identityUser.SendVerification == null ||
+                        (DateTime.Now - identityUser.SendVerification) >
+                        new TimeSpan(0, 0, 30, 0, 0))
+                    {
+                        code = new Random().Next(1111, 9999).ToString();
+                        userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                    }
+                    var callableNumber = number_is_for_iran ?
+                        PhoneUtility.InternationalNumberToLocal(international_mobile) :
+                        PhoneUtility.InternationalNumberToCallable(international_mobile);
+                    userService.SendVerificationSms(callableNumber, code);
+                }
+                return GenerateJsonResult(new
+                {
+                    status = identityUser.PhoneNumberConfirmed &&
+                        identityUser.State == Entities.User.UserState.Acticved &&
+                        string.IsNullOrEmpty(identityUser.PasswordHash) == false ?
+                        (int)Entities.User.SignInFirstStepResult.EnterPassword :
+                        (int)Entities.User.SignInFirstStepResult.MobileConfirm,
+                    code = code,
+                    mobile = international_mobile,
+                    user_id = user.Id,
+                    fname = string.IsNullOrEmpty(user.FName) ? "" : user.FName,
+                    lname = string.IsNullOrEmpty(user.LName) ? "" : user.LName,
+                    notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
+                    isNew = isNew,
+                    phoneConfirmed = identityUser.PhoneNumberConfirmed
                 });
             }
             catch (Exception exc)
@@ -171,6 +286,52 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     status = 0,
                     msg = "متاسفانه خطایی رخ داده است"
+                });
+            }
+        }
+
+        public JsonResult LoginUsingVerificationCode(string mobile, string code, string cid)
+        {
+            if (!ClientAuthenticate(cid))
+            {
+                return null;
+            }
+            try
+            {
+                var internationalMobile = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
+                var identityUser = userService.GetIdentityUser(internationalMobile);
+                if (identityUser.PhoneNumberConfirmed == false)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "لطفا ابتدا ثبت نام کنید"
+                    });
+                }
+                if (identityUser.Code == code)
+                {
+                    identityUser.PhoneNumberConfirmed = true;
+                    userService.UpdateIdentityUser(identityUser);
+                    var jwtToken = userService.JwtSignIn(identityUser, Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]));
+                    return GenerateJsonResult(new { status = 1,
+                        token = new JwtSecurityTokenHandler().WriteToken(jwtToken) });
+                }
+                else
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "کد وارد شده اشتباه است. لطفا مجددا بررسی کنید و کد صحیح را وارد کنید"
+                    });
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = GeneralLocalization.GetExceptionMessage(exc)
                 });
             }
         }
@@ -458,7 +619,7 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     return GenerateJsonResult(new { status = 0, msg = "لطفا رمز عبور و تکرار آن را به درستی وارد کنید" });
                 }
-                var result = userService.ChangeIdentityUserPassword(User.Identity.Name, data.newPassword);
+                var result = userService.ChangePassword(User.Identity.Name, null, data.newPassword);
                 if (result.Succeeded)
                 {
                     var identityUser = userService.GetIdentityUser(User.Identity.Name);

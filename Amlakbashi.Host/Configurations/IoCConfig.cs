@@ -3,6 +3,7 @@ using Amlakbashi.Core.Common.Background;
 using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Localization;
 using Amlakbashi.Core.Common.Mapping;
+using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.PriceHelpers;
 using Amlakbashi.Core.Infrastructure.PriceHelpers.Interfaces;
 using Amlakbashi.Host.Authentication;
@@ -15,6 +16,7 @@ using Autofac.Extensions.DependencyInjection;
 using Hangfire;
 using log4net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -61,6 +63,8 @@ namespace Amlakbashi.Host.Configurations
             //user accessor
             builder.RegisterType<UserAccessor>()
                 .As<IUserAccessor>();
+            builder.RegisterType<CustomPasswordValidator>()
+                .As<IPasswordValidator<AppUser>>();
         }
     }
 }
