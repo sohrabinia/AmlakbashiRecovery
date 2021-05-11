@@ -2,7 +2,7 @@
 /* Slider */
 .slick-loading .slick-list
 {
-    background: #fff url('/file/getfile?file_name=/resource/slick/ajax-loader.gif&type=image/gif') center center no-repeat;
+    background: #fff url('/file/getgiffile?file_name=/resource/slick/ajax-loader.gif') center center no-repeat;
 }
 
 /* Arrows */
