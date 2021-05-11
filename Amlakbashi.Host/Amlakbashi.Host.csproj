@@ -8,7 +8,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Logs\**" />
+    <Compile Remove="wwwroot\Content\**" />
+    <Compile Remove="wwwroot\Resource\images\**" />
+    <Compile Remove="wwwroot\Resource\img\**" />
+    <Content Remove="Logs\**" />
+    <Content Remove="wwwroot\Content\**" />
+    <Content Remove="wwwroot\Resource\images\**" />
+    <Content Remove="wwwroot\Resource\img\**" />
+    <EmbeddedResource Remove="Logs\**" />
+    <EmbeddedResource Remove="wwwroot\Content\**" />
+    <EmbeddedResource Remove="wwwroot\Resource\images\**" />
+    <EmbeddedResource Remove="wwwroot\Resource\img\**" />
+    <None Remove="Logs\**" />
+    <None Remove="wwwroot\Content\**" />
+    <None Remove="wwwroot\Resource\images\**" />
+    <None Remove="wwwroot\Resource\img\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\js\dashboard.min.js" />
+    <Content Remove="wwwroot\Resource\amlakbashi_3_0_0.apk" />
   </ItemGroup>
 
   <ItemGroup>
@@ -199,17 +219,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Logs\Logs\" />
-    <Folder Include="wwwroot\Content\accthumb\" />
-    <Folder Include="wwwroot\Content\advertise\" />
-    <Folder Include="wwwroot\Content\blogpost\" />
-    <Folder Include="wwwroot\Content\ErrorLog\" />
-    <Folder Include="wwwroot\Content\files\" />
-    <Folder Include="wwwroot\Content\imgcache\" />
-    <Folder Include="wwwroot\Content\logo\" />
-    <Folder Include="wwwroot\Content\webp\" />
-    <Folder Include="wwwroot\Content\users\" />
-    <Folder Include="wwwroot\Content\test\" />
     <Folder Include="wwwroot\css\" />
     <Folder Include="wwwroot\Resource\packages\jquery-mobile\images\" />
   </ItemGroup>
