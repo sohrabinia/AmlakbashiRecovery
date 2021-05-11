@@ -800,6 +800,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                             mediator.Publish(new ChangeAdvertiseStatusEvent(parent.Id, parentPrevStatus));
                             mediator.Publish(new ChangeAdvertiseActiveEvent(oldParent, parent));
                         }
+                        mediator.Publish(new CreateAdvertiseGeneralEvent(child.Id));
                     }
                     else
                     {
@@ -981,6 +982,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     mediator.Send(new GenerateThumbImageCommand(data.Id, acc.PhotoID,
                             acc.Photos.Select(s => s.Id).ToList(), rootPath));
                 }
+                mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id));
             }
 
             if (type == DirectorType.Extra || type == DirectorType.ComplexUnit ||

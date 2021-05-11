@@ -142,7 +142,7 @@ namespace Amlakbashi.Host.Controllers.API
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        msg = data.msg,
+                        msg = data.msg != null ? data.msg : "متاسفانه درخواست رزرو با خطا مواجه شد"
                     });
                 }
                 if (PhoneUtility.IsNumberForIran(identityUser.PhoneNumber) == false &&
@@ -161,7 +161,7 @@ namespace Amlakbashi.Host.Controllers.API
                     var formDateGregortian = DateTimeUtility.PersianDateToGregorian(from_date);
                     instantReserve = formDateGregortian <= DateTime.Now.AddDays(advertise.MaxInstantReserveStart).Date;
                 }
-                string msg;
+                string msg = "";
                 long reserveId;
                 var done = advertiseService.ReserveRequest(advertise_id,
                     user.Id, from_date, to_date, number_of_guests,

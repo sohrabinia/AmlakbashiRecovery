@@ -239,10 +239,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
                 .Include(i => i.RegionProvince).FirstOrDefault(f => f.Id == notification.advertiseId));
             var cityTitle = acc.RegionCity.PersianName;
             var areaTitle = acc.Area == null ? null : acc.RegionArea.PersianName;
-            acc.OldSlug = AdvertiseUrlLocalization.GetOldSlug(acc.Title, (int)acc.TypeID);
-            acc.Slug = acc.Id.ToString() + "-" + acc.OldSlug;
-            acc.MetaTitle = acc.Title + " - املاک باشی";
-            acc.MetaDescription = AdvertiseSeoLocalization.GetMetaDescription(acc, cityTitle, areaTitle);
+
+            if (acc.Status == AdvertiseStatus.NotCompleted || acc.Status == AdvertiseStatus.FirstReady)
+            {
+                acc.OldSlug = AdvertiseUrlLocalization.GetOldSlug(acc.Title, (int)acc.TypeID);
+                acc.Slug = acc.Id.ToString() + "-" + acc.OldSlug;
+                acc.MetaTitle = acc.Title + " - املاک باشی";
+                acc.MetaDescription = AdvertiseSeoLocalization.GetMetaDescription(acc, cityTitle, areaTitle);
+            }
 
             //initialize geographical properties
             acc.CountryDirection = (acc.Province == 1029 ||
