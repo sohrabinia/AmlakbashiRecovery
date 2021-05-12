@@ -252,14 +252,13 @@
         }
 
         function sendChatText(customText) {
-            debugger;
             var text;
-            if (customText != undefined) {
+            if (typeof customText != 'undefined' && customText != null && customText != '') {
                 text = customText;
             }
             else {
                 text = $('#js-text-input').val();
-                if (text == null || text == '') {
+                if (text == null || text == '' || typeof text == 'undefined') {
                     return;
                 }
                 $('#js-text-input').val('');

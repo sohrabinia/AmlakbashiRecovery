@@ -30,7 +30,7 @@ namespace Amlakbashi.Host.Controllers.API
         private int[] categories = new int[]
             { 55593, 55574, 74214, 55894, 55944, 55962, 55957, 55861, 55953, 55952, 55961, 55960 };
 
-        //[ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
         public JsonResult GetHomePageCarousels(string cid)
         {
             if (!ClientAuthenticate(cid))
@@ -347,7 +347,7 @@ namespace Amlakbashi.Host.Controllers.API
                 return GenerateJsonResult(new { done = false, msg = "متاسفانه عملیات با خطا مواجه شد" });
             }
         }
-        //[ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "*" })]
+        [ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "*" })]
         public JsonResult GetCategoryAdvertises(int id, string cid,
             string start_date = null, string end_date = null)
         {
@@ -392,7 +392,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        //[ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
         public JsonResult GetAllAvailableAdvertises(string cid, string start_date = null,
             string end_date = null, bool for_discount = false, bool for_instant_reserve = false,
             bool for_norouz_special = false)
@@ -424,7 +424,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        //[ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
+        [ResponseCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
         public JsonResult GetVillaShomalAdvertises(string cid, string start_date = null,
             string end_date = null)
         {
@@ -715,7 +715,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        //[ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "text" })]
+        [ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "text" })]
         public JsonResult SearchRegion(string text, string cid)
         {
             if (!ClientAuthenticate(cid))

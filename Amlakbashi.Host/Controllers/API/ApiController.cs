@@ -134,9 +134,7 @@ namespace Amlakbashi.Host.Controllers.API
                 int AndroidApp_LastBuildNumber = 58;
 
                 //var newFeatures = new string[] {
-                //    "امکان تعیین موقعیت اقامتگاه در نقشه",
-                //    "رفع ایرادات برنامه",
-                //    "اصلاح قوانین و مقررات رزرو"
+                //    "تسهیل ورود به حساب کاربری"
                 //};
                 var newFeatures = new string[] { };
 
@@ -190,7 +188,7 @@ namespace Amlakbashi.Host.Controllers.API
                 int IOSApp_LastBuildNumber = 9;
 
                 var newFeatures = new string[] {
-                    "امکان دریافت تخفیف و هدیه سفر"
+                    "تسهیل ورود به حساب کاربری"
                 };
 
                 var forceUpdate = buildNumber < IOSApp_MinBuildNumber;
