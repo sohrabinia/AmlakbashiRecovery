@@ -1,4 +1,4 @@
-﻿const CACHE_VERSION = 36;
+﻿const CACHE_VERSION = 37;
 const staticCacheName = 'file-cache-v' + CACHE_VERSION;
 var CURRENT_CACHES = {
     ajaxrequest: 'ajaxrequest-cahce-v' + CACHE_VERSION

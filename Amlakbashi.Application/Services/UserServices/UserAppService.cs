@@ -34,18 +34,21 @@ namespace Amlakbashi.Application.Services.UserServices
         private readonly IMediator mediator;
         private readonly IUserContactFacade userContact;
         private readonly UserManager<AppUser> userManager;
+        private readonly IPasswordValidator<AppUser> passwordValidator;
         private readonly RoleManager<AppRole> roleManager;
         private readonly ILog logger;
         public UserAppService(IRepository<User, int> repository, ICacheManager<User> cache,
             IUserContactFacade userContact,
             IMediator mediator,
             UserManager<AppUser> userManager,
+            IPasswordValidator<AppUser> passwordValidator,
             RoleManager<AppRole> roleManager,
             ILog logger) : base(repository, cache)
         {
             this.mediator = mediator;
             this.userContact = userContact;
             this.userManager = userManager;
+            this.passwordValidator = passwordValidator;
             this.roleManager = roleManager;
             this.logger = logger;
         }
@@ -698,6 +701,11 @@ namespace Amlakbashi.Application.Services.UserServices
         public IdentityResult ChangeIdentityUserPassword(string username, string password)
         {
             var user = userManager.FindByNameAsync(username).Result;
+            var result = passwordValidator.ValidateAsync(userManager, user, password).Result;
+            if (result.Succeeded == false)
+            {
+                return result;
+            }
             userManager.RemovePasswordAsync(user).Wait();
             return userManager.AddPasswordAsync(user, password).Result;
         }

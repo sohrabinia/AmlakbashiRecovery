@@ -565,10 +565,10 @@ function sendSupportChatMessage(id, text, questionNumber) {
     if (is_sending_chat) {
         return;
     }
-    if (typeof text === 'undefined') {
+    if (typeof text === 'undefined' || text == null) {
         text = $(".support-chat__text-input").val();
     }
-    if (text == '')
+    if (text == '' || text == null || typeof text === 'undefined')
         return;
     if (!isUserLoggedIn) {
         showNoYesMessage('ورود به سایت',

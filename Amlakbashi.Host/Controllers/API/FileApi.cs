@@ -15,7 +15,7 @@ namespace Amlakbashi.Host.Controllers.API
     {
         private static readonly object objlock = new object();
 
-        //[ResponseCache(Duration = 604800, VaryByQueryKeys = new string[] { "*" })]
+        [ResponseCache(Duration = 604800, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetImage(long id, int w, int h, string cid)
         {
             if (!ClientAuthenticate(cid))
@@ -74,7 +74,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        //[ResponseCache(Duration = 604800, VaryByQueryKeys = new string[] { "*" })]
+        [ResponseCache(Duration = 604800, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetImageRealSize(long id, string cid)
         {
             if (!ClientAuthenticate(cid))
@@ -107,7 +107,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        //[ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetAdvertiseItemImage(long id, string cid, long accid = 0)
         {
             if (accid > 0)
@@ -116,7 +116,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             return GetImage(id, 160, 114, cid);
         }
-        //[ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetAdvertiseImage(long id, string cid, long accid = 0)
         {
             if (accid > 0)
@@ -125,7 +125,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             return GetImage(id, 450, 300, cid);
         }
-        //[ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
+        [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumb(long accid, long fileid, string filename)
         {
             var path = "/content/accthumb/" + accid + "/" + fileid + "/" + filename + ".jpg";

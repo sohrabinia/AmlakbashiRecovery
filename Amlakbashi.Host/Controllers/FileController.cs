@@ -222,6 +222,11 @@ namespace Portal.Controllers
                 var strFormat = "image/" + (extension == "jpg" ? "jpeg" : extension);
                 return File(objFile.FilePath, strFormat);
             }
+            catch(FileNotFoundException exc)
+            {
+                logger.Error("File.GetImage", exc);
+                return File("/resource/img/img202_500_300.png", "image/png");
+            }
             catch (Exception exc)
             {
                 logger.Error("File.GetImage", exc);
@@ -485,7 +490,7 @@ namespace Portal.Controllers
             {
                 var objFile = fileService.Find(FileID);
                 if (objFile == null)
-                    return Redirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h));
+                    return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 string path = "", strFormat = "image/jpeg";
                 try
                 {
@@ -505,7 +510,7 @@ namespace Portal.Controllers
                 catch (Exception exc)
                 {
                     logger.Error("File.UserImageThumb", exc);
-                    return Redirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h));
+                    return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 }
 
                 if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
@@ -558,7 +563,7 @@ namespace Portal.Controllers
             catch (Exception exc)
             {
                 logger.Error("File.UserImageThumb", exc);
-                return Redirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h));
+                return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
             }
         }
 
@@ -583,12 +588,12 @@ namespace Portal.Controllers
                 var advertise = advertiseService.FindIncludingDeleted(advertise_id);
                 if (advertise.Slug != slug)
                 {
-                    return Redirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h));
+                    return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 }
                 var objFile = fileService.Find(advertise.PhotoID == null ? 0 : (long)advertise.PhotoID);
                 if (objFile == null || !System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
                 {
-                    return Redirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h));
+                    return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 }
                 var image_extension = Path.GetExtension(objFile.FilePath).Replace(".", "");
                 var path = string.Format("content/imgcache/img{0}_{1}_{2}." + image_extension, advertise.PhotoID, w, h);
@@ -655,7 +660,7 @@ namespace Portal.Controllers
                 //    return File("/resource/img/img202_500_300.png", "image/png");
                 //}
                 logger.Error("File.AdvertiseImageThumb", exc);
-                return Redirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h));
+                return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
             }
         }
 
@@ -667,14 +672,14 @@ namespace Portal.Controllers
                 var post = postService.Find(PostID);
                 if (post.Title.Replace("+", "-").Replace(" ", "-") != slug)
                 {
-                    return Redirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h));
+                    return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 }
                 return imgThumb(post.PhotoID, w, h);
             }
             catch (Exception exc)
             {
                 logger.Error("File.PostImageThumb", exc);
-                return Redirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h));
+                return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
             }
         }
 
