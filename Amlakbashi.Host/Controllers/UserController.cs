@@ -1048,7 +1048,6 @@ namespace Amlakbashi.Host.Controllers
                     if (identityUser.State == Entities.User.UserState.InActived)
                     {
                         Dictionary<string, string> errors;
-                        // TODO: remove password from signinregister function
                         if (userService.SignInRegister(user_id, fname, lname, out errors))
                         {
                             userService.UpdateState(user_id, true);
