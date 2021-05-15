@@ -4,6 +4,9 @@ using Amlakbashi.Accounting.PaymentContext.PaymentEngines;
 using Amlakbashi.Accounting.PaymentContext.PaymentEngines.Interfaces;
 using Amlakbashi.Accounting.Services;
 using Amlakbashi.Accounting.Services.Interfaces;
+using Amlakbashi.Accounting.BankingContext.Extensions;
+using Amlakbashi.Accounting.PaymentContext.Extensions;
+using Amlakbashi.Accounting.Configurations;
 using Autofac;
 
 namespace Amlakbashi.Accounting
@@ -12,37 +15,10 @@ namespace Amlakbashi.Accounting
     {
         protected override void Load(ContainerBuilder builder)
         {
-            #region payment engines
-            builder.RegisterType<PasargadPaymentEngine>()
-                .As<IPasargadPaymentEngine>();
-            #endregion
-
-            #region payment operator
-            builder.RegisterType<PaymentOperator>()
-                .As<IPaymentOperator>();
-            #endregion
-
-            #region app services
-            builder.RegisterType<ReservePaymentAppService>()
-                .As<IReservePaymentAppService>();
-            builder.RegisterType<ReservePaymentAppService>()
-              .As<IReservePaymentAppService>();
-            builder.RegisterType<DiscountCouponAppService>()
-                .As<IDiscountCouponAppService>();
-            builder.RegisterType<CreditTransactionAppService>()
-                .As<ICreditTransactionAppService>();
-            builder.RegisterType<PrizeCreditTransactionAppService>()
-                .As<IPrizeCreditTransactionAppService>();
-            builder.RegisterType<CartAppService>()
-                .As<ICartAppService>();
-            builder.RegisterType<PaymentAppService>()
-                .As<IPaymentAppService>();
-            builder.RegisterType<GroupPaymentAppService>()
-                .As<IGroupPaymentAppService>();
-            #endregion
-
-            builder.RegisterType<AccountingFacade>()
-                .As<IAccountingFacade>();
+            builder.RegisterPaymentContext();
+            builder.RegisterBankingContext();
+            builder.RegisterAccountingAppServices();
+            builder.RegisterType<AccountingFacade>().As<IAccountingFacade>();
 
             base.Load(builder);
         }

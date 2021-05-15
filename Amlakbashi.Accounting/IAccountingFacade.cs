@@ -1,10 +1,12 @@
 ﻿using Amlakbashi.Accounting.PaymentContext;
+using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.PaymentStatisticsDTOs;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static Amlakbashi.Core.Entities.ActionLog;
 using static Amlakbashi.Core.Entities.PrizeCreditTransaction;
 using static Amlakbashi.Core.Entities.Reserve;
@@ -118,5 +120,6 @@ namespace Amlakbashi.Accounting
             out PaymentChartDTO SitePortionChart,
             out PaymentChartDTO HostCreditorChart);
         PaymentChartDTO GeneratePaymentChart(int year, int month, bool extra_filter = false, List<int> user_list = null);
+        Task<ShebaVerificationResultDTO> VerifySheba(string sheba);
     }
 }
