@@ -97,14 +97,14 @@ namespace Amlakbashi.Host.Controllers
 
             AuthenticationProperties prop = new AuthenticationProperties();
             prop.ExpiresUtc = expireTime;
-            prop.IsPersistent = true;
             prop.IssuedUtc = expireTime;
+            prop.IsPersistent = true;
 
             signInManager.SignOutAsync().Wait();
             signInManager.SignInAsync(identityUser, prop).Wait();
 
-            logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
-            user.FullName + "(" + user.Id + ").");
+            logger.Info("Impersonation: " + admin.FullName + " (id:" + admin.Id + ") impersonate to " +
+                user.FullName + " (id:" + user.Id + ")");
 
             if (!string.IsNullOrEmpty(url))
             {
@@ -134,6 +134,9 @@ namespace Amlakbashi.Host.Controllers
             signInManager.SignOutAsync().Wait();
             signInManager.SignInAsync(admin, true).Wait();
             HttpContext.Session.Clear();
+
+            logger.Info("Impersonation: " + userAccessor.DoerUser.FullName + " (id:" + userAccessor.DoerUser.Id + ") exist from " +
+                userAccessor.CurrentUser.FullName + " (id:" + userAccessor.CurrentUser.Id + ")");
 
             return Redirect("/user/index");
         }
