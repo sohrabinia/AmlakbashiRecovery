@@ -1826,7 +1826,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var advertise = Repository.Find(advertiseId);
             if (advertise.IsForbidden)
             {
-                msg = "";
+                msg = "کاربر گرامی رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است";
                 return false;
             }
             if (advertise.Status != AdvertiseStatus.Published)
