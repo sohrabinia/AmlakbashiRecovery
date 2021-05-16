@@ -14,7 +14,8 @@ else
 {
     if (loggedIn || string.IsNullOrEmpty(originUrl))
     {
-        if (Context.Session.GetObjectFromJson<User>("impersonateUser") != null)
+        //if (Context.Session.GetObjectFromJson<User>("impersonateUser") != null)
+        if (Context.User.IsImpersonatedUser())
         {
             @:<div>شما از طرف کاربر دیگری وارد شده اید. برای دسترسی به این قسمت، به حساب کاربری ادمین خود بازگردید.</div><br />
             <div><a href="/user/impersonatelogout">بازگشت به حساب کاربری ادمین</a></div>

@@ -761,7 +761,12 @@ namespace Amlakbashi.Application.Services.UserServices
             var userClaims = userManager.GetClaimsAsync(user).Result;
             if (userClaims != null && userClaims.Where(w => claims.Select(s => s.Type).Contains(w.Type)).Count() > 0)
             {
-                return false;
+                var expireTime = DateTime.Parse(userClaims.FirstOrDefault(f => f.Type == "ImpersonateExpireTime").Value);
+                if (expireTime > DateTime.Now)
+                {
+                    return false;
+                }
+                userManager.RemoveClaimsAsync(user, userClaims).Wait();
             }
             return userManager.AddClaimsAsync(user, claims).Result.Succeeded;
         }
