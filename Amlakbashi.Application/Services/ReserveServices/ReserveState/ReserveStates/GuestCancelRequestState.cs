@@ -28,16 +28,17 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
 
         public override bool CanTransitTo(ReserveStatus status)
         {
-            switch (status)
-            {
-                case ReserveStatus.Started:
-                case ReserveStatus.Reserved:
-                case ReserveStatus.CashPay:
-                case ReserveStatus.CanceledByGuest:
-                    return true;
-                default:
-                    return false;
-            }
+            return false;
+            //switch (status)
+            //{
+            //    case ReserveStatus.Started:
+            //    case ReserveStatus.Reserved:
+            //    case ReserveStatus.CashPay:
+            //    case ReserveStatus.CanceledByGuest:
+            //        return true;
+            //    default:
+            //        return false;
+            //}
         }
 
         public override void OnTransition(ReserveStatus prevStatus, bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId)
