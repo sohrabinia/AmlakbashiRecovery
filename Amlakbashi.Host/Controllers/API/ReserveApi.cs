@@ -30,7 +30,7 @@ namespace Amlakbashi.Host.Controllers.API
                 if (advertise.IsForbidden)
                 {
                     return GenerateJsonResult(
-                        new { status = 0, msg = "کاربر گرامیُُُُُُ رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است" });
+                        new { status = 0, msg = "کاربر گرامی رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است" });
                 }
                 if (number_of_guests < 1)
                 {
