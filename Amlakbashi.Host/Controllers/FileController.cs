@@ -298,7 +298,7 @@ namespace Portal.Controllers
                             using (var result = (Bitmap)ImageUtility.ResizeImageKeepAspectRatio(OriginalImage, (int)w, (int)h))
                             {
                                 result.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
-                                return File(path.Replace("~", ""), strFormat);
+                                //return File(path.Replace("~", ""), strFormat);
                             }
                             //using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
                             //{
@@ -362,7 +362,7 @@ namespace Portal.Controllers
                     logger.Error("File.ResourceImgThumbPng", exc);
                 }
 
-                if (!System.IO.File.Exists(Path.Combine(host.WebRootPath,path)))
+                if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
                 {
                     string OrginalPath = file_path;
                     using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, OrginalPath)))
@@ -373,7 +373,7 @@ namespace Portal.Controllers
                             using (var result = (Bitmap)ImageUtility.ResizeImageKeepAspectRatio(OriginalImage, (int)w, (int)h))
                             {
                                 result.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
-                                return File(path.Replace("~", ""), strFormat);
+                                //return File(path.Replace("~", ""), strFormat);
                             }
 
                         }
@@ -613,7 +613,7 @@ namespace Portal.Controllers
                             using (var result = (Bitmap)ImageUtility.ResizeImageKeepAspectRatio(OriginalImage, (int)w, (int)h))
                             {
                                 result.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
-                                return File("/" + path.Replace("~/", ""), strFormat);
+                                //return File("/" + path.Replace("~/", ""), strFormat);
                             }
                             //using (Bitmap thumbnailBitmap = new Bitmap((int)w, (int)h))
                             //{
@@ -637,14 +637,11 @@ namespace Portal.Controllers
                         }
                     }
                 }
-                else
-                {
-                    //Response.AddHeader("Content-Type", strFormat);
-                    //System.Web.HttpContext.Current.Server.Transfer(path.Replace("~", ""));
-                    //return path.Replace("~", "");
-                    //HttpContext.Response.AppendHeader("canonical" , path.ToLower().Replace("~", "https://www.amlakbashi.com"));
-                    return File(path.Replace("~", ""), strFormat);
-                }
+                //Response.AddHeader("Content-Type", strFormat);
+                //System.Web.HttpContext.Current.Server.Transfer(path.Replace("~", ""));
+                //return path.Replace("~", "");
+                //HttpContext.Response.AppendHeader("canonical" , path.ToLower().Replace("~", "https://www.amlakbashi.com"));
+                return File(path.Replace("~", ""), strFormat);
             }
             catch (Exception exc)
             {
@@ -707,7 +704,7 @@ namespace Portal.Controllers
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
 
-                using (Image image = Image.FromFile(Path.Combine(host.WebRootPath,file.FilePathWithoutTildeAndSlash)))
+                using (Image image = Image.FromFile(Path.Combine(host.WebRootPath, file.FilePathWithoutTildeAndSlash)))
                 {
                     if (image.Width > 1500)
                         ViewBag.BigImage = true;

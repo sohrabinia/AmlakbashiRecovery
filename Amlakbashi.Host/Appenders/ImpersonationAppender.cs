@@ -7,16 +7,14 @@ using System.Reflection;
 
 namespace Amlakbashi.Host.Appenders
 {
-    public class LogAppender : AppenderSkeleton
+    public class ImpersonationAppender : AppenderSkeleton
     {
-        private const string logDir = "Logs/Logs";
-        private const string filePrefix = "Log-";
+        private const string logDir = "Logs/ImpersonationLogs";
+        private const string filePrefix = "ImpersonationLog-";
 
         protected override void Append(LoggingEvent loggingEvent)
         {
-            if (loggingEvent.LoggerName.Contains("ResponseCaching") == false &&
-                loggingEvent.LoggerName.StartsWith("Hangfire.") == false &&
-                loggingEvent.RenderedMessage.Contains("Impersonation") == false)
+            if (loggingEvent.RenderedMessage.Contains("Impersonation"))
             {
                 var rootPath = "";
 #if DEBUG
@@ -53,44 +51,17 @@ namespace Amlakbashi.Host.Appenders
 
                         var logUrl = request != null ? "Url: " + request.Path + request.QueryString + "\n" : "";
 
-                        var logPostedData = "";
-                        if (request != null && request.Method.ToLower() == "post")
-                        {
-                            logPostedData = "Posted Data:\n";
-                            foreach (var item in request.Form)
-                            {
-                                logPostedData = logPostedData + item.Key + ": " + item.Value + "\n";
-                            }
-                        }
-
-                        var logLocation = loggingEvent.LocationInformation != null ?
-                            "Location: " + loggingEvent.LocationInformation.FullInfo + "\n" : "";
-
-                        var logMessage = "Message: " + loggingEvent.RenderedMessage + "\n";
-
-                        var exceptionMessage = loggingEvent.ExceptionObject != null ?
-                            "Exception: " + loggingEvent.ExceptionObject.Message + "\n" : "";
-
-                        var innerExceptionMessage = loggingEvent.ExceptionObject != null &&
-                            loggingEvent.ExceptionObject.InnerException != null ?
-                            "InnerException: " + loggingEvent.ExceptionObject.InnerException.Message + "\n" : "";
-
-                        var logStack = "StackTrace:\n";
-                        foreach (var item in loggingEvent.LocationInformation.StackFrames)
-                        {
-                            logStack = logStack + item.FullInfo + "\n";
-                        }
+                        var logMessage = loggingEvent.RenderedMessage + "\n";
 
                         var logSeperator = "--------------------------------------------------------------------------------";
 
-                        log = logDetails + logUrl + logPostedData + logLocation + logMessage +
-                            exceptionMessage + innerExceptionMessage + logStack + logSeperator;
+                        log = logDetails + logUrl + logMessage + logSeperator;
                         sw.WriteLine(log);
                     }
                     catch (Exception exc)
                     {
-                        string log = "LogAppender encountered with error:\n";
-                        log = log + exc.Message + "\n" 
+                        string log = "ImpersonationAppender encountered with error:\n";
+                        log = log + exc.Message + "\n"
                             + "--------------------------------------------------------------------------------";
                         sw.WriteLine(log);
                     }

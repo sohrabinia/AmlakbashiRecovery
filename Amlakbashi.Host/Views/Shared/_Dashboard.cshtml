@@ -97,7 +97,8 @@
                     92px"
                  src="/file/resourceimagegif?file_name=gift-75w" />
         </div>*@
-    @if (Context.Session.Keys.Any(a => a == "impersonateUser"))
+    @*@if (Context.Session.Keys.Any(a => a == "impersonateUser"))*@
+    @if (Context.User.IsImpersonatedUser())
     {
         @await Html.PartialAsync("_ImpersonateContainer", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hidden", false } })
     }

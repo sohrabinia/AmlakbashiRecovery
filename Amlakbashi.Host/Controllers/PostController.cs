@@ -735,10 +735,6 @@ namespace Amlakbashi.Host.Controllers
                 var done = userService.Update(user, userAccessor.CurrentUser.Id, hasRefundInProgress, ActionLog.ActionSourceEnum.WebsiteDashboard, out errors);
                 if (done)
                 {
-                    if (HttpContext.Session.GetObjectFromJson<User>("impersonateUser") != null)
-                    {
-                        HttpContext.Session.SetObjectAsJson("impersonateUser", userService.Find(user.id));
-                    }
                     msg = "ویرایش پروفایل شما با موفقیت انجام شد";
                     TempData["suc"] = msg;
                 }

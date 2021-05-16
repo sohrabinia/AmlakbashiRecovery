@@ -14,10 +14,10 @@ namespace Amlakbashi.Host.Authentication
             IUserAppService userService)
         {
             var context = httpContextAccessor.HttpContext;
-            if (context.Session.GetString("impersonateUser") != null)
+            if (context.User.IsImpersonatedUser() == true)
             {
-                CurrentUser = context.Session.GetObjectFromJson<User>("impersonateUser");
-                DoerUser = context.Session.GetObjectFromJson<User>("impersonateAdmin");
+                CurrentUser = userService.GetActivatedUserByMainMobile(context.User.Identity.Name);
+                DoerUser = userService.GetActivatedUserByMainMobile(context.User.GetImpersonatedAdminUsername());
                 return;
             }
 

@@ -70,10 +70,6 @@ namespace Amlakbashi.Host.Controllers
         [Authorize(Policy = Policies.User_Impersonate)]
         public IActionResult Impersonate(int userId, string url)
         {
-            if (HttpContext.Session.GetObjectFromJson<User>("impersonateUser") != null)
-            {
-                return Redirect("/errors/accessdenied");
-            }
             var user = userService.Find(userId, true);
             var identityUser = userService.GetIdentityUser(user.MainMobile);
             var admin = userAccessor.CurrentUser;
@@ -85,10 +81,12 @@ namespace Amlakbashi.Host.Controllers
                 return Redirect("/errors/accessdenied");
             }
 
+            var expireTime = DateTime.Now.AddMinutes(30);
             var claims = new List<Claim>
             {
-                new Claim("AdminUsername", admin.MainMobile),
-                new Claim("IsImpersonated", "true"),
+                new Claim("ImpersonateAdminUsername", admin.MainMobile),
+                new Claim("Impersonate", "true"),
+                new Claim("ImpersonateExpireTime", expireTime.ToString())
             };
             var result = userService.AddClaimsToUser(user.MainMobile, claims);
             if (result == false)
@@ -97,14 +95,16 @@ namespace Amlakbashi.Host.Controllers
                 return Redirect("/errors/accessdenied");
             }
 
+            AuthenticationProperties prop = new AuthenticationProperties();
+            prop.ExpiresUtc = expireTime;
+            prop.IssuedUtc = expireTime;
+            prop.IsPersistent = true;
+
             signInManager.SignOutAsync().Wait();
-            signInManager.SignInAsync(identityUser, false).Wait();
+            signInManager.SignInAsync(identityUser, prop).Wait();
 
-            HttpContext.Session.SetObjectAsJson("impersonateUser", user);
-            HttpContext.Session.SetObjectAsJson("impersonateAdmin", admin);
-
-            logger.Info("Admin " + admin.FullName + "(" + admin.Id + ") Impersonate to " +
-            user.FullName + "(" + user.Id + ").");
+            logger.Info("Impersonation: " + admin.FullName + " (id:" + admin.Id + ") impersonate to " +
+                user.FullName + " (id:" + user.Id + ")");
 
             if (!string.IsNullOrEmpty(url))
             {
@@ -115,25 +115,28 @@ namespace Amlakbashi.Host.Controllers
 
         public IActionResult ImpersonateLogout()
         {
-            var IsImpersonatedClaim = User.FindFirst("IsImpersonated");
-            if (IsImpersonatedClaim == null || IsImpersonatedClaim.Value != "true")
+            if (User.IsImpersonatedUser() == false)
             {
                 return NotFound();
             }
 
-            var adminUsername = User.FindFirst("AdminUsername").Value;
+            var adminUsername = User.GetImpersonatedAdminUsername();
             var admin = userService.GetIdentityUser(adminUsername);
 
             var claims = new List<Claim>
             {
-                new Claim("AdminUsername", adminUsername),
-                new Claim("IsImpersonated", "true"),
+                new Claim("ImpersonateAdminUsername", adminUsername),
+                new Claim("Impersonate", "true"),
+                new Claim("ImpersonateExpireTime", User.GetImpersonateExpireTime())
             };
             userService.RemoveClaimsFromUser(User.Identity.Name, claims);
 
             signInManager.SignOutAsync().Wait();
             signInManager.SignInAsync(admin, true).Wait();
             HttpContext.Session.Clear();
+
+            logger.Info("Impersonation: " + userAccessor.DoerUser.FullName + " (id:" + userAccessor.DoerUser.Id + ") exist from " +
+                userAccessor.CurrentUser.FullName + " (id:" + userAccessor.CurrentUser.Id + ")");
 
             return Redirect("/user/index");
         }
@@ -1475,14 +1478,13 @@ namespace Amlakbashi.Host.Controllers
 
         public JsonResult IsUserAuthenticated()
         {
-            var impersonatedUser = HttpContext.Session.GetObjectFromJson<User>("impersonateUser");
             return GenerateJsonResult(new
             {
                 val = User.Identity.IsAuthenticated,
                 impersonateData = new
                 {
-                    state = impersonatedUser != null,
-                    fullName = impersonatedUser != null ? impersonatedUser.FullName : ""
+                    state = User.IsImpersonatedUser(),
+                    fullName = User.IsImpersonatedUser() ? userAccessor.CurrentUser.FullName : ""
                 }
             });
         }

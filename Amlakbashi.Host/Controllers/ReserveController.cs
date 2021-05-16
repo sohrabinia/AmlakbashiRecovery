@@ -342,14 +342,20 @@ namespace Amlakbashi.Host.Controllers
                 if (originalReserve.TotalPrice != reserve.TotalPrice ||
                     originalReserve.DepositPrice != reserve.DepositPrice)
                 {
+                    if (reserve.DepositPrice < 1 || reserve.TotalPrice < 1)
+                    {
+                        userAllowEdit = userService.UserAllowPolicy(currentIdentityUser, Policies.Reserve_Payment_Actions);
+                        if (userAllowEdit == false)
+                        {
+                            ViewBag.errorMsg = "شما مجوز صفر کردن مبلغ را ندارید";
+                            return View(objReserve);
+                        }
+                    }
                     userAllowEdit = userService.UserAllowPolicy(currentIdentityUser, Policies.Reserve_Edit_Price);
                     if (userAllowEdit == false)
                     {
-                        if (userAllowEdit == false)
-                        {
-                            ViewBag.errorMsg = "شما مجوز ویرایش مبلغ ندارید";
-                            return View(objReserve);
-                        }
+                        ViewBag.errorMsg = "شما مجوز ویرایش مبلغ ندارید";
+                        return View(objReserve);
                     }
                 }
                 string msg;
