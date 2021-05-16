@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Amlakbashi.Mediator\Amlakbashi.Mediator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="PaymentContext\NewFolder\" />
+  </ItemGroup>
+
 </Project>

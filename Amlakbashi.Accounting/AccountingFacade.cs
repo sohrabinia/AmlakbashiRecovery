@@ -26,6 +26,9 @@ using log4net;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using Microsoft.AspNetCore.Identity;
 using Amlakbashi.Core.Identity.Entities;
+using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
+using Amlakbashi.Accounting.BankingContext;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Accounting
 {
@@ -41,6 +44,7 @@ namespace Amlakbashi.Accounting
         private readonly IAccountingRepository repository;
         private readonly IMediator mediator;
         private readonly IPaymentOperator paymentOperator;
+        private readonly IBankingOperator bankingOperator;
         private readonly UserManager<AppUser> userManager;
         private readonly ILog logger;
         public AccountingFacade(IReservePaymentAppService reservePaymentService,
@@ -53,6 +57,7 @@ namespace Amlakbashi.Accounting
             IAccountingRepository repository,
             IMediator mediator,
             IPaymentOperator paymentOperator,
+            IBankingOperator bankingOperator,
             UserManager<AppUser> userManager,
             ILog logger)
         {
@@ -66,6 +71,7 @@ namespace Amlakbashi.Accounting
             this.repository = repository;
             this.mediator = mediator;
             this.paymentOperator = paymentOperator;
+            this.bankingOperator = bankingOperator;
             this.userManager = userManager;
             this.logger = logger;
         }
@@ -1051,6 +1057,11 @@ namespace Amlakbashi.Accounting
                 default:
                     return 0;
             }
+        }
+
+        public Task<ShebaVerificationResultDTO> VerifySheba(string sheba)
+        {
+            return bankingOperator.VerifySheba(sheba);
         }
     }
 }
