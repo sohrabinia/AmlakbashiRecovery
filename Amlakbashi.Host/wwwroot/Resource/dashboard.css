@@ -783,17 +783,19 @@ a.dashboard__item_account:hover {
 }
 
 .profile__msg {
-    color: red;
+    color: white;
     padding: 20px;
     text-align: center;
     font: 14px Miransans;
+    background-color: red;
 }
 
 .profile__suc {
-    color: green;
+    color: white;
     padding: 20px;
     text-align: center;
     font: 14px Miransans;
+    background-color: yellowgreen;
 }
 
 .profile__photo {

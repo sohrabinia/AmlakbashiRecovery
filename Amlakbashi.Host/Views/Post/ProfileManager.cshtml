@@ -87,48 +87,6 @@
             <a asp-controller="user" asp-action="changepassword" style="margin-top:20px;" class="btn-photo">@(Model.hasPassword ? "تغییر" : "تعیین") رمز عبور</a>
         </div>
         <div class="profile__title">اطلاعات تماس</div>
-        if (Model.userGeneralType != (int)Entities.User.UserGeneralTypeEnum.Guest)
-        {
-            <div class="profile__item ">
-                <span class="profile__label">ساعت پاسخگویی از :</span>
-                <span class="profile__text">
-                    <select name="responseFrom">
-                        <option value="2" is-selected="@(2 == Model.responseFrom)">۲ بامداد</option>
-                        <option value="3" is-selected="@(3 == Model.responseFrom)">۳ بامداد</option>
-                        <option value="4" is-selected="@(4 == Model.responseFrom)">۴ بامداد</option>
-                        <option value="5" is-selected="@(5 == Model.responseFrom)">۵ بامداد</option>
-                        <option value="6" is-selected="@(6 == Model.responseFrom)">۶ صبح</option>
-                        <option value="7" is-selected="@(7 == Model.responseFrom)">۷ صبح</option>
-                        <option value="8" is-selected="@(8 == Model.responseFrom)">۸ صبح</option>
-                        <option value="9" is-selected="@(9 == Model.responseFrom)">۹ صبح</option>
-                        <option value="10" is-selected="@(10 == Model.responseFrom)" )>۱۰ صبح</option>
-                        <option value="11" is-selected="@(11 == Model.responseFrom)">۱۱ صبح</option>
-                        <option value="12" is-selected="@(12 == Model.responseFrom)">۱۲ ظهر</option>
-                        <option value="13" is-selected="@(13 == Model.responseFrom)">۱ بعد از ظهر</option>
-                        <option value="14" is-selected="@(14 == Model.responseFrom)">۲ بعد از ظهر</option>
-                    </select>
-                </span>
-            </div>
-            <div class="profile__item ">
-                <span class="profile__label">ساعت پاسخگویی تا :</span>
-                <span class="profile__text">
-                    <select name="responseTo">
-                        <option value="20" is-selected="@(20 == Model.responseFrom)">۸ شب</option>
-                        <option value="21" is-selected="@(21 == Model.responseFrom)">۹ شب</option>
-                        <option value="22" is-selected="@(22 == Model.responseFrom)">۱۰ شب</option>
-                        <option value="23" is-selected="@(23 == Model.responseFrom)">۱۱ شب</option>
-                        <option value="0" is-selected="@(0 == Model.responseFrom)">۱۲ شب</option>
-                        <option value="1" is-selected="@(1 == Model.responseFrom)">۱ بامداد</option>
-                        <option value="2" is-selected="@(2 == Model.responseFrom)">۲ بامداد</option>
-                    </select>
-                </span>
-            </div>
-        }
-        else
-        {
-            <input type="hidden" name="responseFrom" value="@Model.responseFrom" />
-            <input type="hidden" name="responseTo" value="@Model.responseTo" />
-        }
         <div class="profile__item ">
             <span class="profile__label">
                 شماره موبایل :

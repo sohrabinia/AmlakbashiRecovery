@@ -66,8 +66,6 @@ namespace Amlakbashi.Host.Controllers.API
                     user = new User();
                     user.Mobile = international_mobile;
                     user.MainMobile = international_mobile;
-                    user.ResponseFrom = 2;
-                    user.ResponseTo = 2;
                     user.AmlakbashiScore = 1000;
                     userService.Insert(user);
 
@@ -128,7 +126,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("UserApi.SignInFirstStep", exc);
                 return GenerateJsonResult(new
                 {
                     status = (int)Entities.User.SignInFirstStepResult.Error,
@@ -178,8 +176,6 @@ namespace Amlakbashi.Host.Controllers.API
                     user = new User();
                     user.Mobile = international_mobile;
                     user.MainMobile = international_mobile;
-                    user.ResponseFrom = 2;
-                    user.ResponseTo = 2;
                     user.AmlakbashiScore = 1000;
                     userService.Insert(user);
 
@@ -241,7 +237,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("UserApi.SignInFirstStepNew", exc);
                 return GenerateJsonResult(new
                 {
                     status = (int)Entities.User.SignInFirstStepResult.Error,
@@ -705,8 +701,6 @@ namespace Amlakbashi.Host.Controllers.API
         //                }
         //                user.MainMobile = mobile;
         //                user.CreateDate = DateTime.Now;
-        //                user.ResponseFrom = 2;
-        //                user.ResponseTo = 2;
         //                user.AmlakbashiScore = 1000;
         //                userService.Insert(user);
         //                failReason = null;

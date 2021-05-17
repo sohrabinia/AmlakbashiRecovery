@@ -72,8 +72,6 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                 user.GetCallablePhoneNumber(User.PhoneType.ThirdPerson);
 
             dto.userGeneralType = user.UserGeneralType;
-            dto.responseFrom = user.ResponseFrom;
-            dto.responseTo = user.ResponseTo;
             dto.OwnerShip = user.OwnerShip;
             dto.CancelInstantReserveLimit = user.CancelInstantReserveLimit;
             dto.ContactPhone = user.ContactPhone;

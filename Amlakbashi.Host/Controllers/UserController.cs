@@ -738,8 +738,6 @@ namespace Amlakbashi.Host.Controllers
                     user = new User();
                     user.Mobile = international_mobile;
                     user.MainMobile = international_mobile;
-                    user.ResponseFrom = 2;
-                    user.ResponseTo = 2;
                     user.FName = null;
                     user.LName = null;
                     user.AmlakbashiScore = 1000;
