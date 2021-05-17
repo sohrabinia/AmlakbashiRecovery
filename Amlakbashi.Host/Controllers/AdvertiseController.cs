@@ -288,47 +288,6 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        public JsonResult ContactUser(long id)
-        {
-            try
-            {
-                var acc = advertiseService.Find(id);
-
-                if (!acc.IsContactAvailable)
-                {
-                    return GenerateJsonResult(new { status = 0, val = "" });
-                }
-
-                string contact_result = "";
-                string mobile2 = "";
-                int response_from = 0;
-                int response_to = 0;
-                if (acc.UserID > 0)
-                {
-                    var objuser = userService.Find(acc.UserID);
-                    response_from = objuser.ResponseFrom;
-                    response_to = objuser.ResponseTo;
-                    if (string.IsNullOrEmpty(objuser.GetLocalPhoneNumber(Entities.User.PhoneType.OtherMobile1)))
-                        contact_result = objuser.GetLocalPhoneNumber(Entities.User.PhoneType.MainMobile);
-                    else
-                        contact_result = objuser.GetLocalPhoneNumber(Entities.User.PhoneType.OtherMobile1);
-                    mobile2 = objuser.GetLocalPhoneNumber(Entities.User.PhoneType.OtherMobile2);
-                }
-                return GenerateJsonResult(new {
-                    status = 1,
-                    mobile = contact_result,
-                    mobile2 = mobile2,
-                    response_from = response_from,
-                    response_to = response_to
-                });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("ContactUser", exc);
-                return GenerateJsonResult(new { status = 0, val = "" });
-            }
-        }
-
         public ActionResult Add()
         {
             return RedirectPermanent("/accomodation/accbasicform");

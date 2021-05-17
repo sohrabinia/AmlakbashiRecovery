@@ -264,16 +264,16 @@
                         @await Html.PartialAsync("AccPagePartials/_AccPagePrice", Model.Price)
 
                         @*@if (Model.Price.NorouzOverCapacityPrice > 0)
-                            {
-                                <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
-                                    <span class="advertise-page__price-title">
-                                        قیمت هر مهمان اضافه نوروز <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
-                                    </span>
-                                    <span class="advertise-page__price-content">
-                                        @string.Format("{0:n0}", Model.Price.NorouzOverCapacityPrice) تومان
-                                    </span>
-                                </div>
-                            }*@
+                        {
+                            <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
+                                <span class="advertise-page__price-title">
+                                    قیمت هر مهمان اضافه نوروز <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
+                                </span>
+                                <span class="advertise-page__price-content">
+                                    @string.Format("{0:n0}", Model.Price.NorouzOverCapacityPrice) تومان
+                                </span>
+                            </div>
+                        }*@
                     </div>
                 }
 
@@ -314,10 +314,12 @@
             </div>
 
             @* statistics *@
-            <div class="advertise-page__property-box advertise-page__overall-rating-box">
-                @await Html.PartialAsync("AccPagePartials/_AccPageStatistics", Model)
-            </div>
-            @*</div>*@
+            @if (Model.Statistics != null && Model.Statistics.SuccessfullReserveCount > 0)
+            {
+                <div class="advertise-page__property-box advertise-page__overall-rating-box">
+                    @await Html.PartialAsync("AccPagePartials/_AccPageStatistics", Model)
+                </div>
+            }
 
             @* Map *@
             if (Model.Address.Latitude != 0 && Model.Address.Longitude != 0)
@@ -329,9 +331,12 @@
             }
 
             @* Comments *@
-            <div class="advertise-page__property-box advertise-page__comment-box">
-                @await Html.PartialAsync("AccPagePartials/_AccPageComments", Model)
-            </div>
+            @if (Model.Comments != null && Model.Comments.Count > 0)
+            {
+                <div class="advertise-page__property-box advertise-page__comment-box">
+                    @await Html.PartialAsync("AccPagePartials/_AccPageComments", Model)
+                </div>
+            }
         }
 
         @* Related Links *@

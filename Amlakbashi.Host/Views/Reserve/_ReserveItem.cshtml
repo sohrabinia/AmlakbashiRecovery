@@ -282,7 +282,7 @@
             case Reserve.ReserveStatus.CancelRequestByGuest:
             case Reserve.ReserveStatus.CancelRequestByHost:
                 //case Reserve.ReserveStatus.WaitForReserve:
-                if (Model.paidAmount > 0)
+                if (Model.paidAmount >= Model.depositePrice)
                 {
                     <div onclick="contactUser(@(Model.hostlerUserId),null,'@(Model.status == Reserve.ReserveStatus.WaitForReserve ? "مبلغ بیعانه را حتما به حساب سایت واریز کنید در غیر اینصورت هیچگونه مسئولیتی شامل حال املاک باشی نمیگردد" : "")', @Model.reserveId, @(Model.isGuest ? Json.Serialize(true) : Json.Serialize(false)))" class="reserve-dashboard__item-container-button @((Model.status == Reserve.ReserveStatus.Started) ? "call_contant" : "contentCall")">
                         @*<i class="fa fa-phone"></i>*@

@@ -161,8 +161,6 @@ namespace Amlakbashi.Application.Services.UserServices
                 return false;
             var user = Repository.Find(dto.id);
             var shallowUser = user.ShallowCopy();
-            user.ResponseFrom = dto.responseFrom;
-            user.ResponseTo = dto.responseTo;
             user.FName = dto.fname;
             user.LName = dto.lname;
             user.OwnerShip = dto.OwnerShip;
