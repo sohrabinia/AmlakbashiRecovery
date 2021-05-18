@@ -53,7 +53,7 @@ namespace Amlakbashi.Core.Common.Utilities
         {
             if (string.IsNullOrEmpty(international_number))
                 return false;
-            Regex r = new Regex(@"^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$",
+            Regex r = new Regex(@"\+\d+\s[0-9]{5,14}",
                 RegexOptions.IgnoreCase | RegexOptions.Singleline);
             return r.IsMatch(international_number);
         }
