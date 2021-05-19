@@ -912,6 +912,11 @@ namespace Amlakbashi.Accounting
             try
             {
                 var objpay = paymentService.Find(pid);
+                if (objpay.Status == 1)
+                {
+                    msg = "این تراکنش تکراری میباشد";
+                    return false;
+                }
                 objpay.RefID = long.Parse(referenceNumber);
                 objpay.Authority = transactionReferenceID.ToString();
                 objpay.Status = 1;
