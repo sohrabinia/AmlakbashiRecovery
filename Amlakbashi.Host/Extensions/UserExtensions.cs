@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Amlakbashi.Core.Common.StaticData;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -11,8 +13,14 @@ namespace Amlakbashi.Host.Extensions
     {
         public static bool IsImpersonatedUser(this ClaimsPrincipal userPrincipal)
         {
-            var value = userPrincipal.FindFirst("Impersonate");
-            if (value != null && value.Value == "true")
+            //var value = userPrincipal.FindFirst("Impersonate");
+            //if (value != null && value.Value == "true")
+            //{
+            //    return true;
+            //}
+            //return false;
+            var adminIsImpersonated = new HttpContextAccessor().HttpContext.Request.Cookies[ImpersonateData.ImpersonateCookieName];
+            if (string.IsNullOrEmpty(adminIsImpersonated) == false && adminIsImpersonated == ImpersonateData.ImpersonateCookieValue)
             {
                 return true;
             }
