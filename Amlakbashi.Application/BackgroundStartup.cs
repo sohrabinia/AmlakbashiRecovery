@@ -21,7 +21,10 @@ namespace Amlakbashi.Application
 
         public void Startup()
         {
-            mediator.AddOrUpdate("UpdateAdvertiseScore3", new UpdateAdvertiseScoreCommand(0), "0 8 * * *");
+            //mediator.AddOrUpdate("UpdateAdvertiseScore3", new UpdateAdvertiseScoreCommand(0), "0 8 * * *");
+            RecurringJob.RemoveIfExists("UpdateAdvertiseScore");
+            RecurringJob.RemoveIfExists("UpdateAdvertiseScore2");
+            RecurringJob.RemoveIfExists("UpdateAdvertiseScore3");
             mediator.AddOrUpdate("UpdateUserScore", new UpdateUserScoreCommand(0), "40 8 * * *");
             mediator.AddOrUpdate("UpdateReserveSupportExpiration", new UpdateReserveSupportExpirationCommand(), "0 23 * * *");
             mediator.AddOrUpdate("UnsetAllTodayIsEmptyRecords", new UpdateTodayIsEmptyRecordsCommand(), "0 4 * * *");

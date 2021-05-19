@@ -123,6 +123,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
 
         public Task<Unit> Handle(UpdateAdvertiseScoreCommand request, CancellationToken cancellationToken)
         {
+            if (request.AdvertiseId < 1)
+            {
+                return Task.FromResult(Unit.Value);
+            }
             long max_score = 0;
             long last_max_score = 10000;
             long max_click = Convert.ToInt64(last_max_score / 3.2);
