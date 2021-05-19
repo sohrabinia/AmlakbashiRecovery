@@ -3,6 +3,7 @@ using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Data.Identity;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Configurations;
+using AntiXssMiddleware.Middleware;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using FirebaseAdmin;
@@ -162,14 +163,11 @@ namespace Amlakbashi.Host
                 app.UseStatusCodePagesWithReExecute("/errors/http404");
             }
 
+            app.UseAntiXssMiddleware();
             app.UseResponseCaching();
             app.UseStaticFiles();
             app.UseStaticFiles(new StaticFileOptions
             {
-                //FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
-                //Set the content-type without restriction. This setting can download all types of files, but it is not recommended because it is not safe.
-                //ServeUnknownFileTypes = true 
-                //The following settings can download files of type apk
                 ContentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>
                 {
                     { ".apk","application/vnd.android.package-archive"}

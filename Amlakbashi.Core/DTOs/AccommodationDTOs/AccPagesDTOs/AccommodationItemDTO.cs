@@ -169,6 +169,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             var hutChildren = childDirectors.ContainsKey(Advertise.AdvertiseType.Hut) ? childDirectors[Advertise.AdvertiseType.Hut] : new List<AdvertiseDirector>();
             dto.Id = advertise.Id;
             dto.Slug = advertise.Slug;
+            dto.LastModifyDate = DateTimeUtility.GregorianToPersianDate(advertise.LastModifyDate);
             dto.Comments = commentsList;
             dto.SuspendedComment = suspendeComment;
             dto.SuspendedCommentReserveId = scReserveId;
@@ -262,6 +263,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
 
         public long Id { get; set; }
         public string Slug { get; set; }
+        public string LastModifyDate { get; set; }
         public string TypeUrlString { get; set; }
         public string TypeUserString { get; set; }
         public string CityString { get; set; }
