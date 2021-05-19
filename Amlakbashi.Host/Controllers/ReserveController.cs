@@ -781,6 +781,10 @@ namespace Amlakbashi.Host.Controllers
                 switch ((Reserve.HostResponseEnum)host_response)
                 {
                     case Reserve.HostResponseEnum.Accepted:
+                        if (reserve.StartDate.Date == DateTime.Now.Date)
+                        {
+                            advertiseService.SetAsTodayEmpty(reserve.AdvertiseID);
+                        }
                         msg = "شما درخواست رزرو را پذیرفتید. به محض پاسخ مهمان نتیجه از طریق پیامک به اطلاع شما خواهد رسید";
                         break;
                     case Reserve.HostResponseEnum.Rejected:
