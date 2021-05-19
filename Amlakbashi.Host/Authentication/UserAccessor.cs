@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Amlakbashi.Host.Extensions;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.Common.StaticData;
 
 namespace Amlakbashi.Host.Authentication
 {
@@ -16,9 +17,13 @@ namespace Amlakbashi.Host.Authentication
             var context = httpContextAccessor.HttpContext;
             if (context.User.IsImpersonatedUser() == true)
             {
-                CurrentUser = userService.GetActivatedUserByMainMobile(context.User.Identity.Name);
-                DoerUser = userService.GetActivatedUserByMainMobile(context.User.GetImpersonatedAdminUsername());
-                return;
+                var adminIsImpersonated = context.Request.Cookies[ImpersonateData.ImpersonateCookieName];
+                if (string.IsNullOrEmpty(adminIsImpersonated) == false && adminIsImpersonated == ImpersonateData.ImpersonateCookieValue)
+                {
+                    CurrentUser = userService.GetActivatedUserByMainMobile(context.User.Identity.Name);
+                    DoerUser = userService.GetActivatedUserByMainMobile(context.User.GetImpersonatedAdminUsername());
+                    return;
+                }
             }
 
             if (context.Items["userinfo"] != null)

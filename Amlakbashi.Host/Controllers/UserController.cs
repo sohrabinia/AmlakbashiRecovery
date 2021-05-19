@@ -90,6 +90,17 @@ namespace Amlakbashi.Host.Controllers
                     new Claim("Impersonate", "true"),
                     new Claim("ImpersonateExpireTime", expireTime.ToString())
                 };
+                HttpContext.Response.Cookies.Append(
+                    ImpersonateData.ImpersonateCookieName,
+                    ImpersonateData.ImpersonateCookieValue,
+                    new CookieOptions()
+                    {
+                        Expires = expireTime,
+                        HttpOnly = true,
+                        SameSite = SameSiteMode.Lax,
+                        Secure = true
+                    }
+                );
                 var result = userService.AddClaimsToUser(user.MainMobile, claims);
                 if (result == false)
                 {
@@ -140,6 +151,7 @@ namespace Amlakbashi.Host.Controllers
                     new Claim("ImpersonateExpireTime", User.GetImpersonateExpireTime())
                 };
                 userService.RemoveClaimsFromUser(User.Identity.Name, claims);
+                HttpContext.Response.Cookies.Delete(ImpersonateData.ImpersonateCookieName);
 
                 signInManager.SignOutAsync().Wait();
                 signInManager.SignInAsync(admin, true).Wait();
