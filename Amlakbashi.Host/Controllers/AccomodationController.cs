@@ -121,7 +121,7 @@ namespace Amlakbashi.Host.Controllers
                     ModelState.Clear();
                     foreach (var item in errors)
                     {
-                        ModelState.AddModelError(item.Key, item.Value);
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
                     }
                     ViewBag.errors = groupErrors;
                     ViewBag.haveChild = advertiseService.GetAccChilds(data.Id).Any();
@@ -222,7 +222,7 @@ namespace Amlakbashi.Host.Controllers
                     ModelState.Clear();
                     foreach (var item in errors)
                     {
-                        ModelState.AddModelError(item.Key, item.Value);
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
                     }
                     if (hasImportantError)
                     {
@@ -316,7 +316,7 @@ namespace Amlakbashi.Host.Controllers
                     ModelState.Clear();
                     foreach (var item in errors)
                     {
-                        ModelState.AddModelError(item.Key, item.Value);
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
                     }
                     ViewBag.errors = groupErrors;
                     ViewBag.tab = tab;
@@ -449,7 +449,7 @@ namespace Amlakbashi.Host.Controllers
                     ModelState.Clear();
                     foreach (var item in errors)
                     {
-                        ModelState.AddModelError(item.Key, item.Value);
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
                     }
                     ViewBag.errors = groupErrors;
                     ViewBag.childs = childs;
@@ -574,7 +574,7 @@ namespace Amlakbashi.Host.Controllers
                     ModelState.Clear();
                     foreach (var item in errors)
                     {
-                        ModelState.AddModelError(item.Key, item.Value);
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
                     }
                     ViewBag.errors = groupErrors;
                     ViewBag.childs = childs;
@@ -743,7 +743,7 @@ namespace Amlakbashi.Host.Controllers
                     ModelState.Clear();
                     foreach (var item in errors)
                     {
-                        ModelState.AddModelError(item.Key, item.Value);
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
                     }
                     if (isEdit)
                     {
@@ -849,7 +849,7 @@ namespace Amlakbashi.Host.Controllers
                     ModelState.Clear();
                     foreach (var item in errors)
                     {
-                        ModelState.AddModelError(item.Key, item.Value);
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
                     }
                     if (isEdit)
                     {

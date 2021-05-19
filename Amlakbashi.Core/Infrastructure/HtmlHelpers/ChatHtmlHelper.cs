@@ -13,7 +13,7 @@ namespace Amlakbashi.Core.Infrastructure.HtmlHelpers
         {
             string generatedText;
             String[] separator = { "\n" };
-            var sentences = text.Split(separator, StringSplitOptions.None);
+            var sentences = text != null ? text.Split(separator, StringSplitOptions.None) : new string[0];
             var generatedSentences = new List<string>();
             foreach (var sentence in sentences)
             {

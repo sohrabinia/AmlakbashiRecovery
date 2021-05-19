@@ -70,75 +70,91 @@ namespace Amlakbashi.Host.Controllers
         [Authorize(Policy = Policies.User_Impersonate)]
         public IActionResult Impersonate(int userId, string url)
         {
-            var user = userService.Find(userId, true);
-            var identityUser = userService.GetIdentityUser(user.MainMobile);
-            var admin = userAccessor.CurrentUser;
-
-            var employeesNumber = userService.GetAllEmployees().Select(s => s.PhoneNumber).ToList();
-            if (employeesNumber.Contains(identityUser.PhoneNumber))
+            try
             {
-                TempData["userIsEmployees"] = true;
-                return Redirect("/errors/accessdenied");
+                var user = userService.Find(userId, true);
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var admin = userAccessor.CurrentUser;
+
+                var employeesNumber = userService.GetAllEmployees().Select(s => s.PhoneNumber).ToList();
+                if (employeesNumber.Contains(identityUser.PhoneNumber))
+                {
+                    TempData["userIsEmployees"] = true;
+                    return Redirect("/errors/accessdenied");
+                }
+
+                var expireTime = DateTime.Now.AddMinutes(30);
+                var claims = new List<Claim>
+                {
+                    new Claim("ImpersonateAdminUsername", admin.MainMobile),
+                    new Claim("Impersonate", "true"),
+                    new Claim("ImpersonateExpireTime", expireTime.ToString())
+                };
+                var result = userService.AddClaimsToUser(user.MainMobile, claims);
+                if (result == false)
+                {
+                    TempData["userIsImpersonated"] = true;
+                    return Redirect("/errors/accessdenied");
+                }
+
+                AuthenticationProperties prop = new AuthenticationProperties();
+                prop.ExpiresUtc = expireTime;
+                prop.IssuedUtc = expireTime;
+                prop.IsPersistent = true;
+
+                signInManager.SignOutAsync().Wait();
+                signInManager.SignInAsync(identityUser, prop).Wait();
+
+                logger.Info("Impersonation: " + admin.FullName + " (id:" + admin.Id + ") impersonate to " +
+                    user.FullName + " (id:" + user.Id + ")");
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    return Redirect(url);
+                }
+                return Redirect("/dashboard");
             }
-
-            var expireTime = DateTime.Now.AddMinutes(30);
-            var claims = new List<Claim>
+            catch (Exception exc)
             {
-                new Claim("ImpersonateAdminUsername", admin.MainMobile),
-                new Claim("Impersonate", "true"),
-                new Claim("ImpersonateExpireTime", expireTime.ToString())
-            };
-            var result = userService.AddClaimsToUser(user.MainMobile, claims);
-            if (result == false)
-            {
-                TempData["userIsImpersonated"] = true;
-                return Redirect("/errors/accessdenied");
+                logger.Error("User.Impersonate", exc);
+                return Redirect("/errors/http500");
             }
-
-            AuthenticationProperties prop = new AuthenticationProperties();
-            prop.ExpiresUtc = expireTime;
-            prop.IssuedUtc = expireTime;
-            prop.IsPersistent = true;
-
-            signInManager.SignOutAsync().Wait();
-            signInManager.SignInAsync(identityUser, prop).Wait();
-
-            logger.Info("Impersonation: " + admin.FullName + " (id:" + admin.Id + ") impersonate to " +
-                user.FullName + " (id:" + user.Id + ")");
-
-            if (!string.IsNullOrEmpty(url))
-            {
-                return Redirect(url);
-            }
-            return Redirect("/dashboard");
         }
 
         public IActionResult ImpersonateLogout()
         {
-            if (User.IsImpersonatedUser() == false)
+            try
             {
-                return NotFound();
+                if (User.IsImpersonatedUser() == false)
+                {
+                    return NotFound();
+                }
+
+                var adminUsername = User.GetImpersonatedAdminUsername();
+                var admin = userService.GetIdentityUser(adminUsername);
+
+                var claims = new List<Claim>
+                {
+                    new Claim("ImpersonateAdminUsername", adminUsername),
+                    new Claim("Impersonate", "true"),
+                    new Claim("ImpersonateExpireTime", User.GetImpersonateExpireTime())
+                };
+                userService.RemoveClaimsFromUser(User.Identity.Name, claims);
+
+                signInManager.SignOutAsync().Wait();
+                signInManager.SignInAsync(admin, true).Wait();
+                HttpContext.Session.Clear();
+
+                logger.Info("Impersonation: " + userAccessor.DoerUser.FullName + " (id:" + userAccessor.DoerUser.Id + ") exist from " +
+                    userAccessor.CurrentUser.FullName + " (id:" + userAccessor.CurrentUser.Id + ")");
+
+                return Redirect("/user/index");
             }
-
-            var adminUsername = User.GetImpersonatedAdminUsername();
-            var admin = userService.GetIdentityUser(adminUsername);
-
-            var claims = new List<Claim>
+            catch (Exception exc)
             {
-                new Claim("ImpersonateAdminUsername", adminUsername),
-                new Claim("Impersonate", "true"),
-                new Claim("ImpersonateExpireTime", User.GetImpersonateExpireTime())
-            };
-            userService.RemoveClaimsFromUser(User.Identity.Name, claims);
-
-            signInManager.SignOutAsync().Wait();
-            signInManager.SignInAsync(admin, true).Wait();
-            HttpContext.Session.Clear();
-
-            logger.Info("Impersonation: " + userAccessor.DoerUser.FullName + " (id:" + userAccessor.DoerUser.Id + ") exist from " +
-                userAccessor.CurrentUser.FullName + " (id:" + userAccessor.CurrentUser.Id + ")");
-
-            return Redirect("/user/index");
+                logger.Error("User.Impersonate", exc);
+                return Redirect("/errors/http500");
+            }
         }
 
         #region [ admin ]
@@ -903,7 +919,7 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("User.PopupSendSmsAgain", exc);
                 return GenerateJsonResult(new
                 {
                     status = 0,
@@ -974,7 +990,7 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("User.PopupVerifyCode", exc);
                 return GenerateJsonResult(new { status = 0 });
             }
         }
@@ -998,7 +1014,7 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("User.PopupLoginCode", exc);
                 return GenerateJsonResult(new { status = 0, msg = "عملیات با خطا مواجه شد" });
             }
         }
@@ -1026,11 +1042,15 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        public JsonResult PopupLoginRegister(string mobile, string code, string fname = null, 
+        public JsonResult PopupLoginRegister(string mobile, string code, string fname = null,
             string lname = null, string presentorCode = "")
         {
             try
             {
+                if (string.IsNullOrEmpty(presentorCode) == false)
+                {
+                    presentorCode = StringUtility.PersianNumberToEnglish(presentorCode);
+                }
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 int user_id;
                 string errorMsg;
@@ -1267,7 +1287,7 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("User.IncreaseCredit", exc);
                 return GenerateJsonResult(new { status = 0, pid = 0 });
             }
         }
