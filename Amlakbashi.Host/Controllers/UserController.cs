@@ -83,7 +83,7 @@ namespace Amlakbashi.Host.Controllers
                     return Redirect("/errors/accessdenied");
                 }
 
-                var expireTime = DateTime.Now.AddMinutes(30);
+                var expireTime = DateTime.Now.AddMinutes(2);
                 var claims = new List<Claim>
                 {
                     new Claim("ImpersonateAdminUsername", admin.MainMobile),
@@ -113,7 +113,8 @@ namespace Amlakbashi.Host.Controllers
                 prop.IssuedUtc = expireTime;
                 prop.IsPersistent = true;
 
-                signInManager.SignOutAsync().Wait();
+                //signInManager.SignOutAsync().Wait();
+                userService.SignOut();
                 signInManager.SignInAsync(identityUser, prop).Wait();
 
                 logger.Info("Impersonation: " + admin.FullName + " (id:" + admin.Id + ") impersonate to " +
@@ -153,7 +154,8 @@ namespace Amlakbashi.Host.Controllers
                 userService.RemoveClaimsFromUser(User.Identity.Name, claims);
                 HttpContext.Response.Cookies.Delete(ImpersonateData.ImpersonateCookieName);
 
-                signInManager.SignOutAsync().Wait();
+                //signInManager.SignOutAsync().Wait();
+                userService.SignOut();
                 signInManager.SignInAsync(admin, true).Wait();
                 HttpContext.Session.Clear();
 
@@ -627,7 +629,8 @@ namespace Amlakbashi.Host.Controllers
                 if (result.Succeeded)
                 {
                     var user = userService.GetIdentityUser(User.Identity.Name);
-                    signInManager.SignOutAsync().Wait();
+                    //signInManager.SignOutAsync().Wait();
+                    userService.SignOut();
                     signInManager.SignInAsync(user, true).Wait();
                     TempData["suc"] = "تغییر رمز عبور با موفقیت انجام شد";
                     return Redirect("/post/profilemanager?userid=" + userAccessor.CurrentUser.Id);
@@ -1239,14 +1242,16 @@ namespace Amlakbashi.Host.Controllers
 
         public ActionResult Signout()
         {
-            signInManager.SignOutAsync();
+            //signInManager.SignOutAsync();
+            userService.SignOut();
             HttpContext.Session.Clear();
             return Redirect("/");
         }
 
         public ActionResult LogOff()
         {
-            signInManager.SignOutAsync();
+            //signInManager.SignOutAsync();
+            userService.SignOut();
             HttpContext.Session.Clear();
             return Redirect("/");
         }
@@ -1530,22 +1535,22 @@ namespace Amlakbashi.Host.Controllers
                 });
         }
 
-        public JsonResult LogoutAjax()
-        {
-            try
-            {
-                //HttpContext.Session.SetString("mobile", null);
-                //FormsAuthentication.SignOut();
-                HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                HttpContext.Session.Clear();
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
+        //public JsonResult LogoutAjax()
+        //{
+        //    try
+        //    {
+        //        //HttpContext.Session.SetString("mobile", null);
+        //        //FormsAuthentication.SignOut();
+        //        HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        //        HttpContext.Session.Clear();
+        //        return GenerateJsonResult(new { status = 1 });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("", exc);
+        //        return GenerateJsonResult(new { status = 0 });
+        //    }
+        //}
 
         [Authorize]
         public JsonResult UpdateUserNotificationToken(string token)

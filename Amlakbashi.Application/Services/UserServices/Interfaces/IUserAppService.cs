@@ -84,5 +84,6 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         IEnumerable<AppUser> GetAllSupportEmployees();
         IEnumerable<AppUser> GetAllEmployees();
         bool UserAllowPolicy(AppUser identityUser, string policy);
+        void SignOut();
     }
 }
