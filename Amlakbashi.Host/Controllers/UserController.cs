@@ -90,6 +90,12 @@ namespace Amlakbashi.Host.Controllers
                     new Claim("Impersonate", "true"),
                     new Claim("ImpersonateExpireTime", expireTime.ToString())
                 };
+                var result = userService.AddClaimsToUser(user.MainMobile, claims);
+                if (result == false)
+                {
+                    TempData["userIsImpersonated"] = true;
+                    return Redirect("/errors/accessdenied");
+                }
                 HttpContext.Response.Cookies.Append(
                     ImpersonateData.ImpersonateCookieName,
                     ImpersonateData.ImpersonateCookieValue,
@@ -101,13 +107,6 @@ namespace Amlakbashi.Host.Controllers
                         Secure = true
                     }
                 );
-                var result = userService.AddClaimsToUser(user.MainMobile, claims);
-                if (result == false)
-                {
-                    TempData["userIsImpersonated"] = true;
-                    return Redirect("/errors/accessdenied");
-                }
-
                 AuthenticationProperties prop = new AuthenticationProperties();
                 prop.ExpiresUtc = expireTime;
                 prop.IssuedUtc = expireTime;
