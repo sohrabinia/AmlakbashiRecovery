@@ -1767,6 +1767,69 @@ namespace Amlakbashi.Host.Controllers
                 });
             }
         }
+
+        [HttpGet]
+        public IActionResult ChangeDesc(int userId)
+        {
+            try
+            {
+                var user = userService.Find(userId);
+                if (user != null)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 1,
+                        desc = string.IsNullOrEmpty(user.Address) ? "" : user.Address
+                    });
+                }
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "این شناسه کاربری موجود نمی باشد"
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.GetUserDescription", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد"
+                });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ChangeDesc(int userId, string desc)
+        {
+            try
+            {
+                var user = userService.Find(userId);
+                if (user != null)
+                {
+                    userService.UpdateDesc(userId, desc);
+                    return GenerateJsonResult(new
+                    {
+                        status = 1,
+                        msg = "توضیحات کاربر با موفقیت ویرایش شد"
+                    });
+                }
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "این شناسه کاربری موجود نمی باشد"
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.GetUserDescription", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد"
+                });
+            }
+        }
     }
 }
 

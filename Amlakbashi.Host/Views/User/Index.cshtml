@@ -238,7 +238,7 @@
                     <th>شماره شبا</th>
                 }
                 @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ||
-                 data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
+               data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
                 {
                     <th>
                         رزرو آنی
@@ -332,7 +332,7 @@
                                 <i style="color:#242424" class="fa fa-book"></i>
                             </a>
                             <a asp-controller="role" asp-action="edituserrole" asp-route-userId="@item.User.Id" class="fa fa-id-card" title="مدیریت رول ها" style="color:#242424;"></a>
-                            <i onclick="getDescription(@item.User.Address)" class="fa fa-question-circle"></i>
+                            <i onclick="getUserDesc(@item.User.Id)" class="fa fa-question-circle"></i>
                         </td>
                     }
                     else
@@ -352,7 +352,7 @@
                                 <i style="color:#242424" class="fa fa-book"></i>
                             </a>
                             <a asp-controller="role" asp-action="edituserrole" asp-route-userId="@item.User.Id" class="fa fa-id-card" title="مدیریت رول ها" style="color:#242424;"></a>
-                            <i onclick="getDescription(@item.User.Address)" class="fa fa-question-circle"></i>
+                            <i onclick="getUserDesc(@item.User.Id)" class="fa fa-question-circle"></i>
                         </td>
                     }
                 </tr>
@@ -541,18 +541,54 @@
                 + '</div>');
         }
 
-        function getDescription(id) {
-            descMsg = showNoYesMessage('توضیحات کاربر', '',
-                function () {
-                    myajax("user/getdescform", "userId=" + id, function (ret) {
-                        if (ret.status == 1) {
-                            
-                        }
-                        else if (ret.status == 0) {
-                            
-                        }
+        function getUserDesc(id) {
+            myajax("user/changedesc", "userId=" + id, function (ret) {
+                if (ret.status == 1) {
+                    showInfoMessage(
+                        'توضیحات کاربر', '<input type="hidden" id="userIdInput" value="' + id + '" />' +
+                        '<textarea id="userDescInput">' + ret.desc + '</textarea>', {
+                        buttons: [{
+                            title: 'بستن',
+                            color: 'white',
+                            bgColor: '#EA4335'
+                        },
+                        {
+                            title: 'ثبت تغییرات',
+                            color: 'white',
+                            bgColor: '#34A853',
+                            onclick: submitUserDesc
+                        }], autoClose: false
                     });
-                });
+                }
+                else if (ret.status == 0) {
+                    alertify.error(ret.msg);
+                }
+            });
+        }
+
+        function submitUserDesc() {
+            debugger;
+            var userId = $("#userIdInput").val();
+            var desc = $("#userDescInput").val();
+            $.ajax({
+                url: "/user/changedesc",
+                type: "post",
+                data: {
+                    userId: userId,
+                    desc: desc
+                },
+                success: function (ret) {
+                    if (ret.status == 1) {
+                        alertify.success(ret.msg);
+                    }
+                    else {
+                        alertify.error(ret.msg);
+                    }
+                },
+                error: function (ret) {
+                    alertify.error(ret.msg);
+                }
+            });
         }
 
         function increaseCredit($id) {

@@ -39,6 +39,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void UpdateFName(int userId, string newFName);
         void UpdateLName(int userId, string newLName);
         void UpdateFNameLName(int userId, string newFName, string newLName);
+        void UpdateDesc(int userId, string desc);
         void UpdateLoginCode(int userId, string token);
         void UpdateLastNotifPermetionTicks(int userId, long ticks);
         void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,

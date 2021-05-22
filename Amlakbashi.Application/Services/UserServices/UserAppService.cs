@@ -434,6 +434,14 @@ namespace Amlakbashi.Application.Services.UserServices
             Repository.Save();
         }
 
+        public void UpdateDesc(int userId, string desc)
+        {
+            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
+            user.Address = desc;
+            Repository.Update(user);
+            Repository.Save();
+        }
+
         public void UpdateLastNotifPermetionTicks(int userId, long ticks)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
