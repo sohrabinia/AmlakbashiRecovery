@@ -83,7 +83,7 @@ namespace Amlakbashi.Host.Controllers
                     return Redirect("/errors/accessdenied");
                 }
 
-                var expireTime = DateTime.Now.AddMinutes(2);
+                var expireTime = DateTime.Now.AddMinutes(30);
                 var claims = new List<Claim>
                 {
                     new Claim("ImpersonateAdminUsername", admin.MainMobile),
@@ -96,6 +96,16 @@ namespace Amlakbashi.Host.Controllers
                     TempData["userIsImpersonated"] = true;
                     return Redirect("/errors/accessdenied");
                 }
+                
+                AuthenticationProperties prop = new AuthenticationProperties();
+                prop.ExpiresUtc = expireTime;
+                prop.IssuedUtc = expireTime;
+                prop.IsPersistent = true;
+
+                //signInManager.SignOutAsync().Wait();
+                userService.SignOut();
+                signInManager.SignInAsync(identityUser, prop).Wait();
+
                 HttpContext.Response.Cookies.Append(
                     ImpersonateData.ImpersonateCookieName,
                     ImpersonateData.ImpersonateCookieValue,
@@ -107,14 +117,6 @@ namespace Amlakbashi.Host.Controllers
                         Secure = true
                     }
                 );
-                AuthenticationProperties prop = new AuthenticationProperties();
-                prop.ExpiresUtc = expireTime;
-                prop.IssuedUtc = expireTime;
-                prop.IsPersistent = true;
-
-                //signInManager.SignOutAsync().Wait();
-                userService.SignOut();
-                signInManager.SignInAsync(identityUser, prop).Wait();
 
                 logger.Info("Impersonation: " + admin.FullName + " (id:" + admin.Id + ") impersonate to " +
                     user.FullName + " (id:" + user.Id + ")");
