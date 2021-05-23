@@ -9,5 +9,6 @@ namespace Amlakbashi.Core.Common.Background
     public interface IMediatorHangfireBridge
     {
         Task Send(IRequest request);
+        Task Send<T>(IRequest<T> request);
     }
 }

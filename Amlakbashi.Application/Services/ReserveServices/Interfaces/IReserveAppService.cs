@@ -41,9 +41,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
             string end_date, out string msg, int doerUserId,
             ActionSourceEnum actionSource);
         void SetStatus(long reserveId, ReserveStatus status, bool sendSms,
-            ActionLog.ActionSourceEnum actionSource, int doerUserId);
+            ActionLog.ActionSourceEnum actionSource, int doerUserId, bool force = false);
         bool SetHostResponse(long reserveId, HostResponseEnum response,
-            bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId);
+            bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId, bool force = false);
         bool CashPay(long reserveId, out string msg,
             int userId, ActionSourceEnum actionSource, int doerUserId);
         bool ConfirmCashPay(long reserveId, bool paid, out string msg,
@@ -85,10 +85,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
             User currentUser, ReserveManagerSelectType selectType,
             int category, string reserve_id, int status,
             out Dictionary<ReserveCategory, int> countDict);
-        void SetHangfireSchedules_GuestCall();
-        void SetHangfireSchedules_HostCall();
-        void SetHangfireSchedules_ReservedState();
-        void SetHangfireSchedules_StartedState();
         VoucherDTO GenerateVoucher(long reserveId, int currentUserId);
         void SendReserveRequestCall(long reserveId);
         void SendPayReserveCall(long reserveId);

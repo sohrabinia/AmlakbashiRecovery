@@ -18,5 +18,10 @@ namespace Amlakbashi.Core.Common.Background
         {
             await mediator.Send(request);
         }
+
+        public async Task Send<T>(IRequest<T> request)
+        {
+            await mediator.Send(request);
+        }
     }
 }

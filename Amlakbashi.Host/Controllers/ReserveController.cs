@@ -366,8 +366,12 @@ namespace Amlakbashi.Host.Controllers
                     ViewBag.errorMsg = msg;
                     return View(objReserve);
                 }
-                if (!reserveService.SetHostResponse(reserve.Id, reserve.HostResponse, true, ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id))
-                    reserveService.SetStatus(reserve.Id, reserve.Status, true, ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id);
+                if (reserveService.SetHostResponse(reserve.Id, reserve.HostResponse, true,
+                    ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id, true) == false)
+                {
+                    reserveService.SetStatus(reserve.Id, reserve.Status, true,
+                        ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id, true);
+                }
                 return RedirectToAction("Index");
             }
             catch (Exception exc)

@@ -208,7 +208,7 @@ namespace Amlakbashi.Host.Controllers.API
                     return GenerateJsonResult(new { status = 0, msg = "شما میزبان این آگهی نیستید" });
                 }
                 reserveService.SetHostResponse(reserve_id, (Reserve.HostResponseEnum)host_response,
-                    true, ActionLog.ActionSourceEnum.Application, user.Id);
+                    true, ActionLog.ActionSourceEnum.Application, user.Id, false);
                 var msg = "جواب شما ثبت شد";
                 var rejectReason = "";
                 switch ((Reserve.HostResponseEnum)host_response)
