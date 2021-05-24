@@ -243,9 +243,19 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             if (acc.Status == AdvertiseStatus.NotCompleted || acc.Status == AdvertiseStatus.FirstReady)
             {
                 acc.OldSlug = AdvertiseUrlLocalization.GetOldSlug(acc.Title, (int)acc.TypeID);
-                acc.Slug = acc.Id.ToString() + "-" + acc.OldSlug;
-                acc.MetaTitle = acc.Title + " - املاک باشی";
-                acc.MetaDescription = AdvertiseSeoLocalization.GetMetaDescription(acc, cityTitle, areaTitle);
+                if (notification.IsAdmin)
+                {
+                    acc.Slug = string.IsNullOrEmpty(acc.Slug) ? acc.Id.ToString() + "-" + acc.OldSlug : acc.Slug;
+                    acc.MetaTitle = string.IsNullOrEmpty(acc.MetaTitle) ? acc.Title + " - املاک باشی" : acc.MetaTitle;
+                    acc.MetaDescription = string.IsNullOrEmpty(acc.MetaDescription) ? 
+                        AdvertiseSeoLocalization.GetMetaDescription(acc, cityTitle, areaTitle) : acc.MetaDescription;
+                }
+                else
+                {
+                    acc.Slug = acc.Id.ToString() + "-" + acc.OldSlug;
+                    acc.MetaTitle = acc.Title + " - املاک باشی";
+                    acc.MetaDescription = AdvertiseSeoLocalization.GetMetaDescription(acc, cityTitle, areaTitle);
+                }
             }
 
             //initialize geographical properties

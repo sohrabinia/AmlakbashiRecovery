@@ -982,7 +982,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     mediator.Send(new GenerateThumbImageCommand(data.Id, acc.PhotoID,
                             acc.Photos.Select(s => s.Id).ToList(), rootPath));
                 }
-                mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id));
+                mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id, true));
             }
 
             if (type == DirectorType.Extra || type == DirectorType.ComplexUnit ||
