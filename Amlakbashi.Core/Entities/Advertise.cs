@@ -64,6 +64,7 @@ namespace Amlakbashi.Core.Entities
         public ParkingItems Parking { get; set; }
         public int Room { get; set; }
         public bool? Pool { get; set; }
+        public PoolFeaturesEnum PoolFeatures { get; set; }
         public int Capacity { get; set; }
         public int MoreThanCapacity { get; set; }
         public int DailyPrice { get; set; }
@@ -1354,6 +1355,16 @@ namespace Amlakbashi.Core.Entities
         public enum OccupiedSelectType { All, ForFrom, ForTo }
         public enum OccupiedSource { All, Reserves, Tables }
         public enum HygieneProtocolStatus { NotConsider = 0, Consider = 1, Verified = 2, NotVerified = 3 }
+
+        [Flags]
+        public enum PoolFeaturesEnum
+        {
+            None = 0,
+            HotWater = 1,
+            Filtration = 2,
+            Open = 4,
+            Covered = 8
+        }
 
         #endregion
     }

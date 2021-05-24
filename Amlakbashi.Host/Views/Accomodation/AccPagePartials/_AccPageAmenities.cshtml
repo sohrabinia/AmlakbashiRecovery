@@ -12,6 +12,8 @@
         Model.Amenities.WashingMachine || Model.Amenities.Refrigerator || Model.Amenities.Oven || Model.Amenities.MicrowaveOven ||
         Model.Amenities.KitchenHood || Model.Amenities.KitchenUtensils || Model.Amenities.Hairdryer || Model.Amenities.SoundSystem ||
         Model.Amenities.TeaMaker || Model.Amenities.Foosball || Model.Amenities.Golf || Model.Amenities.PoolTable ? true : false;
+    var hasPoolFeature = Model.Pool.Pool == true && (Model.Pool.PoolCovered || Model.Pool.PoolFiltration || Model.Pool.PoolHotWater ||
+        Model.Pool.PoolOpen) ? true : false;
 }
 
 @if (mainAmenities || detailedAmenities)
@@ -152,9 +154,55 @@
             </div>
         }
 
+        @if (hasPoolFeature)
+        {
+            <div class="advertise-page__amenities-detail-container" style="border-top: 1px dotted lightgray; border-bottom: 1px dotted lightgray;">
+                <div class="advertise-page__amenities-main-item">
+                    <p class="advertise-page__amenities-main-title" style="margin-left:50px;">
+                        <i class="fa fa-swimming-pool"></i> استخر:
+                    </p>
+                    @if (Model.Pool.PoolOpen)
+                    {
+                        <div class="advertise-page__amenities-detail-item">
+                            <p>روباز<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                            @*<i class="fa fa-door-open"></i>*@
+                        </div>
+                    }
+                    @if (Model.Pool.PoolCovered)
+                    {
+                        <div class="advertise-page__amenities-detail-item">
+                            <p>سرپوشیده<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                            @*<i class="fa fa-close"></i>*@
+                        </div>
+                    }
+                    @if (Model.Pool.PoolHotWater)
+                    {
+                        <div class="advertise-page__amenities-detail-item">
+                            <p>آب گرم<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                            @*<i class="fa fa-hot-tub"></i>*@
+                        </div>
+                    }
+                    @if (Model.Pool.PoolFiltration)
+                    {
+                        <div class="advertise-page__amenities-detail-item">
+                            <p>سیستم تصفیه<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                            @*<i class="fa fa-filter"></i>*@
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
         @if (detailedAmenities)
         {
             <div class="advertise-page__amenities-detail-container">
+                @if (hasPoolFeature == false && Model.Pool.Pool == true)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>استخر<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <i class="fa fa-swimming-pool"></i>
+                    </div>
+                }
                 @if (Model.Elevator.Elevator)
                 {
                     <div class="advertise-page__amenities-detail-item">
@@ -179,7 +227,7 @@
                 @if (Model.Amenities.Jacuzzi)
                 {
                     <div class="advertise-page__amenities-detail-item">
-                        <p>جکوزی<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>                         
+                        <p>جکوزی<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
                         <img src="/file/resourceimagepng?file_name=icons/jacuzzi" alt="جکوزی" width="32" height="32" />
                     </div>
                 }
@@ -193,15 +241,15 @@
                 @if (Model.Amenities.SoundSystem)
                 {
                     <div class="advertise-page__amenities-detail-item">
-                            <p>ضبط و باند<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
-                            <img src="/file/resourceimagepng?file_name=icons/sound_system" alt="ضبط و باند" width="32" height="32" />
+                        <p>ضبط و باند<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <img src="/file/resourceimagepng?file_name=icons/sound_system" alt="ضبط و باند" width="32" height="32" />
                     </div>
                 }
                 @if (Model.Amenities.Wifi)
                 {
                     <div class="advertise-page__amenities-detail-item">
                         <p>وای فای<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
-                            <i class="fa fa-wifi"></i>
+                        <i class="fa fa-wifi"></i>
                     </div>
                 }
                 @if (Model.Amenities.WashingMachine)
@@ -214,22 +262,22 @@
                 @if (Model.Amenities.Refrigerator)
                 {
                     <div class="advertise-page__amenities-detail-item">
-                        <p>یخچال<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>      
+                        <p>یخچال<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
                         <img src="/file/resourceimagepng?file_name=icons/refrigerator" alt="یخچال" width="32" height="32" />
                     </div>
                 }
                 @if (Model.Amenities.Oven)
                 {
                     <div class="advertise-page__amenities-detail-item">
-                        <p>اجاق گاز <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>              
+                        <p>اجاق گاز <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
                         <img src="/file/resourceimagepng?file_name=icons/oven" alt="اجاق گاز" width="32" height="32" />
                     </div>
                 }
                 @if (Model.Amenities.MicrowaveOven)
                 {
                     <div class="advertise-page__amenities-detail-item">
-                            <p>مایکروویو<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>      
-                            <img src="/file/resourceimagepng?file_name=icons/microwave_oven" alt="مایکروویو" width="32" height="32" />
+                        <p>مایکروویو<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <img src="/file/resourceimagepng?file_name=icons/microwave_oven" alt="مایکروویو" width="32" height="32" />
                     </div>
                 }
                 @if (Model.Amenities.KitchenHood)
@@ -242,7 +290,7 @@
                 @if (Model.Amenities.KitchenUtensils)
                 {
                     <div class="advertise-page__amenities-detail-item">
-                        <p>ظروف<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>  
+                        <p>ظروف<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
                         <i class="fas fa-utensils"></i>
                     </div>
                 }
@@ -270,15 +318,15 @@
                 @if (Model.Amenities.Foosball)
                 {
                     <div class="advertise-page__amenities-detail-item">
-                        <p>فوتبال دستی<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>    
+                        <p>فوتبال دستی<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
                         <img src="/file/resourceimagepng?file_name=icons/foosball" alt="فوتبال دستی" width="32" height="32" />
                     </div>
                 }
                 @if (Model.Amenities.Golf)
                 {
                     <div class="advertise-page__amenities-detail-item">
-                            <span>گلف <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></span>
-                            <i class="fa fa-golf-ball"></i>
+                        <p>گلف <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <i class="fa fa-golf-ball"></i>
                     </div>
                 }
             </div>
