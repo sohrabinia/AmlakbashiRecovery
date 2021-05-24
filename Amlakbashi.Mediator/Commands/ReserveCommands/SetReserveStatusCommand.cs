@@ -4,7 +4,7 @@ using static Amlakbashi.Core.Entities.Reserve;
 
 namespace Amlakbashi.Mediator.Commands.ReserveCommands
 {
-    public class SetReserveStatusCommand : IRequest
+    public class SetReserveStatusCommand : IRequest<bool>
     {
         public long reserveId { get; set; }
         public bool sendSms { get; set; }

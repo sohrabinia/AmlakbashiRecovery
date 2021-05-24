@@ -96,6 +96,16 @@ namespace Amlakbashi.Host.Controllers
                     TempData["userIsImpersonated"] = true;
                     return Redirect("/errors/accessdenied");
                 }
+                
+                AuthenticationProperties prop = new AuthenticationProperties();
+                prop.ExpiresUtc = expireTime;
+                prop.IssuedUtc = expireTime;
+                prop.IsPersistent = true;
+
+                //signInManager.SignOutAsync().Wait();
+                userService.SignOut();
+                signInManager.SignInAsync(identityUser, prop).Wait();
+
                 HttpContext.Response.Cookies.Append(
                     ImpersonateData.ImpersonateCookieName,
                     ImpersonateData.ImpersonateCookieValue,
@@ -107,13 +117,6 @@ namespace Amlakbashi.Host.Controllers
                         Secure = true
                     }
                 );
-                AuthenticationProperties prop = new AuthenticationProperties();
-                prop.ExpiresUtc = expireTime;
-                prop.IssuedUtc = expireTime;
-                prop.IsPersistent = true;
-
-                signInManager.SignOutAsync().Wait();
-                signInManager.SignInAsync(identityUser, prop).Wait();
 
                 logger.Info("Impersonation: " + admin.FullName + " (id:" + admin.Id + ") impersonate to " +
                     user.FullName + " (id:" + user.Id + ")");
@@ -152,7 +155,8 @@ namespace Amlakbashi.Host.Controllers
                 userService.RemoveClaimsFromUser(User.Identity.Name, claims);
                 HttpContext.Response.Cookies.Delete(ImpersonateData.ImpersonateCookieName);
 
-                signInManager.SignOutAsync().Wait();
+                //signInManager.SignOutAsync().Wait();
+                userService.SignOut();
                 signInManager.SignInAsync(admin, true).Wait();
                 HttpContext.Session.Clear();
 
@@ -626,7 +630,8 @@ namespace Amlakbashi.Host.Controllers
                 if (result.Succeeded)
                 {
                     var user = userService.GetIdentityUser(User.Identity.Name);
-                    signInManager.SignOutAsync().Wait();
+                    //signInManager.SignOutAsync().Wait();
+                    userService.SignOut();
                     signInManager.SignInAsync(user, true).Wait();
                     TempData["suc"] = "تغییر رمز عبور با موفقیت انجام شد";
                     return Redirect("/post/profilemanager?userid=" + userAccessor.CurrentUser.Id);
@@ -1238,14 +1243,16 @@ namespace Amlakbashi.Host.Controllers
 
         public ActionResult Signout()
         {
-            signInManager.SignOutAsync();
+            //signInManager.SignOutAsync();
+            userService.SignOut();
             HttpContext.Session.Clear();
             return Redirect("/");
         }
 
         public ActionResult LogOff()
         {
-            signInManager.SignOutAsync();
+            //signInManager.SignOutAsync();
+            userService.SignOut();
             HttpContext.Session.Clear();
             return Redirect("/");
         }
@@ -1529,22 +1536,22 @@ namespace Amlakbashi.Host.Controllers
                 });
         }
 
-        public JsonResult LogoutAjax()
-        {
-            try
-            {
-                //HttpContext.Session.SetString("mobile", null);
-                //FormsAuthentication.SignOut();
-                HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                HttpContext.Session.Clear();
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
+        //public JsonResult LogoutAjax()
+        //{
+        //    try
+        //    {
+        //        //HttpContext.Session.SetString("mobile", null);
+        //        //FormsAuthentication.SignOut();
+        //        HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        //        HttpContext.Session.Clear();
+        //        return GenerateJsonResult(new { status = 1 });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("", exc);
+        //        return GenerateJsonResult(new { status = 0 });
+        //    }
+        //}
 
         [Authorize]
         public JsonResult UpdateUserNotificationToken(string token)
@@ -1753,6 +1760,69 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد"
+                });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ChangeDesc(int userId)
+        {
+            try
+            {
+                var user = userService.Find(userId);
+                if (user != null)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 1,
+                        desc = string.IsNullOrEmpty(user.Address) ? "" : user.Address
+                    });
+                }
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "این شناسه کاربری موجود نمی باشد"
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.GetUserDescription", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد"
+                });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ChangeDesc(int userId, string desc)
+        {
+            try
+            {
+                var user = userService.Find(userId);
+                if (user != null)
+                {
+                    userService.UpdateDesc(userId, desc);
+                    return GenerateJsonResult(new
+                    {
+                        status = 1,
+                        msg = "توضیحات کاربر با موفقیت ویرایش شد"
+                    });
+                }
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "این شناسه کاربری موجود نمی باشد"
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.GetUserDescription", exc);
                 return GenerateJsonResult(new
                 {
                     status = 0,

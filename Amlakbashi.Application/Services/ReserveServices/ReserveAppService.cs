@@ -690,17 +690,17 @@ namespace Amlakbashi.Application.Services.ReserveServices
         }
 
         public void SetStatus(long reserveId, ReserveStatus status, bool sendSms,
-            ActionLog.ActionSourceEnum actionSource, int doerUserId)
+            ActionLog.ActionSourceEnum actionSource, int doerUserId, bool force = false)
         {
             mediator.Send(new SetReserveStatusCommand(reserveId, status, sendSms,
-                actionSource, doerUserId, actionSource == ActionSourceEnum.AdminPanel));
+                actionSource, doerUserId, force));
         }
 
         public bool SetHostResponse(long reserveId, HostResponseEnum response,
-            bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId)
+            bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId, bool force = false)
         {
             return mediator.Send(new SetHostResponseCommand(reserveId,
-                response, sendSms, actionSource, doerUserId)).Result;
+                response, sendSms, actionSource, doerUserId, force)).Result;
         }
 
         public bool CashPay(long reserveId, out string msg,
@@ -954,80 +954,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return reserves.OrderBy(x => x.InitialPriority)
                     .ThenBy(x => x.Priority)
                     .ThenByDescending(x => x.Id).ToList();
-        }
-
-        //TODO: temp
-        public void SetHangfireSchedules_GuestCall()
-        {
-            var nowDate = DateTime.Now;
-            //var date = new DateTime(nowDate.Year, nowDate.Month, nowDate.Day - 1, 22, 51, 0);
-            var date = new DateTime(nowDate.Year, nowDate.Month, nowDate.Day, 8, 0, 0);
-            var callTime = new DateTime(nowDate.Year, nowDate.Month, nowDate.Day, nowDate.Hour, nowDate.Minute, nowDate.Second);
-            var reserves = Repository.Query(q => q.Where(w => w.Status == ReserveStatus.WaitForReserve && w.HostResponseDate > date).ToList());
-
-            foreach (var item in reserves)
-            {
-                var delay = new TimeSpan(0, 8, 0);
-                delay = DateTimeUtility.DelayAvoidingNightTime(delay);
-                mediator.Schedule(new SendPayReserveCallCommand(item.Id), delay);
-            }
-        }
-
-        //TODO: temp
-        public void SetHangfireSchedules_HostCall()
-        {
-            var nowDate = DateTime.Now;
-            //var date = new DateTime(nowDate.Year, nowDate.Month, nowDate.Day - 1, 22, 51, 0);
-            var date = new DateTime(nowDate.Year, nowDate.Month, nowDate.Day, 8, 0, 0);
-            var callTime = new DateTime(nowDate.Year, nowDate.Month, nowDate.Day, nowDate.Hour, nowDate.Minute, nowDate.Second);
-            var reserves = Repository.Query(q => q.Where(w => w.Status == ReserveStatus.WaitForResponse && w.CreateDate > date).ToList());
-
-            foreach (var item in reserves)
-            {
-                var delay = new TimeSpan(0, 8, 0);
-                delay = DateTimeUtility.DelayAvoidingNightTime(delay);
-                callTime = DateTime.Now + delay;
-                if (callTime.Hour < 8)
-                    callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 8, 0, 0);
-                delay = callTime - DateTime.Now;
-                mediator.Schedule(new SendReserveRequestCallCommand(item.Id), delay);
-            }
-        }
-
-        //TODO: temp
-        public void SetHangfireSchedules_ReservedState()
-        {
-            var reserves = Repository.Query(q => q.Where(w => (w.Status == ReserveStatus.Reserved || w.Status == ReserveStatus.CashPay) && w.EndDate >= DateTime.Now).ToList());
-            foreach (var item in reserves)
-            {
-                var finishDelay = new DateTime(item.EndDate.Year, item.EndDate.Month, item.EndDate.Day, 12, 0, 0) - DateTime.Now;
-
-                mediator.Schedule(new SetReserveStatusCommand(item.Id,
-                    ReserveStatus.Completed, true, ActionSourceEnum.Background, 0), finishDelay);
-                mediator.Schedule(new FinishStayMessageCommand(item.Id), finishDelay);
-
-                var beforeStart = new DateTime(item.StartDate.Year, item.StartDate.Month, item.StartDate.Day, 12, 0, 0) - DateTime.Now;
-                if (beforeStart.TotalMilliseconds > 0)
-                {
-                    var onStart = beforeStart.Add(new TimeSpan(2, 0, 0));
-                    mediator.Schedule(new SetReserveStatusCommand(item.Id,
-                        ReserveStatus.Started, true, ActionSourceEnum.Background, 0), onStart);
-                }
-            }
-        }
-
-        //TODO: temp
-        public void SetHangfireSchedules_StartedState()
-        {
-            var reserves = Repository.Query(q => q.Where(w => w.Status == ReserveStatus.Started && w.EndDate >= DateTime.Now).ToList());
-            foreach (var item in reserves)
-            {
-                var finishDelay = new DateTime(item.EndDate.Year, item.EndDate.Month, item.EndDate.Day, 12, 0, 0) - DateTime.Now;
-
-                mediator.Schedule(new SetReserveStatusCommand(item.Id,
-                    ReserveStatus.Completed, true, ActionSourceEnum.Background, 0), finishDelay);
-                mediator.Schedule(new FinishStayMessageCommand(item.Id), finishDelay);
-            }
         }
 
         public Reserve GetReserveIncludingSupport(long id)

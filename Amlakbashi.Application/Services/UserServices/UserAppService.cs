@@ -36,6 +36,7 @@ namespace Amlakbashi.Application.Services.UserServices
         private readonly UserManager<AppUser> userManager;
         private readonly IPasswordValidator<AppUser> passwordValidator;
         private readonly RoleManager<AppRole> roleManager;
+        private readonly SignInManager<AppUser> signInManager;
         private readonly ILog logger;
         public UserAppService(IRepository<User, int> repository, ICacheManager<User> cache,
             IUserContactFacade userContact,
@@ -43,6 +44,7 @@ namespace Amlakbashi.Application.Services.UserServices
             UserManager<AppUser> userManager,
             IPasswordValidator<AppUser> passwordValidator,
             RoleManager<AppRole> roleManager,
+            SignInManager<AppUser> signInManager,
             ILog logger) : base(repository, cache)
         {
             this.mediator = mediator;
@@ -50,6 +52,7 @@ namespace Amlakbashi.Application.Services.UserServices
             this.userManager = userManager;
             this.passwordValidator = passwordValidator;
             this.roleManager = roleManager;
+            this.signInManager = signInManager;
             this.logger = logger;
         }
 
@@ -427,6 +430,14 @@ namespace Amlakbashi.Application.Services.UserServices
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
             user.FName = newFName;
             user.LName = newLName;
+            Repository.Update(user);
+            Repository.Save();
+        }
+
+        public void UpdateDesc(int userId, string desc)
+        {
+            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
+            user.Address = desc;
             Repository.Update(user);
             Repository.Save();
         }
@@ -964,6 +975,12 @@ namespace Amlakbashi.Application.Services.UserServices
             var roles = userManager.GetRolesAsync(identityUser).Result;
             var allowPolicy = PolicyData.AllPolicies[policy].ToList().Intersect(roles).Any();
             return allowPolicy;
+        }
+
+        public void SignOut()
+        {
+            signInManager.SignOutAsync().Wait();
+            mediator.Send(new DeleteImpersonationCookiesCommand());
         }
     }
 }

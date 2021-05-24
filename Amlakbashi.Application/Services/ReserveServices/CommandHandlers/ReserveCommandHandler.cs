@@ -28,7 +28,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         IRequestHandler<HostCanceledForReservedMessageCommand>,
         IRequestHandler<FinishStayMessageCommand>,
         IRequestHandler<SystemCancelReserveCommand, bool>,
-        IRequestHandler<SetReserveStatusCommand>,
+        IRequestHandler<SetReserveStatusCommand, bool>,
         IRequestHandler<RejectRequestsInTimeCommand>,
         IRequestHandler<RejectGuestRequestsInTimeCommand>,
         IRequestHandler<SetHostResponseCommand, bool>,
@@ -143,8 +143,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             return Task.FromResult(Unit.Value);
         }
 
-        public Task<Unit> Handle(SetReserveStatusCommand request, CancellationToken cancellationToken)
+        public Task<bool> Handle(SetReserveStatusCommand request, CancellationToken cancellationToken)
         {
+            bool done = false;
             try
             {
                 if (request.status == ReserveStatus.Started ||
@@ -152,17 +153,17 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                 {
                     if (request.force == false && accounting.IsReservePaidCompletely(request.reserveId) == false)
                     {
-                        return Task.FromResult(Unit.Value);
+                        return Task.FromResult(false);
                     }
                 }
-                reserveState.UseReserve(request.reserveId).SetStatus(request.status,
+                done = reserveState.UseReserve(request.reserveId).SetStatus(request.status,
                     request.sendSms, request.actionSource, request.doerUserId, request.force);
             }
             catch(Exception exc)
             {
                 logger.Error("ReserveCommandHandler.SetReserveStatusCommand", exc);
             }
-            return Task.FromResult(Unit.Value);
+            return Task.FromResult(done);
         }
 
         public Task<bool> Handle(SetHostResponseCommand request, CancellationToken cancellationToken)
@@ -180,14 +181,14 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                 case HostResponseEnum.Accepted:
                     mediator.Send(new SetReserveStatusCommand(request.reserveId,
                         ReserveStatus.WaitForReserve, request.sendSms,
-                        request.actionSource, request.doerUserId, true));
+                        request.actionSource, request.doerUserId, request.force));
                     break;
                 case HostResponseEnum.RejectedPrice:
                 case HostResponseEnum.RejectedHomeFull:
                 case HostResponseEnum.Rejected:
                     mediator.Send(new SetReserveStatusCommand(request.reserveId,
                         ReserveStatus.Rejected, request.sendSms,
-                        request.actionSource, request.doerUserId, true));
+                        request.actionSource, request.doerUserId, request.force));
                     break;
             }
 
@@ -227,7 +228,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             {
                 if (DateTimeUtility.DateRangesHaveOverlap(request.startDate, request.endDate, item.StartDate, item.EndDate))
                 {
-                    mediator.Send(new SetHostResponseCommand(item.Id, HostResponseEnum.Rejected, request.sendSms, request.actionSource, request.doerUserId));
+                    mediator.Send(new SetHostResponseCommand(item.Id, HostResponseEnum.Rejected, request.sendSms, request.actionSource, request.doerUserId, false));
                 }
             }
             return Task.FromResult(Unit.Value);

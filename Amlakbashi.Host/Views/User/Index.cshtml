@@ -60,15 +60,15 @@
                     </select>
                 </td>
                 @*<td class="label">وضعیت کاربر :</td>
-                <td class="minw">
-                    <select name="status">
-                        <option value="-1" is-selected="@((int)data.Status == -1)">همه وضعیت ها</option>
-                        <option value="@((int)Entities.User.UserState.Acticved)" is-selected="@((int)data.Status == (int)Entities.User.UserState.Acticved)">@Entities.User.GetStateTitle((int)Entities.User.UserState.Acticved)</option>
-                        <option value="@((int)Entities.User.UserState.InActived)" is-selected="@((int)data.Status == (int)Entities.User.UserState.InActived)">@Entities.User.GetStateTitle((int)Entities.User.UserState.InActived)</option>
-                        <option value="@((int)Entities.User.UserState.Suspend)" is-selected="@((int)data.Status == (int)Entities.User.UserState.Suspend)">@Entities.User.GetStateTitle((int)Entities.User.UserState.Suspend)</option>
-                        <option value="@((int)Entities.User.UserState.ReserveBanned)" is-selected="@((int)data.Status == (int)Entities.User.UserState.ReserveBanned)">@Entities.User.GetStateTitle((int)Entities.User.UserState.ReserveBanned)</option>
-                    </select>
-                </td>*@
+                    <td class="minw">
+                        <select name="status">
+                            <option value="-1" is-selected="@((int)data.Status == -1)">همه وضعیت ها</option>
+                            <option value="@((int)Entities.User.UserState.Acticved)" is-selected="@((int)data.Status == (int)Entities.User.UserState.Acticved)">@Entities.User.GetStateTitle((int)Entities.User.UserState.Acticved)</option>
+                            <option value="@((int)Entities.User.UserState.InActived)" is-selected="@((int)data.Status == (int)Entities.User.UserState.InActived)">@Entities.User.GetStateTitle((int)Entities.User.UserState.InActived)</option>
+                            <option value="@((int)Entities.User.UserState.Suspend)" is-selected="@((int)data.Status == (int)Entities.User.UserState.Suspend)">@Entities.User.GetStateTitle((int)Entities.User.UserState.Suspend)</option>
+                            <option value="@((int)Entities.User.UserState.ReserveBanned)" is-selected="@((int)data.Status == (int)Entities.User.UserState.ReserveBanned)">@Entities.User.GetStateTitle((int)Entities.User.UserState.ReserveBanned)</option>
+                        </select>
+                    </td>*@
             </tr>
             <tr>
                 <td class="label">تعداد آگهی :</td>
@@ -127,18 +127,18 @@
             </tr>
             <tr>
                 @*<td class="label">وضعیت دسترسی :</td>
-                <td class="minw">
-                    <select name="access_type">
-                        <option value="-1" is-selected="@((int)data.AccessType == -1)">همه وضعیت ها</option>
-                        @{
-                            var all_access_type_states = (User.AccessTypeEnum[])Enum.GetValues(typeof(User.AccessTypeEnum));
-                            foreach (var state in all_access_type_states)
-                            {
-                                <option value="@((int)state)" is-selected="@((User.AccessTypeEnum)data.AccessType == state)">@Entities.User.GetAccessTypeString(state)</option>
+                    <td class="minw">
+                        <select name="access_type">
+                            <option value="-1" is-selected="@((int)data.AccessType == -1)">همه وضعیت ها</option>
+                            @{
+                                var all_access_type_states = (User.AccessTypeEnum[])Enum.GetValues(typeof(User.AccessTypeEnum));
+                                foreach (var state in all_access_type_states)
+                                {
+                                    <option value="@((int)state)" is-selected="@((User.AccessTypeEnum)data.AccessType == state)">@Entities.User.GetAccessTypeString(state)</option>
+                                }
                             }
-                        }
-                    </select>
-                </td>*@
+                        </select>
+                    </td>*@
                 <td class="label">مرتب سازی :</td>
                 <td class="minw">
                     <select name="sort_order">
@@ -238,7 +238,7 @@
                     <th>شماره شبا</th>
                 }
                 @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ||
-                   data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
+               data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
                 {
                     <th>
                         رزرو آنی
@@ -332,6 +332,7 @@
                                 <i style="color:#242424" class="fa fa-book"></i>
                             </a>
                             <a asp-controller="role" asp-action="edituserrole" asp-route-userId="@item.User.Id" class="fa fa-id-card" title="مدیریت رول ها" style="color:#242424;"></a>
+                            <i onclick="getUserDesc(@item.User.Id)" class="fa fa-question-circle"></i>
                         </td>
                     }
                     else
@@ -351,6 +352,7 @@
                                 <i style="color:#242424" class="fa fa-book"></i>
                             </a>
                             <a asp-controller="role" asp-action="edituserrole" asp-route-userId="@item.User.Id" class="fa fa-id-card" title="مدیریت رول ها" style="color:#242424;"></a>
+                            <i onclick="getUserDesc(@item.User.Id)" class="fa fa-question-circle"></i>
                         </td>
                     }
                 </tr>
@@ -537,6 +539,56 @@
                 + '<div onclick="increaseCredit(' + id + ')" style="background-color:#34A853;color:white;border-radius:5px;padding:20px;cursor:pointer;margin: 20px;">واریز به کیف پول</div>'
                 + '<div onclick="decreaseCredit(' + id + ')" style="background-color:#EA4335;color:white;border-radius:5px;padding:20px;cursor:pointer;margin: 20px;">برداشت از کیف پول</div>'
                 + '</div>');
+        }
+
+        function getUserDesc(id) {
+            myajax("user/changedesc", "userId=" + id, function (ret) {
+                if (ret.status == 1) {
+                    showInfoMessage(
+                        'توضیحات کاربر', '<input type="hidden" id="userIdInput" value="' + id + '" />' +
+                        '<textarea id="userDescInput">' + ret.desc + '</textarea>', {
+                        buttons: [{
+                            title: 'بستن',
+                            color: 'white',
+                            bgColor: '#EA4335'
+                        },
+                        {
+                            title: 'ثبت تغییرات',
+                            color: 'white',
+                            bgColor: '#34A853',
+                            onclick: submitUserDesc
+                        }], autoClose: false
+                    });
+                }
+                else if (ret.status == 0) {
+                    alertify.error(ret.msg);
+                }
+            });
+        }
+
+        function submitUserDesc() {
+            debugger;
+            var userId = $("#userIdInput").val();
+            var desc = $("#userDescInput").val();
+            $.ajax({
+                url: "/user/changedesc",
+                type: "post",
+                data: {
+                    userId: userId,
+                    desc: desc
+                },
+                success: function (ret) {
+                    if (ret.status == 1) {
+                        alertify.success(ret.msg);
+                    }
+                    else {
+                        alertify.error(ret.msg);
+                    }
+                },
+                error: function (ret) {
+                    alertify.error(ret.msg);
+                }
+            });
         }
 
         function increaseCredit($id) {

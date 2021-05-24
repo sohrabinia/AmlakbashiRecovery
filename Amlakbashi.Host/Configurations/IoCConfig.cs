@@ -7,6 +7,7 @@ using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.PriceHelpers;
 using Amlakbashi.Core.Infrastructure.PriceHelpers.Interfaces;
 using Amlakbashi.Host.Authentication;
+using Amlakbashi.Host.Handlers;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Amlakbashi.Host.Hubs.Dashboard.HubServers;
 using Amlakbashi.Host.Hubs.HubEventHandlers;
@@ -47,6 +48,7 @@ namespace Amlakbashi.Host.Configurations
             builder.RegisterType<MediatorHangfireBridge>()
                 .As<IMediatorHangfireBridge>();
 
+            builder.RegisterType<HostCommandHandler>().AsImplementedInterfaces().InstancePerDependency();
             builder.RegisterType<ReserveHubEventHandlers>().AsImplementedInterfaces().InstancePerDependency();
 
             // hub servers registration

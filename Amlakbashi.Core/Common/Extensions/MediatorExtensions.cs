@@ -18,6 +18,11 @@ namespace Amlakbashi.Core.Common.Extensions
             BackgroundJob.Schedule<IMediatorHangfireBridge>(bridge => bridge.Send(request), delay);
         }
 
+        public static void Schedule<T>(this IMediator mediator, IRequest<T> request, TimeSpan delay)
+        {
+            BackgroundJob.Schedule<IMediatorHangfireBridge>(bridge => bridge.Send(request), delay);
+        }
+
         public static void AddOrUpdate(this IMediator mediator, string jobId, IRequest request, string time)
         {
             RecurringJob.AddOrUpdate<IMediatorHangfireBridge>(jobId, bridge => bridge.Send(request), time, TimeZoneInfo.Local);

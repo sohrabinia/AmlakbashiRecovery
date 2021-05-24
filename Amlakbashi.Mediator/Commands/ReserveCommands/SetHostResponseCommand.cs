@@ -11,15 +11,17 @@ namespace Amlakbashi.Mediator.Commands.AdvertiseCommands
         public bool sendSms { get; set; }
         public ActionSourceEnum actionSource { get; set; }
         public int doerUserId { get; set; }
+        public bool force { get; set; }
 
         public SetHostResponseCommand(long reserveId, HostResponseEnum hostResponse,
-            bool sendSms, ActionSourceEnum actionSource, int doerUserId)
+            bool sendSms, ActionSourceEnum actionSource, int doerUserId, bool force)
         {
             this.reserveId = reserveId;
             this.hostResponse = hostResponse;
             this.sendSms = sendSms;
             this.actionSource = actionSource;
             this.doerUserId = doerUserId;
+            this.force = force;
         }
     }
 }
