@@ -982,7 +982,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     mediator.Send(new GenerateThumbImageCommand(data.Id, acc.PhotoID,
                             acc.Photos.Select(s => s.Id).ToList(), rootPath));
                 }
-                mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id));
+                mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id, true));
             }
 
             if (type == DirectorType.Extra || type == DirectorType.ComplexUnit ||
@@ -1360,6 +1360,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (part.Validate(out errors, out msg) == false)
                 return false;
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedData.id));
+            var previousPoolFeature = acc.PoolFeatures;//TODO : this is temporary to ignore updating pool feature since this property is not implemented in android and ios application
             var shallowAcc = acc.ShallowCopy();
             PropertyCopier<AmenitiesPart, Advertise>.Copy(part, acc);
             acc.LastModifyDate = DateTime.Now;
@@ -1370,6 +1371,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 acc.Status = AdvertiseStatus.ReadyToPublish;
             }
+            acc.PoolFeatures = previousPoolFeature;//TODO: this is temporary to ignore updating pool feature since this property is not implemented in android and ios application
             Repository.Update(acc);
             Repository.Save();
             if (hasImportantChange)

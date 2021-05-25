@@ -30,6 +30,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
         public bool? Sauna { get; set; }
         public bool? Jacuzzi { get; set; }
         public bool? Pool { get; set; }
+        public PoolFeaturesEnum PoolFeatures { get; set; }
 
         public bool Validate(out Dictionary<string, string> errors, out string msg)
         {

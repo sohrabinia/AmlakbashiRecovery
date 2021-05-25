@@ -1,16 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Amlakbashi.Core;
+using Amlakbashi.Core.Common.Repository;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-namespace Amlakbashi.Core.Common.Repository
+namespace Amlakbashi.Data
 {
     public class GenericRepository<T, K> : IRepository<T, K> where T : Entity<K>
     {
-        private IDbContext _context = null;
+        private AmlakbashiDB _context = null;
         private DbSet<T> dbSet = null;
 
-        public GenericRepository(IDbContext _context)
+        public GenericRepository(AmlakbashiDB _context)
         {
             this._context = _context;
             dbSet = _context.Set<T>();

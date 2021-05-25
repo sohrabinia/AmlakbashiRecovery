@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class UserFavoriteRepository : GenericRepository<UserFavorite, int>
     {
-        public UserFavoriteRepository(IDbContext _context): base(_context)
+        public UserFavoriteRepository(AmlakbashiDB _context): base(_context)
         {
 
         }

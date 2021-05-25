@@ -23,7 +23,7 @@
     }
     @if (Model.BuildingSize.Metrazh != 0)
     {
-<p class="advertise-page__basic-property-item"><i class="fa fa-building"></i>بنا : @Model.BuildingSize.Metrazh متر</p>
+        <p class="advertise-page__basic-property-item"><i class="fa fa-building"></i>بنا : @Model.BuildingSize.Metrazh متر</p>
     }
     @if (Model.LandArea.LandArea != 0)
     {
@@ -71,26 +71,22 @@
     }
     @if (Model.Floor.Floor != Advertise.FloorItems.Unset)
     {
-<p class="advertise-page__basic-property-item">
-    @switch (Model.Floor.Floor)
-    {
-        case Advertise.FloorItems.Underground:
-            <i class="fa fa-building"></i>@("طبقه: زیرزمین")
-            break;
-        case Advertise.FloorItems.Ground:
-            <i class="fa fa-building"></i>@("طبقه: همکف")
-            break;
-        case Advertise.FloorItems.MoreThan10th:
-            <i class="fa fa-building"></i>@("طبقه: بالاتر از 10")
-            break;
-        default:
-            <i class="fa fa-building"></i>@("طبقه:") @((int)Model.Floor.Floor)
-            break;
-    }
-</p>
-    }
-    @if (Model.Amenities.Pool != false)
-    {
-        <p class="advertise-page__basic-property-item"><i class="fa fa-swimming-pool"></i>استخر </p>
+        <p class="advertise-page__basic-property-item">
+            @switch (Model.Floor.Floor)
+            {
+                case Advertise.FloorItems.Underground:
+                    <i class="fa fa-building"></i>@("طبقه: زیرزمین")
+                    break;
+                case Advertise.FloorItems.Ground:
+                    <i class="fa fa-building"></i>@("طبقه: همکف")
+                    break;
+                case Advertise.FloorItems.MoreThan10th:
+                    <i class="fa fa-building"></i>@("طبقه: بالاتر از 10")
+                    break;
+                default:
+                    <i class="fa fa-building"></i>@("طبقه:") @((int)Model.Floor.Floor)
+                    break;
+            }
+        </p>
     }
 </div>

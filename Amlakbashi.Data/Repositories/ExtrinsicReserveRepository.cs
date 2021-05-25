@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class ExtrinsicReserveRepository : GenericRepository<ExtrinsicReserve, long>
     {
-        public ExtrinsicReserveRepository(IDbContext _context) : base(_context)
+        public ExtrinsicReserveRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class UserRepository: GenericRepository<User, int>
     {
-        public UserRepository(IDbContext _context): base(_context)
+        public UserRepository(AmlakbashiDB _context): base(_context)
         {
             
         }

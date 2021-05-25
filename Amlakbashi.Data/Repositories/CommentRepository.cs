@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class CommentRepository : GenericRepository<Comment, long>
     {
-        public CommentRepository(IDbContext _context) : base(_context)
+        public CommentRepository(AmlakbashiDB _context) : base(_context)
         {
 
         }

@@ -5,7 +5,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class BankCardRepository : GenericRepository<BankCard, int>
     {
-        public BankCardRepository(IDbContext _context) : base(_context)
+        public BankCardRepository(AmlakbashiDB _context) : base(_context)
         {
 
         }

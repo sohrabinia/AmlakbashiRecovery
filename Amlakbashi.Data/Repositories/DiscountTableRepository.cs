@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class DiscountTableRepository : GenericRepository<DiscountTable, int>
     {
-        public DiscountTableRepository(IDbContext _context) : base(_context)
+        public DiscountTableRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

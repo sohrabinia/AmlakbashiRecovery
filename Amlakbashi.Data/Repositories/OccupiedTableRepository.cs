@@ -5,7 +5,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class OccupiedTableRepository : GenericRepository<OccupiedTable, long>
     {
-        public OccupiedTableRepository(IDbContext _context) : base(_context)
+        public OccupiedTableRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

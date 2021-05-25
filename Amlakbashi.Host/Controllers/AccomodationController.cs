@@ -30,6 +30,7 @@ using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
+using Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -301,7 +302,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
-        public ActionResult AdminExtraForm(Advertise data, bool forceSave = false, int tab = 0)
+        public ActionResult AdminExtraForm(Advertise data, PoolInputDTO poolDTO, bool forceSave = false, int tab = 0)
         {
             try
             {
@@ -309,6 +310,14 @@ namespace Amlakbashi.Host.Controllers
                 List<string> groupErrors = new List<string>();
                 AdvertiseType parentType;
                 AdvertiseStatus status;
+                if (data.Pool == true)
+                {
+                    data.PoolFeatures = poolDTO.ConvertToEnum();
+                }
+                else
+                {
+                    data.PoolFeatures = PoolFeaturesEnum.None;
+                }
                 var director = advertiseService.SubmitAdminForm(data, out errors, out groupErrors, forceSave,
                     DirectorType.Extra, userAccessor.CurrentUser.Id, out parentType, out status);
                 if (forceSave == false && groupErrors.Any())
@@ -429,7 +438,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
-        public ActionResult AdminComplexForm(Advertise data, bool forceSave = false, int tab = 0)
+        public ActionResult AdminComplexForm(Advertise data, PoolInputDTO poolDTO, bool forceSave = false, int tab = 0)
         {
             try
             {
@@ -441,6 +450,14 @@ namespace Amlakbashi.Host.Controllers
                 List<string> groupErrors;
                 AdvertiseType parentType;
                 AdvertiseStatus status;
+                if (data.Pool == true)
+                {
+                    data.PoolFeatures = poolDTO.ConvertToEnum();
+                }
+                else
+                {
+                    data.PoolFeatures = PoolFeaturesEnum.None;
+                }
                 var childs = advertiseService.GetAccChilds((long)data.ParentId);
                 var director = advertiseService.SubmitAdminForm(data, out errors, out groupErrors, forceSave,
                     DirectorType.ComplexUnit, userAccessor.CurrentUser.Id, out parentType, out status, webHostEnvironment.WebRootPath);
@@ -933,13 +950,21 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult AccExtraForm(Advertise data, bool isEdit = false, int tab = 0)
+        public ActionResult AccExtraForm(Advertise data, PoolInputDTO poolDTO, bool isEdit = false, int tab = 0)
         {
             try
             {
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
                 int level;
+                if (data.Pool == true)
+                {
+                    data.PoolFeatures = poolDTO.ConvertToEnum();
+                }
+                else
+                {
+                    data.PoolFeatures = PoolFeaturesEnum.None;
+                }
                 var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors, out level, isEdit);
                 if (errors.Any())
                 {
@@ -1193,7 +1218,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult AccComplexForm(Advertise data, bool isEdit = false, bool saveAndNewRoom = false, int tab = -1)
+        public ActionResult AccComplexForm(Advertise data, PoolInputDTO poolDTO, bool isEdit = false, bool saveAndNewRoom = false, int tab = -1)
         {
             try
             {
@@ -1204,6 +1229,14 @@ namespace Amlakbashi.Host.Controllers
                 if (data.PhotoID < 1)
                 {
                     data.PhotoID = null;
+                }
+                if (data.Pool == true)
+                {
+                    data.PoolFeatures = poolDTO.ConvertToEnum();
+                }
+                else
+                {
+                    data.PoolFeatures = PoolFeaturesEnum.None;
                 }
                 Dictionary<string, string> errors;
                 List<string> groupErrors;

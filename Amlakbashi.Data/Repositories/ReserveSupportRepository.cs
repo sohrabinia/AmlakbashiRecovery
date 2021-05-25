@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class ReserveSupportRepository : GenericRepository<ReserveSupport, int>
     {
-        public ReserveSupportRepository(IDbContext _context) : base(_context)
+        public ReserveSupportRepository(AmlakbashiDB _context) : base(_context)
         {
 
         }

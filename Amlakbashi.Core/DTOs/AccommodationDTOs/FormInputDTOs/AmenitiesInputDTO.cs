@@ -32,6 +32,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
         public bool? Sauna { get; set; }
         public bool? Jacuzzi { get; set; }
         public bool? Pool { get; set; }
+        public PoolInputDTO PoolFeatures { get; set; }
         public List<DTOSelectItem> heatingSelectItems { get; set; }
         public List<DTOSelectItem> coolingSelectItems { get; set; }
         public List<DTOSelectItem> wcSelectItems { get; set; }
@@ -53,6 +54,11 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
                 dto = new AmenitiesInputDTO();
                 PropertyCopier<AmenitiesPart, AmenitiesInputDTO>.Copy(part, dto);
                 dto.SetCheckboxs();
+                dto.PoolFeatures = new PoolInputDTO();
+                if (part.Pool == true)
+                {
+                    dto.PoolFeatures.GenerateDTO(part.PoolFeatures);
+                }
             }
             return dto;
         }
@@ -61,7 +67,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
         {
             var booleanAmenities = new List<DTOCheckbox>() {
                 AccDTOHelper.GenerateAccCheckbox(Property.Bathroom, Bathroom),
-                AccDTOHelper.GenerateAccCheckbox(Property.Pool, Pool),
+                //AccDTOHelper.GenerateAccCheckbox(Property.Pool, Pool),
                 AccDTOHelper.GenerateAccCheckbox(Property.Sauna, Sauna),
                 AccDTOHelper.GenerateAccCheckbox(Property.Jacuzzi, Jacuzzi),
                 AccDTOHelper.GenerateAccCheckbox(Property.TV, TV),

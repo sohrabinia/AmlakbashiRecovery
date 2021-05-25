@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class ReserveAutoCancelRepository : GenericRepository<ReserveAutoCancel, long>
     {
-        public ReserveAutoCancelRepository(IDbContext _context) : base(_context)
+        public ReserveAutoCancelRepository(AmlakbashiDB _context) : base(_context)
         {
 
         }

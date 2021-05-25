@@ -39,6 +39,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             this.Room = this.Room == null ? new RoomDTO() : this.Room;
             this.TitleDesc = this.TitleDesc == null ? new TitleDescDTO() : this.TitleDesc;
             this.MetaTitleDesc = this.MetaTitleDesc == null ? new MetaTitleDescDTO() : this.MetaTitleDesc;
+            this.Pool = this.Pool == null ? new PoolDTO() : this.Pool;
         }
 
         public static implicit operator AccommodationItemDTO(AdvertiseDirector director)
@@ -184,6 +185,12 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             dto.HutChildren = hutChildren.Select(s => (AccommodationHutItemDTO)s).ToList();
             dto.HotelChildren = hotelChildren.Select(s => (AccommodationHotelItemDTO)s).ToList();
 
+            dto.Pool.Pool = advertise.Pool;
+            if (advertise.Pool == true)
+            {
+                dto.Pool.GenerateDTO(advertise.PoolFeatures);
+            }
+
             //DynamicCategory countryDirectionCat, provinceCat, cityCat, areaCat;
             //string countryDirectionName, provinceName, cityName, areaName;
             //advertise.GetRelatedCategories(out countryDirectionCat, out provinceCat,
@@ -283,6 +290,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
         public BuildingSizeDTO BuildingSize { get; set; }
         public CapacityDTO Capacity { get; set; }
         public ElevatorDTO Elevator { get; set; }
+        public PoolDTO Pool { get; set; }
         public FloorDTO Floor { get; set; }
         public HotelUnitSpecificDTO HotelUnitSpecific { get; set; }
         public LandAreaDTO LandArea { get; set; }

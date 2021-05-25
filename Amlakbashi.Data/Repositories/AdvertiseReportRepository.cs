@@ -5,7 +5,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class AdvertiseReportRepository : GenericRepository<AdvertiseReport, int>
     {
-        public AdvertiseReportRepository(IDbContext _context) : base(_context)
+        public AdvertiseReportRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

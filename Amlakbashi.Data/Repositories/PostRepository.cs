@@ -5,7 +5,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class PostRepository : GenericRepository<Post, long>
     {
-        public PostRepository(IDbContext _context) : base(_context)
+        public PostRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

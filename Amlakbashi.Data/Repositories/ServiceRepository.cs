@@ -5,7 +5,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class ServiceRepository : GenericRepository<Service, int>
     {
-        public ServiceRepository(IDbContext _context) : base(_context)
+        public ServiceRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

@@ -1,6 +1,6 @@
 ﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs.MetaTitleDescInputDTO
 
-@{ 
+@{
     var metaEnabled = ViewBag.status == Advertise.AdvertiseStatus.FirstReady ||
         ViewBag.status == Advertise.AdvertiseStatus.NotCompleted ? true : false;
 }
@@ -8,6 +8,11 @@
 @if (!metaEnabled)
 {
     <input type="hidden" name="Slug" value="@Model.Slug" />
+}
+
+@if (metaEnabled)
+{
+    <p class="static-advertise__extra-footer" style="font-size: 12px;"><i class="fa fa-info-circle" style="color: red;"></i> برای تولید اتوماتیک مقادیر فیلد های زیر، آن ها را خالی بگذارید.</p>
 }
 
 <div class="static-advertise__item acc-title-decs-input">
@@ -26,5 +31,5 @@
 
 <div class="static-advertise__item acc-title-decs-input">
     <p class="static-advertise__label">Url آگهی</p>
-    <input class="js-disable-error static-advertise__property changed-input-target static-advertise__Introduction-title static-advertise__it@(Model.mandatory ? "js-mandatory" : "") @(ViewData.ModelState.GetValidationState("Slug") == ModelValidationState.Invalid ? "input-validation-error" : "")" value="@Model.Slug" name="Slug" @(metaEnabled ? "" : "disabled")/>
+    <input class="js-disable-error static-advertise__property changed-input-target static-advertise__Introduction-title static-advertise__it@(Model.mandatory ? "js-mandatory" : "") @(ViewData.ModelState.GetValidationState("Slug") == ModelValidationState.Invalid ? "input-validation-error" : "")" value="@Model.Slug" name="Slug" @(metaEnabled ? "" : "disabled") />
 </div>
