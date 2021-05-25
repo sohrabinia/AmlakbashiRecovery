@@ -4,6 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// بلاگ داخلی وب سایت که قبلا به عنوان بلاگ استفاده می شده و
+    /// در حال حاضر بعضی از صفحات وب سایت از آن استفاده می کنند 
+    /// </summary>
     public class Post : Entity<long>, ISoftDelete
     {
         [Column("PostID")]

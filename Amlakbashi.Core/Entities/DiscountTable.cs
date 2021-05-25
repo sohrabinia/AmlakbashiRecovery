@@ -7,6 +7,9 @@ using Newtonsoft.Json;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// تخفیف هایی که میزبان ها برای آگهی های خود ثبت می کنند
+    /// </summary>
     public class DiscountTable : Entity<int>, ISoftDelete
     {
         [Column("DiscountTableID")]

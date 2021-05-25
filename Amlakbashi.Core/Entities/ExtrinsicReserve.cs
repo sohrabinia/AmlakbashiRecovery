@@ -6,6 +6,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// رزرو هایی که خارج از وب سایت انجام شده است و توسط میزبان در صفحه آگهی های من (تقویم) پر می شود
+    /// بعد از پر شدن آگهی در تقویم، رکوردی در این جدول ثبت می شود
+    ///
+    /// </summary>
     public class ExtrinsicReserve : Entity<long>, IReserve, ISoftDelete
     {
         public int NotifierUserID { get; set; }

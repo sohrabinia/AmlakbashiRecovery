@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// بن های تخفیف
+    /// تخفیف های درصدی از مبلغ رزرو حساب می شود
+    /// </summary>
     public class DiscountCoupon : Entity<long>
     {
         [Column("ID")]

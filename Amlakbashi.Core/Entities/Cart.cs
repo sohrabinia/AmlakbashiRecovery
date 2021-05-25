@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// قبلا به عنوان سبد خرید استفاده می شد.
+    /// در حال حاضر، به ازای هر پرداخت بانکی یک سبد خرید ساخته می شود. 
+    /// </summary>
     public class Cart : Entity<long>
     {
         [Column("CartID")]

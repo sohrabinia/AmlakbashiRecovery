@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// لغو اتوماتیک رزرو های آنی ثبت شده بعد از گذشت زمان مشخص شده
+    /// </summary>
     public class InstantReserveAutoCancel : Entity<long>
     {
         public override long Id { get; set; }

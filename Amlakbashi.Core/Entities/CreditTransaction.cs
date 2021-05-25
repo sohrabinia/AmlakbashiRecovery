@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// تراکنش های کیف پول
+    /// </summary>
     public class CreditTransaction : Entity<long>
     {
         [Column("CreditTransactionID")]

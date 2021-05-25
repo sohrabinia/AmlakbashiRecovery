@@ -10,6 +10,10 @@ namespace Amlakbashi.Core.Entities
 {
     public class AdvertiseReport : Entity<int>
     {
+        /// <summary>
+        /// برای ثبت گزارش تخلف در محتوای آگهی
+        /// فقط در اپلیکیشن استفاده شده است
+        /// </summary>
         public long AdvertiseID { get; set; }
         public ReportReason Reason { get; set; }
         public string ReasonString { get; set; }

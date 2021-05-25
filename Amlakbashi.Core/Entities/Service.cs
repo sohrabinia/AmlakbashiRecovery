@@ -4,6 +4,9 @@ using System;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// دسته بندی (سرویس خبری) پست ها
+    /// </summary>
     public class Service : Entity<int>, ISoftDelete
     {
         [Column("ServiceID")]

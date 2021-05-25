@@ -6,6 +6,10 @@ namespace Amlakbashi.Core.Entities
 {
     public class BlogPost : Entity<int>, ISoftDelete
     {
+        /// <summary>
+        /// برای ذخیره سازی عکس و آدرس اینترنتی پست های بلاگ برای نمایش در صفحه اصلی سایت
+        /// سه لینک پایین صفحه به وبلاگ
+        /// </summary>
         public int UserID { get; set; }
         public int LastModifyUserID { get; set; }
         public long PhotoID { get; set; }

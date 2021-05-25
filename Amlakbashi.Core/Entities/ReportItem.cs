@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// امتیاز ها و نظرسنجی آگهی
+    /// ستاره های نظرسنجی پایان رزرو
+    /// </summary>
     public class ReportItem : Entity<long>, ISoftDelete
     {
         [Column("ReportItemID")]

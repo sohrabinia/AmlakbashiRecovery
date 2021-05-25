@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// قیمت های مشخص شده هر آگهی در تاریخ های مختلف
+    /// </summary>
     public class PriceTable : Entity<int>, ISoftDelete
     {
         [Column("PriceTableID")]

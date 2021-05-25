@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// جدول چند به چند بین پست و سرویس
+    /// </summary>
     public class ServicePost : Entity<int>
     {
         [Column("ServicePostID")]

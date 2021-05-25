@@ -4,6 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// روز های پر آگهی ها
+    /// برای استعلام پربودن اقامتگاه استفاده می شود
+    /// بعد از پر شدن هر اقامتگاه به هر دلیل (رزرو یا تقویم)، اطلاعات این انتیتی بطور خودکار بروز رسانی می شود
+    /// </summary>
     public class OccupiedTable : Entity<long>, ISoftDelete
     {
         [Column("OccupiedTableID")]

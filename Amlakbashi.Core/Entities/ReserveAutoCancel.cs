@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// برای لغو رزرو توسط سیستم بعد از گذشت مهلت پرداخت استفاده می شود
+    /// </summary>
     public class ReserveAutoCancel : Entity<long>
     {
         public override long Id { get; set; }
