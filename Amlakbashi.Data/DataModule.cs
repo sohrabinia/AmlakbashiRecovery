@@ -11,7 +11,6 @@ namespace Amlakbashi.Data
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<AmlakbashiDB>()
-                .As<IDbContext>()
                 .InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(GenericRepository<,>))
                 .As(typeof(IRepository<,>))

@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class PrizeCreditTransactionRepository : GenericRepository<PriceTable, int>
     {
-        public PrizeCreditTransactionRepository(IDbContext _context) : base(_context)
+        public PrizeCreditTransactionRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

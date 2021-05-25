@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class ReserveSendSmsRepository : GenericRepository<ReserveSendSms, long>
     {
-        public ReserveSendSmsRepository(IDbContext _context) : base(_context)
+        public ReserveSendSmsRepository(AmlakbashiDB _context) : base(_context)
         {
 
         }

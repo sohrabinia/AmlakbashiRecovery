@@ -5,7 +5,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class RegionRepository : GenericRepository<Region, int>
     {
-        public RegionRepository(IDbContext _context) : base(_context)
+        public RegionRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

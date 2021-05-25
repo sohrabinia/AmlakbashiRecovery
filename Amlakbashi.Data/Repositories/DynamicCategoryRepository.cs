@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class DynamicCategoryRepository : GenericRepository<DynamicCategory, int>
     {
-        public DynamicCategoryRepository(IDbContext _context) : base(_context)
+        public DynamicCategoryRepository(AmlakbashiDB _context) : base(_context)
         {
 
         }

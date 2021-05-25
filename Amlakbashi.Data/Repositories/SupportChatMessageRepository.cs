@@ -5,7 +5,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class SupportChatMessageRepository : GenericRepository<SupportChatMessage, long>
     {
-        public SupportChatMessageRepository(IDbContext _context) : base(_context)
+        public SupportChatMessageRepository(AmlakbashiDB _context) : base(_context)
         {
 
         }

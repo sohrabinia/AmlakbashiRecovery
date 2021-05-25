@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class CartRepository : GenericRepository<Cart, long>
     {
-        public CartRepository(IDbContext _context) : base(_context)
+        public CartRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

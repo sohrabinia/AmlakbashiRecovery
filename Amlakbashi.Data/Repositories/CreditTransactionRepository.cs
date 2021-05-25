@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class CreditTransactionRepository : GenericRepository<CreditTransaction, long>
     {
-        public CreditTransactionRepository(IDbContext _context) : base(_context)
+        public CreditTransactionRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class SettingRepository : GenericRepository<Setting, int>
     {
-        public SettingRepository(IDbContext _context) : base(_context)
+        public SettingRepository(AmlakbashiDB _context) : base(_context)
         {
         }
     }

@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class ReportItemRepository : GenericRepository<ReportItem, long>
     {
-        public ReportItemRepository(IDbContext _context) : base(_context)
+        public ReportItemRepository(AmlakbashiDB _context) : base(_context)
         {
 
         }

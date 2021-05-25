@@ -10,7 +10,7 @@ namespace Amlakbashi.Data.Repositories
 {
     public class FileRepository : GenericRepository<File, long>
     {
-        public FileRepository(IDbContext _context) : base(_context)
+        public FileRepository(AmlakbashiDB _context) : base(_context)
         {
 
         }

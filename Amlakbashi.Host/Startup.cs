@@ -1,5 +1,6 @@
 using Amlakbashi.Application;
 using Amlakbashi.Core.Identity.Entities;
+using Amlakbashi.Data;
 using Amlakbashi.Data.Identity;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Configurations;
@@ -201,7 +202,8 @@ namespace Amlakbashi.Host
                 Credential = GoogleCredential.FromFile(env.ContentRootPath + "/amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json")
             });
 
-            DatabaseInitializer.SeedData(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
+            //DatabaseInitializer.SeedData(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
+            AmlakbashiDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
         }
     }
 }
