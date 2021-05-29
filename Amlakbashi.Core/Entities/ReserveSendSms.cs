@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// ارسال گروهی پیامک های رزرو ها در یک فاصله زمانی مشخص
+    /// </summary>
     public class ReserveSendSms : Entity<long>
     {
         public override long Id { get; set; }

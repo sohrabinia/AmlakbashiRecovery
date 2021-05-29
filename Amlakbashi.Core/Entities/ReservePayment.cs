@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// هر گونه پرداخت برای یک رزرو از طریق پرداخت بانکی یا کیف پول
+    /// </summary>
     public class ReservePayment : Entity<long>, ISoftDelete
     {
         [Column("ReservePaymentID")]

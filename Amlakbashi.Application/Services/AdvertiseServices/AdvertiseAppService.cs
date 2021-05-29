@@ -546,6 +546,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         break;
                 }
             }
+            acc.LastModifyDate = DateTime.Now;
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id));
@@ -624,6 +625,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     mediator.Publish(new ChangeAdvertiseActiveEvent(oldAcc, acc));
                 }
             }
+            acc.LastModifyDate = DateTime.Now;
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id));
@@ -668,6 +670,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     var child = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
                     var oldChild = child.ShallowCopy();
                     director.Submit(ref child);
+                    child.LastModifyDate = DateTime.Now;
                     Repository.Update(child);
                     if (parent.Status == AdvertiseStatus.NotCompleted || parent.Status == AdvertiseStatus.FirstReady)
                     {
@@ -789,6 +792,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         mediator.Send(new GenerateThumbImageCommand(child.Id, child.PhotoID,
                             child.Photos.Select(s => s.Id).ToList(), rootPath));
                     }
+                    child.LastModifyDate = DateTime.Now;
                     Repository.Update(child);
                     if (parent.Status == AdvertiseStatus.NotCompleted || parent.Status == AdvertiseStatus.FirstReady)
                     {

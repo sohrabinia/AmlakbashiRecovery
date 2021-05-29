@@ -2,6 +2,9 @@
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// یک سری داده های عمومی مربوط به وب سایت
+    /// </summary>
     public class  Setting : Entity<int>
     {
         [Column("SettingID")]

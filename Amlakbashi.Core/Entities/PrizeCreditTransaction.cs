@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// کیف هدیه که توسط کابر قابل برداشت نیست و تنها برای رزرو استفاده می شود
+    /// </summary>
     public class PrizeCreditTransaction : Entity<long>
     {
         [Column("ID")]

@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
+    /// <summary>
+    /// ذخیره اطلاعات مربوط به پشتیبانی یک رزرو
+    /// مثلا اینکه چه پشتیبانی چه رزروی رو داره پشتیبانی میکنه و زمان شروع پشتیبانی و ...
+    /// </summary>
     public class ReserveSupport : Entity<int>, ISoftDelete
     {
         [Column("ReserveSupportID")]
