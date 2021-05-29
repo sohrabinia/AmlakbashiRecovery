@@ -220,11 +220,10 @@ namespace Portal.Controllers
                 //}
                 var extension = Path.GetExtension(objFile.FilePath).Replace(".", "");
                 var strFormat = "image/" + (extension == "jpg" ? "jpeg" : extension);
-                return File(objFile.FilePath, strFormat);
-            }
-            catch(FileNotFoundException exc)
-            {
-                logger.Error("File.GetImage", exc);
+                if (System.IO.File.Exists(host.WebRootPath + "/" + objFile.FilePathWithoutTildeAndSlash))
+                {
+                    return File(objFile.FilePath, strFormat);
+                }
                 return File("/resource/img/img202_500_300.png", "image/png");
             }
             catch (Exception exc)
