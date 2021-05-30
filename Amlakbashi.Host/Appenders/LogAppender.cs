@@ -51,12 +51,12 @@ namespace Amlakbashi.Host.Appenders
                             loggingEvent.Level.Name + "] [" +
                             loggingEvent.LoggerName + "]\n";
 
-                        var logUrl = request != null ? "Url: " + request.Path + request.QueryString + "\n" : "";
+                        var logUrl = request != null ? "#Url: " + request.Path + request.QueryString + "\n" : "";
 
                         var logPostedData = "";
                         if (request != null && request.Method.ToLower() == "post")
                         {
-                            logPostedData = "Posted Data:\n";
+                            logPostedData = "#PostedData:\n";
                             foreach (var item in request.Form)
                             {
                                 logPostedData = logPostedData + item.Key + ": " + item.Value + "\n";
@@ -64,27 +64,27 @@ namespace Amlakbashi.Host.Appenders
                         }
 
                         var logLocation = loggingEvent.LocationInformation != null ?
-                            "Location: " + loggingEvent.LocationInformation.FullInfo + "\n" : "";
+                            "#Location: " + loggingEvent.LocationInformation.FullInfo + "\n" : "";
 
-                        var logMessage = "Message: " + loggingEvent.RenderedMessage + "\n";
+                        var logMessage = "#Message: " + loggingEvent.RenderedMessage + "\n";
 
                         var exceptionMessage = loggingEvent.ExceptionObject != null ?
-                            "Exception: " + loggingEvent.ExceptionObject.Message + "\n" : "";
+                            "#Exception: " + loggingEvent.ExceptionObject.Message + "\n" : "";
 
                         var innerExceptionMessage = loggingEvent.ExceptionObject != null &&
                             loggingEvent.ExceptionObject.InnerException != null ?
-                            "InnerException: " + loggingEvent.ExceptionObject.InnerException.Message + "\n" : "";
+                            "#InnerException: " + loggingEvent.ExceptionObject.InnerException.Message + "\n" : "";
 
-                        var logStack = "StackTrace:\n";
-                        foreach (var item in loggingEvent.LocationInformation.StackFrames)
-                        {
-                            logStack = logStack + item.FullInfo + "\n";
-                        }
+                        //var logStack = "StackTrace:\n";
+                        //foreach (var item in loggingEvent.LocationInformation.StackFrames)
+                        //{
+                        //    logStack = logStack + item.FullInfo + "\n";
+                        //}
 
                         var logSeperator = "--------------------------------------------------------------------------------";
 
                         log = logDetails + logUrl + logPostedData + logLocation + logMessage +
-                            exceptionMessage + innerExceptionMessage + logStack + logSeperator;
+                            exceptionMessage + innerExceptionMessage + logSeperator;
                         sw.WriteLine(log);
                     }
                     catch (Exception exc)

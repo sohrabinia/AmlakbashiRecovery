@@ -8,23 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Logs\**" />
-    <Compile Remove="wwwroot\Resource\images\**" />
-    <Compile Remove="wwwroot\Resource\img\**" />
-    <Content Remove="Logs\**" />
-    <Content Remove="wwwroot\Resource\images\**" />
-    <Content Remove="wwwroot\Resource\img\**" />
-    <EmbeddedResource Remove="Logs\**" />
-    <EmbeddedResource Remove="wwwroot\Resource\images\**" />
-    <EmbeddedResource Remove="wwwroot\Resource\img\**" />
-    <None Remove="Logs\**" />
-    <None Remove="wwwroot\Resource\images\**" />
-    <None Remove="wwwroot\Resource\img\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Remove="wwwroot\js\dashboard.min.js" />
-    <Content Remove="wwwroot\Resource\amlakbashi_3_0_0.apk" />
   </ItemGroup>
 
   <ItemGroup>
@@ -176,6 +160,46 @@
     <None Include="Views\User\UserCreditManager.cshtml" />
     <None Include="Views\User\_InstantReserveConfirm.cshtml" />
     <None Include="wwwroot\js\dashboard.min.js" />
+    <None Include="wwwroot\Resource\img\apartment.webp" />
+    <None Include="wwwroot\Resource\img\dailyrent.webp" />
+    <None Include="wwwroot\Resource\img\esfahan.webp" />
+    <None Include="wwwroot\Resource\img\featureicons\MostViewRegions\esfahan.webp" />
+    <None Include="wwwroot\Resource\img\featureicons\MostViewRegions\gilan.webp" />
+    <None Include="wwwroot\Resource\img\featureicons\MostViewRegions\kordan.webp" />
+    <None Include="wwwroot\Resource\img\featureicons\MostViewRegions\mashhad.webp" />
+    <None Include="wwwroot\Resource\img\featureicons\MostViewRegions\mazandaran.webp" />
+    <None Include="wwwroot\Resource\img\featureicons\MostViewRegions\ramsar.webp" />
+    <None Include="wwwroot\Resource\img\featureicons\MostViewRegions\shiraz.webp" />
+    <None Include="wwwroot\Resource\img\featureicons\MostViewRegions\tehran.webp" />
+    <None Include="wwwroot\Resource\img\gilan.webp" />
+    <None Include="wwwroot\Resource\img\home-page-bg.webp" />
+    <None Include="wwwroot\Resource\img\home_page_slider_1.webp" />
+    <None Include="wwwroot\Resource\img\home_page_slider_2.webp" />
+    <None Include="wwwroot\Resource\img\home_page_slider_3.webp" />
+    <None Include="wwwroot\Resource\img\hotel.webp" />
+    <None Include="wwwroot\Resource\img\icon-40x40_round.webp" />
+    <None Include="wwwroot\Resource\img\instant-reserve-banner-small.webp" />
+    <None Include="wwwroot\Resource\img\instant-reserve-banner.webp" />
+    <None Include="wwwroot\Resource\img\kordan.webp" />
+    <None Include="wwwroot\Resource\img\logo.svg" />
+    <None Include="wwwroot\Resource\img\map.webp" />
+    <None Include="wwwroot\Resource\img\mashhad.webp" />
+    <None Include="wwwroot\Resource\img\mazandaran.webp" />
+    <None Include="wwwroot\Resource\img\MostViewRegions\esfahan.webp" />
+    <None Include="wwwroot\Resource\img\MostViewRegions\gilan.webp" />
+    <None Include="wwwroot\Resource\img\MostViewRegions\kordan.webp" />
+    <None Include="wwwroot\Resource\img\MostViewRegions\mashhad.webp" />
+    <None Include="wwwroot\Resource\img\MostViewRegions\mazandaran.webp" />
+    <None Include="wwwroot\Resource\img\MostViewRegions\ramsar.webp" />
+    <None Include="wwwroot\Resource\img\MostViewRegions\shiraz.webp" />
+    <None Include="wwwroot\Resource\img\MostViewRegions\tehran.webp" />
+    <None Include="wwwroot\Resource\img\ramsar.webp" />
+    <None Include="wwwroot\Resource\img\samandehi.webp" />
+    <None Include="wwwroot\Resource\img\shiraz.webp" />
+    <None Include="wwwroot\Resource\img\sibche.svg" />
+    <None Include="wwwroot\Resource\img\siteicons\icon-40x40_round.webp" />
+    <None Include="wwwroot\Resource\img\tehran.webp" />
+    <None Include="wwwroot\Resource\img\villa.webp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -215,6 +239,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Logs\HangfireLogs\" />
+    <Folder Include="Logs\Logs\" />
     <Folder Include="wwwroot\Content\blogpost\" />
     <Folder Include="wwwroot\Content\ErrorLog\" />
     <Folder Include="wwwroot\Content\files\" />
