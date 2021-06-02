@@ -47,7 +47,6 @@ var pressKey = $(document).keypress(function (event) {
         return;
     }
     if (keycode == '13') {
-        debugger;
         switch (currentLoginStep) {
             case loginStepEnum.enterMobile:
                 login();
@@ -62,6 +61,15 @@ var pressKey = $(document).keypress(function (event) {
                 break;
             case loginStepEnum.forgetPassword:
                 saveNewPass();
+                break;
+            case loginStepEnum.enterEmail:
+                getForeignNumberEmail();
+                break;
+            case loginStepEnum.verifyEmail:
+                verifyForeignNumberEmail();
+                break;
+            case loginStepEnum.signupForeignUser:
+                registerForeignNumber();
                 break;
             default:
                 break;
@@ -122,6 +130,22 @@ $("#passLogin").on("keyup", function () {
     }
 })
 
+$("#verifyEmailCode").on("keyup", function () {
+    if ($(this).val() != null && $(this).val() != "") {
+        $("#btnVerifyForeignNumberEmailForm").css('background', '#fdd835');
+    } else {
+        $("#btnVerifyForeignNumberEmailForm").css('background', '#e2e2e2');
+    }
+})
+
+$("#passLogin").on("keyup", function () {
+    if ($(this).val() != null && $(this).val() != "") {
+        $("#btnLoginPassForm").css('background', '#fdd835');
+    } else {
+        $("#btnLoginPassForm").css('background', '#e2e2e2');
+    }
+})
+
 $(".forgot-pass-input").on("keyup", function () {
     if ($("#forgotPass").val() != null && $("#forgotConfirmPass").val() != null &&
         $("#forgotPass").val() != "" && $("#forgotConfirmPass").val() != "") {
@@ -140,10 +164,13 @@ function SignUp_button() {
     }
 }
 
+var recoveryPassword = false;
+var isNumberForIran = true;
+var isNewUser = false;
 var mobileCurrent
 var login_in_progress = false;
 var checked_mobile_current = false;
-const loginStepEnum = { "none": 0, "enterMobile": 1, "enterPassword": 2, "enterCode": 3, "forgetPassword": 4, "signupUser": 5 }
+const loginStepEnum = { "none": 0, "enterMobile": 1, "enterPassword": 2, "enterCode": 3, "forgetPassword": 4, "signupUser": 5, "enterEmail": 6, "verifyEmail": 7, "signupForeignUser": 8 }
 var currentLoginStep = loginStepEnum.enterMobile;
 
 function login(step) {
@@ -162,67 +189,72 @@ function login(step) {
         "&step=" + step + "&send_verification=" + can_send_login_message,
         function (ret) {
             login_in_progress = false;
-            if (ret.isNumberForIran == true) {
-                isNumberForIran = ret.isNumberForIran;
-            }
+            isNumberForIran = ret.isNumberForIran;
             if (ret.status == 0) {
-                //$("#login-error-container").html(ret.msg);
                 alertify.error(ret.msg);
             }
             else if (ret.status == 1 || ret.status == 4) {
-                currentLoginStep = loginStepEnum.enterCode;
-                checked_mobile_current = true;
-                mobileCurrent = function () {
-                    $(".input-code").show();
-                    $("#resend_form").show();
-                    $("#check-number").show();
-                    $(".button-get-number").css('display', 'none');
-                    $(".iti.iti--allow-dropdown").css('display', 'none');
-                    $(".login__box-button").css('background', '#e2e2e2');
-                    $(".icon-back").css('display', 'block');
-                    $("#login_form").find('.login__please-enter-mobile').html("");
-                    var mobileNumber = mobile.replace("00989", "09");
-                    $("#login_form").find('.login__please-enter-mobile').append(`<div class="login__please-enter-mobile">کد تایید به شماره موبایل ${mobileNumber} ارسال شد. </div><div>برای ورود کد تایید را وارد نمایید.</div>`);
-                    //$(".iti").css('margin', '15px auto 0 auto')
-                    //$("#mobile").prop("disabled", true).css({ 'cursor': 'no-drop', 'opacity': '0.3' });
-                    //$(".iti__flag-container").prop("disabled", true).css({ 'cursor': 'no-drop', 'opacity': '0.3' });
-                    $("div#selectRoot").css('margin-top', '-23px');
-                    $("#login_form .login__please-enter-mobile").css('margin', '35px auto 8px auto');
-                    //$("#mobile_label").html(mobileNumber);
-                    if (can_send_login_message) {
-                        can_send_login_message = false;
-                        startCountDown($("#count_down_timer")[0], function () {
-                            can_send_login_message = true;
-                            $("#count_down_timer").html("");
-                            $("#resend_button").attr("onclick", "resend_login_sms()");
-                            $("#resend_button").html("درخواست ارسال مجدد").css({ 'cursor': 'pointer', 'color': '#242424', 'font': '13px Miransans' });
-                            $("#resend_button").click(function () {
-                                $("#resend_button").css({ 'cursor': 'auto', 'color': '#ccc' });
-                            })
+                isNewUser = true;
+                if (ret.isNumberForIran == false) {
+                    $(".login_form").hide();
+                    $('#loginForeignNumberEmailForm').show();
+                    currentLoginStep = loginStepEnum.enterEmail;
+                }
+                else {
+                    currentLoginStep = loginStepEnum.enterCode;
+                    checked_mobile_current = true;
+                    mobileCurrent = function () {
+                        $(".input-code").show();
+                        $("#resend_form").show();
+                        $("#check-number").show();
+                        $(".button-get-number").css('display', 'none');
+                        $(".iti.iti--allow-dropdown").css('display', 'none');
+                        $(".login__box-button").css('background', '#e2e2e2');
+                        $(".icon-back").css('display', 'block');
+                        $("#login_form").find('.login__please-enter-mobile').html("");
+                        var mobileNumber = mobile.replace("00989", "09");
+                        $("#login_form").find('.login__please-enter-mobile').append(`<div class="login__please-enter-mobile">کد تایید به شماره موبایل ${mobileNumber} ارسال شد. </div><div>برای ورود کد تایید را وارد نمایید.</div>`);
+                        //$(".iti").css('margin', '15px auto 0 auto')
+                        //$("#mobile").prop("disabled", true).css({ 'cursor': 'no-drop', 'opacity': '0.3' });
+                        //$(".iti__flag-container").prop("disabled", true).css({ 'cursor': 'no-drop', 'opacity': '0.3' });
+                        $("div#selectRoot").css('margin-top', '-23px');
+                        $("#login_form .login__please-enter-mobile").css('margin', '35px auto 8px auto');
+                        //$("#mobile_label").html(mobileNumber);
+                        if (can_send_login_message) {
+                            can_send_login_message = false;
+                            startCountDown($("#count_down_timer")[0], function () {
+                                can_send_login_message = true;
+                                $("#count_down_timer").html("");
+                                $("#resend_button").attr("onclick", "resend_login_sms()");
+                                $("#resend_button").html("درخواست ارسال مجدد").css({ 'cursor': 'pointer', 'color': '#242424', 'font': '13px Miransans' });
+                                $("#resend_button").click(function () {
+                                    $("#resend_button").css({ 'cursor': 'auto', 'color': '#ccc' });
+                                })
+                            });
+                        }
+                        $("#code").on('keypress', function (e) {
+                            if (e.which == 13) {
+                                if (ret.status == 1) {
+                                    login_success(ret.mobile, ret.isNew);
+                                }
+                                else if (ret.status == 4) {
+                                    loginCode(ret.mobile);
+                                }
+                            }
                         });
-                    }
-                    $("#code").on('keypress', function (e) {
-                        if (e.which == 13) {
+                        $("#success__code").click(function () {
                             if (ret.status == 1) {
                                 login_success(ret.mobile, ret.isNew);
                             }
                             else if (ret.status == 4) {
                                 loginCode(ret.mobile);
                             }
-                        }
-                    });
-                    $("#success__code").click(function () {
-                        if (ret.status == 1) {
-                            login_success(ret.mobile, ret.isNew);
-                        }
-                        else if (ret.status == 4) {
-                            loginCode(ret.mobile);
-                        }
-                    });
-                    setTimeout(function () { $("#code").focus() }, 1000);
+                        });
+                        setTimeout(function () { $("#code").focus() }, 1000);
+                    }
+                    mobileCurrent();
+                    console.log(mobileCurrent);
                 }
-                mobileCurrent();
-                console.log(mobileCurrent);
             }
             else if (ret.status == 2) {
                 toggle_login_container(false);
@@ -235,6 +267,19 @@ function login(step) {
                 $('#loginPasswordForm').show();
                 currentLoginStep = loginStepEnum.enterPassword;
             }
+            else if (ret.status == 5) {
+                if (ret.doLogin) {
+                    $('.login_form').hide();
+                    $("#loginVerifyForeignNumberEmailForm").show();
+                    currentLoginStep = loginStepEnum.verifyEmail;
+                }
+                else {
+                    isNewUser = true;
+                    $(".login_form").hide();
+                    $('#loginForeignNumberEmailForm').show();
+                    currentLoginStep = loginStepEnum.enterEmail;
+                }
+            }
             toggle_login_container(true, function () {
                 $(".login__container").css("display", "flex");
                 if (ret.status == 0) {
@@ -244,9 +289,92 @@ function login(step) {
         });
 }
 
+function getForeignNumberEmail() {
+    var email = $('#emailLogin').val();
+    var number = intl.getNumber();
+    var mobile = number.replace("+", "00");
+    myajax("user/PopupLoginForeignNumberEmail", "mobile=" + mobile + "&email=" + email, function (ret) {
+        if (ret.status == 1) {
+            $('.login_form').hide();
+            $("#loginVerifyForeignNumberEmailForm").show();
+            currentLoginStep = loginStepEnum.verifyEmail;
+        } else {
+            alertify.error('کد وارد شده اشتباه است');
+        }
+    });
+}
+
+function verifyForeignNumberEmail() {
+    var emailCode = $('#verifyEmailCode').val();
+    var number = intl.getNumber();
+    var mobile = number.replace("+", "00");
+    var beLogin = !isNewUser;
+    if (recoveryPassword) {
+        beLogin = false;
+    }
+    myajax("user/PopupVerifyForeignNumberEmail", "mobile=" + mobile + "&code=" + emailCode + "&beLogin=" + beLogin, function (ret) {
+        if (ret.status == 1) {
+            if (isNewUser) {
+                $('.login_form').hide();
+                $("#loginRegisterForeignNumber").show();
+                currentLoginStep = loginStepEnum.signupForeignUser;
+            }
+            else if (recoveryPassword) {
+                $('.login_form').hide();
+                $("#loginForgotPasswordForm").show();
+                currentLoginStep = loginStepEnum.forgetPassword;
+            }
+            else {
+                toggle_login();
+                verification_success();
+            }
+        } else {
+            alertify.error('کد وارد شده اشتباه است');
+        }
+    });
+}
+
+function registerForeignNumber() {
+    var code = $('#verifyEmailCode').val();
+    var number = intl.getNumber();
+    var mobile = number.replace("+", "00");
+    var fname = $("#foreignFname").val();
+    var lname = $("#foreignLname").val();
+    //var pass = $("#foreignPass").val();
+    //var passConfirm = $("#foreignConfirmPass").val();
+    var presentorCode = $('#foreignPresentorCode').val();
+    login_in_progress = true;
+    myajax("user/PopupRegisterForeignNumber", "mobile=" + mobile + "&code=" + code + "&fname=" +
+        fname + "&lname=" + lname + "&presentorcode=" + presentorCode,
+        function (ret) {
+            login_in_progress = false;
+            if (ret.status == 1) {
+                toggle_login();
+                verification_success();
+            }
+            else {
+                alertify.error(ret.msg);
+            }
+        });
+}
+
 function showCodeForm() {
     var number = intl.getNumber();
     var mobile = number.replace("+", "00");
+    if (isNumberForIran == false) {
+        myajax("user/PopupForgotPassForeignNumberEmail", "mobile=" + mobile, function (ret) {
+            if (ret.status = 1) {
+                $('.login_form').hide();
+                $("#loginVerifyForeignNumberEmailForm").show();
+                currentLoginStep = loginStepEnum.verifyEmail;
+                recoveryPassword = true;
+            }
+            else {
+                alertify.error(ret.msg);
+            }
+        });
+        return;
+    }
     myajax("user/popupsendsmsagain", "mobile=" + mobile,
         function (ret) {
             login_in_progress = false;
@@ -295,12 +423,19 @@ function showCodeForm() {
 }
 
 function saveNewPass() {
-    var code = $('#code').val();
+    if (isNumberForIran) {
+        var code = $('#code').val();
+    }
+    else {
+        var code = $('#verifyEmailCode').val();
+    }
     var number = intl.getNumber();
     var mobile = number.replace("+", "00");
     var pass = $("#forgotPass").val();
     var confPass = $("#forgotConfirmPass").val();
-    myajax("user/savenewpass", "mobile=" + mobile + "&code=" + code + "&password=" + pass + "&confirmPassword=" + confPass,
+    var verifyByEmail = !isNumberForIran;
+    myajax("user/savenewpass", "mobile=" + mobile + "&code=" + code + "&password=" + pass
+        + "&confirmPassword=" + confPass + "&verifyByEmail=" + verifyByEmail,
         function (ret) {
             login_in_progress = false;
             if (ret.status == 1) {

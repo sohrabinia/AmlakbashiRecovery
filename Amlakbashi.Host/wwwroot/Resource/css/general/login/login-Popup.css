@@ -313,7 +313,7 @@ span#count_down_timer {
     padding-right: 10px !important;
 }
 
-#verification_form label {
+.login-form-container label {
     color: #242424;
     margin: 0;
     width: 320px;
