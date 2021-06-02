@@ -490,26 +490,26 @@ namespace Portal.Controllers
             {
                 IQueryable<User> users = userService.GetAllAsIQueryable();
                 var identityUserList = userService.GetAllIdentityUsernamesByState();
-                users = users.Where(x => x.NotificationToken != null &&
-                    identityUserList.Contains(x.MainMobile));
+                var userList = users.Where(x => x.NotificationToken != null).ToList();
+                userList = userList.Where(w => identityUserList.Contains(w.MainMobile)).ToList();
                 switch (user_type)
                 {
                     case 0:
-                        users = users.Where(x => x.UserGeneralType == 0);
+                        userList = userList.Where(x => x.UserGeneralType == 0).ToList();
                         break;
                     case 1:
-                        users = users.Where(x => x.UserGeneralType > 0);
+                        userList = userList.Where(x => x.UserGeneralType > 0).ToList();
                         var userIds = advertiseService.FilterAdmin(province, city, area).Select(s => s.UserID).Distinct().ToList();
-                        users = users.Where(w => userIds.Contains(w.Id));
+                        userList = userList.Where(w => userIds.Contains(w.Id)).ToList();
                         break;
                 }
-                var tokens = users.Select(x => x.NotificationToken).ToList();
+                var tokens = userList.Select(x => x.NotificationToken).ToList();
                 userService.SendGroupNotification(tokens, title, body, click_action);
                 msg = string.Format("نوتیفیکیشن به {0} کاربر ارسال شد", tokens.Count());
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("Admin.SendGroupNotification", exc);
                 msg = "خطای سیستم";
             }
             ViewBag.msg = msg;
