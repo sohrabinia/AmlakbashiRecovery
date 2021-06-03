@@ -228,7 +228,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             {
                 if (DateTimeUtility.DateRangesHaveOverlap(request.startDate, request.endDate, item.StartDate, item.EndDate))
                 {
-                    mediator.Send(new SetHostResponseCommand(item.Id, HostResponseEnum.Rejected, request.sendSms, request.actionSource, request.doerUserId, false));
+                    mediator.Send(new SetHostResponseCommand(item.Id, HostResponseEnum.Rejected, request.sendSms, request.actionSource, request.doerUserId, true));
                 }
             }
             return Task.FromResult(Unit.Value);
