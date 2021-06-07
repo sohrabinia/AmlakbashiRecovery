@@ -842,7 +842,7 @@ namespace Amlakbashi.Host.Controllers
                 query_string = HtmlUtility.AddToQueryString(query_string,
                     "empty_range_from", empty_range_from.ToString());
             }
-            if (string.IsNullOrEmpty(empty_range_from) == false)
+            if (string.IsNullOrEmpty(empty_range_to) == false)
             {
                 query_string = HtmlUtility.AddToQueryString(query_string,
                     "empty_range_to", empty_range_to.ToString());
