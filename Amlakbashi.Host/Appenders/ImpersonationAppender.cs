@@ -14,6 +14,7 @@ namespace Amlakbashi.Host.Appenders
 
         protected override void Append(LoggingEvent loggingEvent)
         {
+            return;
             if (loggingEvent.RenderedMessage.Contains("Impersonation"))
             {
                 var rootPath = "";

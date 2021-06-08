@@ -2058,15 +2058,18 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return dictionary;
         }
 
-        public void DeleteExtrinsicReserves(long advertiseId, string from_date, string to_date)
+        public void DeleteExtrinsicReserves(long advertiseId, string from_date, string to_date, bool withLastDay = false)
         {
             var acc = Repository.Find(advertiseId);
             var fromGregorian = DateTimeUtility.PersianDateToGregorian(from_date);
             var toGregorian = DateTimeUtility.PersianDateToGregorian(to_date);
+            if (withLastDay)
+            {
+                toGregorian = toGregorian.AddDays(1);
+            }
             //var idsToDelete = acc.ExtrinsicReserves.Where(
             //    w => w.StartDate >= fromGregorian && w.StartDate <= toGregorian)
             //    .Select(s => s.Id).ToList();
-
             Repository.RemoveChildren<ExtrinsicReserve, long,
                 IQueryable<ExtrinsicReserve>>(advertiseId, "ExtrinsicReserves",
                 q => q.Where(w => w.StartDate >= fromGregorian &&

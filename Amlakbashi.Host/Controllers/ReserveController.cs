@@ -372,6 +372,10 @@ namespace Amlakbashi.Host.Controllers
                     reserveService.SetStatus(reserve.Id, reserve.Status, true,
                         ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id, true);
                 }
+                if (reserve.HostResponse == HostResponseEnum.Accepted)
+                {
+                    advertiseService.DeleteExtrinsicReserves(objReserve.AdvertiseID, start_date, end_date, true);
+                }
                 return RedirectToAction("Index");
             }
             catch (Exception exc)

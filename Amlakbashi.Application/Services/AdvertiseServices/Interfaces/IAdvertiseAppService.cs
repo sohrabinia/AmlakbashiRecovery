@@ -116,7 +116,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void AddAdvertiseHostReplyComment(int userId, long advertiseId,
             string text, int? operatorId = null);
         Dictionary<string, string> GetRulesDictionary(long id);
-        void DeleteExtrinsicReserves(long advertiseId, string from_date, string to_date);
+        void DeleteExtrinsicReserves(long advertiseId, string from_date, string to_date, bool withLastDay = false);
         bool ReserveRequest(long advertiseId, int userId, string startDate,
             string endDate, int guestCount, bool instantReserve, out string msg, out long reserveId);
         IList<Advertise> GetNorouzAdvertises(int count);

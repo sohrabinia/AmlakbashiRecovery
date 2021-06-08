@@ -4,7 +4,7 @@
 {
     foreach (var item in Model)
     {
-        var url = string.Format("/اخبار-و-مقالات/{0}-{1}", item.Title.Replace("+", "-").Replace(" ", "-"), item);
+        var url = string.Format("/اخبار-و-مقالات/{0}-{1}", item.Title.Replace("+", "-").Replace(" ", "-"), item.Id);
             <div class="content row">
                 <div class="col-xs-12 col-sm-3 col-md-2" >
                     <a href="@url">
