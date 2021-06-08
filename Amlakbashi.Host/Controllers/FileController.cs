@@ -583,9 +583,13 @@ namespace Portal.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(slug))
+                {
+                    return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
+                }
                 var advertise_id = long.Parse(slug.Split('-')[0]);
                 var advertise = advertiseService.FindIncludingDeleted(advertise_id);
-                if (advertise.Slug != slug)
+                if (advertise == null || advertise.Slug != slug)
                 {
                     return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 }

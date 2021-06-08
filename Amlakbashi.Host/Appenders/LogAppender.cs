@@ -15,8 +15,7 @@ namespace Amlakbashi.Host.Appenders
         protected override void Append(LoggingEvent loggingEvent)
         {
             if (loggingEvent.LoggerName.Contains("ResponseCaching") == false &&
-                loggingEvent.LoggerName.StartsWith("Hangfire.") == false &&
-                loggingEvent.RenderedMessage.Contains("Impersonation") == false)
+                loggingEvent.LoggerName.StartsWith("Hangfire.") == false)
             {
                 var rootPath = "";
 #if DEBUG
@@ -53,6 +52,8 @@ namespace Amlakbashi.Host.Appenders
 
                         var logUrl = request != null ? "#Url: " + request.Path + request.QueryString + "\n" : "";
 
+                        var logRefererUrl = request != null ? "#RefererUrl: " + request.Headers["referer"] + "\n" : "";
+
                         var logPostedData = "";
                         if (request != null && request.Method.ToLower() == "post")
                         {
@@ -83,7 +84,7 @@ namespace Amlakbashi.Host.Appenders
 
                         var logSeperator = "--------------------------------------------------------------------------------";
 
-                        log = logDetails + logUrl + logPostedData + logLocation + logMessage +
+                        log = logDetails + logUrl + logRefererUrl + logPostedData + logLocation + logMessage +
                             exceptionMessage + innerExceptionMessage + logSeperator;
                         sw.WriteLine(log);
                     }

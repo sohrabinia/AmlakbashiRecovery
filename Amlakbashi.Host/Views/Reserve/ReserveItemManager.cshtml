@@ -131,10 +131,10 @@
         function cancelReserve(reserve_id, is_host, instantReserve, reservePaid){
             var tip_text = '';
             if (instantReserve && is_host && reservePaid) {
-                tip_text = 'در صورت لغو رزرو آنی طبق قوانین رزرو آنی از حساب شما جریمه کسر میشود';
+                tip_text = 'در صورت لغو رزرو آنی طبق قوانین از حساب شما جریمه کسر میشود';
             }
             else if (is_host) {
-                tip_text = '<span>توجه داشته باشید که بعد از پذیرش درخواست، در صورت لغو برای شما <strong style="color:red">امتیاز منفی</strong> منظور خواهد شد و در صورتی که دلیل منطقی برای این کار نداشته باشید از ادامه همکاری با شما معذوریم</span><br />';
+                tip_text = '<span>توجه داشته باشید که در صورت تایید درخواست لغو، برای شما <strong style="color:red">امتیاز منفی</strong> لحاظ خواهد شد</span><br />';
             }
             var cancle_reserve = `${tip_text}<div id="cancel_reason_container"><span id="cancel_reason_span" style="display:block;padding:5px;">لطفا دلیل لغو سفر را بنویسید:</span><input id="cancel_reason_input" style="width:100%" type="text" placeholder="لطفا فارسی تایپ کنید"/></div>`
 

@@ -404,7 +404,7 @@ namespace Amlakbashi.Host.Controllers
             postList.Add(postService.Filter(PostStatus.Published, 14).Take(3).ToList());
             ViewBag.news = true;
             ViewBag.amp_version = amp_version;
-            return View();
+            return View(postList);
         }
 
         [Authorize]
