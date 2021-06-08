@@ -948,8 +948,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize]
         public ActionResult GuestPayReserve(long reserve_id,
-            int pay_reserve_type, bool useCoupon = false, bool usePrize = false, long couponId = 0
-            )
+            int pay_reserve_type, bool useCoupon = false, bool usePrize = false, long couponId = 0)
         {
             try
             {

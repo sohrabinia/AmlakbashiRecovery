@@ -162,6 +162,8 @@
                     var discountPrice = response.discountPrice;
                     reservePaymentData.totalPrice = reservePaymentData.totalPrice - discountPrice;
                     reservePaymentData.depositePrice = reservePaymentData.depositePrice - discountPrice;
+                    reservePaymentData.finalPriceTotal = reservePaymentData.finalPriceTotal - discountPrice;
+                    reservePaymentData.finalPriceDeposite = reservePaymentData.finalPriceDeposite - discountPrice;
                     $("#js-payment-type-discount").css("display", "flex");
                     $("#js-final-discount-price-label").html(discountPrice);
                     $("#js-final-total-price-label").html(reservePaymentData.totalPrice);

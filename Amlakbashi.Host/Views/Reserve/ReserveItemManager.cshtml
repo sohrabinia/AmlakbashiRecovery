@@ -352,7 +352,7 @@
 
         function payAndReserve(reserve_id)
         {
-            showNoYesMessage('پرداخت رزرو', '', function(){
+            showNoYesMessage('پرداخت رزرو', '', function () {
                 switch (reservePaymentData.payMethod) {
                     case 1:
                         payWithCredit(reservePaymentData.payType, reserve_id, reservePaymentData.finalPriceTotal, reservePaymentData.finalPriceDeposite, reservePaymentData.userId, reservePaymentData.paidPrice, reservePaymentData.useCoupon, reservePaymentData.usePrize,
@@ -479,7 +479,7 @@
                 prizePrice = 0;
             }
             var current_user_credit = 0;
-            myajax("User/GetCurrentCredit", "", function (ret){
+            myajax("User/GetCurrentCredit", "", function (ret) {
                 if (ret.status == 1) {
                     current_user_credit = ret.current_credit;
                     if (pay_type == "1") {
@@ -676,7 +676,6 @@
         var is_sending_chat = false;
 
         function sendMessage(reserve_id) {
-            debugger
             if (is_sending_chat) {
                 return;
             }
