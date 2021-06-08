@@ -459,13 +459,9 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 {
                     penaltyPrice = (int)Math.Floor(objReserve.TotalPrice * 0.1f);
                 }
-                else if (hostCancelCount == 1)
+                else if (hostCancelCount > 0)
                 {
                     penaltyPrice = (int)Math.Floor(objReserve.TotalPrice * 0.15f);
-                }
-                else
-                {
-                    penaltyPrice = 0;
                 }
                 if (penaltyPrice > 0)
                 {

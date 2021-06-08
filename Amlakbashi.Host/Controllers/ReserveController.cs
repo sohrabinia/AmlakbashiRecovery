@@ -948,8 +948,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize]
         public ActionResult GuestPayReserve(long reserve_id,
-            int pay_reserve_type, bool useCoupon = false, bool usePrize = false, long couponId = 0
-            )
+            int pay_reserve_type, bool useCoupon = false, bool usePrize = false, long couponId = 0)
         {
             try
             {
@@ -2427,7 +2426,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
             }
-            var startDate = DateTime.Parse("10/28/2020");
+            var startDate = DateTime.Parse("10/28/2015");
             var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
             if (identityUser.CreateDate.Value.Date < startDate.Date)
             {
