@@ -29,48 +29,64 @@ namespace Amlakbashi.Host.Controllers.API
                 var advertise = advertiseService.Find(advertise_id);
                 if (advertise.IsForbidden)
                 {
-                    return GenerateJsonResult(
-                        new { status = 0, msg = "کاربر گرامی رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است" });
+                    return GenerateJsonResult(new 
+                    { 
+                        status = 0, 
+                        msg = "کاربر گرامی رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است"
+                    });
                 }
                 if (number_of_guests < 1)
                 {
-                    return GenerateJsonResult(
-                        new { status = 0, msg = "لطفا تعداد نفرات را وارد کنید" });
+                    return GenerateJsonResult(new 
+                    { 
+                        status = 0, 
+                        msg = "لطفا تعداد نفرات را وارد کنید" 
+                    });
                 }
                 if (from_date == to_date)
                 {
-                    return GenerateJsonResult(
-                            new { status = 0, msg = "تاریخ ورود و تاریخ خروج نمیتوانند یکی باشند" }
-                        );
+                    return GenerateJsonResult(new 
+                    { 
+                        status = 0, 
+                        msg = "تاریخ ورود و تاریخ خروج نمیتوانند یکی باشند" 
+                    });
                 }
                 var days = DateTimeUtility.GetPersianDateRangeDays(from_date, to_date);
                 if (advertise.MinReserveDays > 0 && days < advertise.MinReserveDays)
                 {
-                    return GenerateJsonResult(
-                        new { status = 0, msg = "برای رزرو این اقامتگاه باید حداقل " + advertise.MinReserveDays + "  شب اقامت کنید. برای اقامت " + days + " شبه میتوانید اقامتگاه های دیگر را رزرو کنید." }
-                    );
+                    return GenerateJsonResult(new 
+                    { 
+                        status = 0, 
+                        msg = "برای رزرو این اقامتگاه باید حداقل " + advertise.MinReserveDays + "  شب اقامت کنید. برای اقامت " + days + " شبه میتوانید اقامتگاه های دیگر را رزرو کنید."
+                    });
                 }
                 if (advertise.MaxReserveDays > 0 && days > advertise.MaxReserveDays)
                 {
-                    return GenerateJsonResult(
-                        new { status = 0, msg = "شما میتوانید حداکثر " + advertise.MaxReserveDays + "  شب در این اقامتگاه اقامت کنید. برای اقامت طولانی تر میتوانید اقامتگاه های دیگر را رزرو کنید." }
-                    );
+                    return GenerateJsonResult(new 
+                    { 
+                        status = 0, 
+                        msg = "شما میتوانید حداکثر " + advertise.MaxReserveDays + "  شب در این اقامتگاه اقامت کنید. برای اقامت طولانی تر میتوانید اقامتگاه های دیگر را رزرو کنید." 
+                    });
                 }
                 var todayUnix = DateTimeUtility.DateValueOfJS(DateTime.Now.Date);
                 if (advertise.unixNorouzMinRequestDate > todayUnix &&
                     DateTimeUtility.IsNorouz(DateTimeUtility.PersianDateRangeToList(from_date, to_date, true, false)))
                 {
                     var minDateString = DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate));
-                    return GenerateJsonResult(
-                        new { status = 0, msg = "برای رزرو نوروزی این اقامتگاه میتوانید از تاریخ " + minDateString + " اقدام کنید و یا اقامتگاه های دیگر را رزرو کنید." }
-                    );
+                    return GenerateJsonResult(new 
+                    { 
+                        status = 0, 
+                        msg = "برای رزرو نوروزی این اقامتگاه میتوانید از تاریخ " + minDateString + " اقدام کنید و یا اقامتگاه های دیگر را رزرو کنید." 
+                    });
                 }
 
                 if (advertiseService.GetOccupiedDatesInRange(advertise_id, from_date, to_date).Any())
                 {
-                    return GenerateJsonResult(
-                            new { status = 0, msg = "متاسفانه بعضی از روز های انتخاب شده پر هستند" }
-                        );
+                    return GenerateJsonResult(new 
+                    { 
+                        status = 0, 
+                        msg = "متاسفانه بعضی از روز های انتخاب شده پر هستند" 
+                    });
                 }
                 long without_discount_price, couponCalPrice;
                 var total_price = advertiseService.GetReservePrice(advertise_id, from_date, to_date, number_of_guests,
@@ -90,9 +106,11 @@ namespace Amlakbashi.Host.Controllers.API
                         DateTimeUtility.PersianDateToGregorian(from_date),
                         DateTimeUtility.PersianDateToGregorian(to_date)))
                 {
-                    return GenerateJsonResult(
-                            new { status = 0, msg = "شما یک درخواست مشابه برای این آگهی دارید، برای درخواست جدید درخواست قبلی را لغو کنید" }
-                        );
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "شما یک درخواست مشابه برای این آگهی دارید، برای درخواست جدید درخواست قبلی را لغو کنید"
+                    });
                 }
                 return GenerateJsonResult(
                     new { status = 1, price = total_price, withoutDiscountPrice = without_discount_price }
@@ -123,7 +141,7 @@ namespace Amlakbashi.Host.Controllers.API
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        msg = "برای درخواست رزرو ابتدا باید با حساب کاربری خود وارد شوید",
+                        msg = "برای درخواست رزرو ابتدا باید با حساب کاربری خود وارد شوید"
                     });
                 }
                 if (identityUser.State != Entities.User.UserState.Acticved)
@@ -131,7 +149,7 @@ namespace Amlakbashi.Host.Controllers.API
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        msg = "امکان درخواست رزرو برای شما مسدود شده است. جهت فعالسازی با پشتیبانی تماس بگیرید",
+                        msg = "امکان درخواست رزرو برای شما مسدود شده است. جهت فعالسازی با پشتیبانی تماس بگیرید"
                     });
                 }
                 var checkResult = CheckReserve(advertise_id, from_date, to_date,
@@ -142,7 +160,7 @@ namespace Amlakbashi.Host.Controllers.API
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        msg = data.msg != null ? data.msg : "متاسفانه درخواست رزرو با خطا مواجه شد"
+                        msg = data["msg"] != null ? data["msg"] : "متاسفانه درخواست رزرو با خطا مواجه شد"
                     });
                 }
                 if (PhoneUtility.IsNumberForIran(identityUser.PhoneNumber) == false &&
@@ -180,7 +198,7 @@ namespace Amlakbashi.Host.Controllers.API
                 return GenerateJsonResult(new
                 {
                     status = 0,
-                    msg = "متاسفانه درخواست رزرو با خطا مواجه شد",
+                    msg = "متاسفانه درخواست رزرو با خطا مواجه شد"
                 });
             }
         }
@@ -238,12 +256,15 @@ namespace Amlakbashi.Host.Controllers.API
             catch (Exception exc)
             {
                 logger.Error("ReserveApi.ReserveResponse", exc);
-                return GenerateJsonResult(new { status = 0,
-                    msg = "متاسفانه جواب درخواست رزرو با خطا مواجه شد" });
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "متاسفانه جواب درخواست رزرو با خطا مواجه شد"
+                });
             }
         }
 
-        
+
         public JsonResult ReserveHostOrGuest(string cid)
         {
             if (!ClientAuthenticate(cid))
@@ -553,7 +574,7 @@ namespace Amlakbashi.Host.Controllers.API
                 var user = GetUser();
                 string msg;
                 var started = reserveService.StartStay(reserve_id,
-                    user.Id, out msg, ActionLog.ActionSourceEnum.Application,user.Id);
+                    user.Id, out msg, ActionLog.ActionSourceEnum.Application, user.Id);
                 return GenerateJsonResult(new
                 {
                     status = started ? 1 : 0,
