@@ -486,7 +486,8 @@ namespace Amlakbashi.Core.Entities
         {
             get
             {
-                return City == 794 && IsfahanForbiddenTypes.Contains(ParentOrSelf.TypeID);
+                //return City == 794 && IsfahanForbiddenTypes.Contains(ParentOrSelf.TypeID);
+                return false;
             }
         }
 
