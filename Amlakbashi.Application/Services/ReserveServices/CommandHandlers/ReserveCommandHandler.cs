@@ -204,7 +204,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                         reserve.AdvertiseID, reserve.StartDate, reserve.EndDate,
                         request.actionSource, request.doerUserId, true));
 
-                    if ((reserve.EndDate - reserve.StartDate).TotalDays == 1)
+                    if ((reserve.EndDate - reserve.StartDate).TotalDays <= 5)
                     {
                         mediator.Send(new InsertExtrinsicReserveCommand(reserve.AdvertiseID,
                             DateTimeUtility.GregorianToPersianDate(reserve.StartDate),
