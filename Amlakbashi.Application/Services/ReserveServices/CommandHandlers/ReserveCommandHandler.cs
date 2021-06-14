@@ -68,8 +68,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             var delay = DateTimeUtility.DelayAvoidingNightTime(new TimeSpan(0, 8, 0));
             var reserve = reserveRepository.Find(request.reserveId);
             mediator.Schedule(new SendPayReserveCallCommand(reserve.Id), delay);
-            mediator.Send(new ScheduleReserveAutoCancelCommand(reserve.Id,
-                delay.Add(new TimeSpan(24, 0, 0)), true, false));
+            mediator.Send(new ScheduleReserveAutoCancelCommand(reserve.Id, delay.Add(new TimeSpan(0, 30, 0))));
             return Task.FromResult(Unit.Value);
         }
 
@@ -104,6 +103,11 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             }
             if (reserve.DisableAutoCancel && !request.force)
                 return Task.FromResult(false);
+            if (reserve.Status == ReserveStatus.WaitForResponse && (reserve.EndDate - reserve.StartDate).TotalDays <= 5)
+            {
+                mediator.Send(new SetExtrinsicReserveForWaitForResponseCommand(reserve.AdvertiseID, reserve.Id,
+                    reserve.StartDate, reserve.EndDate));
+            }
             reserveState.UseReserve(request.reserveId)
                 .SetStatus(ReserveStatus.CanceledBySystem, request.sendSms,
                 ActionLog.ActionSourceEnum.Background, 0);
@@ -259,23 +263,28 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             var delay = new TimeSpan(0, 8, 0);
             var callTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
             callTime = callTime.AddTicks(delay.Ticks);
+            var canselCall = false;
             if (callTime.Hour < 8)
             {
                 callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 8, 0, 0);
                 delay = new TimeSpan(callTime.Ticks - now.Ticks);
+                canselCall = true;
             }
             else if (callTime.Hour >= 23)
             {
                 callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 8, 0, 0);
                 callTime = callTime.AddDays(1);
                 delay = new TimeSpan(callTime.Ticks - now.Ticks);
+                canselCall = true;
             }
             callTime = DateTime.Now + delay;
             if (callTime.Hour < 8)
                 callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 8, 0, 0);
             delay = callTime - DateTime.Now;
-
-            mediator.Schedule(new SendReserveRequestCallCommand(request.ReserveId), delay);
+            if (canselCall == false)
+            {
+                mediator.Schedule(new SendReserveRequestCallCommand(request.ReserveId), delay);
+            }
             return Task.FromResult(delay);
         }
 

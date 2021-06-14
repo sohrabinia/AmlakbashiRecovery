@@ -374,7 +374,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (reserve.HostResponse == HostResponseEnum.Accepted)
                 {
-                    advertiseService.DeleteExtrinsicReserves(objReserve.AdvertiseID, start_date, end_date, true);
+                    advertiseService.DeleteExtrinsicReserves(objReserve.AdvertiseID, start_date, end_date);
                 }
                 return RedirectToAction("Index");
             }

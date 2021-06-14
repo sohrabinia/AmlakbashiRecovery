@@ -12,6 +12,7 @@ using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Application.Services.SettingServices.SettingManager;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using Microsoft.EntityFrameworkCore;
+using static Amlakbashi.Core.Entities.Reserve;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
 {
@@ -25,7 +26,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
         IRequestHandler<UpdateAdvertiseOccupiedCommand>,
         IRequestHandler<InsertExtrinsicReserveCommand>,
         IRequestHandler<UpdateInstantReserveStatusCommand>,
-        IRequestHandler<IncreaseInstantReserveCancelCommand>
+        IRequestHandler<IncreaseInstantReserveCancelCommand>,
+        IRequestHandler<SetExtrinsicReserveForWaitForResponseCommand>,
+        IRequestHandler<InsertExtrinsicReserveByDateListCommand>
     {
         private IMediator mediator;
         private readonly IRepository<Advertise, long> advertiseRepository;
@@ -368,8 +371,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                         };
                         acc.ExtrinsicReserves.Add(item);
                         mediator.Send(new RejectRequestsInTimeCommand(request.advertiseId,
-                            gregorian_date, gregorian_date.AddDays(1), request.actionSource,
-                            request.doerUserId));
+                        gregorian_date, gregorian_date.AddDays(1), request.actionSource,
+                        request.doerUserId));
                     }
                 }
             }
@@ -397,6 +400,74 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             acc.InstantReserveCancels++;
             advertiseRepository.Update(acc);
             advertiseRepository.Save();
+            return Task.FromResult(Unit.Value);
+        }
+
+        public Task<Unit> Handle(SetExtrinsicReserveForWaitForResponseCommand request, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Find(request.AdvertiseId);
+            var otherReserves = acc.Reserves.Where(w => w.Id != request.SystemCanseledReserveId &&
+                (w.Status == ReserveStatus.WaitForReserve || w.Status == ReserveStatus.WaitForResponse)).ToList();
+
+            var dateRangeList = DateTimeUtility.PersianDateRangeToList(
+                DateTimeUtility.GregorianToPersianDate(request.FromDate),
+                DateTimeUtility.GregorianToPersianDate(request.ToDate),
+                true, false);
+
+            if (otherReserves.Any(a => a.Status == ReserveStatus.WaitForReserve))
+            {
+                var waitForReserveList = otherReserves.Where(w => w.Status == ReserveStatus.WaitForReserve).ToList();
+                foreach (var item in waitForReserveList)
+                {
+                    var waitForReserveDateRange = DateTimeUtility.PersianDateRangeToList(
+                        DateTimeUtility.GregorianToPersianDate(item.StartDate),
+                        DateTimeUtility.GregorianToPersianDate(item.EndDate),
+                        true, false);
+
+                    foreach (var date in waitForReserveDateRange)
+                    {
+                        if (dateRangeList.Any(a => a == date))
+                        {
+                            dateRangeList.Remove(date);
+                        }
+                    }
+                }
+            }
+
+            mediator.Send(new InsertExtrinsicReserveByDateListCommand(request.AdvertiseId,
+                request.SystemCanseledReserveId, dateRangeList, acc.UserID, ActionLog.ActionSourceEnum.Background));
+
+            return Task.FromResult(Unit.Value);
+        }
+
+        public Task<Unit> Handle(InsertExtrinsicReserveByDateListCommand request, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Find(request.AdvertiseId);
+            var hostUser = acc.User;
+            DateTime gregorianDate;
+            var occupiedDatesPersian = acc.OccupiedDates().Select(s => DateTimeUtility.GregorianToPersianDate(s));
+            foreach(var persianDate in request.Dates)
+            {
+                var exist = occupiedDatesPersian.Contains(persianDate);
+                if (!exist)
+                {
+                    gregorianDate = DateTimeUtility.PersianDateToGregorian(persianDate);
+                    var item = new ExtrinsicReserve()
+                    {
+                        HostUser = hostUser,
+                        NotifierUserID = request.DoerUserId,
+                        StartDate = gregorianDate,
+                        CreateDate = DateTime.Now
+                    };
+                    acc.ExtrinsicReserves.Add(item);
+                    mediator.Send(new RejectRequestsInTimeCommand(request.AdvertiseId, gregorianDate,
+                        gregorianDate.AddDays(1), request.ActionSource, request.DoerUserId,
+                        true, request.SystemCanseledReserveId));
+                }
+            }
+            advertiseRepository.Update(acc);
+            advertiseRepository.Save();
+            mediator.Send(new UpdateAdvertiseOccupiedCommand(request.AdvertiseId));
             return Task.FromResult(Unit.Value);
         }
     }
