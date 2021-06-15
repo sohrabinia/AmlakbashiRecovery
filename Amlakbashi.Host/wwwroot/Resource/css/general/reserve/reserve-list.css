@@ -222,6 +222,14 @@ span.reserve-setbars_box-number.is_Active::after {
     flex-flow: wrap;
 }
 
+.unseccessful-reserve-header {
+    margin: 0 20px;
+    background-color: #fDc831;
+    font: small Miransans;
+    padding: 5px;
+    text-align: center;
+}
+
 /*.reserve-dashboard__item-container img{
     width:100%;
     height: 150px;

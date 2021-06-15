@@ -424,15 +424,16 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
+                var currentUser = userAccessor.CurrentUser;
                 if (reserve_id != null)
                     reserve_id = StringUtility.PersianNumberToEnglish(reserve_id);
                 if (selectType == ReserveManagerSelectType.All)
                 {
-                    selectType = userAccessor.CurrentUser.UserGeneralType > 0 ?
+                    selectType = currentUser.UserGeneralType > 0 ?
                         ReserveManagerSelectType.Host : ReserveManagerSelectType.Guest;
                 }
                 Dictionary<ReserveCategory, int> countDict;
-                var reserves = reserveService.GetReserveDashboardItems(userAccessor.CurrentUser,
+                var reserves = reserveService.GetReserveDashboardItems(currentUser,
                     selectType, category, reserve_id, status, out countDict);
                 if (initialPayId > 0)
                 {
@@ -445,7 +446,6 @@ namespace Amlakbashi.Host.Controllers
                 var index = 0;
                 var isHost = selectType == ReserveManagerSelectType.Host;
                 var isGuest = !isHost;
-                var currentUser = userAccessor.CurrentUser;
                 foreach (var reserve in reserves)
                 {
                     var advertise = reserve.Advertise;

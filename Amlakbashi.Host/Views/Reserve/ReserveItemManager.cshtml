@@ -52,6 +52,7 @@
         <input style="font:13px Miransans;padding:10px;" class="personal-filter-button bg-yellow" type="submit" value="جستجو" />
     </div>
 }
+
 <div class="reserve-dashboard__stepBars">
     @foreach (var category in categories)
     {
@@ -74,12 +75,15 @@
         </div>
     }
 </div>
+
 <div class="reserve-dashboard-container">
     <div id="@((int)ViewBag.selectType == 2 ? "host_root" : "guest_root")">
-        @await Html.PartialAsync("_ReserveList", Model, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "reserve_type", "host" }, { "reserveId", ViewBag.reserve_id }, { "categoryString", ViewBag.category < 0 ? "" : ReserveLocalization.GetReserveCategoryTitle((Reserve.ReserveCategory)ViewBag.category, ViewBag.selectType) } })
+        @await Html.PartialAsync("_ReserveList", Model, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "reserve_type", "host" }, { "reserveId", ViewBag.reserve_id }, { "category", ViewBag.category }, { "categoryString", ViewBag.category < 0 ? "" : ReserveLocalization.GetReserveCategoryTitle((Reserve.ReserveCategory)ViewBag.category, ViewBag.selectType) } })
     </div>
 </div>
+
 <div style="display: none" id="cancel_discussion_hidden_holder"></div>
+
 @section ScriptBlock
 {
     <script type="text/javascript">
