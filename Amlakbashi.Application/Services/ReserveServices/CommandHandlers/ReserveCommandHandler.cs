@@ -68,7 +68,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             var delay = DateTimeUtility.DelayAvoidingNightTime(new TimeSpan(0, 8, 0));
             var reserve = reserveRepository.Find(request.reserveId);
             mediator.Schedule(new SendPayReserveCallCommand(reserve.Id), delay);
-            mediator.Send(new ScheduleReserveAutoCancelCommand(reserve.Id, delay.Add(new TimeSpan(0, 30, 0))));
+            mediator.Send(new ScheduleReserveAutoCancelCommand(reserve.Id, delay.Add(new TimeSpan(0, 22, 0))));
             return Task.FromResult(Unit.Value);
         }
 
@@ -269,8 +269,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         public Task<TimeSpan> Handle(ScheduleSendReserveRequestCallCommand request, CancellationToken cancellationToken)
         {
             var now = DateTime.Now;
-            //var delay = new TimeSpan(0, 8, 0);
-            var delay = new TimeSpan(0, 1, 0);
+            var delay = new TimeSpan(0, 8, 0);
             var callTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
             callTime = callTime.AddTicks(delay.Ticks);
             var canselCall = false;
