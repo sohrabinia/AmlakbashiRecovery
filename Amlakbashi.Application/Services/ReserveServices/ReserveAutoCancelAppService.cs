@@ -20,9 +20,12 @@ namespace Amlakbashi.Application.Services.ReserveServices
         public void UpdateScheduledTime(long reserveId, int delayInMinute = 30)
         {
             var data = Repository.Query(q => q.FirstOrDefault(w => w.ReserveId == reserveId));
-            data.ScheduledTime = DateTime.Now.AddMinutes(delayInMinute);
-            Repository.Update(data);
-            Repository.Save();
+            if (data != null)
+            {
+                data.ScheduledTime = DateTime.Now.AddMinutes(delayInMinute);
+                Repository.Update(data);
+                Repository.Save();
+            }
         }
     }
 }

@@ -1412,7 +1412,13 @@ namespace Amlakbashi.Host.Controllers
             {
                 var acc = advertiseService.Find(id);
                 var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s));
-                return GenerateJsonResult(new { status = 1, occupiedList = occupiedList });
+                var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
+                return GenerateJsonResult(new 
+                { 
+                    status = 1, 
+                    occupiedList = occupiedList,
+                    extrinsicList = extrinsicList
+                });
             }
             catch (Exception exc)
             {
@@ -1434,7 +1440,6 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var checkResult = advertiseService.CheckSetAsOccupiedDateRange(advertise_id,
                     from_date, to_date);
-                List<long> occupiedList;
                 if (checkResult.Result == CheckSetOccupiedResult.OK ||
                     checkResult.Result == CheckSetOccupiedResult.ContainsReserveRequest)
                 {
@@ -1447,12 +1452,13 @@ namespace Amlakbashi.Host.Controllers
                         changeToday = true;
                     }
                     acc = advertiseService.Find(acc.Id, true);
-                    occupiedList = acc.OccupiedDates().Select(s =>
-                        DateTimeUtility.DateValueOfJS(s)).ToList();
+                    var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+                    var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
                     return GenerateJsonResult(new { 
                         status = 1, 
                         msg = "محدوده انتخاب شده به عنوان روز های پر ثبت شد",
                         occupiedList = occupiedList,
+                        extrinsicList = extrinsicList,
                         changeToday = changeToday
                     });
                 }
@@ -1506,11 +1512,13 @@ namespace Amlakbashi.Host.Controllers
                         changeToday = true;
                     }
                     var occupiedList = advertise.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+                    var extrinsicList = advertise.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
                     return GenerateJsonResult(new
                     {
                         status = 1,
                         msg = checkResult.ToString(),
                         occupiedList = occupiedList,
+                        extrinsicList = extrinsicList,
                         changeToday = changeToday
                     });
                 }
@@ -2655,7 +2663,9 @@ namespace Amlakbashi.Host.Controllers
                 return null;
             }
             var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+            var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
             ViewBag.occupiedList = SerializeUtility.SerializeToJS(occupiedList);
+            ViewBag.extrinsicList = SerializeUtility.SerializeToJS(extrinsicList);
             return PartialView("_AccSetOccupied", acc);
         }
 

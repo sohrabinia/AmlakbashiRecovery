@@ -462,7 +462,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                     acc.ExtrinsicReserves.Add(item);
                     mediator.Send(new RejectRequestsInTimeCommand(request.AdvertiseId, gregorianDate,
                         gregorianDate.AddDays(1), request.ActionSource, request.DoerUserId,
-                        true, request.SystemCanseledReserveId));
+                        true, request.SystemCanseledReserveId, true, true));
                 }
             }
             advertiseRepository.Update(acc);

@@ -102,9 +102,9 @@
     border-color:#f4f4f4;
 }
 
-.jalali-occupied-day span:not(.jalali-reserved-label) {
+/*.jalali-occupied-day span:not(.jalali-reserved-label) {
     color: #d3d1d1;
-}
+}*/
 
 .jalali-selected-day {
     background-color:#fdd835;
@@ -115,7 +115,17 @@
 }
 
 .jalali-reserved-label {
-    color:#606060;
+    color: #606060;
+    font-size: 0.6em;
+}
+
+.jalali-reserved-label-host {
+    color: #50C878;
+    font-size: 0.6em;
+}
+
+.jalali-filled-label {
+    color: #606060;
     font-size: 0.6em;
 }
 

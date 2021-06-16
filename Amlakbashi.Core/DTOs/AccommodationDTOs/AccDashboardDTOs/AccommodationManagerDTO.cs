@@ -54,12 +54,14 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                     }
                 }
                 var _unavailableDates = new List<long>();
+                var _extrinsicDates = new List<long>();
                 if (!item.Childs.Any())
                 {
                     //_unavailableDates = ReserveDepend.GetAdvertiseUnavailableDates(item.AdvertiseID,
                     //    ReserveDepend.OccupiedSelectType.ForFrom,
                     //    ReserveDepend.OccupiedSource.All, item, reserves, occupiedTables).ConvertAll(x => x.Replace(",", "/"));
                     _unavailableDates = item.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+                    _extrinsicDates = item.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
                 }
                 var _mainType = !hasChildren ? AccMainType.Single :
                         (hotelAccTypes.Contains(item.TypeID) ?
@@ -189,6 +191,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                                     && a.SeenByHost == false),
                     userRating = item.AverageUserRating,
                     unavailableDates = _unavailableDates,
+                    extrinsicDates = _extrinsicDates,
                     discounts = _mainType != AccMainType.Single ? new List<DiscountDTO>() : item.DiscountTables.Select(s => (DiscountDTO)s).ToList(),
                     hotelRooms = _hotelRooms,
                     apartmentUnits = _apartmentUnits,

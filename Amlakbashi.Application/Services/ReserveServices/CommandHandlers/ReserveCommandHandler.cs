@@ -232,7 +232,16 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             {
                 if (DateTimeUtility.DateRangesHaveOverlap(request.startDate, request.endDate, item.StartDate, item.EndDate))
                 {
-                    mediator.Send(new SetHostResponseCommand(item.Id, HostResponseEnum.Rejected, request.sendSms, request.actionSource, request.doerUserId, true));
+                    if (request.doSystemCancel)
+                    {
+                        mediator.Send(new SetReserveStatusCommand(item.Id, ReserveStatus.CanceledBySystem, 
+                            request.sendSms, request.actionSource, request.doerUserId, true));
+                    }
+                    else
+                    {
+                        mediator.Send(new SetHostResponseCommand(item.Id, HostResponseEnum.Rejected, request.sendSms, 
+                            request.actionSource, request.doerUserId, true));
+                    }
                 }
             }
             return Task.FromResult(Unit.Value);
@@ -260,7 +269,8 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         public Task<TimeSpan> Handle(ScheduleSendReserveRequestCallCommand request, CancellationToken cancellationToken)
         {
             var now = DateTime.Now;
-            var delay = new TimeSpan(0, 8, 0);
+            //var delay = new TimeSpan(0, 8, 0);
+            var delay = new TimeSpan(0, 1, 0);
             var callTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
             callTime = callTime.AddTicks(delay.Ticks);
             var canselCall = false;
