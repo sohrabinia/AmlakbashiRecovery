@@ -350,9 +350,25 @@ function updateDatePickerOccupied(elems, setting) {
         $monthElem.find('.jalali-real-day').each(function () {
             var value = parseInt($(this).attr('data-value'));
             occupied = setting.occupiedList && setting.occupiedList.includes(value);
+            var isHostPanel = false;
+            var isExtrinsic = false;
+            if (setting.extrinsicList != undefined) {
+                isHostPanel = true;
+                isExtrinsic = occupied && setting.extrinsicList.includes(value);
+            }
             if (occupied) {
                 $(this).find('.jalali-price-label').hide();
-                $(this).append('<span class="jalali-reserved-label">رزرو شده</span>');
+                if (isExtrinsic) {
+                    $(this).append('<span class="jalali-filled-label">پر شده</span>');
+                }
+                else {
+                    if (isHostPanel) {
+                        $(this).append('<span class="jalali-reserved-label-host">رزرو شده</span>');
+                    }
+                    else {
+                        $(this).append('<span class="jalali-reserved-label">رزرو شده</span>');
+                    }
+                }
                 $(this).addClass('jalali-occupied-day');
                 if (!setting.occupiedSelectEnabled) {
                     $(this).addClass('jalali-disabled-day');

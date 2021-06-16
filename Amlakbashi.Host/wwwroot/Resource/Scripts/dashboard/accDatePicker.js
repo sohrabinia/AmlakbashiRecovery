@@ -68,6 +68,7 @@ function initializecalendarWindow(elem) {
     {
         priceDict: {},
         occupiedList: occupiedDictionary[currentAccId],
+        extrinsicList: extrinsicDictionary[currentAccId],
         selectionType: 'multi',
         occupiedSelectEnabled: true,
         monthOffset: 0,
@@ -222,6 +223,7 @@ function updateOccupieddates(id) {
             {
                 priceDict: {},
                 occupiedList: ret.occupiedList,
+                extrinsicList: ret.extrinsicList,
                 monthOffset: 0,
                 selectionType: 'multi',
                 occupiedSelectEnabled: true,

@@ -25,12 +25,14 @@ namespace Amlakbashi.Host.Controllers
         private readonly IAdvertiseAppService advertiseService;
         private readonly IChatAppService chatService;
         private readonly IReserveAppService reserveService;
+        private readonly IReserveAutoCancelAppService reserveAutoCancelService;
         private readonly IUserAccessor userAccessor;
         private readonly IReserveDashboardHubServer reserveDashboardHubServer;
         private readonly IReserveAdminHubServer reserveAdminHubServer;
         public ChatController(ILog logger,
             IUserAppService userService,
             IReserveAppService reserveService,
+            IReserveAutoCancelAppService reserveAutoCancelService,
             IChatAppService chatService,
             IAdvertiseAppService advertiseService,
             IUserAccessor userAccessor,
@@ -45,6 +47,7 @@ namespace Amlakbashi.Host.Controllers
             this.userAccessor = userAccessor;
             this.reserveDashboardHubServer = reserveDashboardHubServer;
             this.reserveAdminHubServer = reserveAdminHubServer;
+            this.reserveAutoCancelService = reserveAutoCancelService;
         }
 
         [Authorize(Policy = Policies.Reserve_View)]
@@ -220,6 +223,7 @@ namespace Amlakbashi.Host.Controllers
                     ChatStatus = has_forbidden_characters ? (int)Chat.ChatStatusEnum.HasForbiddenCharacters : (int)Chat.ChatStatusEnum.Sent
                 };
                 var chat = chatService.Insert(msg);
+                reserveAutoCancelService.UpdateScheduledTime(reserve_id);
                 var reserveChatCount = chatService.GetCountByReserveId(reserve_id);
                 reserveAdminHubServer.ChangeChatCountFromServer(reserve_id, reserveChatCount,
                     chatService.GetNotReadSupportCountByReserveId(reserve_id));

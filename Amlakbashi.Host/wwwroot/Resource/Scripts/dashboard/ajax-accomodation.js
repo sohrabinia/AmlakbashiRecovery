@@ -192,6 +192,7 @@ function setFullRooms(id, elem) {
             {
                 priceDict: {},
                 occupiedList: ret.occupiedList,
+                extrinsicList: ret.extrinsicList,
                 monthOffset: 0,
                 selectionType: 'multi',
                 occupiedSelectEnabled: true,
@@ -227,6 +228,7 @@ function setEmptyRooms(id, elem) {
                     {
                         priceDict: {},
                         occupiedList: ret.occupiedList,
+                        extrinsicList: ret.extrinsicList,
                         monthOffset: 0,
                         selectionType: 'multi',
                         occupiedSelectEnabled: true,

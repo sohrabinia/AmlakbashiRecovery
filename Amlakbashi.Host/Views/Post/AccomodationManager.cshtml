@@ -1,21 +1,27 @@
 ﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs;
+@using Amlakbashi.Core.Common.Utilities;
+
+@model AccommodationManagerDTO
+
 @{
     ViewBag.Title = "آگهی های من";
     ViewBag.personal = true;
     Layout = "~/Views/Shared/_Dashboard.cshtml";
 }
-@model AccommodationManagerDTO
+
 @section StyleLink{
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/dashboard/host-panel.css&v=10">
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/dashboard/numberinput.css&v=1">
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/popup-calendar.css">
 }
+
 @section ScriptLink{
     <script src="/file/getjs?src=/resource/Scripts/dashboard/host-panel.js&v=3"></script>
     <script src="/file/getjs?src=/resource/Scripts/dashboard/accDatePicker.js&v=2"></script>
     <script src="/file/getjs?src=/resource/Scripts/dashboard/ajax-accomodation.js&v=4"></script>
     <script src="/file/getjs?src=/resource/Scripts/dashboard/numberInput.js&v=1"></script>
 }
+
 <form id="filter-banner" action="/post/accomodationmanager" method="get" class="form-filter-banner">
     <input type="hidden" value=@ViewBag.UserID>
     <span class="filter-banner__item">
@@ -39,6 +45,7 @@
         <input class="bg-yellow" type="submit" value="فیلتر">
     </span>
 </form>
+
 @foreach (var item in Model.accList)
 {
     <!-- Start acclist -->
@@ -54,8 +61,10 @@
                     {
                         <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
                     }
-                 <div> @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-                    new ModelStateDictionary()) { { "score", item.userRating } })</div>
+                    <div>
+                        @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                     new ModelStateDictionary()) { { "score", item.userRating } })
+                    </div>
                     <a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="backgorund:@( item.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>
                 </div>
             </div>
@@ -79,7 +88,7 @@
                 </div>
                 <div class="flex-style quick-access-desktop" style="justify-content:@(item.mainType == AccMainType.Single ? "space-between" : item.status == Advertise.AdvertiseStatus.NotCompleted?"flex-start": "flex-end");">
                     @*<button type="button" data-type='@item.mainType.ToString().ToLower()' class="button_fast-reserve" > رزرو آنی</button>*@
-                    <a  href="@item.editUrl" target="_blank" class="completed-advertise-button" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"flex":"none")">
+                    <a href="@item.editUrl" target="_blank" class="completed-advertise-button" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"flex":"none")">
                         <p>اطلاعات را تکمیل کنید</p>
                     </a>
                     <form style="display:@(item.mainType == AccMainType.Single && item.status != Advertise.AdvertiseStatus.NotCompleted ?  "block" : "none" );">
@@ -116,7 +125,7 @@
                 <div class="icons div-unset" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
                     <div>
                         @*<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-s" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="30" height="30" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>
-                        <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-xs" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="24" height="24" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_24x24" /></a>*@
+                            <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-xs" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="24" height="24" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_24x24" /></a>*@
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
                         <a title="حذف " class="icons-item trash-icon" onclick="deleteButton(@item.id , this)"><i class="fa fa-trash"></i></a>
                         <a href="@item.editUrl" class="icons-item edit-icon-banner" target="_blank"><i class="fas fa-pencil-alt"></i></a>
@@ -316,11 +325,13 @@
     </div>
     <!-- END acclist -->
 }
+
 <div id="pagenation-stylee" class="row">
     <div class="adpagelist">
         @Html.PagedListPager((IPagedList)Model.accList, page => Url.Action("accomodationmanager", "post", new { page, type = (string)ViewBag.type }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5 })
     </div>
 </div>
+
 @section ScriptBlock{
     <script type="text/javascript">
         function DeserializeOccupiedList(str) {
@@ -329,59 +340,67 @@
             var occupiedList = JSON.parse(occupiedListStr);
             return occupiedList;
         }
+
         var showReasonsDic = {};
         @foreach( var item in Model.accList)
         {
             @:var reasonList = [];
-                         foreach (var reason in item.notVerifyReasons) { @: reasonList.push('@reason');
-                         } @*@:var showReasonsStr = DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(item.notVerifyReasons)');*@   @: showReasonsDic[@item.id]=reasonList;
-                         } var occupiedDictionary = { }; @foreach(var occupiued in Model.accList) { @: var occupiedListString=DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(occupiued.unavailableDates)');
-                         @:occupiedDictionary['@occupiued.id']=occupiedListString;
-                         foreach ( var Hotel in occupiued.hotelRooms)
-                         {
-                         @:var occupiedListStringHotel=DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(Hotel.unavailableDates)');
-                         @:occupiedDictionary['@Hotel.id']=occupiedListStringHotel;
-                         }
-                         foreach ( var apartment in occupiued.apartmentUnits)
-                         {
-                         @:var occupiedListStringApartment=DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(apartment.unavailableDates)');
-                         @:occupiedDictionary['@apartment.id']=occupiedListStringApartment;
-                         }
-                         foreach ( var suitUnits in occupiued.suitUnits)
-                         {
-                         @:var occupiedListStringSuitUnits=DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(suitUnits.unavailableDates)');
-                         @:occupiedDictionary['@suitUnits.id']=occupiedListStringSuitUnits;
-                         }
-                         foreach ( var villaUnits in occupiued.villaUnits)
-                         {
-                         @:var occupiedListStringVillaUnits=DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(villaUnits.unavailableDates)');
-                         @:occupiedDictionary['@villaUnits.id '] = occupiedListStringVillaUnits;
-                         }
-                        foreach ( var houseUnits in occupiued.houseUnits)
-                        {
-                                @:var occupiedListStringHouseUnits = DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(houseUnits.unavailableDates)');
-                                @:occupiedDictionary['@houseUnits.id'] = occupiedListStringHouseUnits;
-                            }
-                            foreach ( var hutUnits in occupiued.hutUnits)
-                            {
-                                @:var occupiedListStringhutUnits = DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(hutUnits.unavailableDates)');
-                                @:occupiedDictionary['@hutUnits.id'] = occupiedListStringhutUnits;
-                            }
-                        }
+            foreach (var reason in item.notVerifyReasons)
+            {
+                @: reasonList.push('@reason');
+            }
+            @*@:var showReasonsStr = DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(item.notVerifyReasons)');*@
+            @: showReasonsDic[@item.id]=reasonList;
+         }
 
-                         function showReasons(id) {
-                         debugger;
-                         var reasonsStr;
-                         Object.keys(showReasonsDic).forEach(function (key) {
-                         if (key == id) {
-                         showReasonsDic[key].forEach(function (item) {
-                         reasonsStr=$(".button_reason_not_verified div").append(`${item}<br>`);
+        var occupiedDictionary = {};
+        var extrinsicDictionary = {};
+        @foreach(var occupiued in Model.accList)
+        {
+            @:occupiedDictionary['@occupiued.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(occupiued.unavailableDates)');
+            @:extrinsicDictionary['@occupiued.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(occupiued.extrinsicDates)');
+            foreach ( var Hotel in occupiued.hotelRooms)
+            {
+                @:occupiedDictionary['@Hotel.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(Hotel.unavailableDates)');
+                @:extrinsicDictionary['@Hotel.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(Hotel.extrinsicDates)');
+            }
+            foreach ( var apartment in occupiued.apartmentUnits)
+            {
+                @:occupiedDictionary['@apartment.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(apartment.unavailableDates)');
+                @:extrinsicDictionary['@apartment.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(apartment.extrinsicDates)');
+            }
+            foreach ( var suitUnits in occupiued.suitUnits)
+            {
+                @:occupiedDictionary['@suitUnits.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(suitUnits.unavailableDates)');
+                @:extrinsicDictionary['@suitUnits.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(suitUnits.extrinsicDates)');
+            }
+            foreach ( var villaUnits in occupiued.villaUnits)
+            {
+                @:occupiedDictionary['@villaUnits.id '] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(villaUnits.unavailableDates)');
+                @:extrinsicDictionary['@villaUnits.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(villaUnits.extrinsicDates)');
+            }
+            foreach ( var houseUnits in occupiued.houseUnits)
+            {
+                @:occupiedDictionary['@houseUnits.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(houseUnits.unavailableDates)');
+                @:extrinsicDictionary['@houseUnits.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(houseUnits.extrinsicDates)');
+            }
+            foreach ( var hutUnits in occupiued.hutUnits)
+            {
+                @:occupiedDictionary['@hutUnits.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(hutUnits.unavailableDates)');
+                @:extrinsicDictionary['@hutUnits.id'] = DeserializeOccupiedList('@SerializeUtility.SerializeToJS(hutUnits.extrinsicDates)');
+            }
+        }
+
+        function showReasons(id) {
+            var reasonsStr;
+            Object.keys(showReasonsDic).forEach(function (key) {
+                if (key == id) {
+                    showReasonsDic[key].forEach(function (item) {
+                        reasonsStr = $(".button_reason_not_verified div").append(`${item}<br>`);
                     });
                 }
             });
             showInfoMessage('موارد زیر را اصلاح کنید', reasonsStr);
         }
-
-
     </script>
 }

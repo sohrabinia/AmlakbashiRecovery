@@ -50,7 +50,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.EventHandlers
                 var scheduleItem = new ReserveAutoCancel()
                 {
                     ReserveId = reserve.Id,
-                    ScheduledTime = DateTime.Now.Add(delay.Add(new TimeSpan(24, 0, 0))),
+                    ScheduledTime = DateTime.Now.Add(delay.Add(new TimeSpan(0, 22, 0))),
                     SendSms = true,
                     Force = false
                 };

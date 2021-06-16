@@ -2,6 +2,7 @@
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Core.Infrastructure.StyleHelpers;
+using System;
 using System.Collections.Generic;
 using static Amlakbashi.Core.Entities.Reserve;
 
@@ -35,6 +36,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public int unreadChatCount { get; set; }
         public bool cancelIsAvailable { get; set; }
         public string rulesString { get; set; }
+        public bool isRecently { get; set; }
 
         public static ReserveDashboardItemDTO Generate(Reserve reserve,
             int index, bool isGuest, bool isHostler, int userId, long paidAmount,
@@ -75,6 +77,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             dto.rulesString = SerializeUtility.SerializeToJS(rulesDict);
             dto.cancelIsAvailable = (isGuest && Reserve.CancelIsAvailableForGuest((int)reserve.Status)) ||
                 (isHostler && Reserve.CancelIsAvailableForHost((int)reserve.Status));
+            dto.isRecently = (DateTime.Now - reserve.CreateDate).TotalHours <= 24 ? true : false;
             return dto;
         }
     }

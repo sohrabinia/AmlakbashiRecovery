@@ -11,6 +11,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
         public string photoUrl { get; set; }
         public List<DiscountDTO> discounts { get; set; }
         public List<long> unavailableDates { get; set; }
+        public List<long> extrinsicDates { get; set; }
         public bool todayIsEmpty { get; set; }
         public bool todayIsFull { get; set; }
     }

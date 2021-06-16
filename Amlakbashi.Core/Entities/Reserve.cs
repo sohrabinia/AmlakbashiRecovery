@@ -287,6 +287,22 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
+        public static int GetUnseccessfulReservePriority(int status)
+        {
+            switch ((ReserveStatus)status)
+            {
+                case ReserveStatus.CanceledBySystem:
+                    return 1;
+                case ReserveStatus.CanceledByHost:
+                case ReserveStatus.CancelRequestByGuest:
+                    return 2;
+                case ReserveStatus.Rejected:
+                    return 3;
+                default:
+                    return 4;
+            }
+        }
+
         public static bool StatusIsReserving(ReserveStatus status)
         {
             switch (status)

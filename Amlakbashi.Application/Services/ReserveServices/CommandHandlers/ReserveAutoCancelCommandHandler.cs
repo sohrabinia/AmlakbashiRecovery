@@ -2,6 +2,7 @@
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading;
@@ -22,11 +23,11 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             this.repository = repository;
             this.mediator = mediator;
         }
+
         public Task<Unit> Handle(RefreshReserveAutoCancelCommand request, CancellationToken cancellationToken)
         {
             var now = DateTime.Now;
-            var queue = repository.Query(q =>
-                q.Where(w => w.ScheduledTime <= now)).ToList();
+            var queue = repository.Query(q => q.Where(w => w.ScheduledTime <= now)).ToList();
             foreach (var item in queue)
             {
                 mediator.Send(new SystemCancelReserveCommand(item.ReserveId, item.SendSms, item.Force));
@@ -38,14 +39,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
 
         public Task<Unit> Handle(ScheduleReserveAutoCancelCommand request, CancellationToken cancellationToken)
         {
-            var scheduleItem = new ReserveAutoCancel()
-            {
-                ReserveId = request.reserveId,
-                ScheduledTime = DateTime.Now.Add(request.delay),
-                SendSms = request.sendSms,
-                Force = request.force
-            };
-            repository.Insert(scheduleItem);
+            var reserveAutoCansel = repository.Query(q => q.FirstOrDefault(f => f.ReserveId == request.reserveId));
+            reserveAutoCansel.ScheduledTime = DateTime.Now.Add(request.delay);
+            repository.Update(reserveAutoCansel);
             repository.Save();
             return Task.FromResult(Unit.Value);
         }

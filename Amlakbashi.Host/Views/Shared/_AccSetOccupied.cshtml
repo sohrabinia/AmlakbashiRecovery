@@ -9,12 +9,18 @@
     var occupiedListStr = '@ViewBag.occupiedList';
     occupiedListStr = occupiedListStr.replaceAll('&quot;', '"');
     var occupiedList = JSON.parse(occupiedListStr);
+
+    var extrinsicListStr = '@ViewBag.extrinsicList';
+    extrinsicListStr = extrinsicListStr.replaceAll('&quot;', '"');
+    var extrinsicList = JSON.parse(extrinsicListStr);
+
     firstSelectedDay = undefined;
     secondSelectedDay = undefined;
     updateDatePicker([$('#main-date-picker')[0]], jalaliCurrentMonth,
     {
         priceDict: {},
         occupiedList: occupiedList,
+        extrinsicList: extrinsicList,
         monthOffset: 0,
         selectionType: 'multi',
         occupiedSelectEnabled: true,
@@ -104,6 +110,7 @@
                             {
                                 priceDict: {},
                                 occupiedList: ret.occupiedList,
+                                extrinsicList: ret.extrinsicList,
                                 monthOffset: 0,
                                 selectionType: 'multi',
                                 occupiedSelectEnabled: true,
@@ -113,6 +120,7 @@
                                 {
                                     priceDict: {},
                                     occupiedList: ret.occupiedList,
+                                    extrinsicList: ret.extrinsicList,
                                     monthOffset: 0,
                                     selectionType: 'multi',
                                     occupiedSelectEnabled: true,
@@ -152,6 +160,7 @@
                         {
                             priceDict: {},
                             occupiedList: ret.occupiedList,
+                            extrinsicList: ret.extrinsicList,
                             monthOffset: 0,
                             selectionType: 'multi',
                             occupiedSelectEnabled: true,
@@ -161,6 +170,7 @@
                             {
                                 priceDict: {},
                                 occupiedList: ret.occupiedList,
+                                extrinsicList: ret.extrinsicList,
                                 monthOffset: 0,
                                 selectionType: 'multi',
                                 occupiedSelectEnabled: true,

@@ -16,5 +16,16 @@ namespace Amlakbashi.Application.Services.ReserveServices
         public ReserveAutoCancelAppService(IRepository<ReserveAutoCancel, long> repository, ICacheManager<ReserveAutoCancel> cache) : base(repository, cache)
         {
         }
+
+        public void UpdateScheduledTime(long reserveId, int delayInMinute = 30)
+        {
+            var data = Repository.Query(q => q.FirstOrDefault(w => w.ReserveId == reserveId));
+            if (data != null)
+            {
+                data.ScheduledTime = DateTime.Now.AddMinutes(delayInMinute);
+                Repository.Update(data);
+                Repository.Save();
+            }
+        }
     }
 }

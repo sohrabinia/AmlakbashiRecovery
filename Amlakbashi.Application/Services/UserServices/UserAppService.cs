@@ -608,7 +608,8 @@ namespace Amlakbashi.Application.Services.UserServices
                     user.AmlakbashiScore = 1000;
                     if (!string.IsNullOrEmpty(presentorCode))
                     {
-                        var prId = int.Parse(presentorCode);
+                        int prId = 0;
+                        int.TryParse(presentorCode, out prId);
                         var prUser = Repository.Find(prId);
                         if (prUser == null)
                         {
