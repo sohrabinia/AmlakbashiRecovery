@@ -41,6 +41,7 @@ namespace Amlakbashi.Core.Common.Utilities
             DateTime gregorian_date = new DateTime(persian_date_split[0], persian_date_split[1], persian_date_split[2], persian_calendar);
             return gregorian_date;
         }
+
         public static string GregorianToPersianDate(DateTime gregorian_date, bool include_zero = false)
         {
             PersianCalendar persian_calendar = new PersianCalendar();
@@ -116,16 +117,19 @@ namespace Amlakbashi.Core.Common.Utilities
             }
             return persian_date_list;
         }
+
         public static int GetPersianDateRangeDays(string from_date, string to_date)
         {
             var from_date_gregorian = PersianDateToGregorian(from_date);
             var to_date_gregorian = PersianDateToGregorian(to_date);
             return GetDatRangeDays(from_date_gregorian, to_date_gregorian);
         }
+
         public static int GetDatRangeDays(DateTime from_date, DateTime to_date)
         {
             return (int)(to_date - from_date).TotalDays;
         }
+
         public static long DateValueOfJS(DateTime date)
         {
             date = date.ToUniversalTime();

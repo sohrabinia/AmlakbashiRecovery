@@ -53,6 +53,7 @@ namespace Amlakbashi.Host.Controllers.API
                 switch (result)
                 {
                     case GuestPayResult.ReadyToPay:
+                        reserveAutoCancelService.UpdateScheduledTime(reserve_id);
                         return Redirect(GeneralData.WebsiteUrl + "/Cart/ConfirmAndPayment?id="
                             + payment_id
                             + "&bank=2" + "&useCustomRedirect=true"

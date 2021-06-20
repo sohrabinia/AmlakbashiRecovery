@@ -29,6 +29,7 @@ using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using Amlakbashi.Accounting.BankingContext;
 using System.Threading.Tasks;
+using Amlakbashi.Core.DTOs.PaymentDTOs;
 
 namespace Amlakbashi.Accounting
 {
@@ -490,6 +491,21 @@ namespace Amlakbashi.Accounting
             paymentService.Update(editedPayment);
         }
 
+        public CheckPaymentDTO CheckPaymentResult(int paymentId)
+        {
+            var payment = paymentService.Find(paymentId);
+            var result = paymentOperator.ReadPaymentResult(BanksEnum.Pasargad, payment.Id, payment.Date);
+            if (result.Result == true)
+            {
+                payment.Authority = result.TransactionReferenceId;
+                payment.RefID = Convert.ToInt64(result.ReferenceNumber);
+                payment.PayDate = DateTime.Parse(result.TransactionDate);
+                payment.Status = 1;
+                paymentService.Update(payment);
+            }
+            return result;
+        }
+
         // GroupPayment Functions
         public IList<GroupPayment> FilterGroupPayment(int status)
         {
@@ -581,7 +597,7 @@ namespace Amlakbashi.Accounting
         }
 
         public GuestPayResult GuestPayReserve(int userId, long reserveId,
-            int payReserveType, out long payment_id, int doerUserId,
+            int payReserveType, out long paymentId, int doerUserId,
             ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId)
         {
             var payType = (ReservePaymentType)payReserveType;
@@ -589,13 +605,18 @@ namespace Amlakbashi.Accounting
             {
                 case ReservePaymentType.GuestDeposite:
                 case ReservePaymentType.GuestClearing:
-                    bool already_payed;
-                    long price;
-                    payment_id = (long)PayGuest(userId, reserveId, payType, out already_payed,
-                        out price, ReservePaymentMethod.EPay, doerUserId, actionSource, useCoupon, usePrize, couponId);
-                    if (already_payed)
+                    var reserve = repository.FindReserve(reserveId);
+                    if (reserve.Status == ReserveStatus.CanceledBySystem)
                     {
-                        var reserve = repository.FindReserve(reserveId);
+                        paymentId = 0;
+                        return GuestPayResult.IncorrectPaymentType;
+                    }
+                    bool alreadyPayed;
+                    long price;
+                    paymentId = (long)PayGuest(userId, reserveId, payType, out alreadyPayed,
+                        out price, ReservePaymentMethod.EPay, doerUserId, actionSource, useCoupon, usePrize, couponId);
+                    if (alreadyPayed)
+                    {
                         if (reserve.Status == ReserveStatus.WaitForReserve)
                         {
                             mediator.Send(new SetReserveStatusCommand(reserveId,
@@ -621,10 +642,10 @@ namespace Amlakbashi.Accounting
                 case ReservePaymentType.SiteDepositeToHost:
                 case ReservePaymentType.SiteClearingToHost:
                 case ReservePaymentType.SiteRefundToGuest:
-                    payment_id = 0;
+                    paymentId = 0;
                     return GuestPayResult.UnhandledPaymentType;
                 default:
-                    payment_id = 0;
+                    paymentId = 0;
                     return GuestPayResult.IncorrectPaymentType;
             }
         }
@@ -638,14 +659,19 @@ namespace Amlakbashi.Accounting
             {
                 case ReservePaymentType.GuestDeposite:
                 case ReservePaymentType.GuestClearing:
-                    bool already_payed;
+                    var reserve = repository.FindReserve(reserveId);
+                    if (reserve.Status == ReserveStatus.CanceledBySystem)
+                    {
+                        paymentId = 0;
+                        return GuestPayResult.IncorrectPaymentType;
+                    }
+                    bool alreadyPayed;
                     long price;
-                    paymentId = PayGuest(userId, reserveId, payType, out already_payed,
+                    paymentId = PayGuest(userId, reserveId, payType, out alreadyPayed,
                         out price, ReservePaymentMethod.AmlakbashiCredit, doerUserId,
                         actionSource, useCoupon, usePrize, couponId);
-                    if (already_payed)
+                    if (alreadyPayed)
                     {
-                        var reserve = repository.FindReserve(reserveId);
                         if (reserve.Status == ReserveStatus.WaitForReserve)
                         {
                             mediator.Send(new SetReserveStatusCommand(reserveId,
@@ -742,13 +768,14 @@ namespace Amlakbashi.Accounting
                         var objpay = paymentService.Find(pid);
                         string referenceNumber;
                         long transactionReferenceID;
+                        DateTime transactionDate;
                         var verified = paymentOperator.VerifyPayment(bank,
                             paymentResult, objpay.Id, objpay.TotalPrice,
-                            out referenceNumber, out transactionReferenceID);
+                            out referenceNumber, out transactionReferenceID, out transactionDate);
                         if (verified)
                         {
                             if (GiveProduct(pid, userId, referenceNumber,
-                                transactionReferenceID, out msg, actionSource,
+                                transactionReferenceID, transactionDate, out msg, actionSource,
                                 doerUserId))
                             {
                                 invalidInput = false;
@@ -785,7 +812,8 @@ namespace Amlakbashi.Accounting
             Random random = new Random();
             var randomRefId = random.Next(100000000, 999999999);
             var randomTransactionId = random.Next(100000000, 999999999);
-            return GiveProduct(pid, userId, randomRefId.ToString(), randomTransactionId, out msg, ActionSourceEnum.Background, userId);
+            var transactionDate = DateTime.Now;
+            return GiveProduct(pid, userId, randomRefId.ToString(), randomTransactionId, transactionDate, out msg, ActionSourceEnum.Background, userId);
         }
 
         public Dictionary<string, object> GeneratePaymentData(BanksEnum bank, int pid, string redirectAddress)
@@ -795,7 +823,7 @@ namespace Amlakbashi.Accounting
             DateTime invoiceDate;
             var result = paymentOperator.GeneratePaymentData(bank, pid,
                 payment.TotalPrice, redirectAddress, out sign, out invoiceDate);
-            payment.Authority = sign;
+            //payment.Authority = sign;
             payment.BankId = (int)bank;
             payment.Date = invoiceDate;
             UpdatePayment(payment);
@@ -906,7 +934,7 @@ namespace Amlakbashi.Accounting
         }
 
         private bool GiveProduct(int pid, int user_id, string referenceNumber,
-            long transactionReferenceID, out string msg,
+            long transactionReferenceID, DateTime transactionDate, out string msg,
             ActionSourceEnum actionSource, int doerUserId)
         {
             try
@@ -920,7 +948,7 @@ namespace Amlakbashi.Accounting
                 objpay.RefID = long.Parse(referenceNumber);
                 objpay.Authority = transactionReferenceID.ToString();
                 objpay.Status = 1;
-                objpay.PayDate = DateTime.Now;
+                objpay.PayDate = transactionDate;
                 paymentService.Update(objpay);
                 var user = repository.FindUser(user_id);
                 var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;

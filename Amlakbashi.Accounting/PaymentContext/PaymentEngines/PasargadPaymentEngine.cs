@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Accounting.PaymentContext.PaymentEngines.Interfaces;
+using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace Amlakbashi.Accounting.PaymentContext.PaymentEngines
         const string merchantCode = "4398762";
         const string terminalCode = "1573467";
         const string key = "<RSAKeyValue><Modulus>jgQHQPmnm8fvGZf3MNGQ+BhTzLG5cZaBFU75Ew1BqfKBVme+K6ZxByqfH0UIkzAANoHeo4R5C7r5E2jb3ZgRWA64rKQhNRhn8OPhFd5s3avYvP4musD1TH2oVBE1tX1gVpFTRGjbJgjeHz1biBz0IQ/23ff8tI0ndRV50UaSGjM=</Modulus><Exponent>AQAB</Exponent><P>xoPujff/OxZzfK5gCRANggQDXApBCFvACOk+Eo+mxKkpo9jBDAJSYeYJhoSAjtUgPuFDF70xtHaXZde+EQ3gqw==</P><Q>tyO+dAF1tJPcCKmM+ovg6ePJfhGswHz00YyRkF+TE3r/ws3fpUo5VD+U6C3YXbGTgGZvSgQVmA6H3bMS3Vx8mQ==</Q><DP>JfHr9GkV+UZmVsvCAZl264Y22i3/lkhrYYir28JnnymykuYIqHH9K0dcRMEpDaRBYKOQPoZkbNlKQSZG512etw==</DP><DQ>hFYq4G7RnEwf+o5yVfXP75LvXc7t0yY4TlfSM84sXC5MNHtJuYn6BTvwoRnHuGSCHo1mq8hpxjfxy60D27tiOQ==</DQ><InverseQ>m5SRVGzsvzMRigpL3OZMATs5j50yKE8X855YjwESuN8HApNQk0Q1lp3GRbiY5N6O4K+vuDsTFsypWDPpkUVWJQ==</InverseQ><D>jYzCVicAwqrzTMVFYule34oP7JSwS+FBZCXE6RJrgqLt+1uIFyXcvtHirF44f8x2Sd4ENWOS6vg/zvLTQvmRPoF1Ofc8O7Hf4PnDKG+BlRZcZl7mTQp4JURK0+i+Y/t8EWDZlo0cnAEbWXei9iAE0dJ75qvlK64in/uRhvxXD2E=</D></RSAKeyValue>";
+
         public bool ReadPaymentResult(string tref, out string result)
         {
             HttpWebRequest request =
@@ -41,9 +43,48 @@ namespace Amlakbashi.Accounting.PaymentContext.PaymentEngines
             return resp.result.ToLower() == "true";
         }
 
+        public CheckPaymentDTO ReadPaymentResult(long paymentId, DateTime paymentDate)
+        {
+            HttpWebRequest request =
+                (HttpWebRequest)WebRequest.Create("https://pep.shaparak.ir/CheckTransactionResult.aspx");
+            string text = "invoiceNumber=" + paymentId + "&invoiceDate=" + paymentDate +
+                "&merchantCode=" + merchantCode + "&terminalCode=" + terminalCode;
+            byte[] textArray = Encoding.UTF8.GetBytes(text);
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = textArray.Length;
+            ServicePointManager.ServerCertificateValidationCallback = new
+                RemoteCertificateValidationCallback(RemoteCertificateValidation);
+
+            request.GetRequestStream().Write(textArray, 0, textArray.Length);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            StreamReader reader = new StreamReader(response.GetResponseStream());
+            var result = reader.ReadToEnd();
+            XDocument doc = XDocument.Parse(result); //or XDocument.Load(path)
+            string jsonText = JsonConvert.SerializeXNode(doc);
+            dynamic resp = ((dynamic)JsonConvert.DeserializeObject<ExpandoObject>(jsonText)).resultObj;
+
+            CheckPaymentDTO dto = new CheckPaymentDTO()
+            {
+                Result = Convert.ToBoolean(resp.result),
+                PaymentId = resp.invoiceNumber,
+                CreatePaymentDate = resp.invoiceDate,
+                TransactionReferenceId = resp.transactionReferenceID,
+                Price = resp.amount
+            };
+            if (dto.Result)
+            {
+                dto.TransactionDate = resp.transactionDate;
+                dto.ReferenceNumber = resp.referenceNumber;
+                dto.TraceNumber = resp.traceNumber;
+            }
+
+            return dto;
+        }
+
         public bool VerifyPayment(string paymentResult, int paymentId,
             long totalPayingPrice, out string referenceNumber,
-            out long transactionReferenceID)
+            out long transactionReferenceID, out DateTime transactionDate)
         {
             XDocument doc = XDocument.Parse(paymentResult); //or XDocument.Load(path)
             string jsonText = JsonConvert.SerializeXNode(doc);
@@ -86,16 +127,21 @@ namespace Amlakbashi.Accounting.PaymentContext.PaymentEngines
             {
                 referenceNumber = (string)resp.referenceNumber;
                 transactionReferenceID = long.Parse(resp.transactionReferenceID);
+                if (DateTime.TryParse(resp.transactionDate, out transactionDate) == false)
+                {
+                    transactionDate = DateTime.Now;
+                }
             }
             else
             {
                 referenceNumber = null;
                 transactionReferenceID = 0;
+                transactionDate = DateTime.Now;
             }
             return validated;
         }
 
-        public Dictionary<string,object> GeneratePaymentData(int paymentId,
+        public Dictionary<string, object> GeneratePaymentData(int paymentId,
             long paymentTotalAmount, string redirectAddress,
             out string sign, out DateTime invoiceDate)
         {

@@ -963,6 +963,7 @@ namespace Amlakbashi.Host.Controllers
                 switch (result)
                 {
                     case GuestPayResult.ReadyToPay:
+                        reserveAutoCancelService.UpdateScheduledTime(reserve_id);
                         return RedirectToAction("performpay", "cart", new { payment_id = payment_id });
                     default:
                         return Redirect(Request.Headers["referer"].ToString());

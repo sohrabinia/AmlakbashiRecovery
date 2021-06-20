@@ -285,6 +285,21 @@ namespace Amlakbashi.Host.Controllers
             return Redirect(string.Format("/{0}/{1}", redirect_controller, redirect_action));
         }
 
+        public IActionResult CheckPasargadPaymentResult(int paymentId)
+        {
+            try
+            {
+                var result = accounting.CheckPaymentResult(paymentId);
+                return PartialView("_CheckPaymentResult", result);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Cart.CheckPasargadPaymentResult", exc);
+                return Redirect("/errors/http500");
+            }
+            
+        }
+
 #if DEBUG
         [Authorize(Roles = Roles.TechnicalManager + "," + Roles.TechnicalEmployee)]
         public ActionResult TestVerifyPasargad(int pid)

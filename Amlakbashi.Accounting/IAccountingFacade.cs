@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Accounting.PaymentContext;
+using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.PaymentStatisticsDTOs;
 using Amlakbashi.Core.Entities;
@@ -85,6 +86,7 @@ namespace Amlakbashi.Accounting
         Payment FindPayment(long id);
         void InsertPayment(Payment newPayment);
         void UpdatePayment(Payment editedPayment);
+        CheckPaymentDTO CheckPaymentResult(int paymentId);
 
         // GroupPayment Functions
         IList<GroupPayment> FilterGroupPayment(int status);
