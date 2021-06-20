@@ -290,13 +290,6 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var result = accounting.CheckPaymentResult(paymentId);
-
-                //var test = new CheckPaymentDTO()
-                //{
-                //    PaymentId = 123456,
-                //    Result = true
-                //};
-
                 return PartialView("_CheckPaymentResult", result);
             }
             catch (Exception exc)
