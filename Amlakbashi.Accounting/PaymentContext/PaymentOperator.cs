@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Accounting.PaymentContext.PaymentEngines.Interfaces;
+using Amlakbashi.Core.DTOs.PaymentDTOs;
 using System;
 using System.Collections.Generic;
 
@@ -23,12 +24,17 @@ namespace Amlakbashi.Accounting.PaymentContext
             return GetEngine(bank).ReadPaymentResult(tref, out result);
         }
 
+        public CheckPaymentDTO ReadPaymentResult(BanksEnum bank, long paymentId, DateTime paymentDate)
+        {
+            return GetEngine(bank).ReadPaymentResult(paymentId, paymentDate);
+        }
+
         public bool VerifyPayment(BanksEnum bank, string paymentResult,
             int paymentId, long totalPayingPrice,
-            out string referenceNumber, out long transactionReferenceID)
+            out string referenceNumber, out long transactionReferenceID, out DateTime transactionDate)
         {
             return GetEngine(bank).VerifyPayment(paymentResult, paymentId,
-                totalPayingPrice, out referenceNumber, out transactionReferenceID);
+                totalPayingPrice, out referenceNumber, out transactionReferenceID, out transactionDate);
         }
 
         private IPaymentEngine GetEngine(BanksEnum bank)

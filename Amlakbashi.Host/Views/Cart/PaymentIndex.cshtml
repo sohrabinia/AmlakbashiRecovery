@@ -55,6 +55,9 @@
             شماره تراکنش
         </th>
         <th>
+            شماره ارجاع
+        </th>
+        <th>
             کاربر
         </th>
         <th>
@@ -78,9 +81,12 @@
     @foreach (var item in data)
     {
         Idx++;
-        <tr>
+        <tr style="border-bottom: 1px solid #808080;">
             <td>
                 @Idx
+            </td>
+            <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span style="overflow-y: hidden;">@item.Payment.Authority</span>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Payment.RefID)
@@ -89,7 +95,7 @@
                 <a style="text-decoration:none;display:block" target="_blank" href="@string.Format("/user/index?code={0}" , item.Payment.UserID)">@item.UserPhoneNumber</a>
             </td>
             <td>
-                <span  class="imgstatus @(item.Payment.Status==1 ? "enable" : "disable")"></span>
+                <span class="imgstatus @(item.Payment.Status==1 ? "enable" : "disable")"></span>
             </td>
             <td>
                 @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(item.Payment.Date).ToString()
@@ -99,6 +105,7 @@
             </td>            
             <td>
                 <a href="@string.Format("/cart/index?refid={0}", item.Payment.RefID)"><i class="fa fa-cart-plus"></i></a>
+                <button type="button" onclick="checkPayment(@item.Payment.Id)" style="border: 0; background-color: white; cursor: pointer;"><i class="fas fa-sync" style="font-size: 16px; color: blue; margin-right: 5px;"></i></button>
             </td>
         </tr>
     }
@@ -123,6 +130,10 @@
                     }
                 });
             }
+        }
+
+        function checkPayment(id) {
+            showInfoMessage('اطلاعات تراکنش', '', { contentUrl: '/Cart/CheckPasargadPaymentResult?paymentId=' + id, fullScreen: screen.width < 781 });
         }
 
     </script>

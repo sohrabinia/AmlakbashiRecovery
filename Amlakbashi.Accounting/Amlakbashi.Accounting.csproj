@@ -5,13 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Amlakbashi.Core\Amlakbashi.Core.csproj" />
-    <ProjectReference Include="..\Amlakbashi.Data\Amlakbashi.Data.csproj" />
-    <ProjectReference Include="..\Amlakbashi.Mediator\Amlakbashi.Mediator.csproj" />
+    <Compile Remove="PaymentContext\NewFolder\**" />
+    <EmbeddedResource Remove="PaymentContext\NewFolder\**" />
+    <None Remove="PaymentContext\NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="PaymentContext\NewFolder\" />
+    <ProjectReference Include="..\Amlakbashi.Core\Amlakbashi.Core.csproj" />
+    <ProjectReference Include="..\Amlakbashi.Data\Amlakbashi.Data.csproj" />
+    <ProjectReference Include="..\Amlakbashi.Mediator\Amlakbashi.Mediator.csproj" />
   </ItemGroup>
 
 </Project>

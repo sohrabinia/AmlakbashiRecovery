@@ -102,7 +102,7 @@ namespace Amlakbashi.Accounting.Services
             data.Date = editedPayment.Date;
             data.RefID = editedPayment.RefID;
             data.Status = editedPayment.Status;
-            data.PayDate = DateTime.Now;
+            data.PayDate = editedPayment.PayDate;
             Repository.Update(data);
             Repository.Save();
         }
