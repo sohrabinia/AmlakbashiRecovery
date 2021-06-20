@@ -597,7 +597,7 @@ namespace Amlakbashi.Accounting
         }
 
         public GuestPayResult GuestPayReserve(int userId, long reserveId,
-            int payReserveType, out long payment_id, int doerUserId,
+            int payReserveType, out long paymentId, int doerUserId,
             ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId)
         {
             var payType = (ReservePaymentType)payReserveType;
@@ -605,13 +605,18 @@ namespace Amlakbashi.Accounting
             {
                 case ReservePaymentType.GuestDeposite:
                 case ReservePaymentType.GuestClearing:
-                    bool already_payed;
-                    long price;
-                    payment_id = (long)PayGuest(userId, reserveId, payType, out already_payed,
-                        out price, ReservePaymentMethod.EPay, doerUserId, actionSource, useCoupon, usePrize, couponId);
-                    if (already_payed)
+                    var reserve = repository.FindReserve(reserveId);
+                    if (reserve.Status == ReserveStatus.CanceledBySystem)
                     {
-                        var reserve = repository.FindReserve(reserveId);
+                        paymentId = 0;
+                        return GuestPayResult.IncorrectPaymentType;
+                    }
+                    bool alreadyPayed;
+                    long price;
+                    paymentId = (long)PayGuest(userId, reserveId, payType, out alreadyPayed,
+                        out price, ReservePaymentMethod.EPay, doerUserId, actionSource, useCoupon, usePrize, couponId);
+                    if (alreadyPayed)
+                    {
                         if (reserve.Status == ReserveStatus.WaitForReserve)
                         {
                             mediator.Send(new SetReserveStatusCommand(reserveId,
@@ -637,10 +642,10 @@ namespace Amlakbashi.Accounting
                 case ReservePaymentType.SiteDepositeToHost:
                 case ReservePaymentType.SiteClearingToHost:
                 case ReservePaymentType.SiteRefundToGuest:
-                    payment_id = 0;
+                    paymentId = 0;
                     return GuestPayResult.UnhandledPaymentType;
                 default:
-                    payment_id = 0;
+                    paymentId = 0;
                     return GuestPayResult.IncorrectPaymentType;
             }
         }
@@ -654,14 +659,19 @@ namespace Amlakbashi.Accounting
             {
                 case ReservePaymentType.GuestDeposite:
                 case ReservePaymentType.GuestClearing:
-                    bool already_payed;
+                    var reserve = repository.FindReserve(reserveId);
+                    if (reserve.Status == ReserveStatus.CanceledBySystem)
+                    {
+                        paymentId = 0;
+                        return GuestPayResult.IncorrectPaymentType;
+                    }
+                    bool alreadyPayed;
                     long price;
-                    paymentId = PayGuest(userId, reserveId, payType, out already_payed,
+                    paymentId = PayGuest(userId, reserveId, payType, out alreadyPayed,
                         out price, ReservePaymentMethod.AmlakbashiCredit, doerUserId,
                         actionSource, useCoupon, usePrize, couponId);
-                    if (already_payed)
+                    if (alreadyPayed)
                     {
-                        var reserve = repository.FindReserve(reserveId);
                         if (reserve.Status == ReserveStatus.WaitForReserve)
                         {
                             mediator.Send(new SetReserveStatusCommand(reserveId,
