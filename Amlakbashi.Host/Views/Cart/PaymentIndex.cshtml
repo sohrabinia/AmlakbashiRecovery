@@ -104,7 +104,7 @@
                 @item.Payment.TotalPrice
             </td>            
             <td>
-                <a href="@string.Format("/cart/index?refid={0}", item.Payment.RefID)"><i class="fa fa-cart-plus"></i></a>
+                @*<a href="@string.Format("/cart/index?refid={0}", item.Payment.RefID)"><i class="fa fa-cart-plus"></i></a>*@
                 <button type="button" onclick="checkPayment(@item.Payment.Id)" style="border: 0; background-color: white; cursor: pointer;"><i class="fas fa-sync" style="font-size: 16px; color: blue; margin-right: 5px;"></i></button>
             </td>
         </tr>

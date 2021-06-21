@@ -1,41 +1,48 @@
 ﻿@model Amlakbashi.Core.DTOs.PaymentDTOs.CheckPaymentDTO
 
-<div>
-    <span>نتیجه:</span>
-    @if (Model.Result)
-    {
-        <span style="color: limegreen;">موفق</span>
-    }
-    else
-    {
-        <span style="color: red;">ناموفق</span>
-    }
-</div>
-<div>
-    <span>شناسه پرداخت:</span>
-    <span>@Model.PaymentId</span>
-</div>
-<div>
-    <span>شماره تراکنش:</span>
-    <span>@Model.TransactionReferenceId</span>
-</div>
-<div>
-    <span>شماره ارجاع:</span>
-    <span>@Model.ReferenceNumber</span>
-</div>
-<div>
-    <span>شماره پیگیری:</span>
-    <span>@Model.TraceNumber</span>
-</div>
-<div>
-    <span>تاریخ ایجاد پرداخت:</span>
-    <span>@Model.CreatePaymentDate</span>
-</div>
-<div>
-    <span>تاریخ تکمیل فرآیند پرداخت:</span>
-    <span>@Model.TransactionDate</span>
-</div>
-<div>
-    <span>مبلغ پرداخت:</span>
-    <span>@Model.Price</span>
-</div>
+@if (Model == null && ViewBag.hasError)
+{
+    <p style="text-align: center;">عملیات با خطا مواجه شد</p>
+}
+else
+{
+    <div>
+        <span>نتیجه:</span>
+        @if (Model.Result)
+        {
+            <span style="color: limegreen;">موفق</span>
+        }
+        else
+        {
+            <span style="color: red;">ناموفق</span>
+        }
+    </div>
+    <div>
+        <span>شناسه پرداخت:</span>
+        <span>@Model.PaymentId</span>
+    </div>
+    <div>
+        <span>شماره تراکنش:</span>
+        <span>@Model.TransactionReferenceId</span>
+    </div>
+    <div>
+        <span>شماره ارجاع:</span>
+        <span>@Model.ReferenceNumber</span>
+    </div>
+    <div>
+        <span>شماره پیگیری:</span>
+        <span>@Model.TraceNumber</span>
+    </div>
+    <div>
+        <span>تاریخ ایجاد پرداخت:</span>
+        <span>@Model.CreatePaymentDate</span>
+    </div>
+    <div>
+        <span>تاریخ تکمیل فرآیند پرداخت:</span>
+        <span>@Model.TransactionDate</span>
+    </div>
+    <div>
+        <span>مبلغ پرداخت:</span>
+        <span>@Model.Price</span>
+    </div>
+}

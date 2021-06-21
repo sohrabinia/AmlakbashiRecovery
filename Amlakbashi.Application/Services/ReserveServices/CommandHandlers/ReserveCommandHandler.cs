@@ -273,22 +273,22 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             var callTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
             callTime = callTime.AddTicks(delay.Ticks);
             var canselCall = false;
-            if (callTime.Hour < 8)
+            if (callTime.Hour < 10)
             {
-                callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 8, 0, 0);
+                callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 10, 0, 0);
                 delay = new TimeSpan(callTime.Ticks - now.Ticks);
                 canselCall = true;
             }
             else if (callTime.Hour >= 23)
             {
-                callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 8, 0, 0);
+                callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 10, 0, 0);
                 callTime = callTime.AddDays(1);
                 delay = new TimeSpan(callTime.Ticks - now.Ticks);
                 canselCall = true;
             }
             callTime = DateTime.Now + delay;
-            if (callTime.Hour < 8)
-                callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 8, 0, 0);
+            if (callTime.Hour < 10)
+                callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 10, 0, 0);
             delay = callTime - DateTime.Now;
             if (canselCall == false)
             {
