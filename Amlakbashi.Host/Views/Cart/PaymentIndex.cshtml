@@ -98,7 +98,7 @@
                 <span class="imgstatus @(item.Payment.Status==1 ? "enable" : "disable")"></span>
             </td>
             <td>
-                @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(item.Payment.Date).ToString()
+                @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(item.Payment.Date, false, true)
             </td>
             <td>
                 @item.Payment.TotalPrice

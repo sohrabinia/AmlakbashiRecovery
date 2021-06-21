@@ -145,7 +145,7 @@ namespace Amlakbashi.Core.Common.Utilities
             return result;
         }
 
-        public static string ConvertDate(DateTime GDate, bool shorthand = false)
+        public static string ConvertDate(DateTime GDate, bool shorthand = false, bool withClock = false)
         {
             PersianCalendar objPersianCalendar = new PersianCalendar();
             var year = objPersianCalendar.GetYear(GDate).ToString();
@@ -153,7 +153,12 @@ namespace Amlakbashi.Core.Common.Utilities
             {
                 year = year.Remove(0, 2);
             }
-            return year + "/" + objPersianCalendar.GetMonth(GDate) + "/" + objPersianCalendar.GetDayOfMonth(GDate);
+            var datetime = year + "/" + objPersianCalendar.GetMonth(GDate) + "/" + objPersianCalendar.GetDayOfMonth(GDate);
+            if (withClock)
+            {
+                datetime = datetime + " " + objPersianCalendar.GetHour(GDate) + ":" + objPersianCalendar.GetMinute(GDate);
+            }
+            return datetime;
         }
 
         public static int DiffDays(DateTime date)
