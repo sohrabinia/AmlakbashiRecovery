@@ -285,6 +285,7 @@ namespace Amlakbashi.Host.Controllers
             return Redirect(string.Format("/{0}/{1}", redirect_controller, redirect_action));
         }
 
+        [Authorize(Policy = Policies.Payment_View)]
         public IActionResult CheckPasargadPaymentResult(int paymentId)
         {
             try
@@ -295,7 +296,8 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Cart.CheckPasargadPaymentResult", exc);
-                return Redirect("/errors/http500");
+                ViewBag.hasError = true;
+                return PartialView("_CheckPaymentResult");
             }
             
         }
