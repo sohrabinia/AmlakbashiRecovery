@@ -45,4 +45,40 @@ else
         <span>مبلغ پرداخت:</span>
         <span>@Model.Price</span>
     </div>
+    if (Model.ReserveId > 0)
+    {
+        <div>
+            <span>کد رزرو:</span>
+            <a href="/reserve/index?reserve_id=@Model.ReserveId&mainFilter=1" target="_blank">@Model.ReserveId</a>
+            @if (Model.Result)
+            {
+                <span> | </span>
+                <button class="message-popup__message-button" type="button" onclick="doReserveByPaymentReinquiry(@Model.ReserveId, @Model.PaymentId)">تکمیل رزرو</button>
+            }
+        </div>
+    }
 }
+
+<script type="text/javascript">
+    function doReserveByPaymentReinquiry(reserveId, paymentId) {
+        //myajax("reserve/ReserveByPaymentReinquiry", "reserveId=" + reserveId + "&paymentId=" + paymentId, function (ret) {
+        //    if (ret.status == 1) {
+        //        alertify.success(ret.msg);
+        //    }
+        //    else {
+        //        alertify.error(ret.msg);
+        //    }
+        //});
+
+        showNoYesMessage('تکمیل رزرو', 'وضعیت رزرو با کد ' + reserveId + ' به حالت «رزرو شده» تغییر می یابد. آیا از این مورد مطمئنید؟', function () {
+            myajax("reserve/ReserveByPaymentReinquiry", "reserveId=" + reserveId + "&paymentId=" + paymentId, function (ret) {
+                if (ret.status == 1) {
+                    alertify.success(ret.msg);
+                }
+                else {
+                    alertify.error(ret.msg);
+                }
+            });
+        });
+    }
+</script>

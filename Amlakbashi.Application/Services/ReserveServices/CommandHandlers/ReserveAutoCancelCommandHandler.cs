@@ -40,9 +40,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         public Task<Unit> Handle(ScheduleReserveAutoCancelCommand request, CancellationToken cancellationToken)
         {
             var reserveAutoCansel = repository.Query(q => q.FirstOrDefault(f => f.ReserveId == request.reserveId));
-            reserveAutoCansel.ScheduledTime = DateTime.Now.Add(request.delay);
-            repository.Update(reserveAutoCansel);
-            repository.Save();
+            if (reserveAutoCansel != null)
+            {
+                reserveAutoCansel.ScheduledTime = DateTime.Now.Add(request.delay);
+                repository.Update(reserveAutoCansel);
+                repository.Save();
+            }
             return Task.FromResult(Unit.Value);
         }
     }

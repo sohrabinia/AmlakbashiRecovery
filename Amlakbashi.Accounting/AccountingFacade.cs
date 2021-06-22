@@ -495,6 +495,7 @@ namespace Amlakbashi.Accounting
         {
             var payment = paymentService.Find(paymentId);
             var result = paymentOperator.ReadPaymentResult(BanksEnum.Pasargad, payment.Id, payment.Date);
+            result.ReserveId = payment.ReserveID != null ? (long)payment.ReserveID : 0;
             if (result.Result == true)
             {
                 payment.Authority = result.TransactionReferenceId;

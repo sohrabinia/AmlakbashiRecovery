@@ -996,5 +996,65 @@ namespace Amlakbashi.Application.Services.ReserveServices
         {
             mediator.Enqueue(new SendPayReserveCallCommand(reserveId));
         }
+
+        public bool ReserveByPaymentReinquiry(long reserveId, long paymentId, out string msg)
+        {
+            var reserve = Repository.Find(reserveId);
+            if (reserve.Status == Reserve.ReserveStatus.Reserved ||
+                reserve.Status == Reserve.ReserveStatus.Started ||
+                reserve.Status == Reserve.ReserveStatus.Completed ||
+                reserve.Status == Reserve.ReserveStatus.CashPay)
+            {
+                msg = $"وضعیت این رزرو «{ReserveLocalization.GetStatusString((int)reserve.Status, StatusStringType.Site)}» می باشد.";
+                return false;
+            }
+            var occupiedDates = reserve.Advertise.OccupiedDates();
+            var reserveDateList = DateTimeUtility.DateRangeToList(reserve.StartDate, reserve.EndDate);
+            foreach (var item in reserveDateList)
+            {
+                if (occupiedDates.Contains(item))
+                {
+                    msg = "تقویم آگهی مربوطه در بازه زمانی این رزرو پر می باشد";
+                    return false;
+                }
+            }
+            var payment = accounting.FindPayment(paymentId);
+            if (payment.Status == 0)
+            {
+                msg = "وضعیت پرداخت ناموفق می باشد";
+                return false;
+            }
+            mediator.Send(new SetReserveStatusCommand(reserveId, ReserveStatus.Reserved, false,
+                ActionSourceEnum.AdminPanel, payment.UserID, true));
+            if (payment.CouponID > 0)
+            {
+                accounting.UseDiscountCouponForReserve(payment.CouponID, reserveId);
+                reserve = Repository.Find(reserveId);
+            }
+            else if (payment.PrizePrice > 0)
+            {
+                accounting.UsePrizeCreditForReserve(reserveId, payment.UserID, ActionSourceEnum.AdminPanel);
+                reserve = Repository.Find(reserveId);
+            }
+            var paymentType = payment.TotalPrice >=
+                (reserve.TotalPrice - reserve.CouponPrice - reserve.PrizePrice) ?
+                ReservePaymentType.GuestClearing :
+                ReservePaymentType.GuestDeposite;
+            var reservePayment = new ReservePayment()
+            {
+                CreateDate = DateTime.Now,
+                UserID = reserve.UserID,
+                TransactionID = long.Parse(payment.Authority),
+                RefID = payment.RefID,
+                ReserveID = reserve.Id,
+                PaymentType = (int)paymentType,
+                Price = payment.TotalPrice / 10,
+                PaymentMethod = (int)ReservePaymentMethod.EPay
+            };
+            accounting.InsertReservePayment(reservePayment);
+
+            msg = "عملیات با موفقیت انجام شد";
+            return true;
+        }
     }
 }
