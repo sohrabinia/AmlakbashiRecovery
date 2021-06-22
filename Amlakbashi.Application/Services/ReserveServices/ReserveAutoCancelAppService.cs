@@ -2,6 +2,7 @@
 using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Repository;
+using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,8 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var data = Repository.Query(q => q.FirstOrDefault(w => w.ReserveId == reserveId));
             if (data != null)
             {
-                data.ScheduledTime = DateTime.Now.AddMinutes(delayInMinute);
+                var delay = DateTimeUtility.DelayAvoidingNightTime(new TimeSpan(0, delayInMinute, 0));
+                data.ScheduledTime = DateTime.Now.Add(delay);
                 Repository.Update(data);
                 Repository.Save();
             }

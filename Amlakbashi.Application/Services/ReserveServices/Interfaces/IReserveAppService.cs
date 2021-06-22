@@ -88,5 +88,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         VoucherDTO GenerateVoucher(long reserveId, int currentUserId);
         void SendReserveRequestCall(long reserveId);
         void SendPayReserveCall(long reserveId);
+        bool ReserveByPaymentReinquiry(long reserveId, long paymentId, out string msg);
     }
 }

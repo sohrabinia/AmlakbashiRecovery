@@ -28,6 +28,8 @@ using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+using static Amlakbashi.Core.Entities.ReservePayment;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -220,7 +222,7 @@ namespace Amlakbashi.Host.Controllers
                 foreach (var item in supporters)
                 {
                     var supporter = userService.GetByMainMobile(item);
-                    
+
                     if (supporter != null)
                         supporterList.Add(new UserFullNameDTO() { id = supporter.Id, fullName = supporter.FullName });
                 }
@@ -2460,6 +2462,30 @@ namespace Amlakbashi.Host.Controllers
                 discountPrice = discountPrice,
                 msg = "کد تخفیف اعمال شد"
             });
+        }
+
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
+        public IActionResult ReserveByPaymentReinquiry(long reserveId, long paymentId)
+        {
+            try
+            {
+                string msg;
+                var result = reserveService.ReserveByPaymentReinquiry(reserveId, paymentId, out msg);
+                return GenerateJsonResult(new
+                {
+                    status = result ? 1 : 0,
+                    msg = msg
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Reserve.ReserveByPaymentReinquiry", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطا مواجه شد."
+                });
+            }
         }
     }
 }

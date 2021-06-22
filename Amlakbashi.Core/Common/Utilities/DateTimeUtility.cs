@@ -118,6 +118,13 @@ namespace Amlakbashi.Core.Common.Utilities
             return persian_date_list;
         }
 
+        public static List<DateTime> DateRangeToList(DateTime fromDate, DateTime toDate, bool includeEndDay = false)
+        {
+            toDate = includeEndDay ? toDate : toDate.AddDays(-1);
+            var days = GetDateRangeFromGregorianDate(fromDate, toDate);
+            return days;
+        }
+
         public static int GetPersianDateRangeDays(string from_date, string to_date)
         {
             var from_date_gregorian = PersianDateToGregorian(from_date);
@@ -287,14 +294,14 @@ namespace Amlakbashi.Core.Common.Utilities
             var delay = desiredDelay;
             var callTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
             callTime = callTime.AddTicks(delay.Ticks);
-            if (callTime.Hour < 8)
+            if (callTime.Hour < 10)
             {
-                callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 8, 0, 0);
+                callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 10, 0, 0);
                 delay = new TimeSpan(callTime.Ticks - now.Ticks);
             }
             else if (callTime.Hour >= 23)
             {
-                callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 8, 0, 0);
+                callTime = new DateTime(callTime.Year, callTime.Month, callTime.Day, 10, 0, 0);
                 callTime = callTime.AddDays(1);
                 delay = new TimeSpan(callTime.Ticks - now.Ticks);
             }
