@@ -208,8 +208,6 @@
                 </th>
                 <th>توضیحات پشیتبان</th>
                 <th>وضعیت پشتیبانی</th>
-                @*<th>تماس مهمان با میزبان</th>
-                    <th>تماس میزبان با مهمان</th>*@
                 <th>
                     عملیات
                 </th>
@@ -231,8 +229,26 @@
                     <td>
                         <div>زمان درخواست: @(item.createDateString)</div>
                         <div>کد آگهی: <a href="/Advertise/Index?status=-1&id=@(item.parentAccomodationId > 0 ? item.parentAccomodationId : item.accommodationId)">@item.accommodationId @(item.parentAccomodationId > 0 ? " >> " + item.parentAccomodationId : "")</a><i style="margin: 0 10px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.accommodationId)', 'کد آگهی @(item.accommodationId)')"></i></div>
-                        <div>کد میزبان: <a href="/User/Index?code=@item.hostUserId">@item.hostUserId</a><i style="margin: 0 10px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.hostUserId)', 'کد میزبان @(item.hostUserId)')"></i><i style="cursor:pointer;margin: 0 5px 0 0" class="fa fa-phone" onclick="showCallPopup(@(item.hostUserId),@(item.id),'میزبان')"></i></div>
-                        <div>کد مهمان: <a href="/User/Index?code=@item.guestUserId">@item.guestUserId</a><i style="margin: 0 10px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.guestUserId)', 'کد مهمان @(item.guestUserId)')"></i><i style="cursor:pointer;margin: 0 5px 0 0" class="fa fa-phone" onclick="showCallPopup(@(item.guestUserId),@(item.id),'مهمان')"></i></div>
+                        <div>
+                            @if (item.ContactWithHost)
+                            {
+                                <i style="margin-left:5px;" class="fa fa-phone-volume"></i>
+                            }
+                            کد میزبان:
+                            <a href="/User/Index?code=@item.hostUserId">@item.hostUserId</a>
+                            <i style="margin: 0 5px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.hostUserId)', 'کد میزبان @(item.hostUserId)')"></i>
+                            <i style="cursor:pointer;margin: 0 0px 0 0" class="fa fa-phone" onclick="showCallPopup(@(item.hostUserId),@(item.id),'میزبان')"></i>
+                        </div>
+                        <div>
+                            @if (item.ContactWithGuest)
+                            {
+                                <i style="margin-left:5px;" class="fa fa-phone-volume"></i>
+                            }
+                            کد مهمان:
+                            <a href="/User/Index?code=@item.guestUserId">@item.guestUserId</a>
+                            <i style="margin: 0 5px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.guestUserId)', 'کد مهمان @(item.guestUserId)')"></i>
+                            <i style="cursor:pointer;margin: 0 0px 0 0" class="fa fa-phone" onclick="showCallPopup(@(item.guestUserId),@(item.id),'مهمان')"></i>
+                        </div>
                     </td>
                     <td>
                         <span>از @item.startDateString تا @item.endDateString</span><br />
@@ -396,7 +412,7 @@
                     <td style="width:90px">
                         <a href="@Url.Action("Edit",new {reserve_id= item.id})"><span class="editicon" title="ویرایش"></span></a>
                         @if (item.status == (int)Reserve.ReserveStatus.WaitForResponse ||
-                          item.status == (int)Reserve.ReserveStatus.WaitForReserve)
+                         item.status == (int)Reserve.ReserveStatus.WaitForReserve)
                         {
                             if (item.status == (int)Reserve.ReserveStatus.WaitForResponse)
                             {

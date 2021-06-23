@@ -61,15 +61,6 @@ else
 
 <script type="text/javascript">
     function doReserveByPaymentReinquiry(reserveId, paymentId) {
-        //myajax("reserve/ReserveByPaymentReinquiry", "reserveId=" + reserveId + "&paymentId=" + paymentId, function (ret) {
-        //    if (ret.status == 1) {
-        //        alertify.success(ret.msg);
-        //    }
-        //    else {
-        //        alertify.error(ret.msg);
-        //    }
-        //});
-
         showNoYesMessage('تکمیل رزرو', 'وضعیت رزرو با کد ' + reserveId + ' به حالت «رزرو شده» تغییر می یابد. آیا از این مورد مطمئنید؟', function () {
             myajax("reserve/ReserveByPaymentReinquiry", "reserveId=" + reserveId + "&paymentId=" + paymentId, function (ret) {
                 if (ret.status == 1) {

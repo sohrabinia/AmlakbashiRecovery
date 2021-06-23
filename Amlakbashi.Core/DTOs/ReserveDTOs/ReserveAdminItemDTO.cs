@@ -36,13 +36,14 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public bool systemCalledToGuest { get; set; }
         public bool disableAutoCancel { get; set; }
         public bool accVisitedByGuest { get; set; }
+        public bool ContactWithHost { get; set; }
+        public bool ContactWithGuest { get; set; }
 
         public static ReserveAdminItemDTO Generate(Reserve reserve,
             SupporterStatus supportStatus, long guestPaidPrice,
             bool canDoClearing, bool mustRefund, bool refundDone)
         {
-            var advertise = reserve.Advertise;
-            var linkAdvertise = advertise.ParentOrSelf;
+            var linkAdvertise = reserve.Advertise.ParentOrSelf;
             bool canGrantSupport; 
             switch (supportStatus)
             {
@@ -191,7 +192,9 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                 systemCalledToGuest = infoList.Any(x => x.Contains("توسط سیستم با مهمان تماس گرفته شد")),
                 instantReserve = reserve.InstantReserve,
                 disableAutoCancel = reserve.DisableAutoCancel,
-                accVisitedByGuest = reserve.AccVisitedByGuest
+                accVisitedByGuest = reserve.AccVisitedByGuest,
+                ContactWithGuest = reserve.GuestUser.ContactPhone == "1" ? true : false,
+                ContactWithHost = reserve.HostUser.ContactPhone == "1" ? true : false
             };
             var basic = (ReserveAdminBasicItemDTO)reserve;
             PropertyCopier<ReserveAdminBasicItemDTO, ReserveAdminItemDTO>.Copy(basic, dto);
