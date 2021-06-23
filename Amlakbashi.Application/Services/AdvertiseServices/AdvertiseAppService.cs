@@ -2174,7 +2174,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 UserNotificationToken = advertise.User.NotificationToken,
                 Type = UserContactType.ReserveRequest,
                 AdvertiseId = reserve.AdvertiseID.ToString(),
-                UserId = user.Id.ToString(),
+                //UserId = user.Id.ToString(),
+                UserId = string.Format("{0:n0}", reserve.TotalPrice - (reserve.TotalPrice * 0.1f)), // به جای کد مهمان، در این فیلد سهم میزبان فرستاده می شود
                 ReserveId = reserve.Id.ToString(),
                 Extra1 = startDate,
                 Extra2 = endDate + Environment.NewLine + "به مدت " + (reserve.EndDate - reserve.StartDate).TotalDays + " شب" +
