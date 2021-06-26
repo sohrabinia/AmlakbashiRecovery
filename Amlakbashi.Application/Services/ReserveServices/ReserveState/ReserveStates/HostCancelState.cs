@@ -56,7 +56,8 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     EmailConfirmed = identityUser.EmailConfirmed,
                     UserFcmAppNotificationToken = reserve.GuestUser.FcmAppNotificationToken,
                     UserNotificationToken = reserve.GuestUser.NotificationToken,
-                    Type = UserContactType.GuestReserveCanceledByHost,
+                    //Type = UserContactType.GuestReserveCanceledByHost,
+                    Type = UserContactType.HostReserveCanceled,
                     AdvertiseId = reserve.AdvertiseID.ToString(),
                     ReserveId = reserve.Id.ToString()
                 };

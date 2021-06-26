@@ -296,10 +296,17 @@
     }
     @if (Model.cancelIsAvailable)
     {
-        <div onclick="cancelReserve(@Model.reserveId,@(Model.isHostler ? "true" : "false"), @(Model.instantReserve ? "true" : "false"), @((int)Model.status > 4 && (int)Model.status < 9 ? "true" : "false"))" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
-            @*<i class="fa fa-times"></i>*@
-            درخواست لغو رزرو
-        </div>
+<div onclick="cancelReserve(@Model.reserveId,@(Model.isHostler ? "true" : "false"), @(Model.instantReserve ? "true" : "false"), @((int)Model.status > 4 && (int)Model.status < 9 ? "true" : "false"))" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
+    @*<i class="fa fa-times"></i>*@
+    @if (Model.status == Reserve.ReserveStatus.WaitForReserve || Model.status == Reserve.ReserveStatus.WaitForResponse)
+    {
+        @:لغو رزرو
+    }
+    else
+    {
+        @:درخواست لغو رزرو
+    }
+</div>
     }
     @if (Model.isHostler && Model.status != Reserve.ReserveStatus.Rejected)
     {

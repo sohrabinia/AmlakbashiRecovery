@@ -52,20 +52,20 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             accounting.RefundPrizeCreditIfAny(reserve.Id);
             if (sendSms)
             {
-                var guestIdentityUser = userManager.FindByNameAsync(reserve.GuestUser.MainMobile).Result;
-                var guestContact = new UserContactDTO()
-                {
-                    UserMainMobile = reserve.GuestUser.MainMobile,
-                    UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
-                    UserEmail = guestIdentityUser.Email,
-                    EmailConfirmed = guestIdentityUser.EmailConfirmed,
-                    UserFcmAppNotificationToken = reserve.GuestUser.FcmAppNotificationToken,
-                    UserNotificationToken = reserve.GuestUser.NotificationToken,
-                    Type = UserContactType.GuestReserveCanceled,
-                    AdvertiseId = reserve.AdvertiseID.ToString(),
-                    ReserveId = reserve.Id.ToString()
-                };
-                mediator.Enqueue(new SendMessageCommand(guestContact));
+                //var guestIdentityUser = userManager.FindByNameAsync(reserve.GuestUser.MainMobile).Result;
+                //var guestContact = new UserContactDTO()
+                //{
+                //    UserMainMobile = reserve.GuestUser.MainMobile,
+                //    UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
+                //    UserEmail = guestIdentityUser.Email,
+                //    EmailConfirmed = guestIdentityUser.EmailConfirmed,
+                //    UserFcmAppNotificationToken = reserve.GuestUser.FcmAppNotificationToken,
+                //    UserNotificationToken = reserve.GuestUser.NotificationToken,
+                //    Type = UserContactType.GuestReserveCanceled,
+                //    AdvertiseId = reserve.AdvertiseID.ToString(),
+                //    ReserveId = reserve.Id.ToString()
+                //};
+                //mediator.Enqueue(new SendMessageCommand(guestContact));
 
                 var user = Repository.Find<User, int>(reserve.HostUserID);
                 var hostIdentityUser = userManager.FindByNameAsync(user.MainMobile).Result;
@@ -77,7 +77,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     EmailConfirmed = hostIdentityUser.EmailConfirmed,
                     UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                     UserNotificationToken = user.NotificationToken,
-                    Type = UserContactType.HostReserveCanceled,
+                    Type = UserContactType.GuestReserveCanceled,
                     AdvertiseId = reserve.AdvertiseID.ToString(),
                     ReserveId = reserve.Id.ToString()
                 };
