@@ -33,6 +33,7 @@ using Amlakbashi.Mediator.Commands.UserCommands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Amlakbashi.Core.Identity.Entities;
+using Amlakbashi.Mediator.Commands.FileCommands;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
@@ -510,12 +511,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             director.Submit(ref acc);
 
+            var removedPhotoIds = new List<long>();
             var photoPart = director.GetAdvertisePart<PhotoPart>();
             var photoIds = photoPart.AlbumPhotosArray;
             if (!acc.Photos.Select(s => s.Id).SequenceEqual(photoIds) || acc.PhotoID != photoPart.PhotoID)
             {
                 if (photoIds != null && photoIds.Count() > 0)
                 {
+                    removedPhotoIds = acc.Photos.Select(s => s.Id).Except(photoIds).ToList();
                     acc.Photos.Clear();
                     foreach (var photoId in photoIds)
                     {
@@ -524,6 +527,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 }
                 else
                 {
+                    removedPhotoIds = acc.Photos.Select(s => s.Id).ToList();
                     acc.Photos.Clear();
                 }
             }
@@ -549,6 +553,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.LastModifyDate = DateTime.Now;
             Repository.Update(acc);
             Repository.Save();
+            if (removedPhotoIds.Any())
+            {
+                mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+            }
             mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id));
             mediator.Publish(new ChangeAdvertiseAddressEvent(shallowAcc, acc));
             mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID,
@@ -773,12 +781,15 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     var child = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
                     var oldChild = child.ShallowCopy();
                     director.Submit(ref child);
+
+                    var removedPhotoIds = new List<long>();
                     var photoPart = director.GetAdvertisePart<PhotoPart>();
                     var photoIds = photoPart.AlbumPhotosArray;
                     if (!child.Photos.Select(s => s.Id).SequenceEqual(photoIds))
                     {
                         if (photoIds != null && photoIds.Count() > 0)
                         {
+                            removedPhotoIds = child.Photos.Select(s => s.Id).Except(photoIds).ToList();
                             child.Photos.Clear();
                             foreach (var photoId in photoIds)
                             {
@@ -787,10 +798,15 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         }
                         else
                         {
+                            removedPhotoIds = child.Photos.Select(s => s.Id).ToList();
                             child.Photos.Clear();
                         }
                         mediator.Send(new GenerateThumbImageCommand(child.Id, child.PhotoID,
                             child.Photos.Select(s => s.Id).ToList(), rootPath));
+                        if (removedPhotoIds.Any())
+                        {
+                            mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+                        }
                     }
                     child.LastModifyDate = DateTime.Now;
                     Repository.Update(child);
@@ -967,12 +983,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
             if (type == DirectorType.General || type == DirectorType.ComplexUnit)
             {
+                var removedPhotoIds = new List<long>();
                 var photoPart = director.GetAdvertisePart<PhotoPart>();
                 var photoIds = photoPart.AlbumPhotosArray;
                 if (!acc.Photos.Select(s => s.Id).SequenceEqual(photoIds))
                 {
                     if (photoIds != null && photoIds.Count() > 0)
                     {
+                        removedPhotoIds = acc.Photos.Select(s => s.Id).Except(photoIds).ToList();
                         acc.Photos.Clear();
                         foreach (var photoId in photoIds)
                         {
@@ -981,10 +999,15 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     }
                     else
                     {
+                        removedPhotoIds = acc.Photos.Select(s => s.Id).ToList();
                         acc.Photos.Clear();
                     }
                     mediator.Send(new GenerateThumbImageCommand(data.Id, acc.PhotoID,
                             acc.Photos.Select(s => s.Id).ToList(), rootPath));
+                    if (removedPhotoIds.Any())
+                    {
+                        mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+                    }
                 }
                 mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id, true));
             }

@@ -695,39 +695,56 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                var test = User;
                 if (user.id != userAccessor.CurrentUser.Id)
                     return Redirect("/errors/http404");
 
                 string ext = "", filepath = "";
-                int FileType = -1;
                 if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
                 {
                     var uploadfile = Request.Form.Files[0];
                     ext = System.IO.Path.GetExtension(uploadfile.FileName).ToLower();
-                    if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif")
-                        FileType = (int)Entities.File.FileTypes.Image;
-                    else
+
+                    if ((ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif") == false)
                     {
                         TempData["msg"] = "فرمت عکس مورد قبول نمی باشد .";
-                        return Redirect(Request.Headers["Referer"].ToString());
+                        return Redirect(Request.Headers["referer"].ToString());
                     }
 
-                    filepath = string.Format("~/content/users/user{0}{1}", Guid.NewGuid(), ext);
+                    long PhotoID = 0;
+                    if (userAccessor.CurrentUser.Photo != null)
+                    {
+                        filepath = userAccessor.CurrentUser.Photo.FilePath;
+                        var editedPhoto = userAccessor.CurrentUser.Photo.Clone();
+                        editedPhoto.LastModifyDate = DateTime.Now;
+                        fileService.Update(editedPhoto, webHostEnvironment.WebRootPath);
+                        PhotoID = editedPhoto.Id;
+                    }
+                    else
+                    {
+                        filepath = string.Format("~/content/users/user{0}{1}", Guid.NewGuid(), ext);
+                        var profilePhoto = new File();
+                        profilePhoto.FilePath = filepath;
+                        profilePhoto.PostDate = DateTime.Now;
+                        profilePhoto.LastModifyDate = DateTime.Now;
+                        profilePhoto.UserID = userAccessor.CurrentUser.Id;
+                        PhotoID = fileService.Insert(profilePhoto);
+                    }
+
                     if (!System.IO.Directory.Exists(webHostEnvironment.WebRootPath + "/content/users"))
                         System.IO.Directory.CreateDirectory(webHostEnvironment.WebRootPath + "/content/users");
+
                     using (var stream = System.IO.File.Create(webHostEnvironment.WebRootPath + filepath.Replace("~", "")))
                     {
                         uploadfile.CopyTo(stream);
                     }
-
-                    var nfile = new File();
-                    nfile.FilePath = filepath;
-                    nfile.PostDate = DateTime.Now;
-                    nfile.LastModifyDate = DateTime.Now;
-                    nfile.UserID = userAccessor.CurrentUser.Id;
-                    long PhotoID = fileService.Insert(nfile);
+                    
                     userService.UpdateProfilePhoto(user.id, PhotoID, Entities.User.UserPhotoState.ready_publish);
+
+                    System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(System.IO.Path.Combine(webHostEnvironment.WebRootPath, "content/imgcache"));
+                    foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
+                    {
+                        IOfile.Delete();
+                    }
                 }
                 string msg;
                 List<string> errors;
@@ -744,12 +761,12 @@ namespace Amlakbashi.Host.Controllers
                     TempData["msg"] = msg;
                 }
 
-                return Redirect(Request.Headers["Referer"].ToString());
+                return Redirect(Request.Headers["referer"].ToString());
             }
             catch (Exception exc)
             {
                 logger.Error("Post.ProfileManager", exc);
-                return Redirect(Request.Headers["Referer"].ToString());
+                return Redirect(Request.Headers["referer"].ToString());
             }
         }
 

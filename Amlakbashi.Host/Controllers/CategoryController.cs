@@ -184,7 +184,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var regions = regionService.GetBySearchRegion(search_string);
-                if (!regions.Any() && search_string != "")
+                if (regions.Any() == false && string.IsNullOrEmpty(search_string) == false)
                     ViewBag.showNotFound = true;
                 var model = new List<SearchTableDTO>();
                 foreach (var item in regions)

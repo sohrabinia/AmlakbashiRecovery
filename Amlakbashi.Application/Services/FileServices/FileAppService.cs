@@ -53,15 +53,15 @@ namespace Amlakbashi.Application.Services.FileServices
             return newFile.Id;
         }
 
-        public void Update(File editedFile, string rootPath)
+        public void Update(File editedFile, string wwwrootPath)
         {
             var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedFile.Id));
             if (!editedFile.FilePath.IsNullOrEmpty() && editedFile.FilePath != data.FilePath)
             {
-                if (System.IO.File.Exists(rootPath + data.FilePath.Replace("~/", "")))
+                if (System.IO.File.Exists(wwwrootPath + data.FilePath.Replace("~/", "")))
                     lock (objlock)
                     {
-                        System.IO.File.Delete(rootPath + data.FilePath.Replace("~/", ""));
+                        System.IO.File.Delete(wwwrootPath + data.FilePath.Replace("~/", ""));
                     }
                 data.FilePath = editedFile.FilePath;
             }
@@ -110,9 +110,42 @@ namespace Amlakbashi.Application.Services.FileServices
             mediator.Send(new StopQueuedJobCommand());
         }
 
-        public void SetWatermark(long fileId, string serverPath)
+        public void SetWatermarkForAdvertisePhotos(long advertiseId, string serverPath)
         {
-            mediator.Send(new SetWatermarkCommand(fileId, serverPath));
+            var advertise = Repository.Find<Advertise, long>(advertiseId);
+            var advertisesToWatermark = new List<Advertise>();
+            advertisesToWatermark.Add(advertise);
+            if ((advertise.TypeID == Advertise.AdvertiseType.Complex ||
+                advertise.TypeID == Advertise.AdvertiseType.HotelApartment) &&
+                advertise.Childs != null)
+            {
+                advertisesToWatermark.AddRange(advertise.Childs);
+            }
+            foreach (var adv in advertisesToWatermark)
+            {
+                if (adv.Photos.Any())
+                {
+                    foreach (var photo in adv.Photos)
+                    {
+                        if (!photo.FilePath.Contains("watermark_advertise"))
+                        {
+                            mediator.Send(new SetWatermarkCommand(photo.Id, serverPath));
+                        }
+                    }
+                    mediator.Send(new GenerateThumbImageCommand(adv.Id, adv.PhotoID,
+                    adv.Photos.Select(s => s.Id).ToList(), serverPath));
+                }
+            }
+            lock (objlock)
+            {
+                System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(System.IO.Path.Combine(serverPath, "content/imgcache"));
+                foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
+                {
+                    IOfile.Delete();
+                }
+            }
+
+
         }
 
         public void GenerateThumbImage(long accId, string rootPath)

@@ -15,12 +15,12 @@ namespace Amlakbashi.Application.Services.FileServices.Interfaces
         List<string> GetAllFilePath();
         File Find(long id);
         long Insert(File newFile);
-        void Update(File editedFile, string serverPath);
+        void Update(File editedFile, string wwwrootPath);
         void Delete(int fileId, string serverPath);
         void DeleteExtraFiles(List<long> existFile);
         void MinifyImage(long fileId, string filePath);
         void StopQueuedJob();
-        void SetWatermark(long fileId, string serverPath);
+        void SetWatermarkForAdvertisePhotos(long fileId, string serverPath);
         void GenerateThumbImage(long accId, string rootPath);
     }
 }
