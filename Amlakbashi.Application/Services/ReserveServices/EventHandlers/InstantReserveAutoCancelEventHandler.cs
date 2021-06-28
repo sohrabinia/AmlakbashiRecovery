@@ -24,7 +24,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.EventHandlers
                 repository.Insert(new InstantReserveAutoCancel()
                 {
                     ReserveId = reserve.Id,
-                    ScheduledTime = DateTime.Now.Add(new TimeSpan(1, 0, 0)),
+                    ScheduledTime = DateTime.Now.Add(new TimeSpan(0, 30, 0)),
                     SendSms = false,
                     Force = false
                 });
