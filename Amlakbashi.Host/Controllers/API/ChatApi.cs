@@ -103,7 +103,10 @@ namespace Amlakbashi.Host.Controllers.API
                     ReadStatus = (int)Chat.ReadStatusEnum.NotRead
                 };
                 chatService.Insert(chat);
-                reserveAutoCancelService.UpdateScheduledTime(reserveId);
+                if (reserve.InstantReserve == false)
+                {
+                    reserveAutoCancelService.UpdateScheduledTime(reserveId);
+                }
                 int chatCount = chatService.GetCountByReserveId(reserveId);
                 var notReadChatCount = chatService.GetNotReadSupportCountByReserveId(reserveId);
                 reserveDashboardHubServer.ReloadChatFromServer(reserveId);

@@ -111,7 +111,7 @@
         var cropped;
         var $target;
         var result;
-        if (cropper && data.method && data.method == "amlakbashi_save") {            
+        if (cropper && data.method && data.method == "amlakbashi_save") {
             cropper.getCroppedCanvas().toBlob(function (blob) {
                 var formData = new FormData();
 

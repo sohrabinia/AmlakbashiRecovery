@@ -223,7 +223,10 @@ namespace Amlakbashi.Host.Controllers
                     ChatStatus = has_forbidden_characters ? (int)Chat.ChatStatusEnum.HasForbiddenCharacters : (int)Chat.ChatStatusEnum.Sent
                 };
                 var chat = chatService.Insert(msg);
-                reserveAutoCancelService.UpdateScheduledTime(reserve_id);
+                if (reserve.InstantReserve == false)
+                {
+                    reserveAutoCancelService.UpdateScheduledTime(reserve_id);
+                }
                 var reserveChatCount = chatService.GetCountByReserveId(reserve_id);
                 reserveAdminHubServer.ChangeChatCountFromServer(reserve_id, reserveChatCount,
                     chatService.GetNotReadSupportCountByReserveId(reserve_id));

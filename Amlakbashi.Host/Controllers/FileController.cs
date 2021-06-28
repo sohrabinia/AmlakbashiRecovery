@@ -731,97 +731,50 @@ namespace Portal.Controllers
                     lock (objlock)
                     {
                         Entities.File ObjFile = fileService.Find(id).Clone();
-                        string directory_path = ObjFile.FilePathWithoutTildeAndSlash.Substring(0, ObjFile.FilePathWithoutTildeAndSlash.LastIndexOf('/') + 1);
-                        string ext = ".jpg", filepath = "";
                         var uploadfile = Request.Form.Files[0];
-                        string filename = string.Format("edited{0}{1}", Guid.NewGuid(), ext);
-                        filepath = directory_path + filename;
-                        if (!System.IO.Directory.Exists(Path.Combine(host.WebRootPath, directory_path)))
-                            System.IO.Directory.CreateDirectory(Path.Combine(host.WebRootPath, directory_path));
 
-                        var extension = System.IO.Path.GetExtension(Path.Combine(host.WebRootPath, filepath));
-                        ImageCodecInfo format;
-                        EncoderParameters encoderParameters;
-                        switch (extension)
+                        string directoryPath = ObjFile.FilePathWithoutTildeAndSlash.Substring(0,
+                            ObjFile.FilePathWithoutTildeAndSlash.LastIndexOf('/') + 1);
+                        var filepath = Path.Combine(host.WebRootPath, ObjFile.FilePathWithoutTildeAndSlash);
+
+                        if (Directory.Exists(Path.Combine(host.WebRootPath, directoryPath)) == false)
+                            Directory.CreateDirectory(Path.Combine(host.WebRootPath, directoryPath));
+
+                        var format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
+                        var encoderParameters = new EncoderParameters(1);
+                        encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
+
+                        //switch (uploadfile.ContentType.ToLower())
+                        //{
+                        //    case "image/png":
+                        //        format = ImageUtility.GetEncoder(ImageFormat.Png);
+                        //        encoderParameters = new EncoderParameters(1);
+                        //        encoderParameters.Param[0] = new EncoderParameter(Encoder.Compression, (long)EncoderValue.CompressionLZW);
+                        //        break;
+                        //    case "image/gif":
+                        //        format = ImageUtility.GetEncoder(ImageFormat.Gif);
+                        //        encoderParameters = new EncoderParameters(0);
+                        //        break;
+                        //    default:
+                        //        format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
+                        //        encoderParameters = new EncoderParameters(1);
+                        //        encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
+                        //        break;
+                        //}
+
+                        using (var imageToSave = Image.FromStream(uploadfile.OpenReadStream(), true, true))
                         {
-                            case ".png":
-                                format = ImageUtility.GetEncoder(ImageFormat.Png);
-                                encoderParameters = new EncoderParameters(1);
-                                encoderParameters.Param[0] = new EncoderParameter(Encoder.Compression, (long)EncoderValue.CompressionLZW);
-                                break;
-                            case ".gif":
-                                format = ImageUtility.GetEncoder(ImageFormat.Gif);
-                                encoderParameters = new EncoderParameters(0);
-                                break;
-                            default:
-                                format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
-                                encoderParameters = new EncoderParameters(1);
-                                encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
-                                break;
+                            imageToSave.Save(Path.Combine(host.WebRootPath, filepath), format, encoderParameters);
                         }
 
-                        var imageToSave = Image.FromStream(uploadfile.OpenReadStream(), true, true);
-                        imageToSave.Save(Path.Combine(host.WebRootPath, filepath), format, encoderParameters);
-
-                        ObjFile.FilePath = "~/" + filepath;
                         ObjFile.LastModifyDate = DateTime.Now;
                         fileService.Update(ObjFile, host.WebRootPath);
+
                         if (accId > 0)
                         {
                             fileService.GenerateThumbImage(accId, host.WebRootPath);
                         }
-                        try
-                        {
-                            System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
-                            foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
-                            {
-                                IOfile.Delete();
-                            }
-                        }
-                        catch { }
-                    }
-                }
 
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("File.SavePhontoCropper", exc);
-                return GenerateJsonResult(new { status = 0, message = "فرمت عکس مورد قبول نمی باشد ." });
-            }
-
-        }
-
-        public JsonResult SetWatermark(long id)
-        {
-            try
-            {
-                var advertise = advertiseService.Find(id);
-                var advertises_to_watermark = new List<Advertise>();
-                advertises_to_watermark.Add(advertise);
-                if ((advertise.TypeID == AdvertiseType.Complex ||
-                    advertise.TypeID == AdvertiseType.HotelApartment) &&
-                    advertise.Childs != null)
-                {
-                    advertises_to_watermark.AddRange(advertise.Childs);
-                }
-                foreach (var adv in advertises_to_watermark)
-                {
-                    if (adv.Photos.Any())
-                    {
-                        foreach (var photo in adv.Photos)
-                        {
-                            if (!photo.FilePath.Contains("watermark_advertise"))
-                            {
-                                fileService.SetWatermark(photo.Id, host.WebRootPath);
-                            }
-                        }
-                    }
-                }
-                try
-                {
-                    lock (objlock)
-                    {
                         System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
                         foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
                         {
@@ -829,7 +782,20 @@ namespace Portal.Controllers
                         }
                     }
                 }
-                catch { }
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("File.SavePhontoCropper", exc);
+                return GenerateJsonResult(new { status = 0, message = "فرمت عکس مورد قبول نمی باشد ." });
+            }
+        }
+
+        public JsonResult SetWatermark(long id)
+        {
+            try
+            {
+                fileService.SetWatermarkForAdvertisePhotos(id, host.WebRootPath);
                 return GenerateJsonResult(new
                 {
                     status = 1,

@@ -498,24 +498,16 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize(Policy = Policies.User_General_Edit)]
         [HttpGet]
-        public ActionResult Edit(int uid = -1)
+        public ActionResult Edit(int uid)
         {
             try
             {
                 ViewBag.msg = TempData["msg"];
-                if (uid == -1)
-                {
-                    User objUser = new User();
-                    objUser.Id = -1;
-                    return View(objUser);
-                }
-                else
-                {
-                    var model = userService.Find(uid);
-                    var identityUser = userService.GetIdentityUser(model.MainMobile);
-                    ViewBag.userState = identityUser.State;
-                    return View(model);
-                }
+                var model = userService.Find(uid);
+                var identityUser = userService.GetIdentityUser(model.MainMobile);
+                ViewBag.userState = identityUser.State;
+                ViewBag.instantReserveCancelCount = model.Advertises.Sum(x => x.InstantReserveCancels);
+                return View(model);
             }
             catch (Exception exc)
             {
@@ -524,7 +516,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = Policies.User_General_Edit)]
         [HttpPost]
         public ActionResult Edit(User user, int userState)
         {
@@ -563,7 +555,7 @@ namespace Amlakbashi.Host.Controllers
                 //{
                 List<string> errors;
                 var identityUser = userService.GetIdentityUser(user.MainMobile);
-                if (userState != null && identityUser.State != (User.UserState)userState)
+                if (identityUser.State != (User.UserState)userState)
                 {
                     identityUser.State = (User.UserState)userState;
                     userService.UpdateIdentityUser(identityUser);

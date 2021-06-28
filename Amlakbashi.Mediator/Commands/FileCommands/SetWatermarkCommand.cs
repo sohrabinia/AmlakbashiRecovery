@@ -2,7 +2,7 @@
 
 namespace Amlakbashi.Mediator.Commands.FileCommands
 {
-    public class SetWatermarkCommand : IRequest
+    public class SetWatermarkCommand : IRequest<string>
     {
         public long FileId { get; set; }
         public string ServerPath { get; set; }

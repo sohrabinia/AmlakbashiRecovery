@@ -90,7 +90,7 @@
                     <div class="static-advertise__extra-footer">
                     </div>
                 </div>
-                <div onclick="set_watermark()" class="advertise__watermark">واترمارک همه عکس ها</div>
+                @*<div onclick="set_watermark()" class="advertise__watermark">واترمارک همه عکس ها</div>*@
             </div>
             <div class="admin-status_button-box">
                 <a href='@urlReferrer' class="static-advertise__submit" style="text-decoration:none;background-color:#fdd835; color:#242424; margin-left:auto;width:auto;">بازگشت به مدیریت آگهی</a>
@@ -166,7 +166,7 @@
         }
         $(".chosen-select").chosen();
         $(".chosen-container").css('width', '100%');
-        function set_watermark(advertise_id) {
+        @*function set_watermark(advertise_id) {
             advertise_id = advertise_id == undefined ||
                 advertise_id == null ? @(Model.Id) : advertise_id;
             myajax("File/SetWatermark", "id=" + advertise_id , function (ret) {
@@ -177,7 +177,7 @@
                     alert(ret.val) ;
                 }
             });
-        }
+        }*@
         function setImagesAsFixed(id) {
             myajax('accomodation/setbrokenimageasfixed', 'id=' + id, function(ret){
                 if (ret.status == 1) {

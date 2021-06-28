@@ -244,6 +244,7 @@
     <Folder Include="wwwroot\Content\blogpost\" />
     <Folder Include="wwwroot\Content\ErrorLog\" />
     <Folder Include="wwwroot\Content\files\" />
+    <Folder Include="wwwroot\Content\imgcache\" />
     <Folder Include="wwwroot\Content\test\" />
     <Folder Include="wwwroot\Content\webp\" />
     <Folder Include="wwwroot\css\" />
