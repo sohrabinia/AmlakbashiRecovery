@@ -241,6 +241,7 @@
   <ItemGroup>
     <Folder Include="Logs\HangfireLogs\" />
     <Folder Include="Logs\Logs\" />
+    <Folder Include="wwwroot\Content\advertisecache\" />
     <Folder Include="wwwroot\Content\blogpost\" />
     <Folder Include="wwwroot\Content\ErrorLog\" />
     <Folder Include="wwwroot\Content\files\" />
