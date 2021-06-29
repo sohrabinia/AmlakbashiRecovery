@@ -182,6 +182,10 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
             var thumbs = new List<ImageThumbDTO>();
             foreach (var file in files)
             {
+                if (File.Exists(request.Path + file.FilePath.Replace("~", "")) == false)
+                {
+                    continue;
+                }
                 var waterPath = mediator.Send(new SetWatermarkCommand(file.Id, host.WebRootPath)).Result;
                 //var origFilePath = request.Path + "/" + file.FilePathWithoutTildeAndSlash;
                 var watermarkedImagePath = request.Path + waterPath;
@@ -272,7 +276,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
 
             foreach (var thumb in thumbs)
             {
-                if (System.IO.File.Exists(thumb.OrigPath))
+                if (File.Exists(thumb.OrigPath))
                 {
                     //new System.IO.FileInfo(thumb.thumbPath).Directory.Create();
                     if (Directory.Exists(thumb.directoryPath) == false)
@@ -291,7 +295,10 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
             }
             foreach (var item in watermarkedImageList)
             {
-                File.Delete(item);
+                if (File.Exists(item))
+                {
+                    File.Delete(item);
+                }
             }
             return Task.FromResult(true);
         }
