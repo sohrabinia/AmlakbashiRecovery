@@ -369,8 +369,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             int y = image.Height - Convert.ToInt16((double)water_height + ((double)water_height / 10));
                             watermarkBrush.TranslateTransform(x, y);
                             imageGraphics.FillRectangle(watermarkBrush, new Rectangle(new Point(x, y), new Size(water_width + 1, water_height)));
-                            waterPath = "/content/imgcache/" + "watermark_" +
-                                file.FilePath.Substring(file.FilePath.LastIndexOf('/') + 1);
+                            waterPath = "/content/advertisecache/" + file.FilePath.Substring(file.FilePath.LastIndexOf('/') + 1);
                             var extension = System.IO.Path.GetExtension(request.ServerPath + waterPath);
                             ImageCodecInfo format;
                             EncoderParameters encoderParameters;
