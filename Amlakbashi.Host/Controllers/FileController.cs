@@ -791,27 +791,27 @@ namespace Portal.Controllers
             }
         }
 
-        public JsonResult SetWatermark(long id)
-        {
-            try
-            {
-                fileService.SetWatermarkForAdvertisePhotos(id, host.WebRootPath);
-                return GenerateJsonResult(new
-                {
-                    status = 1,
-                    val = "واترمارک با موفقیت انجام شد"
-                });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("File.SetWatermark", exc);
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    val = "خطایی رخ داد: " + exc.Message
-                });
-            }
-        }
+        //public JsonResult SetWatermark(long id)
+        //{
+        //    try
+        //    {
+        //        fileService.SetWatermarkForAdvertisePhotos(id, host.WebRootPath);
+        //        return GenerateJsonResult(new
+        //        {
+        //            status = 1,
+        //            val = "واترمارک با موفقیت انجام شد"
+        //        });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("File.SetWatermark", exc);
+        //        return GenerateJsonResult(new
+        //        {
+        //            status = 0,
+        //            val = "خطایی رخ داد: " + exc.Message
+        //        });
+        //    }
+        //}
 
         [Authorize(Roles = Roles.TechnicalManager)]
         public JsonResult RemoveExtraPhoto()

@@ -20,7 +20,7 @@ namespace Amlakbashi.Application.Services.FileServices.Interfaces
         void DeleteExtraFiles(List<long> existFile);
         void MinifyImage(long fileId, string filePath);
         void StopQueuedJob();
-        void SetWatermarkForAdvertisePhotos(long fileId, string serverPath);
+        //void SetWatermarkForAdvertisePhotos(long fileId, string serverPath);
         void GenerateThumbImage(long accId, string rootPath);
     }
 }
