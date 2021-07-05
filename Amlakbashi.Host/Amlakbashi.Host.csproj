@@ -116,7 +116,7 @@
     <None Include="Views\Post\NewsItem.cshtml" />
     <None Include="Views\Post\Page.cshtml" />
     <None Include="Views\Post\PresentAndPrize.cshtml" />
-    <None Include="Views\Post\ProfileManager.cshtml" />
+    <None Include="Views\User\ProfileManager.cshtml" />
     <None Include="Views\Post\Public.cshtml" />
     <None Include="Views\Post\ReplyComment.cshtml" />
     <None Include="Views\Post\SamandehiRedirect.cshtml" />
@@ -246,6 +246,7 @@
     <Folder Include="wwwroot\Content\ErrorLog\" />
     <Folder Include="wwwroot\Content\files\" />
     <Folder Include="wwwroot\Content\imgcache\" />
+    <Folder Include="wwwroot\Content\logocache\" />
     <Folder Include="wwwroot\Content\test\" />
     <Folder Include="wwwroot\Content\webp\" />
     <Folder Include="wwwroot\css\" />

@@ -323,7 +323,7 @@
                             <a title="آگهی های کاربر" class="adminicon fa fa-home" href='/user/impersonate?userId=@(item.User.Id)&url=/post/accomodationmanager' target="_blank"></a>
                             <a title="کیف پول" class="adminicon fa fa-money-bill-alt" style="margin: 0 5px;" href='/user/impersonate?userId=@(item.User.Id)&url=/user/usercreditmanager' target="_blank"></a>
                             <a class="adminicon fa fa-heart" href="/user/impersonate?userId=@(item.User.Id)&url=/post/favoritemanager?userid=@item.User.Id" target="_blank"></a>
-                            <a class="adminicon fa fa-eye" href="/user/impersonate?userId=@(item.User.Id)&url=/post/profilemanager" target="_blank"></a>
+                            <a class="adminicon fa fa-eye" href="/user/impersonate?userId=@(item.User.Id)&url=/user/profilemanager" target="_blank"></a>
                             <span class="adminicon fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></span>
                             <span class="adminicon fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></span>
                             <i onclick="incDecCredit(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="واریز/برداشت کیف پول"></i>

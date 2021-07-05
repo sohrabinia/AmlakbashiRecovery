@@ -116,6 +116,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             return GetImage(id, 160, 114, cid);
         }
+
         [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetAdvertiseImage(long id, string cid, long accid = 0)
         {
@@ -125,16 +126,19 @@ namespace Amlakbashi.Host.Controllers.API
             }
             return GetImage(id, 450, 300, cid);
         }
+
         [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumb(long accid, long fileid, string filename)
         {
             var path = "/content/accthumb/" + accid + "/" + fileid + "/" + filename + ".jpg";
             return File(path, "image/jpeg");
         }
+
         public ActionResult GetSquareMediumImage(long id, string cid)
         {
             return GetImage(id, 320, 320, cid);
         }
+
         public ActionResult GetProfileSmallImage(long id, string cid)
         {
             return GetImage(id, 40, 40, cid);
@@ -151,63 +155,71 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                string msg;
-                string file_path = "~/content/users/user";
                 if (image == null)
                 {
-                    msg = "خطا در دریافت عکس";
                     return GenerateJsonResult(new
                     {
                         done = false,
-                        msg = msg
+                        msg = "خطا در دریافت عکس"
                     });
                 }
-                string ext;
-                ext = Path.GetExtension(image.FileName).ToLower();
-                if (!(ext == ".png" || ext == ".jpg" || ext == ".gif"))
+
+                var contentType = image.ContentType.ToLower();
+                if ((contentType == "image/png" ||
+                     contentType == "image/gif" ||
+                     contentType == "image/jpg" ||
+                     contentType == "image/jpeg") == false)
                 {
-                    msg = "فرمت عکس مورد قبول نمی باشد";
                     return GenerateJsonResult(new
                     {
                         done = false,
-                        msg = msg
+                        msg = "فرمت عکس مورد قبول نمی باشد"
                     });
                 }
-                file_path += (Guid.NewGuid() + ext);
+
+                var filePath = $"~/content/users/user_{user.Id}.jpg";
+                long photoID = 0;
+                if (user.Photo != null)
+                {
+                    photoID = user.Photo.Id;
+                    var oldFilePath = webHostEnvironment.WebRootPath + user.Photo.FilePath.Replace("~", "");
+                    fileService.UpdateFilePath(photoID, filePath);
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+                }
+                else
+                {
+                    var newProfilePhoto = new Entities.File()
+                    {
+                        PostDate = DateTime.Now,
+                        LastModifyDate = DateTime.Now,
+                        UserID = user.Id,
+                        FilePath = filePath
+                    };
+                    photoID = fileService.Insert(newProfilePhoto);
+                }
+
                 if (!Directory.Exists(webHostEnvironment.WebRootPath + "/content/users"))
                     Directory.CreateDirectory(webHostEnvironment.WebRootPath + "/content/users");
+
                 using (var stream = System.IO.File.Create(
-                    webHostEnvironment.WebRootPath + file_path.Replace("~", "")))
+                    webHostEnvironment.WebRootPath + filePath.Replace("~", "")))
                 {
                     image.CopyTo(stream);
                 }
 
-                var nfile = new Entities.File();
-                nfile.FilePath = file_path;
-                nfile.PostDate = DateTime.Now;
-                nfile.LastModifyDate = DateTime.Now;
-                nfile.UserID = user.Id;
-                var file_id = fileService.Insert(nfile);
-                msg = null;
-
-                if (file_id < 1)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        done = false,
-                        msg = msg
-                    });
-                }
-                user.PhotoID = file_id;
-                userService.UpdateProfilePhoto(user.Id, user.PhotoID == null ? 0 : (long)user.PhotoID, Entities.User.UserPhotoState.ready_publish);
+                userService.UpdateProfilePhoto(user.Id, photoID, Entities.User.UserPhotoState.ready_publish);
                 return GenerateJsonResult(new
                 {
                     done = true,
-                    id = file_id
+                    id = photoID
                 });
             }
             catch (Exception exc)
             {
+                logger.Error("FileApi.SetProfileImage", exc);
                 return GenerateJsonResult(new
                 {
                     done = false,
@@ -227,69 +239,64 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                var quality = 80;
-                var maxWidth = 1024;
-                long photoID = -1;
+                var files = Request.Form.Files;
                 if (image != null)
                 {
-                    string extension = "", filepath = "";
-                    image = Request.Form.Files[0];
-                    extension = System.IO.Path.GetExtension(image.FileName).ToLower();
-
-                    string filename = string.Format("advertise{0}{1}", Guid.NewGuid(), ".jpg");
-
-                    filepath = "~/content/advertise/" + filename;
-                    if (!System.IO.Directory.Exists(webHostEnvironment.WebRootPath + "/content/advertise"))
-                        System.IO.Directory.CreateDirectory(webHostEnvironment.WebRootPath + "/content/advertise");
-                    switch (extension)
+                    var contentType = image.ContentType.ToLower();
+                    if ((contentType == "image/png" ||
+                        contentType == "image/gif" ||
+                        contentType == "image/jpg" ||
+                        contentType == "image/jpeg") == false)
                     {
-                        case ".png":
-                        case ".gif":
-                        case ".jpg":
-                        case ".jpeg":
-                            ImageCodecInfo format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
-                            EncoderParameters encoderParameters = new EncoderParameters(1);
-                            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, quality);
-                            var imageToSave = Image.FromStream(image.OpenReadStream(), true, true);
-                            imageToSave = ImageUtility.MinifyImage(imageToSave, maxWidth);
-                            imageToSave.Save(webHostEnvironment.WebRootPath + filepath.Replace("~", ""), format, encoderParameters);
-                            break;
-                        default:
-                            return GenerateJsonResult(new
-                            {
-                                done = false,
-                                msg = "فرمت عکس مورد قبول نمی باشد"
-                            });
+                        return GenerateJsonResult(new
+                        {
+                            done = false,
+                            msg = "فرمت عکس مورد قبول نمی باشد"
+                        });
                     }
 
+                    var quality = 80;
+                    var maxWidth = 1024;
+
                     Entities.File ObjFile = new Entities.File();
-                    ObjFile.FilePath = filepath;
                     ObjFile.PostDate = DateTime.Now;
                     ObjFile.UserID = user.Id;
                     ObjFile.LastModifyDate = DateTime.Now;
                     ObjFile.MinifyStatus = Entities.File.MinifyStatusEnum.Done;
                     ObjFile.MinifyQualityPercent = quality;
                     ObjFile.MinifyMaxWidth = maxWidth;
-                    photoID = fileService.Insert(ObjFile);
-                }
+                    long photoID = fileService.Insert(ObjFile);
 
-                if (photoID < 1)
-                {
+                    var filepath = $"~/content/advertise/advertise_{photoID}.jpg";
+
+                    if (Directory.Exists(webHostEnvironment.WebRootPath + "/content/advertise") == false)
+                        Directory.CreateDirectory(webHostEnvironment.WebRootPath + "/content/advertise");
+
+                    ImageCodecInfo format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
+                    EncoderParameters encoderParameters = new EncoderParameters(1);
+                    encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, quality);
+                    var imageToSave = Image.FromStream(image.OpenReadStream(), true, true);
+                    imageToSave = ImageUtility.MinifyImage(imageToSave, maxWidth);
+                    imageToSave.Save(webHostEnvironment.WebRootPath + filepath.Replace("~", ""), format, encoderParameters);
+
+                    fileService.UpdateFilePath(photoID, filepath);
+
                     return GenerateJsonResult(new
                     {
-                        done = false,
-                        msg = "خطا در دریافت فایل، لطفا دوباره امتحان کنید"
+                        done = true,
+                        id = photoID
                     });
                 }
 
                 return GenerateJsonResult(new
                 {
-                    done = true,
-                    id = photoID
+                    done = false,
+                    msg = "خطا در دریافت فایل، لطفا دوباره امتحان کنید"
                 });
             }
             catch (Exception exc)
             {
+                logger.Error("FileApi.UploadAdvertiseImage", exc);
                 return GenerateJsonResult(new
                 {
                     done = false,

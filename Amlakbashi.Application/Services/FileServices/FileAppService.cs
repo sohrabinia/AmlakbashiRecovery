@@ -10,6 +10,7 @@ using MediatR;
 using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Mediator.Commands.FileCommands;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
+using System;
 
 namespace Amlakbashi.Application.Services.FileServices
 {
@@ -71,6 +72,15 @@ namespace Amlakbashi.Application.Services.FileServices
             data.MinifyStatusInt = editedFile.MinifyStatusInt;
             data.MinifyMaxWidth = editedFile.MinifyMaxWidth;
             data.MinifyQualityPercent = editedFile.MinifyQualityPercent;
+            Repository.Update(data);
+            Repository.Save();
+        }
+
+        public void UpdateFilePath(long fileId, string filePath)
+        {
+            var data = Repository.Find(fileId);
+            data.FilePath = filePath;
+            data.LastModifyDate = DateTime.Now;
             Repository.Update(data);
             Repository.Save();
         }

@@ -854,7 +854,7 @@ namespace Amlakbashi.Host.Controllers.API
                     return GenerateJsonResult(new
                     {
                         done = false,
-                        msg = "این آگهی متعطلق به شما نیست"
+                        msg = "این آگهی متعلق به شما نیست"
                     });
                 }
                 var data = advertiseService.GetPrices(id);
@@ -894,7 +894,7 @@ namespace Amlakbashi.Host.Controllers.API
                     return GenerateJsonResult(new
                     {
                         done = false,
-                        msg = "این آگهی متعطلق به شما نیست"
+                        msg = "این آگهی متعلق به شما نیست"
                     });
                 }
                 Dictionary<string, string> errors;
@@ -934,7 +934,7 @@ namespace Amlakbashi.Host.Controllers.API
                     return GenerateJsonResult(new
                     {
                         done = false,
-                        msg = "این آگهی متعطلق به شما نیست"
+                        msg = "این آگهی متعلق به شما نیست"
                     });
                 }
                 if (data == null)
@@ -976,11 +976,27 @@ namespace Amlakbashi.Host.Controllers.API
                     return GenerateJsonResult(new
                     {
                         done = false,
-                        msg = new List<string>() { "این آگهی متعطلق به شما نیست" }
+                        msg = new List<string>() { "این آگهی متعلق به شما نیست" }
                     });
                 }
                 List<string> errors = new List<string>();
                 var done = advertiseService.UpdatePhotos(data, webHostEnvironment.WebRootPath);
+                if (done)
+                {
+                    foreach (var item in data.album)
+                    {
+                        var file = fileService.Find(item);
+                        var oldFilePath = webHostEnvironment.WebRootPath + file.FilePathWithoutTilde;
+                        var newFileName = $"~/content/advertise/advertise_{data.id}_{file.Id}.jpg";
+                        var newFilePath = $"{webHostEnvironment.WebRootPath}/content/advertise/advertise_{data.id}_{file.Id}.jpg";
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Copy(oldFilePath, newFilePath, true);
+                            System.IO.File.Delete(oldFilePath);
+                            fileService.UpdateFilePath(file.Id, newFileName);
+                        }
+                    }
+                }
                 return GenerateJsonResult(new
                 {
                     done = done,

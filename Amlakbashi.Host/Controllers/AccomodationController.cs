@@ -1042,7 +1042,7 @@ namespace Amlakbashi.Host.Controllers
                         {
                             var success_str = "آگهی شما با موفقیت " + (isAdd ? "ثبت" : "ویرایش") + " و پس از تایید کارشناس " + (isAdd ? "" : "دوباره ") + "نمایش داده میشود، لطفا اطلاعات مورد نیاز را تکمیل کنید";
                             TempData["alert_success"] = success_str;
-                            return RedirectToAction("ProfileManager", "Post", new { UserID = user.Id });
+                            return RedirectToAction("ProfileManager", "User", new { UserID = user.Id });
                         }
                         else
                         {

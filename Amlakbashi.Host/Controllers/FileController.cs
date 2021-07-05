@@ -1198,6 +1198,59 @@ namespace Portal.Controllers
             var strFormat = "image/" + (extension == "jpg" ? "jpeg" : extension);
             return File(objFile.FilePath, strFormat);
         }
+
+        [Authorize]
+        [HttpPost]
+        public JsonResult SaveUploadedFile(long accId)
+        {
+            try
+            {
+                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
+                {
+                    var uploadfile = Request.Form.Files[0];
+                    var contentType = uploadfile.ContentType.ToLower();
+                    if ((contentType == "image/png" ||
+                        contentType == "image/gif" ||
+                        contentType == "image/jpg" ||
+                        contentType == "image/jpeg") == false)
+                    {
+                        return GenerateJsonResult(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد" });
+                    }
+
+                    var quality = 80;
+                    var maxWidth = 1024;
+
+                    var ObjFile = new Entities.File();
+                    ObjFile.PostDate = DateTime.Now;
+                    ObjFile.UserID = userAccessor.CurrentUser.Id;
+                    ObjFile.LastModifyDate = DateTime.Now;
+                    ObjFile.MinifyStatus = Entities.File.MinifyStatusEnum.Done;
+                    ObjFile.MinifyQualityPercent = quality;
+                    ObjFile.MinifyMaxWidth = maxWidth;
+                    var photoID = fileService.Insert(ObjFile);
+
+                    if (Directory.Exists(host.WebRootPath + "/content/advertise") == false)
+                        Directory.CreateDirectory(host.WebRootPath + "/content/advertise");
+
+                    var filepath = $"~/content/advertise/advertise_{accId}_{photoID}.jpg";
+                    ImageCodecInfo format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
+                    EncoderParameters encoderParameters = new EncoderParameters(1);
+                    encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, quality);
+                    var image = Image.FromStream(uploadfile.OpenReadStream(), true, true);
+                    image = ImageUtility.MinifyImage(image, maxWidth);
+                    image.Save(host.WebRootPath + filepath.Replace("~", ""), format, encoderParameters);
+
+                    fileService.UpdateFilePath(photoID, filepath);
+                    return GenerateJsonResult(new { Status = 1, id = photoID });
+                }
+                return Json(new { Status = 0, Message = "خطا در دریافت فایل، لطفا دوباره امتحان کنید" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Post.SaveUploadedFile", exc);
+                return GenerateJsonResult(new { Status = 0, Message = "عملیات با خطا مواجه شد" });
+            }
+        }
     }
 }
 

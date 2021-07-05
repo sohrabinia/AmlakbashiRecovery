@@ -23,7 +23,7 @@ Disallow: /advertisetype
 Disallow: /post/advertisemanager
 Disallow: /post/personal
 Disallow: /post/profile
-Disallow: /post/profilemanager
+Disallow: /user/profilemanager
 Disallow: /post/favorite
 Disallow: /post/favoritemanager
 Disallow: /post/index
