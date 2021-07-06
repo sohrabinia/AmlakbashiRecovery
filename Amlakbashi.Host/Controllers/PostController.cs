@@ -193,24 +193,23 @@ namespace Amlakbashi.Host.Controllers
                     TempData["msg"] = "لطفا عنوان پست را وارد کنید .";
                     return RedirectToAction("Edit");
                 }
-                List<int> serviceIds = new List<int>();
-                if (Services != null)
+                if (Services == null)
                 {
-                    serviceIds = Services;
+                    Services = new List<int>();
                 }
                 if (post.Id == -1)
                 {
-                    postService.Insert(post, userAccessor.CurrentUser.Id, serviceIds);
+                    postService.Insert(post, userAccessor.CurrentUser.Id, Services);
                 }
                 else
                 {
-                    postService.Update(post, serviceIds);
+                    postService.Update(post, Services);
                 }
                 return RedirectToAction("Index");
             }
             catch (Exception exc)
             {
-                logger.Error("post insert/update failed", exc);
+                logger.Error("Post.Edit", exc);
                 return Redirect(Request.Headers["Referer"].ToString());
             }
         }
@@ -437,8 +436,7 @@ namespace Amlakbashi.Host.Controllers
                 }
             }
             var model = serviceService.Find(sid);
-            ViewBag.FirstPost = postService.Filter(PostStatus.Published,
-                sid).FirstOrDefault();
+            ViewBag.FirstPost = postService.Filter(PostStatus.Published, sid).FirstOrDefault();
             ViewBag.raw_url = HttpContext.Request.Path.Value.ToLower();
             return View(model);
         }
