@@ -144,11 +144,13 @@ li.guid-list-item i {
 .footer_button-download-app:hover{
     transform:scale(1.01);
 }
-#drftsguidrftnbpewmcs, #jxlznbqejxlzfukzapfuapfu {
+.img-footer {
     background: #f0f0f0;
     border-radius: 5px;
     text-align: center;
     border: 1px solid #e5e5ea;
+    width: 125px;
+    height: 136px;
 }
 @media screen and (max-width:1200px) {
     .footer-links {
@@ -233,5 +235,9 @@ li.guid-list-item i {
         padding-top: 10px;
         width: 78%;
         margin: 0 10px;
+    }
+    .img-footer{
+        width: 100px;
+        height: 108px;
     }
 }
