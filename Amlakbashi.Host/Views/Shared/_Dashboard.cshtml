@@ -202,7 +202,7 @@
                             <li class="main-navigation_list-item @(ViewBag.Invoice != null ? "menu__item--active" : "")"><a href="/reserve/invoice"><i class="fa fa-list"></i> صورت حساب رزرو ها</a></li>
                         }
                         <li class="main-navigation_list-item @(ViewBag.presentandprize != null ? "menu__item--active " : "")"><a href="@string.Format("/post/presentandprize?userid={0}", userAccessor.CurrentUser.Id)"><i class="fas fa-gift"></i> هدیه سفر</a></li>
-                        <li class="main-navigation_list-item @(ViewBag.profile != null ? "menu__item--active " : "")"><a href="@string.Format("/post/profilemanager")"><i class="fas fa-user"></i>پروفایل من</a></li>
+                        <li class="main-navigation_list-item @(ViewBag.profile != null ? "menu__item--active " : "")"><a href="@string.Format("/user/profilemanager")"><i class="fas fa-user"></i>پروفایل من</a></li>
                         <li class="main-navigation_list-item @(ViewBag.UserCredit != null ? "menu__item--active " : "")"><a href="/user/usercreditmanager"><i class="fa fa-money-bill-alt"></i> کیف پول</a></li>
                         <li class="main-navigation_list-item @(ViewBag.favorite != null ? "menu__item--active" : "")"><a href="@string.Format("/post/favoritemanager")"><i class="fas fa-heart"></i> علاقه مندی های من</a></li>
                         if (userAccessor.CurrentUser.UserGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)

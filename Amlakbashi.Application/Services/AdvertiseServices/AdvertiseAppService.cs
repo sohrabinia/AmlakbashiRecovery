@@ -1456,10 +1456,16 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 return true;
             }
+            var removedPhotoIds = acc.Photos.Select(s => s.Id).Except(editedData.album).ToList();
             acc.Photos.Clear();
             foreach (var item in editedData.album)
             {
-                acc.Photos.Add(Repository.Find<File, long>(item));
+                var file = Repository.Find<File, long>(item);
+                acc.Photos.Add(file);
+            }
+            if (removedPhotoIds.Any())
+            {
+                mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
             }
             acc.PhotoID = editedData.mainPhoto;
             acc.AlbumPhoto = editedData.ConvertAlbumToString();

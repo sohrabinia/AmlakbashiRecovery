@@ -16,6 +16,7 @@ namespace Amlakbashi.Application.Services.FileServices.Interfaces
         File Find(long id);
         long Insert(File newFile);
         void Update(File editedFile, string wwwrootPath);
+        void UpdateFilePath(long fileId, string filePath);
         void Delete(int fileId, string serverPath);
         void DeleteExtraFiles(List<long> existFile);
         void MinifyImage(long fileId, string filePath);

@@ -35,6 +35,9 @@ using System.Text;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+using Amlakbashi.Application.Services.ReserveServices.Interfaces;
+using Amlakbashi.Application.Services.FileServices.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -43,28 +46,37 @@ namespace Amlakbashi.Host.Controllers
         private readonly ILog logger;
         private readonly IBankCardAppService bankCardService;
         private readonly IUserAppService userService;
+        private readonly IReserveAppService reserveService;
+        private readonly IFileAppService fileService;
         private readonly IAccountingFacade accounting;
         private readonly IUserContactFacade userContact;
         private readonly IAdvertiseAppService advertiseService;
         private readonly IUserAccessor userAccessor;
         private readonly SignInManager<AppUser> signInManager;
+        private readonly IWebHostEnvironment host;
         public UserController(IUserAppService userService,
             IBankCardAppService bankCardService,
             IAccountingFacade accounting,
             IUserContactFacade userContact,
+            IReserveAppService reserveService,
+            IFileAppService fileService,
             IAdvertiseAppService advertiseService,
             IUserAccessor userAccessor,
             SignInManager<AppUser> signInManager,
+            IWebHostEnvironment host,
             ILog logger)
         {
             this.userService = userService;
             this.bankCardService = bankCardService;
             this.accounting = accounting;
             this.userContact = userContact;
+            this.reserveService = reserveService;
+            this.fileService = fileService;
             this.advertiseService = advertiseService;
             this.logger = logger;
             this.userAccessor = userAccessor;
             this.signInManager = signInManager;
+            this.host = host;
         }
 
         #region Impersonate
@@ -628,7 +640,7 @@ namespace Amlakbashi.Host.Controllers
                     userService.SignOut();
                     signInManager.SignInAsync(user, true).Wait();
                     TempData["suc"] = "تغییر رمز عبور با موفقیت انجام شد";
-                    return Redirect("/post/profilemanager?userid=" + userAccessor.CurrentUser.Id);
+                    return Redirect("/user/profilemanager?userid=" + userAccessor.CurrentUser.Id);
                 }
                 var errorList = new List<string>();
                 foreach (var item in result.Errors)
@@ -2018,6 +2030,120 @@ namespace Amlakbashi.Host.Controllers
                     status = 0,
                     msg = "عملیات با خطای فنی مواجه شد"
                 });
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult ProfileManager()
+        {
+            try
+            {
+                var user = userAccessor.CurrentUser;
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var model = UserDTO.Generate(user, identityUser);
+                var bankCard = bankCardService.GetByUserId(user.Id);
+                if (bankCard != null)
+                {
+                    model.bankCardNumber = bankCard.BankCardNumber;
+                    model.shabaNumber = bankCard.ShabaNumber;
+                    model.bankFname = bankCard.FName;
+                    model.bankLname = bankCard.LName;
+                }
+                ViewBag.msg = TempData["msg"];
+                ViewBag.suc = TempData["suc"];
+                ViewBag.photoId = user.PhotoID;
+                ViewBag.photoStatus = user.PhotoStatus;
+                ViewBag.hasCanselReserve = reserveService.UserHasRefundInProgress(user.Id);
+                return View(model);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.ProfileManager", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult ProfileManager(UserDTO user)
+        {
+            try
+            {
+                if (user.id != userAccessor.CurrentUser.Id)
+                    return Redirect("/errors/http404");
+                
+                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
+                {
+                    var uploadfile = Request.Form.Files[0];
+                    var contentType = uploadfile.ContentType.ToLower();
+                    if ((contentType == "image/png" ||
+                        contentType == "image/gif" ||
+                        contentType == "image/jpg" ||
+                        contentType == "image/jpeg") == false)
+                    {
+                        TempData["msg"] = "فرمت عکس مورد قبول نمی باشد";
+                        return RedirectToAction("profilemanager");
+                    }
+
+                    string filepath = $"~/content/users/user_{user.id}.jpg";
+                    long PhotoID = 0;
+                    if (userAccessor.CurrentUser.Photo != null)
+                    {
+                        PhotoID = userAccessor.CurrentUser.Photo.Id;
+                        var oldFilePath = host.WebRootPath + userAccessor.CurrentUser.Photo.FilePath.Replace("~", "");
+                        fileService.UpdateFilePath(PhotoID, filepath);
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                    }
+                    else
+                    {
+                        var newProfilePhoto = new File()
+                        {
+                            PostDate = DateTime.Now,
+                            LastModifyDate = DateTime.Now,
+                            UserID = user.id,
+                            FilePath = filepath
+                        };
+                        PhotoID = fileService.Insert(newProfilePhoto);
+                    }
+
+                    if (!System.IO.Directory.Exists(host.WebRootPath + "/content/users"))
+                        System.IO.Directory.CreateDirectory(host.WebRootPath + "/content/users");
+
+                    using (var stream = System.IO.File.Create(host.WebRootPath + filepath.Replace("~", "")))
+                    {
+                        uploadfile.CopyTo(stream);
+                    }
+
+                    userService.UpdateProfilePhoto(user.id, PhotoID, Entities.User.UserPhotoState.ready_publish);
+
+                    System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(System.IO.Path.Combine(host.WebRootPath, "content/imgcache"));
+                    foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
+                    {
+                        IOfile.Delete();
+                    }
+                }
+                List<string> errors;
+                bool hasRefundInProgress = reserveService.UserHasRefundInProgress(user.id);
+                var done = userService.Update(user, userAccessor.CurrentUser.Id, hasRefundInProgress, ActionLog.ActionSourceEnum.WebsiteDashboard, out errors);
+                if (done)
+                {
+                    TempData["suc"] = "ویرایش پروفایل شما با موفقیت انجام شد";
+                }
+                else
+                {
+                    TempData["msg"] = errors.First();
+                }
+
+                return RedirectToAction("profilemanager");
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.ProfileManager", exc);
+                return RedirectToAction("profilemanager");
             }
         }
     }

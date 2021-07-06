@@ -32,12 +32,10 @@ namespace Amlakbashi.Application.Services.PostServices
         public IList<Post> Filter(Post.PostStatus status, int serviceId)
         {
             var statusInt = (int)status;
-            var list = Repository.Query(q =>
-                q.Where(w => w.Status == statusInt));
+            var list = Repository.Query(q => q.Where(w => w.Status == statusInt));
             if (serviceId != -1)
             {
-                var servicePostList = servicePostRepository.Query(q =>
-                    q.Where(w => w.ServiceID == serviceId));
+                var servicePostList = servicePostRepository.Query(q => q.Where(w => w.ServiceID == serviceId));
                 var postIds = servicePostList.Select(s => s.PostID).Distinct().ToList();
                 list = list.Where(w => postIds.Contains(w.Id));
             }
@@ -101,8 +99,7 @@ namespace Amlakbashi.Application.Services.PostServices
         {
             using (var tran = new TransactionScope())
             {
-                var currItem = Repository.Query(q =>
-                    q.FirstOrDefault(f => f.Id == item.Id));
+                var currItem = Repository.Query(q => q.FirstOrDefault(f => f.Id == item.Id));
                 currItem.Title = item.Title;
                 currItem.FileID = item.FileID;
                 currItem.Link = item.Link;
@@ -112,8 +109,8 @@ namespace Amlakbashi.Application.Services.PostServices
                 currItem.LastModifyDate = DateTime.Now;
                 Repository.Update(currItem);
                 Repository.Save();
-                servicePostRepository.Delete(
-                    q => q.PostID == currItem.Id);
+
+                servicePostRepository.Delete(q => q.PostID == currItem.Id);
                 foreach (int servideId in serviceIds)
                 {
                     var servicePostItem = new ServicePost();

@@ -131,7 +131,7 @@
                                                 @foreach (var grandchild in grandchildren)
                                                 {
                                                     <li>
-                                                        <input type="checkbox" value="@grandchild.Id" is-checked="@(CurrentServices.Contains(grandchild.Id))" />
+                                                        <input type="checkbox" name="Services" value="@grandchild.Id" is-checked="@(CurrentServices.Contains(grandchild.Id))" />
                                                         @grandchild.Title
                                                     </li>
                                                 }
@@ -142,7 +142,7 @@
                             }
                             else
                             {
-                                <input type="checkbox" value="@child.Id" is-checked="@(CurrentServices.Contains(child.Id))" />
+                                <input type="checkbox" name="Services" value="@child.Id" is-checked="@(CurrentServices.Contains(child.Id))" />
                                 <span style=" margin-left:18px; color: #444; font: 13px bnassim; padding-right: 5px;">@child.Title</span>
                             }
                         }

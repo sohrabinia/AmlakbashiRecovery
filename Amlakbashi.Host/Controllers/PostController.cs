@@ -193,24 +193,23 @@ namespace Amlakbashi.Host.Controllers
                     TempData["msg"] = "لطفا عنوان پست را وارد کنید .";
                     return RedirectToAction("Edit");
                 }
-                List<int> serviceIds = new List<int>();
-                if (Services != null)
+                if (Services == null)
                 {
-                    serviceIds = Services;
+                    Services = new List<int>();
                 }
                 if (post.Id == -1)
                 {
-                    postService.Insert(post, userAccessor.CurrentUser.Id, serviceIds);
+                    postService.Insert(post, userAccessor.CurrentUser.Id, Services);
                 }
                 else
                 {
-                    postService.Update(post, serviceIds);
+                    postService.Update(post, Services);
                 }
                 return RedirectToAction("Index");
             }
             catch (Exception exc)
             {
-                logger.Error("post insert/update failed", exc);
+                logger.Error("Post.Edit", exc);
                 return Redirect(Request.Headers["Referer"].ToString());
             }
         }
@@ -437,8 +436,7 @@ namespace Amlakbashi.Host.Controllers
                 }
             }
             var model = serviceService.Find(sid);
-            ViewBag.FirstPost = postService.Filter(PostStatus.Published,
-                sid).FirstOrDefault();
+            ViewBag.FirstPost = postService.Filter(PostStatus.Published, sid).FirstOrDefault();
             ViewBag.raw_url = HttpContext.Request.Path.Value.ToLower();
             return View(model);
         }
@@ -657,119 +655,6 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Authorize]
-        [HttpGet]
-        public ActionResult ProfileManager()
-        {
-            try
-            {
-                var user = userAccessor.CurrentUser;
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
-                var model = UserDTO.Generate(user, identityUser);
-                var bankCard = bankCardService.GetByUserId(user.Id);
-                if (bankCard != null)
-                {
-                    model.bankCardNumber = bankCard.BankCardNumber;
-                    model.shabaNumber = bankCard.ShabaNumber;
-                    model.bankFname = bankCard.FName;
-                    model.bankLname = bankCard.LName;
-                }
-                ViewBag.msg = TempData["msg"];
-                ViewBag.suc = TempData["suc"];
-                ViewBag.photoId = user.PhotoID;
-                ViewBag.photoStatus = user.PhotoStatus;
-                ViewBag.hasCanselReserve = reserveService.UserHasRefundInProgress(user.Id);
-                return View(model);
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Post.ProfileManager", exc);
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
-        }
-
-        [Authorize]
-        [HttpPost]
-        //[ValidateAntiForgeryToken]
-        public ActionResult ProfileManager(UserDTO user)
-        {
-            try
-            {
-                if (user.id != userAccessor.CurrentUser.Id)
-                    return Redirect("/errors/http404");
-
-                string ext = "", filepath = "";
-                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
-                {
-                    var uploadfile = Request.Form.Files[0];
-                    ext = System.IO.Path.GetExtension(uploadfile.FileName).ToLower();
-
-                    if ((ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif") == false)
-                    {
-                        TempData["msg"] = "فرمت عکس مورد قبول نمی باشد .";
-                        return Redirect(Request.Headers["referer"].ToString());
-                    }
-
-                    long PhotoID = 0;
-                    if (userAccessor.CurrentUser.Photo != null)
-                    {
-                        filepath = userAccessor.CurrentUser.Photo.FilePath;
-                        var editedPhoto = userAccessor.CurrentUser.Photo.Clone();
-                        editedPhoto.LastModifyDate = DateTime.Now;
-                        fileService.Update(editedPhoto, webHostEnvironment.WebRootPath);
-                        PhotoID = editedPhoto.Id;
-                    }
-                    else
-                    {
-                        filepath = string.Format("~/content/users/user{0}{1}", Guid.NewGuid(), ext);
-                        var profilePhoto = new File();
-                        profilePhoto.FilePath = filepath;
-                        profilePhoto.PostDate = DateTime.Now;
-                        profilePhoto.LastModifyDate = DateTime.Now;
-                        profilePhoto.UserID = userAccessor.CurrentUser.Id;
-                        PhotoID = fileService.Insert(profilePhoto);
-                    }
-
-                    if (!System.IO.Directory.Exists(webHostEnvironment.WebRootPath + "/content/users"))
-                        System.IO.Directory.CreateDirectory(webHostEnvironment.WebRootPath + "/content/users");
-
-                    using (var stream = System.IO.File.Create(webHostEnvironment.WebRootPath + filepath.Replace("~", "")))
-                    {
-                        uploadfile.CopyTo(stream);
-                    }
-                    
-                    userService.UpdateProfilePhoto(user.id, PhotoID, Entities.User.UserPhotoState.ready_publish);
-
-                    System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(System.IO.Path.Combine(webHostEnvironment.WebRootPath, "content/imgcache"));
-                    foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
-                    {
-                        IOfile.Delete();
-                    }
-                }
-                string msg;
-                List<string> errors;
-                bool hasRefundInProgress = reserveService.UserHasRefundInProgress(user.id);
-                var done = userService.Update(user, userAccessor.CurrentUser.Id, hasRefundInProgress, ActionLog.ActionSourceEnum.WebsiteDashboard, out errors);
-                if (done)
-                {
-                    msg = "ویرایش پروفایل شما با موفقیت انجام شد";
-                    TempData["suc"] = msg;
-                }
-                else
-                {
-                    msg = errors.First();
-                    TempData["msg"] = msg;
-                }
-
-                return Redirect(Request.Headers["referer"].ToString());
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Post.ProfileManager", exc);
-                return Redirect(Request.Headers["referer"].ToString());
-            }
-        }
-
         [HttpGet]
         public ActionResult FrequentlyQuestions(bool amp_version = false)
         {
@@ -798,81 +683,9 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("Post.Contact", exc);
                 return Redirect(Request.Headers["Referer"].ToString());
             }
-        }
-
-        [HttpPost]
-        public JsonResult SaveUploadedFile()
-        {
-            try
-            {
-                var quality = 80;
-                var maxWidth = 1024;
-                long photoID = -1;
-                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
-                {
-                    string extension = "", filepath = "";
-                    var uploadfile = Request.Form.Files[0];
-                    extension = System.IO.Path.GetExtension(uploadfile.FileName).ToLower();
-
-                    string filename = string.Format("advertise{0}{1}", Guid.NewGuid(), ".jpg");
-
-                    filepath = "~/content/advertise/" + filename;
-                    if (!System.IO.Directory.Exists(webHostEnvironment.WebRootPath + "/content/advertise"))
-                        System.IO.Directory.CreateDirectory(webHostEnvironment.WebRootPath + "/content/advertise");
-                    switch (extension)
-                    {
-                        case ".png":
-                        case ".gif":
-                        case ".jpg":
-                        case ".jpeg":
-                            ImageCodecInfo format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
-                            EncoderParameters encoderParameters = new EncoderParameters(1);
-                            encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, quality);
-                            var image = Image.FromStream(uploadfile.OpenReadStream(), true, true);
-                            image = ImageUtility.MinifyImage(image, maxWidth);
-                            image.Save(webHostEnvironment.WebRootPath + filepath.Replace("~", ""), format, encoderParameters);
-                            break;
-                        default:
-                            //return Json(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
-                            return GenerateJsonResult(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
-                    }
-
-                    File ObjFile = new File();
-                    ObjFile.FilePath = filepath;
-                    ObjFile.PostDate = DateTime.Now;
-                    if (User.Identity.IsAuthenticated)
-                    {
-                        ObjFile.UserID = userAccessor.CurrentUser.Id;
-                    }
-                    else
-                    {
-                        ObjFile.UserID = 0;
-                    }
-                    ObjFile.LastModifyDate = DateTime.Now;
-                    ObjFile.MinifyStatus = Entities.File.MinifyStatusEnum.Done;
-                    ObjFile.MinifyQualityPercent = quality;
-                    ObjFile.MinifyMaxWidth = maxWidth;
-                    photoID = fileService.Insert(ObjFile);
-                }
-
-                if (photoID < 1)
-                {
-                    return Json(new { Status = 0, Message = "خطا در دریافت فایل، لطفا دوباره امتحان کنید" });
-                }
-
-                //return Json(new { Status = 1, id = photoID });
-                return GenerateJsonResult(new { Status = 1, id = photoID });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Post.SaveUploadedFile", exc);
-                //return Json(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
-                return GenerateJsonResult(new { Status = 0, Message = "فرمت عکس مورد قبول نمی باشد ." });
-            }
-
         }
 
         public ActionResult DownloadApp(bool fromApp = false, bool amp_version = false)
@@ -885,7 +698,7 @@ namespace Amlakbashi.Host.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 24 * 60 * 60, VaryByQueryKeys = new string[] {"*"})]
+        [ResponseCache(Duration = 24 * 60 * 60, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult DownloadAppPopup(bool ios = false)
         {
             ViewBag.ios = ios;
