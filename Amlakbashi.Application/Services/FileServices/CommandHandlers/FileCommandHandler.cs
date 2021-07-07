@@ -291,7 +291,13 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             using (Image origImage = Image.FromStream(stream))
                             {
                                 var thumbImage = ImageUtility.ResizeImageKeepAspectRatio(origImage, thumb.w, thumb.h);
-                                ImageUtility.SaveThumb(thumbImage, thumb.thumbPath, thumb.OrigPath);
+                                //ImageUtility.SaveThumb(thumbImage, thumb.thumbPath, thumb.OrigPath);
+
+                                var format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
+                                var encoderParameters = new EncoderParameters(1);
+                                encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
+                                thumbImage.Save(thumb.thumbPath, format, encoderParameters);
+
                                 thumbImage.Dispose();
                             }
                         }
@@ -415,14 +421,23 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
         {
             try
             {
+                bool hasChange = false;
                 var files = fileRepository.Query(q => q.Where(w => request.PhotoIds.Contains(w.Id)));
                 foreach (var item in files)
                 {
-                    fileRepository.Delete(item.Id);
-                    if (File.Exists(Path.Combine(host.WebRootPath, item.FilePathWithoutTildeAndSlash)))
+                    if (item.Advertises.Count == 0)
                     {
-                        File.Delete(Path.Combine(host.WebRootPath, item.FilePathWithoutTildeAndSlash));
+                        fileRepository.Delete(item.Id);
+                        if (File.Exists(Path.Combine(host.WebRootPath, item.FilePathWithoutTildeAndSlash)))
+                        {
+                            File.Delete(Path.Combine(host.WebRootPath, item.FilePathWithoutTildeAndSlash));
+                        }
+                        hasChange = true;
                     }
+                }
+                if (hasChange)
+                {
+                    fileRepository.Save();
                 }
                 return Task.FromResult(Unit.Value);
             }

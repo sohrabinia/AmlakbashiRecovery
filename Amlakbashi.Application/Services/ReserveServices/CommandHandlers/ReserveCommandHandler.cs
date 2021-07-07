@@ -98,7 +98,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             if (reserve.Status != ReserveStatus.WaitForResponse &&
                 reserve.Status != ReserveStatus.WaitForReserve)
             {
-                return Task.FromResult(false);
+                return Task.FromResult(true);
             }
             if (reserve.DisableAutoCancel && !request.force)
                 return Task.FromResult(false);
