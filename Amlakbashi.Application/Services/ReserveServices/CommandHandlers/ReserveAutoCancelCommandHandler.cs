@@ -30,9 +30,13 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             var queue = repository.Query(q => q.Where(w => w.ScheduledTime <= now)).ToList();
             foreach (var item in queue)
             {
-                mediator.Send(new SystemCancelReserveCommand(item.ReserveId, item.SendSms, item.Force));
+                var result = mediator.Send(new SystemCancelReserveCommand(item.ReserveId, item.SendSms, item.Force)).Result;
+                if (result)
+                {
+                    repository.Delete(item.Id);
+                }
             }
-            repository.Delete(q => q.ScheduledTime <= now);
+            //repository.Delete(q => q.ScheduledTime <= now);
             repository.Save();
             return Task.FromResult(Unit.Value);
         }
