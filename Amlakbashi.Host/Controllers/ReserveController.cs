@@ -1961,6 +1961,10 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 reserveService.UpdateDisableAutoCancel(id, active);
+                if (active == false)
+                {
+                    reserveAutoCancelService.UpdateScheduledTime(id);
+                }
                 return GenerateJsonResult(new { status = 1 });
             }
             catch (Exception exc)
