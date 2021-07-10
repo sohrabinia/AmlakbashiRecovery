@@ -239,34 +239,32 @@ namespace Portal.Controllers
             try
             {
                 var objFile = fileService.Find(FileID);
-                if (objFile == null)
-                    return File("/resource/img/img202_500_300.png", "image/png");
-                string path = "", strFormat = "image/jpeg";
-                try
+                if (objFile == null ||
+                    System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)) == false)
                 {
-                    using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
-                    {
-                        if (tmpImage.RawFormat.Equals(ImageFormat.Png))
-                        {
-                            path = string.Format("content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
-                            strFormat = "image/png";
-                        }
-                        else
-                        {
-                            path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
-                        }
-                    }
+                    return File("/resource/img/img202_500_300.png", "image/png");
                 }
-                catch (Exception exc)
+
+                string path = "", strFormat = "";
+                using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
                 {
-                    return File("/resource/img/img202_500_300.png", "image/png");
+                    if (tmpImage.RawFormat.Equals(ImageFormat.Png))
+                    {
+                        path = string.Format("content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
+                        strFormat = "image/png";
+                    }
+                    else
+                    {
+                        path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
+                        strFormat = "image/jpeg";
+                    }
                 }
 
                 //if(!AllowImageThumb.Contains((w*10000)+h) || (w==0 && h==0))
                 //{
                 //    path="~/Resource/img/noimage.jpg" ;
                 //}
-                if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
+                if (System.IO.File.Exists(Path.Combine(host.WebRootPath, path)) == false)
                 {
                     string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
 
@@ -274,51 +272,44 @@ namespace Portal.Controllers
                     //    OrginalPath = "~/Resource/img/img202_500_300.png";
                     using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, OrginalPath)))
                     {
-                        lock (objlock)
+                        //double nw, nh, zz;
+                        //if (w == 0)
+                        //{
+                        //    zz = (double)OriginalImage.Height / (double)h;
+                        //    nh = h;
+                        //    nw = (double)OriginalImage.Width / zz;
+                        //}
+                        //else if (h == 0)
+                        //{
+                        //    zz = (double)OriginalImage.Width / (double)w;
+                        //    nw = w;
+                        //    nh = (double)OriginalImage.Height / zz;
+                        //}
+                        //else
+                        //{
+                        //    nw = w;
+                        //    nh = h;
+                        //}
+                        using (var result = (Bitmap)ImageUtility.ResizeImageKeepAspectRatio(OriginalImage, (int)w, (int)h))
                         {
-                            //double nw, nh, zz;
-                            //if (w == 0)
-                            //{
-                            //    zz = (double)OriginalImage.Height / (double)h;
-                            //    nh = h;
-                            //    nw = (double)OriginalImage.Width / zz;
-                            //}
-                            //else if (h == 0)
-                            //{
-                            //    zz = (double)OriginalImage.Width / (double)w;
-                            //    nw = w;
-                            //    nh = (double)OriginalImage.Height / zz;
-                            //}
-                            //else
-                            //{
-                            //    nw = w;
-                            //    nh = h;
-                            //}
-                            using (var result = (Bitmap)ImageUtility.ResizeImageKeepAspectRatio(OriginalImage, (int)w, (int)h))
-                            {
-                                result.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
-                                //return File(path.Replace("~", ""), strFormat);
-                            }
-                            //using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
-                            //{
-                            //    thumbnailBitmap.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
-                            //    using (Graphics thumbnailGraph = Graphics.FromImage(thumbnailBitmap))
-                            //    {
-                            //        thumbnailGraph.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                            //        thumbnailGraph.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                            //        thumbnailGraph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                            //        Rectangle imageRectangle = new Rectangle(0, 0, (int)nw, (int)nh);
-                            //        thumbnailGraph.DrawImage(OriginalImage, imageRectangle);
-                            //        thumbnailBitmap.Save(Server.MapPath(path) , OriginalImage.RawFormat);
-                            //    }
-                            //}
-
+                            result.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
                         }
+                        //using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
+                        //{
+                        //    thumbnailBitmap.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
+                        //    using (Graphics thumbnailGraph = Graphics.FromImage(thumbnailBitmap))
+                        //    {
+                        //        thumbnailGraph.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                        //        thumbnailGraph.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                        //        thumbnailGraph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        //        Rectangle imageRectangle = new Rectangle(0, 0, (int)nw, (int)nh);
+                        //        thumbnailGraph.DrawImage(OriginalImage, imageRectangle);
+                        //        thumbnailBitmap.Save(Server.MapPath(path) , OriginalImage.RawFormat);
+                        //    }
+                        //}
                     }
                 }
-                //Response.AddHeader("Content-Type", strFormat);
-                //Server.Transfer(path.Replace("~",""));
-                return File("/" + path.Replace("~/", ""), strFormat);
+                return File("/" + path, strFormat);
             }
             catch (Exception exc)
             {
@@ -392,81 +383,66 @@ namespace Portal.Controllers
             try
             {
                 var objFile = fileService.Find(FileID);
-                if (objFile == null)
-                    return File("/resource/img/img202_500_300.png", "image/png");
-                string path = "", strFormat = "image/jpeg";
-                try
+                if (objFile == null ||
+                    System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)) == false)
                 {
-                    using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                    return File("/resource/img/img202_500_300.png", "image/png");
+                }
+
+                string path = "", strFormat = "";
+                using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                {
+                    if (tmpImage.RawFormat.Equals(ImageFormat.Png))
                     {
-                        if (tmpImage.RawFormat.Equals(ImageFormat.Png))
+                        path = string.Format("content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
+                        strFormat = "image/png";
+                    }
+                    else
+                    {
+                        path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
+                        strFormat = "image/jpeg";
+                    }
+                }
+
+                if (System.IO.File.Exists(Path.Combine(host.WebRootPath, path)) == false)
+                {
+                    string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
+                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, OrginalPath)))
+                    {
+                        double nw, nh, zz;
+                        if (w == 0)
                         {
-                            path = string.Format("content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
-                            strFormat = "image/png";
+                            zz = (double)OriginalImage.Height / (double)h;
+                            nh = h;
+                            nw = (double)OriginalImage.Width / zz;
+                        }
+                        else if (h == 0)
+                        {
+                            zz = (double)OriginalImage.Width / (double)w;
+                            nw = w;
+                            nh = (double)OriginalImage.Height / zz;
                         }
                         else
                         {
-                            path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
+                            nw = w;
+                            nh = h;
                         }
-                    }
-                }
-                catch (Exception exc)
-                {
-                    logger.Error("File.imgThumbOld", exc);
-                }
-
-                //if(!AllowImageThumb.Contains((w*10000)+h) || (w==0 && h==0))
-                //{
-                //    path="~/Resource/img/noimage.jpg" ;
-                //}
-                if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
-                {
-                    string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
-                    //if (objFile.FileType != (int)FileDepend.FileTypes.Image || !System.IO.File.Exists(Server.MapPath(OrginalPath)))
-                    //    OrginalPath = "~/Resource/img/img202_500_300.png";
-
-                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, OrginalPath)))
-                    {
-                        lock (objlock)
+                        using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
                         {
-                            double nw, nh, zz;
-                            if (w == 0)
+                            thumbnailBitmap.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
+                            using (Graphics thumbnailGraph = Graphics.FromImage(thumbnailBitmap))
                             {
-                                zz = (double)OriginalImage.Height / (double)h;
-                                nh = h;
-                                nw = (double)OriginalImage.Width / zz;
+                                thumbnailGraph.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                                thumbnailGraph.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                                thumbnailGraph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                                Rectangle imageRectangle = new Rectangle(0, 0, (int)nw, (int)nh);
+                                thumbnailGraph.DrawImage(OriginalImage, imageRectangle);
+                                thumbnailBitmap.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
                             }
-                            else if (h == 0)
-                            {
-                                zz = (double)OriginalImage.Width / (double)w;
-                                nw = w;
-                                nh = (double)OriginalImage.Height / zz;
-                            }
-                            else
-                            {
-                                nw = w;
-                                nh = h;
-                            }
-                            using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
-                            {
-                                thumbnailBitmap.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
-                                using (Graphics thumbnailGraph = Graphics.FromImage(thumbnailBitmap))
-                                {
-                                    thumbnailGraph.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                                    thumbnailGraph.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                                    thumbnailGraph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                                    Rectangle imageRectangle = new Rectangle(0, 0, (int)nw, (int)nh);
-                                    thumbnailGraph.DrawImage(OriginalImage, imageRectangle);
-                                    thumbnailBitmap.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
-                                }
-                            }
-
                         }
                     }
                 }
-                //Response.AddHeader("Content-Type", strFormat);
-                //Server.Transfer(path.Replace("~",""));
-                return File("/" + path.Replace("~/", ""), strFormat);
+                return File("/" + path, strFormat);
             }
             catch (Exception exc)
             {

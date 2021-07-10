@@ -36,7 +36,7 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     objFile = fileService.Find(id);
                 }
-                if (id != 202 && (objFile == null || !System.IO.File.Exists(webHostEnvironment.WebRootPath + objFile.FilePath.Replace("~", ""))))
+                if (id != 202 && (objFile == null || System.IO.File.Exists(webHostEnvironment.WebRootPath + objFile.FilePath.Replace("~", "")) == false))
                 {
                     return GetImage(202, w, h, cid);
                 }
@@ -44,7 +44,7 @@ namespace Amlakbashi.Host.Controllers.API
                 var path = string.Format("~/content/imgcache/img{0}_{1}_{2}." + image_extension, id, w, h);
                 var strFormat = "image/" + image_extension;
 
-                if (!System.IO.File.Exists(webHostEnvironment.WebRootPath + path.Replace("~", "")))
+                if (System.IO.File.Exists(webHostEnvironment.WebRootPath + path.Replace("~", "")) == false)
                 {
                     using (Image OriginalImage = Image.FromFile(webHostEnvironment.WebRootPath + objFile.FilePath.Replace("~", "")))
                     {
@@ -65,7 +65,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("FileApi.GetImage", exc);
                 if (id != 202)
                 {
                     return GetImage(202, w, h, cid);
@@ -112,6 +112,10 @@ namespace Amlakbashi.Host.Controllers.API
         {
             if (accid > 0)
             {
+                if (id == 0)
+                {
+                    return GetImage(202, 160, 114, cid);
+                }
                 return AccThumb(accid, id, "appcard");
             }
             return GetImage(id, 160, 114, cid);

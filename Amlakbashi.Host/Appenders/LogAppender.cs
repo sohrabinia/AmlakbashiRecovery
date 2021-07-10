@@ -9,14 +9,20 @@ namespace Amlakbashi.Host.Appenders
 {
     public class LogAppender : AppenderSkeleton
     {
-        private const string logDir = "Logs/Logs";
-        private const string filePrefix = "Log-";
+        private string logDir = "Logs/Logs";
+        private string filePrefix = "Log-";
 
         protected override void Append(LoggingEvent loggingEvent)
         {
             if (loggingEvent.LoggerName.Contains("ResponseCaching") == false &&
                 loggingEvent.LoggerName.StartsWith("Hangfire.") == false)
             {
+                if (loggingEvent.RenderedMessage.Contains("Impersonation:"))
+                {
+                    logDir = "Logs/ImpersonationLogs";
+                    filePrefix = "ImpersonationLog-";
+                }
+
                 var rootPath = "";
 #if DEBUG
                 rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location.Substring(0, Assembly.GetEntryAssembly().Location.IndexOf("bin\\")));
@@ -91,7 +97,7 @@ namespace Amlakbashi.Host.Appenders
                     catch (Exception exc)
                     {
                         string log = "LogAppender encountered with error:\n";
-                        log = log + exc.Message + "\n" 
+                        log = log + exc.Message + "\n"
                             + "--------------------------------------------------------------------------------";
                         sw.WriteLine(log);
                     }
