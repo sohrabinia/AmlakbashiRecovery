@@ -763,7 +763,7 @@ namespace Amlakbashi.Host.Controllers.API
                     currentComment = currentComment != null ?
                         currentComment.Text : "",
                     userRatings = userRatings,
-                    title = "سفر به " + 
+                    title = "سفر به " +
                     regionService.Find(advertise.City == null ? 0 : (int)advertise.City).PersianName + " - " + advertise.Title
                 });
             }
@@ -986,14 +986,24 @@ namespace Amlakbashi.Host.Controllers.API
                     foreach (var item in data.album)
                     {
                         var file = fileService.Find(item);
-                        var oldFilePath = webHostEnvironment.WebRootPath + file.FilePathWithoutTilde;
-                        var newFileName = $"~/content/advertise/advertise_{data.id}_{file.Id}.jpg";
-                        var newFilePath = $"{webHostEnvironment.WebRootPath}/content/advertise/advertise_{data.id}_{file.Id}.jpg";
-                        if (System.IO.File.Exists(oldFilePath))
+                        if (file.FilePath.Contains("_" + data.id + "_") == false)
                         {
-                            System.IO.File.Copy(oldFilePath, newFilePath, true);
-                            System.IO.File.Delete(oldFilePath);
-                            fileService.UpdateFilePath(file.Id, newFileName);
+                            try
+                            {
+                                var oldFilePath = webHostEnvironment.WebRootPath + file.FilePathWithoutTilde;
+                                var newFileName = $"~/content/advertise/advertise_{data.id}_{file.Id}.jpg";
+                                var newFilePath = $"{webHostEnvironment.WebRootPath}/content/advertise/advertise_{data.id}_{file.Id}.jpg";
+                                if (System.IO.File.Exists(oldFilePath))
+                                {
+                                    System.IO.File.Copy(oldFilePath, newFilePath, true);
+                                    System.IO.File.Delete(oldFilePath);
+                                    fileService.UpdateFilePath(file.Id, newFileName);
+                                }
+                            }
+                            catch (Exception exc)
+                            {
+                                logger.Error("AdvertiseApi.EditAdvertisePhotos(rename photos)", exc);
+                            }
                         }
                     }
                 }
@@ -1191,7 +1201,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
         }
 
-        [Authorize(AuthenticationSchemes = bearerScheme)] 
+        [Authorize(AuthenticationSchemes = bearerScheme)]
         public JsonResult GetAdvertiseRules(string cid, long id)
         {
             if (!ClientAuthenticate(cid))

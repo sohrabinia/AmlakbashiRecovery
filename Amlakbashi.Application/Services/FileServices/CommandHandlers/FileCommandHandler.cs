@@ -295,9 +295,16 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
 
                                 var format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
                                 var encoderParameters = new EncoderParameters(1);
-                                encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
-                                thumbImage.Save(thumb.thumbPath, format, encoderParameters);
-
+                                encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
+                                try
+                                {
+                                    thumbImage.Save(thumb.thumbPath, format, encoderParameters);
+                                }
+                                catch (Exception exc)
+                                {
+                                    var existDir = Directory.Exists(thumb.thumbPath).ToString();
+                                    logger.Error($"FileCommandHandler.GenerateThumbImageCommand(generate thumbs: save image: {existDir})", exc);
+                                }
                                 thumbImage.Dispose();
                             }
                         }
@@ -308,19 +315,24 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                     logger.Error("FileCommandHandler.GenerateThumbImageCommand(generate thumbs)", exc);
                 }
 
-                try
+                foreach (var item in watermarkedImageList)
                 {
-                    foreach (var item in watermarkedImageList)
+                    for (int i = 1; i <= 3; ++i)
                     {
-                        if (File.Exists(item))
+                        try
                         {
-                            File.Delete(item);
+                            if (File.Exists(item))
+                            {
+                                File.Delete(item);
+                            }
+                            break;
+                        }
+                        catch (IOException exc) when (i <= 3)
+                        {
+                            logger.Error("FileCommandHandler.GenerateThumbImageCommand(delete watermarked images)", exc);
+                            Thread.Sleep(1000);
                         }
                     }
-                }
-                catch (Exception exc)
-                {
-                    logger.Error("FileCommandHandler.GenerateThumbImageCommand(delete watermarked images)", exc);
                 }
             }
             catch (Exception exc)
