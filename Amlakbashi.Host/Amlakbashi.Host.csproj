@@ -240,6 +240,7 @@
 
   <ItemGroup>
     <Folder Include="Logs\HangfireLogs\" />
+    <Folder Include="Logs\ImpersonationLogs\" />
     <Folder Include="Logs\Logs\" />
     <Folder Include="wwwroot\Content\advertisecache\" />
     <Folder Include="wwwroot\Content\blogpost\" />

@@ -9,8 +9,12 @@ namespace Amlakbashi.Host.Appenders
 {
     public class LogAppender : AppenderSkeleton
     {
-        private string logDir = "Logs/Logs";
-        private string filePrefix = "Log-";
+        private string logDir, filePrefix;
+#if DEBUG
+        private readonly string rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location.Substring(0, Assembly.GetEntryAssembly().Location.IndexOf("bin\\")));
+#else
+        private readonly string rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+#endif
 
         protected override void Append(LoggingEvent loggingEvent)
         {
@@ -22,13 +26,18 @@ namespace Amlakbashi.Host.Appenders
                     logDir = "Logs/ImpersonationLogs";
                     filePrefix = "ImpersonationLog-";
                 }
+                else
+                {
+                    logDir = "Logs/Logs";
+                    filePrefix = "Log-";
+                }
 
-                var rootPath = "";
-#if DEBUG
-                rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location.Substring(0, Assembly.GetEntryAssembly().Location.IndexOf("bin\\")));
-#else
-                rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-#endif
+                //var rootPath = "";
+//#if DEBUG
+//                rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location.Substring(0, Assembly.GetEntryAssembly().Location.IndexOf("bin\\")));
+//#else
+//                rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+//#endif
                 var now = DateTime.Now;
                 var fileName = Path.Combine(rootPath, logDir, filePrefix + now.Year + "-" +
                     now.Month + "-" + now.Day + "-" + now.Hour + ".txt");
