@@ -1,4 +1,5 @@
 ﻿@inject IUserAccessor userAccessor;
+
 <!DOCTYPE html>
 <html class="theme3">
 <head>
@@ -30,17 +31,12 @@
         <meta name="description" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
     }
     <meta name="enamad" content="344312021" />
-    @*****   style   ****@    
-    <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.default.css" />
-    <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.core.css" />
-    <link rel="stylesheet" type="text/css" href="/resource/dashboard.css?v=3.9" />
-    
 
+    <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.default.css" asp-append-version="true" />
+    <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.core.css" asp-append-version="true" />
+    <link rel="stylesheet" type="text/css" href="/resource/dashboard.css" asp-append-version="true" />
     @RenderSection("StyleLink", required: false)
     @RenderSection("StyleBlock", required: false)
-    @*****   end style   ****@
-
-
 </head>
 <body>
     <div class="page">
@@ -117,9 +113,8 @@
         <img src="~/Resource/img/new-loader.gif" />
     </div>
 
-    @*****   script   ****@
-    <script src="/resource/scripts/jquery-2.1.1.min.js"></script>
-    <script src="/resource/alertify.js-0.3.11/src/alertify.js"></script>   
+    <script src="/resource/scripts/jquery-2.1.1.min.js" asp-append-version="true"></script>
+    <script src="/resource/alertify.js-0.3.11/src/alertify.js" asp-append-version="true"></script>   
 
     @RenderSection("ScriptLink", required: false)
     <script type="text/javascript">
@@ -147,8 +142,6 @@
                 window.location.href = "/اجاره-روزانه/اجاره-ویلا-سوئیت-آپارتمان";
             }
         }
-
-        
     </script>
 
     <script type="text/javascript">
@@ -172,11 +165,7 @@
         function close_alert() {
             $(".alert-msg").hide();
         }
-
     </script>
-
     @RenderSection("ScriptBlock", required: false)
-    @*****   end script   ****@
-    
 </body>
 </html>

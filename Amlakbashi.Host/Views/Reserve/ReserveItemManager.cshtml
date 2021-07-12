@@ -33,13 +33,6 @@
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css/general/reserve/reserve-list.css">
 }
 
-@section ScriptLink
-{
-    <script src="/file/getjs?src=/Resource/Scripts/jquery.onmutate.min.js"></script>
-    <!--Reference the SignalR library. -->
-    <script src="/js/signalr/dist/browser/signalr.min.js"></script>
-}
-
 @using (Html.BeginForm("ReserveItemManager", "Reserve", FormMethod.Get))
 {
     <input type="hidden" name="user_id" value="@ViewBag.user_id" />
@@ -83,6 +76,12 @@
 </div>
 
 <div style="display: none" id="cancel_discussion_hidden_holder"></div>
+
+@section ScriptLink
+{
+    <script src="/file/getjs?src=/Resource/Scripts/jquery.onmutate.min.js"></script>
+    <script src="/js/signalr/dist/browser/signalr.min.js" asp-append-version="true"></script>
+}
 
 @section ScriptBlock
 {

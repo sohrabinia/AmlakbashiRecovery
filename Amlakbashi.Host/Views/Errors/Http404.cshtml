@@ -1,11 +1,13 @@
 ﻿@{
     ViewBag.Title = "404 not fount";
     Layout = "~/Views/Shared/_Master.cshtml";
+    var isAccommodation = ViewBag.isAccommodation != null ? ViewBag.isAccommodation : false;
 }
-@{ 
-    var isAccommodation = ViewBag.isAccommodation != null ?
-        ViewBag.isAccommodation : false;
+
+@section StyleLink {
+    <link rel="stylesheet" href="/resource/css/portal/portal-error.css" asp-append-version="true" />
 }
+
 <div class="error__background">
     <span class="error__error-number-label">404</span>
     <span class="error__error-description-label">
@@ -33,13 +35,3 @@
         }
     }
 </div>
-
-@section ScriptBlock
-{
-    <script type="text/javascript">
-    </script>
-}
-@section StyleLink {
-    <link rel="stylesheet" href="/resource/css/portal/portal-error.css" />
-}
-

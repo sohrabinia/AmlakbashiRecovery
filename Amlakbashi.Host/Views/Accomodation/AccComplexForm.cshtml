@@ -14,15 +14,12 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
           integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
           crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-            crossorigin=""></script>
-    <link rel="stylesheet" href="~/Resource/css/dashboard/numberInput.css">
-    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-public-style-form.css" />
-    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-extra-form.css" />
-    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-hotel-form.css" />
-    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-general-form.css" />
-    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-complex-form.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/numberInput.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-public-style-form.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-extra-form.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-hotel-form.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-general-form.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-complex-form.css" asp-append-version="true" />
 }
 
 <div class="add-advertise-static-container">
@@ -97,10 +94,13 @@
 </div>
 
 @section ScriptLink{
-    <script src="~/Resource/Scripts/general/accommodation-edit-form.js"></script>
-    <script src="~/Resource/Scripts/dashboard/numberInput.js"></script>
-    <script src="~/Resource/Scripts/dashboard/acc-public-form.js"></script>
-    <script src="~/Resource/Scripts/dashboard/complexForm.js"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+    <script src="~/Resource/Scripts/general/accommodation-edit-form.js" asp-append-version="true"></script>
+    <script src="~/Resource/Scripts/dashboard/numberInput.js" asp-append-version="true"></script>
+    <script src="~/Resource/Scripts/dashboard/acc-public-form.js" asp-append-version="true"></script>
+    <script src="~/Resource/Scripts/dashboard/complexForm.js" asp-append-version="true"></script>
 }
 
 @section ScriptBlock

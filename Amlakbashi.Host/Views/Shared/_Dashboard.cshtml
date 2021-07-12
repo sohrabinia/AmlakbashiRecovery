@@ -1,6 +1,7 @@
 ﻿@using Entities = Amlakbashi.Core.Entities;
 @using Amlakbashi.Host.Authentication;
 @inject IUserAccessor userAccessor;
+
 <!DOCTYPE html>
 <html class="theme3">
 <head>
@@ -54,29 +55,29 @@
     }
     <meta name="enamad" content="344312021" />
     <environment include="Development">
-        <link rel="stylesheet" type="text/css" href="/resource/dailyrent.css">
-        <link rel="stylesheet" type="text/css" href="/resource/tmmegamenu/css/tmmegamenu.css">
-        <link rel="stylesheet" type="text/css" href="/resource/bootstrap/css/bootstrap-rtl.min.css">
-        <link rel="stylesheet" type="text/css" href="/resource/ticker/ticker-style.css">
-        <link rel="stylesheet" type="text/css" href="/resource/chosen_v1.4.2/chosen.css">
-        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.default.css">
-        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.core.css">
-        <link rel="stylesheet" type="text/css" href="/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/intlTelInput.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/login-Popup.css">
-        <link rel="stylesheet" type="text/css" href="/resource/dashboard.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/chat-popup.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/message-popup.css">
-        <link rel="stylesheet" type="text/css" href="/resource/loader.min.css">
-        <link rel="stylesheet" type="text/css" href="/resource/jquery-confirm/jquery-confirm.min.css">
-        <link rel="stylesheet" type="text/css" href="/resource/rating/themes/fontawesome-stars.css">
-        <link rel="stylesheet" type="text/css" href="/resource/star-rating/star-rating.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/jalali-date-picker.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/dashboardAccount.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/popup-calendar.css">
+        <link rel="stylesheet" type="text/css" href="/resource/dailyrent.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/tmmegamenu/css/tmmegamenu.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/bootstrap/css/bootstrap-rtl.min.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/ticker/ticker-style.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/chosen_v1.4.2/chosen.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.default.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.core.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/intlTelInput.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/login-Popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/dashboard.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/chat-popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/message-popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/loader.min.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/jquery-confirm/jquery-confirm.min.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/rating/themes/fontawesome-stars.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/star-rating/star-rating.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/jalali-date-picker.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/dashboardAccount.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/popup-calendar.css" asp-append-version="true">
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" type="text/css" href="/css/dashboard.min.css">
+        <link rel="stylesheet" type="text/css" href="/css/dashboard.min.css" asp-append-version="true">
     </environment>
     @RenderSection("StyleLink", required: false)
     @RenderSection("StyleBlock", required: false)
@@ -260,49 +261,50 @@
             <button onclick="close_alert()" class="alert__btn">بستن</button>
         </div>
     }
+
     <environment include="Development">
-        <script src="/resource/scripts/jquery-2.1.1.min.js"></script>
-        <script src="/lib/dropzone/dropzone.js"></script>
-        <script src="/resource/scripts/jquery.maskedinput.min.js"></script>
-        <script src="/resource/scripts/jquery.nicescroll.min.js"></script>
-        <script src="/resource/ticker/jquery.ticker.js"></script>
-        <script src="/resource/chosen_v1.4.2/chosen.jquery.min.js"></script>
-        <script src="/resource/alertify.js-0.3.11/src/alertify.js"></script>
-        <script src="/resource/scripts/general/lazy-loading.js"></script>
-        <script src="/resource/jquery-confirm/jquery-confirm.min.js"></script>
-        <script src="/resource/persian-date-picker/persian-datepicker.js"></script>
-        <script src="/resource/Scripts/general/jalali-date-converter.js"></script>
-        <script src="/resource/Scripts/general/jalali-date-handler.js"></script>
-        <script src="/resource/Scripts/general/jalali-date-picker.js"></script>
-        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.js"></script>
-        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.plus.js"></script>
-        <script src="/resource/Scripts/jquery.plugin.min.js"></script>
-        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.all.js"></script>
-        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.persian.js"></script>
-        <script src="/resource/Scripts/jquery.onmutate.min.js"></script>
-        <script src="/resource/rating/jquery.barrating.min.js"></script>
-        <script src="/resource/scripts/general/ajax-helper.js"></script>
-        <script src="/resource/scripts/general/client-helper.js"></script>
-        <script src="/resource/scripts/general/detail-button.js"></script>
-        <script src="/resource/scripts/general/increase-decrease-button.js"></script>
-        <script src="/resource/scripts/general/input-validation-helper.js"></script>
-        <script src="/resource/scripts/general/loading-indicator.js"></script>
-        <script src="/resource/Scripts/general/login/intlTelInput.min.js"></script>
-        <script src="/resource/scripts/general/login/login-popup.js"></script>
-        <script src="/resource/scripts/general/more-text-button.js"></script>
-        <script src="/resource/scripts/general/price-string-generator.js"></script>
-        <script src="/resource/scripts/general/rating-detail.js"></script>
-        <script src="/resource/scripts/general/string-replace-all.js"></script>
-        <script src="/resource/scripts/general/textarea-autoexpand.js"></script>
-        <script src="/resource/scripts/general/user-rating.js"></script>
-        <script src="/resource/scripts/general/message-popup.js"></script>
-        <script src="/resource/scripts/general/confirm-alert-helper.js"></script>
-        <script src="/scripts/jquery.unobtrusive-ajax.min.js"></script>
-        <script src="/resource/Scripts/dashboard/dashboard-navigation.js"></script>
-        <script src="/resource/Scripts/dashboard/registerEmail.js"></script>
+        <script src="/resource/scripts/jquery-2.1.1.min.js" asp-append-version="true"></script>
+        <script src="/lib/dropzone/dropzone.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/jquery.maskedinput.min.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/jquery.nicescroll.min.js" asp-append-version="true"></script>
+        <script src="/resource/ticker/jquery.ticker.js" asp-append-version="true"></script>
+        <script src="/resource/chosen_v1.4.2/chosen.jquery.min.js" asp-append-version="true"></script>
+        <script src="/resource/alertify.js-0.3.11/src/alertify.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/lazy-loading.js" asp-append-version="true"></script>
+        <script src="/resource/jquery-confirm/jquery-confirm.min.js" asp-append-version="true"></script>
+        <script src="/resource/persian-date-picker/persian-datepicker.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-converter.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-handler.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-picker.js" asp-append-version="true"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.js" asp-append-version="true"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.plus.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/jquery.plugin.min.js" asp-append-version="true"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.all.js" asp-append-version="true"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.persian.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/jquery.onmutate.min.js" asp-append-version="true"></script>
+        <script src="/resource/rating/jquery.barrating.min.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/ajax-helper.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/client-helper.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/detail-button.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/increase-decrease-button.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/input-validation-helper.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/loading-indicator.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/login/intlTelInput.min.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/login/login-popup.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/more-text-button.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/price-string-generator.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/rating-detail.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/string-replace-all.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/textarea-autoexpand.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/user-rating.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/message-popup.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/confirm-alert-helper.js" asp-append-version="true"></script>
+        <script src="/scripts/jquery.unobtrusive-ajax.min.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/dashboard-navigation.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/registerEmail.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">
-        <script src="/js/dashboard.min.js"></script>
+        <script src="/js/dashboard.min.js" asp-append-version="true"></script>
     </environment>
     <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-messaging.js"></script>

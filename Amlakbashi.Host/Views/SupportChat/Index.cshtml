@@ -1,14 +1,11 @@
 ﻿@using Amlakbashi.Core.DTOs.SupportChatDTOs;
+@model IEnumerable<SupportChatDTO>
+
 @{
     ViewBag.Title = "چت پشتیبانی";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
-@section ScriptLink
-{
-    <!--Reference the SignalR library. -->
-    <script src="/js/signalr/dist/browser/signalr.min.js"></script>
-}
-@model IEnumerable<SupportChatDTO>
+
 <div id="js-new-message-btn" onclick="scrollTopSupport()" style="position:relative; display:none; width:100px; border-radius:60px; cursor:pointer; text-align:center; border:1px solid #242424; top: 30px;right:13%;background-color:white;color:#242424;">
     🡹 پیام جدید
 </div>
@@ -27,7 +24,7 @@
         </div>
         <div class="support-chat-index__chat-input">
             <i class="fa fa-play" onclick="sendChatText()"></i>
-            <textarea onpaste="onChatBoxPaste(this)" onkeyup="chatInputKeyUp()" id="js-text-input" type="text" placeholder="متن خود را اینجا بنویسید" ></textarea>
+            <textarea onpaste="onChatBoxPaste(this)" onkeyup="chatInputKeyUp()" id="js-text-input" type="text" placeholder="متن خود را اینجا بنویسید"></textarea>
         </div>
     </div>
 </div>
@@ -62,6 +59,11 @@
     </div>
 </div>
 <div id="temp-holder" style="display:none"></div>
+
+@section ScriptLink
+{
+    <script src="/js/signalr/dist/browser/signalr.min.js" asp-append-version="true"></script>
+}
 
 @section ScriptBlock
 {
@@ -263,7 +265,7 @@
                 }
                 $('#js-text-input').val('');
             }
-            
+
             var $chatBoxElem = $('.support-chat-index__chat-box');
             var id = parseInt($chatBoxElem.attr('data_id'));
             //placeTempChat($chatBoxElem[0], id, text, function () {

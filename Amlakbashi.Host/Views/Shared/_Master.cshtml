@@ -69,24 +69,24 @@
 
     @RenderSection("StyleLink", required: false)
     <environment include="Development">
-        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.default.css">
-        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.core.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/fa-icons.css">
-        <link rel="stylesheet" type="text/css" href="/resource/rating/themes/fontawesome-stars.css">
-        <link rel="stylesheet" type="text/css" href="/resource/star-rating/star-rating.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/chat-popup.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-footer.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/message-popup.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/intlTelInput.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/login-Popup.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/general/footer.css">
+        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.default.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.core.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/fa-icons.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/rating/themes/fontawesome-stars.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/star-rating/star-rating.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/chat-popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-footer.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/message-popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/intlTelInput.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/login-Popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/footer.css" asp-append-version="true">
 
-        <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-shared.css">
-        <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-header.css">
+        <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-shared.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-header.css" asp-append-version="true">
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" type="text/css" href="/css/master.min.css">
-        <link rel="stylesheet" type="text/css" href="/css/master-critical.min.css">
+        <link rel="stylesheet" type="text/css" href="/css/master.min.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/css/master-critical.min.css" asp-append-version="true">
     </environment>
     <style>
         @RenderSection("StyleBlock", required: false)
@@ -180,37 +180,36 @@
         <div style="display: none" id="chat_hidden_holder"></div>
         <input type="hidden" value="0" id="js-support-chat-id">
         <environment include="Development">
-            <script src="/resource/scripts/general/message-popup.js" defer></script>
-            <script src="/resource/alertify.js-0.3.11/src/alertify.js" defer></script>
-            <script src="/resource/rating/jquery.barrating.min.js" defer></script>
-            <script src="/resource/Scripts/jquery.scrollTo.min.js" defer></script>
-            <script src="/resource/scripts/general/string-replace-all.js" defer></script>
-            <script src="/resource/scripts/general/ajax-helper.js" defer></script>
-            <script src="/resource/scripts/general/client-helper.js" defer></script>
-            <script src="/resource/scripts/general/loading-indicator.js" defer></script>
-            <script src="/resource/scripts/general/user-rating.js" defer></script>
-            <script src="/resource/scripts/general/input-validation-helper.js" defer></script>
-            <script src="/resource/scripts/general/master.js" defer></script>
-            <script src="/resource/scripts/general/lazy-loading.js" defer></script>
-            <script src="/resource/Scripts/general/login/intlTelInput.min.js" defer></script>
-            <script src="/resource/scripts/general/login/login-popup.js" defer></script>
+            <script src="/resource/scripts/general/message-popup.js" defer asp-append-version="true"></script>
+            <script src="/resource/alertify.js-0.3.11/src/alertify.js" defer asp-append-version="true"></script>
+            <script src="/resource/rating/jquery.barrating.min.js" defer asp-append-version="true"></script>
+            <script src="/resource/Scripts/jquery.scrollTo.min.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/string-replace-all.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/ajax-helper.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/client-helper.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/loading-indicator.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/user-rating.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/input-validation-helper.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/master.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/lazy-loading.js" defer asp-append-version="true"></script>
+            <script src="/resource/Scripts/general/login/intlTelInput.min.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/login/login-popup.js" defer asp-append-version="true"></script>
 
-            <script src="/resource/scripts/jquery-2.1.1.min.js"></script>
-            <script src="/resource/scripts/firebase-5.9.4/firebase-app.js"></script>
-            <script src="/resource/scripts/firebase-5.9.4/firebase-messaging.js"></script>
-            <script src="/resource/scripts/firebase/firebase-initialization.js"></script>
+            <script src="/resource/scripts/jquery-2.1.1.min.js" asp-append-version="true"></script>
+            <script src="/resource/scripts/firebase-5.9.4/firebase-app.js" asp-append-version="true"></script>
+            <script src="/resource/scripts/firebase-5.9.4/firebase-messaging.js" asp-append-version="true"></script>
+            <script src="/resource/scripts/firebase/firebase-initialization.js" asp-append-version="true"></script>
         </environment>
         <environment exclude="Development">
-            <script src="/js/master-defer.min.js" defer></script>
-            <script src="/js/master.min.js"></script>
+            <script src="/js/master-defer.min.js" defer asp-append-version="true"></script>
+            <script src="/js/master.min.js" asp-append-version="true"></script>
         </environment>
+        <script src="/js/signalr/dist/browser/signalr.min.js" asp-append-version="true"></script>
         <script type="text/javascript">
             var lockInPage = @(ViewBag.LockInPage != null && ViewBag.LockInPage == true ? "true" : "false");
             var isHomePage = @(ViewBag.home == null || !ViewBag.home ? "false" : "true");
         </script>
         @RenderSection("ScriptLink", required: false)
-        <!--Reference the autogenerated SignalR hub script. -->
-        <script src="/js/signalr/dist/browser/signalr.min.js"></script>
         @RenderSection("ScriptBlock", required: false)
         <script type="text/javascript">
             $(document).ready(function () {

@@ -17,8 +17,8 @@
 }
 
 @section styleLink{
-    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-public-style-form.css" />
-    <link rel="stylesheet" href="~/Resource/css/dashboard/admin-public-style.css" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-public-style-form.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/admin-public-style.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
           integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
           crossorigin="" />
@@ -108,8 +108,12 @@
 </div>
 
 @section ScriptLink{
-    <script src="~/Resource/Scripts/dashboard/acc-public-form.js"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+    <script src="~/Resource/Scripts/dashboard/acc-public-form.js" asp-append-version="true"></script>
 }
+
 @section ScriptBlock
 {
     <script type="text/javascript">
@@ -206,8 +210,4 @@
             });
         }
     </script>
-
-    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-            crossorigin=""></script>
 }

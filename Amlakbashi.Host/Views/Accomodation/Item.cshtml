@@ -4,6 +4,7 @@
 @using Amlakbashi.Core.Common.Utilities;
 
 @model AccommodationItemDTO
+
 @{
     ViewBag.Title = Model.MetaTitleDesc.MetaTitle;
     ViewBag.isAccPage = true;
@@ -31,54 +32,7 @@
         Model.Amenities.WashingMachine || Model.Amenities.Refrigerator || Model.Amenities.Oven || Model.Amenities.MicrowaveOven ||
         Model.Amenities.KitchenHood || Model.Amenities.KitchenUtensils || Model.Amenities.Hairdryer || Model.Amenities.SoundSystem ||
         Model.Amenities.TeaMaker || Model.Amenities.Foosball || Model.Amenities.Golf || Model.Amenities.PoolTable ? true : false;
-}
 
-@section ScriptLink {
-    <environment include="Development">
-        <script src="/resource/Scripts/jquery.plugin.min.js"></script>
-        <script src="/resource/slick/slick.js"></script>
-        <script src="/resource/jquery-sticky-kit/jquery-sticky-kit.js"></script>
-        <script src="/resource/lightbox/lightbox.js"></script>
-        <script src="/resource/scripts/general/search-by-region.js"></script>
-        <script src="/resource/scripts/general/master-search.js"></script>
-        <script src="/resource/Scripts/general/jalali-date-converter.js"></script>
-        <script src="/resource/Scripts/general/jalali-date-handler.js"></script>
-        <script src="/resource/Scripts/general/jalali-date-picker.js"></script>
-        <script src="/resource/scripts/general/rating-detail.js"></script>
-        <script src="/resource/scripts/general/price-string-generator.js"></script>
-        <script src="/resource/scripts/page/accommodation-item-page.js"></script>
-        <script src="/resource/scripts/general/detail-button.js"></script>
-        <script src="/resource/scripts/general/increase-decrease-button.js"></script>
-        <script src="/resource/Scripts/dashboard/registerEmail.js"></script>
-    </environment>
-    <environment exclude="Development">
-        <script src="/js/acc-item.min.js"></script>
-    </environment>
-}
-@section StyleLink {
-    <link rel="stylesheet" href="/css/acc-item.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-          crossorigin="" />
-    <script defer="defer" src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-            crossorigin=""></script>
-
-}
-@section HeaderAddition
-{
-    @if (!Model.IsPreview)
-    {
-        <link rel="canonical" href="https://www.amlakbashi.com@(Model.RawUrl)" />
-        <meta property="og:url" content="https://www.amlakbashi.com@(Model.RawUrl)" />
-        <meta property="og:image" content='@("https://www.amlakbashi.com" + (Model.Photo.PhotoID != null ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.Photo.PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
-    }
-    else
-    {
-        <meta name="robots" content="noindex, nofollow">
-    }
-}
-@{
     List<long> album_photos;
     if (string.IsNullOrEmpty(Model.Photo.AlbumPhoto) || Model.Photo.AlbumPhoto == ",")
     {
@@ -96,12 +50,33 @@
     {
         album_photos.Insert(0, (long)Model.Photo.PhotoID);
     }
-}
-@{
+
     var u_ = "https://www.amlakbashi.com" + Model.RawUrl;
     var t_ = ViewBag.Title;
     var img_ = "https://www.amlakbashi.com" + (Model.Photo.PhotoID != null ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.Photo.PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394));
 }
+
+@section HeaderAddition
+{
+    @if (!Model.IsPreview)
+    {
+        <link rel="canonical" href="https://www.amlakbashi.com@(Model.RawUrl)" />
+        <meta property="og:url" content="https://www.amlakbashi.com@(Model.RawUrl)" />
+        <meta property="og:image" content='@("https://www.amlakbashi.com" + (Model.Photo.PhotoID != null ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.Photo.PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
+    }
+    else
+    {
+        <meta name="robots" content="noindex, nofollow">
+    }
+}
+
+@section StyleLink {
+    <link rel="stylesheet" href="/css/acc-item.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossorigin="" />
+}
+
 <div class="share-post__container" style="flex-flow: row;left: 0;bottom: 0;right: 0;overflow: auto;background-color: white;width: fit-content;height: 70px;align-items: center;position: fixed;max-width: 100%;">
     <a class="share-post__item" href="#" onclick="window.open('https://t.me/share/url?url=@(u_)&text=@(t_)', 'telegramShare', 'width=626,height=436'); return false;" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;width: 40px;height: 40px;">
         <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram">
@@ -413,6 +388,32 @@
             </div>
         </div>
     }*@
+
+@section ScriptLink {
+    <script defer="defer" src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+    <environment include="Development">
+        <script src="/resource/Scripts/jquery.plugin.min.js" asp-append-version="true"></script>
+        <script src="/resource/slick/slick.js" asp-append-version="true"></script>
+        <script src="/resource/jquery-sticky-kit/jquery-sticky-kit.js" asp-append-version="true"></script>
+        <script src="/resource/lightbox/lightbox.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/search-by-region.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/master-search.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-converter.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-handler.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-picker.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/rating-detail.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/price-string-generator.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/page/accommodation-item-page.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/detail-button.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/increase-decrease-button.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/registerEmail.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/acc-item.min.js" asp-append-version="true"></script>
+    </environment>
+}
 
 @section ScriptBlock
 {

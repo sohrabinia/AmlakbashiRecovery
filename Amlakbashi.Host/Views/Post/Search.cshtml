@@ -4,7 +4,7 @@
 }
 
 @section StyleLink {
-    <link rel="stylesheet" type="text/css" href="/css/search.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/search.min.css" asp-append-version="true">
 }
 
 @section StyleBlock {
@@ -14,12 +14,12 @@
     }
 }
 
-@section ScriptLink {
-    <script src="/js/search.min.js"></script>
-}
-
 @await Html.PartialAsync("_HomePageSearch", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "autofocus", true } })
+
+@section ScriptLink {
+    <script src="/js/search.min.js" asp-append-version="true"></script>
+}
 
 @section ScriptBlock
 {

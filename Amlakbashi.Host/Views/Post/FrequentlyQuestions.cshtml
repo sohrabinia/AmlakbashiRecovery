@@ -2,7 +2,19 @@
     ViewBag.Title = "سوالات متداول - املاک باشی";
     Layout = "~/Views/Shared/_Master.cshtml";
     ViewBag.Description = "سوالات متداول سایت املاک باشی";
+    var url_splitted = ("/سوالات-متداول").Substring(1).Split('/');
 }
+
+@section HeaderAddition
+{
+    <link rel="canonical" href="https://www.amlakbashi.com/سوالات-متداول" />
+    <meta property="og:url" content="https://www.amlakbashi.com/سوالات-متداول" />
+}
+
+@section StyleLink {
+    <link rel="stylesheet" type="text/css" href="/resource/css/portal/post-list.css" asp-append-version="true" />
+}
+
 <div class="container">
     <div class="row" style="font: 25px Biransans; text-align: right; padding:0 10px;margin:0 10px;border-radius:5px; color: #242424;"><h1>سوالات متداول</h1></div>
     <div @*class="row"*@>
@@ -62,7 +74,7 @@
                 <i class="fa fa-chevron-left"></i>
             </p>
             <p class="public__content-text">
-                پس از انجام مراحل رزرو و پرداخت، شماره تماس میزبان برای شما در بخش رزروها نمایان می شود شما میتوانید با میزبان ارتباط بگیرید 
+                پس از انجام مراحل رزرو و پرداخت، شماره تماس میزبان برای شما در بخش رزروها نمایان می شود شما میتوانید با میزبان ارتباط بگیرید
             </p>
 
             <p class="public__header-text">
@@ -120,7 +132,7 @@
                 <i class="fa fa-chevron-left"></i>
             </p>
             <p class="public__content-text">
-                کارت ملی و در صورت زوج بودن ارائه اصل شناسنامه 
+                کارت ملی و در صورت زوج بودن ارائه اصل شناسنامه
             </p>
 
             <p class="public__header-text">
@@ -151,21 +163,6 @@
     </div>
 </div>
 
-@section HeaderAddition
-{
-    <link rel="canonical" href="https://www.amlakbashi.com/سوالات-متداول" />
-
-    <meta property="og:url" content="https://www.amlakbashi.com/سوالات-متداول" />
-}
-@section StyleLink {
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css_output/minifypostlistcss_v1_2.css" />
-
-    @*@MvcHtmlString.Create(
-        Bundle.Css()
-            .Add("/resource/css/portal/post-list.css")
-            .ForceRelease()
-            .Render("/resource/css_output/minifypostlistcss_v1_1.css"))*@
-}
 @section ScriptBlock
 {
     <script type="text/javascript">
@@ -183,13 +180,12 @@
             else
                 curr_icon = "fa fa-chevron-left";
             $icon.fadeTo(200, 0).promise().done(function () {
-                
+
                 $icon.attr("class", curr_icon).fadeTo(200, 1);
             });
         });
     </script>
-@{ var url_splitted = ("/سوالات-متداول").Substring(1).Split('/'); }
-<script type="application/ld+json">
+    <script type="application/ld+json">
     {
     "@@context": "https://schema.org",
     "@@type": "BreadcrumbList",
@@ -217,5 +213,5 @@
             }
     ]
     }
-</script>
+    </script>
 }

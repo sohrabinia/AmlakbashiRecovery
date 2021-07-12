@@ -1,18 +1,22 @@
 ﻿@model Service
+
 @{
     ViewBag.Title = Model.Title + " - املاک باشی";
     Layout = "~/Views/Shared/_Master.cshtml";
     ViewBag.Description = Model.Title + " - سایت املاک باشی";
+    var url_splitted = ((string)ViewBag.raw_url).Substring(1).Split('/');
 }
-@section StyleLink {
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css_output/minifypostlistcss_v1_2.css" />
 
-    @*@MvcHtmlString.Create(
-        Bundle.Css()
-            .Add("/resource/css/portal/post-list.css")
-            .ForceRelease()
-            .Render("/resource/css_output/minifypostlistcss_v1_0.css"))*@
+@section HeaderAddition
+{
+    <link rel="canonical" href="https://www.amlakbashi.com@(ViewBag.raw_url)" />
+    <meta property="og:url" content="https://www.amlakbashi.com@(ViewBag.raw_url)" />
 }
+
+@section StyleLink {
+    <link rel="stylesheet" type="text/css" href="/resource/css/portal/post-list.css" asp-append-version="true" />
+}
+
 <div class="container">
     <div class="row" style="font: 25px Biransans; text-align: right; padding: 10px;margin:10px;border-radius:5px; color: #fdd835;background:#242424; "><h1>@Model.Title</h1></div>
     <div>
@@ -22,17 +26,10 @@
     </div>
 </div>
 
-@section HeaderAddition
-{
-    <link rel="canonical" href="https://www.amlakbashi.com@(ViewBag.raw_url)" />
-    <meta property="og:url" content="https://www.amlakbashi.com@(ViewBag.raw_url)" />
-}
-
 @section ScriptBlock
 {
     <script type="text/javascript">
         $(".public__header-text").click(function () {
-
             $header = $(this);
             //getting the next element
             $content = $header.next();
@@ -45,12 +42,11 @@
             else
                 curr_icon = "fa fa-chevron-left";
             $icon.fadeTo(200, 0).promise().done(function () {
-                
+
                 $icon.attr("class", curr_icon).fadeTo(200, 1);
             });
         });
     </script>
-@{ var url_splitted = ((string)ViewBag.raw_url).Substring(1).Split('/'); }
     <script type="application/ld+json">
         {
         "@@context": "https://schema.org",
@@ -80,5 +76,4 @@
         ]
         }
     </script>
-
 }
