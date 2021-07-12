@@ -2675,19 +2675,27 @@ namespace Amlakbashi.Host.Controllers
             {
                 id = StringUtility.PersianNumberToEnglish(id);
                 var idLong = long.Parse(id);
+                string slug = "";
                 var acc = advertiseService.Find(idLong);
-                if (acc == null || acc.Status != AdvertiseStatus.Published ||
-                    acc.Count > 0 || !acc.Available)
+                if (acc == null || acc.Status != AdvertiseStatus.Published || !acc.Available)
                 {
                     return GenerateJsonResult(new
                     {
                         status = 0
                     });
                 }
+                if (acc.Mode == AdvertiseMode.Child && acc.Count > 0)
+                {
+                    slug = acc.Parent.Slug;
+                }
+                else
+                {
+                    slug = acc.Slug;
+                }
                 return GenerateJsonResult(new
                 {
                     status = 1,
-                    url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(acc.Slug)
+                    url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(slug)
                 });
             }
             catch

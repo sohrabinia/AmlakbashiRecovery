@@ -1,26 +1,24 @@
 ﻿@using Amlakbashi.Core.Entities;
-@using Amlakbashi.Core.Infrastructure.LocalizationHelpers; 
+@using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+
 @{
     ViewBag.Title = "تماس با ما - املاک باشی";
     Layout = "~/Views/Shared/_Master.cshtml";
     ViewBag.Description = "تماس با املاک باشی";
+    var url_splitted = ("/contact").Substring(1).Split('/');
 }
-@section HeaderAddition
-  {
-    <link rel="canonical" href="https://www.amlakbashi.com/contact" />
 
+@section HeaderAddition
+{
+    <link rel="canonical" href="https://www.amlakbashi.com/contact" />
     <meta property="og:url" content="https://www.amlakbashi.com/contact" />
 }
+
 @section StyleLink {
-    @*<link rel="stylesheet" type="text/css" href="~/Resource/css/portal/post/contact.css">*@
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/css_output/minifypostlistcss_v1_2.css" />
-    @*@MvcHtmlString.Create(
-        Bundle.Css()
-            .Add("/resource/css/portal/post-list.css")
-            .Add("/resource/css/portal/post/contact.css")
-            .ForceRelease()
-            .Render("/resource/css_output/minifypostlistcss_v1_2.css"))*@
+    <link rel="stylesheet" type="text/css" href="/resource/css/portal/post/contact.css" asp-append-version="true" />
+    <link rel="stylesheet" type="text/css" href="/resource/css/portal/post-list.css" asp-append-version="true" />
 }
+
 <div class="container">
     <div class="row" style="font: 25px Biransans; text-align: right; padding: 10px;margin:10px;border-radius:5px;color: #242424;"><h1>تماس با ما</h1></div>
     <p style="padding:10px;">کاربر گرامی سوال شما یکی از موارد زیر است؟</p>
@@ -86,7 +84,7 @@
                 <strong>تماس با املاک باشی</strong>
                 <img src="/file/resourceimagepng?file_name=support-icon-35w" width="35" height="35" />
             </p>
-            <div class="public__content-text contact-parent">
+            <div class="public__content-text contact-parent" style="display: block;">
                 <div>شماره های تماس:</div>
                 <div class="contact-container">
                     <a class="contact-button" href="tel:02632565304">
@@ -108,7 +106,7 @@
                 </div>
                 <div>راه های ارتباطی:</div>
                 <div class="contact-container">
-                    <a rel="nofollow noopener" class="contact-button contact-button-large" target="_blank" href="https://wa.me/989360263804">
+                    <a rel="nofollow noopener" class="contact-button contact-button-large" target="_blank" href="https://wa.me/+989360263804">
                         <span>واتساپ پشتیبانی</span>
                         <img style="background-color:#24CD63" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp" width="40" height="40" />
                     </a>
@@ -155,6 +153,11 @@
                         <i class="fa fa-phone fa-rotate-90"></i>
                     </a>
                 </div>
+                <div>آدرس: </div>
+                <div class="contact-container">
+                    <i class="fa fa-map-marker"></i>&nbsp;
+                    <span>استان البرز، کرج، منطقه شهرداری هشت، بلوار آزادگان، ساختمان آراد، پلاک ۸۶۹، طبقه اول، واحد ۳</span>
+                </div><br />
             </div>
         </div>
     </div>
@@ -177,13 +180,12 @@
             else
                 curr_icon = "fa fa-chevron-left";
             $icon.fadeTo(200, 0).promise().done(function () {
-                
+
                 $icon.attr("class", curr_icon).fadeTo(200, 1);
             });
         });
     </script>
-@{ var url_splitted = ("/contact").Substring(1).Split('/'); }
-<script type="application/ld+json">
+    <script type="application/ld+json">
     {
     "@@context": "https://schema.org",
     "@@type": "BreadcrumbList",
@@ -211,5 +213,5 @@
             }
     ]
     }
-</script>
+    </script>
 }
