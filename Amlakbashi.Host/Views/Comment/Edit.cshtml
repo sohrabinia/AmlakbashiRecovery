@@ -1,18 +1,11 @@
 ﻿@model Comment
+
 @{
     ViewBag.Title = "ویرایش نظر";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
-@section StyleLink
-{
-    @*<link rel="stylesheet" type="text/css" href="/resource/ckeditor/ckeditor.css">*@
-}
-@section ScriptLink
-{
-    <script src="/resource/ckeditor/ckeditor.js"></script>
-}
-<div class="title">ویرایش  نظر</div>
 
+<div class="title">ویرایش  نظر</div>
 @using (Html.BeginForm("Edit", "Comment", FormMethod.Post, new { enctype = "multipart/form-data", id = "ManageForm" }))
 {
     @Html.HiddenFor(model => model.Id)
@@ -52,7 +45,7 @@
                 <select name="type">
                     <option value="@((int)Comment.CommentType.advertise)" is-selected="@(Model.type == (int)Comment.CommentType.advertise)">آگهی</option>
                     <option value="@((int)Comment.CommentType.advertiseHostReply)" is-selected="@(Model.type == Comment.CommentType.advertiseHostReply)">پاسخ میزبان</option>
-                    <option value="@((int)Comment.CommentType.post)" is-selected="@(Model.type == Comment.CommentType.post)">پست</option> 
+                    <option value="@((int)Comment.CommentType.post)" is-selected="@(Model.type == Comment.CommentType.post)">پست</option>
                 </select>
             </td>
             <td></td>
@@ -86,11 +79,10 @@
         <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
     </div>
 
-<div class="adminmsg">@ViewBag.msg</div>
+    <div class="adminmsg">@ViewBag.msg</div>
 }
 
-@section ScriptBlock
+@section ScriptLink
 {
-    <script type="text/javascript">
-    </script>
+    <script src="/resource/ckeditor/ckeditor.js" asp-append-version="true"></script>
 }

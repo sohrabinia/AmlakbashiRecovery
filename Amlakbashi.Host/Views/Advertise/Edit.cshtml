@@ -1,24 +1,112 @@
 ﻿@model Advertise
+
 @{
     ViewBag.Title = "مدیریت آگهی";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
-@section StyleLink
-{
-    @*<link rel="stylesheet" type="text/css" href="/resource/ckeditor/ckeditor.css">*@
-}
-@section ScriptLink
-{
-    <script type="text/javascript" src="/file/getjs?src=/resource/ckeditor/ckeditor.js"></script>
-}
-<div class="title">ویرایش  آگهی</div>
 
+@section StyleBlock
+{
+    <style>
+        .grouptitle {
+            text-align: right;
+            font: 16px Miransans;
+            color: #444;
+        }
+
+        .propertycontainer {
+            text-align: right;
+            direction: rtl;
+            background-color: #eee;
+            padding: 25px 40px;
+        }
+
+        .propertyItem {
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px dotted #dbdbdb;
+        }
+
+            .propertyItem span {
+                width: 150px;
+                text-align: right;
+                display: inline-block;
+                font: 13px Liransans;
+                overflow: hidden;
+            }
+
+        .dropdown {
+            display: inline-block;
+            margin: 0 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 7px;
+        }
+
+            .dropdown dd, .dropdown dt {
+                margin: 0px;
+                padding: 0px;
+            }
+
+            .dropdown ul {
+                margin: -1px 0 0 0;
+            }
+
+            .dropdown dd {
+                position: relative;
+            }
+
+            .dropdown a,
+            .dropdown a:visited {
+                color: #000;
+                text-decoration: none;
+                outline: none;
+                font: 14px bnassim;
+            }
+
+            .dropdown dt a span, .multiSel span {
+                cursor: pointer;
+                display: inline-block;
+                padding: 0 3px 2px 0;
+            }
+
+            .dropdown dd ul {
+                background-color: #626262;
+                border: 0;
+                color: #fff;
+                display: none;
+                right: 0px;
+                padding: 2px 15px 2px 5px;
+                position: absolute;
+                top: 12px;
+                width: 200px;
+                overflow: auto;
+            }
+
+            .dropdown span.value {
+                display: none;
+            }
+
+            .dropdown dd ul li a {
+                padding: 5px;
+                display: block;
+            }
+
+            .dropdown dd ul li {
+                list-style: none;
+            }
+
+                .dropdown dd ul li a:hover {
+                    background-color: #fff;
+                }
+    </style>
+}
+
+<div class="title">ویرایش  آگهی</div>
 @using (Html.BeginForm("Edit", "Advertise", FormMethod.Post, new { enctype = "multipart/form-data", id = "ManageForm" }))
 {
-
     @Html.HiddenFor(model => model.Id)
     <table>
-
         <tr>
             <td class="label">  امتیاز اصلی آگهی :</td>
             <td class="value">
@@ -45,7 +133,7 @@
         </tr>
         <tr>
             <td class="label">
-                 کد کاربر :
+                کد کاربر :
             </td>
             <td style="width:300px;">
                 @Html.EditorFor(model => model.UserID)
@@ -66,19 +154,19 @@
             <td class="value">
                 @Html.EditorFor(model => model.MetaTitle)
             </td>
-        </tr>        
+        </tr>
         <tr>
             <td class="label">    آدرس URL :</td>
             <td class="value">
                 @Html.EditorFor(model => model.Slug)
             </td>
-        </tr>       
+        </tr>
         <tr>
             <td class="label">   توضیح برای گوگل - متا :</td>
             <td class="value">
                 @Html.TextAreaFor(model => model.MetaDescription)
             </td>
-        </tr>    
+        </tr>
         <tr>
             <td class="label">
                 توضیحات آگهی :
@@ -87,7 +175,7 @@
                 @Html.TextAreaFor(model => model.Description)
             </td>
             <td></td>
-        </tr>             
+        </tr>
 
         <tr>
             <td class="label">
@@ -122,9 +210,8 @@
                 @Html.EditorFor(model => model.AmlakbashiScore)
             </td>
             <td></td>
-        </tr>     
+        </tr>
     </table>
-
     <div style="margin-top:20px;">
         <input class="apply" type="button" onclick="submit_form()" value="ثبت" />
         <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
@@ -132,102 +219,12 @@
 }
 
 <div class="adminmsg">@ViewBag.msg</div>
-<style>
-    /***advertise****/
 
-    .grouptitle {
-        text-align: right;
-        font: 16px Miransans;
-        color: #444;
-    }
+@section ScriptLink
+{
+    <script type="text/javascript" src="/file/getjs?src=/resource/ckeditor/ckeditor.js"></script>
+}
 
-    .propertycontainer {
-        text-align: right;
-        direction: rtl;
-        background-color: #eee;
-        padding: 25px 40px;
-    }
-
-    .propertyItem {
-        margin: 5px 0;
-        padding: 5px 0;
-        border-bottom: 1px dotted #dbdbdb;
-    }
-
-        .propertyItem span {
-            width: 150px;
-            text-align: right;
-            display: inline-block;
-            font: 13px Liransans;
-            overflow: hidden;
-        }
-
-    /***advertise****/
-    .dropdown {
-        display: inline-block;
-        margin: 0 10px;
-        border: 1px solid #ccc;
-        padding: 10px;
-        border-radius: 7px;
-    }
-
-        .dropdown dd, .dropdown dt {
-            margin: 0px;
-            padding: 0px;
-        }
-
-        .dropdown ul {
-            margin: -1px 0 0 0;
-        }
-
-        .dropdown dd {
-            position: relative;
-        }
-
-        .dropdown a,
-        .dropdown a:visited {
-            color: #000;
-            text-decoration: none;
-            outline: none;
-            font: 14px bnassim;
-        }
-
-        .dropdown dt a span, .multiSel span {
-            cursor: pointer;
-            display: inline-block;
-            padding: 0 3px 2px 0;
-        }
-
-        .dropdown dd ul {
-            background-color: #626262;
-            border: 0;
-            color: #fff;
-            display: none;
-            right: 0px;
-            padding: 2px 15px 2px 5px;
-            position: absolute;
-            top: 12px;
-            width: 200px;
-            overflow: auto;
-        }
-
-        .dropdown span.value {
-            display: none;
-        }
-
-        .dropdown dd ul li a {
-            padding: 5px;
-            display: block;
-        }
-
-        .dropdown dd ul li {
-            list-style: none;
-        }
-
-            .dropdown dd ul li a:hover {
-                background-color: #fff;
-            }
-</style>
 @section ScriptBlock
 {
     <script type="text/javascript">

@@ -1,4 +1,7 @@
 ﻿@using Amlakbashi.Core.DTOs.BlogPostDTOs;
+
+@model IEnumerable<BlogPost>
+
 @{
     ViewBag.Title = "مدیریت پست های وبلاگ";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
@@ -7,29 +10,19 @@
     ViewBag.region_filter_item_class = "admin-shared__filter-item";
     ViewBag.region_filter_label_class = "admin-shared__filter-label";
     ViewBag.region_filter_property_class = "admin-shared__filter-input";
-}
 
-@model IEnumerable<BlogPost>
-
-@{ 
     var data = ViewBag.dto as IEnumerable<BlogPostIndexDTO>;
-}
 
-@section ScriptLink
-{
-}
-
-@section StyleLink
-{
-    <link rel="stylesheet" type="text/css" href="~/resource/css/admin/admin-shared.css" />
-}
-
-@{ 
     var status = (BlogPost.BlogPostStatus)ViewBag.status;
     var sortOrder = (BlogPost.SortOrdersEnum)ViewBag.sortOrder;
     var showingPlace = (int)ViewBag.showingPlace;
     string postTitle = ViewBag.postTitle == null ? (string)null : (string)ViewBag.postTitle;
     var id = (int)ViewBag.id;
+}
+
+@section StyleLink
+{
+    <link rel="stylesheet" type="text/css" href="~/resource/css/admin/admin-shared.css" asp-append-version="true" />
 }
 
 <div class="admin-shared__root">
@@ -123,7 +116,7 @@
                             else
                             {
                                 @:بدون عکس
-                        }
+                            }
                         </td>
                         <td>
                             <div style="display:flex;flex-flow:column;justify-content:center;align-items:center;">
@@ -142,40 +135,40 @@
                         <td>@(BlogPost.GetPlaceString(item.BlogPost.ShowingPlace))</td>
                         <td>@item.ShowingPlace</td>
                         <td>
-                        @if (item.BlogPost.ShowingPlace == BlogPost.PlaceEnum.HomePage || (Advertise.AdvertiseType)item.BlogPost.AccommodationType == Advertise.AdvertiseType.All)
-                        {
-                            @:-
-                        }
-                        else
-                        {
-                            @(Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianString((int)item.BlogPost.AccommodationType))
-                        }
-                    </td>
-                    <td>
-                        @if (item.BlogPost.ShowingPlace == BlogPost.PlaceEnum.HomePage || !item.BlogPost.AnyFilter())
-                        {
-                            @:-
-                        }
-                        else
-                        {
-                            <div style="display:flex;flex-flow:column;justify-content:center;align-items:center;">
-                                @if ((Advertise.PositionType)item.BlogPost.PositionType != Advertise.PositionType.none && (int)item.BlogPost.PositionType > 0)
-                                {
-                                    <div>موقعیت: @Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetPositionTypeString((int)item.BlogPost.PositionType)</div>
-                                }
-                                @if (item.BlogPost.PoolStatus == BlogPost.PoolStatusEnum.WithPool)
-                                {
-                                    <div>دارای استخر</div>
-                                }
-                            </div>
-                        }
-                    </td>
-                    <td style="color:@BlogPost.GetStatusColor(item.BlogPost.Status)">
-                        @BlogPost.GetStatusString(item.BlogPost.Status)
-                    </td>
-                    <td>
-                        <div style="display:flex;justify-content:space-between">
-                            <div style="cursor:pointer" onclick="editItem(@item.BlogPost.Id)"><span class="editicon" title="ویرایش"></span></div>
+                            @if (item.BlogPost.ShowingPlace == BlogPost.PlaceEnum.HomePage || (Advertise.AdvertiseType)item.BlogPost.AccommodationType == Advertise.AdvertiseType.All)
+                            {
+                                @:-
+                            }
+                            else
+                            {
+                                @(Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianString((int)item.BlogPost.AccommodationType))
+                            }
+                        </td>
+                        <td>
+                            @if (item.BlogPost.ShowingPlace == BlogPost.PlaceEnum.HomePage || !item.BlogPost.AnyFilter())
+                            {
+                                @:-
+                            }
+                            else
+                            {
+                                <div style="display:flex;flex-flow:column;justify-content:center;align-items:center;">
+                                    @if ((Advertise.PositionType)item.BlogPost.PositionType != Advertise.PositionType.none && (int)item.BlogPost.PositionType > 0)
+                                    {
+                                        <div>موقعیت: @Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetPositionTypeString((int)item.BlogPost.PositionType)</div>
+                                    }
+                                    @if (item.BlogPost.PoolStatus == BlogPost.PoolStatusEnum.WithPool)
+                                    {
+                                        <div>دارای استخر</div>
+                                    }
+                                </div>
+                            }
+                        </td>
+                        <td style="color:@BlogPost.GetStatusColor(item.BlogPost.Status)">
+                            @BlogPost.GetStatusString(item.BlogPost.Status)
+                        </td>
+                        <td>
+                            <div style="display:flex;justify-content:space-between">
+                                <div style="cursor:pointer" onclick="editItem(@item.BlogPost.Id)"><span class="editicon" title="ویرایش"></span></div>
                                 @switch (item.BlogPost.Status)
                                 {
                                     case BlogPost.BlogPostStatus.Draft:
@@ -187,14 +180,14 @@
                                         <i class="fa fa-trash-alt" style="font-size:20px;cursor:pointer;color:red;" onclick="removeItem(@item.BlogPost.Id)" title="حذف"></i>
                                         break;
                                 }
-                        </div>
-                    </td>
-                </tr>
+                            </div>
+                        </td>
+                    </tr>
                 }
             </table>
         </div>
 
-                    }
+    }
     <div class="mypagelist">
         @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "BlogPost", new { page, id = id, status = (int)status, sortOrder = (int)sortOrder, showingPlace = showingPlace, postTitle = postTitle, Province = (int)ViewBag.Province, City = (int)ViewBag.City, Area = (int)ViewBag.Area }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
     </div>

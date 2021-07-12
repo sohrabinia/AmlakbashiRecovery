@@ -48,118 +48,117 @@
     @RenderSection("StyleBlock", required: false)
     @RenderSection("HeaderAddition", required: false)
 </head>
-    <body>
-        <div class="page" dir="rtl">
-            <div class="header">
+<body>
+    <div class="page" dir="rtl">
+        <div class="header">
+        </div>
+        <div class="body">
+            <div class="top">
+                <a class="menuitem" href="/">صفحه نخست</a>
+                <a class="logoff" href="/user/signout">خروج</a>
             </div>
-            <div class="body">
-                <div class="top">
-                    <a class="menuitem" href="/">صفحه نخست</a>
-                    <a class="logoff" href="/user/signout">خروج</a>
-                </div>
-                <div class="zonr">
-                    @*<a href="/admin/setting" style="background-image: url(/resource/img/settings.png)" class="item">تنظیمات عمومی</a>*@
-                    @*<a href="/ticket/admin" style="background-image: url(/resource/img/ticket.png)" class="item">مدیریت تیکت</a>*@
-                    <a href="/advertise/admin" style="background-image:url(/resource/img/advertise.png)" class="item">آگهی ها</a>
-                    <a href="/reserve/admin" style="background-image:url(/resource/img/service.png)" class="item">رزرو ها</a>
-                    <a href="/user/admin" style="background-image:url(/resource/img/user.png)" class="item">کاربران</a>
-                    <a href="/bankcard/index" style="background-image:url(/resource/img/bankCard.png)" class="item">حساب بانکی</a>
-                    <a href="/supportchat/index" style="background-image:url(/resource/img/Message-icon-grey.png)" class="item">چت پشتیبانی</a>
-                    <a href="/cart/admin" style="background-image:url(/resource/img/buy.png)" class="item">مالی</a>
-                    <a href="/grouppayment/index" style="background-image:url(/resource/img/credit_card_multi-512.png)" class="item">پرداخت گروهی</a>
-                    <a href="/blogpost/index" style="background-image:url(/resource/img/post.png)" class="item">پست وبلاگ</a>
-                    @*<a href="/categorypost/index" style="background-image:url(/resource/img/post.png)" class="item">پست دسته بندی</a>*@
-                    <a href="/admin/adminstatistic" style="background-image:url(/resource/img/statistic.png)" class="item">آمار</a>
-                    <a href="/file/index" style="background-image:url(/resource/img/file.png)" class="item">فایل ها</a>
-                    <a href="/post/index" style="background-image:url(/resource/img/post.png)" class="item">پست ها</a>
-                    @*<a href="/service/index" style="background-image:url(/resource/img/service.png)" class="item">مدیریت سرویس ها</a>*@
-                    @*<a href="/admin/email" style="background-image: url(/resource/img/email2.png)" class="item">مدیریت ارسال ایمیل</a>*@
-                    <a href="/admin/sms" style="background-image: url(/resource/img/Message-icon-grey.png)" class="item">ارسال اس ام اس</a>
-                    <a href="/actionlog/index" style="background-image:url(/resource/img/log.png)" class="item">لاگ تغییرات</a>
-                    <a href="/admin/SendGroupNotification" style="background-image: url(/resource/img/Message-icon-grey.png)" class="item">نوتیفیکیشن گروهی</a>
-                </div>
-                <div class="zonl">
-                    @RenderBody()
-                </div>
+            <div class="zonr">
+                @*<a href="/admin/setting" style="background-image: url(/resource/img/settings.png)" class="item">تنظیمات عمومی</a>*@
+                @*<a href="/ticket/admin" style="background-image: url(/resource/img/ticket.png)" class="item">مدیریت تیکت</a>*@
+                <a href="/advertise/admin" style="background-image:url(/resource/img/advertise.png)" class="item">آگهی ها</a>
+                <a href="/reserve/admin" style="background-image:url(/resource/img/service.png)" class="item">رزرو ها</a>
+                <a href="/user/admin" style="background-image:url(/resource/img/user.png)" class="item">کاربران</a>
+                <a href="/bankcard/index" style="background-image:url(/resource/img/bankCard.png)" class="item">حساب بانکی</a>
+                <a href="/supportchat/index" style="background-image:url(/resource/img/Message-icon-grey.png)" class="item">چت پشتیبانی</a>
+                <a href="/cart/admin" style="background-image:url(/resource/img/buy.png)" class="item">مالی</a>
+                <a href="/grouppayment/index" style="background-image:url(/resource/img/credit_card_multi-512.png)" class="item">پرداخت گروهی</a>
+                <a href="/blogpost/index" style="background-image:url(/resource/img/post.png)" class="item">پست وبلاگ</a>
+                @*<a href="/categorypost/index" style="background-image:url(/resource/img/post.png)" class="item">پست دسته بندی</a>*@
+                <a href="/admin/adminstatistic" style="background-image:url(/resource/img/statistic.png)" class="item">آمار</a>
+                <a href="/file/index" style="background-image:url(/resource/img/file.png)" class="item">فایل ها</a>
+                <a href="/post/index" style="background-image:url(/resource/img/post.png)" class="item">پست ها</a>
+                @*<a href="/service/index" style="background-image:url(/resource/img/service.png)" class="item">مدیریت سرویس ها</a>*@
+                @*<a href="/admin/email" style="background-image: url(/resource/img/email2.png)" class="item">مدیریت ارسال ایمیل</a>*@
+                <a href="/admin/sms" style="background-image: url(/resource/img/Message-icon-grey.png)" class="item">ارسال اس ام اس</a>
+                <a href="/actionlog/index" style="background-image:url(/resource/img/log.png)" class="item">لاگ تغییرات</a>
+                <a href="/admin/SendGroupNotification" style="background-image: url(/resource/img/Message-icon-grey.png)" class="item">نوتیفیکیشن گروهی</a>
             </div>
-            <div class="footer">
+            <div class="zonl">
+                @RenderBody()
             </div>
         </div>
-        <div style="z-index:2147483648" id="loading-icon" class="loading-contianer">
-            <div class="ui active large loader loading-icon"></div>
-        </div>  
-            <script src="/file/getjs?src=/resource/scripts/jquery-2.1.1.min.js"></script>
-            <script src="/file/getjs?src=/Scripts/jquery.unobtrusive-ajax.min.js&v=1"></script>
-            <script src="/file/getjs?src=/resource/scripts/jquery.nicescroll.min.js"></script>
-            <script src="/file/getjs?src=/resource/chosen_v1.4.2/chosen.jquery.min.js"></script>
-            <script src="/file/getjs?src=/resource/highcharts/highcharts.js"></script>
-            <script src="/file/getjs?src=/resource/alertify.js-0.3.11/src/alertify.js"></script>
-            <script src="/file/getjs?src=~/Resource/jquery-confirm/jquery-confirm.min.js"></script>
-            <script src="/file/getjs?src=~/Resource/persian-date-picker/persian-datepicker.js"></script>
-            <script src="/file/getjs?src=~/Resource/persian-date-picker/persian-date.min.js"></script>
-            <script src="/file/getjs?src=/resource/drop-zone-2019/dropzone.js"></script>
-            @*<script src="/file/getjs?src=~/Resource/dropzone-v5.4/dropzone.min.js"></script>*@
-            <script src="/file/getjs?src=/Resource/rating/jquery.barrating.min.js"></script>
+        <div class="footer">
+        </div>
+    </div>
+    <div style="z-index:2147483648" id="loading-icon" class="loading-contianer">
+        <div class="ui active large loader loading-icon"></div>
+    </div>
 
-            <script src="/file/getjs?src=/resource/scripts/general/accommodation-edit-form.js"></script>
-            @*<script src="/file/getjs?src=/resource/scripts/general/accommodation-item.js"></script>*@
-            <script src="/file/getjs?src=/resource/scripts/general/ajax-helper.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/client-helper.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/date-time-helper.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/detail-button.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/increase-decrease-button.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/input-validation-helper.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/lazy-loading.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/loading-indicator.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/more-text-button.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/price-string-generator.js&v=1"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/rating-detail.js&v=1"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/string-replace-all.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/textarea-autoexpand.js"></script>
-            <script src="/file/getjs?src=/resource/scripts/admin/user-rating-admin.js&v=1"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/message-popup.js&v=4"></script>
-            <script src="/file/getjs?src=/resource/scripts/general/confirm-alert-helper.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/jquery-2.1.1.min.js"></script>
+    <script src="/file/getjs?src=/Scripts/jquery.unobtrusive-ajax.min.js&v=1"></script>
+    <script src="/file/getjs?src=/resource/scripts/jquery.nicescroll.min.js"></script>
+    <script src="/file/getjs?src=/resource/chosen_v1.4.2/chosen.jquery.min.js"></script>
+    <script src="/file/getjs?src=/resource/highcharts/highcharts.js"></script>
+    <script src="/file/getjs?src=/resource/alertify.js-0.3.11/src/alertify.js"></script>
+    <script src="/file/getjs?src=~/Resource/jquery-confirm/jquery-confirm.min.js"></script>
+    <script src="/file/getjs?src=~/Resource/persian-date-picker/persian-datepicker.js"></script>
+    <script src="/file/getjs?src=~/Resource/persian-date-picker/persian-date.min.js"></script>
+    <script src="/file/getjs?src=/resource/drop-zone-2019/dropzone.js"></script>
+    @*<script src="/file/getjs?src=~/Resource/dropzone-v5.4/dropzone.min.js"></script>*@
+    <script src="/file/getjs?src=/Resource/rating/jquery.barrating.min.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/accommodation-edit-form.js"></script>
+    @*<script src="/file/getjs?src=/resource/scripts/general/accommodation-item.js"></script>*@
+    <script src="/file/getjs?src=/resource/scripts/general/ajax-helper.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/client-helper.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/date-time-helper.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/detail-button.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/increase-decrease-button.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/input-validation-helper.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/lazy-loading.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/loading-indicator.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/more-text-button.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/price-string-generator.js&v=1"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/rating-detail.js&v=1"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/string-replace-all.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/textarea-autoexpand.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/admin/user-rating-admin.js&v=1"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/message-popup.js&v=4"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/confirm-alert-helper.js"></script>
+    <script src="/file/getjs?src=~/Resource/Scripts/jquery.onmutate.min.js"></script>
 
-            <script src="/file/getjs?src=~/Resource/Scripts/jquery.onmutate.min.js"></script>
-
-            @RenderSection("ScriptLink", required: false)   
-            @RenderSection("ScriptBlock", required: false)
-            @*<script>
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function (registrations) {
-                    for(let registration of registrations) {
-                        registration.unregister()
-                    }
-                });
-            }
-            myajax("user/updateusernotificationtoken", "token=null", function (ret) {
-            }, false);
-            </script>*@
-            <script type="text/javascript">
-            var registered_service_worker;
-            document.addEventListener("DOMContentLoaded", function () {
-                if ('serviceWorker' in navigator) {
-                    window.addEventListener('load', function () {
-                        navigator.serviceWorker.getRegistration("/service_worker.js").then(registration => {
-                            if (registration == undefined) {
-                                navigator.serviceWorker.register('/service_worker.js')
-                                 .then(reg => {
-                                     console.log('Service worker registered! 😎', reg);
-                                     registered_service_worker = reg;
-                                 })
-                                 .catch(err => {
-                                     console.log('😥 Service worker registration failed: ', err);
-                                 });
-                            }
-                            else {
-                                registered_service_worker = registration;
-                            }
-                        });
-                    });
-                }
-                else {
+    @RenderSection("ScriptLink", required: false)
+    @RenderSection("ScriptBlock", required: false)
+    @*<script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for(let registration of registrations) {
+                    registration.unregister()
                 }
             });
-            </script>
-    </body>
+        }
+        myajax("user/updateusernotificationtoken", "token=null", function (ret) {
+        }, false);
+        </script>*@
+    <script type="text/javascript">
+        var registered_service_worker;
+        document.addEventListener("DOMContentLoaded", function () {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker.getRegistration("/service_worker.js").then(registration => {
+                        if (registration == undefined) {
+                            navigator.serviceWorker.register('/service_worker.js')
+                                .then(reg => {
+                                    console.log('Service worker registered! 😎', reg);
+                                    registered_service_worker = reg;
+                                })
+                                .catch(err => {
+                                    console.log('😥 Service worker registration failed: ', err);
+                                });
+                        }
+                        else {
+                            registered_service_worker = registration;
+                        }
+                    });
+                });
+            }
+            else {
+            }
+        });
+    </script>
+</body>
 </html>
