@@ -417,6 +417,14 @@ namespace Amlakbashi.Host.Controllers
 
         public ActionResult Public(int sid)
         {
+            if (sid < 1)
+            {
+                return RedirectToRoute(new
+                {
+                    controller = "error",
+                    action = "Http404"
+                });
+            }
             if (HttpContext.Request.Path.Value == "/post/public?sid=" + sid)
             {
                 switch (sid)

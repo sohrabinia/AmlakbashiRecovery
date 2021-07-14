@@ -372,6 +372,42 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
+        //public static bool IsActiveReserve(int status)
+        //{
+        //    switch ((ReserveStatus)status)
+        //    {
+        //        case ReserveStatus.WaitForReserve:
+        //        case ReserveStatus.WaitForResponse:
+        //        case ReserveStatus.Reserved:
+        //        case ReserveStatus.CashPay:
+        //        case ReserveStatus.Started:
+        //        case ReserveStatus.CancelRequestByGuest:
+        //        case ReserveStatus.CancelRequestByHost:
+        //            return true;
+        //        default:
+        //            return false;
+        //    }
+        //}
+
+        [NotMapped]
+        public bool IsActiveReserve {
+            get {
+                switch (this.Status)
+                {
+                    case ReserveStatus.WaitForReserve:
+                    case ReserveStatus.WaitForResponse:
+                    case ReserveStatus.Reserved:
+                    case ReserveStatus.CashPay:
+                    case ReserveStatus.Started:
+                    case ReserveStatus.CancelRequestByGuest:
+                    case ReserveStatus.CancelRequestByHost:
+                        return true;
+                    default:
+                        return false;
+                }
+            } 
+        }
+
         public bool CanReserveStarted(out DateTime canStartTime)
         {
             canStartTime = new DateTime(StartDate.Year, StartDate.Month,

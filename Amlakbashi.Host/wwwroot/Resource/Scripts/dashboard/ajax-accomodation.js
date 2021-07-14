@@ -412,10 +412,10 @@ function deleteButton(id, elem) {
     showNoYesMessage(' حذف آگهی', 'آیا از حذف این آگهی مطمئن هستید؟', function () {
         myajax("accomodation/delete", "id=" + id, function (ret) {
             if (ret.status == 0) {
-                showErrorMessage('خطا', ret.msg);
+                alertify.error(ret.msg);
             }
             if (ret.status == 1) {
-                alertify.success(' آگهی با موفقیت حذف شد');
+                alertify.success('آگهی با موفقیت حذف شد');
                 $(elem).parent().parent().parent().parent().parent().remove();
             }
         });

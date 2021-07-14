@@ -134,15 +134,20 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
         }
 
-        public void Delete(long id)
+        public bool Delete(long id)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            var prevAcc = acc.ShallowCopy();
-            acc.Status = AdvertiseStatus.Deleted;
-            Repository.Update(acc);
-            Repository.Save();
-            mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
-            mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
+            if (acc != null && acc.Reserves.Any(a => a.IsActiveReserve) == false)
+            {
+                var prevAcc = acc.ShallowCopy();
+                acc.Status = AdvertiseStatus.Deleted;
+                Repository.Update(acc);
+                Repository.Save();
+                mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
+                mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
+                return true;
+            }
+            return false;
         }
 
         public IList<Advertise> Filter(AdvertiseStatus status, int adtype, int userid, string sort, long id, int instantReserveStatus,
