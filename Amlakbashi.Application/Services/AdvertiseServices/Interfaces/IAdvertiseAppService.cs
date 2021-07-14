@@ -24,7 +24,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         Advertise Find(long id, bool includeOccupiedTables = false);
         Advertise Find(long id, int statusLowerThan);
         Advertise FindIncludingDeleted(long id);
-        void Delete(long id);
+        bool Delete(long id);
         List<long> GetAdvertisesPhotoIds();
         void AddSupporterInfo(long id, string text, User supporter);
         IList<Advertise> Filter(AdvertiseStatus status, int adtype, int userid, string sort, long id, int instantReserveStatus,

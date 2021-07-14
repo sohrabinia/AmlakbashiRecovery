@@ -174,13 +174,13 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                advertiseService.Delete(id);
-                return GenerateJsonResult(new { status = 1, val = "" });
+                var status = advertiseService.Delete(id);
+                return GenerateJsonResult(new { status = status, msg = status ? "" : "این آگهی دارای درخواست رزرو فعال است" });
             }
             catch (Exception exc)
             {
                 logger.Error("Advertise.Delete", exc);
-                return GenerateJsonResult(new { status = 0, val = "" });
+                return GenerateJsonResult(new { status = 0, msg = "عملیات با خطا مواجه شد" });
             }
         }
 

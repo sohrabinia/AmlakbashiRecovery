@@ -263,14 +263,26 @@
     <script type="text/javascript">
 
         function deleteItem($id, obj) {
-            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟"))
-            {
-                myajax("Advertise/Delete", "id=" + $id , function (ret) {
-                    if (ret.status==1) {
-                        $(obj).parent().parent().remove() ;
+            //if (confirm("آیا از حذف این آیتم اطمینان دارید ؟"))
+            //{
+            //    myajax("Advertise/Delete", "id=" + $id , function (ret) {
+            //        if (ret.status==1) {
+            //            $(obj).parent().parent().remove() ;
+            //        }
+            //    });
+            //}
+
+            showNoYesMessage(' حذف آگهی', 'آیا از حذف این آگهی مطمئن هستید؟', function () {
+                myajax("Advertise/Delete", "id=" + $id, function (ret) {
+                    if (ret.status == 0) {
+                        alertify.error(ret.msg);
+                    }
+                    if (ret.status == 1) {
+                        alertify.success('آگهی با موفقیت حذف شد');
+                        $(elem).parent().parent().parent().parent().parent().remove();
                     }
                 });
-            }
+            });
         }
 
         function confirmHygieneProtocol($id, obj) {

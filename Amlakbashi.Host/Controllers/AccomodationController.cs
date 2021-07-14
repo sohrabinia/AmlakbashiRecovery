@@ -2658,7 +2658,7 @@ namespace Amlakbashi.Host.Controllers
         {
             var user = userAccessor.CurrentUser;
             var acc = advertiseService.Find(id);
-            if (acc.UserID != user.Id)
+            if (acc == null || acc.UserID != user.Id)
             {
                 return PartialView("_AccSetOccupied");
             }
@@ -2714,19 +2714,19 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 Advertise acc = advertiseService.Find(id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc == null || acc.UserID != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        val = ""
+                        msg = "شما مجوز حذف این آگهی را ندارید"
                     });
                 }
-                advertiseService.Delete(id);
+                var status = advertiseService.Delete(id);
                 return GenerateJsonResult(new
                 {
-                    status = 0,
-                    val = ""
+                    status = status,
+                    msg = status ? "" : "این آگهی دارای درخواست رزرو فعال است"
                 });
             }
             catch (Exception exc)
@@ -2735,7 +2735,7 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new
                 {
                     status = 0,
-                    val = ""
+                    msg = "عملیات با خطا مواجه شد"
                 });
             }
         }
