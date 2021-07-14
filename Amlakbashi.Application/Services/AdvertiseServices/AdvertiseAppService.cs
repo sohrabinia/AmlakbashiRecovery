@@ -561,6 +561,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             mediator.Publish(new ChangeAdvertiseAddressEvent(shallowAcc, acc));
             mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID,
                     acc.Photos.Select(s => s.Id).ToList(), rootPath));
+            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
             return director;
         }
 
@@ -807,6 +808,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         {
                             mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
                         }
+                        mediator.Send(new RenameAdvertisePhotosCommand(child.Id));
                     }
                     child.LastModifyDate = DateTime.Now;
                     Repository.Update(child);
@@ -1008,6 +1010,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     {
                         mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
                     }
+                    mediator.Send(new RenameAdvertisePhotosCommand(data.Id));
                 }
                 mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id, true));
             }
@@ -1489,6 +1492,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
             }
+            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
             return true;
         }
 
