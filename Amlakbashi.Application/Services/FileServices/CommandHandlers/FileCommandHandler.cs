@@ -462,13 +462,14 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             var newFilePath = $"{host.WebRootPath}/content/advertise/{fileName}.jpg";
                             if (File.Exists(oldFilePath))
                             {
+                                var file = fileRepository.Find(item.Id);
+                                file.FilePath = newDbFilePath;
+                                fileRepository.Update(file);
+                                fileRepository.Save();
                                 File.Move(oldFilePath, newFilePath, true);
-                                item.FilePath = newDbFilePath;
-                                fileRepository.Update(item);
                             }
                         }
                     }
-                    fileRepository.Save();
                 }
             }
             catch (Exception exc)
