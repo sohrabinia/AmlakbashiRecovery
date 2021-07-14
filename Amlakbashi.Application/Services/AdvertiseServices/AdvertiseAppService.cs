@@ -561,6 +561,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             mediator.Publish(new ChangeAdvertiseAddressEvent(shallowAcc, acc));
             mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID,
                     acc.Photos.Select(s => s.Id).ToList(), rootPath));
+            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
             return director;
         }
 
@@ -1489,6 +1490,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
             }
+            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
             return true;
         }
 

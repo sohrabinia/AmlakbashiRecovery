@@ -960,8 +960,7 @@ namespace Amlakbashi.Host.Controllers.API
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = bearerScheme)]
-        public JsonResult EditAdvertisePhotos(string cid,
-            ApiPhotoDTO data, int targetStatus = -1)
+        public JsonResult EditAdvertisePhotos(string cid, ApiPhotoDTO data, int targetStatus = -1)
         {
             if (!ClientAuthenticate(cid))
             {
@@ -981,32 +980,27 @@ namespace Amlakbashi.Host.Controllers.API
                 }
                 List<string> errors = new List<string>();
                 var done = advertiseService.UpdatePhotos(data, webHostEnvironment.WebRootPath);
-                if (done)
-                {
-                    foreach (var item in data.album)
-                    {
-                        var file = fileService.Find(item);
-                        if (file.FilePath.Contains("_" + data.id + "_") == false)
-                        {
-                            try
-                            {
-                                var oldFilePath = webHostEnvironment.WebRootPath + file.FilePathWithoutTilde;
-                                var newFileName = $"~/content/advertise/advertise_{data.id}_{file.Id}.jpg";
-                                var newFilePath = $"{webHostEnvironment.WebRootPath}/content/advertise/advertise_{data.id}_{file.Id}.jpg";
-                                if (System.IO.File.Exists(oldFilePath))
-                                {
-                                    System.IO.File.Copy(oldFilePath, newFilePath, true);
-                                    System.IO.File.Delete(oldFilePath);
-                                    fileService.UpdateFilePath(file.Id, newFileName);
-                                }
-                            }
-                            catch (Exception exc)
-                            {
-                                logger.Error("AdvertiseApi.EditAdvertisePhotos(rename photos)", exc);
-                            }
-                        }
-                    }
-                }
+                //if (done)
+                //{
+                //    lock (objlock)
+                //    {
+                //        foreach (var item in data.album)
+                //        {
+                //            var file = fileService.Find(item);
+                //            if (file.FilePath.Contains("advertise_" + file.Id + "."))
+                //            {
+                //                var oldFilePath = webHostEnvironment.WebRootPath + file.FilePathWithoutTilde;
+                //                var newFileName = $"~/content/advertise/advertise_{data.id}_{file.Id}.jpg";
+                //                var newFilePath = $"{webHostEnvironment.WebRootPath}/content/advertise/advertise_{data.id}_{file.Id}.jpg";
+                //                if (System.IO.File.Exists(oldFilePath))
+                //                {
+                //                    System.IO.File.Move(oldFilePath, newFilePath);
+                //                    fileService.UpdateFilePath(file.Id, newFileName);
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
                 return GenerateJsonResult(new
                 {
                     done = done,

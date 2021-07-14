@@ -1,16 +1,19 @@
 ﻿@model Advertise
 
-@await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" }, { "noImageLazy", true } })
+@if (Model != null)
+{
+    @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" }, { "noImageLazy", true } })
 
-<div class="acc-set-date__input-container">
-    <div onclick="setAsSelectedDate(this)" class="acc-set-date__button">انتخاب</div>
-    <div onclick="clearSelectedDate(this)" class="acc-set-date__button">حذف تاریخ</div>
-</div>
-<div class="acc-set-date__date-string"></div>
-<script type="text/javascript">
-    currentSelectedDay = undefined;
-    debugger;
-    var jalaliSelectedDay = @(Model.unixNorouzMinRequestDate > 0 ? "gregorianToJalaliDate(new Date(" + Model.unixNorouzMinRequestDate +"))" : "undefined");
+    <div class="acc-set-date__input-container">
+        <div onclick="setAsSelectedDate(this)" class="acc-set-date__button">انتخاب</div>
+        <div onclick="clearSelectedDate(this)" class="acc-set-date__button">حذف تاریخ</div>
+    </div>
+    <div class="acc-set-date__date-string"></div>
+
+    <script type="text/javascript">
+        currentSelectedDay = undefined;
+
+    var jalaliSelectedDay = @(Model.unixNorouzMinRequestDate > 0 ? "gregorianToJalaliDate(new Date(" + Model.unixNorouzMinRequestDate + "))" : "undefined");
     if (jalaliSelectedDay != undefined) {
         var value = @Model.unixNorouzMinRequestDate;
         currentSelectedDay = {
@@ -89,4 +92,5 @@
              onChangeMinNorouzReserve(@Model.Id, selectedDate > 0 ? gregorianToJalaliDate(new Date(selectedDate)).dateString : undefined);
          });
     }
-</script>
+    </script>
+}

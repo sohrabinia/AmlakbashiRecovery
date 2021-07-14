@@ -1,16 +1,20 @@
 ﻿@model Advertise
-@await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" }, { "noImageLazy", true } })
-<div class="acc-set-date__input-container" style="align-items: baseline;">
-    <span>قیمت: </span>
-    <div style="width: 25%;max-width: 400px;">
-        <input onkeyup="onChangeInputPrice()" style="width: 100%;max-width: 400px;" disabled id="js-price-input" class="acc-set-date__price-input" type="text" placeholder="" />
-        <div id="js-input-price-string" style="position: sticky;font: 12px Liransans;color:#34A853;"></div>
+
+@if (Model != null)
+{
+    @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" }, { "noImageLazy", true } })
+    <div class="acc-set-date__input-container" style="align-items: baseline;">
+        <span>قیمت: </span>
+        <div style="width: 25%;max-width: 400px;">
+            <input onkeyup="onChangeInputPrice()" style="width: 100%;max-width: 400px;" disabled id="js-price-input" class="acc-set-date__price-input" type="text" placeholder="" />
+            <div id="js-input-price-string" style="position: sticky;font: 12px Liransans;color:#34A853;"></div>
+        </div>
+        <span>تومان</span>
+        <span onclick="setPrice(this)" class="acc-set-date__button acc-set-date__disabled-button">ثبت قیمت</span>
     </div>
-    <span>تومان</span>
-    <span onclick="setPrice(this)" class="acc-set-date__button acc-set-date__disabled-button">ثبت قیمت</span>
-</div>
-<div class="acc-set-date__date-string"></div>
-<script type="text/javascript">
+    <div class="acc-set-date__date-string"></div>
+
+    <script type="text/javascript">
     var priceDictStr = '@ViewBag.priceDict';
     priceDictStr = priceDictStr.replaceAll('&quot;', '"');
     var priceDict = JSON.parse(priceDictStr);
@@ -134,4 +138,5 @@
         var str = val < 1 ? '' : getPriceString(val);
         $('#js-input-price-string').html(str);
     }
-</script>
+    </script>
+}

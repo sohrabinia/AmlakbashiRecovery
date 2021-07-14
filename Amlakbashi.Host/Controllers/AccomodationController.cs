@@ -2634,7 +2634,7 @@ namespace Amlakbashi.Host.Controllers
             var acc = advertiseService.Find(id);
             if (acc.UserID != user.Id)
             {
-                return null;
+                return PartialView("_AccSetPrice");
             }
             var priceDict = advertiseService.GetAccPriceDatesInfo(id);
             ViewBag.priceDict = SerializeUtility.SerializeToJS(priceDict);
@@ -2648,19 +2648,19 @@ namespace Amlakbashi.Host.Controllers
             var acc = advertiseService.Find(id);
             if (acc.UserID != user.Id)
             {
-                return null;
+                return PartialView("_AccSetMinNorouzReserve");
             }
             return PartialView("_AccSetMinNorouzReserve", acc);
         }
 
         [Authorize]
-        public ActionResult GetSetOccupiedPopup(long id)
+        public IActionResult GetSetOccupiedPopup(long id)
         {
             var user = userAccessor.CurrentUser;
             var acc = advertiseService.Find(id);
             if (acc.UserID != user.Id)
             {
-                return null;
+                return PartialView("_AccSetOccupied");
             }
             var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
             var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
@@ -2669,7 +2669,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_AccSetOccupied", acc);
         }
 
-        public JsonResult GetAccUrlById(string id)
+        public IActionResult GetAccUrlById(string id)
         {
             try
             {
@@ -2698,8 +2698,9 @@ namespace Amlakbashi.Host.Controllers
                     url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(slug)
                 });
             }
-            catch
+            catch (Exception exc)
             {
+                logger.Error("Accomodation.GetAccUrlById", exc);
                 return GenerateJsonResult(new
                 {
                     status = 0
@@ -2730,7 +2731,7 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("Delete", exc);
+                logger.Error("Accomodation.Delete", exc);
                 return GenerateJsonResult(new
                 {
                     status = 0,

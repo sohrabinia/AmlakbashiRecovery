@@ -1,24 +1,24 @@
 ﻿@font-face {
     font-family: "Biransans";
-    src: url("/file/geteotfile?file_name=/resource/fonts/IRANSans-Bold-web.eot") format("eot"), url("/file/getwofffile?file_name=/resource/fonts/IRANSans-Bold-web.woff") format("woff"), url("/file/getttffile?file_name=/resource/fonts/IRANSans-Bold-web.ttf") format("truetype");
+    src: url("../../fonts/IRANSans-Bold-web.eot") format("eot"), url("../../fonts/IRANSans-Bold-web.woff") format("woff"), url("../../fonts/IRANSans-Bold-web.ttf") format("truetype");
     font-display: swap;
 }
 
 @font-face {
     font-family: "Liransans";
-    src: url("/file/geteotfile?file_name=/resource/fonts/IRANSans-Light-web.eot") format("eot"), url("/file/getwofffile?file_name=/resource/fonts/IRANSans-Light-web.woff") format("woff"), url("/file/getttffile?file_name=/resource/fonts/IRANSans-Light-web.ttf") format("truetype");
+    src: url("../../fonts/IRANSans-Light-web.eot") format("eot"), url("../../fonts/IRANSans-Light-web.woff") format("woff"), url("../../fonts/IRANSans-Light-web.ttf") format("truetype");
     font-display: swap;
 }
 
 @font-face {
     font-family: "Miransans";
-    src: url("/file/geteotfile?file_name=/resource/fonts/IRANSans-Medium-web.eot") format("eot"), url("/file/getwofffile?file_name=/resource/fonts/IRANSans-Medium-web.woff") format("woff"), url("/file/getttffile?file_name=/resource/fonts/IRANSans-Medium-web.ttf") format("truetype");
+    src: url("../../fonts/IRANSans-Medium-web.eot") format("eot"), url("../../fonts/IRANSans-Medium-web.woff") format("woff"), url("../../fonts/IRANSans-Medium-web.ttf") format("truetype");
     font-display: swap;
 }
 
 @font-face {
     font-family: "ULiransans";
-    src: url("/file/geteotfile?file_name=/resource/fonts/IRANSans-UltraLight-web.eot") format("eot"), url("/file/getwofffile?file_name=/resource/fonts/IRANSans-UltraLight-web.woff") format("woff"), url("/file/getttffile?file_name=/resource/fonts/IRANSans-UltraLight-web.ttf") format("truetype");
+    src: url("../../fonts/IRANSans-UltraLight-web.eot") format("eot"), url("../../fonts/IRANSans-UltraLight-web.woff") format("woff"), url("../../fonts/IRANSans-UltraLight-web.ttf") format("truetype");
     font-display: swap;
 }
 

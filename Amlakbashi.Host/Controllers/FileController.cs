@@ -464,72 +464,61 @@ namespace Portal.Controllers
             try
             {
                 var objFile = fileService.Find(FileID);
-                if (objFile == null)
-                    return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
-                string path = "", strFormat = "image/jpeg";
-                try
+                if (objFile == null ||
+                    System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)) == false)
                 {
-                    using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                    return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
+                }
+
+                string path = "", strFormat = "";
+                using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                {
+                    if (tmpImage.RawFormat.Equals(ImageFormat.Png))
                     {
-                        if (tmpImage.RawFormat.Equals(ImageFormat.Png))
+                        path = string.Format("content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
+                        strFormat = "image/png";
+                    }
+                    else
+                    {
+                        path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
+                        strFormat = "image/jpeg";
+                    }
+                }
+
+                if (System.IO.File.Exists(Path.Combine(host.WebRootPath, path)) == false)
+                {
+                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                    {
+                        double nw, nh, zz;
+                        if (w == 0)
                         {
-                            path = string.Format("content/imgcache/img{0}_{1}_{2}.png", FileID, w, h);
-                            strFormat = "image/png";
+                            zz = (double)OriginalImage.Height / (double)h;
+                            nh = h;
+                            nw = (double)OriginalImage.Width / zz;
+                        }
+                        else if (h == 0)
+                        {
+                            zz = (double)OriginalImage.Width / (double)w;
+                            nw = w;
+                            nh = (double)OriginalImage.Height / zz;
                         }
                         else
                         {
-                            path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", FileID, w, h);
+                            nw = w;
+                            nh = h;
                         }
-                    }
-                }
-                catch (Exception exc)
-                {
-                    logger.Error("File.UserImageThumb", exc);
-                    return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
-                }
-
-                if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
-                {
-                    string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
-                    if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, OrginalPath)))
-                        OrginalPath = "resource/img/noimage.jpg";
-
-                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, OrginalPath)))
-                    {
-                        lock (objlock)
+                        using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
                         {
-                            double nw, nh, zz;
-                            if (w == 0)
+                            thumbnailBitmap.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
+                            using (Graphics thumbnailGraph = Graphics.FromImage(thumbnailBitmap))
                             {
-                                zz = (double)OriginalImage.Height / (double)h;
-                                nh = h;
-                                nw = (double)OriginalImage.Width / zz;
+                                thumbnailGraph.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                                thumbnailGraph.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                                thumbnailGraph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                                Rectangle imageRectangle = new Rectangle(0, 0, (int)nw, (int)nh);
+                                thumbnailGraph.DrawImage(OriginalImage, imageRectangle);
+                                thumbnailBitmap.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
                             }
-                            else if (h == 0)
-                            {
-                                zz = (double)OriginalImage.Width / (double)w;
-                                nw = w;
-                                nh = (double)OriginalImage.Height / zz;
-                            }
-                            else
-                            {
-                                nw = w;
-                                nh = h;
-                            }
-                            using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
-                            {
-                                thumbnailBitmap.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
-                                using (Graphics thumbnailGraph = Graphics.FromImage(thumbnailBitmap))
-                                {
-                                    thumbnailGraph.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                                    thumbnailGraph.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                                    thumbnailGraph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                                    Rectangle imageRectangle = new Rectangle(0, 0, (int)nw, (int)nh);
-                                    thumbnailGraph.DrawImage(OriginalImage, imageRectangle);
-                                    thumbnailBitmap.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
-                                }
-                            }
-
                         }
                     }
                 }

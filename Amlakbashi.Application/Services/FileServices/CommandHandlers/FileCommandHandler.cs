@@ -24,7 +24,8 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
         IRequestHandler<GenerateThumbImageCommand, bool>,
         IRequestHandler<SetWatermarkCommand, string>,
         IRequestHandler<RemovePhotosByFileIdsCommand>,
-        IRequestHandler<RemovePhotosByPathsCommnd>
+        IRequestHandler<RemovePhotosByPathsCommnd>,
+        IRequestHandler<RenameAdvertisePhotosCommand>
     {
         private static readonly object objlock = new object();
         private readonly IRepository<Entities.File, long> fileRepository;
@@ -152,133 +153,121 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
         {
             try
             {
-                var accThumbPath = request.Path + "/content/accthumb/" + request.AdvertiseId;
-                var watermarkFolderPath = request.Path + "/content/imgcache/";
-                if (System.IO.Directory.Exists(accThumbPath))
+                lock (objlock)
                 {
-                    for (int i = 1; i <= 3; ++i)
+                    var accThumbPath = request.Path + "/content/accthumb/" + request.AdvertiseId;
+                    var watermarkFolderPath = request.Path + "/content/imgcache/";
+
+                    if (Directory.Exists(accThumbPath))
                     {
-                        try
-                        {
-                            Directory.Delete(accThumbPath, true);
-                            break;
-                        }
-                        catch (IOException exc) when (i <= 3)
-                        {
-                            logger.Error("FileCommandHandler.GenerateThumbImageCommand(delete old thumb directory)", exc);
-                            Thread.Sleep(1000);
-                        }
+                        Directory.Delete(accThumbPath, true);
                     }
-                }
 
-                var files = new List<Entities.File>();
-                if (request.PhotoAlbumIds.Count > 0)
-                {
-                    files.AddRange(fileRepository.Query(q => q.Where(w => request.PhotoAlbumIds.Contains(w.Id))));
-                }
-                if (request.MainPhotoId != null && !request.PhotoAlbumIds.Contains((long)request.MainPhotoId))
-                {
-                    files.Add(fileRepository.Find((long)request.MainPhotoId));
-                }
-
-                var watermarkedImageList = new List<string>();
-                var thumbs = new List<ImageThumbDTO>();
-                foreach (var file in files)
-                {
-                    if (File.Exists(request.Path + file.FilePath.Replace("~", "")) == false)
+                    var files = new List<Entities.File>();
+                    if (request.PhotoAlbumIds.Count > 0)
                     {
-                        continue;
+                        files.AddRange(fileRepository.Query(q => q.Where(w => request.PhotoAlbumIds.Contains(w.Id))));
                     }
-                    var waterPath = mediator.Send(new SetWatermarkCommand(file.Id, host.WebRootPath)).Result;
-                    //var origFilePath = request.Path + "/" + file.FilePathWithoutTildeAndSlash;
-                    var watermarkedImagePath = request.Path + waterPath;
-                    watermarkedImageList.Add(watermarkedImagePath);
-                    var fileThumbPath = accThumbPath + "/" + file.Id;
+                    if (request.MainPhotoId != null && request.PhotoAlbumIds.Contains((long)request.MainPhotoId) == false)
+                    {
+                        files.Add(fileRepository.Find((long)request.MainPhotoId));
+                    }
 
-                    thumbs.Add(new ImageThumbDTO()
+                    var watermarkedImageList = new List<string>();
+                    var thumbs = new List<ImageThumbDTO>();
+                    foreach (var file in files)
                     {
-                        directoryPath = fileThumbPath,
-                        OrigPath = watermarkedImagePath,
-                        thumbPath = fileThumbPath + "/appcard.jpg",
-                        w = 160,
-                        h = 114
-                    });
-                    thumbs.Add(new ImageThumbDTO()
-                    {
-                        directoryPath = fileThumbPath,
-                        OrigPath = watermarkedImagePath,
-                        thumbPath = fileThumbPath + "/appcarousel.jpg",
-                        w = 450,
-                        h = 300
-                    });
-                    thumbs.Add(new ImageThumbDTO()
-                    {
-                        directoryPath = fileThumbPath,
-                        OrigPath = watermarkedImagePath,
-                        thumbPath = fileThumbPath + "/card.jpg",
-                        w = 240,
-                        h = 144
-                    });
-                    thumbs.Add(new ImageThumbDTO()
-                    {
-                        directoryPath = fileThumbPath,
-                        OrigPath = watermarkedImagePath,
-                        thumbPath = fileThumbPath + "/xxxlarge.jpg",
-                        w = 700,
-                        h = 394
-                    });
-                    thumbs.Add(new ImageThumbDTO()
-                    {
-                        directoryPath = fileThumbPath,
-                        OrigPath = watermarkedImagePath,
-                        thumbPath = fileThumbPath + "/xxlarge.jpg",
-                        w = 600,
-                        h = 338
-                    });
-                    thumbs.Add(new ImageThumbDTO()
-                    {
-                        directoryPath = fileThumbPath,
-                        OrigPath = watermarkedImagePath,
-                        thumbPath = fileThumbPath + "/xlarge.jpg",
-                        w = 400,
-                        h = 253
-                    });
-                    thumbs.Add(new ImageThumbDTO()
-                    {
-                        directoryPath = fileThumbPath,
-                        OrigPath = watermarkedImagePath,
-                        thumbPath = fileThumbPath + "/large.jpg",
-                        w = 331,
-                        h = 186
-                    });
-                    thumbs.Add(new ImageThumbDTO()
-                    {
-                        directoryPath = fileThumbPath,
-                        OrigPath = watermarkedImagePath,
-                        thumbPath = fileThumbPath + "/medium.jpg",
-                        w = 249,
-                        h = 140
-                    });
-                    thumbs.Add(new ImageThumbDTO()
-                    {
-                        directoryPath = fileThumbPath,
-                        OrigPath = watermarkedImagePath,
-                        thumbPath = fileThumbPath + "/small.jpg",
-                        w = 213,
-                        h = 120
-                    });
-                    thumbs.Add(new ImageThumbDTO()
-                    {
-                        directoryPath = fileThumbPath,
-                        OrigPath = watermarkedImagePath,
-                        thumbPath = fileThumbPath + "/xsmall.jpg",
-                        w = 146,
-                        h = 82
-                    });
-                }
+                        if (File.Exists(request.Path + file.FilePathWithoutTilde) == false)
+                        {
+                            continue;
+                        }
+                        var waterPath = mediator.Send(new SetWatermarkCommand(file.Id, host.WebRootPath)).Result;
+                        var watermarkedImagePath = request.Path + waterPath;
+                        watermarkedImageList.Add(watermarkedImagePath);
+                        var fileThumbPath = accThumbPath + "/" + file.Id;
 
-                try
-                {
+                        thumbs.Add(new ImageThumbDTO()
+                        {
+                            directoryPath = fileThumbPath,
+                            OrigPath = watermarkedImagePath,
+                            thumbPath = fileThumbPath + "/appcard.jpg",
+                            w = 160,
+                            h = 114
+                        });
+                        thumbs.Add(new ImageThumbDTO()
+                        {
+                            directoryPath = fileThumbPath,
+                            OrigPath = watermarkedImagePath,
+                            thumbPath = fileThumbPath + "/appcarousel.jpg",
+                            w = 450,
+                            h = 300
+                        });
+                        thumbs.Add(new ImageThumbDTO()
+                        {
+                            directoryPath = fileThumbPath,
+                            OrigPath = watermarkedImagePath,
+                            thumbPath = fileThumbPath + "/card.jpg",
+                            w = 240,
+                            h = 144
+                        });
+                        thumbs.Add(new ImageThumbDTO()
+                        {
+                            directoryPath = fileThumbPath,
+                            OrigPath = watermarkedImagePath,
+                            thumbPath = fileThumbPath + "/xxxlarge.jpg",
+                            w = 700,
+                            h = 394
+                        });
+                        thumbs.Add(new ImageThumbDTO()
+                        {
+                            directoryPath = fileThumbPath,
+                            OrigPath = watermarkedImagePath,
+                            thumbPath = fileThumbPath + "/xxlarge.jpg",
+                            w = 600,
+                            h = 338
+                        });
+                        thumbs.Add(new ImageThumbDTO()
+                        {
+                            directoryPath = fileThumbPath,
+                            OrigPath = watermarkedImagePath,
+                            thumbPath = fileThumbPath + "/xlarge.jpg",
+                            w = 400,
+                            h = 253
+                        });
+                        thumbs.Add(new ImageThumbDTO()
+                        {
+                            directoryPath = fileThumbPath,
+                            OrigPath = watermarkedImagePath,
+                            thumbPath = fileThumbPath + "/large.jpg",
+                            w = 331,
+                            h = 186
+                        });
+                        thumbs.Add(new ImageThumbDTO()
+                        {
+                            directoryPath = fileThumbPath,
+                            OrigPath = watermarkedImagePath,
+                            thumbPath = fileThumbPath + "/medium.jpg",
+                            w = 249,
+                            h = 140
+                        });
+                        thumbs.Add(new ImageThumbDTO()
+                        {
+                            directoryPath = fileThumbPath,
+                            OrigPath = watermarkedImagePath,
+                            thumbPath = fileThumbPath + "/small.jpg",
+                            w = 213,
+                            h = 120
+                        });
+                        thumbs.Add(new ImageThumbDTO()
+                        {
+                            directoryPath = fileThumbPath,
+                            OrigPath = watermarkedImagePath,
+                            thumbPath = fileThumbPath + "/xsmall.jpg",
+                            w = 146,
+                            h = 82
+                        });
+                    }
+
                     foreach (var thumb in thumbs)
                     {
                         if (File.Exists(thumb.OrigPath))
@@ -291,46 +280,20 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             using (Image origImage = Image.FromStream(stream))
                             {
                                 var thumbImage = ImageUtility.ResizeImageKeepAspectRatio(origImage, thumb.w, thumb.h);
-                                //ImageUtility.SaveThumb(thumbImage, thumb.thumbPath, thumb.OrigPath);
-
                                 var format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
                                 var encoderParameters = new EncoderParameters(1);
                                 encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
-                                try
-                                {
-                                    thumbImage.Save(thumb.thumbPath, format, encoderParameters);
-                                }
-                                catch (Exception exc)
-                                {
-                                    var existDir = Directory.Exists(thumb.thumbPath).ToString();
-                                    logger.Error($"FileCommandHandler.GenerateThumbImageCommand(generate thumbs: save image: {existDir})", exc);
-                                }
+                                thumbImage.Save(thumb.thumbPath, format, encoderParameters);
                                 thumbImage.Dispose();
                             }
                         }
                     }
-                }
-                catch (Exception exc)
-                {
-                    logger.Error("FileCommandHandler.GenerateThumbImageCommand(generate thumbs)", exc);
-                }
 
-                foreach (var item in watermarkedImageList)
-                {
-                    for (int i = 1; i <= 3; ++i)
+                    foreach (var item in watermarkedImageList)
                     {
-                        try
+                        if (File.Exists(item))
                         {
-                            if (File.Exists(item))
-                            {
-                                File.Delete(item);
-                            }
-                            break;
-                        }
-                        catch (IOException exc) when (i <= 3)
-                        {
-                            logger.Error("FileCommandHandler.GenerateThumbImageCommand(delete watermarked images)", exc);
-                            Thread.Sleep(1000);
+                            File.Delete(item);
                         }
                     }
                 }
@@ -353,71 +316,68 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 if (file == null || File.Exists(filePath) == false)
                     return Task.FromResult(waterPath);
 
-                lock (objlock)
+                double ratio = 4.5;
+                using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (Image watermarkImage = Image.FromFile(request.ServerPath + "/resource/img/water_logo.png"))
+                using (Image image = Image.FromStream(stream))
                 {
-                    double ratio = 4.5;
-                    using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    using (Image watermarkImage = Image.FromFile(request.ServerPath + "/resource/img/water_logo.png"))
-                    using (Image image = Image.FromStream(stream))
+                    int waterWidth = Convert.ToInt16((double)image.Width / ratio);
+                    double waterRate = (double)watermarkImage.Width / (double)waterWidth;
+                    int waterHeight = Convert.ToInt16((double)watermarkImage.Height / waterRate);
+                    string logoPath = "";
+
+                    using (Bitmap thumbnailBitmap = new Bitmap(waterWidth, waterHeight))
                     {
-                        int waterWidth = Convert.ToInt16((double)image.Width / ratio);
-                        double waterRate = (double)watermarkImage.Width / (double)waterWidth;
-                        int waterHeight = Convert.ToInt16((double)watermarkImage.Height / waterRate);
-                        string logoPath = "";
-
-                        using (Bitmap thumbnailBitmap = new Bitmap(waterWidth, waterHeight))
+                        thumbnailBitmap.SetResolution(watermarkImage.HorizontalResolution, watermarkImage.VerticalResolution);
+                        using (Graphics new_watermark = Graphics.FromImage(thumbnailBitmap))
                         {
-                            thumbnailBitmap.SetResolution(watermarkImage.HorizontalResolution, watermarkImage.VerticalResolution);
-                            using (Graphics new_watermark = Graphics.FromImage(thumbnailBitmap))
-                            {
-                                new_watermark.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                                new_watermark.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                                new_watermark.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                                Rectangle imageRectangle = new Rectangle(0, 0, waterWidth, waterHeight);
-                                new_watermark.DrawImage(watermarkImage, imageRectangle);
-                                logoPath = "/content/logocache/" + string.Format("logo_{0}.png", file.Id);
-                                ImageCodecInfo format = ImageUtility.GetEncoder(ImageFormat.Png);
-                                EncoderParameters encoderParameters = new EncoderParameters(1);
+                            new_watermark.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                            new_watermark.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                            new_watermark.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                            Rectangle imageRectangle = new Rectangle(0, 0, waterWidth, waterHeight);
+                            new_watermark.DrawImage(watermarkImage, imageRectangle);
+                            logoPath = "/content/logocache/" + string.Format("logo_{0}.png", file.Id);
+                            ImageCodecInfo format = ImageUtility.GetEncoder(ImageFormat.Png);
+                            EncoderParameters encoderParameters = new EncoderParameters(1);
+                            encoderParameters.Param[0] = new EncoderParameter(Encoder.Compression, (long)EncoderValue.CompressionLZW);
+                            thumbnailBitmap.Save(request.ServerPath + logoPath, format, encoderParameters);
+                        }
+                    }
+
+                    using (Image NewWatermarkImage = Image.FromFile(request.ServerPath + logoPath))
+                    using (Graphics imageGraphics = Graphics.FromImage(image))
+                    using (TextureBrush watermarkBrush = new TextureBrush(NewWatermarkImage))
+                    {
+                        int x = image.Width - Convert.ToInt16((double)waterWidth + ((double)waterWidth / 10));
+                        int y = image.Height - Convert.ToInt16((double)waterHeight + ((double)waterHeight / 10));
+                        watermarkBrush.TranslateTransform(x, y);
+                        imageGraphics.FillRectangle(watermarkBrush, new Rectangle(new Point(x, y), new Size(waterWidth + 1, waterHeight)));
+                        waterPath = "/content/advertisecache/" + file.FilePath.Substring(file.FilePath.LastIndexOf('/') + 1);
+                        var extension = System.IO.Path.GetExtension(request.ServerPath + waterPath);
+                        ImageCodecInfo format;
+                        EncoderParameters encoderParameters;
+                        switch (extension)
+                        {
+                            case ".png":
+                                format = ImageUtility.GetEncoder(ImageFormat.Png);
+                                encoderParameters = new EncoderParameters(1);
                                 encoderParameters.Param[0] = new EncoderParameter(Encoder.Compression, (long)EncoderValue.CompressionLZW);
-                                thumbnailBitmap.Save(request.ServerPath + logoPath, format, encoderParameters);
-                            }
+                                break;
+                            case ".gif":
+                                format = ImageUtility.GetEncoder(ImageFormat.Gif);
+                                encoderParameters = new EncoderParameters(0);
+                                break;
+                            default:
+                                format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
+                                encoderParameters = new EncoderParameters(1);
+                                encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
+                                break;
                         }
-
-                        using (Image NewWatermarkImage = Image.FromFile(request.ServerPath + logoPath))
-                        using (Graphics imageGraphics = Graphics.FromImage(image))
-                        using (TextureBrush watermarkBrush = new TextureBrush(NewWatermarkImage))
-                        {
-                            int x = image.Width - Convert.ToInt16((double)waterWidth + ((double)waterWidth / 10));
-                            int y = image.Height - Convert.ToInt16((double)waterHeight + ((double)waterHeight / 10));
-                            watermarkBrush.TranslateTransform(x, y);
-                            imageGraphics.FillRectangle(watermarkBrush, new Rectangle(new Point(x, y), new Size(waterWidth + 1, waterHeight)));
-                            waterPath = "/content/advertisecache/" + file.FilePath.Substring(file.FilePath.LastIndexOf('/') + 1);
-                            var extension = System.IO.Path.GetExtension(request.ServerPath + waterPath);
-                            ImageCodecInfo format;
-                            EncoderParameters encoderParameters;
-                            switch (extension)
-                            {
-                                case ".png":
-                                    format = ImageUtility.GetEncoder(ImageFormat.Png);
-                                    encoderParameters = new EncoderParameters(1);
-                                    encoderParameters.Param[0] = new EncoderParameter(Encoder.Compression, (long)EncoderValue.CompressionLZW);
-                                    break;
-                                case ".gif":
-                                    format = ImageUtility.GetEncoder(ImageFormat.Gif);
-                                    encoderParameters = new EncoderParameters(0);
-                                    break;
-                                default:
-                                    format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
-                                    encoderParameters = new EncoderParameters(1);
-                                    encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
-                                    break;
-                            }
-                            image.Save(request.ServerPath + waterPath, format, encoderParameters);
-                        }
-                        if (File.Exists(request.ServerPath + logoPath))
-                        {
-                            File.Delete(request.ServerPath + logoPath);
-                        }
+                        image.Save(request.ServerPath + waterPath, format, encoderParameters);
+                    }
+                    if (File.Exists(request.ServerPath + logoPath))
+                    {
+                        File.Delete(request.ServerPath + logoPath);
                     }
                 }
                 return Task.FromResult(waterPath);
@@ -435,49 +395,88 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
             {
                 bool hasChange = false;
                 var files = fileRepository.Query(q => q.Where(w => request.PhotoIds.Contains(w.Id)));
-                foreach (var item in files)
+                lock (objlock)
                 {
-                    if (item.Advertises.Count == 0)
+                    foreach (var item in files)
                     {
-                        fileRepository.Delete(item.Id);
-                        if (File.Exists(Path.Combine(host.WebRootPath, item.FilePathWithoutTildeAndSlash)))
+
+                        if (item.Advertises.Count == 0)
                         {
-                            File.Delete(Path.Combine(host.WebRootPath, item.FilePathWithoutTildeAndSlash));
+                            fileRepository.Delete(item.Id);
+                            if (File.Exists(Path.Combine(host.WebRootPath, item.FilePathWithoutTildeAndSlash)))
+                            {
+                                File.Delete(Path.Combine(host.WebRootPath, item.FilePathWithoutTildeAndSlash));
+                            }
+                            hasChange = true;
                         }
-                        hasChange = true;
                     }
                 }
                 if (hasChange)
                 {
                     fileRepository.Save();
                 }
-                return Task.FromResult(Unit.Value);
             }
             catch (Exception exc)
             {
                 logger.Error("FileCommandHandler.RemovePhotosByFileIdsCommand", exc);
-                return Task.FromResult(Unit.Value);
             }
+            return Task.FromResult(Unit.Value);
         }
 
         public Task<Unit> Handle(RemovePhotosByPathsCommnd request, CancellationToken cancellationToken)
         {
             try
             {
-                foreach (var item in request.PathList)
+                lock (objlock)
                 {
-                    if (File.Exists(Path.Combine(host.WebRootPath, item)))
+                    foreach (var item in request.PathList)
                     {
-                        File.Delete(Path.Combine(host.WebRootPath, item));
+                        if (File.Exists(Path.Combine(host.WebRootPath, item)))
+                        {
+                            File.Delete(Path.Combine(host.WebRootPath, item));
+                        }
                     }
                 }
-                return Task.FromResult(Unit.Value);
             }
             catch (Exception exc)
             {
                 logger.Error("FileCommandHandler.RemovePhotosByPathsCommnd", exc);
-                return Task.FromResult(Unit.Value);
             }
+            return Task.FromResult(Unit.Value);
+        }
+
+        public Task<Unit> Handle(RenameAdvertisePhotosCommand request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var acc = fileRepository.Find<Entities.Advertise, long>(request.AdvertiseId);
+                lock (objlock)
+                {
+                    foreach (var item in acc.Photos)
+                    {
+                        if (item.FilePath.Contains($"/advertise_{item.Id}.") ||
+                            item.FilePath.Contains($"/advertise_") == false)
+                        {
+                            var fileName = $"advertise_{acc.Id}_{item.Id}";
+                            var oldFilePath = host.WebRootPath + item.FilePathWithoutTilde;
+                            var newDbFilePath = $"~/content/advertise/{fileName}.jpg";
+                            var newFilePath = $"{host.WebRootPath}/content/advertise/{fileName}.jpg";
+                            if (File.Exists(oldFilePath))
+                            {
+                                File.Move(oldFilePath, newFilePath, true);
+                                item.FilePath = newDbFilePath;
+                                fileRepository.Update(item);
+                            }
+                        }
+                    }
+                    fileRepository.Save();
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("FileCommandHandler.RenameAdvertisePhotosCommand", exc);
+            }
+            return Task.FromResult(Unit.Value);
         }
     }
 }
