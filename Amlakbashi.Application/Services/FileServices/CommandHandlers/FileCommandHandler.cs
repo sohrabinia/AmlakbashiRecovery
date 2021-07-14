@@ -156,7 +156,6 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 lock (objlock)
                 {
                     var accThumbPath = request.Path + "/content/accthumb/" + request.AdvertiseId;
-                    var watermarkFolderPath = request.Path + "/content/imgcache/";
 
                     if (Directory.Exists(accThumbPath))
                     {
@@ -336,7 +335,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             new_watermark.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                             Rectangle imageRectangle = new Rectangle(0, 0, waterWidth, waterHeight);
                             new_watermark.DrawImage(watermarkImage, imageRectangle);
-                            logoPath = "/content/logocache/" + string.Format("logo_{0}.png", file.Id);
+                            logoPath = "/content/advertise/temp/" + string.Format("logo_{0}.png", file.Id);
                             ImageCodecInfo format = ImageUtility.GetEncoder(ImageFormat.Png);
                             EncoderParameters encoderParameters = new EncoderParameters(1);
                             encoderParameters.Param[0] = new EncoderParameter(Encoder.Compression, (long)EncoderValue.CompressionLZW);
@@ -352,7 +351,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                         int y = image.Height - Convert.ToInt16((double)waterHeight + ((double)waterHeight / 10));
                         watermarkBrush.TranslateTransform(x, y);
                         imageGraphics.FillRectangle(watermarkBrush, new Rectangle(new Point(x, y), new Size(waterWidth + 1, waterHeight)));
-                        waterPath = "/content/advertisecache/" + file.FilePath.Substring(file.FilePath.LastIndexOf('/') + 1);
+                        waterPath = "/content/advertise/temp/" + file.FilePath.Substring(file.FilePath.LastIndexOf('/') + 1);
                         var extension = System.IO.Path.GetExtension(request.ServerPath + waterPath);
                         ImageCodecInfo format;
                         EncoderParameters encoderParameters;

@@ -808,6 +808,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         {
                             mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
                         }
+                        mediator.Send(new RenameAdvertisePhotosCommand(child.Id));
                     }
                     child.LastModifyDate = DateTime.Now;
                     Repository.Update(child);
@@ -1009,6 +1010,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     {
                         mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
                     }
+                    mediator.Send(new RenameAdvertisePhotosCommand(data.Id));
                 }
                 mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id, true));
             }
