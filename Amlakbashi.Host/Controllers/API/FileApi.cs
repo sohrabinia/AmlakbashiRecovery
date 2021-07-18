@@ -124,11 +124,20 @@ namespace Amlakbashi.Host.Controllers.API
         [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetAdvertiseImage(long id, string cid, long accid = 0)
         {
-            if (accid > 0)
+            try
             {
-                return AccThumb(accid, id, "appcarousel");
+                if (accid > 0)
+                {
+                    return AccThumb(accid, id, "appcarousel");
+                }
+                return GetImage(id, 450, 300, cid);
             }
-            return GetImage(id, 450, 300, cid);
+            catch (Exception exc)
+            {
+                logger.Error("FileApi.GetAdvertiseImage", exc);
+                return GetImage(202, 450, 300, cid);
+            }
+            
         }
 
         [ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]

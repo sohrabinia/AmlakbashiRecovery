@@ -310,7 +310,6 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
         {
             try
             {
-                throw new Exception();
                 var file = fileRepository.Find(request.FileId);
                 var filePath = request.ServerPath + file.FilePathWithoutTilde;
                 string waterPath = string.Empty;
