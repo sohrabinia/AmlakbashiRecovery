@@ -162,7 +162,14 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 Payment objpay = accounting.FindPayment(id);
-                #region [ Pasargad ]
+                if (objpay == null || objpay.Status == 1)
+                {
+                    return RedirectToRoute(new
+                    {
+                        controller = "errors",
+                        action = "http404"
+                    });
+                }
 
                 var amount = objpay.TotalPrice;
                 string redirectAddress;
@@ -183,7 +190,6 @@ namespace Amlakbashi.Host.Controllers
                 var result = accounting.GeneratePaymentData(BanksEnum.Pasargad,
                     (int)id, redirectAddress);
                 return View("Bank", result);
-                #endregion
             }
             catch (Exception exc)
             {
@@ -198,12 +204,20 @@ namespace Amlakbashi.Host.Controllers
         public ActionResult PerformPay(int payment_id)
         {
             var objpay = accounting.FindPayment(payment_id);
+            if (objpay == null || objpay.Status == 1)
+            {
+                return RedirectToRoute(new
+                {
+                    controller = "errors",
+                    action = "http404"
+                });
+            }
             objpay.Date = DateTime.Now;
-            ViewBag.PayPrice = objpay.TotalPrice;
-            ViewBag.PayDate = DateTimeUtility.ConvertDate(objpay.Date);
             objpay.Authority = "";
             objpay.BankId = 0;
             accounting.UpdatePayment(objpay);
+            ViewBag.PayPrice = objpay.TotalPrice;
+            ViewBag.PayDate = DateTimeUtility.ConvertDate(objpay.Date);
             return View(objpay);
         }
 
