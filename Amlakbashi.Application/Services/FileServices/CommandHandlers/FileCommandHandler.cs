@@ -181,7 +181,9 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             continue;
                         }
                         var waterPath = mediator.Send(new SetWatermarkCommand(file.Id, host.WebRootPath)).Result;
-                        var watermarkedImagePath = request.Path + waterPath;
+                        var watermarkedImagePath = string.IsNullOrEmpty(waterPath) ? 
+                            request.Path + file.FilePathWithoutTilde :
+                            request.Path + waterPath;
                         watermarkedImageList.Add(watermarkedImagePath);
                         var fileThumbPath = accThumbPath + "/" + file.Id;
 
@@ -308,8 +310,9 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
         {
             try
             {
+                throw new Exception();
                 var file = fileRepository.Find(request.FileId);
-                var filePath = request.ServerPath + file.FilePath.Replace("~", "");
+                var filePath = request.ServerPath + file.FilePathWithoutTilde;
                 string waterPath = string.Empty;
 
                 if (file == null || File.Exists(filePath) == false)

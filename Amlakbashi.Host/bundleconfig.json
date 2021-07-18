@@ -92,7 +92,8 @@
   {
     "outputFileName": "wwwroot/js/dashboard.min.js",
     "inputFiles": [
-      "wwwroot/resource/scripts/jquery-2.1.1.min.js",
+      //"wwwroot/resource/scripts/jquery-2.1.1.min.js",
+      "wwwroot/lib/jquery/dist/jquery.min.js",
       "wwwroot/lib/dropzone/dropzone.js",
       "wwwroot/resource/scripts/jquery.maskedinput.min.js",
       "wwwroot/resource/scripts/jquery.nicescroll.min.js",
@@ -210,7 +211,7 @@
   {
     "outputFileName": "wwwroot/js/master.min.js",
     "inputFiles": [
-      "wwwroot/resource/scripts/jquery-2.1.1.min.js",
+      "wwwroot/lib/jquery/dist/jquery.min.js",
       "wwwroot/resource/scripts/firebase-5.9.4/firebase-app.js",
       "wwwroot/resource/scripts/firebase-5.9.4/firebase-messaging.js",
       "wwwroot/resource/scripts/firebase/firebase-initialization.js"
