@@ -290,9 +290,12 @@ namespace Portal.Controllers
                         //    nw = w;
                         //    nh = h;
                         //}
-                        using (var result = (Bitmap)ImageUtility.ResizeImageKeepAspectRatio(OriginalImage, (int)w, (int)h))
+                        lock (objlock)
                         {
-                            result.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
+                            using (var result = (Bitmap)ImageUtility.ResizeImageKeepAspectRatio(OriginalImage, (int)w, (int)h))
+                            {
+                                result.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
+                            }
                         }
                         //using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
                         //{
@@ -427,17 +430,20 @@ namespace Portal.Controllers
                             nw = w;
                             nh = h;
                         }
-                        using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
+                        lock (objlock)
                         {
-                            thumbnailBitmap.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
-                            using (Graphics thumbnailGraph = Graphics.FromImage(thumbnailBitmap))
+                            using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
                             {
-                                thumbnailGraph.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                                thumbnailGraph.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                                thumbnailGraph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                                Rectangle imageRectangle = new Rectangle(0, 0, (int)nw, (int)nh);
-                                thumbnailGraph.DrawImage(OriginalImage, imageRectangle);
-                                thumbnailBitmap.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
+                                thumbnailBitmap.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
+                                using (Graphics thumbnailGraph = Graphics.FromImage(thumbnailBitmap))
+                                {
+                                    thumbnailGraph.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                                    thumbnailGraph.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                                    thumbnailGraph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                                    Rectangle imageRectangle = new Rectangle(0, 0, (int)nw, (int)nh);
+                                    thumbnailGraph.DrawImage(OriginalImage, imageRectangle);
+                                    thumbnailBitmap.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
+                                }
                             }
                         }
                     }
@@ -507,17 +513,20 @@ namespace Portal.Controllers
                             nw = w;
                             nh = h;
                         }
-                        using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
+                        lock (objlock)
                         {
-                            thumbnailBitmap.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
-                            using (Graphics thumbnailGraph = Graphics.FromImage(thumbnailBitmap))
+                            using (Bitmap thumbnailBitmap = new Bitmap((int)nw, (int)nh))
                             {
-                                thumbnailGraph.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                                thumbnailGraph.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                                thumbnailGraph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                                Rectangle imageRectangle = new Rectangle(0, 0, (int)nw, (int)nh);
-                                thumbnailGraph.DrawImage(OriginalImage, imageRectangle);
-                                thumbnailBitmap.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
+                                thumbnailBitmap.SetResolution(OriginalImage.HorizontalResolution, OriginalImage.VerticalResolution);
+                                using (Graphics thumbnailGraph = Graphics.FromImage(thumbnailBitmap))
+                                {
+                                    thumbnailGraph.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                                    thumbnailGraph.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                                    thumbnailGraph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                                    Rectangle imageRectangle = new Rectangle(0, 0, (int)nw, (int)nh);
+                                    thumbnailGraph.DrawImage(OriginalImage, imageRectangle);
+                                    thumbnailBitmap.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
+                                }
                             }
                         }
                     }
