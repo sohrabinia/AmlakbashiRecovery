@@ -279,13 +279,15 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             }
                             using (FileStream stream = new FileStream(thumb.OrigPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                             using (Image origImage = Image.FromStream(stream))
+                            using (Image thumbImage = ImageUtility.ResizeImageKeepAspectRatio(origImage, thumb.w, thumb.h))
                             {
-                                var thumbImage = ImageUtility.ResizeImageKeepAspectRatio(origImage, thumb.w, thumb.h);
-                                var format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
-                                var encoderParameters = new EncoderParameters(1);
-                                encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
-                                thumbImage.Save(thumb.thumbPath, format, encoderParameters);
-                                thumbImage.Dispose();
+                                //var thumbImage = ImageUtility.ResizeImageKeepAspectRatio(origImage, thumb.w, thumb.h);
+                                ImageUtility.SaveThumb(thumbImage, thumb.thumbPath, thumb.OrigPath);
+                                //var format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
+                                //var encoderParameters = new EncoderParameters(1);
+                                //encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
+                                //thumbImage.Save(thumb.thumbPath, format, encoderParameters);
+                                //thumbImage.Dispose();
                             }
                         }
                     }

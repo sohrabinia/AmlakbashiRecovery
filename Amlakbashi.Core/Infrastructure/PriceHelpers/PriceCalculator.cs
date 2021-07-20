@@ -66,6 +66,14 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                     bool is_holiday_pike;
                     bool is_norouz;
                     localization.GetJalaliDateHolidayStatus(jalaliDate, out is_holiday_or_between, out is_holiday_pike, out is_norouz);
+                    // TODO: temp
+                    if (advertise.TypeID == Advertise.AdvertiseType.Villa &&
+                        (advertise.Province == 1 || advertise.Province == 352) &&
+                        gregorianDate.Month == 7 && (gregorianDate.Day == 23 || gregorianDate.Day == 24 || gregorianDate.Day == 25))
+                    {
+                        is_holiday_pike = true;
+                    }
+                    // ##########
                     if (is_norouz && advertise.NorouzPrice > 0)
                     {
                         priceWithoutDiscount = advertise.NorouzPrice;
