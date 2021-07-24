@@ -558,15 +558,15 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.LastModifyDate = DateTime.Now;
             Repository.Update(acc);
             Repository.Save();
+            mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id));
+            mediator.Publish(new ChangeAdvertiseAddressEvent(shallowAcc, acc));
             if (removedPhotoIds.Any())
             {
                 mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
             }
-            mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id));
-            mediator.Publish(new ChangeAdvertiseAddressEvent(shallowAcc, acc));
+            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
             mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID,
                     acc.Photos.Select(s => s.Id).ToList(), rootPath));
-            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
             return director;
         }
 
@@ -787,11 +787,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     var child = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
                     var oldChild = child.ShallowCopy();
                     director.Submit(ref child);
-
                     var removedPhotoIds = new List<long>();
                     var photoPart = director.GetAdvertisePart<PhotoPart>();
                     var photoIds = photoPart.AlbumPhotosArray;
-                    if (!child.Photos.Select(s => s.Id).SequenceEqual(photoIds))
+                    var hasPhotoChange = !child.Photos.Select(s => s.Id).SequenceEqual(photoIds);
+                    if (hasPhotoChange)
                     {
                         if (photoIds != null && photoIds.Count() > 0)
                         {
@@ -807,13 +807,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                             removedPhotoIds = child.Photos.Select(s => s.Id).ToList();
                             child.Photos.Clear();
                         }
-                        mediator.Send(new GenerateThumbImageCommand(child.Id, child.PhotoID,
-                            child.Photos.Select(s => s.Id).ToList(), rootPath));
-                        if (removedPhotoIds.Any())
-                        {
-                            mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
-                        }
-                        mediator.Send(new RenameAdvertisePhotosCommand(child.Id));
+                        //if (removedPhotoIds.Any())
+                        //{
+                        //    mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+                        //}
+                        //mediator.Send(new RenameAdvertisePhotosCommand(child.Id));
+                        //mediator.Send(new GenerateThumbImageCommand(child.Id, child.PhotoID,
+                        //    child.Photos.Select(s => s.Id).ToList(), rootPath));
+                        
                     }
                     child.LastModifyDate = DateTime.Now;
                     Repository.Update(child);
@@ -839,6 +840,16 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         mediator.Publish(new ChangeAdvertiseActiveEvent(oldParent, parent));
                     }
                     Repository.Save();
+                    if (hasPhotoChange)
+                    {
+                        if (removedPhotoIds.Any())
+                        {
+                            mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+                        }
+                        mediator.Send(new RenameAdvertisePhotosCommand(child.Id));
+                        mediator.Send(new GenerateThumbImageCommand(child.Id, child.PhotoID,
+                            child.Photos.Select(s => s.Id).ToList(), rootPath));
+                    }
                 }
                 else
                 {
@@ -888,6 +899,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     }
                     if (photoIds != null && photoIds.Count() > 0)
                     {
+                        mediator.Send(new RenameAdvertisePhotosCommand(data.Id));
                         mediator.Send(new GenerateThumbImageCommand(data.Id, data.PhotoID,
                             data.Photos.Select(s => s.Id).ToList(), rootPath));
                     }
@@ -993,7 +1005,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 var removedPhotoIds = new List<long>();
                 var photoPart = director.GetAdvertisePart<PhotoPart>();
                 var photoIds = photoPart.AlbumPhotosArray;
-                if (!acc.Photos.Select(s => s.Id).SequenceEqual(photoIds))
+                var hasPhotoChange = !acc.Photos.Select(s => s.Id).SequenceEqual(photoIds);
+                if (hasPhotoChange)
                 {
                     if (photoIds != null && photoIds.Count() > 0)
                     {
@@ -1009,13 +1022,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         removedPhotoIds = acc.Photos.Select(s => s.Id).ToList();
                         acc.Photos.Clear();
                     }
-                    mediator.Send(new GenerateThumbImageCommand(data.Id, acc.PhotoID,
-                            acc.Photos.Select(s => s.Id).ToList(), rootPath));
                     if (removedPhotoIds.Any())
                     {
                         mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
                     }
                     mediator.Send(new RenameAdvertisePhotosCommand(data.Id));
+                    mediator.Send(new GenerateThumbImageCommand(data.Id, acc.PhotoID,
+                            acc.Photos.Select(s => s.Id).ToList(), rootPath));
                 }
                 mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id, true));
             }
@@ -1471,18 +1484,19 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 var file = Repository.Find<File, long>(item);
                 acc.Photos.Add(file);
             }
-            if (removedPhotoIds.Any())
-            {
-                mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
-            }
+            //if (removedPhotoIds.Any())
+            //{
+            //    mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+            //}
             acc.PhotoID = editedData.mainPhoto;
             acc.AlbumPhoto = editedData.ConvertAlbumToString();
             acc.LastModifyDate = DateTime.Now;
-            var thumbStatus = mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID, editedData.album, rootPath)).Result;
-            if (thumbStatus)
-            {
-                acc.ImageThumbGenerateStatus = ImageThumbStatusEnum.Done;
-            }
+            //mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
+            //var thumbStatus = mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID, editedData.album, rootPath)).Result;
+            //if (thumbStatus)
+            //{
+            //    acc.ImageThumbGenerateStatus = ImageThumbStatusEnum.Done;
+            //}
             var director = new AdvertiseDirector(acc, DirectorType.General);
             var hasImportantChange = director.HasImpotantChange(shallowAcc);
             if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
@@ -1497,7 +1511,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
             }
+            if (removedPhotoIds.Any())
+            {
+                mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+            }
             mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
+            mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID, editedData.album, rootPath));
             return true;
         }
 

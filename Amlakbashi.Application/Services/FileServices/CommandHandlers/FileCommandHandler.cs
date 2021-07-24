@@ -458,6 +458,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                     foreach (var item in acc.Photos)
                     {
                         if (item.FilePath.Contains($"/advertise_{item.Id}.") ||
+                            item.FilePath.Contains($"/advertise_0_") ||
                             item.FilePath.Contains($"/advertise_") == false)
                         {
                             var fileName = $"advertise_{acc.Id}_{item.Id}";

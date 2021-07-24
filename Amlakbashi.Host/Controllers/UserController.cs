@@ -1729,6 +1729,13 @@ namespace Amlakbashi.Host.Controllers
 
         public JsonResult IsUserLoginBanned()
         {
+            if (User.Identity.IsAuthenticated == false || string.IsNullOrEmpty(userAccessor.CurrentUser.MainMobile))
+            {
+                return GenerateJsonResult(new
+                {
+                    val = false
+                });
+            }
             var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
             return GenerateJsonResult(
                 new
