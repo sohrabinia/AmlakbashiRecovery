@@ -43,8 +43,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         private readonly UserManager<AppUser> userManager;
         private readonly IMediator mediator;
         public AdvertiseAppService(IRepository<Advertise, long> repository,
-            IMediator mediator, ICacheManager<Advertise> cache,
-            IPriceCalculator priceCalculator, UserManager<AppUser> userManager) : base(repository, cache)
+            IMediator mediator, IPriceCalculator priceCalculator, UserManager<AppUser> userManager) : base(repository)
         {
             this.mediator = mediator;
             this.priceCalculator = priceCalculator;

@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Common.Caching
 {
-    public interface ICacheManager<T>
+    public interface ICacheManager
     {
-        T Set(T entity);
-        T Get(object id);
-
-        bool Remove(object id);
+        T Set<T>(string key, T entity);
+        T Get<T>(string key);
+        void Remove(string key);
     }
 }

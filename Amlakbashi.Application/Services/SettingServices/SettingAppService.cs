@@ -10,7 +10,7 @@ namespace Amlakbashi.Application.Services.SettingServices
 {
     public class SettingAppService : AppServiceBase<Setting, int>, ISettingAppService
     {
-        public SettingAppService(IRepository<Setting, int> repository, ICacheManager<Setting> cache) : base(repository, cache)
+        public SettingAppService(IRepository<Setting, int> repository) : base(repository)
         {
         }
 

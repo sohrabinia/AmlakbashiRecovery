@@ -1,7 +1,6 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 {
     internal class DiscountTableAppService : AppServiceBase<DiscountTable, int>, IDiscountTableAppService
     {
-        public DiscountTableAppService(IRepository<DiscountTable, int> repository, ICacheManager<DiscountTable> cache) : base(repository, cache)
+        public DiscountTableAppService(IRepository<DiscountTable, int> repository) : base(repository)
         {
         }
 

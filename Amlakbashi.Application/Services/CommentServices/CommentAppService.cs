@@ -1,9 +1,7 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.CommentServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Data;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,9 +9,8 @@ namespace Amlakbashi.Application.Services.CommentServices
 {
     internal class CommentAppService : AppServiceBase<Comment, long>, ICommentAppService
     {
-        public CommentAppService(IRepository<Comment, long> repository, ICacheManager<Comment> cache) : base(repository, cache)
+        public CommentAppService(IRepository<Comment, long> repository) : base(repository)
         {
-
         }
 
         //TODO: Delete this

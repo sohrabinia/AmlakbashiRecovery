@@ -1,7 +1,6 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -13,10 +12,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 {
     internal class RegionAppService : AppServiceBase<Region, int>, IRegionAppService
     {
-        public RegionAppService(IRepository<Region, int> repository,
-            ICacheManager<Region> cache) : base(repository, cache)
+        public RegionAppService(IRepository<Region, int> repository) : base(repository)
         {
-
         }
 
         public IList<Region> Filter(AdvertiseRegion type, int parentId = 0,

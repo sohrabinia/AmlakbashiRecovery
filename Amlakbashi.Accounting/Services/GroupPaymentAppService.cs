@@ -1,6 +1,5 @@
 ﻿using Amlakbashi.Accounting.Services.Interfaces;
 using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using System;
@@ -13,7 +12,7 @@ namespace Amlakbashi.Accounting.Services
 {
     internal class GroupPaymentAppService : AppServiceBase<GroupPayment, int>, IGroupPaymentAppService
     {
-        public GroupPaymentAppService(IRepository<GroupPayment, int> repository, ICacheManager<GroupPayment> cache) : base(repository, cache)
+        public GroupPaymentAppService(IRepository<GroupPayment, int> repository) : base(repository)
         {
         }
 

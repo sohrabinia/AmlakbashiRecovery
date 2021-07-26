@@ -1,6 +1,5 @@
 ﻿using Amlakbashi.Accounting.Services.Interfaces;
 using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
@@ -14,7 +13,7 @@ namespace Amlakbashi.Accounting.Services
 {
     internal class PaymentAppService : AppServiceBase<Payment, int>, IPaymentAppService
     {
-        public PaymentAppService(IRepository<Payment, int> repository, ICacheManager<Payment> cache) : base(repository, cache)
+        public PaymentAppService(IRepository<Payment, int> repository) : base(repository)
         {
         }
 

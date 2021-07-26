@@ -1,16 +1,10 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.ReserveServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Data;
-using ServiceStack;
-using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediatR;
 using Amlakbashi.Mediator.Commands.ReserveCommands;
 using Amlakbashi.Core.Common.Extensions;
@@ -20,8 +14,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
     internal class ChatAppService : AppServiceBase<Chat, long>, IChatAppService
     {
         private readonly IMediator mediator;
-        public ChatAppService(IRepository<Chat, long> repository,
-            ICacheManager<Chat> cache, IMediator mediator) : base(repository, cache)
+        public ChatAppService(IRepository<Chat, long> repository, IMediator mediator) : base(repository)
         {
             this.mediator = mediator;
         }

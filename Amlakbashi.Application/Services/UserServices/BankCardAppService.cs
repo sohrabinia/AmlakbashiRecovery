@@ -1,7 +1,6 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
 using MediatR;
 using System;
@@ -15,7 +14,7 @@ namespace Amlakbashi.Application.Services.UserServices
     internal class BankCardAppService : AppServiceBase<BankCard, int>, IBankCardAppService
     {
         private readonly IMediator mediator;
-        public BankCardAppService(IRepository<BankCard, int> repository, ICacheManager<BankCard> cache, IMediator mediator) : base(repository, cache)
+        public BankCardAppService(IRepository<BankCard, int> repository, IMediator mediator) : base(repository)
         {
             this.mediator = mediator;
         }

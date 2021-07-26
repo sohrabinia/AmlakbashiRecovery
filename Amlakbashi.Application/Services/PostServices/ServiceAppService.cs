@@ -2,7 +2,6 @@
 using Amlakbashi.Core.Common.Repository;
 using System.Collections.Generic;
 using Amlakbashi.Application.Services.PostServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
 using System.Linq;
 using System.Transactions;
@@ -14,14 +13,10 @@ namespace Amlakbashi.Application.Services.PostServices
     internal class ServiceAppService : AppServiceBase<Service, int>, IServiceAppService
     {
         private readonly IMediator mediator;
-        private readonly IRepository<ServicePost, int> servicePostRepository;
         public ServiceAppService(IRepository<Service, int> repository,
-            IRepository<ServicePost, int> servicePostRepository,
-            IMediator mediator,
-            ICacheManager<Service> cache) : base(repository, cache)
+            IMediator mediator) : base(repository)
         {
             this.mediator = mediator;
-            this.servicePostRepository = servicePostRepository;
         }
 
         public Service Find(int id)
@@ -48,6 +43,7 @@ namespace Amlakbashi.Application.Services.PostServices
                 q.Where(w => w.ParentId == parentId));
             return list.ToList();
         }
+
         public bool Validate(Service item)
         {
             if (item.ParentId == item.Id)
@@ -61,6 +57,7 @@ namespace Amlakbashi.Application.Services.PostServices
             }
             return true;
         }
+
         public void Update(Service item)
         {
             var currItem = Repository.Query(q =>

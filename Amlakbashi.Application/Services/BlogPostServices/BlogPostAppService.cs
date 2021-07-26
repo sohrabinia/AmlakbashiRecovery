@@ -2,21 +2,20 @@
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
-using Amlakbashi.Data;
 using Amlakbashi.Application.Services.BlogPostServices.Interfaces;
 using System.Linq;
 using static Amlakbashi.Core.Entities.BlogPost;
 using System;
 using Amlakbashi.Core.Common.Utilities;
-using Amlakbashi.Core.Common.Caching;
 
 namespace Amlakbashi.Application.Services.BlogPostServices
 {
     internal class BlogPostAppService : AppServiceBase<BlogPost, int>, IBlogPostAppService
     {
-        public BlogPostAppService(IRepository<BlogPost, int> repository, ICacheManager<BlogPost> cache) : base(repository,cache)
+        public BlogPostAppService(IRepository<BlogPost, int> repository) : base(repository)
         {
         }
+
         public BlogPost Find(int id)
         {
             //var item = Cache.Get(id);
@@ -29,6 +28,7 @@ namespace Amlakbashi.Application.Services.BlogPostServices
             //return item;
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
         }
+
         public IList<BlogPost> Filter(int id = 0,
             SortOrdersEnum sortOrder = SortOrdersEnum.ID_Descending,
             BlogPostStatus status = BlogPostStatus.All,
@@ -140,11 +140,13 @@ namespace Amlakbashi.Application.Services.BlogPostServices
             Repository.Update(currItem);
             Repository.Save();
         }
+
         public void Delete(int id)
         {
             Repository.Delete(id);
             Repository.Save();
         }
+
         public void Scrap(int id)
         {
             var item = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
@@ -152,6 +154,7 @@ namespace Amlakbashi.Application.Services.BlogPostServices
             Repository.Update(item);
             Repository.Save();
         }
+
         public void Recycle(int id)
         {
             var item = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
@@ -159,6 +162,7 @@ namespace Amlakbashi.Application.Services.BlogPostServices
             Repository.Update(item);
             Repository.Save();
         }
+
         public IList<BlogPost> GetNewItems(PlaceEnum showingPlace, int count)
         {
             var list = Repository.Query(q => q);
@@ -171,6 +175,7 @@ namespace Amlakbashi.Application.Services.BlogPostServices
             }
             return new List<BlogPost>();
         }
+
         public IList<BlogPost> GetAccommodationNewItems(int city, int area,
             int accType, int positionType, bool hasPool, int count)
         {

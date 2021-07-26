@@ -1,9 +1,7 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.SupportChatServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Data;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -17,7 +15,7 @@ namespace Amlakbashi.Application.Services.SupportChatServices
     {
         private readonly IMediator mediator;
         public SupportChatMessageAppService(IRepository<SupportChatMessage, long> repository,
-            IMediator mediator, ICacheManager<SupportChatMessage> cache) : base(repository, cache)
+            IMediator mediator) : base(repository)
         {
             this.mediator = mediator;
         }
