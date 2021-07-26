@@ -1,6 +1,5 @@
 ﻿using Amlakbashi.Accounting.Services.Interfaces;
 using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using System;
@@ -13,9 +12,8 @@ namespace Amlakbashi.Accounting.Services
 {
     internal class DiscountCouponAppService : AppServiceBase<DiscountCoupon, long>, IDiscountCouponAppService
     {
-        public DiscountCouponAppService(IRepository<DiscountCoupon, long> repository, ICacheManager<DiscountCoupon> cache) : base(repository, cache)
+        public DiscountCouponAppService(IRepository<DiscountCoupon, long> repository) : base(repository)
         {
-
         }
 
         public DiscountCoupon Find(long id)

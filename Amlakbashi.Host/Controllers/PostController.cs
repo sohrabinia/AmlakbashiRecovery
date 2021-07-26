@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using X.PagedList;
-using System.Drawing;
-using System.Drawing.Imaging;
 using Amlakbashi.Application.Services.BlogPostServices.Interfaces;
 using log4net;
 using AutoMapper;
@@ -14,7 +12,6 @@ using Amlakbashi.Core.Entities;
 using Amlakbashi.Application.Services.CommentServices.Interfaces;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Entities = Amlakbashi.Core.Entities;
-using Amlakbashi.Core.DTOs.UserDTOs;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Application.Services.FileServices.Interfaces;
@@ -31,9 +28,10 @@ using Amlakbashi.Host.Controllers.Base;
 using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
-using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
+using Microsoft.Extensions.Caching.Distributed;
+using Amlakbashi.Core.Common.Caching;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -59,6 +57,7 @@ namespace Amlakbashi.Host.Controllers
         private readonly IReserveAppService reserveService;
         private readonly IUserAccessor userAccessor;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ICacheManager cache;
         public PostController(
             IPostAppService postService,
             IServiceAppService serviceService,
@@ -75,6 +74,7 @@ namespace Amlakbashi.Host.Controllers
             IReserveAppService reserveService,
             IUserAccessor userAccessor,
             IWebHostEnvironment webHostEnvironment,
+            ICacheManager cache,
             ILog logger, IMapper mapper)
         {
             this.logger = logger;
@@ -94,7 +94,25 @@ namespace Amlakbashi.Host.Controllers
             this.discountTableServie = discountTableServie;
             this.userAccessor = userAccessor;
             this.webHostEnvironment = webHostEnvironment;
+            this.cache = cache;
         }
+
+        //public JsonResult test()
+        //{
+        //    List<Advertise> advertises = cache.Get<List<Advertise>>("advertiseList");
+        //    if (advertises == null)
+        //    {
+        //        advertises = advertiseService.GetAdvertisesByStatus(AdvertiseStatus.Published).ToList();
+        //        cache.Set<List<Advertise>>("advertiseList", advertises);
+        //    }
+        //    return GenerateJsonResult(advertises);
+        //}
+
+        //public JsonResult testremove()
+        //{
+        //    cache.Remove("advertiseList");
+        //    return GenerateJsonResult("remove done!");
+        //}
 
         [Authorize(Policy = Policies.Post_View)]
         public ActionResult Index(int? page,

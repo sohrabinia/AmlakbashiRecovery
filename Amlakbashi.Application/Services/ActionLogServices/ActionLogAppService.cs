@@ -1,9 +1,7 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.ActionLogServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +12,8 @@ namespace Amlakbashi.Application.Services.ActionLogServices
 {
     internal class ActionLogAppService : AppServiceBase<ActionLog, long>, IActionLogAppService
     {
-        public ActionLogAppService(IRepository<ActionLog, long> repository, ICacheManager<ActionLog> cache) : base(repository, cache)
+        public ActionLogAppService(IRepository<ActionLog, long> repository) : base(repository)
         {
-
         }
 
         public IList<ActionLog> Filter(int userId, int actionType, int actionSource, long relatedId)

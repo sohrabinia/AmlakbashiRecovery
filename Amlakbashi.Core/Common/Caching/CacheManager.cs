@@ -1,43 +1,44 @@
-﻿using ServiceStack.Redis;
-using ServiceStack.Redis.Generic;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Common.Caching
 {
-    public class CacheManager<T> : ICacheManager<T>
+    public class CacheManager : ICacheManager
     {
-        IRedisTypedClient<T> redisClient;
-        public CacheManager(/*RedisManagerPool redisManager*/)
+        private readonly IDistributedCache cache;
+        public CacheManager(IDistributedCache cache)
         {
-            //var redis = redisManager.GetClient();
-            //redisClient = redis.As<T>();
+            this.cache = cache;
         }
 
-        public T Set(T entity)
+        public T Set<T>(string key, T value)
         {
-            return redisClient.Store(entity);
-        }
-
-        public T Get(object id)
-        {
-            return redisClient.GetById(id);
-        }
-
-        public bool Remove(object id)
-        {
-            try
+            var options = new DistributedCacheEntryOptions
             {
-                redisClient.DeleteById(id);
-                return true;
-            }
-            catch
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60),
+                SlidingExpiration = TimeSpan.FromMinutes(30)
+            };
+
+            cache.SetString(key, JsonConvert.SerializeObject(value), options);
+            return value;
+        }
+
+        public T Get<T>(string key)
+        {
+            var value = cache.GetString(key);
+
+            if (value != null)
             {
-                return false;
+                return JsonConvert.DeserializeObject<T>(value);
             }
+
+            return default;
+        }
+
+        public void Remove(string key)
+        {
+            cache.Remove(key);
         }
     }
 }

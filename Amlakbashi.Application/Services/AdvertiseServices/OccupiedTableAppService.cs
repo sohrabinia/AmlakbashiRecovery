@@ -14,7 +14,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 {
     internal class OccupiedTableAppService : AppServiceBase<OccupiedTable, long>, IOccupiedTableAppService
     {
-        public OccupiedTableAppService(IRepository<OccupiedTable, long> repository, ICacheManager<OccupiedTable> cache) : base(repository, cache)
+        public OccupiedTableAppService(IRepository<OccupiedTable, long> repository) : base(repository)
         {
         }
     }

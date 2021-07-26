@@ -1,7 +1,6 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.FileServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +17,7 @@ namespace Amlakbashi.Application.Services.FileServices
     {
         private static readonly object objlock = new object();
         private readonly IMediator mediator;
-        public FileAppService(IRepository<File, long> repository, ICacheManager<File> cache, IMediator mediator) : base(repository, cache)
+        public FileAppService(IRepository<File, long> repository, IMediator mediator) : base(repository)
         {
             this.mediator = mediator;
         }

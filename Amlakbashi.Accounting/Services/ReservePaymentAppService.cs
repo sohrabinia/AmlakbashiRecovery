@@ -1,7 +1,6 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Accounting.Services.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -12,9 +11,8 @@ namespace Amlakbashi.Accounting.Services
 {
     internal class ReservePaymentAppService : AppServiceBase<ReservePayment, long>, IReservePaymentAppService
     {
-        public ReservePaymentAppService(IRepository<ReservePayment, long> repository, ICacheManager<ReservePayment> cache) : base(repository, cache)
+        public ReservePaymentAppService(IRepository<ReservePayment, long> repository) : base(repository)
         {
-
         }
 
         public IList<ReservePayment> GetAll()

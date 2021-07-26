@@ -13,12 +13,9 @@ using Amlakbashi.Host.Hubs.Dashboard.HubServers;
 using Amlakbashi.Host.Hubs.HubEventHandlers;
 using Amlakbashi.Host.Hubs.Portal.HubServers;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Hangfire;
 using log4net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,8 +30,8 @@ namespace Amlakbashi.Host.Configurations
             // log4net
             builder.Register(c => LogManager.GetLogger("Default"));
 
-            builder.RegisterGeneric(typeof(CacheManager<>)).
-                As(typeof(ICacheManager<>));
+            builder.RegisterType(typeof(CacheManager)).
+                As(typeof(ICacheManager));
             builder.RegisterType(typeof(Localization)).
                 As(typeof(ILocalization));
             builder.RegisterType(typeof(PriceCalculator)).

@@ -1,6 +1,5 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
 using System.Linq;
 using System.Collections.Generic;
@@ -15,10 +14,7 @@ using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Mediator.Events.UserEvents;
 using Amlakbashi.Core.DTOs.UserDTOs;
 using Microsoft.EntityFrameworkCore;
-using log4net;
 using Microsoft.AspNetCore.Identity;
-using Amlakbashi.Data.Identity;
-using System.Threading.Tasks;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using System.Security.Claims;
@@ -37,15 +33,13 @@ namespace Amlakbashi.Application.Services.UserServices
         private readonly IPasswordValidator<AppUser> passwordValidator;
         private readonly RoleManager<AppRole> roleManager;
         private readonly SignInManager<AppUser> signInManager;
-        private readonly ILog logger;
-        public UserAppService(IRepository<User, int> repository, ICacheManager<User> cache,
+        public UserAppService(IRepository<User, int> repository,
             IUserContactFacade userContact,
             IMediator mediator,
             UserManager<AppUser> userManager,
             IPasswordValidator<AppUser> passwordValidator,
             RoleManager<AppRole> roleManager,
-            SignInManager<AppUser> signInManager,
-            ILog logger) : base(repository, cache)
+            SignInManager<AppUser> signInManager) : base(repository)
         {
             this.mediator = mediator;
             this.userContact = userContact;
@@ -53,7 +47,6 @@ namespace Amlakbashi.Application.Services.UserServices
             this.passwordValidator = passwordValidator;
             this.roleManager = roleManager;
             this.signInManager = signInManager;
-            this.logger = logger;
         }
 
         public IList<User> GetAll()

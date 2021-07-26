@@ -11,12 +11,9 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Hangfire;
 using Hangfire.SqlServer;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.StaticFiles;
@@ -28,8 +25,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -52,7 +47,6 @@ namespace Amlakbashi.Host
         public IConfigurationRoot Configuration { get; private set; }
 
         public ILifetimeScope AutofacContainer { get; private set; }
-
 
         // ConfigureServices is where you register dependencies. This gets
         // called by the runtime before the ConfigureContainer method, below.
@@ -138,6 +132,12 @@ namespace Amlakbashi.Host
                 x.ValueLengthLimit = 20971520;
                 x.MultipartBodyLengthLimit = 20971520;
             });
+
+            //services.AddStackExchangeRedisCache(options =>
+            //{
+            //    options.Configuration =
+            //        $"{Configuration.GetValue<string>("Redis:Server")}:{Configuration.GetValue<int>("Redis:Port")}";
+            //});
         }
 
         // ConfigureContainer is where you can register things directly

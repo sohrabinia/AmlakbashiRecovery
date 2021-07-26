@@ -21,10 +21,9 @@ namespace Amlakbashi.Application.Services.Category
     {
         private readonly IAdvertiseFilterHelper advertiseFilter;
         private readonly IMediator mediator;
-        public CategoryAppService(IMediator mediator,
-            IAdvertiseFilterHelper advertiseFilter,
-            IRepository<DynamicCategory, int> repository,
-            ICacheManager<DynamicCategory> cache) : base(repository, cache)
+        public CategoryAppService(IRepository<DynamicCategory, int> repository,
+            IMediator mediator,
+            IAdvertiseFilterHelper advertiseFilter) : base(repository)
         {
             this.advertiseFilter = advertiseFilter;
             this.mediator = mediator;

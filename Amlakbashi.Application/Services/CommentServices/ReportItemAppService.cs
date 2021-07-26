@@ -1,7 +1,6 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.CommentServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
 using System.Data;
 using System.Collections.Generic;
@@ -17,8 +16,7 @@ namespace Amlakbashi.Application.Services.CommentServices
     {
         private readonly IMediator mediator;
         public ReportItemAppService(IRepository<ReportItem, long> repository,
-            IMediator mediator,
-            ICacheManager<ReportItem> cache) : base(repository, cache)
+            IMediator mediator) : base(repository)
         {
             this.mediator = mediator;
         }

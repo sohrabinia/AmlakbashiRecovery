@@ -1,6 +1,5 @@
 ﻿using Amlakbashi.Application.Services.ReserveServices.Interfaces;
 using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
@@ -14,7 +13,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 {
     public class ReserveAutoCancelAppService : AppServiceBase<ReserveAutoCancel, long>, IReserveAutoCancelAppService
     {
-        public ReserveAutoCancelAppService(IRepository<ReserveAutoCancel, long> repository, ICacheManager<ReserveAutoCancel> cache) : base(repository, cache)
+        public ReserveAutoCancelAppService(IRepository<ReserveAutoCancel, long> repository) : base(repository)
         {
         }
 

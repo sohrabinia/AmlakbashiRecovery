@@ -1,7 +1,6 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.ReserveServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
 using System;
@@ -26,11 +25,9 @@ namespace Amlakbashi.Application.Services.ReserveServices
     {
         private readonly IMediator mediator;
         private readonly IAccountingFacade accounting;
-        public ReserveAppService(
+        public ReserveAppService(IRepository<Reserve, long> repository,
             IMediator mediator,
-            IAccountingFacade accounting,
-            IRepository<Reserve, long> repository,
-            ICacheManager<Reserve> cache) : base(repository, cache)
+            IAccountingFacade accounting) : base(repository)
         {
             this.mediator = mediator;
             this.accounting = accounting;
@@ -399,27 +396,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var objReserve = Repository.Query(q => q.Include("Advertise.User.Advertises").FirstOrDefault(f => f.Id == reserve.Id));
             var isPaidDeposit = accounting.GetReservePaidAmount(objReserve.Id, StatusStringType.Guest) >=
                 objReserve.DepositPrice - objReserve.CouponPrice - objReserve.PrizePrice;
-
-            //if ((objReserve.Status < Reserve.ReserveStatus.Reserved ||
-            //    objReserve.Status == Reserve.ReserveStatus.CanceledBySystem)
-            //    &&
-            //    (
-            //        reserve.Status == Reserve.ReserveStatus.Reserved ||
-            //        reserve.Status == Reserve.ReserveStatus.Started ||
-            //        reserve.Status == Reserve.ReserveStatus.CashPay ||
-            //        reserve.Status == Reserve.ReserveStatus.Completed ||
-            //        reserve.Status == Reserve.ReserveStatus.CancelRequestByGuest ||
-            //        reserve.Status == Reserve.ReserveStatus.CancelRequestByHost
-            //    )
-            //    &&
-            //    reserve.DepositPrice > 0)
-            //{
-            //    if (accounting.GetReservePaidAmount(objReserve.Id, StatusStringType.Guest) < objReserve.DepositPrice - objReserve.CouponPrice - objReserve.PrizePrice)
-            //    {
-            //        msg = "مبلغ بیعانه هنوز پرداخت نشده، تغییر به وضعیت " + ReserveLocalization.GetStatusString((int)reserve.Status, Reserve.StatusStringType.Site) + " امکان پذیر نیست";
-            //        return false;
-            //    }
-            //}
 
             if (isPaidDeposit == false && (reserve.Status == ReserveStatus.Reserved || reserve.Status == ReserveStatus.CashPay ||
                 reserve.Status == ReserveStatus.Started || reserve.Status == ReserveStatus.Completed ||

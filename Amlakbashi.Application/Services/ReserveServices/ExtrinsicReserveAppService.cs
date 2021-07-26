@@ -1,6 +1,5 @@
 using Amlakbashi.Application.Services.ReserveServices.Interfaces;
 using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
@@ -14,10 +13,8 @@ namespace Amlakbashi.Application.Services.ReserveServices
     public class ExtrinsicReserveAppService : AppServiceBase<ExtrinsicReserve, long>, IExtrinsicReserveAppService
     {
         private readonly IMediator mediator;
-        public ExtrinsicReserveAppService(
-            IMediator mediator,
-            IRepository<ExtrinsicReserve, long> repository,
-            ICacheManager<ExtrinsicReserve> cache) : base(repository, cache)
+        public ExtrinsicReserveAppService(IRepository<ExtrinsicReserve, long> repository,
+            IMediator mediator) : base(repository)
         {
             this.mediator = mediator;
         }
@@ -30,8 +27,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
                  DateTimeUtility.GregorianToPersianDate(date.AddDays(1)),
                  actionSource, doerUserID, count));
         }
-
-
 
         public void Insert(long advertiseId, string from_date,
             string to_date, ActionSourceEnum actionSource, int doerUserId, int count = 1)

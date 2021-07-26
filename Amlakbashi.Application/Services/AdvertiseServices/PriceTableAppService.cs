@@ -1,10 +1,8 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +11,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 {
     internal class PriceTableAppService : AppServiceBase<PriceTable, int>, IPriceTableAppService
     {
-        public PriceTableAppService(IRepository<PriceTable, int> repository, ICacheManager<PriceTable> cache) : base(repository, cache)
+        public PriceTableAppService(IRepository<PriceTable, int> repository) : base(repository)
         {
         }
 

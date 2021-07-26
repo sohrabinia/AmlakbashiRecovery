@@ -11,7 +11,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 {
     internal class AdvertiseReportAppService : AppServiceBase<AdvertiseReport, int>, IAdvertiseReportAppService
     {
-        public AdvertiseReportAppService(IRepository<AdvertiseReport, int> repository, ICacheManager<AdvertiseReport> cache) : base(repository, cache)
+        public AdvertiseReportAppService(IRepository<AdvertiseReport, int> repository) : base(repository)
         {
         }
 

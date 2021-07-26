@@ -3,9 +3,7 @@ using Amlakbashi.Core.Common.Repository;
 using System;
 using System.Collections.Generic;
 using Amlakbashi.Application.Services.PostServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Data;
 using System.Linq;
 using static Amlakbashi.Core.Entities.Post;
 using System.Transactions;
@@ -17,8 +15,7 @@ namespace Amlakbashi.Application.Services.PostServices
         private readonly IRepository<ServicePost, int> servicePostRepository;
         public PostAppService(
             IRepository<Post, long> repository,
-            IRepository<ServicePost, int> servicePostRepository,
-            ICacheManager<Post> cache) : base(repository, cache)
+            IRepository<ServicePost, int> servicePostRepository) : base(repository)
         {
             this.servicePostRepository = servicePostRepository;
         }

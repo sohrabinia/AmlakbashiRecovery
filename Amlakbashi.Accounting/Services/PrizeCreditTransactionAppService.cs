@@ -1,6 +1,5 @@
 ﻿using Amlakbashi.Accounting.Services.Interfaces;
 using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Mediator.Events.AccountingEvents;
@@ -13,10 +12,8 @@ namespace Amlakbashi.Accounting.Services
     internal class PrizeCreditTransactionAppService : AppServiceBase<PrizeCreditTransaction, long>, IPrizeCreditTransactionAppService
     {
         private readonly IMediator mediator;
-        public PrizeCreditTransactionAppService(
-            IMediator mediator,
-            IRepository<PrizeCreditTransaction, long> repository,
-            ICacheManager<PrizeCreditTransaction> cache) : base(repository, cache)
+        public PrizeCreditTransactionAppService(IRepository<PrizeCreditTransaction, long> repository,
+            IMediator mediator) : base(repository)
         {
             this.mediator = mediator;
         }

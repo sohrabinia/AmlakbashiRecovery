@@ -1,6 +1,5 @@
 ﻿using Amlakbashi.Accounting.Services.Interfaces;
 using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using System;
@@ -13,7 +12,7 @@ namespace Amlakbashi.Accounting.Services
 {
     internal class CartAppService : AppServiceBase<Cart, long>, ICartAppService
     {
-        public CartAppService(IRepository<Cart, long> repository, ICacheManager<Cart> cache) : base(repository, cache)
+        public CartAppService(IRepository<Cart, long> repository) : base(repository)
         {
         }
 
