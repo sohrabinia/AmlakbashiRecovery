@@ -21,12 +21,15 @@ namespace Amlakbashi.Application.Services.Category
     {
         private readonly IAdvertiseFilterHelper advertiseFilter;
         private readonly IMediator mediator;
+        private readonly ICacheManager cacheManager;
         public CategoryAppService(IRepository<DynamicCategory, int> repository,
             IMediator mediator,
+            ICacheManager cacheManager,
             IAdvertiseFilterHelper advertiseFilter) : base(repository)
         {
             this.advertiseFilter = advertiseFilter;
             this.mediator = mediator;
+            this.cacheManager = cacheManager;
         }
 
         public IList<DynamicCategory> Filter(AdvertiseType Type, int Province, int City, int Area, string sort, string query)
@@ -98,6 +101,24 @@ namespace Amlakbashi.Application.Services.Category
             var advertiseIds = category.Advertises.Select(s => s.Id).ToList();
             advertises = Repository.Query<Advertise, long>(q =>
                 q.Where(w => advertiseIds.Contains(w.Id)));
+
+            // #############
+            //IQueryable<Advertise> advertises;
+
+            //var cachedData = cacheManager.Get<IEnumerable<Advertise>>("category:" + categoryId + ":advertises");
+            //if (cachedData == null)
+            //{
+            //    var category = Repository.Find(categoryId);
+            //    var advertiseIds = category.Advertises.Select(s => s.Id).ToList();
+            //    advertises = Repository.Query<Advertise, long>(q => q.Where(w => advertiseIds.Contains(w.Id)));
+            //    cacheManager.Set("category:" + categoryId + ":advertises", advertises.AsEnumerable());
+            //}
+            //else
+            //{
+            //    advertises = cachedData.AsQueryable();
+            //}
+
+            // #############
 
             bool OccupiedTablesincluded = false;
             bool DiscountTablesincluded = false;

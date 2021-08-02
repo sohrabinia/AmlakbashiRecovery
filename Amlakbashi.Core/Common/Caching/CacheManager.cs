@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System;
+using System.IO;
+using System.Text;
 
 namespace Amlakbashi.Core.Common.Caching
 {
@@ -40,5 +42,10 @@ namespace Amlakbashi.Core.Common.Caching
         {
             cache.Remove(key);
         }
+    }
+
+    public enum CacheNames
+    {
+        CategoryItem
     }
 }

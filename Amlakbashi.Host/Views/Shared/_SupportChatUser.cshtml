@@ -3,19 +3,20 @@
     <span style="padding:10px 5px" onclick="showSupportChat()">سلام چطور میتونم کمکتون کنم؟</span>
 </div>
 <div class="support-chat__button" style="" onclick="showSupportChat()">
-    <i class="fa fa-circle support-chat__light-icon"></i>
-    <img style="display:@(ViewBag.onlineSupport ? "unset" : "none")"
+    @*<i class="fa fa-circle support-chat__light-icon"></i>*@
+    @*<img style="display:@(ViewBag.onlineSupport ? "unset" : "none")"
          class="support-chat__green-light"
          srcset="/file/resourceimagegif?file_name=blink-green-light-7w 7w,
                 /file/resourceimagegif?file_name=blink-green-light-10w 10w"
          sizes="(max-width: 680px) 7px,
                 10px"
-         src="/file/resourceimagegif?file_name=blink-green-light-7w" alt="green_light"/>
-    <img srcset="/file/resourceimagepng?file_name=support-icon-35w 35w,
+         src="/file/resourceimagegif?file_name=blink-green-light-7w" alt="green_light"/>*@
+    @*<img srcset="/file/resourceimagepng?file_name=support-icon-35w 35w,
                 /file/resourceimagepng?file_name=support-icon-45w 45w"
          sizes="(max-width: 680px) 35px,
                 45px"
-         src="/file/resourceimagepng?file_name=support-icon-35w" alt="support_icon"/>
+         src="/file/resourceimagepng?file_name=support-icon-35w" alt="support_icon"/>*@
+    <i class="fa fa-comments"></i>
     <div style="display:none" class="support-chat__new-count">0</div>
 </div>
 <div class="support-chat__container" style="display:none;">

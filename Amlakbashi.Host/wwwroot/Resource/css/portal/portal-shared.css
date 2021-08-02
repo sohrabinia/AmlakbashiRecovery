@@ -47,7 +47,7 @@ img {
 
 a {
     text-decoration: none;
-    color: #337ab7;
+    /*color: #337ab7;*/
 }
 
 .bg-yellow {
@@ -396,7 +396,8 @@ a {
 }
 .style-box-status-room p {
     margin: 1px 2px;
-    background-color: #DF7549;
+    /*background-color: #DF7549;*/
+    background-color: green;
     width: max-content;
     border-radius: 5px;
     padding: 5px;
@@ -433,7 +434,7 @@ a {
 .home-page__advertise-city {
     width: 100%;
     font: 12px Liransans;
-    color: #8e8e8e;
+    color: #242424;
     margin: 2px;
 }
 
@@ -567,13 +568,13 @@ p.home-page__advertise-capacity .fa-users {
     height: 60px;
     opacity: .95;
     /*background-image: linear-gradient(to right ,#f9ca2c, #fdd835);*/
-    background-image: -webkit-gradient(linear,left top, right top,from(#fce188),to(#ffe068));
-    background-image: -o-linear-gradient(left,#fce188,#ffe068);
-    background-image: linear-gradient(to right,#fce188,#ffe068);
+    /*background-image: -webkit-gradient(linear,left top, right top,from(#fce188),to(#ffe068));*/
+    /*background-image: -o-linear-gradient(left,#fce188,#ffe068);*/
+    /*background-image: linear-gradient(to right,#fce188,#ffe068);*/
     width: 57px;
     height: 57px;
-    -webkit-box-shadow: 1px 2px 3px 0 rgba(0,0,0,.1);
-    box-shadow: 1px 2px 3px 0 rgba(0,0,0,.1);
+    -webkit-box-shadow: 5px 5px 5px 0px #888888;
+    box-shadow: 5px 5px 5px 0px #888888;
 }
 
     .support-chat__button:hover {
@@ -582,14 +583,17 @@ p.home-page__advertise-capacity .fa-users {
         background-color: #ffeca0;
     }
 
+    .support-chat__button i{
+        font-size: 36px;
+    }
 
-.support-chat__light-icon {
-    font-size: 10px;
-    color: #c4c4c4;
-    position: absolute;
-    right: 5px;
-    top: 5px;
-}
+    .support-chat__light-icon {
+        font-size: 10px;
+        color: #c4c4c4;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+    }
 
 .support-chat__green-light {
     position: absolute;
@@ -819,6 +823,10 @@ html, body {
         height: 45px;
         width: 45px;
     }
+
+        .support-chat__button i {
+            font-size: 30px;
+        }
 
     .support-chat__light-icon {
         font-size: 7px;

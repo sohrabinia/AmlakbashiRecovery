@@ -1,6 +1,7 @@
 ﻿using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
 using Amlakbashi.Application.Services.Category.Interfaces;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
+using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.AccommodationDTOs;
 using Amlakbashi.Core.DTOs.CategoryDTOs;
@@ -9,6 +10,7 @@ using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
+using Amlakbashi.Host.Filters;
 using log4net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,15 +34,17 @@ namespace Amlakbashi.Host.Controllers
         private readonly ICategoryAppService categoryService;
         private readonly IUserAppService userService;
         private readonly IUserAccessor userAccessor;
+        private readonly ICacheManager cacheManager;
         public CategoryController(ILog logger, IRegionAppService regionService,
-            ICategoryAppService dynamicCategoryService, IUserAppService userService,
-            IUserAccessor userAccessor)
+            ICategoryAppService categoryService, IUserAppService userService,
+            IUserAccessor userAccessor, ICacheManager cacheManager)
         {
             this.logger = logger;
             this.regionService = regionService;
-            this.categoryService = dynamicCategoryService;
+            this.categoryService = categoryService;
             this.userService = userService;
             this.userAccessor = userAccessor;
+            this.cacheManager = cacheManager;
         }
 
         [Authorize(Policy = Policies.Category_View)]
@@ -392,6 +396,27 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (!string.IsNullOrEmpty(phrase) && phrase.Last() == '-')
                     phrase = phrase.Remove(phrase.Length - 1, 1);
+
+                // #################
+                //var cachedName = $"category.item:r{regionId}:cd{countryDirection}:t{typeInt}";
+                //if (string.IsNullOrEmpty(Request.QueryString.Value))
+                //{
+                //    var cachedData = cacheManager.Get<CategoryItemDTO>(cachedName);
+                //    if (cachedData != null)
+                //    {
+                //        if (ajax)
+                //        {
+                //            return PartialView("_AdvertiseListItems", cachedData);
+                //        }
+                //        else
+                //        {
+                //            return View(cachedData);
+                //        }
+                //    }
+                //}
+                //##################
+
+                CategoryItemDTO categoryItemDTO = new CategoryItemDTO();
                 var model = categoryService.GetFilteredAdvertises(category.Id,
                     area, frompaypernight, topaypernight, null, region, capacity,
                     room, elevator, pool, norouz_special, today_empty_homes,
@@ -402,90 +427,91 @@ namespace Amlakbashi.Host.Controllers
                     parking == 1, sort, deserializedRoomList, phrase.Replace("-", " "),
                     string.IsNullOrEmpty(hygieneProtocol) == false && hygieneProtocol == "1");
 
-                ViewBag.raw_url = ajax ? path.Split('?')[0] : HttpContext.Request.Path.Value;
-                ViewBag.urlWithParameters = ajax ? path : rawUrl;
-                ViewBag.dcategory = category;
-                ViewBag.area = area;
+                categoryItemDTO.RawUrl = ajax ? path.Split('?')[0] : HttpContext.Request.Path.Value;
+                categoryItemDTO.UrlWithParameters = ajax ? path : rawUrl;
+                categoryItemDTO.Category = category;
+                categoryItemDTO.Area = area;
                 var provinceString = category.Province == null ? "" : category.RegionProvince.PersianName;
                 var cityString = category.City == null ? "" : category.RegionCity.PersianName;
                 var areaString = category.Area == null ? "" : category.RegionArea.PersianName;
                 var countryDirectionString = GetCountryDirectionString(category.CountryDirection);
-                ViewBag.provinceString = provinceString;
-                ViewBag.cityString = cityString;
-                ViewBag.areaString = areaString;
-                ViewBag.countryDirectionString = countryDirectionString;
-                ViewBag.categoryH1Title = AdvertiseSeoLocalization
+                categoryItemDTO.ProvinceString = provinceString;
+                categoryItemDTO.CityString = cityString;
+                categoryItemDTO.AreaString = areaString;
+                categoryItemDTO.CountryDirectionString = countryDirectionString;
+                categoryItemDTO.CategoryH1Title = AdvertiseSeoLocalization
                     .GetTitle(category.MostAccType,
                     (int)category.Type, provinceString,
                     cityString, areaString, countryDirectionString);
-                ViewBag.phrase = phrase;
-                ViewBag.frompaypernight = frompaypernight;
-                ViewBag.topaypernight = topaypernight;
-                ViewBag.fromMetrazh = fromMetrazh;
-                ViewBag.toMetrazh = toMetrazh;
-                ViewBag.parking = parking;
-                ViewBag.hygieneProtocol = hygieneProtocol;
-                ViewBag.region = region;
-                ViewBag.capacity = capacity;
-                ViewBag.room = room;
-                ViewBag.elevator = elevator;
-                ViewBag.pool = pool;
-                ViewBag.priceRangeType = priceRangeType;
-                ViewBag.wcType = wcType;
-                ViewBag.wifi = wifi;
-                ViewBag.washingMachine = washingMachine;
-                ViewBag.jacuzzi = jacuzzi;
-                ViewBag.poolTable = poolTable;
-                ViewBag.foosball = foosball;
-                ViewBag.teaMaker = teaMaker;
-                ViewBag.rules_pets = rules_pets;
-                ViewBag.rules_party = rules_party;
-                ViewBag.rules_smoking = rules_smoking;
-                ViewBag.norouz_special = norouz_special;
-                ViewBag.today_empty_homes = today_empty_homes;
-                ViewBag.empty_range_from = empty_range_from;
-                ViewBag.empty_range_to = empty_range_to;
-                ViewBag.discount_homes = discount_homes;
-                ViewBag.instant_reserve = instant_reserve;
-                ViewBag.roomList = roomList;
-                ViewBag.type = category == null ?
+                categoryItemDTO.Phrase = phrase;
+                categoryItemDTO.FromPayPerNight = frompaypernight;
+                categoryItemDTO.ToPayPerNight = topaypernight;
+                categoryItemDTO.FromMetrazh = fromMetrazh;
+                categoryItemDTO.ToMetrazh = toMetrazh;
+                categoryItemDTO.Parking = parking;
+                categoryItemDTO.HygieneProtocol = hygieneProtocol != null && hygieneProtocol == "1";
+                categoryItemDTO.Region = region;
+                categoryItemDTO.Capacity = capacity;
+                categoryItemDTO.Room = room;
+                categoryItemDTO.Elevator = elevator;
+                categoryItemDTO.Pool = pool;
+                categoryItemDTO.PriceRangeType = priceRangeType;
+                categoryItemDTO.WcType = wcType;
+                categoryItemDTO.Wifi = wifi;
+                categoryItemDTO.WashingMachine = washingMachine;
+                categoryItemDTO.Jacuzzi = jacuzzi;
+                categoryItemDTO.PoolTable = poolTable;
+                categoryItemDTO.Foosball = foosball;
+                categoryItemDTO.TeaMaker = teaMaker;
+                categoryItemDTO.RulesPets = rules_pets;
+                categoryItemDTO.RulesParty = rules_party;
+                categoryItemDTO.RulesSmoking = rules_smoking;
+                categoryItemDTO.NorouzSpecial = norouz_special != null && norouz_special == "1";
+                categoryItemDTO.TodayEmptyHomes = today_empty_homes != null && today_empty_homes == "1";
+                categoryItemDTO.EmptyRangeFrom = empty_range_from;
+                categoryItemDTO.EmptyRangeTo = empty_range_to;
+                categoryItemDTO.DiscountHomes = discount_homes != null && discount_homes == "1";
+                categoryItemDTO.InstantReserve = instant_reserve != null && instant_reserve == "1";
+                categoryItemDTO.RoomList = roomList;
+                categoryItemDTO.Type = category == null ?
                     Advertise.AdvertiseTypeToHeadType(typeInt) :
                     (int)category.ParentAccType;
-                ViewBag.t = t;
-                ViewBag.sort = sort;
+                categoryItemDTO.T = t;
+                categoryItemDTO.Sort = sort;
                 var areaRegionRelated = area < 1 ? null : regionService.Find(area).Related;
                 var areaRegionRelatedIds = string.IsNullOrEmpty(areaRegionRelated) ? null : Array.ConvertAll(
                             areaRegionRelated.Trim(',').Split(','), x => int.Parse(x));
-                ViewBag.related_categories = subCategory != null ?
+                categoryItemDTO.RelatedCategories = subCategory != null ?
                     categoryService.GetRelatedCategories(subCategory.Id, areaRegionRelatedIds, model.Count())
                     : (category == null ? new List<DynamicCategory>() :
                     categoryService.GetRelatedCategories(category.Id, areaRegionRelatedIds, model.Count()));
 
-                ViewBag.AnyTodayEmpty = today_empty_homes == "1" || model.Any(x => x.TodayIsEmpty || x.Childs.All(y => y.TodayIsEmpty));
+                categoryItemDTO.AnyTodayEmpty = today_empty_homes == "1" || model.Any(x => x.TodayIsEmpty || x.Childs.All(y => y.TodayIsEmpty));
+
                 var pages_count = Math.Max(1, Math.Ceiling((float)((float)model.Count() / 12f)));
-                ViewBag.pagesCount = pages_count;
-                ViewBag.currentPageNumber = page;
+                categoryItemDTO.PagesCount = pages_count;
+                categoryItemDTO.CurrentPageNumber = page;
 
-                ViewBag.Title = AdvertiseSeoLocalization.GetMetaTitle(category.MostAccType, category.CountAdvertise,
+                categoryItemDTO.Title = AdvertiseSeoLocalization.GetMetaTitle(category.MostAccType, category.CountAdvertise,
                     (int)category.MinPrice, (int)category.Type, provinceString, cityString, null, countryDirectionString);
-                ViewBag.keywords = AdvertiseSeoLocalization.GetKeywords((int)category.Type, provinceString, cityString, areaString, countryDirectionString);
-                ViewBag.Description = AdvertiseSeoLocalization.GetDescription(category.MostAccType, (int)category.Type, provinceString, cityString, areaString, countryDirectionString);
-                ViewBag.accTypeUrlString = AdvertiseUrlLocalization.AdvertiseTypeToUrlString((int)category.Type);
+                categoryItemDTO.Keywords = AdvertiseSeoLocalization.GetKeywords((int)category.Type, provinceString, cityString, areaString, countryDirectionString);
+                categoryItemDTO.Description = AdvertiseSeoLocalization.GetDescription(category.MostAccType, (int)category.Type, provinceString, cityString, areaString, countryDirectionString);
+                categoryItemDTO.AccTypeUrlString = AdvertiseUrlLocalization.AdvertiseTypeToUrlString((int)category.Type);
 
-                ViewBag.categoryFaqTrustQuestion = CategoryFaqLocalization.CategoryFaqTrustQuestion(category);
-                ViewBag.categoryFaqTrustAnswer = CategoryFaqLocalization.CategoryFaqTrustAnswer();
-                ViewBag.categoryFaqPriceQuestion = CategoryFaqLocalization.CategoryFaqPriceQuestion(category);
-                ViewBag.categoryFaqPriceAnswer = CategoryFaqLocalization.CategoryFaqPriceAnswer(category);
-                ViewBag.categoryFaqAreasQuestion = CategoryFaqLocalization.CategoryFaqAreasQuestion(category);
-                ViewBag.categoryFaqAreasAnswer = CategoryFaqLocalization.CategoryFaqAreasAnswer(category);
-                ViewBag.categoryFaqEvidenceQuestion = CategoryFaqLocalization.CategoryFaqEvidenceQuestion(category);
-                ViewBag.categoryFaqEvidenceAnswer = CategoryFaqLocalization.CategoryFaqEvidenceAnswer();
-                ViewBag.categoryFaqReserveQuestion = CategoryFaqLocalization.CategoryFaqReserveQuestion(category);
-                ViewBag.categoryFaqReserveAnswer = CategoryFaqLocalization.CategoryFaqReserveAnswer(category);
-                ViewBag.categoryFaqHostQuestion = CategoryFaqLocalization.CategoryFaqHostQuestion();
-                ViewBag.categoryFaqHostAnswer = CategoryFaqLocalization.CategoryFaqHostAnswer();
+                categoryItemDTO.CategoryFaqTrustQuestion = CategoryFaqLocalization.CategoryFaqTrustQuestion(category);
+                categoryItemDTO.CategoryFaqTrustAnswer = CategoryFaqLocalization.CategoryFaqTrustAnswer();
+                categoryItemDTO.CategoryFaqPriceQuestion = CategoryFaqLocalization.CategoryFaqPriceQuestion(category);
+                categoryItemDTO.CategoryFaqPriceAnswer = CategoryFaqLocalization.CategoryFaqPriceAnswer(category);
+                categoryItemDTO.CategoryFaqAreasQuestion = CategoryFaqLocalization.CategoryFaqAreasQuestion(category);
+                categoryItemDTO.CategoryFaqAreasAnswer = CategoryFaqLocalization.CategoryFaqAreasAnswer(category);
+                categoryItemDTO.CategoryFaqEvidenceQuestion = CategoryFaqLocalization.CategoryFaqEvidenceQuestion(category);
+                categoryItemDTO.CategoryFaqEvidenceAnswer = CategoryFaqLocalization.CategoryFaqEvidenceAnswer();
+                categoryItemDTO.CategoryFaqReserveQuestion = CategoryFaqLocalization.CategoryFaqReserveQuestion(category);
+                categoryItemDTO.CategoryFaqReserveAnswer = CategoryFaqLocalization.CategoryFaqReserveAnswer(category);
+                categoryItemDTO.CategoryFaqHostQuestion = CategoryFaqLocalization.CategoryFaqHostQuestion();
+                categoryItemDTO.CategoryFaqHostAnswer = CategoryFaqLocalization.CategoryFaqHostAnswer();
 
-                ViewBag.priceOptions = new int[]
+                categoryItemDTO.PriceOptions = new int[]
                 {
                     30000, 50000, 100000, 150000,200000,
                     250000, 300000, 350000, 400000, 500000,
@@ -494,7 +520,7 @@ namespace Amlakbashi.Host.Controllers
                     2000000, 2500000, 3500000, 4000000,
                     5000000, 10000000
                 };
-                ViewBag.monthlyPriceOptions = new int[]
+                categoryItemDTO.MonthlyPriceOptions = new int[]
                 {
                     300000, 1000000, 2000000, 3000000,
                     4000000, 5000000, 6000000, 7000000,
@@ -517,7 +543,7 @@ namespace Amlakbashi.Host.Controllers
                     }
                     dateString += StringUtility.EnglishNumberToPersian(empty_range_to.Substring(5));
                 }
-                ViewBag.dateString = dateString;
+                categoryItemDTO.DateString = dateString;
 
                 var priceMin = priceRangeType == 3 ? 300000 : 30000;
                 var priceMax = priceRangeType == 3 ? 150000000 : 10000000;
@@ -531,7 +557,7 @@ namespace Amlakbashi.Host.Controllers
                         //priceMinString = String.Format("{0:n0}", priceInt) + " تومان";
                     }
                 }
-                ViewBag.priceMin = priceMin;
+                categoryItemDTO.PriceMin = priceMin;
                 if (topaypernight != null)
                 {
                     priceInt = int.Parse(topaypernight);
@@ -541,14 +567,14 @@ namespace Amlakbashi.Host.Controllers
                         priceMax = priceInt;
                     }
                 }
-                ViewBag.priceMax = priceMax;
+                categoryItemDTO.PriceMax = priceMax;
 
                 var positionArray = (Advertise.PositionType[])(Enum.GetValues(typeof(Advertise.PositionType)));
                 var positionItems = positionArray.ToList();
                 positionItems.Remove(Advertise.PositionType.none);
-                ViewBag.positionItems = positionItems;
+                categoryItemDTO.PositionItems = positionItems;
 
-                ViewBag.regionString = area > 0 ? areaString :
+                categoryItemDTO.RegionString = area > 0 ? areaString :
                     (category.Province != null || category.CountryDirection > 0 ? category.RegionString : "");
 
                 var priceTypeString = priceRangeType == 0 ? "" :
@@ -572,9 +598,9 @@ namespace Amlakbashi.Host.Controllers
                         priceString = priceTypeString + "تا " + PriceUtility.GetPriceString(price);
                     }
                 }
-                ViewBag.priceString = priceString;
+                categoryItemDTO.PriceString = priceString;
 
-                ViewBag.accTypeString = t > 0 ?
+                categoryItemDTO.AccTypeString = t > 0 ?
                     AdvertiseMainLocalization.GetAdvertiseTypeUserString((Advertise.AdvertiseType)t) :
                     (category.Type != Advertise.AdvertiseType.All ? category.TypeString : "");
 
@@ -583,7 +609,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     roomListIds = Array.ConvertAll(roomList.Split(','), x => int.Parse(x)).ToList();
                 }
-                ViewBag.roomListIds = roomListIds;
+                categoryItemDTO.RoomListIds = roomListIds;
 
                 string queryString = null;
                 if (!string.IsNullOrEmpty(capacity) || dateString != "")
@@ -618,7 +644,7 @@ namespace Amlakbashi.Host.Controllers
                         queryString += ("capacity=" + (capacity == null ? "0" : capacity));
                     }
                 }
-                ViewBag.queryString = queryString;
+                categoryItemDTO.QueryString = queryString;
 
                 if (page > pages_count || page < 1)
                 {
@@ -636,28 +662,34 @@ namespace Amlakbashi.Host.Controllers
                     }
                 }
 
-                ViewBag.provinces = regionService.GetByType(AdvertiseRegion.Province);
-                ViewBag.cities = regionService.GetChildren(category.Province == null ? 0 : (int)category.Province, RegionStatus.HasAdvertise);
-                ViewBag.areas = regionService.GetChildren(category.City == null ? 0 : (int)category.City, RegionStatus.HasAdvertise);
+                categoryItemDTO.Provinces = regionService.GetByType(AdvertiseRegion.Province);
+                categoryItemDTO.Cities = regionService.GetChildren(category.Province == null ? 0 : (int)category.Province, RegionStatus.HasAdvertise);
+                categoryItemDTO.Areas = regionService.GetChildren(category.City == null ? 0 : (int)category.City, RegionStatus.HasAdvertise);
+                categoryItemDTO.ForAdvertisePage = true;
 
                 model = model.Skip(12 * (page - 1)).Take(12);
                 var user = userAccessor.CurrentUser;
                 var userFavorite = user.Id > 0 ? user.Favorite : new List<UserFavorite>();
-                List<AccommodationCardDTO> advertiseItemDTOs = new List<AccommodationCardDTO>();
+                categoryItemDTO.AdvertiseItems = new List<AccommodationCardDTO>();
                 foreach (var item in model)
                 {
                     var dto = (AccommodationCardDTO)item;
                     dto.Favourited = user.Id > 0 && userFavorite.Any(x => x.AdvertiseID == item.Id);
-                    advertiseItemDTOs.Add(dto);
+                    categoryItemDTO.AdvertiseItems.Add(dto);
                 }
+
+                //if (string.IsNullOrEmpty(Request.QueryString.Value))
+                //{
+                //    cacheManager.Set(cachedName, categoryItemDTO);
+                //}
+
                 if (ajax)
                 {
-                    ViewBag.for_advertise_page = true;
-                    return PartialView("_AdvertiseListItems", advertiseItemDTOs);
+                    return PartialView("_AdvertiseListItems", categoryItemDTO);
                 }
                 else
                 {
-                    return View(advertiseItemDTOs);
+                    return View(categoryItemDTO);
                 }
             }
             catch (Exception exc)
