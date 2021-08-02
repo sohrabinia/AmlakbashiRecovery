@@ -3874,7 +3874,8 @@ h1.dashboard-box-favorite {
 }
 .style-box-status-room p {
     margin: 1px 2px;
-    background-color: #df7549;
+    /*background-color: #df7549;*/
+    background-color: green;
     width: max-content;
     border-radius: 5px;
     padding: 5px;

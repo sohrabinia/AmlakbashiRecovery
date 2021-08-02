@@ -1,147 +1,106 @@
 ﻿@using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
-@using Amlakbashi.Core.DTOs.AccommodationDTOs;
-@model IEnumerable<AccommodationCardDTO>
+@using Amlakbashi.Core.DTOs.CategoryDTOs;
+
+@model CategoryItemDTO
 
 @{
     ViewBag.CurrentPage = "AdvertiseCategory";
-    string province = ViewBag.provinceString;
-    string city = ViewBag.cityString;
-    string area = ViewBag.areaString;
-    var country_direction = ViewBag.countryDirectionString;
-    string phrase = ViewBag.phrase == null ? null : ViewBag.phrase.Replace("-", " ");
-    var category = (DynamicCategory)ViewBag.dcategory;
-    ViewBag.Title = ViewBag.Title;
-    ViewBag.keywords = ViewBag.keywords;
-    ViewBag.Description = ViewBag.Description;
+    string phrase = Model.Phrase == null ? null : Model.Phrase.Replace("-", " ");
+    ViewBag.Title = Model.Title;
+    ViewBag.keywords = Model.Keywords;
+    ViewBag.Description = Model.Description;
     Layout = "~/Views/Shared/_Master.cshtml";
     ViewBag.region_filter_status = (int)Region.RegionStatus.HasAdvertise;
-    var related_categories = (ViewBag.related_categories == null ? new List<DynamicCategory>() : ViewBag.related_categories) as IEnumerable<DynamicCategory>;
-    bool norouz_special = ViewBag.norouz_special != null && ViewBag.norouz_special == "1";
-    bool today_empty_homes = ViewBag.today_empty_homes != null && ViewBag.today_empty_homes == "1";
-    bool hygieneProtocol = ViewBag.hygieneProtocol != null && ViewBag.hygieneProtocol == "1";
-    bool discount_homes = ViewBag.discount_homes != null && ViewBag.discount_homes == "1";
-    bool instant_reserve = ViewBag.instant_reserve != null && ViewBag.instant_reserve == "1";
+
+    var related_categories = (Model.RelatedCategories == null ? new List<DynamicCategory>() : Model.RelatedCategories);
+
     ViewBag.region_filter_item_class = "advertise-filter__item";
     ViewBag.region_filter_label_class = "advertise-filter__title";
     ViewBag.region_filter_property_class = "advertise-filter__property";
-    var next_page_available = ViewBag.pagesCount > ViewBag.currentPageNumber;
-    var previous_page_available = ViewBag.currentPageNumber > 1;
-    var next_page = ViewBag.currentPageNumber + 1;
-    var previous_page = ViewBag.currentPageNumber - 1;
 
-    var priorT = ViewBag.t;
-
-    var capacity = string.IsNullOrEmpty(ViewBag.capacity) ? 0 : int.Parse(ViewBag.capacity);
-    var dateString = ViewBag.dateString;
-
-    //var priceMinString = "0 تومان";
-    //var priceMaxString = "10,000,000 تومان";
-    var priceMin = ViewBag.priceMin;
-    var priceMax = ViewBag.priceMax;
+    var next_page_available = Model.PagesCount > Model.CurrentPageNumber;
+    var previous_page_available = Model.CurrentPageNumber > 1;
+    var next_page = Model.CurrentPageNumber + 1;
+    var previous_page = Model.CurrentPageNumber - 1;
+    var capacity = string.IsNullOrEmpty(Model.Capacity) ? 0 : int.Parse(Model.Capacity);
     var types = Advertise.GetAdvertiseTypes(Advertise.AdvertisePageType.Filter);
-    var positionItems = ViewBag.positionItems;
-    //var parkingItems = ((ParkingItems[])PropertyHelper.GetPropertyItems(Property.Parking)).ToList();
-    //parkingItems.Remove(ParkingItems.Unset);
-    var regionString = ViewBag.regionString;
-    var accTypeUrlString = ViewBag.accTypeUrlString;
-    var priceString = ViewBag.priceString;
-
-    var priceOptions = ViewBag.priceOptions;
-    var monthlyPriceOptions = ViewBag.monthlyPriceOptions;
 
     var moreFilterCount = 0;
-    if (priceString != "")
+    if (Model.PriceString != "")
     {
         moreFilterCount++;
     }
 
-    var accTypeString = ViewBag.accTypeString;
+    var accTypeString = Model.AccTypeString;
     if (accTypeString != "")
     {
         moreFilterCount++;
     }
 
-    if (ViewBag.region != null && ViewBag.region != "-1")
+    if (Model.Region != null && Model.Region != "-1")
     {
         moreFilterCount++;
     }
-    //if (priceMinString != "0 تومان" ||
-    //    priceMaxString != "10,000,000 تومان")
-    //{
-    //    moreFilterCount++;
-    //}
-    //var roomString = "";
-    //if (ViewBag.room != null && ViewBag.room != "-1")
-    //{
-    //    var roomValue = int.Parse(ViewBag.room);
-    //    roomString = roomValue == 0 ? "بدون اتاق خواب" :
-    //            (roomValue > 4 ? "بیشتر از 4 خواب" :
-    //            roomValue + " خوابه");
-    //    moreFilterCount++;
-    //}
-    List<int> deserializedRoomList = ViewBag.roomListIds;
-    if (!string.IsNullOrEmpty(ViewBag.roomList))
+    if (!string.IsNullOrEmpty(Model.RoomList))
     {
         moreFilterCount++;
     }
-    if (ViewBag.parking == 1)
+    if (Model.Parking == 1)
     {
         moreFilterCount++;
     }
-    if (ViewBag.rules_pets == 1)
+    if (Model.RulesPets == 1)
     {
         moreFilterCount++;
     }
-    if (ViewBag.rules_party == 1)
+    if (Model.RulesParty == 1)
     {
         moreFilterCount++;
     }
-    if (ViewBag.rules_smoking == 1)
+    if (Model.RulesSmoking == 1)
     {
         moreFilterCount++;
     }
-    if (ViewBag.pool == "1")
+    if (Model.Pool == "1")
     {
         moreFilterCount++;
     }
-    if (ViewBag.elevator == "1")
+    if (Model.Elevator == "1")
     {
         moreFilterCount++;
     }
-    if (ViewBag.wcType != -1)
+    if (Model.WcType != -1)
     {
-        if (ViewBag.wcType == 128)
+        if (Model.WcType == 128)
         {
             moreFilterCount++;
         }
         moreFilterCount++;
     }
-    if (ViewBag.wifi == 1)
+    if (Model.Wifi == 1)
     {
         moreFilterCount++;
     }
-    if (ViewBag.washingMachine == 1)
+    if (Model.WashingMachine == 1)
     {
         moreFilterCount++;
     }
-    if (ViewBag.jacuzzi == 1)
+    if (Model.Jacuzzi == 1)
     {
         moreFilterCount++;
     }
-    if (ViewBag.poolTable == 1)
+    if (Model.PoolTable == 1)
     {
         moreFilterCount++;
     }
-    if (ViewBag.foosball == 1)
+    if (Model.Foosball == 1)
     {
         moreFilterCount++;
     }
-    if (ViewBag.teaMaker == 1)
+    if (Model.TeaMaker == 1)
     {
         moreFilterCount++;
     }
-
-    string queryString = ViewBag.queryString;
 }
 
 @section StyleBlock {
@@ -183,19 +142,19 @@
     <div class="advertise-list__pin-filter-container">
         <div class="advertise-list__pin-filter-top">
             <div class="advertise-list__pin-filter-right">
-                <div id="divDateFilter" onclick="showDateFilter()" class="advertise-list__pin-filter-item" style="background-color:@(dateString != "" ? "#fdd835" : "white")">
+                <div id="divDateFilter" onclick="showDateFilter()" class="advertise-list__pin-filter-item" style="background-color:@(Model.DateString != "" ? "#fdd835" : "white")">
                     <i class="fa fa-calendar-alt"></i>
-                    <span>@(dateString == "" ? "تاریخ سفر" : dateString)</span>
+                    <span>@(Model.DateString == "" ? "تاریخ سفر" : Model.DateString)</span>
                 </div>
                 <div class="advertise-list__filter-box-item" id="js-date-filter-item">
                     <div class="advertise-list__filter-popup-header">
                         <div class="advertise-list__filter-header-text">تاریخ ورود و خروج</div>
                         <div onclick="hideAllFilterItems()" class="advertise-list__filter-close-btn"><i class="fa fa-times"></i></div>
                     </div>
-                    <input type="hidden" id="from_date_date_picker" value="@(!string.IsNullOrEmpty(ViewBag.empty_range_from) ? ViewBag.empty_range_from : "")" />
-                    <input type="hidden" id="to_date_date_picker" value="@(!string.IsNullOrEmpty(ViewBag.empty_range_to) ? ViewBag.empty_range_to : "")" />
+                    <input type="hidden" id="from_date_date_picker" value="@(!string.IsNullOrEmpty(Model.EmptyRangeFrom) ? Model.EmptyRangeFrom : "")" />
+                    <input type="hidden" id="to_date_date_picker" value="@(!string.IsNullOrEmpty(Model.EmptyRangeTo) ? Model.EmptyRangeTo : "")" />
                     @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" } })
-                    <div style="margin-top:-1vh;text-align: center;border: 1px solid #ccc;border-radius: 5px;">از <span id="js-from-date-label">@(!string.IsNullOrEmpty(ViewBag.empty_range_from) ? ViewBag.empty_range_from : "-")</span> تا <span id="js-to-date-label">@(!string.IsNullOrEmpty(ViewBag.empty_range_to) ? ViewBag.empty_range_to : "-")</span></div>
+                    <div style="margin-top:-1vh;text-align: center;border: 1px solid #ccc;border-radius: 5px;">از <span id="js-from-date-label">@(!string.IsNullOrEmpty(Model.EmptyRangeFrom) ? Model.EmptyRangeFrom : "-")</span> تا <span id="js-to-date-label">@(!string.IsNullOrEmpty(Model.EmptyRangeTo) ? Model.EmptyRangeTo : "-")</span></div>
                     <div class="advertise-list__filter-btn-container">
                         <div onclick="removeDateFilter()" style="background-color:#EA4335;">حذف فیلتر</div>
                         <div onclick="doDateFilter()" style="background-color:#34A853;">اعمال فیلتر</div>
@@ -223,37 +182,9 @@
                         <div onclick="doCapacityFilter()" style="background-color:#34A853;">اعمال فیلتر</div>
                     </div>
                 </div>
-                @*<div onclick="showAccTypeFilter()" class="advertise-list__pin-filter-item" style="background-color:@(accTypeString != "" ? "#fdd835" : "white")">
-                        <i class="fa fa-hotel"></i>
-                        <span>@(accTypeString == "" ? "نوع اقامتگاه" : accTypeString.Replace("اقامتگاه ", "").Replace("اتاق و سوئیت مبله", "سوئیت").Replace("خانه ویلایی مبله", "ویلایی"))</span>
-                    </div>
-                    <div class="advertise-list__filter-box-item" id="js-acctype-filter-item">
-                        <div class="advertise-list__filter-popup-header">
-                            <div class="advertise-list__filter-header-text">نوع اقامتگاه</div>
-                            <div onclick="hideAllFilterItems()" class="advertise-list__filter-close-btn"><i class="fa fa-times"></i></div>
-                        </div>
-                        <div class="advertise-list__filter-select-container">
-                            <div onclick="changeAccTypeValue(this)" class="advertise-list__filter-select-item@(priorT > 0 ? (priorT == 81 ? " filter-selected-item" : "") : (category.Type == 81 ? " filter-selected-item" : ""))" data-value="81">
-                                <span>همه</span>
-                                <i class="fa fa-check"></i>
-                            </div>
-                            @foreach (var typeFilterItem in types)
-                            {
-                                <div onclick="changeAccTypeValue(this)" class="advertise-list__filter-select-item@(priorT > 0 ? (priorT == (int)typeFilterItem ? " filter-selected-item" : "") : ((int)typeFilterItem == category.Type ? " filter-selected-item" : ""))" data-value="@((int)typeFilterItem)">
-                                    <span>@AdvertiseTypeHelper.GetAdvertiseTypeUserString(typeFilterItem)</span>
-                                    <i class="fa fa-check"></i>
-                                </div>
-                            }
-                        </div>
-                        <input type="hidden" id="js-acctype-input" value="@category.Type" />
-                        <div class="advertise-list__filter-btn-container">
-                            <div onclick="removeAccTypeFilter()" style="background-color:#EA4335;">حذف فیلتر</div>
-                            <div onclick="doAccTypeFilter()" style="background-color:#34A853;">اعمال فیلتر</div>
-                        </div>
-                    </div>*@
-                <div id="divRegionFilter" onclick="showRegionFilter()" class="advertise-list__pin-filter-item" style="background-color:@(regionString != "" ? "#fdd835" : "white")">
+                <div id="divRegionFilter" onclick="showRegionFilter()" class="advertise-list__pin-filter-item" style="background-color:@(Model.RegionString != "" ? "#fdd835" : "white")">
                     <i class="fa fa-map-marker-alt"></i>
-                    <span>@(regionString == "" ? "مقصد سفر" : regionString)</span>
+                    <span>@(Model.RegionString == "" ? "مقصد سفر" : Model.RegionString)</span>
                 </div>
                 <div class="advertise-list__filter-box-item" id="js-region-filter-item">
                     <div class="advertise-list__filter-popup-header">
@@ -267,13 +198,13 @@
                             { "provinceName", "accItemProvince"},
                             { "cityName", "accItemCity"},
                             { "areaName", "accItemArea"},
-                            { "province", category.Province},
-                            { "city", category.City},
-                            { "area", ViewBag.area},
+                            { "province", Model.Category.Province},
+                            { "city", Model.Category.City},
+                            { "area", Model.Area},
                             { "region_filter_status", 1 },
-                           {"provinces", ViewBag.provinces },
-                           {"cities", ViewBag.cities },
-                           {"areas", ViewBag.areas },
+                           {"provinces", Model.Provinces },
+                           {"cities", Model.Cities },
+                           {"areas", Model.Areas },
                            { "selectEnabled", true }
                         })
                         </div>
@@ -283,67 +214,11 @@
                         <div onclick="doRegionFilter()" style="background-color:#34A853;">اعمال فیلتر</div>
                     </div>
                 </div>
-                @*<div onclick="showPriceRangeFilter()" id="price-range-filter-item" class="advertise-list__pin-filter-item" style="background-color:@(priceString != "" ? "#fdd835" : "white")">
-                        <i class="fa fa-money-bill-alt"></i>
-                        <span>@(priceString == "" ? "قیمت" : priceString)</span>
-                    </div>*@
-                @*<div class="advertise-list__filter-box-item" id="js-pricerange-filter-item">
-                    <div class="advertise-list__filter-popup-header">
-                        <div class="advertise-list__filter-header-text">محدوده قیمت</div>
-                        <div onclick="hideAllFilterItems()" class="advertise-list__filter-close-btn"><i class="fa fa-times"></i></div>
-                    </div>
-                    <div>*@
-                @*<div class="price-slider">
-                        <input id="js-pricemin-input" min="30000" max="10000000" step="10000" type="range" oninput="updatePriceLabels()" value="@(ViewBag.frompaypernight == null || int.Parse(ViewBag.frompaypernight) < 0 ? (30000).ToString() : ViewBag.frompaypernight)"/>
-                        <input id="js-pricemax-input" min="0" max="10000000" step="200000" type="range" oninput="updatePriceLabels()" value="@(ViewBag.topaypernight == null || int.Parse(ViewBag.topaypernight) < 0 ? (10000000).ToString() : ViewBag.topaypernight)"/>
-                    </div>*@
-                @*<input style="display:none" type="range" name="price-min" id="js-pricemin-input" step="10000" value="@(ViewBag.frompaypernight == null || int.Parse(ViewBag.frompaypernight) < 0 ? (30000).ToString() : ViewBag.frompaypernight)" min="0" max="10000000">
-                    <input style="display:none" type="range" name="price-max" id="js-pricemax-input" step="10000" value="@(ViewBag.topaypernight == null || int.Parse(ViewBag.topaypernight) < 0 ? (10000000).ToString() : ViewBag.topaypernight)" min="0" max="10000000">
-                    <div id="js-price-range-slider-root" style="margin:0 50px;">
-                    </div>*@
-                @*@{
-                            var priceOptions = new int[] {
-                            30000, 50000, 100000, 150000,200000,
-                            250000, 300000, 350000, 400000, 500000,
-                            600000, 700000, 800000, 900000, 1000000,
-                            1200000, 1400000, 1600000, 1800000,
-                            2000000, 2500000, 3500000, 4000000,
-                            5000000, 10000000
-                        };
-                        }
-                        <div style="display: flex;justify-content: space-around;margin-bottom:10px;">
-                            <div style="border-radius:5px;padding:5px;font:13px Liransans;display: flex;flex-flow: column;">
-                                <span>حداقل قیمت:</span>
-                                <select id="js-pricemin-input">
-                                    @for (int i = 0; i < priceOptions.Length; i++)
-                                    {
-                                        var priceValue = priceOptions[i];
-                                        <option @IsSelected(priceValue == priceMin) value="@priceValue">@string.Format("{0:n0}", priceValue) تومان</option>
-                                    }
-                                </select>
-                            </div>
-                            <div style="border-radius:5px;padding:5px;font:13px Liransans;display: flex;flex-flow: column;">
-                                <span>حداکثر قیمت:</span>
-                                <select id="js-pricemax-input">
-                                    @for (int i = 0; i < priceOptions.Length; i++)
-                                    {
-                                        var priceValue = priceOptions[i];
-                                        <option @IsSelected(priceValue == priceMax) value="@priceValue">@string.Format("{0:n0}", priceValue) تومان</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                    </div>*@
-                @*<div class="advertise-list__filter-btn-container">
-                            <div onclick="removePriceRangeFilter()" style="background-color:#EA4335;">حذف فیلتر</div>
-                            <div onclick="doPriceRangeFilter()" style="background-color:#34A853;">اعمال فیلتر</div>
-                        </div>
-                    </div>*@
             </div>
             <div class="advertise-list__pin-filter-left">
                 <div onclick="showMoreFilter()" class="advertise-list__pin-filter-item">
                     <i class="fa fa-filter"></i>
-                    <span>فیلتر بیشتر@*@(moreFilterCount > 0 ? " (" + moreFilterCount + ")" : "")*@</span>
+                    <span>فیلتر بیشتر</span>
                 </div>
                 <div class="advertise-list__filter-box-item" id="js-more-filter-item">
                     <div class="advertise-list__filter-popup-header">
@@ -357,40 +232,42 @@
                                 <i class="fa fa-chevron-down"></i>
                             </div>
                             <div id="js-acctype-container" class="advertise-list__filter-select-container" style="display:none">
-                                <div onclick="changeAccTypeValue(this)" class="advertise-list__filter-select-item@(priorT > 0 ? (priorT == 81 ? " filter-selected-item" : "") : (category.Type == Advertise.AdvertiseType.All ? " filter-selected-item" : ""))" data-value="81">
+                                <div onclick="changeAccTypeValue(this)" class="advertise-list__filter-select-item@(Model.T > 0 ? (Model.T == 81 ? " filter-selected-item" : "") : (Model.Category.Type == Advertise.AdvertiseType.All ? " filter-selected-item" : ""))" data-value="81">
                                     <span>همه</span>
                                     <i class="fa fa-check"></i>
                                 </div>
                                 @foreach (var typeFilterItem in types)
                                 {
-                                    <div onclick="changeAccTypeValue(this)" class="advertise-list__filter-select-item@(priorT > 0 ? (priorT == (int)typeFilterItem ? " filter-selected-item" : "") : (typeFilterItem == category.Type ? " filter-selected-item" : ""))" data-value="@((int)typeFilterItem)">
+                                    <div onclick="changeAccTypeValue(this)" class="advertise-list__filter-select-item@(Model.T > 0 ? (Model.T == (int)typeFilterItem ? " filter-selected-item" : "") : (typeFilterItem == Model.Category.Type ? " filter-selected-item" : ""))" data-value="@((int)typeFilterItem)">
                                         <span>@AdvertiseMainLocalization.GetAdvertiseTypeUserString(typeFilterItem)</span>
                                         <i class="fa fa-check"></i>
                                     </div>
                                 }
                             </div>
-                            <input type="hidden" id="js-acctype-input" value="@category.Type" />
+                            <input type="hidden" id="js-acctype-input" value="@Model.Category.Type" />
                         </div>
+
                         <div class="advertise-list__more-filter-item">
                             <div onclick="togglePositionsContainer(this)" class="advertise-list__more-filter-expand-btn">
                                 <span>موقعیت اقامتگاه</span>
                                 <i class="fa fa-chevron-down"></i>
                             </div>
                             <div id="js-positions-container" class="advertise-list__filter-select-container" style="display:none">
-                                @foreach (var positionFilterItem in positionItems)
+                                @foreach (var positionFilterItem in Model.PositionItems)
                                 {
                                     if (positionFilterItem == Advertise.PositionType.none)
                                     {
                                         continue;
                                     }
-                                    <div class="advertise-list__filter-select-item@((ViewBag.region != null && ((int)positionFilterItem).ToString() == ViewBag.region.ToString()) ? " filter-selected-item" : "")" data-value="@((int)positionFilterItem)">
+                                    <div class="advertise-list__filter-select-item@((Model.Region != null && ((int)positionFilterItem).ToString() == Model.Region.ToString()) ? " filter-selected-item" : "")" data-value="@((int)positionFilterItem)">
                                         <span>@AdvertiseMainLocalization.GetPositionTypeString((int)positionFilterItem)</span>
                                         <i class="fa fa-check"></i>
                                     </div>
                                 }
                             </div>
-                            <input type="hidden" id="js-position-input" value="@(ViewBag.region == null ? "-1" : ViewBag.region)" />
+                            <input type="hidden" id="js-position-input" value="@(Model.Region == null ? "-1" : Model.Region)" />
                         </div>
+
                         <div class="advertise-list__more-filter-item">
                             <div onclick="togglePriceRangeContainer(this)" class="advertise-list__more-filter-expand-btn">
                                 <span>محدوده قیمت</span>
@@ -398,21 +275,21 @@
                             </div>
                             <div id="js-pricerange-container" style="display:none">
                                 <div class="advertise-list__radio-container">
-                                    <input type="hidden" id="js-pricerange-filter-type-input" value="@ViewBag.priceRangeType" />
+                                    <input type="hidden" id="js-pricerange-filter-type-input" value="@Model.PriceRangeType" />
                                     <div class="advertise-list__radio-item">
-                                        <input onchange="changePriceRangeType(0)" is-checked="@(ViewBag.priceRangeType == 0)" type="radio" id="js-price-range-type-0" name="js-price-range-type" value="0" />
+                                        <input onchange="changePriceRangeType(0)" is-checked="@(Model.PriceRangeType == 0)" type="radio" id="js-price-range-type-0" name="js-price-range-type" value="0" />
                                         <label for="js-price-range-type-0">پایه</label>
                                     </div>
                                     <div class="advertise-list__radio-item">
-                                        <input onchange="changePriceRangeType(1)" is-checked="@(ViewBag.priceRangeType == 1)" type="radio" id="js-price-range-type-1" name="js-price-range-type" value="1" />
+                                        <input onchange="changePriceRangeType(1)" is-checked="@(Model.PriceRangeType == 1)" type="radio" id="js-price-range-type-1" name="js-price-range-type" value="1" />
                                         <label for="js-price-range-type-1">روزهای تعطیل</label>
                                     </div>
                                     <div class="advertise-list__radio-item">
-                                        <input onchange="changePriceRangeType(2)" is-checked="@(ViewBag.priceRangeType == 2)" type="radio" id="js-price-range-type-2" name="js-price-range-type" value="2" />
+                                        <input onchange="changePriceRangeType(2)" is-checked="@(Model.PriceRangeType == 2)" type="radio" id="js-price-range-type-2" name="js-price-range-type" value="2" />
                                         <label for="js-price-range-type-2">پیک تعطیلات</label>
                                     </div>
                                     <div class="advertise-list__radio-item">
-                                        <input onchange="changePriceRangeType(3)" is-checked="@(ViewBag.priceRangeType == 3)" type="radio" id="js-price-range-type-3" name="js-price-range-type" value="3" />
+                                        <input onchange="changePriceRangeType(3)" is-checked="@(Model.PriceRangeType == 3)" type="radio" id="js-price-range-type-3" name="js-price-range-type" value="3" />
                                         <label for="js-price-range-type-3">اجاره ماهانه</label>
                                     </div>
                                 </div>
@@ -420,20 +297,20 @@
                                     <div style="border-radius:5px;padding:5px;font:13px Liransans;display: flex;flex-flow: column;">
                                         <span>حداقل قیمت:</span>
                                         <select id="js-pricemin-input">
-                                            @if (ViewBag.priceRangeType == 3)
+                                            @if (Model.PriceRangeType == 3)
                                             {
-                                                for (int i = 0; i < monthlyPriceOptions.Length; i++)
+                                                for (int i = 0; i < Model.MonthlyPriceOptions.Length; i++)
                                                 {
-                                                    var priceValue = monthlyPriceOptions[i];
-                                                    <option is-selected="@(priceValue == priceMin)" value="@priceValue">@(priceValue == 150000000 ? "بیشتر از پنجاه میلیون" : string.Format("{0:n0}", priceValue) +" تومان")</option>
+                                                    var priceValue = Model.MonthlyPriceOptions[i];
+                                                    <option is-selected="@(priceValue == Model.PriceMin)" value="@priceValue">@(priceValue == 150000000 ? "بیشتر از پنجاه میلیون" : string.Format("{0:n0}", priceValue) +" تومان")</option>
                                                 }
                                             }
                                             else
                                             {
-                                                for (int i = 0; i < priceOptions.Length; i++)
+                                                for (int i = 0; i < Model.PriceOptions.Length; i++)
                                                 {
-                                                    var priceValue = priceOptions[i];
-                                                    <option is-selected="@(priceValue == priceMin)" value="@priceValue">@string.Format("{0:n0}", priceValue) تومان</option>
+                                                    var priceValue = Model.PriceOptions[i];
+                                                    <option is-selected="@(priceValue == Model.PriceMin)" value="@priceValue">@string.Format("{0:n0}", priceValue) تومان</option>
                                                 }
                                             }
                                         </select>
@@ -441,20 +318,20 @@
                                     <div style="border-radius:5px;padding:5px;font:13px Liransans;display: flex;flex-flow: column;">
                                         <span>حداکثر قیمت:</span>
                                         <select id="js-pricemax-input">
-                                            @if (ViewBag.priceRangeType == 3)
+                                            @if (Model.PriceRangeType == 3)
                                             {
-                                                for (int i = 0; i < monthlyPriceOptions.Length; i++)
+                                                for (int i = 0; i < Model.MonthlyPriceOptions.Length; i++)
                                                 {
-                                                    var priceValue = monthlyPriceOptions[i];
-                                                    <option is-selected="@(priceValue == priceMax)" value="@priceValue">@(priceValue == 150000000 ? "بیشتر از پنجاه میلیون" : string.Format("{0:n0}", priceValue) + " تومان")</option>
+                                                    var priceValue = Model.MonthlyPriceOptions[i];
+                                                    <option is-selected="@(priceValue == Model.PriceMax)" value="@priceValue">@(priceValue == 150000000 ? "بیشتر از پنجاه میلیون" : string.Format("{0:n0}", priceValue) + " تومان")</option>
                                                 }
                                             }
                                             else
                                             {
-                                                for (int i = 0; i < priceOptions.Length; i++)
+                                                for (int i = 0; i < Model.PriceOptions.Length; i++)
                                                 {
-                                                    var priceValue = priceOptions[i];
-                                                    <option is-selected="@(priceValue == priceMax)" value="@priceValue">@string.Format("{0:n0}", priceValue) تومان</option>
+                                                    var priceValue = Model.PriceOptions[i];
+                                                    <option is-selected="@(priceValue == Model.PriceMax)" value="@priceValue">@string.Format("{0:n0}", priceValue) تومان</option>
                                                 }
                                             }
                                         </select>
@@ -462,46 +339,32 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="advertise-list__more-filter-item">
                             <div onclick="toggleRoomContainer(this)" class="advertise-list__more-filter-expand-btn">
                                 <span>اتاق خواب</span>
                                 <i class="fa fa-chevron-down"></i>
                             </div>
                             <div id="js-room-container" class="advertise-list__filter-select-container" style="display:none" multi="multi">
-                                <div class="advertise-list__filter-select-item@((deserializedRoomList != null && deserializedRoomList.Contains(0)) ? " filter-selected-item" : "")" data-value="0">
+                                <div class="advertise-list__filter-select-item@((Model.RoomListIds != null && Model.RoomListIds.Contains(0)) ? " filter-selected-item" : "")" data-value="0">
                                     <span>بدون اتاق خواب</span>
                                     <i class="fa fa-check"></i>
                                 </div>
                                 @for (int i = 1; i <= 4; i++)
                                 {
-                                    <div class="advertise-list__filter-select-item@((deserializedRoomList != null && deserializedRoomList.Contains(i)) ? " filter-selected-item" : "")" data-value="@(i)">
+                                    <div class="advertise-list__filter-select-item@((Model.RoomListIds != null && Model.RoomListIds.Contains(i)) ? " filter-selected-item" : "")" data-value="@(i)">
                                         <span>@(i + " خوابه")</span>
                                         <i class="fa fa-check"></i>
                                     </div>
                                 }
-                                <div class="advertise-list__filter-select-item@((deserializedRoomList != null && deserializedRoomList.Contains(5)) ? " filter-selected-item" : "")" data-value="5">
+                                <div class="advertise-list__filter-select-item@((Model.RoomListIds != null && Model.RoomListIds.Contains(5)) ? " filter-selected-item" : "")" data-value="5">
                                     <span>بیشتر از 4 خواب</span>
                                     <i class="fa fa-check"></i>
                                 </div>
                             </div>
-                            <input type="hidden" id="js-roomlist-input" value="@(string.IsNullOrEmpty(ViewBag.roomList) ? "" : ViewBag.roomList)" />
+                            <input type="hidden" id="js-roomlist-input" value="@(string.IsNullOrEmpty(Model.RoomList) ? "" : Model.RoomList)" />
                         </div>
-                        @*<div class="advertise-list__more-filter-item">
-                                <div onclick="toggleParkingContainer(this)" class="advertise-list__more-filter-expand-btn">
-                                    <span>پارکینگ</span>
-                                    <i class="fa fa-chevron-down"></i>
-                                </div>
-                                <div id="js-parking-container" class="advertise-list__filter-select-container" style="display:none">
-                                    @foreach (var parkingFilterItem in parkingItems)
-                                    {
-                                        <div onclick="changeParkingValue(this)" class="advertise-list__filter-select-item@((ViewBag.parking != null && ((int)parkingFilterItem).ToString() == ViewBag.parking) ? " filter-selected-item" : "")" data-value="@((int)parkingFilterItem)">
-                                            <span>@PropertyItemHelper.GetItemTitle(parkingFilterItem)</span>
-                                            <i class="fa fa-check"></i>
-                                        </div>
-                                    }
-                                </div>
-                                <input type="hidden" id="js-parking-input" value="@(ViewBag.parking == null ? "-1" : ViewBag.parking)" />
-                            </div>*@
+
                         <div class="advertise-list__more-filter-item">
                             <div onclick="toggleFacilitiesContainer(this)" class="advertise-list__more-filter-expand-btn">
                                 <span>امکانات</span>
@@ -509,60 +372,60 @@
                             </div>
                             <div id="js-facilities-container" class="advertise-list__filter-select-container" style="display:none">
                                 <div style="display:flex;flex-wrap:wrap;">
-                                    <input type="hidden" id="js-pool-input" value="@(ViewBag.pool == null ? "-1" : ViewBag.pool)" />
+                                    <input type="hidden" id="js-pool-input" value="@(Model.Pool == null ? "-1" : Model.Pool)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>استخر</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.pool != "1" ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Pool != "1" ? "unchecked-3" : "checked-3")" />
                                     </div>
-                                    <input type="hidden" id="js-elevator-input" value="@(ViewBag.elevator == null ? "-1" : ViewBag.elevator)" />
+                                    <input type="hidden" id="js-elevator-input" value="@(Model.Elevator == null ? "-1" : Model.Elevator)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>آسانسور</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.elevator != "1" ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Elevator != "1" ? "unchecked-3" : "checked-3")" />
                                     </div>
-                                    <input type="hidden" id="js-parking-input" value="@(ViewBag.parking == null ? -1 : ViewBag.parking)" />
+                                    <input type="hidden" id="js-parking-input" value="@(Model.Parking)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>پارکینگ</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.parking != 1 ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Parking != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
-                                    <input type="hidden" id="js-perwc-input" value="@(ViewBag.wcType == 127 || ViewBag.wcType == 128  ? 1 : -1)" />
+                                    <input type="hidden" id="js-perwc-input" value="@(Model.WcType == 127 || Model.WcType == 128  ? 1 : -1)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>سرویس ایرانی</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.wcType == 127 || ViewBag.wcType == 128  ? "checked-3" : "unchecked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.WcType == 127 || Model.WcType == 128  ? "checked-3" : "unchecked-3")" />
                                     </div>
-                                    <input type="hidden" id="js-euwc-input" value="@(ViewBag.wcType == 129 || ViewBag.wcType == 128  ? 1 : -1)" />
+                                    <input type="hidden" id="js-euwc-input" value="@(Model.WcType == 129 || Model.WcType == 128  ? 1 : -1)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>سرویس فرنگی</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.wcType == 129 || ViewBag.wcType == 128  ? "checked-3" : "unchecked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.WcType == 129 || Model.WcType == 128  ? "checked-3" : "unchecked-3")" />
                                     </div>
-                                    <input type="hidden" id="js-wifi-input" value="@(ViewBag.wifi == null ? -1 : ViewBag.wifi)" />
+                                    <input type="hidden" id="js-wifi-input" value="@(Model.Wifi)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>وای فای</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.wifi != 1 ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Wifi != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
-                                    <input type="hidden" id="js-washingmachine-input" value="@(ViewBag.washingMachine == null ? -1 : ViewBag.washingMachine)" />
+                                    <input type="hidden" id="js-washingmachine-input" value="@(Model.WashingMachine)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>ماشین لباسشویی</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.washingMachine != 1 ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.WashingMachine != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
-                                    <input type="hidden" id="js-jacuzzi-input" value="@(ViewBag.jacuzzi == null ? -1 : ViewBag.jacuzzi)" />
+                                    <input type="hidden" id="js-jacuzzi-input" value="@(Model.Jacuzzi)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>جکوزی</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.jacuzzi != 1 ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Jacuzzi != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
-                                    <input type="hidden" id="js-pooltable-input" value="@(ViewBag.poolTable == null ? -1 : ViewBag.poolTable)" />
+                                    <input type="hidden" id="js-pooltable-input" value="@(Model.PoolTable)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>بیلیارد</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.poolTable != 1 ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.PoolTable != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
-                                    <input type="hidden" id="js-foosball-input" value="@(ViewBag.foosball == null ? -1 : ViewBag.foosball)" />
+                                    <input type="hidden" id="js-foosball-input" value="@(Model.Foosball)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>فوتبال دستی</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.foosball != 1 ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Foosball != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
-                                    <input type="hidden" id="js-teamaker-input" value="@(ViewBag.teaMaker == null ? -1 : ViewBag.teaMaker)" />
+                                    <input type="hidden" id="js-teamaker-input" value="@(Model.TeaMaker)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>چای ساز</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.teaMaker != 1 ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.TeaMaker != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
                                 </div>
                             </div>
@@ -574,24 +437,24 @@
                             </div>
                             <div id="js-rules-container" class="advertise-list__filter-select-container" style="display:none">
                                 <div style="display:flex;flex-wrap:wrap;">
-                                    <input type="hidden" id="js-pets-input" value="@(ViewBag.rules_pets == null ? "-1" : ViewBag.rules_pets)" />
+                                    <input type="hidden" id="js-pets-input" value="@(Model.RulesPets)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>حیوان خانگی مجاز</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.rules_pets != 1 ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.RulesPets != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
                                 </div>
                                 <div style="display:flex;flex-wrap:wrap;">
-                                    <input type="hidden" id="js-party-input" value="@(ViewBag.rules_party == null ? "-1" : ViewBag.rules_party)" />
+                                    <input type="hidden" id="js-party-input" value="@(Model.RulesParty)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>مهمانی گرفتن مجاز</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.rules_party != 1 ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.RulesParty != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
                                 </div>
                                 <div style="display:flex;flex-wrap:wrap;">
-                                    <input type="hidden" id="js-smoking-input" value="@(ViewBag.rules_smoking == null ? "-1" : ViewBag.rules_smoking)" />
+                                    <input type="hidden" id="js-smoking-input" value="@(Model.RulesSmoking)" />
                                     <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
                                         <span>استعمال دخانیات مجاز</span>
-                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(ViewBag.rules_smoking != 1 ? "unchecked-3" : "checked-3")" />
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.RulesSmoking != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
                                 </div>
                             </div>
@@ -614,17 +477,17 @@
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.region != null && ViewBag.region != "-1")
+                if (Model.Region != null && Model.Region != "-1")
                 {
                     <div onclick="removePositionFilter()" class="advertise-list__pin-filter-list-item">
-                        <span>@AdvertiseMainLocalization.GetPositionTypeString(int.Parse(ViewBag.region))</span>
+                        <span>@AdvertiseMainLocalization.GetPositionTypeString(int.Parse(Model.Region))</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (priceString != "")
+                if (Model.PriceString != "")
                 {
                     <div onclick="removePriceRangeFilter()" class="advertise-list__pin-filter-list-item">
-                        <span>@priceString</span>
+                        <span>@Model.PriceString</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
@@ -635,10 +498,10 @@
                             <i class="fa fa-times"></i>
                         </div>
                     }*@
-                if (deserializedRoomList != null)
+                if (Model.RoomListIds != null)
                 {
 
-                    foreach (var roomItem in deserializedRoomList)
+                    foreach (var roomItem in Model.RoomListIds)
                     {
                         var roomString = roomItem == 0 ? "بدون اتاق خواب" :
                             (roomItem > 4 ? "بیشتر از 4 خواب" :
@@ -649,98 +512,98 @@
                         </div>
                     }
                 }
-                if (ViewBag.parking == 1)
+                if (Model.Parking == 1)
                 {
                     <div onclick="removeParkingFilter()" class="advertise-list__pin-filter-list-item">
                         <span>پارکینگ</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.rules_pets == 1)
+                if (Model.RulesPets == 1)
                 {
                     <div onclick="removePetsFilter()" class="advertise-list__pin-filter-list-item">
                         <span>حیوان خانگی</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.rules_party == 1)
+                if (Model.RulesParty == 1)
                 {
                     <div onclick="removePartyFilter()" class="advertise-list__pin-filter-list-item">
                         <span>مهمانی گرفتن</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.rules_smoking == 1)
+                if (Model.RulesSmoking == 1)
                 {
                     <div onclick="removeSmokingFilter()" class="advertise-list__pin-filter-list-item">
                         <span>استعمال دخانیات</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.pool != null && ViewBag.pool == "1")
+                if (Model.Pool != null && Model.Pool == "1")
                 {
                     <div onclick="removePoolFilter()" class="advertise-list__pin-filter-list-item">
                         <span>استخر</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.elevator != null && ViewBag.elevator == "1")
+                if (Model.Elevator != null && Model.Elevator == "1")
                 {
                     <div onclick="removeElevatorFilter()" class="advertise-list__pin-filter-list-item">
                         <span>آسانسور</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.wcType == 127 || ViewBag.wcType == 128)
+                if (Model.WcType == 127 || Model.WcType == 128)
                 {
                     <div onclick="removePerWCFilter()" class="advertise-list__pin-filter-list-item">
                         <span>سرویس ایرانی</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.wcType == 129 || ViewBag.wcType == 128)
+                if (Model.WcType == 129 || Model.WcType == 128)
                 {
                     <div onclick="removeEuWCFilter()" class="advertise-list__pin-filter-list-item">
                         <span>سرویس فرنگی</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.wifi == 1)
+                if (Model.Wifi == 1)
                 {
                     <div onclick="removeWifiFilter()" class="advertise-list__pin-filter-list-item">
                         <span>وای فای</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.washingMachine == 1)
+                if (Model.WashingMachine == 1)
                 {
                     <div onclick="removeWashingMachineFilter()" class="advertise-list__pin-filter-list-item">
                         <span>لباسشویی</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.jacuzzi == 1)
+                if (Model.Jacuzzi == 1)
                 {
                     <div onclick="removeJacuzziFilter()" class="advertise-list__pin-filter-list-item">
                         <span>جکوزی</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.poolTable == 1)
+                if (Model.PoolTable == 1)
                 {
                     <div onclick="removePoolTableFilter()" class="advertise-list__pin-filter-list-item">
                         <span>بیلیارد</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.foosball == 1)
+                if (Model.Foosball == 1)
                 {
                     <div onclick="removeFoosballFilter()" class="advertise-list__pin-filter-list-item">
                         <span>فوتبال دستی</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
-                if (ViewBag.teaMaker == 1)
+                if (Model.TeaMaker == 1)
                 {
                     <div onclick="removeTeaMakerFilter()" class="advertise-list__pin-filter-list-item">
                         <span>چای ساز</span>
@@ -752,7 +615,7 @@
     </div>
 }
 
-@await Html.PartialAsync("_AdvertiseFilter", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "dcategory", category }, { "norouz_special", norouz_special }, { "discount_homes", discount_homes }, { "today_empty_homes", today_empty_homes }, { "instant_reserve", instant_reserve }, { "hygieneProtocol", hygieneProtocol }, { "ViewBag", ViewBag } })
+@await Html.PartialAsync("_AdvertiseFilter", Model)
 
 @*@if (category != null && category.Province == 793)
     {
@@ -775,7 +638,7 @@
     }*@
 
 @*<div class="advertise-category__special-filter-container" style="width:90%;margin:auto;">*@
-@*<a class="advertise-category__norouz_button" href="/category/category?type=@(category.Type)&a_m_p_version=false&province=@(category.Province)&city=@(category.City)&area=@(ViewBag.area)&norouz_special=@(norouz_special ? "false" : "true")&today_empty_homes=@(today_empty_homes ? "true" : "false")&discount_homes=@(discount_homes ? "true" : "false")">
+@*<a class="advertise-category__norouz_button" href="/category/category?type=@(category.Type)&a_m_p_version=false&province=@(category.Province)&city=@(category.City)&area=@(Model.Area)&norouz_special=@(norouz_special ? "false" : "true")&today_empty_homes=@(today_empty_homes ? "true" : "false")&discount_homes=@(discount_homes ? "true" : "false")">
         <img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32" />
         <span>اقامتگاه های ویژه نوروز</span>
         <img width="16" height="16" rel="checkbox" src="/file/resourceimagepng?file_name=@(norouz_special ? "checked" : "unchecked")" />
@@ -785,7 +648,7 @@
         var amp_version = "false";
         var _province_ = category != null ? category.Province : 0;
         var _city_ = category != null ? category.City : 0;
-        var _area_ = category != null ? ViewBag.area : 0;
+        var _area_ = category != null ? Model.Area : 0;
         var _countrydirection_= category != null ? category.CountryDirection : 0;
         var norouz_spc = norouz_special ? "true" : "false";
         var today_empt = today_empty_homes ? "true" : "false";
@@ -833,53 +696,52 @@
         <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(today_empty_homes ? "checked-3" : "unchecked-3")" />
     </div>*@
 @*</div>*@
+
 @{
-    var u_ = "https://www.amlakbashi.com" + ViewBag.raw_url;
-    var t_ = ViewBag.Title;
-    var img_ = "https://www.amlakbashi.com" + (Model.Any() && Model.First().PhotoID > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.First().PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394));
+    var u_ = "https://www.amlakbashi.com" + Model.RawUrl;
+    var img_ = "https://www.amlakbashi.com" + (Model.AdvertiseItems.Any() && Model.AdvertiseItems.First().PhotoID > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.AdvertiseItems.First().PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394));
 }
-@*<div class="share-post__button">
-        <i class="fa fa-share-alt" style="font-size:20px;"></i>
-    </div>*@
-<div class="share-post__container">
-    <a class="share-post__item" href="#" onclick="window.open('https://t.me/share/url?url=@(u_)&text=@(t_)', 'telegramShare', 'width=626,height=436'); return false;" title="اشتراک گذاری در تلگرام">
+
+@*<div class="share-post__container">
+    <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(Model.Title)" target="_blank" rel="noreferrer" title="اشتراک گذاری در تلگرام">
         <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram" style="background-color: #259DCF;">
     </a>
-    <a class="share-post__item" href="whatsapp://send?text=@(t_) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(t_) @(u_)')" title="اشتراک گذاری در واتس اپ">
+    <a class="share-post__item" href="whatsapp://send?text=@(Model.Title) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(Model.Title) @(u_)')" title="اشتراک گذاری در واتس اپ">
         <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp" style="background-color: #1BD741;">
     </a>
-    <a class="share-post__item" href="#" onclick="window.open('http://twitter.com/share?text=@(t_);url=@(u_)', 'twitterShare', 'width=626,height=436'); return false;" title="توئیت کردن اقامتگاه">
+    <a class="share-post__item" href="http://twitter.com/share?text=@(Model.Title);url=@(u_)" target="_blank" rel="noreferrer" title="توئیت کردن اقامتگاه">
         <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter" style="background-color: #55ACEE;">
     </a>
-    <a class="share-post__item" href="#" onclick="window.open('http://www.facebook.com/sharer.php?u=@(u_);t=@(t_)', 'facebookShare', 'width=626,height=436'); return false;" title="اشتراک گذاری در فیسبوک">
+    <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(Model.Title)" target="_blank" rel="noreferrer" title="اشتراک گذاری در فیسبوک">
         <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook" style="background-color: #3b5998;">
     </a>
-    <a class="share-post__item" href="#" onclick="window.open('http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(t_)', 'pinterestShare', 'width=750,height=350'); return false;" title="پین کردن در پینترست">
+    <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(Model.Title)" target="_blank" rel="noreferrer" title="پین کردن در پینترست">
         <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest" style="background-color: #BD081C;">
     </a>
-    <a class="share-post__item" href="mailto:?subject=@(t_);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" title="اشتراک گذاری با ایمیل">
+    <a class="share-post__item" href="mailto:?subject=@(Model.Title);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" title="اشتراک گذاری با ایمیل">
         <i class="fa fa-envelope share-post__icon" style="font-size:24px;padding:8px;color:white;background-color:#3d3d3d;"></i>
     </a>
-</div>
+</div>*@
+
 <div class="container" style="max-width:1100px">
     <div class="dynamic__header-container">
         <div class="dynamic-title">
             <div class="dynamic-text" style="width: 100%;">
-                <h1 style="text-align: center;width: 100%;">@(!string.IsNullOrEmpty(phrase) ? "جستجوی عبارت \"" + phrase + "\"" : ViewBag.categoryH1Title)@(string.IsNullOrEmpty(area) ? "" : " - " + area)</h1>
+                <h1 style="text-align: center;width: 100%;">@(!string.IsNullOrEmpty(phrase) ? "جستجوی عبارت \"" + phrase + "\"" : Model.CategoryH1Title)@(string.IsNullOrEmpty(Model.AreaString) ? "" : " - " + Model.AreaString)</h1>
             </div>
         </div>
     </div>
     <div class="advertise-filter__inpage-filter">
         <div class="advertise-filter__extra-filter-container">
-            <div id="instant-reserve-filter-button" onclick="toggleInstantReserve()" style="background-color:@(instant_reserve ? "#fdd835" : "white");" class="advertise-list__pin-filter-item">
+            <div id="instant-reserve-filter-button" onclick="toggleInstantReserve()" style="background-color:@(Model.InstantReserve ? "#fdd835" : "white");" class="advertise-list__pin-filter-item">
                 <i class="fa fa-bolt"></i>
                 <span>رزرو آنی</span>
             </div>
-            <div id="today-empty-filter-button" onclick="toggleTodayEmpty()" style="background-color:@(today_empty_homes ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+            <div id="today-empty-filter-button" onclick="toggleTodayEmpty()" style="background-color:@(Model.TodayEmptyHomes ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
                 <i class="fa fa-home"></i>
                 <span>خالی امشب</span>
             </div>
-            <div id="discount-homes-filter-button" onclick="toggleDiscount()" style="background-color:@(discount_homes ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+            <div id="discount-homes-filter-button" onclick="toggleDiscount()" style="background-color:@(Model.DiscountHomes ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
                 <i class="fa fa-percent"></i>
                 <span>تخفیف دار</span>
             </div>
@@ -887,27 +749,28 @@
                     <img width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
                     <span>ویژه نوروز</span>
                 </div>*@
-            <div id="corona-special-filter-button" onclick="toggleHygieneProtocol()" style="background-color:@(hygieneProtocol ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+            <div id="corona-special-filter-button" onclick="toggleHygieneProtocol()" style="background-color:@(Model.HygieneProtocol ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
                 <img width="16" height="16" rel="ضدعفونی شده" title="ضدعفونی شده" src="/file/resourceimagepng?file_name=no-virus" />
                 <span>ضدعفونی شده</span>
             </div>
         </div>
         <div class="advertise-filter__inpage-filter-left">
             <div onclick="toggleSortPopup()" id="sort-filter-button" class="advertise-list__pin-filter-item">
-                <img alt="sort" src="/file/resourceimagepng?file_name=icons/20_sort" />
-                @if (ViewBag.sort == 0)
+                @*<img alt="sort" src="/file/resourceimagepng?file_name=icons/20_sort" />*@
+                <i class="fa fa-sort"></i>
+                @if (Model.Sort == 0)
                 {
                     <span>مرتب سازی</span>
                 }
-                else if (ViewBag.sort == 1)
+                else if (Model.Sort == 1)
                 {
                     <span>گران ترین</span>
                 }
-                else if (ViewBag.sort == 2)
+                else if (Model.Sort == 2)
                 {
                     <span>ارزان ترین</span>
                 }
-                else if (ViewBag.sort == 3)
+                else if (Model.Sort == 3)
                 {
                     <span>امتیاز کاربران</span>
                 }
@@ -922,23 +785,23 @@
                     <div class="advertise-list__filter-close-btn"><i class="fa fa-times"></i></div>
                 </div>
                 <div class="advertise-list__sort-popup-container">
-                    <div id="sortItem0" onclick="changeSortOrder(0)" class="advertise-list__sort-popup-item@(ViewBag.sort == 0 ? " sort-item-selected" : "")">
+                    <div id="sortItem0" onclick="changeSortOrder(0)" class="advertise-list__sort-popup-item@(Model.Sort == 0 ? " sort-item-selected" : "")">
                         <span>پیش فرض</span>
                         <i class="fa fa-check"></i>
                     </div>
-                    <div id="sortItem1" onclick="changeSortOrder(1)" class="advertise-list__sort-popup-item@(ViewBag.sort == 1 ? " sort-item-selected" : "")">
+                    <div id="sortItem1" onclick="changeSortOrder(1)" class="advertise-list__sort-popup-item@(Model.Sort == 1 ? " sort-item-selected" : "")">
                         <span>گران ترین</span>
                         <i class="fa fa-check"></i>
                     </div>
-                    <div id="sortItem2" onclick="changeSortOrder(2)" class="advertise-list__sort-popup-item@(ViewBag.sort == 2 ? " sort-item-selected" : "")">
+                    <div id="sortItem2" onclick="changeSortOrder(2)" class="advertise-list__sort-popup-item@(Model.Sort == 2 ? " sort-item-selected" : "")">
                         <span>ارزان ترین</span>
                         <i class="fa fa-check"></i>
                     </div>
-                    <div id="sortItem3" onclick="changeSortOrder(3)" class="advertise-list__sort-popup-item@(ViewBag.sort == 3 ? " sort-item-selected" : "")">
+                    <div id="sortItem3" onclick="changeSortOrder(3)" class="advertise-list__sort-popup-item@(Model.Sort == 3 ? " sort-item-selected" : "")">
                         <span>امتیاز کاربران</span>
                         <i class="fa fa-check"></i>
                     </div>
-                    <div id="sortItem4" onclick="changeSortOrder(4)" class="advertise-list__sort-popup-item@(ViewBag.sort == 4 ? " sort-item-selected" : "")">
+                    <div id="sortItem4" onclick="changeSortOrder(4)" class="advertise-list__sort-popup-item@(Model.Sort == 4 ? " sort-item-selected" : "")">
                         <span>نظافت</span>
                         <i class="fa fa-check"></i>
                     </div>
@@ -948,62 +811,62 @@
         </div>
     </div>
     <div id="accListContainer">
-        @await Html.PartialAsync("_AdvertiseListItems", Model, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "for_advertise_page", true },
-        { "all_images_lazy", false }, { "ViewBag", ViewBag },{ "currentPageNumber", ViewBag.currentPageNumber }, { "dcategory", ViewBag.dcategory },
-        { "pagesCount", ViewBag.pagesCount },{ "urlWithParameters",ViewBag.urlWithParameters }, { "instant_reserve", ViewBag.instant_reserve },
-        { "today_empty_homes", ViewBag.today_empty_homes }, { "discount_homes",ViewBag.discount_homes }, { "capacity", ViewBag.capacity },
-        { "norouz_special", ViewBag.norouz_special },
-        { "empty_range_from", ViewBag.empty_range_from }, {"empty_range_to", ViewBag.empty_range_to }, { "hygieneProtocol", ViewBag.hygieneProtocol }, { "related_categories", ViewBag.related_categories } })
+        @await Html.PartialAsync("_AdvertiseListItems", Model)
     </div>
 </div>
-@if (category != null && !string.IsNullOrEmpty(category.CategoryPostTitle) &&
-  !string.IsNullOrEmpty(category.CategoryPostText))
+@if (Model.Category != null && !string.IsNullOrEmpty(Model.Category.CategoryPostTitle) && 
+    string.IsNullOrEmpty(Model.Category.CategoryPostText) == false)
 {
     <div class="advertise-category__description" style="white-space:unset;border-radius: 5px;">
         <header>
-            <h2 style="margin:10px;font:15px Biransans;">@category.CategoryPostTitle</h2>
+            <h2 style="margin:10px;font:15px Biransans;">@Model.Category.CategoryPostTitle</h2>
         </header>
-        @Html.Raw(category.CategoryPostText)
+        @Html.Raw(Model.Category.CategoryPostText)
     </div>
 }
 <div class="advertise-category-link__title">سوالات متداول</div>
 <div class="advertise-list__faq-container">
     <p class="public__header-text">
-        <strong>@ViewBag.categoryFaqTrustQuestion</strong>
+        <strong>@Model.CategoryFaqTrustQuestion</strong>
         <i class="fa fa-chevron-left"></i>
     </p>
-    <p class="public__content-text">@ViewBag.categoryFaqTrustAnswer</p>
+    <p class="public__content-text">@Model.CategoryFaqTrustAnswer</p>
     <p class="public__header-text">
-        <strong>@ViewBag.categoryFaqPriceQuestion</strong>
+        <strong>@Model.CategoryFaqPriceQuestion</strong>
         <i class="fa fa-chevron-left"></i>
     </p>
-    <p class="public__content-text">@ViewBag.categoryFaqPriceAnswer</p>
-    @if (!string.IsNullOrEmpty(category.CityAreaListString))
+    <p class="public__content-text">@Model.CategoryFaqPriceAnswer</p>
+    @if (!string.IsNullOrEmpty(Model.Category.CityAreaListString))
     {
         <p class="public__header-text">
-            <strong>@ViewBag.categoryFaqAreasQuestion</strong>
+            <strong>@Model.CategoryFaqAreasQuestion</strong>
             <i class="fa fa-chevron-left"></i>
         </p>
-        <p class="public__content-text">@ViewBag.categoryFaqAreasAnswer</p>
+        <p class="public__content-text">@Model.CategoryFaqAreasAnswer</p>
     }
     <p class="public__header-text">
-        <strong>@ViewBag.categoryFaqEvidenceQuestion</strong>
+        <strong>@Model.CategoryFaqEvidenceQuestion</strong>
         <i class="fa fa-chevron-left"></i>
     </p>
-    <p class="public__content-text">@ViewBag.categoryFaqEvidenceAnswer</p>
+    <p class="public__content-text">@Model.CategoryFaqEvidenceAnswer</p>
     <p class="public__header-text">
-        <strong>@ViewBag.categoryFaqReserveQuestion</strong>
+        <strong>@Model.CategoryFaqReserveQuestion</strong>
         <i class="fa fa-chevron-left"></i>
     </p>
     <div class="public__content-text">
-        @ViewBag.categoryFaqReserveAnswer
-        <iframe class="style-video" src="https://www.aparat.com/video/video/embed/videohash/vS7Oe/vt/frame" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
+        @Model.CategoryFaqReserveAnswer
+        <br />
+        <div style="text-align:center; margin: 20px;">
+            <a href="https://www.aparat.com/v/vS7Oe" target="_blank" rel="noreferrer"><i class="fas fa-play-circle"></i> مشاهده در آپارات</a>
+        </div>
+        
+        @*<iframe class="style-video" src="https://www.aparat.com/video/video/embed/videohash/vS7Oe/vt/frame" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>*@
     </div>
     <p class="public__header-text">
-        <strong>@ViewBag.categoryFaqHostQuestion</strong>
+        <strong>@Model.CategoryFaqHostQuestion</strong>
         <i class="fa fa-chevron-left"></i>
     </p>
-    <p class="public__content-text">@ViewBag.categoryFaqHostAnswer</p>
+    <p class="public__content-text">@Model.CategoryFaqHostAnswer</p>
 </div>
 @section HeaderAddition
 {
@@ -1015,30 +878,30 @@
         }
         else
         {
-            canonicalUrl = "https://www.amlakbashi.com" + (category == null || ViewBag.area < 1 ? ViewBag.raw_url :
-                "/s/" + category.City + "/" + city + (category.Type == Advertise.AdvertiseType.All ? "" : "/" + accTypeUrlString));
+            canonicalUrl = "https://www.amlakbashi.com" + (Model.Category == null || Model.Area < 1 ? Model.RawUrl :
+                "/s/" + Model.Category.City + "/" + Model.CityString + (Model.Category.Type == Advertise.AdvertiseType.All ? "" : "/" + Model.AccTypeUrlString));
         }
     }
-    @if (Model.Any())
+    @if (Model.AdvertiseItems.Any())
     {
         <link rel="canonical" href="@(canonicalUrl)" />
-        @*if (ViewBag.currentPageNumber > 1)
+        @*if (Model.CurrentPageNumber > 1)
             {
-                <link rel="prev" href="@(canonicalUrl)@(ViewBag.currentPageNumber == 2 ? "" : "?page=" + (ViewBag.currentPageNumber - 1).ToString())" />
+                <link rel="prev" href="@(canonicalUrl)@(Model.CurrentPageNumber == 2 ? "" : "?page=" + (Model.CurrentPageNumber - 1).ToString())" />
             }
-            <link rel="canonical" href="@(canonicalUrl)@(ViewBag.currentPageNumber > 1 ? "?page=" + ViewBag.currentPageNumber : "")" ) />
-            if (ViewBag.pagesCount > ViewBag.currentPageNumber)
+            <link rel="canonical" href="@(canonicalUrl)@(Model.CurrentPageNumber > 1 ? "?page=" + Model.CurrentPageNumber : "")" ) />
+            if (Model.PagesCount > Model.CurrentPageNumber)
             {
-                <link rel="next" href="@(canonicalUrl)?page=@(ViewBag.currentPageNumber + 1)" />
+                <link rel="next" href="@(canonicalUrl)?page=@(Model.CurrentPageNumber + 1)" />
             }*@
     }
     else
     {
         <meta name="robots" content="noindex, follow">
     }
-    @*<link rel="amphtml" href="https://www.amlakbashi.com/amp@(ViewBag.raw_url)" />*@
-    <meta property="og:url" content="https://www.amlakbashi.com@(ViewBag.raw_url)" />
-    <meta property="og:image" content='@("https://www.amlakbashi.com" + (Model.Any() && Model.First().PhotoID > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.First().PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
+    @*<link rel="amphtml" href="https://www.amlakbashi.com/amp@(Model.RawUrl)" />*@
+    <meta property="og:url" content="https://www.amlakbashi.com@(Model.RawUrl)" />
+    <meta property="og:image" content='@("https://www.amlakbashi.com" + (Model.AdvertiseItems.Any() && Model.AdvertiseItems.First().PhotoID > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.AdvertiseItems.First().PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
 }
 
 @section ScriptLink {
@@ -1052,23 +915,23 @@
             pastDayOffset = -1;
         }
         allowSelectRegion = true;
-        initialProvince = '@category.Province';
-        initialCity = '@category.City';
-        initialArea = '@ViewBag.area';
+        initialProvince = '@Model.Category.Province';
+        initialCity = '@Model.Category.City';
+        initialArea = '@Model.Area';
     </script>
     <script type="text/javascript">
-        var categoryId = @(category == null ? 0 : category.Id);
-        var categoryArea = @(category == null ? 0 : ViewBag.area);
-        var categoryCity = @(category == null || category.City == null ? 0 : category.City);
+        var categoryId = @(Model.Category == null ? 0 : Model.Category.Id);
+        var categoryArea = @(Model.Category == null ? 0 : Model.Area);
+        var categoryCity = @(Model.Category == null || Model.Category.City == null ? 0 : Model.Category.City);
         var next_page = @(next_page);
         var previous_page = @(previous_page);
-        var norouz_special = @(norouz_special ? "true" : "false" );
-        var discount_homes = @(discount_homes ? "true" : "false" );
-        var instant_reserve = @(instant_reserve ? "true" : "false");
-        var today_empty_homes = @(today_empty_homes ? "true" : "false" );
-        var hygieneProtocol = @(hygieneProtocol ? "true" : "false" );
-        var empty_range_from = @(string.IsNullOrEmpty(ViewBag.empty_range_from) ? "undefined" : Html.Raw("'" + ViewBag.empty_range_from + "'"));
-        var empty_range_to = @(string.IsNullOrEmpty(ViewBag.empty_range_to) ? "undefined" : Html.Raw("'" + ViewBag.empty_range_to + "'"));
+        var norouz_special = @(Model.NorouzSpecial ? "true" : "false" );
+        var discount_homes = @(Model.DiscountHomes ? "true" : "false" );
+        var instant_reserve = @(Model.InstantReserve ? "true" : "false");
+        var today_empty_homes = @(Model.TodayEmptyHomes ? "true" : "false" );
+        var hygieneProtocol = @(Model.HygieneProtocol ? "true" : "false" );
+        var empty_range_from = @(string.IsNullOrEmpty(Model.EmptyRangeFrom) ? "undefined" : Html.Raw("'" + Model.EmptyRangeFrom + "'"));
+        var empty_range_to = @(string.IsNullOrEmpty(Model.EmptyRangeTo) ? "undefined" : Html.Raw("'" + Model.EmptyRangeTo + "'"));
         currentGuestCount = @(capacity);
 
         @if (moreFilterCount > 0)
@@ -1076,8 +939,8 @@
             @:$('.body').attr("data-more-filter", "true");
         }
 
-        @*var shouldRemoveDates = @(string.IsNullOrEmpty(ViewBag.empty_range_from) ||
-            string.IsNullOrEmpty(ViewBag.empty_range_to) ? "true" : "false");*@
+        @*var shouldRemoveDates = @(string.IsNullOrEmpty(Model.EmptyRangeFrom) ||
+            string.IsNullOrEmpty(Model.EmptyRangeTo) ? "true" : "false");*@
 
 //function checkCoronaMsgShown() {
 //    var shown = getCookie("coronamsgshown") === "yes";
@@ -1100,7 +963,7 @@
         });*@
 
     @*@{
-            var url_splitted = ((string)ViewBag.raw_url).Substring(1).Split('/');
+            var url_splitted = ((string)Model.RawUrl).Substring(1).Split('/');
         }*@
         @{
         var pos = 2;
@@ -1153,25 +1016,25 @@
         "item": "https://www.amlakbashi.com/ایران"
         }
         @{pos++;}
-        @if (category.City > 0)
+        @if (Model.Category.City > 0)
         {
             @(pos > 1 ? "," : "" )
             @:{
             @:"@@type": "ListItem",
             @:"position": @pos,
-            @:"name": "@city",
-            @:"item": "https://www.amlakbashi.com/s/@(category.City)/@(city)"
+            @:"name": "@Model.CityString",
+            @:"item": "https://www.amlakbashi.com/s/@(Model.Category.City)/@(Model.CityString)"
             @:}
             pos++;
         }
-        @if (category.City > 0 && category.Type != Advertise.AdvertiseType.All)
+        @if (Model.Category.City > 0 && Model.Category.Type != Advertise.AdvertiseType.All)
         {
             @(pos > 1 ? "," : "" )
             @:{
             @:"@@type": "ListItem",
             @:"position": @pos,
-            @:"name": "@accTypeUrlString.Replace("-", " ")",
-            @:"item": "https://www.amlakbashi.com/s/@(category.City)/@(city)/@(accTypeUrlString)"
+            @:"name": "@Model.AccTypeUrlString.Replace("-", " ")",
+            @:"item": "https://www.amlakbashi.com/s/@(Model.Category.City)/@(Model.CityString)/@(Model.AccTypeUrlString)"
             @:}
             pos++;
         }
@@ -1179,14 +1042,14 @@
         }
     </script>
     <script>
-    if ('@(category != null)' === 'True') {
+    if ('@(Model.Category != null)' === 'True') {
         gtag('event', 'select_content', {
             "content_type": "product_list",
             "items": [
                 {
-                    "id": "@(category != null ? category.Id : 0)",
-                    "name": "@(category != null ? category.Title : "")",
-                    "category": "@(category != null ? (category.Province > 0 ? (category.City > 0 ? province + "/" + city : "استان " + province) : (category.CountryDirection > 0 ? country_direction : "کل کشور")) : "")"
+                    "id": "@(Model.Category != null ? Model.Category.Id : 0)",
+                    "name": "@(Model.Category != null ? Model.Category.Title : "")",
+                    "category": "@(Model.Category != null ? (Model.Category.Province > 0 ? (Model.Category.City > 0 ? Model.ProvinceString + "/" + Model.CityString : "استان " + Model.ProvinceString) : (Model.Category.CountryDirection > 0 ? Model.CountryDirectionString : "کل کشور")) : "")"
                 }
             ]
         });
@@ -1205,7 +1068,7 @@
     }
     </script>
     @{
-        var items = Model.ToList();
+        var items = Model.AdvertiseItems.ToList();
         var itemCount = items.Count;
         if (itemCount > 0)
         {
@@ -1229,7 +1092,7 @@
                     @:"position": "@(position)",
                     @:"item": {
                     @:"@@type": "Hotel",
-                    @:"url": "@( "https://www.amlakbashi.com" + ViewBag.raw_url + "#advertise_" + item.AdvertiseID)",
+                    @:"url": "@( "https://www.amlakbashi.com" + Model.RawUrl + "#advertise_" + item.AdvertiseID)",
                     @:"name": "@(title)",
                     @:"image": [
                     @:"https://www.amlakbashi.com@(img_src)"
@@ -1274,41 +1137,41 @@
             "@@type":"FAQPage",
             "mainEntity":[
             {"@@type":"Question",
-            "name":"@(ViewBag.categoryFaqTrustQuestion)",
+            "name":"@(Model.CategoryFaqTrustQuestion)",
             "acceptedAnswer":[
             {"@@type":"Answer",
-            "text":"@(ViewBag.categoryFaqTrustAnswer)"
+            "text":"@(Model.CategoryFaqTrustAnswer)"
             }
             ]
             },
             {"@@type":"Question",
-            "name":"@(ViewBag.categoryFaqPriceQuestion)",
+            "name":"@(Model.CategoryFaqPriceQuestion)",
             "acceptedAnswer":[
             {"@@type":"Answer",
-            "text":"@(ViewBag.categoryFaqPriceAnswer)"
+            "text":"@(Model.CategoryFaqPriceAnswer)"
             }
             ]
             },
-            @if (!string.IsNullOrEmpty(category.CityAreaListString))
+            @if (!string.IsNullOrEmpty(Model.Category.CityAreaListString))
             {
                 @:{
                 @:"@@type":"Question",
-                @:"name":"@(ViewBag.categoryFaqAreasQuestion)",
+                @:"name":"@(Model.CategoryFaqAreasQuestion)",
                 @:"acceptedAnswer":[{
                 @:"@@type":"Answer",
-                @:"text":"@(ViewBag.categoryFaqAreasAnswer)"}]},
+                @:"text":"@(Model.CategoryFaqAreasAnswer)"}]},
             }
-            {"@@type":"Question","name":"@(ViewBag.categoryFaqEvidenceQuestion)",
+            {"@@type":"Question","name":"@(Model.CategoryFaqEvidenceQuestion)",
             "acceptedAnswer":[{"@@type":"Answer",
-            "text":"@(ViewBag.categoryFaqEvidenceAnswer)"}]},
+            "text":"@(Model.CategoryFaqEvidenceAnswer)"}]},
             {"@@type":"Question",
-            "name":"@(ViewBag.categoryFaqReserveQuestion)",
+            "name":"@(Model.CategoryFaqReserveQuestion)",
             "acceptedAnswer":[{"@@type":"Answer",
-            "text":"@(ViewBag.categoryFaqReserveAnswer)"}]}]},
+            "text":"@(Model.CategoryFaqReserveAnswer)"}]}]},
             {"@@type":"Question",
-            "name":"@(ViewBag.categoryFaqHostQuestion)",
+            "name":"@(Model.CategoryFaqHostQuestion)",
             "acceptedAnswer":[{"@@type":"Answer",
-            "text":"@(ViewBag.categoryFaqHostAnswer)"}]}]},
+            "text":"@(Model.CategoryFaqHostAnswer)"}]}]},
         </script>
     }
 }

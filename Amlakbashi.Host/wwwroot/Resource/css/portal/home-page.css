@@ -370,7 +370,7 @@ a.home-page__category-link.home-page__link i {
     flex-flow: row wrap;
     justify-content: space-between;
     align-items: center;
-    color: #a8a8a8;
+    /*color: #a8a8a8;*/
 }
 .text-border-bottom_style:hover{
       color: #fbbb03;
@@ -1000,7 +1000,8 @@ cursor: pointer;
 }*/
 
 .home-page_amlakbashi-medium.carousel-container .carousel .carousel-item h4 {
-    color: #808080;
+    /*color: #808080;*/
+    color: dimgray;
     margin: 12px auto;
 }
 
@@ -1524,7 +1525,8 @@ section.home-page_box-banner a.home-page_item-banner img {
         width: 190px;
     }
     .home-page__banner-container {
-        height: 300px;
+        /*height: 300px;*/
+        height: 330px;
     }
 
     .home-page__banner-container .box {
@@ -1618,7 +1620,7 @@ section.home-page_box-banner a.home-page_item-banner img {
     }
     .home-page__banner-container .box .details .view-all-Discounts {
         position: absolute;
-        top: 97%;
+        top: 96%;
         left: 33%;
     }
     .home-page__banner-container.home-page__banner-norouz .box .details .view-all-Discounts {
@@ -1861,7 +1863,6 @@ section.home-page_box-banner a.home-page_item-banner img {
         width: 60px;
     }
     .home-page_amlakbashi-medium.carousel-container .carousel .carousel-item h4 {
-        color: #808080;
         margin: 0px auto 10px auto;
         font: 13px Liransans;
     }
@@ -2069,7 +2070,7 @@ section.home-page_box-banner a.home-page_item-banner img {
 
     .home-page__banner-container .box .details .view-all-Discounts {
         position: absolute;
-        top: 92%;
+        top: 90%;
         left: 3%;
         font: 12px Liransans;
     }

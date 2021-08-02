@@ -1728,8 +1728,8 @@ input[type=number] {
         margin:0;
     }
     .advertise-page__amenities-main-container div img, .advertise-page__amenities-main-container div i{
-        width: 35px;
-        padding:0 5px;
+        width: 32px;
+        /*padding:0 5px;*/
         text-align:center;
     }
     .advertise-page__amenities-detail-container{

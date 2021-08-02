@@ -80,6 +80,7 @@
         <link rel="stylesheet" type="text/css" href="/resource/css/general/login/intlTelInput.css" asp-append-version="true">
         <link rel="stylesheet" type="text/css" href="/resource/css/general/login/login-Popup.css" asp-append-version="true">
         <link rel="stylesheet" type="text/css" href="/resource/css/general/footer.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css" asp-append-version="true" />
 
         <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-shared.css" asp-append-version="true">
         <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-header.css" asp-append-version="true">
@@ -98,17 +99,16 @@
         <div class="ui active large loader loading-icon"></div>
     </div>
     <div class="adloading"></div>
-    @if (ViewBag.CurrentPage != "AdvertiseItem")
+    @*@if (ViewBag.CurrentPage != "AdvertiseItem")
     {
         <div onclick="showPresentPopup()" class="present-prize__button">
-            @*<i class="fa fa-gift" style="font-size:23px;"></i>*@
             <img class="lazy" data-srcset="/file/resourceimagegif?file_name=gift-75w 75w,
                 /file/resourceimagegif?file_name=gift-92w 92w"
                  sizes="(max-width: 680px) 75px,
                 92px"
                  data-src="/file/resourceimagegif?file_name=gift-75w" alt="gift" />
         </div>
-    }
+    }*@
     <div class="master__page">
         @if (ViewBag.LockInPage == null || !ViewBag.LockInPage)
         {

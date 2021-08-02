@@ -8,7 +8,7 @@ namespace Amlakbashi.Core.Common.Caching
 {
     public interface ICacheManager
     {
-        T Set<T>(string key, T entity);
+        T Set<T>(string key, T value);
         T Get<T>(string key);
         void Remove(string key);
     }
