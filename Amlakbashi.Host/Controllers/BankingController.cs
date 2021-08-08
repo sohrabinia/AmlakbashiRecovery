@@ -20,7 +20,7 @@ namespace Amlakbashi.Host.Controllers
             this.accountingFacade = accountingFacade;
         }
 
-        [Authorize(Roles = Roles.TechnicalManager)]
+        //[Authorize(Roles = Roles.TechnicalManager)]
         public async Task<JsonResult> VerifySheba(string sheba)
         {
             var result = await accountingFacade.VerifySheba(sheba);

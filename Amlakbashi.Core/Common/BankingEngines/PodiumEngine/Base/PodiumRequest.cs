@@ -12,7 +12,8 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Base
     {
         private readonly HttpClient client = new HttpClient();
         private const string url = "https://api.pod.ir/srv/sc/nzh/doServiceCall";
-        private const string token = "6e0012adb3ef44fe81fa5240b299090f";
+        //private const string token = "6e0012adb3ef44fe81fa5240b299090f";
+        private const string token = "be49c42827a3424c9774a9467865b8ff";
         private const string tokenIssuer = "1";
 
         protected abstract TReq GetRequestData();

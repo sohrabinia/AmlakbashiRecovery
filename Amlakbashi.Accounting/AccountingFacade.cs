@@ -1097,5 +1097,10 @@ namespace Amlakbashi.Accounting
         {
             return bankingOperator.VerifySheba(sheba);
         }
+
+        public Task<ShebaPaymentResultDTO> PaySheba(string sheba, long amount, string fullname)
+        {
+            return bankingOperator.PaySheba(sheba, amount, fullname);
+        }
     }
 }
