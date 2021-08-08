@@ -423,18 +423,18 @@
                         </a>
                         @if (item.mustDoClearing)
                         {
-                            <span class="fa fa-credit-card clearing_button" onclick="siteClearingHost(@item.id, false, null, 0, 0, 0, 0, null, this)" style="font-size:18px;cursor:pointer;color:#ff572d;" title="تسویه میزبان"></span>
+                            <span class="fa fa-credit-card clearing_button" onclick="showSiteClearingHostPopup(@item.id)" style="font-size:18px;cursor:pointer;color:#ff572d;" title="تسویه میزبان"></span>
                             <span class="fa fa-money-bill-alt clearing_button" onclick="siteClearingHostWithCredit(@item.id, this)" style="font-size:18px;cursor:pointer;color:#ff572d;" title="تسویه میزبان با کیف پول"></span>
                         }
                         else if (item.canDoClearing)
                         {
-                            <span class="fa fa-credit-card clearing_button" onclick="siteClearingHost(@item.id, false, null, 0, 0, 0, 0, null, this)" style="font-size:18px;cursor:pointer;color:green;" title="تسویه میزبان"></span>
+                            <span class="fa fa-credit-card clearing_button" onclick="showSiteClearingHostPopup(@item.id)" style="font-size:18px;cursor:pointer;color:green;" title="تسویه میزبان"></span>
                             <span class="fa fa-money-bill-alt clearing_button" onclick="siteClearingHostWithCredit(@item.id, this)" style="font-size:18px;cursor:pointer;color:green;" title="تسویه میزبان با کیف پول"></span>
                         }
                         @{
                             if (item.mustRefund)
                             {
-                                <span class="fa fa-credit-card refund_button" style="font-size:20px;color:red;cursor:pointer;cursor:pointer;color:red;" onclick="siteRefundGuest(@item.id, false, null, 0, 0, 0, null, this)" title="عودت به مهمان"></span>
+                                <span class="fa fa-credit-card refund_button" style="font-size:20px;color:red;cursor:pointer;cursor:pointer;color:red;" onclick="showSiteRefundGuestPopup(@item.id)" title="عودت به مهمان"></span>
                                 <span class="fa fa-money-bill-alt refund_button" style="font-size:20px;color:red;cursor:pointer;cursor:pointer;color:red;" onclick="siteRefundGuestWithCredit(@item.id, this)" title="عودت به مهمان با کیف پول"></span>
                             }
                         }
@@ -720,415 +720,427 @@
             }
         }
 
-        function siteClearingHost($id, confirmed, user_id, transaction_id, ref_id, method_id, price, send_sms, obj)
-        {
-            var set_parameters_string = "reserve_id=" + $id +
-                "&confirmed=" + confirmed +
-                "&user_id=" + user_id +
-                "&transaction_id=" + transaction_id +
-                "&ref_id=" + ref_id +
-                "&method_id=" + method_id +
-                "&price=" + price +
-                "&send_sms=" + send_sms;
-            myajax("Reserve/SiteClearingHost", set_parameters_string, function (ret) {
-                switch (ret.status) {
-                    case 0:
-                        $.confirm({
-                            title: '',
-                            content: ret.msg,
-                            type: 'red',
-                            smoothContent: true,
-                            typeAnimated: true,
-                            columnClass: 'small',
-                            rtl: true,
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                بستن: function () {
-                                }
-                            }
-                        });
-                        break;
-                    case 1:
-                        $.confirm({
-                            title: '',
-                            content: ret.msg,
-                            type: 'green',
-                            smoothContent: true,
-                            typeAnimated: true,
-                            columnClass: 'small',
-                            rtl: true,
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                بستن: function () {
-                                }
-                            }
-                        });
-                        reserveAdminHubConnection.invoke('reserveCleared', $id);
-                        break;
-                    case 2:
-                        $.confirm({
-                            title: '',
-                            content: 'آیا تایید میکنید؟' +
-                                '<br />' +
-                                'مدت اقامت: ' + ret.days + ' شب ____' +
-                                ' مبلغ کل: ' + ret.total_price +
-                                '<br />' +
-                                'پرداختی توسط مهمان: ' + ret.guest_payed_price + ' ____ ' +
-                                (parseInt(ret.guest_payed_price.replaceAll(',', '')) > parseInt(ret.total_price.replaceAll(',', '')) ? "<span style='font-size:20px;color:red;'>مبلغ مغایرت دارد. مبلغ پرداختی مهمان نمیتواند از کل مبلغ رزرو بیشتر باشد</span>" : "") +
-                                ' سهم املاک باشی: ' + ret.site_portion +
-                                '<br />' +
-                                'قابل پرداخت: <span style="font-size:23px;color:#2200ff;">' + ret.payable_price + '</span><i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + ret.payable_price_raw +'\', \'مبلغ قابل پرداخت\')" />' +
-                                (parseInt(ret.payable_price.replaceAll(',', '')) >parseInt(ret.total_price.replaceAll(',', '')) ? "<span style='font-size:20px;color:red;'>مبلغ مغایرت دارد. مبلغ قابل پرداخت از کل مبلغ رزرو بیشتر است</span>" : "") +
-                                '<br />' +
-                                '<div style="display:flex;flex-flow:row;align-items:center;">' +
-                                '<div> شماره کارت: </div>' +
-                                '<div style="font-size:30px;color:' + (ret.bank_card_verified ? '#2200ff' : '#ff0000') + ';direction:ltr;text-align:right;">' + (isNaN(ret.bank_card_number) ? ret.bank_card_number : ret.bank_card_number.match(/\d{1,4}/g).toString().replaceAll(",", " ")) + '</div>' +
-                                '<i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + ret.bank_card_number +'\', \'شماره کارت\')" />' +
-                                '</div>' +
-                                '<div>' + 'نام صاحب کارت: ' + '<span style="font-size:21px;color:#2200ff;">' + ret.bank_card_name + '</span>' + '</div>' +
-                                'نام میزبان: <span style="font-size:21px;color:#2200ff;">' + ret.host_name + '</span>' +
-                                '<br />' +
-                                //'شماره کارت: ' + ret.bank_card_number +
-                                'شماره شبا: ' + '<span style="color:' + (ret.shaba_verified ? '#2200ff' : '#ff0000') + '">' + ret.shaba_number + '</span>' + '<i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + ret.shaba_number +'\', \'شماره شبا\')" />' +
-                                '<br />' +
-                                'موجودی کیف پول: <span style="' + (ret.host_credit >= 0 ? (ret.host_credit == 0 ? 'color:#242424;' : 'color:#34A853;') : 'color:#EA4335;' ) +'">' + ret.host_credit + '</span>' +
-                                '<br />' +
-                                'کد رزرو: ' + $id + ' ' + '<i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + 'کد رزرو: ' + $id +'\', \'کد رزرو\')" />' +
-                                '',
-                            type: 'blue',
-                            smoothContent: true,
-                            typeAnimated: true,
-                            rtl: true,
-                            columnClass: 'small',
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                بله: function () {
-                                    siteClearingHost($id, true, user_id, transaction_id, ref_id, method_id, price, send_sms, obj);
-                                },
-                                نه: function () {
-                                    //nothing
-                                }
-                            }
-                        });
-                        break;
-                    case 3:
-                        $.confirm({
-                            title: '',
-                            content: 'لطفا اطلاعات زیر را واردکنید' +
-                                '<br />' +
-                                '<span>کد کاربری: </span>' +
-                                '<input type="text" style="width:150px;" value="' +
-                                ret.default_user_id + '" id="clearing_user_id" />' +
-                                '<span>شماره تراکنش: </span>' +
-                                '<input type="text" style="width:150px;" value="' +
-                                ret.default_transaction_id + '" id="clearing_transaction_id" />' +
-                                '<span>شماره ارجاع: </span>' +
-                                '<input type="text" style="width:150px;" value="' +
-                                '0' + '" id="clearing_ref_id" />' +
-                                '<span>روش پرداخت: </span>' +
-                                '<select type="text" style="width:150px;"' +
-                                ' id="clearing_method_id" >' +
-                                '<option value ="0">پرداخت اینترنتی</option>' +
-                                '<option selected="selected" value ="2">کارت به کارت</option>' +
-                                '</select>' +
-                                '<span>مبلغ پرداخت: </span>' +
-                                '<input type="text" style="width:150px;" value="' +
-                                ret.default_price + '" id="clearing_price" />' +
-                                '',
-                            type: 'blue',
-                            smoothContent: true,
-                            typeAnimated: true,
-                            rtl: true,
-                            columnClass: 'small',
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                بله: function () {
-                                    siteClearingHost($id, true,
-                                        $("#clearing_user_id").val(),
-                                        $("#clearing_transaction_id").val(),
-                                        $('#clearing_ref_id').val(),
-                                        $('#clearing_method_id').val(),
-                                        $("#clearing_price").val(),
-                                        send_sms, obj);
-                                },
-                                نه: function () {
-                                    //nothing
-                                }
-                            }
-                        });
-                        if (ret.error != "") {
-                            $.confirm({
-                                title: 'خطا',
-                                content: ret.error,
-                                type: 'red',
-                                smoothContent: true,
-                                typeAnimated: true,
-                                rtl: true,
-                                columnClass: 'small',
-                                animation: 'scale',
-                                closeIcon: true,
-                                buttons: {
-                                    بستن: function () {
-                                        //nothing
-                                    }
-                                }
-                            });
-                        }
-                        break;
-                    case 4:
-                        $.confirm({
-                            title: '',
-                            content: 'آیا به میزبان پیامک ارسال شود؟',
-                            type: 'blue',
-                            smoothContent: true,
-                            rtl: true,
-                            typeAnimated: true,
-                            columnClass: 'small',
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                بله: function () {
-                                    siteClearingHost($id, true, user_id, transaction_id, ref_id, method_id, price, true, obj);
-                                },
-                                نه: function () {
-                                    siteClearingHost($id, true, user_id, transaction_id, ref_id, method_id, price, false, obj);
-                                }
-                            }
-                        });
-                        break;
-                }
-            });
+        function showSiteClearingHostPopup($id) {
+            showInfoMessage('واریز به حساب کاربر', '',
+                { contentUrl: '/Reserve/GetSiteClearingHostInfo?reserveId=' + $id, fullScreen: screen.width < 781 }
+            );
         }
 
-        function siteRefundGuest($id, confirmed, user_id, transaction_id, ref_id, method_id,
-            price, send_sms, obj, new_bank_card_number, new_bank_card_fname, new_bank_card_lname) {
-            var set_parameters_string = "reserve_id=" + $id +
-                "&confirmed=" + confirmed +
-                "&user_id=" + user_id +
-                "&transaction_id=" + transaction_id +
-                "&ref_id=" + ref_id +
-                "&method_id=" + method_id +
-                "&price=" + price +
-                "&send_sms=" + send_sms +
-                "&new_bank_card_number=" + (new_bank_card_number === undefined ? "" :
-                    new_bank_card_number) +
-                "&new_bank_card_fname=" + (new_bank_card_fname === undefined ? "" :
-                    new_bank_card_fname) +
-                "&new_bank_card_lname=" + (new_bank_card_lname === undefined ? "" :
-                    new_bank_card_lname);
-                myajax("Reserve/SiteRefundGuest", set_parameters_string, function (ret) {
-                switch (ret.status) {
-                    case 0:
-                        $.confirm({
-                            title: '',
-                            content: ret.msg,
-                            type: 'red',
-                            smoothContent: true,
-                            typeAnimated: true,
-                            columnClass: 'small',
-                            rtl: true,
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                بستن: function () {
-                                }
-                            }
-                        });
-                        break;
-                    case 1:
-                        $.confirm({
-                            title: '',
-                            content: ret.msg,
-                            type: 'green',
-                            smoothContent: true,
-                            typeAnimated: true,
-                            columnClass: 'small',
-                            rtl: true,
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                بستن: function () {
-                                }
-                            }
-                        });
-                        reserveAdminHubConnection.invoke('reserveRefunded', $id);
-                        break;
-                    case 2:
-                        $.confirm({
-                            title: '',
-                            content: 'مهمان مورد نظر شماره کارت ندارد لطفا شماره کارت را وارد کنید:' +
-                                '<br />' +
-                                '<input type="text" id="new_bank_card_number" />' +
-                                '<span>نام: </span>' +
-                                '<input type="text" id="new_bank_card_fname" />' +
-                                '<span>نام خانوادگی: </span>' +
-                                '<input type="text" id="new_bank_card_lname" />',
-                            type: 'blue',
-                            smoothContent: true,
-                            typeAnimated: true,
-                            rtl: true,
-                            columnClass: 'small',
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                تایید: function () {
-                                    siteRefundGuest($id, false, user_id, transaction_id,
-                                        ref_id, method_id, price, send_sms, obj,
-                                        $("#new_bank_card_number").val(),
-                                        $("#new_bank_card_fname").val(),
-                                        $("#new_bank_card_lname").val());
-                                },
-                            }
-                        });
-                        if (ret.msg != "") {
-                            $.confirm({
-                                title: 'خطا',
-                                content: ret.msg,
-                                type: 'blue',
-                                smoothContent: true,
-                                typeAnimated: true,
-                                rtl: true,
-                                columnClass: 'small',
-                                animation: 'scale',
-                                closeIcon: true,
-                                buttons: {
-                                    بستن: function () {
-                                    },
-                                }
-                            });
-                        }
-                        break;
-                    case 3:
-                        $.confirm({
-                            title: '',
-                            content: 'آیا تایید میکنید؟' +
-                                '<br />' +
-                                'مبلغ کل: ' + ret.total_price + ' ____ ' +
-                                //'<br />' +
-                                'پرداختی توسط مهمان: ' + ret.guest_payed_price +
-                                '<br />' +
-                                'قابل پرداخت: <span style="font-size:23px;color:#2200ff;">' + ret.guest_payed_price + '</span><i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + ret.guest_payed_price_raw +'\', \'مبلغ قابل عودت\')" />' +
-                                '<br />' +
-                                '<div style="display:flex;flex-flow:row;align-items:center;">' +
-                                '<div>شماره کارت: </div>' +
-                                '<div style="font-size:30px;color:' + (ret.bank_card_verified ? '#2200ff' : '#ff0000') + ';direction:ltr;text-align:right;">' + (isNaN(ret.bank_card_number) ? ret.bank_card_number : ret.bank_card_number.match(/\d{1,4}/g).toString().replaceAll(",", " ")) + '</div>' +
-                                '<i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + ret.bank_card_number +'\', \'شماره کارت\')" />' +
-                                '</div>' +
-                                '<div>' + 'نام صاحب کارت: ' + '<span style="font-size:21px;color:#2200ff;">' + ret.bank_card_name + '</span>' + '</div>' +
-                                'نام مهمان: <span style="font-size:21px;color:#2200ff;">' + ret.guest_name + '</span>' +
-                                '<br />' +
-                                'کد رزرو: ' + $id + ' ' + '<i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + 'کد رزرو: ' + $id +'\', \'کد رزرو\')" />' +
-                                '',
-                            type: 'blue',
-                            smoothContent: true,
-                            typeAnimated: true,
-                            rtl: true,
-                            columnClass: 'small',
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                بله: function () {
-                                    siteRefundGuest($id, true, user_id, transaction_id, ref_id, method_id, price, send_sms, obj);
-                                },
-                                نه: function () {
-                                    //nothing
-                                }
-                            }
-                        });
-                        break;
-                    case 4:
-                        $.confirm({
-                            title: '',
-                            content: 'لطفا اطلاعات زیر را واردکنید' +
-                                '<br />' +
-                                '<span>کد کاربری: </span>' +
-                                '<input type="text" style="width:150px;" value="' +
-                                ret.default_user_id + '" id="clearing_user_id" />' +
-                                '<span>شماره تراکنش: </span>' +
-                                '<input type="text" style="width:150px;" value="' +
-                                ret.default_transaction_id + '" id="clearing_transaction_id" />' +
-                                '<span>شماره ارجاع: </span>' +
-                                '<input type="text" style="width:150px;" value="' +
-                                '0' + '" id="clearing_ref_id" />' +
-                                '<span>روش پرداخت: </span>' +
-                                '<select type="text" style="width:150px;"' +
-                                ' id="clearing_method_id" >' +
-                                '<option value ="0">پرداخت اینترنتی</option>' +
-                                '<option selected="selected" value ="2">کارت به کارت</option>' +
-                                '</select>' +
-                                '<span>مبلغ پرداخت: </span>' +
-                                '<input type="text" style="width:150px;" value="' +
-                                ret.default_price + '" id="clearing_price" />' +
-                                '',
-                            type: 'blue',
-                            smoothContent: true,
-                            typeAnimated: true,
-                            rtl: true,
-                            columnClass: 'small',
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                بله: function () {
-                                    siteRefundGuest($id, true,
-                                        $("#clearing_user_id").val(),
-                                        $("#clearing_transaction_id").val(),
-                                        $('#clearing_ref_id').val(),
-                                        $("#clearing_method_id").val(),
-                                        $("#clearing_price").val(),
-                                        send_sms, obj);
-                                },
-                                نه: function () {
-                                    //nothing
-                                }
-                            }
-                        });
-                        if (ret.error != "") {
-                            $.confirm({
-                                title: 'خطا',
-                                content: ret.error,
-                                type: 'red',
-                                smoothContent: true,
-                                typeAnimated: true,
-                                rtl: true,
-                                columnClass: 'small',
-                                animation: 'scale',
-                                closeIcon: true,
-                                buttons: {
-                                    بستن: function () {
-                                        //nothing
-                                    }
-                                }
-                            });
-                        }
-                        break;
-                    case 5:
-                        $.confirm({
-                            title: '',
-                            content: 'آیا به مهمان پیامک ارسال شود؟',
-                            type: 'blue',
-                            smoothContent: true,
-                            rtl: true,
-                            typeAnimated: true,
-                            columnClass: 'small',
-                            animation: 'scale',
-                            closeIcon: true,
-                            buttons: {
-                                بله: function () {
-                                    siteRefundGuest($id, true, user_id, transaction_id, ref_id, method_id, price, true, obj);
-                                },
-                                نه: function () {
-                                    siteRefundGuest($id, true, user_id, transaction_id, ref_id, method_id, price, false, obj);
-                                }
-                            }
-                        });
-                        break;
-                }
-            });
+        function showSiteRefundGuestPopup($id) {
+            showInfoMessage('واریز به حساب کاربر', '',
+                { contentUrl: '/Reserve/GetSiteRefundGuestInfo?reserveId=' + $id, fullScreen: screen.width < 781 }
+            );
         }
+
+        //function SiteClearingHost($id, confirmed, user_id, transaction_id, ref_id, method_id, price, send_sms, obj)
+        //{
+            //var set_parameters_string = "reserve_id=" + $id +
+            //    "&confirmed=" + confirmed +
+            //    "&user_id=" + user_id +
+            //    "&transaction_id=" + transaction_id +
+            //    "&ref_id=" + ref_id +
+            //    "&method_id=" + method_id +
+            //    "&price=" + price +
+            //    "&send_sms=" + send_sms;
+            //myajax("Reserve/SiteClearingHost", set_parameters_string, function (ret) {
+            //    switch (ret.status) {
+            //        case 0:
+            //            $.confirm({
+            //                title: '',
+            //                content: ret.msg,
+            //                type: 'red',
+            //                smoothContent: true,
+            //                typeAnimated: true,
+            //                columnClass: 'small',
+            //                rtl: true,
+            //                animation: 'scale',
+            //                closeIcon: true,
+            //                buttons: {
+            //                    بستن: function () {
+            //                    }
+            //                }
+            //            });
+            //            break;
+            //        case 1:
+            //            $.confirm({
+            //                title: '',
+            //                content: ret.msg,
+            //                type: 'green',
+            //                smoothContent: true,
+            //                typeAnimated: true,
+            //                columnClass: 'small',
+            //                rtl: true,
+            //                animation: 'scale',
+            //                closeIcon: true,
+            //                buttons: {
+            //                    بستن: function () {
+            //                    }
+            //                }
+            //            });
+            //            reserveAdminHubConnection.invoke('reserveCleared', $id);
+            //            break;
+            //        case 2:
+            //            $.confirm({
+            //                title: '',
+            //                content: 'آیا تایید میکنید؟' +
+            //                    '<br />' +
+            //                    'مدت اقامت: ' + ret.days + ' شب ____' +
+            //                    ' مبلغ کل: ' + ret.total_price +
+            //                    '<br />' +
+            //                    'پرداختی توسط مهمان: ' + ret.guest_payed_price + ' ____ ' +
+            //                    (parseInt(ret.guest_payed_price.replaceAll(',', '')) > parseInt(ret.total_price.replaceAll(',', '')) ? "<span style='font-size:20px;color:red;'>مبلغ مغایرت دارد. مبلغ پرداختی مهمان نمیتواند از کل مبلغ رزرو بیشتر باشد</span>" : "") +
+            //                    ' سهم املاک باشی: ' + ret.site_portion +
+            //                    '<br />' +
+            //                    'قابل پرداخت: <span style="font-size:23px;color:#2200ff;">' + ret.payable_price + '</span><i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + ret.payable_price_raw +'\', \'مبلغ قابل پرداخت\')" />' +
+            //                    (parseInt(ret.payable_price.replaceAll(',', '')) >parseInt(ret.total_price.replaceAll(',', '')) ? "<span style='font-size:20px;color:red;'>مبلغ مغایرت دارد. مبلغ قابل پرداخت از کل مبلغ رزرو بیشتر است</span>" : "") +
+            //                    '<br />' +
+            //                    '<div style="display:flex;flex-flow:row;align-items:center;">' +
+            //                    '<div> شماره کارت: </div>' +
+            //                    '<div style="font-size:30px;color:' + (ret.bank_card_verified ? '#2200ff' : '#ff0000') + ';direction:ltr;text-align:right;">' + (isNaN(ret.bank_card_number) ? ret.bank_card_number : ret.bank_card_number.match(/\d{1,4}/g).toString().replaceAll(",", " ")) + '</div>' +
+            //                    '<i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + ret.bank_card_number +'\', \'شماره کارت\')" />' +
+            //                    '</div>' +
+            //                    '<div>' + 'نام صاحب کارت: ' + '<span style="font-size:21px;color:#2200ff;">' + ret.bank_card_name + '</span>' + '</div>' +
+            //                    'نام میزبان: <span style="font-size:21px;color:#2200ff;">' + ret.host_name + '</span>' +
+            //                    '<br />' +
+            //                    //'شماره کارت: ' + ret.bank_card_number +
+            //                    'شماره شبا: ' + '<span style="color:' + (ret.shaba_verified ? '#2200ff' : '#ff0000') + '">' + ret.shaba_number + '</span>' + '<i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + ret.shaba_number +'\', \'شماره شبا\')" />' +
+            //                    '<br />' +
+            //                    'موجودی کیف پول: <span style="' + (ret.host_credit >= 0 ? (ret.host_credit == 0 ? 'color:#242424;' : 'color:#34A853;') : 'color:#EA4335;' ) +'">' + ret.host_credit + '</span>' +
+            //                    '<br />' +
+            //                    'کد رزرو: ' + $id + ' ' + '<i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + 'کد رزرو: ' + $id +'\', \'کد رزرو\')" />' +
+            //                    '',
+            //                type: 'blue',
+            //                smoothContent: true,
+            //                typeAnimated: true,
+            //                rtl: true,
+            //                columnClass: 'small',
+            //                animation: 'scale',
+            //                closeIcon: true,
+            //                buttons: {
+            //                    بله: function () {
+            //                        siteClearingHost($id, true, user_id, transaction_id, ref_id, method_id, price, send_sms, obj);
+            //                    },
+            //                    نه: function () {
+            //                        //nothing
+            //                    }
+            //                }
+            //            });
+            //            break;
+            //        case 3:
+            //            $.confirm({
+            //                title: '',
+            //                content: 'لطفا اطلاعات زیر را واردکنید' +
+            //                    '<br />' +
+            //                    '<span>کد کاربری: </span>' +
+            //                    '<input type="text" style="width:150px;" value="' +
+            //                    ret.default_user_id + '" id="clearing_user_id" />' +
+            //                    '<span>شماره تراکنش: </span>' +
+            //                    '<input type="text" style="width:150px;" value="' +
+            //                    ret.default_transaction_id + '" id="clearing_transaction_id" />' +
+            //                    '<span>شماره ارجاع: </span>' +
+            //                    '<input type="text" style="width:150px;" value="' +
+            //                    '0' + '" id="clearing_ref_id" />' +
+            //                    '<span>روش پرداخت: </span>' +
+            //                    '<select type="text" style="width:150px;"' +
+            //                    ' id="clearing_method_id" >' +
+            //                    '<option value ="0">پرداخت اینترنتی</option>' +
+            //                    '<option selected="selected" value ="2">کارت به کارت</option>' +
+            //                    '</select>' +
+            //                    '<span>مبلغ پرداخت: </span>' +
+            //                    '<input type="text" style="width:150px;" value="' +
+            //                    ret.default_price + '" id="clearing_price" />' +
+            //                    '',
+            //                type: 'blue',
+            //                smoothContent: true,
+            //                typeAnimated: true,
+            //                rtl: true,
+            //                columnClass: 'small',
+            //                animation: 'scale',
+            //                closeIcon: true,
+            //                buttons: {
+            //                    بله: function () {
+            //                        siteClearingHost($id, true,
+            //                            $("#clearing_user_id").val(),
+            //                            $("#clearing_transaction_id").val(),
+            //                            $('#clearing_ref_id').val(),
+            //                            $('#clearing_method_id').val(),
+            //                            $("#clearing_price").val(),
+            //                            send_sms, obj);
+            //                    },
+            //                    نه: function () {
+            //                        //nothing
+            //                    }
+            //                }
+            //            });
+            //            if (ret.error != "") {
+            //                $.confirm({
+            //                    title: 'خطا',
+            //                    content: ret.error,
+            //                    type: 'red',
+            //                    smoothContent: true,
+            //                    typeAnimated: true,
+            //                    rtl: true,
+            //                    columnClass: 'small',
+            //                    animation: 'scale',
+            //                    closeIcon: true,
+            //                    buttons: {
+            //                        بستن: function () {
+            //                            //nothing
+            //                        }
+            //                    }
+            //                });
+            //            }
+            //            break;
+            //        case 4:
+            //            $.confirm({
+            //                title: '',
+            //                content: 'آیا به میزبان پیامک ارسال شود؟',
+            //                type: 'blue',
+            //                smoothContent: true,
+            //                rtl: true,
+            //                typeAnimated: true,
+            //                columnClass: 'small',
+            //                animation: 'scale',
+            //                closeIcon: true,
+            //                buttons: {
+            //                    بله: function () {
+            //                        siteClearingHost($id, true, user_id, transaction_id, ref_id, method_id, price, true, obj);
+            //                    },
+            //                    نه: function () {
+            //                        siteClearingHost($id, true, user_id, transaction_id, ref_id, method_id, price, false, obj);
+            //                    }
+            //                }
+            //            });
+            //            break;
+            //    }
+            //});
+        //}
+
+        //function siteRefundGuest($id, confirmed, user_id, transaction_id, ref_id, method_id,
+        //    price, send_sms, obj, new_bank_card_number, new_bank_card_fname, new_bank_card_lname) {
+        //    var set_parameters_string = "reserve_id=" + $id +
+        //        "&confirmed=" + confirmed +
+        //        "&user_id=" + user_id +
+        //        "&transaction_id=" + transaction_id +
+        //        "&ref_id=" + ref_id +
+        //        "&method_id=" + method_id +
+        //        "&price=" + price +
+        //        "&send_sms=" + send_sms +
+        //        "&new_bank_card_number=" + (new_bank_card_number === undefined ? "" :
+        //            new_bank_card_number) +
+        //        "&new_bank_card_fname=" + (new_bank_card_fname === undefined ? "" :
+        //            new_bank_card_fname) +
+        //        "&new_bank_card_lname=" + (new_bank_card_lname === undefined ? "" :
+        //            new_bank_card_lname);
+        //        myajax("Reserve/SiteRefundGuest", set_parameters_string, function (ret) {
+        //        switch (ret.status) {
+        //            case 0:
+        //                $.confirm({
+        //                    title: '',
+        //                    content: ret.msg,
+        //                    type: 'red',
+        //                    smoothContent: true,
+        //                    typeAnimated: true,
+        //                    columnClass: 'small',
+        //                    rtl: true,
+        //                    animation: 'scale',
+        //                    closeIcon: true,
+        //                    buttons: {
+        //                        بستن: function () {
+        //                        }
+        //                    }
+        //                });
+        //                break;
+        //            case 1:
+        //                $.confirm({
+        //                    title: '',
+        //                    content: ret.msg,
+        //                    type: 'green',
+        //                    smoothContent: true,
+        //                    typeAnimated: true,
+        //                    columnClass: 'small',
+        //                    rtl: true,
+        //                    animation: 'scale',
+        //                    closeIcon: true,
+        //                    buttons: {
+        //                        بستن: function () {
+        //                        }
+        //                    }
+        //                });
+        //                reserveAdminHubConnection.invoke('reserveRefunded', $id);
+        //                break;
+        //            case 2:
+        //                $.confirm({
+        //                    title: '',
+        //                    content: 'مهمان مورد نظر شماره کارت ندارد لطفا شماره کارت را وارد کنید:' +
+        //                        '<br />' +
+        //                        '<input type="text" id="new_bank_card_number" />' +
+        //                        '<span>نام: </span>' +
+        //                        '<input type="text" id="new_bank_card_fname" />' +
+        //                        '<span>نام خانوادگی: </span>' +
+        //                        '<input type="text" id="new_bank_card_lname" />',
+        //                    type: 'blue',
+        //                    smoothContent: true,
+        //                    typeAnimated: true,
+        //                    rtl: true,
+        //                    columnClass: 'small',
+        //                    animation: 'scale',
+        //                    closeIcon: true,
+        //                    buttons: {
+        //                        تایید: function () {
+        //                            siteRefundGuest($id, false, user_id, transaction_id,
+        //                                ref_id, method_id, price, send_sms, obj,
+        //                                $("#new_bank_card_number").val(),
+        //                                $("#new_bank_card_fname").val(),
+        //                                $("#new_bank_card_lname").val());
+        //                        },
+        //                    }
+        //                });
+        //                if (ret.msg != "") {
+        //                    $.confirm({
+        //                        title: 'خطا',
+        //                        content: ret.msg,
+        //                        type: 'blue',
+        //                        smoothContent: true,
+        //                        typeAnimated: true,
+        //                        rtl: true,
+        //                        columnClass: 'small',
+        //                        animation: 'scale',
+        //                        closeIcon: true,
+        //                        buttons: {
+        //                            بستن: function () {
+        //                            },
+        //                        }
+        //                    });
+        //                }
+        //                break;
+        //            case 3:
+        //                $.confirm({
+        //                    title: '',
+        //                    content: 'آیا تایید میکنید؟' +
+        //                        '<br />' +
+        //                        'مبلغ کل: ' + ret.total_price + ' ____ ' +
+        //                        //'<br />' +
+        //                        'پرداختی توسط مهمان: ' + ret.guest_payed_price +
+        //                        '<br />' +
+        //                        'قابل پرداخت: <span style="font-size:23px;color:#2200ff;">' + ret.guest_payed_price + '</span><i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + ret.guest_payed_price_raw +'\', \'مبلغ قابل عودت\')" />' +
+        //                        '<br />' +
+        //                        '<div style="display:flex;flex-flow:row;align-items:center;">' +
+        //                        '<div>شماره کارت: </div>' +
+        //                        '<div style="font-size:30px;color:' + (ret.bank_card_verified ? '#2200ff' : '#ff0000') + ';direction:ltr;text-align:right;">' + (isNaN(ret.bank_card_number) ? ret.bank_card_number : ret.bank_card_number.match(/\d{1,4}/g).toString().replaceAll(",", " ")) + '</div>' +
+        //                        '<i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + ret.bank_card_number +'\', \'شماره کارت\')" />' +
+        //                        '</div>' +
+        //                        '<div>' + 'نام صاحب کارت: ' + '<span style="font-size:21px;color:#2200ff;">' + ret.bank_card_name + '</span>' + '</div>' +
+        //                        'نام مهمان: <span style="font-size:21px;color:#2200ff;">' + ret.guest_name + '</span>' +
+        //                        '<br />' +
+        //                        'کد رزرو: ' + $id + ' ' + '<i class="fas fa-copy" style="cursor:pointer;margin:0 5px;" onclick="copyStringToClipboard(\'' + 'کد رزرو: ' + $id +'\', \'کد رزرو\')" />' +
+        //                        '',
+        //                    type: 'blue',
+        //                    smoothContent: true,
+        //                    typeAnimated: true,
+        //                    rtl: true,
+        //                    columnClass: 'small',
+        //                    animation: 'scale',
+        //                    closeIcon: true,
+        //                    buttons: {
+        //                        بله: function () {
+        //                            siteRefundGuest($id, true, user_id, transaction_id, ref_id, method_id, price, send_sms, obj);
+        //                        },
+        //                        نه: function () {
+        //                            //nothing
+        //                        }
+        //                    }
+        //                });
+        //                break;
+        //            case 4:
+        //                $.confirm({
+        //                    title: '',
+        //                    content: 'لطفا اطلاعات زیر را واردکنید' +
+        //                        '<br />' +
+        //                        '<span>کد کاربری: </span>' +
+        //                        '<input type="text" style="width:150px;" value="' +
+        //                        ret.default_user_id + '" id="clearing_user_id" />' +
+        //                        '<span>شماره تراکنش: </span>' +
+        //                        '<input type="text" style="width:150px;" value="' +
+        //                        ret.default_transaction_id + '" id="clearing_transaction_id" />' +
+        //                        '<span>شماره ارجاع: </span>' +
+        //                        '<input type="text" style="width:150px;" value="' +
+        //                        '0' + '" id="clearing_ref_id" />' +
+        //                        '<span>روش پرداخت: </span>' +
+        //                        '<select type="text" style="width:150px;"' +
+        //                        ' id="clearing_method_id" >' +
+        //                        '<option value ="0">پرداخت اینترنتی</option>' +
+        //                        '<option selected="selected" value ="2">کارت به کارت</option>' +
+        //                        '</select>' +
+        //                        '<span>مبلغ پرداخت: </span>' +
+        //                        '<input type="text" style="width:150px;" value="' +
+        //                        ret.default_price + '" id="clearing_price" />' +
+        //                        '',
+        //                    type: 'blue',
+        //                    smoothContent: true,
+        //                    typeAnimated: true,
+        //                    rtl: true,
+        //                    columnClass: 'small',
+        //                    animation: 'scale',
+        //                    closeIcon: true,
+        //                    buttons: {
+        //                        بله: function () {
+        //                            siteRefundGuest($id, true,
+        //                                $("#clearing_user_id").val(),
+        //                                $("#clearing_transaction_id").val(),
+        //                                $('#clearing_ref_id').val(),
+        //                                $("#clearing_method_id").val(),
+        //                                $("#clearing_price").val(),
+        //                                send_sms, obj);
+        //                        },
+        //                        نه: function () {
+        //                            //nothing
+        //                        }
+        //                    }
+        //                });
+        //                if (ret.error != "") {
+        //                    $.confirm({
+        //                        title: 'خطا',
+        //                        content: ret.error,
+        //                        type: 'red',
+        //                        smoothContent: true,
+        //                        typeAnimated: true,
+        //                        rtl: true,
+        //                        columnClass: 'small',
+        //                        animation: 'scale',
+        //                        closeIcon: true,
+        //                        buttons: {
+        //                            بستن: function () {
+        //                                //nothing
+        //                            }
+        //                        }
+        //                    });
+        //                }
+        //                break;
+        //            case 5:
+        //                $.confirm({
+        //                    title: '',
+        //                    content: 'آیا به مهمان پیامک ارسال شود؟',
+        //                    type: 'blue',
+        //                    smoothContent: true,
+        //                    rtl: true,
+        //                    typeAnimated: true,
+        //                    columnClass: 'small',
+        //                    animation: 'scale',
+        //                    closeIcon: true,
+        //                    buttons: {
+        //                        بله: function () {
+        //                            siteRefundGuest($id, true, user_id, transaction_id, ref_id, method_id, price, true, obj);
+        //                        },
+        //                        نه: function () {
+        //                            siteRefundGuest($id, true, user_id, transaction_id, ref_id, method_id, price, false, obj);
+        //                        }
+        //                    }
+        //                });
+        //                break;
+        //        }
+        //    });
+        //}
 
         function siteClearingHostWithCredit($id, obj) {
             $.confirm({

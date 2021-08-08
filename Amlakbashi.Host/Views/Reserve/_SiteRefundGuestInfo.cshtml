@@ -1,0 +1,95 @@
+﻿@using Amlakbashi.Core.DTOs.ReserveDTOs
+
+@model SitePaymentDTO
+
+@if (Model == null)
+{
+    <p>عملیات با خطا مواجه شد</p>
+}
+else
+{
+    <div>
+        <span>کد رزرو:</span>
+        <span>@Model.ReserveId</span>
+        <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('@Model.ReserveId', 'کد رزرو')" /></span>
+    </div>
+    <div>
+        <span>مبلغ کل:</span>
+        <span>@string.Format("{0:n0}", Model.TotalPrice) تومان</span>
+    </div>
+    <div>
+        <span>پرداختی توسط مهمان:</span>
+        <span>@string.Format("{0:n0}", Model.GuestPayedPrice) تومان</span>
+    </div>
+    <div>
+        <span>مبلغ قابل پرداخت:</span>
+        <span style="color: blue; font-size: x-large;">@string.Format("{0:n0}", Model.PayablePrice) تومان</span>
+        <span><i class="fa fa-copy" style="cursor:pointer; color: #999;" onclick="copyStringToClipboard('@Model.PayablePrice', 'مبلغ قابل پرداخت')" /></span>
+    </div>
+    <br />
+    <div>
+        <span>نام مهمان:</span>
+        <span>@Model.UserName</span>
+    </div>
+    <div>
+        @{
+            var bankCardNumberString = Model.BankCardNumber;
+            if (Model.BankCardNumber != "ثبت نشده")
+            {
+                bankCardNumberString = String.Format("{0} {1} {2} {3}", Model.BankCardNumber.Substring(0, 4),
+                    Model.BankCardNumber.Substring(4, 4), Model.BankCardNumber.Substring(8, 4), Model.BankCardNumber.Substring(12));
+            }
+        }
+        <span>شماره کارت:</span>
+        <span id="BankCardNumberSpan" style="color: @(Model.BankCardVerified ? "blue" : "red"); font-size:x-large; direction:ltr; unicode-bidi: embed;">@bankCardNumberString</span>
+        <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('@Model.BankCardNumber', 'شماره کارت')" /></span>
+    </div>
+    <div>
+        <span>نام صاحب کارت:</span>
+        <span id="BankCardNameSpan">@Model.BankCardName</span>
+    </div>
+    <br />
+    <div style="text-align:center;">
+        @{
+            var hasBankCard = Model.BankCardNumber != "ثبت نشده";
+        }
+        <button class="btn-set-card-bank" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans; display: @(!hasBankCard ? "inline" : "none");" onclick="registerBankCard()">ثبت کارت بانکی</button>
+        @*<button class="btn-set-payment" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans; display: @(hasBankCard ? "inline" : "none");" onclick="autoSiteRefundGuest()">پرداخت خودکار</button>*@
+        <button class="btn-set-payment" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans; display: @(hasBankCard ? "inline" : "none");" onclick="manualSiteRefundGuest()">پرداخت دستی</button>
+    </div>
+}
+
+<script>
+    function manualSiteRefundGuest() {
+        var queryString = "reserveId=" + @Model.ReserveId + "&price=" + @Model.PayablePrice + "&userType=" + '@Model.UserType';
+        showInfoMessage('ثبت پرداخت', '',
+            { contentUrl: '/Reserve/ManualSitePayment?' + queryString, fullScreen: screen.width < 781 }
+        );
+    }
+
+    function autoSiteRefundGuest() {
+        @*showNoYesMessage('', 'آیا از واریز وجه به حساب میزبان مطمئنید؟',
+            function () {
+                $.ajax({
+                type: "get",
+                url: "/reserve/autoSiteClearingHost?reserveId" + @Model.ReserveId,
+                success: function (response) {
+                    if (response.status == 0) {
+                        alertify.error(response.msg);
+                    }
+                    else {
+                        alertify.success(response.msg);
+                        reserveAdminHubConnection.invoke('reserveCleared', @Model.ReserveId);
+                        popupMsgList[0].btnClick(0, true);
+                    }
+                }
+            });
+        })*@
+    }
+
+    function registerBankCard() {
+        showInfoMessage('ثبت کارت بانکی', '',
+            { contentUrl: '/Reserve/SetUserBankCard?userId=' + @Model.UserId, fullScreen: screen.width < 781 }
+        );
+    }
+</script>

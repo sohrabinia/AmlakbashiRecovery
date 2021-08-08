@@ -1,0 +1,75 @@
+﻿@using Amlakbashi.Core.DTOs.ReserveDTOs
+
+<style>
+    #ManualSitePaymentForm div {
+        margin-bottom: 10px;
+    }
+</style>
+
+<form id="ManualSitePaymentForm">
+    <input type="hidden" name="reserveId" value="@ViewBag.reserveId" />
+    <input type="hidden" name="userType" value="@ViewBag.userType" />
+    <div>
+        <label>کد رزرو:</label>
+        <span>@ViewBag.reserveId</span>
+    </div>
+    <div>
+        <label>کد کاربر:</label>
+        <input type="text" name="userId" value="@ViewBag.userId" />
+    </div>
+    <div>
+        <label>شماره تراکنش:</label>
+        <input type="text" name="transactionId" />
+    </div>
+    <div>
+        <label>شماره ارجاع:</label>
+        <input type="text" name="referenceId" />
+    </div>
+    <div>
+        <label>نوع پرداخت:</label>
+        <select name="paymentMethod">
+            <option value="0">پرداخت اینترنتی</option>
+            <option selected="selected" value="2">کارت به کارت</option>
+        </select>
+    </div>
+    <div>
+        <label>مبلغ:</label>
+        <input type="text" name="price" value="@ViewBag.price" />
+    </div>
+    <div>
+        <label>ارسال پیامک به @(ViewBag.userType == UserType.Host ? "میزبان" : "مهمان")</label>
+        <input type="checkbox" name="sendSms" value="true" checked="checked" />
+    </div>
+    <div style="text-align:center;">
+        <button type="button" onclick="submitManualSitePaymentForm()" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;">ثبت پرداخت</button>
+    </div>
+</form>
+
+<script>
+    function submitManualSitePaymentForm() {
+        var form = $('#ManualSitePaymentForm');
+        $.ajax({
+            type: "POST",
+            url: "/reserve/ManualSitePayment",
+            data: form.serialize(),
+            success: function (response) {
+                if (response.status == 0) {
+                    alertify.error(response.msg);
+                }
+                else {
+                    alertify.success(response.msg);
+                    @if (ViewBag.userType == UserType.Host)
+                    {
+                        @:reserveAdminHubConnection.invoke('reserveCleared', @ViewBag.reserveId);
+                    }
+                    else
+                    {
+                        @:reserveAdminHubConnection.invoke('reserveRefunded', @ViewBag.reserveId);
+                    }
+                    popupMsgList[1].btnClick(0, true);
+                    popupMsgList[0].btnClick(0, true);
+                }
+            }
+        });
+    }
+</script>

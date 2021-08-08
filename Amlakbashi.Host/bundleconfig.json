@@ -78,7 +78,8 @@
       "wwwroot/resource/css/general/message-popup.css",
       "wwwroot/resource/css/general/login/intlTelInput.css",
       "wwwroot/resource/css/general/login/login-Popup.css",
-      "wwwroot/resource/css/general/footer.css"
+      "wwwroot/resource/css/general/footer.css",
+      "wwwroot/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css"
     ]
   },
   {
