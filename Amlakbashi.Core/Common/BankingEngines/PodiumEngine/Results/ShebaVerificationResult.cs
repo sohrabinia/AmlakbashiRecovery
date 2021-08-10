@@ -5,7 +5,7 @@ using System;
 namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Results
 {
     [Serializable]
-    public class ShebaVerificationResult : PodiumResult<ShebaVerificationResultInfo>
+    public class ShebaVerificationResult : PodiumResponse<ShebaVerificationResultInfo>
     {
     }
 }

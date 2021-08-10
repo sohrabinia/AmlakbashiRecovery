@@ -3,7 +3,7 @@ using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Base;
 
 namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Results
 {
-    public class ShebaPaymentResult : PodiumResult<ShebaPaymentResultInfo>
+    public class ShebaPaymentResult : PodiumResponse<ShebaPaymentResultInfo>
     {
     }
 }

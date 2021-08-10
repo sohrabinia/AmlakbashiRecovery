@@ -1311,14 +1311,14 @@ namespace Amlakbashi.Host.Controllers
                         msg = "لطفا شماره تراکنش را وارد کنید"
                     });
                 }
-                if (referenceId <= 0)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = 0,
-                        msg = "لطفا شماره ارجاع را وارد کنید"
-                    });
-                }
+                //if (referenceId <= 0)
+                //{
+                //    return GenerateJsonResult(new
+                //    {
+                //        status = 0,
+                //        msg = "لطفا شماره ارجاع را وارد کنید"
+                //    });
+                //}
 
                 var reservePayment = accounting.InsertReservePayment(userId, reserveId, transactionId, referenceId,
                     userType == UserType.Host ?
@@ -2548,7 +2548,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_AddGuestPayment", reserve);
         }
 
-        public PartialViewResult InvoiceItemPopup(long id)
+        public IActionResult InvoiceItemPopup(long id)
         {
             var reserve = reserveService.Find(id);
             var acc = reserve.Advertise;

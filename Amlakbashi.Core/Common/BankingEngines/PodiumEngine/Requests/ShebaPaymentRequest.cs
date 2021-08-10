@@ -4,12 +4,13 @@ using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Results;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.ResultInfos;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.RequestInfos;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
 {
     public class ShebaPaymentRequest : PodiumRequest<ShebaPaymentResult, ShebaPaymentResultInfo, ShebaPaymentRequestInfo>
     {
-        private const string userName = "97374service";
+        //private const string userName = "97374service";
         private const string sourceDepositNumber = "3902.800.97374.1";
         private const string apiKey = "c162c3e83070480b87bd7d1485e45520";
         private const string productId = "35591";
@@ -29,25 +30,24 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
             this.fileUniqueIdentifier = fileUniqueIdentifier;
         }
         
-        protected override ShebaPaymentRequestInfo GetRequestData()
+        protected override RequestData GetRequestData()
         {
-            return new ShebaPaymentRequestInfo()
+            var request = new ShebaPaymentRequestInfo()
             {
                 UserName = userName,
                 SourceDepositNumber = sourceDepositNumber,
-                scApiKey = apiKey,
                 CentralBankTransferDetailType = ((int)transferType).ToString(),
                 BatchPayaItemInfos = payItems,
                 FileUniqueIdentifier = fileUniqueIdentifier,
-                //privateKey = "",
-                //scVoucherHash = new List<string>(),
-                //TransferMoneyBillNumber = "",
             };
-        }
-
-        protected override string GetProductId()
-        {
-            return productId;
+            string jsonRequest = request.GenerateJson();
+            return new RequestData()
+            {
+                scProductId = productId,
+                scApiKey = apiKey,
+                request = jsonRequest,
+                signature = GenerateSignature(jsonRequest)
+            };
         }
     }
 }

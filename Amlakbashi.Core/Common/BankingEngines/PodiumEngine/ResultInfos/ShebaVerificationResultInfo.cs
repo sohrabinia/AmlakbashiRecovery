@@ -7,7 +7,15 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.ResultInfos
     [Serializable]
     public class ShebaVerificationResultInfo : PodiumResultInfo
     {
-        public string sheba { get; set; }
-        public BankAccountOwner[] owners { get; set; }
+        public ShebaVerificationResultData Data { get; set; }
+    }
+
+    [Serializable]
+    public class ShebaVerificationResultData
+    {
+        public string Sheba { get; set; }
+        public string AccountStatus { get; set; }
+        public string AccountStatusName { get; set; }
+        public BankAccountOwner[] AccountOwners { get; set; }
     }
 }

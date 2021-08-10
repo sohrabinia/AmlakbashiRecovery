@@ -1,7 +1,12 @@
-﻿namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Base
+﻿using Newtonsoft.Json;
+
+namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Base
 {
     public abstract class PodiumRequestInfo
     {
-        public string scProductId { get; set; }
+        public string GenerateJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 }

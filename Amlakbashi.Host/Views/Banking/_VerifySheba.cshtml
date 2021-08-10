@@ -1,0 +1,44 @@
+﻿@model Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs.ShebaVerificationResultDTO
+
+@if (Model == null)
+{
+    <div>
+        <span>نتیجه:</span>
+        <span style="color: red;">نا موفق</span>
+    </div>
+    <div>
+        <span>عملیات با خطا مواجه شد</span>
+    </div>
+}
+else if (Model.HasError)
+{
+    <div>
+        <span>نتیجه:</span>
+        <span style="color: red;">نا موفق</span>
+    </div>
+    <div>
+        <span>@Model.ErrorMessage</span>
+    </div>
+}
+else
+{
+    <div>
+        <span>نتیجه:</span>
+        <span style="color: limegreen;">موفق</span>
+    </div>
+    <div>
+        <span>پیغام:</span>
+        <span>@Model.Message</span>
+    </div>
+    <div>
+        <span>شماره شبا:</span>
+        <span>@Model.Sheba</span>
+    </div>
+    <div>
+        <span>صاحب (های) حساب:</span>
+        @foreach (var item in Model.Owners)
+        {
+            <p style="text-align:center;">@item.firstName @item.lastName</p>
+        }
+    </div>
+}
