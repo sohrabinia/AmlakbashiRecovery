@@ -10,13 +10,8 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.RequestInfos
     {
         public string UserName { get; set; }
         public string SourceDepositNumber { get; set; }
-        //public string TransferMoneyBillNumber { get; set; }
         public string CentralBankTransferDetailType { get; set; }
         public string FileUniqueIdentifier { get; set; }
         public List<BatchPayaRequestItem> BatchPayaItemInfos { get; set; }
-        //public string privateKey { get; set; }
-        //public List<string> scVoucherHash { get; set; }
-        public string scApiKey { get; set; }
-
     }
 }

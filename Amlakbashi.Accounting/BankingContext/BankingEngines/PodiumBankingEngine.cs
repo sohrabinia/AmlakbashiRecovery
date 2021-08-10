@@ -1,9 +1,9 @@
 ﻿using Amlakbashi.Accounting.BankingContext.BankingEngines.Interfaces;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.GeneralInfos;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests;
-using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Amlakbashi.Accounting.BankingContext.BankingEngines
@@ -23,53 +23,46 @@ namespace Amlakbashi.Accounting.BankingContext.BankingEngines
                         Description = "تست انتقال وجه توسط پایا"
                     }
                 };
-            var data = await new ShebaPaymentRequest(CentralBankTransferEnum.CCPA, payItems, "ACH1234abcdEFGH").Send();
+            dynamic data = await new ShebaPaymentRequest(CentralBankTransferEnum.CCPA, payItems, "ACH1234abcdEFGH").Send();
             var result = new ShebaPaymentResultDTO()
             {
-                hasError = data.hasError,
-                errorCode = data.errorCode,
-                message = data.message,
-                ott = data.ott,
-                referenceNumber = data.referenceNumber,
-                IsSuccess = data.result.result.IsSuccess,
-                Message = data.result.result.Message
+                HasError = data.hasError,
+                //errorCode = data.errorCode,
+                //Message = data.message,
+                //ott = data.ott,
+                //referenceNumber = data.referenceNumber,
+                //IsSuccess = data.result.result.IsSuccess,
+                //Message = data.result.result.Message
             };
-            var dataLength = data.result.result.Data.Count;
-            result.Data = new ShebaPaymentBatchResultDTO[dataLength];
-            for (int i = 0; i < dataLength; i++)
-            {
-                var podiumData = data.result.result.Data[i];
-                PropertyCopier<BatchPayaResultItem, ShebaPaymentBatchResultDTO>
-                    .Copy(podiumData, result.Data[i]);
-            }
+            //var dataLength = data.result.result.Data.Count;
+            //result.Data = new ShebaPaymentBatchResultDTO[dataLength];
+            //for (int i = 0; i < dataLength; i++)
+            //{
+            //    var podiumData = data.result.result.Data[i];
+            //    PropertyCopier<BatchPayaResultItem, ShebaPaymentBatchResultDTO>
+            //        .Copy(podiumData, result.Data[i]);
+            //}
             return result;
         }
 
         public async Task<ShebaVerificationResultDTO> VerifySheba(string sheba)
         {
             var data = await new ShebaVerificationRequest(sheba).Send();
-            var result = new ShebaVerificationResultDTO()
+            var result = new ShebaVerificationResultDTO();
+            if (data.hasError == false && data.BankResult.IsSuccess)
             {
-                 hasError = data.hasError,
-                 errorCode = data.errorCode,
-                 message = data.message,
-                referenceNumber = data.referenceNumber,
-                ott = data.ott,
-                sheba = data.hasError ? null : data.result.sheba
-            };
-            if (data.hasError == false)
+                result.Sheba = data.BankResult.Data.Sheba;
+                result.AccountStatus = data.BankResult.Data.AccountStatusName;
+                result.Message = data.BankResult.Message;
+                result.Owners = data.BankResult.Data.AccountOwners.Select(s=>new BankAccountOwnerDTO() {
+                    firstName = s.firstName,
+                    lastName = s.lastName
+                }) .ToList();
+            }
+            else
             {
-                var ownerLength = data.result.owners.Length;
-                result.owners = new BankAccountOwnerDTO[ownerLength];
-                for (int i = 0; i < ownerLength; i++)
-                {
-                    var owner = data.result.owners[i];
-                    result.owners[i] = new BankAccountOwnerDTO()
-                    {
-                        firstName = owner.firstName,
-                        lastName = owner.lastName
-                    };
-                }
+                result.HasError = true;
+                result.ErrorMessage = data.hasError ? data.message : data.BankResult.Message;
             }
             return result;
         }

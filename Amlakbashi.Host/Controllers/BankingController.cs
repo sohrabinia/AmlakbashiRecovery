@@ -4,6 +4,7 @@ using Amlakbashi.Host.Controllers.Base;
 using log4net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Controllers
@@ -20,11 +21,19 @@ namespace Amlakbashi.Host.Controllers
             this.accountingFacade = accountingFacade;
         }
 
-        //[Authorize(Roles = Roles.TechnicalManager)]
-        public async Task<JsonResult> VerifySheba(string sheba)
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
+        public async Task<IActionResult> VerifySheba(string sheba)
         {
-            var result = await accountingFacade.VerifySheba(sheba);
-            return GenerateJsonResult(result);
+            try
+            {
+                var result = await accountingFacade.VerifySheba("IR" + sheba);
+                return PartialView("_VerifySheba", result);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Banking.VerifySheba", exc);
+                return PartialView("_VerifySheba");
+            }
         }
     }
 }

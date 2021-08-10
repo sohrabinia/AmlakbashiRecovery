@@ -2,29 +2,35 @@
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Results;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.RequestInfos;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.ResultInfos;
+using System;
 
 namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
 {
     public class ShebaVerificationRequest : PodiumRequest<ShebaVerificationResult, ShebaVerificationResultInfo, ShebaVerificationRequestInfo>
     {
         private readonly string sheba;
-        private const string productId = "34254";
-        private const string apiKey = "da24452a84dd4d0795e8d72364418179";
+        private const string productId = "437012";
+        private const string apiKey = "2dace115dfaa47f39ef03fbffb88b88d";
         public ShebaVerificationRequest(string sheba)
         {
             this.sheba = sheba;
         }
 
-        protected override string GetProductId()
+        protected override RequestData GetRequestData()
         {
-            return productId;
-        }
-
-        protected override ShebaVerificationRequestInfo GetRequestData()
-        {
-            return new ShebaVerificationRequestInfo()
+            var request = new ShebaVerificationRequestInfo()
             {
-                sheba = sheba
+                UserName = userName,
+                Sheba = sheba,
+                Timestamp = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss:FFF")
+            };
+            string jsonRequest = request.GenerateJson();
+            return new RequestData()
+            {
+                scProductId = productId,
+                scApiKey = apiKey,
+                request = jsonRequest,
+                signature = GenerateSignature(jsonRequest)
             };
         }
     }

@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
 {
     [Serializable]
     public class ShebaVerificationResultDTO : BankingResultDTO
     {
-        public string sheba { get; set; }
-        public BankAccountOwnerDTO[] owners { get; set; }
+        public string Sheba { get; set; }
+        public string Message { get; set; }
+        public string AccountStatus { get; set; }
+        public List<BankAccountOwnerDTO> Owners { get; set; }
     }
 }

@@ -11,7 +11,7 @@ else
     <div>
         <span>کد رزرو:</span>
         <span>@Model.ReserveId</span>
-        <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('@Model.ReserveId', 'کد رزرو')" /></span>
+        <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('کد رزرو: @Model.ReserveId', 'کد رزرو')" /></span>
     </div>
     <div>
         <span>مبلغ کل:</span>
@@ -24,7 +24,7 @@ else
     <div>
         <span>مبلغ قابل پرداخت:</span>
         <span style="color: blue; font-size: x-large;">@string.Format("{0:n0}", Model.PayablePrice) تومان</span>
-        <span><i class="fa fa-copy" style="cursor:pointer; color: #999;" onclick="copyStringToClipboard('@Model.PayablePrice', 'مبلغ قابل پرداخت')" /></span>
+        <span><i class="fa fa-copy" style="cursor:pointer; color: #999;" onclick="copyStringToClipboard('@Model.PayablePriceRaw', 'مبلغ قابل پرداخت')" /></span>
     </div>
     <br />
     <div>
