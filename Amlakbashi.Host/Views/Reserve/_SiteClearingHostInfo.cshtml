@@ -54,13 +54,20 @@ else
     </div>
     <div>
         <span>نام صاحب کارت:</span>
-        <span>@Model.BankCardName</span>
+        <span id="BankCardNameSpan">@Model.BankCardName</span>
     </div>
     <div>
         <span>شماره شبا:</span>
-        <span style="color: @(Model.ShebaVerified ? "blue" : "red");">@Model.ShebaNumber</span>
-        <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('@Model.ShebaNumber', 'شماره شبا')" /></span>
-        <span><i class="fa fa-sync" style="cursor: pointer; color: #999;" onclick="verifySheba()" /></span>
+        <span id="ShebaNumberSpan" style="color: @(Model.ShebaVerified ? "blue" : "red");">@Model.ShebaNumber</span>
+        @if (string.IsNullOrEmpty(Model.ShebaNumber) == false)
+        {
+            <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('@Model.ShebaNumber', 'شماره شبا')" /></span>
+            @if (Model.ShebaVerified == false || string.IsNullOrEmpty(Model.BankCardName))
+            {
+                <span><i class="fa fa-sync" style="cursor: pointer; color: #999;" onclick="verifySheba()" /></span>
+                <span style="visibility:hidden; color: darkorange; margin-left: 10px; font-size: small;" id="ShebaNumberWaitingSpan">لطفا صبر کنید ...</span>
+            }
+        }
     </div>
     <div>
         <span>موجودی کیف پول:</span>
@@ -102,9 +109,29 @@ else
     }
 
     function verifySheba() {
-        var shebaNum = '@Model.ShebaNumber';
+        @*var queryString = "sheba=" + "@Model.ShebaNumber" + "&hostName=" + "@Model.UserName" + "&bankCardName=" + "@Model.BankCardName" +
+            "&bankCardId=" + @Model.BankCardId + "&shebaVerify=" + "@Model.ShebaVerified";
         showInfoMessage('استعلام شماره شبا', '',
-            { contentUrl: '/banking/verifysheba?sheba=' + shebaNum, fullScreen: screen.width < 781 }
-        );
+            { contentUrl: '/banking/verifysheba?' + queryString, fullScreen: screen.width < 781 }
+        );*@
+
+        $.ajax({
+            url: "/banking/verifysheba",
+            type: "get",
+            data: {
+                sheba: '@(Model.ShebaNumber)',
+                hostName: '@(Model.UserName)',
+                bankCardName: '@(Model.BankCardName)',
+                bankCardId: '@(Model.BankCardId)',
+                shebaVerify: '@(Model.ShebaVerified)'
+            },
+            beforeSend: function () {
+                $('#ShebaNumberWaitingSpan').css("visibility", "visible");
+            },
+            success: function (data, status, xhr) {
+                $('#ShebaNumberWaitingSpan').css("visibility", "hidden");
+                showInfoMessage('استعلام شماره شبا', data);
+            }
+        });
     }
 </script>

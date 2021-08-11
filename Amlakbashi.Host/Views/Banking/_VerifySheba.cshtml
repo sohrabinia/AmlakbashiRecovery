@@ -30,6 +30,15 @@ else
         <span>پیغام:</span>
         <span>@Model.Message</span>
     </div>
+    <br />
+    <div>
+        <span>نام میزبان:</span>
+        <span>@Model.HostName</span>
+    </div>
+    <div>
+        <span>نام صاحب کارت:</span>
+        <span>@Model.BankCardName</span>
+    </div>
     <div>
         <span>شماره شبا:</span>
         <span>@Model.Sheba</span>
@@ -41,4 +50,53 @@ else
             <p style="text-align:center;">@item.firstName @item.lastName</p>
         }
     </div>
+    <br />
+    <div style="text-align:center;">
+        @if (Model.ShebaVerify == false)
+        {
+            <button id="VerifyShebaNumberBtn" type="button" onclick="VerifyShebaNumber()" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;">تایید شماره شبا</button>
+        }
+        @if (string.IsNullOrEmpty(Model.BankCardName) && Model.Owners.Count == 1)
+        {
+            <button type="button" onclick="SetBankCardName()" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;">ذخیره نام صاحب کارت</button>
+        }
+    </div>
 }
+
+<script>
+    function VerifyShebaNumber() {
+        myajax("bankcard/toggleshabastatus", "id=" + '@Model.BankCardId', function (ret) {
+            if (ret.status == 1) {
+                $("#ShebaNumberSpan").css("color", "blue");
+                $("#VerifyShebaNumberBtn").css("visibility", "hidden");
+                alertify.success("شماره شبا تایید شد");
+            }
+            else {
+                alertify.error("عملیات با خطا مواجه شد");
+            }
+        });
+    }
+
+    function SetBankCardName() {
+        var fname = '@(Model.Owners.First().firstName)';
+        var lname = '@(Model.Owners.First().lastName)';
+        $.ajax({
+            url: "/bankcard/SetBankCardName",
+            type: "get",
+            data: {
+                bankCardFName: fname,
+                bankCardLName: lname,
+                bankCardId: '@(Model.BankCardId)'
+            },
+            success: function (data) {
+                if (data.status == 1) {
+                    alertify.success("ذخیره شد");
+                    $("#BankCardNameSpan").html(fname + ' ' + lname);
+                }
+                else {
+                    alertify.error("عملیات با خطا مواجه شد");
+                }
+            }
+        });
+    }
+</script>

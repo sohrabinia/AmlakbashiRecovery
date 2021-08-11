@@ -14,11 +14,14 @@ namespace Amlakbashi.Host.Controllers
     public class BankCardController : BaseController
     {
         private readonly IBankCardAppService bankCardService;
+        private readonly IUserAccessor userAccessor;
         private readonly ILog logger;
         private readonly IMapper mapper;
-        public BankCardController(IBankCardAppService bankCardService, ILog logger, IMapper mapper)
+        public BankCardController(IBankCardAppService bankCardService,
+            IUserAccessor userAccessor, ILog logger, IMapper mapper)
         {
             this.bankCardService = bankCardService;
+            this.userAccessor = userAccessor;
             this.logger = logger;
             this.mapper = mapper;
         }
@@ -44,7 +47,7 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("Index", exc);
+                logger.Error("BankCard.Index", exc);
                 return Redirect(Request.Headers["Referer"].ToString());
             }
         }
@@ -59,7 +62,7 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("ToggleBankCardStatus", exc);
+                logger.Error("BankCard.ToggleBankCardStatus", exc);
                 return GenerateJsonResult(new { status = 0, val = "" });
             }
         }
@@ -74,7 +77,25 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("ToggleShabaStatus", exc);
+                logger.Error("BankCard.ToggleShabaStatus", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Authorize(Policy = Policies.User_Bank_Info)]
+        public JsonResult SetBankCardName(int bankCardId, string bankCardFName, string bankCardLName)
+        {
+            try
+            {
+                var bankCard = bankCardService.Find(bankCardId);
+                bankCard.FName = bankCardFName;
+                bankCard.LName = bankCardLName;
+                bankCardService.Update(bankCard, userAccessor.CurrentUser.Id, Core.Entities.ActionLog.ActionSourceEnum.AdminPanel);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("BankCard.SetBankCardName", exc);
                 return GenerateJsonResult(new { status = 0 });
             }
         }

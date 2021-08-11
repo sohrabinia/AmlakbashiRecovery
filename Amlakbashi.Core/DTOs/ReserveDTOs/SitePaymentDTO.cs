@@ -15,6 +15,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public long PayablePriceRaw { get; set; }
         public string BankCardNumber { get; set; }
         public string BankCardName { get; set; }
+        public int BankCardId { get; set; }
         public bool BankCardVerified { get; set; }
         public string ShebaNumber { get; set; }
         public bool ShebaVerified { get; set; }
