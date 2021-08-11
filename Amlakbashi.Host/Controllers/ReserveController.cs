@@ -1199,10 +1199,10 @@ namespace Amlakbashi.Host.Controllers
                     BankCardNumber = hostBankCard != null &&
                             !string.IsNullOrEmpty(hostBankCard.BankCardNumber) ?
                             hostBankCard.BankCardNumber : "ثبت نشده",
-                    BankCardName = !string.IsNullOrEmpty(bankCardName) ?
-                            bankCardName : "بدون نام",
+                    BankCardName = bankCardName,
                     BankCardVerified = hostBankCard != null &&
                             hostBankCard.BankCardStatus == (int)BankCard.BankCardStatusEnum.Verified,
+                    BankCardId = hostBankCard.Id,
                     ShebaVerified = hostBankCard != null &&
                             hostBankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.Verified,
                     ShebaNumber = hostBankCard != null &&
