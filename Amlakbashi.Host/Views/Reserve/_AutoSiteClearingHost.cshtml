@@ -1,0 +1,65 @@
+﻿
+@if (ViewBag.error != null && ViewBag.error == true)
+{
+    <div>
+        <span>عملیات با خطا مواجه شد</span>
+    </div>
+}
+else
+{
+    <div>
+        <span>نام صاحب حساب:</span>
+        <span>@ViewBag.bankCardName</span>
+    </div>
+    <div>
+        <span>شماره شبای مقصد:</span>
+        <span>IR@(ViewBag.shebaNumber)</span>
+    </div>
+    <div>
+        <span>مبلغ پرداخت:</span>
+        <span>@ViewBag.price ریال</span>
+    </div>
+    <div>
+        <label>ارسال پیامک به میزبان</label>
+        <input type="checkbox" id="SendSmsCheckbox" name="sendSms" value="true" checked="checked" />
+    </div>
+    <div style="text-align: center;">
+        <button type="button" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;" onclick="DoAutoSiteClearingPayment()">پرداخت</button>
+    </div>
+    <div style="text-align: center;">
+        <span id="PaymentResultWaitingSpan" style="visibility:hidden; color: darkorange;">لطفا منتظر بمانید ...</span>
+    </div>
+}
+
+<script>
+    function DoAutoSiteClearingPayment() {
+        var sendSms = $("#SendSmsCheckbox").prop('checked');
+        $.ajax({
+            url: "/reserve/AutoSiteClearingHost",
+            type: "post",
+            data: {
+                reserveId: '@ViewBag.reserveId',
+                sendSms: sendSms
+            },
+            beforeSend: function () {
+                $('#PaymentResultWaitingSpan').css("visibility", "visible");
+            },
+            success: function (response) {
+                $('#PaymentResultWaitingSpan').css("visibility", "hidden");
+                if (response.status == 0) {
+                    showInfoMessage('پرداخت ناموفق', '<p style="color: red;">' + response.msg + '</p>');
+                }
+                else {
+                    reserveAdminHubConnection.invoke('reserveCleared', @ViewBag.reserveId);
+                    showInfoMessage('پرداخت موفق', '<p style="color: blue;">' + response.msg + '</p>');
+                    popupMsgList[1].btnClick(0, true);
+                    popupMsgList[0].btnClick(0, true);
+                }
+            },
+            error: function (ret) {
+                $('#PaymentResultWaitingSpan').css("visibility", "hidden");
+                alertify.error("عملیات با خطا مواجه شد");
+            }
+        });
+    }
+</script>

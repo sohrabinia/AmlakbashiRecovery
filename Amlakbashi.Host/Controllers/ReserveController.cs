@@ -1198,7 +1198,7 @@ namespace Amlakbashi.Host.Controllers
                     PayablePriceRaw = payablePrice * 10,
                     BankCardNumber = hostBankCard != null &&
                             !string.IsNullOrEmpty(hostBankCard.BankCardNumber) ?
-                            hostBankCard.BankCardNumber : "ثبت نشده",
+                            hostBankCard.BankCardNumber : "",
                     BankCardName = bankCardName,
                     BankCardVerified = hostBankCard != null &&
                             hostBankCard.BankCardStatus == (int)BankCard.BankCardStatusEnum.Verified,
@@ -1207,7 +1207,7 @@ namespace Amlakbashi.Host.Controllers
                             hostBankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.Verified,
                     ShebaNumber = hostBankCard != null &&
                             !string.IsNullOrEmpty(hostBankCard.ShabaNumber) ?
-                            hostBankCard.ShabaNumber : "ثبت نشده",
+                            hostBankCard.ShabaNumber : "",
                     UserName = hostName,
                     UserId = hostUser.Id,
                     UserCredit = hostUser.Credit,
@@ -1293,6 +1293,15 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserveId);
+                if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePayment.ReservePaymentType.SiteClearingToHost))
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "این رزرو قبلا تسویه شده است. برای ثبت، ابتدا تسویه قبلی را بیعانه کنید"
+                    });
+                }
+
                 var destUser = userType == UserType.Host ? reserve.HostUser : reserve.GuestUser;
                 var user = userService.Find(userId);
                 if (user == null)
@@ -1311,20 +1320,13 @@ namespace Amlakbashi.Host.Controllers
                         msg = "لطفا شماره تراکنش را وارد کنید"
                     });
                 }
-                //if (referenceId <= 0)
-                //{
-                //    return GenerateJsonResult(new
-                //    {
-                //        status = 0,
-                //        msg = "لطفا شماره ارجاع را وارد کنید"
-                //    });
-                //}
 
                 var reservePayment = accounting.InsertReservePayment(userId, reserveId, transactionId, referenceId,
                     userType == UserType.Host ?
                     ReservePayment.ReservePaymentType.SiteClearingToHost :
                     ReservePaymentType.SiteRefundToGuest, price,
                     (ReservePayment.ReservePaymentMethod)paymentMethod, userAccessor.CurrentUser.Id);
+
                 if (reservePayment == null)
                 {
                     return GenerateJsonResult(new
@@ -1370,15 +1372,64 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize(Policy = Policies.Reserve_Payment_Actions)]
-        public IActionResult AutoSiteClearingHost(long reserveId, long price)
+        [HttpGet]
+        public IActionResult AutoSiteClearingHost(long reserveId)
         {
             try
             {
-                //accounting.PaySheba("", 0, "");
+                var reserve = reserveService.Find(reserveId);
+                var guestPaidAmount = accounting.GetReservePaidAmount(reserveId, StatusStringType.Guest);
+                var payablePrice = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guestPaidAmount,
+                    reserve.CouponPrice, reserve.PrizePrice);
+
+                var hostBankCard = bankCardService.GetByUserId(reserve.HostUserID);
+                var bankCardName = hostBankCard != null ?
+                    ((hostBankCard.FName != null ? hostBankCard.FName + " " : "") +
+                    (hostBankCard.LName != null ? hostBankCard.LName : "")) : "";
+
+                ViewBag.reserveId = reserveId;
+                ViewBag.shebaNumber = hostBankCard.ShabaNumber;
+                ViewBag.bankCardName = bankCardName;
+                ViewBag.price = payablePrice * 10;
+                return PartialView("_AutoSiteClearingHost");
+            }
+            catch(Exception exc)
+            {
+                logger.Error("Reserve.AutoSiteClearingHost", exc);
+                ViewBag.error = true;
+                return PartialView("_AutoSiteClearingHost");
+            }
+        }
+
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
+        [HttpPost]
+        public IActionResult AutoSiteClearingHost(long reserveId, bool sendSms)
+        {
+            try
+            {
+                var result = accounting.SiteClearingHostAutoPayment(reserveId, userAccessor.CurrentUser.Id);
+                if (result.HasError == false && sendSms)
+                {
+                    var user = userService.Find(result.UserId);
+                    var identityUser = userService.GetIdentityUser(user.MainMobile);
+                    userService.SendMessage(new UserContactDTO()
+                    {
+                        UserMainMobile = user.MainMobile,
+                        UserAppNotificationToken = user.AppNotificationToken,
+                        UserEmail = identityUser.Email,
+                        UserFcmAppNotificationToken = user.FcmAppNotificationToken,
+                        UserNotificationToken = user.NotificationToken,
+                        Type = UserContactType.SiteClearingHost,
+                        Price = result.PayablePrice.ToString(),
+                        ReserveId = reserveId.ToString(),
+                        TransactionId = result.TransactionId,
+                        AdvertiseId = result.AdvertiseId.ToString()
+                    });
+                }
                 return GenerateJsonResult(new
                 {
-                    status = 1,
-                    msg = "عملیات پرداخت با موفقیت انجام شد"
+                    status = result.HasError ? 0 : 1,
+                    msg = result.HasError ? result.ErrorMessage : result.Message
                 });
             }
             catch (Exception exc)

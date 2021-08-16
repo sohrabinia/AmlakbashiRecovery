@@ -95,6 +95,13 @@ namespace Amlakbashi.Accounting.Services
         public ReservePayment Insert(int user_id, long reserve_id, long transaction_id, long ref_id,
             ReservePaymentType type, long price, ReservePaymentMethod payment_method, int operator_id = 0, bool dontSave = false)
         {
+            IQueryable<ReservePayment> reservePayments = Repository.Query(q =>
+                q.Where(x => x.CreateDate >= DateTime.Now.Date.AddDays(-20).Date));
+            if (reservePayments.Any(x => x.TransactionID == transaction_id && x.PaymentMethod == (int)payment_method))
+            {
+                return null;
+            }
+
             var reservePayment = new ReservePayment();
             reservePayment.PaymentType = (int)type;
             reservePayment.ReserveID = reserve_id;
@@ -105,15 +112,7 @@ namespace Amlakbashi.Accounting.Services
             reservePayment.PaymentMethod = (int)payment_method;
             reservePayment.CreateDate = DateTime.Now;
             reservePayment.OperatorID = operator_id;
-            var payment_method_int = (int)payment_method;
-
-            IQueryable<ReservePayment> reservePayments = Repository.Query(q => q);
-            var twenty_days_before = DateTime.Now.Date.AddDays(-20).Date;
-            reservePayments = reservePayments.Where(x => x.CreateDate >= twenty_days_before);
-            if (reservePayments.Any(x => x.TransactionID == transaction_id && x.PaymentMethod == payment_method_int))
-            {
-                return null;
-            }
+            
             if (!dontSave)
             {
                 Repository.Insert(reservePayment);
