@@ -1,4 +1,5 @@
-﻿using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
+﻿using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.GeneralInfos;
+using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +9,7 @@ namespace Amlakbashi.Accounting.BankingContext.BankingEngines.Interfaces
 {
     internal interface IPodiumBankingEngine
     {
-        Task<ShebaVerificationResultDTO> VerifySheba(string sheba);
-        Task<ShebaPaymentResultDTO> PaySheba(string sheba, long amount, string fullName);
+        ShebaVerificationResultDTO ShebaVerification(string sheba);
+        ShebaPaymentResultDTO ShebaPayment(ShebaPaymentRequestDTO requestDTO);
     }
 }

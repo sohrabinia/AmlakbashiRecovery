@@ -14,14 +14,14 @@ namespace Amlakbashi.Accounting.BankingContext
             this.podiumEngine = podiumEngine;
         }
 
-        public Task<ShebaPaymentResultDTO> PaySheba(string sheba, long amount, string fullName)
+        public ShebaPaymentResultDTO ShebaPayment(ShebaPaymentRequestDTO reqeustDTO)
         {
-            return podiumEngine.PaySheba(sheba, amount, fullName);
+            return podiumEngine.ShebaPayment(reqeustDTO);
         }
 
-        public Task<ShebaVerificationResultDTO> VerifySheba(string sheba)
+        public ShebaVerificationResultDTO ShebaVerification(string sheba)
         {
-            return podiumEngine.VerifySheba(sheba);
+            return podiumEngine.ShebaVerification(sheba);
         }
     }
 }

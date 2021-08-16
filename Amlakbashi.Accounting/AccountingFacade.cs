@@ -28,8 +28,8 @@ using Microsoft.AspNetCore.Identity;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using Amlakbashi.Accounting.BankingContext;
-using System.Threading.Tasks;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
+using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.GeneralInfos;
 
 namespace Amlakbashi.Accounting
 {
@@ -1093,14 +1093,64 @@ namespace Amlakbashi.Accounting
             }
         }
 
-        public Task<ShebaVerificationResultDTO> VerifySheba(string sheba)
+        public ShebaVerificationResultDTO VerifySheba(string sheba)
         {
-            return bankingOperator.VerifySheba(sheba);
+            return bankingOperator.ShebaVerification(sheba);
         }
 
-        public Task<ShebaPaymentResultDTO> PaySheba(string sheba, long amount, string fullname)
+        public ShebaPaymentResultDTO SiteClearingHostAutoPayment(long reserveId, int operatorId)
         {
-            return bankingOperator.PaySheba(sheba, amount, fullname);
+            var reserve = repository.FindReserve(reserveId);
+            if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePayment.ReservePaymentType.SiteClearingToHost))
+            {
+                return new ShebaPaymentResultDTO()
+                {
+                    HasError = true,
+                    ErrorMessage = "این رزرو قبلا تسویه شده است. برای ثبت، ابتدا تسویه قبلی را بیعانه کنید"
+                };
+            }
+
+            var hostUser = reserve.HostUser;
+            var guestPaidAmount = GetReservePaidAmount(reserveId, StatusStringType.Guest);
+            var payablePrice = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guestPaidAmount,
+                reserve.CouponPrice, reserve.PrizePrice);
+            var hostBankCard = repository.FindBankCardByUserId(hostUser.Id);
+
+            var reservePayment = new ReservePayment()
+            {
+                PaymentType = (int)ReservePayment.ReservePaymentType.WaitingForPodium,
+                ReserveID = reserveId,
+                UserID = operatorId,
+                Price = payablePrice,
+                PaymentMethod = (int)ReservePayment.ReservePaymentMethod.Podium,
+                CreateDate = DateTime.Now,
+                OperatorID = operatorId,
+            };
+            reservePayment = reservePaymentService.Insert(reservePayment);
+
+            ShebaPaymentRequestDTO payDTO = new ShebaPaymentRequestDTO()
+            {
+                DestSheba = "IR" + hostBankCard.ShabaNumber,
+                DestFirstName = hostBankCard.FName,
+                DestLastName = hostBankCard.LName,
+                PaymentId = reservePayment.Id,
+                Timestamp = DateTime.Now,
+                Amount = (payablePrice * 10),
+                CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
+            };
+            var result = bankingOperator.ShebaPayment(payDTO);
+
+            if (result.HasError == false)
+            {
+                reservePayment.PaymentType = (int)ReservePayment.ReservePaymentType.SiteClearingToHost;
+                reservePayment.TransactionID = long.Parse(result.TransactionId);
+                reservePaymentService.Update(reservePayment);
+
+                result.UserId = hostUser.Id;
+                result.PayablePrice = payablePrice;
+                result.AdvertiseId = reserve.AdvertiseID;
+            }
+            return result;
         }
     }
 }

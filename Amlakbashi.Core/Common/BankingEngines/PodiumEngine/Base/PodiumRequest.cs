@@ -25,15 +25,15 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Base
 
         protected abstract RequestData GetRequestData();
 
-        public async Task<R> Send()
+        public R Send()
         {
             var requestData = GetRequestData();
             var requestDict = RequestDataToDict(requestData);
             var content = new FormUrlEncodedContent(requestDict);
             client.DefaultRequestHeaders.Add("_token_", token);
             client.DefaultRequestHeaders.Add("_token_issuer_", tokenIssuer);
-            var httpResponse = await client.PostAsync(url, content);
-            var stringResponse = await httpResponse.Content.ReadAsStringAsync();
+            var httpResponse = client.PostAsync(url, content).Result;
+            var stringResponse = httpResponse.Content.ReadAsStringAsync().Result;
 
             var responseData = JsonConvert.DeserializeObject<R>(stringResponse);
             if (responseData.hasError == false && string.IsNullOrEmpty(responseData.result.result) == false)

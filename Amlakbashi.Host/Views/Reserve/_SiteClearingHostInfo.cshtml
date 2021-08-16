@@ -40,7 +40,7 @@ else
         <span>@Model.UserName</span>
     </div>
     <div>
-        @{ 
+        @{
             var bankCardNumberString = Model.BankCardNumber;
             if (Model.BankCardNumber != "ثبت نشده")
             {
@@ -64,7 +64,7 @@ else
             <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('@Model.ShebaNumber', 'شماره شبا')" /></span>
             @if (Model.ShebaVerified == false || string.IsNullOrEmpty(Model.BankCardName))
             {
-                <span><i class="fa fa-sync" style="cursor: pointer; color: #999;" onclick="verifySheba()" /></span>
+                <span><i class="fa fa-sync" style="cursor: pointer; color: #999;" onclick="VerifySheba()" /></span>
                 <span style="visibility:hidden; color: darkorange; margin-left: 10px; font-size: small;" id="ShebaNumberWaitingSpan">لطفا صبر کنید ...</span>
             }
         }
@@ -75,49 +75,29 @@ else
     </div>
     <br />
     <div style="text-align:center;">
-        @*<button style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;" onclick="autoSiteClearingHost()">پرداخت خودکار</button>*@
-        <button style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;" onclick="manualSiteClearingHost()">پرداخت دستی</button>
+        <button style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;" onclick="AutoSiteClearingHost()">پرداخت خودکار</button>
+        <button style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;" onclick="ManualSiteClearingHost()">پرداخت دستی</button>
     </div>
 }
 
 <script>
-    function manualSiteClearingHost() {
+    function ManualSiteClearingHost() {
         var queryString = "reserveId=" + @Model.ReserveId + "&price=" + @Model.PayablePrice + "&userType=" + '@Model.UserType';
         showInfoMessage('ثبت پرداخت', '',
             { contentUrl: '/Reserve/ManualSitePayment?' + queryString, fullScreen: screen.width < 781 }
         );
     }
 
-    function autoSiteClearingHost() {
-        @*showNoYesMessage('', 'آیا از واریز وجه به حساب میزبان مطمئنید؟',
-            function () {
-                $.ajax({
-                type: "get",
-                url: "/reserve/autoSiteClearingHost?reserveId" + @Model.ReserveId,
-                success: function (response) {
-                    if (response.status == 0) {
-                        alertify.error(response.msg);
-                    }
-                    else {
-                        alertify.success(response.msg);
-                        reserveAdminHubConnection.invoke('reserveCleared', @Model.ReserveId);
-                        popupMsgList[0].btnClick(0, true);
-                    }
-                }
-            });
-        })*@
+    function AutoSiteClearingHost() {
+        showInfoMessage('تکمیل پرداخت', '',
+            { contentUrl: '/Reserve/AutoSiteClearingHost?reserveId=' + @Model.ReserveId, fullScreen: screen.width < 781 }
+        );
     }
 
-    function verifySheba() {
-        @*var queryString = "sheba=" + "@Model.ShebaNumber" + "&hostName=" + "@Model.UserName" + "&bankCardName=" + "@Model.BankCardName" +
-            "&bankCardId=" + @Model.BankCardId + "&shebaVerify=" + "@Model.ShebaVerified";
-        showInfoMessage('استعلام شماره شبا', '',
-            { contentUrl: '/banking/verifysheba?' + queryString, fullScreen: screen.width < 781 }
-        );*@
-
+    function VerifySheba() {
         $.ajax({
             url: "/banking/verifysheba",
-            type: "get",
+            type: "post",
             data: {
                 sheba: '@(Model.ShebaNumber)',
                 hostName: '@(Model.UserName)',
@@ -131,6 +111,10 @@ else
             success: function (data, status, xhr) {
                 $('#ShebaNumberWaitingSpan').css("visibility", "hidden");
                 showInfoMessage('استعلام شماره شبا', data);
+            },
+            error: function (ret) {
+                $('#ShebaNumberWaitingSpan').css("visibility", "hidden");
+                alertify.error("عملیات با خطا مواجه شد");
             }
         });
     }

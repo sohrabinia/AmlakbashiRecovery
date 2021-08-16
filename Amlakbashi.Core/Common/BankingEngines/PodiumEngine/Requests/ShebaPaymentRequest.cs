@@ -1,45 +1,41 @@
-﻿using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.GeneralInfos;
-using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Base;
+﻿using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Base;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Results;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.ResultInfos;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.RequestInfos;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 
 namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
 {
     public class ShebaPaymentRequest : PodiumRequest<ShebaPaymentResult, ShebaPaymentResultInfo, ShebaPaymentRequestInfo>
     {
-        //private const string userName = "97374service";
+        private const string apiKey = "0a84cf56a4cc4951bfd64f2c700d61d5";
+        private const string productId = "445929";
         private const string sourceDepositNumber = "3902.800.97374.1";
-        private const string apiKey = "c162c3e83070480b87bd7d1485e45520";
-        private const string productId = "35591";
-        private CentralBankTransferEnum transferType;
-        private readonly List<BatchPayaRequestItem> payItems;
-        private readonly string fileUniqueIdentifier;
-        //private const string TransferMoneyBillNumber = "";
-        //private const string FileUniqueIdentifier = "";
-        //private const string privateKey = "";
-        //private readonly List<string> scVoucherHash;
+        private const string sourceSheba = "IR440570390280000097374001";
 
-        public ShebaPaymentRequest(CentralBankTransferEnum transferType, List<BatchPayaRequestItem> payItems,
-            string fileUniqueIdentifier)
+        private readonly ShebaPaymentRequestInfo request;
+        public ShebaPaymentRequest(ShebaPaymentRequestDTO requestDTO)
         {
-            this.transferType = transferType;
-            this.payItems = payItems;
-            this.fileUniqueIdentifier = fileUniqueIdentifier;
+            request = new ShebaPaymentRequestInfo()
+            {
+                UserName = userName,
+                SourceDepositNumber = sourceDepositNumber,
+                DestDepositNumber = requestDTO.DestDepositNumber,
+                SourceSheba = sourceSheba,
+                DestSheba = requestDTO.DestSheba,
+                DestFirstName = requestDTO.DestFirstName,
+                DestLastName = requestDTO.DestLastName,
+                Amount = requestDTO.Amount,
+                PaymentId = requestDTO.PaymentId,
+                SourceComment = requestDTO.SourceComment,
+                DestComment = requestDTO.DestComment,
+                CentralBankTransferDetailType = (int)requestDTO.CentralBankTransferDetailType,
+                Timestamp = requestDTO.Timestamp.ToString("yyyy/MM/dd HH:mm:ss:FFF")
+            };
         }
         
         protected override RequestData GetRequestData()
         {
-            var request = new ShebaPaymentRequestInfo()
-            {
-                UserName = userName,
-                SourceDepositNumber = sourceDepositNumber,
-                CentralBankTransferDetailType = ((int)transferType).ToString(),
-                BatchPayaItemInfos = payItems,
-                FileUniqueIdentifier = fileUniqueIdentifier,
-            };
             string jsonRequest = request.GenerateJson();
             return new RequestData()
             {

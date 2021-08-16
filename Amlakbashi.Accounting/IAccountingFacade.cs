@@ -122,7 +122,7 @@ namespace Amlakbashi.Accounting
             out PaymentChartDTO SitePortionChart,
             out PaymentChartDTO HostCreditorChart);
         PaymentChartDTO GeneratePaymentChart(int year, int month, bool extra_filter = false, List<int> user_list = null);
-        Task<ShebaVerificationResultDTO> VerifySheba(string sheba);
-        Task<ShebaPaymentResultDTO> PaySheba(string sheba, long amount, string fullname);
+        ShebaVerificationResultDTO VerifySheba(string sheba);
+        ShebaPaymentResultDTO SiteClearingHostAutoPayment(long reserveId, int operatorId);
     }
 }

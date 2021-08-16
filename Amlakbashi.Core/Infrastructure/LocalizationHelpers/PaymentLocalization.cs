@@ -20,6 +20,8 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "کیف پول";
                 case ReservePaymentMethod.BankCard:
                     return "کارت به کارت";
+                case ReservePaymentMethod.Podium:
+                    return "پادیوم";
                 default:
                     return "";
             }
@@ -74,6 +76,8 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "پرداخت تسویه میزبان توسط سایت";
                 case ReservePaymentType.SiteRefundToGuest:
                     return "عودت مبلغ به مهمان توسط سایت";
+                case ReservePaymentType.WaitingForPodium:
+                    return "پرداخت ناموفق پادیوم";
                 default:
                     return "";
             }

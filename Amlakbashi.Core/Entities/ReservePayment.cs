@@ -41,13 +41,15 @@ namespace Amlakbashi.Core.Entities
             SiteDepositeToHost = 2,
             SiteClearingToHost = 3,
             SiteRefundToGuest = 4,
+            WaitingForPodium = 5,
         }
 
         public enum ReservePaymentMethod
         {
             EPay = 0,
             AmlakbashiCredit = 1,
-            BankCard = 2
+            BankCard = 2,
+            Podium = 3
         }
 
         public static string GetPaymentDatabaseString(ReservePaymentType payment_type)

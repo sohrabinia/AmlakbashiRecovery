@@ -22,12 +22,13 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize(Policy = Policies.Reserve_Payment_Actions)]
-        public async Task<IActionResult> VerifySheba(string sheba, string hostName, string bankCardName,
+        [HttpPost]
+        public IActionResult VerifySheba(string sheba, string hostName, string bankCardName,
             int bankCardId, bool shebaVerify)
         {
             try
             {
-                var result = await accountingFacade.VerifySheba("IR" + sheba);
+                var result = accountingFacade.VerifySheba("IR" + sheba);
                 result.HostName = hostName;
                 result.BankCardName = bankCardName;
                 result.BankCardId = bankCardId;
