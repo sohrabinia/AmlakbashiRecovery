@@ -111,12 +111,12 @@ namespace Amlakbashi.Host.Controllers
                     invalid_data = true;
                     error_message = "لطفا کد رزرو را وارد کنید.";
                 }
-                else if (transaction_id <= 0)
+                else if (transaction_id <= 0 && method_id != 3)
                 {
                     invalid_data = true;
                     error_message = "لطفا شماره تراکنش را وارد کنید.";
                 }
-                else if (accounting.ReservePaymentExists( transaction_id, method_id, reserve_payment_id))
+                else if (method_id != 3 && accounting.ReservePaymentExists(transaction_id, method_id, reserve_payment_id))
                 {
                     invalid_data = true;
                     error_message = "شماره تراکنش تکراری میباشد.";
@@ -207,13 +207,13 @@ namespace Amlakbashi.Host.Controllers
                     invalid_data = true;
                     error_message = "لطفا کد رزرو را وارد کنید.";
                 }
-                else if (reserve_payment.TransactionID <= 0)
+                else if (reserve_payment.PaymentMethod != 3 && reserve_payment.TransactionID <= 0)
                 {
                     invalid_data = true;
                     error_message = "لطفا شماره تراکنش را وارد کنید.";
                 }
-                else if (accounting.ReservePaymentExists(reserve_payment.TransactionID,
-                    reserve_payment.PaymentMethod, reserve_payment.Id))
+                else if (reserve_payment.PaymentMethod != 3 &&
+                    accounting.ReservePaymentExists(reserve_payment.TransactionID, reserve_payment.PaymentMethod, reserve_payment.Id))
                 {
                     invalid_data = true;
                     error_message = "شماره تراکنش تکراری میباشد.";
@@ -276,6 +276,20 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.OperationStatus = 0;
                 ViewBag.AlertMessage = "خطا: " + exc.Message;
                 return View(reserve_payment);
+            }
+        }
+
+        public IActionResult CheckPodiumPaymentStatus(long reservePaymentId)
+        {
+            try
+            {
+                var result = accounting.CheckShebaPaymentStatus(reservePaymentId);
+                return PartialView("_CheckPodiumPaymentStatus", result);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("ReservePayment.CheckPodiumPaymentStatus", exc);
+                return PartialView("_CheckPodiumPaymentStatus");
             }
         }
 

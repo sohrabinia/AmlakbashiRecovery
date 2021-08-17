@@ -37,5 +37,6 @@
         public const string Post_Publish = "Post_Publish";
         public const string Post_Edit = "Post_Edit";
         public const string Payment_View = "Payment_View";
+        public const string Payment_Actions = "Payment_Actions";
     }
 }

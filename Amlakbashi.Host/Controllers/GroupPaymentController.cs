@@ -53,7 +53,7 @@ namespace Amlakbashi.Host.Controllers
             this.userAccessor = userAccessor;
         }
 
-        [Authorize(Policy = Policies.Payment_View)]
+        [Authorize(Policy = Policies.Payment_Actions)]
         public ActionResult Index(int? page, int status = -1)
         {
             try

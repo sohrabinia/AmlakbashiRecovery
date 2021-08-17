@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Accounting;
+using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Controllers.Base;
 using log4net;
@@ -38,7 +39,10 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Banking.VerifySheba", exc);
-                return PartialView("_VerifySheba");
+                return PartialView("_VerifySheba", new ShebaVerificationResultDTO() { 
+                    HasError = true,
+                    ErrorMessage = "عملیات با خطا مواجه شد"
+                });
             }
         }
     }

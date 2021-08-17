@@ -11,5 +11,6 @@ namespace Amlakbashi.Accounting.BankingContext.BankingEngines.Interfaces
     {
         ShebaVerificationResultDTO ShebaVerification(string sheba);
         ShebaPaymentResultDTO ShebaPayment(ShebaPaymentRequestDTO requestDTO);
+        CheckShebaPaymentResultDTO CheckShebaPaymentStatus(string date, string paymentId);
     }
 }

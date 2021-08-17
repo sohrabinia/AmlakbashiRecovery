@@ -1,0 +1,29 @@
+﻿@model Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs.CheckShebaPaymentResultDTO
+
+@if (Model == null)
+{
+    <div>
+        <span>عملیات با خطا مواجه شد</span>
+    </div>
+}
+else if (Model.HasError)
+{
+    <div>
+        <span>@Model.ErrorMessage</span>
+    </div>
+}
+else
+{
+    <div>
+        <span>شماره ارجاع درخواست:</span>
+        <span>@Model.RefrenceNumber</span>
+    </div>
+    <div>
+        <span>کد وضعیت انتقال وجه:</span>
+        <span>@Model.Key</span>
+    </div>
+    <div>
+        <span>شرح وضعیت:</span>
+        <span>@Model.Value</span>
+    </div>
+}

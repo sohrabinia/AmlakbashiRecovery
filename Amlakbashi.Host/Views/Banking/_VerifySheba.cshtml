@@ -1,16 +1,6 @@
 ﻿@model Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs.ShebaVerificationResultDTO
 
-@if (Model == null)
-{
-    <div>
-        <span>نتیجه:</span>
-        <span style="color: red;">نا موفق</span>
-    </div>
-    <div>
-        <span>عملیات با خطا مواجه شد</span>
-    </div>
-}
-else if (Model.HasError)
+@if (Model.HasError)
 {
     <div>
         <span>نتیجه:</span>

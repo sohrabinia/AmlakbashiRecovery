@@ -23,5 +23,10 @@ namespace Amlakbashi.Accounting.BankingContext
         {
             return podiumEngine.ShebaVerification(sheba);
         }
+
+        public CheckShebaPaymentResultDTO CheckShebaPaymentStatus(string date, string paymentId)
+        {
+            return podiumEngine.CheckShebaPaymentStatus(date, paymentId);
+        }
     }
 }
