@@ -1302,6 +1302,19 @@ namespace Amlakbashi.Host.Controllers
                     });
                 }
 
+                if (userType == UserType.Host)
+                {
+                    var bankCard = bankCardService.GetByUserId(reserve.HostUserID);
+                    if (bankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.NotVerified)
+                    {
+                        return GenerateJsonResult(new
+                        {
+                            status = 0,
+                            msg = "شماره شبای کاربر تایید نشده است"
+                        });
+                    }
+                }
+
                 var destUser = userType == UserType.Host ? reserve.HostUser : reserve.GuestUser;
                 var user = userService.Find(userId);
                 if (user == null)

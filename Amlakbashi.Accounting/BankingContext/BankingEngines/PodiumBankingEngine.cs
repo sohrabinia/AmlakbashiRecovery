@@ -45,5 +45,23 @@ namespace Amlakbashi.Accounting.BankingContext.BankingEngines
             }
             return result;
         }
+
+        public CheckShebaPaymentResultDTO CheckShebaPaymentStatus(string date, string paymentId)
+        {
+            var data = new CheckShebaPaymentRequest(date, paymentId).Send();
+            var result = new CheckShebaPaymentResultDTO();
+            if (data.hasError == false && data.BankResult.IsSuccess)
+            {
+                result.RefrenceNumber = data.BankResult.Data.RefrenceNumber;
+                result.Key = data.BankResult.Data.Key;
+                result.Value = data.BankResult.Data.Value;
+            }
+            else
+            {
+                result.HasError = true;
+                result.ErrorMessage = data.hasError ? data.message : data.BankResult.Message;
+            }
+            return result;
+        }
     }
 }

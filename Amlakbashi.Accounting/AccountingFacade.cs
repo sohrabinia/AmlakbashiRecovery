@@ -1093,6 +1093,8 @@ namespace Amlakbashi.Accounting
             }
         }
 
+        // Podium Services
+
         public ShebaVerificationResultDTO VerifySheba(string sheba)
         {
             return bankingOperator.ShebaVerification(sheba);
@@ -1116,6 +1118,15 @@ namespace Amlakbashi.Accounting
                 reserve.CouponPrice, reserve.PrizePrice);
             var hostBankCard = repository.FindBankCardByUserId(hostUser.Id);
 
+            if (hostBankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.NotVerified)
+            {
+                return new ShebaPaymentResultDTO()
+                {
+                    HasError = true,
+                    ErrorMessage = "شماره شبای کاربر تایید نشده است"
+                };
+            }
+
             var reservePayment = new ReservePayment()
             {
                 PaymentType = (int)ReservePayment.ReservePaymentType.WaitingForPodium,
@@ -1134,7 +1145,7 @@ namespace Amlakbashi.Accounting
                 DestFirstName = hostBankCard.FName,
                 DestLastName = hostBankCard.LName,
                 PaymentId = reservePayment.Id,
-                Timestamp = DateTime.Now,
+                Timestamp = reservePayment.CreateDate,
                 Amount = (payablePrice * 10),
                 CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
             };
@@ -1151,6 +1162,13 @@ namespace Amlakbashi.Accounting
                 result.AdvertiseId = reserve.AdvertiseID;
             }
             return result;
+        }
+
+        public CheckShebaPaymentResultDTO CheckShebaPaymentStatus(long reservePaymentId)
+        {
+            var reservePayment = reservePaymentService.Find(reservePaymentId);
+            var date = reservePayment.CreateDate.ToString("yyyy/MM/dd");
+            return bankingOperator.CheckShebaPaymentStatus(date, reservePayment.Id.ToString());
         }
     }
 }

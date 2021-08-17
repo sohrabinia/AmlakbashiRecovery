@@ -416,6 +416,23 @@ namespace Amlakbashi.Core.Identity
                             Roles.Admin,
                             Roles.TechnicalManager,
                             Roles.TechnicalEmployee,
+                            Roles.ReserveJunior,
+                            Roles.ReserveManager,
+                            Roles.ReserveSenior,
+                            Roles.AdvertiseManager,
+                            Roles.FinanceManager,
+                            Roles.FinanceSenior,
+                            Roles.FinanceJunior
+                        }
+                    },
+                    {
+                        Policies.Payment_Actions,
+                        new string[]
+                        {
+                            Roles.SuperAdmin,
+                            Roles.Admin,
+                            Roles.TechnicalManager,
+                            Roles.TechnicalEmployee,
                             Roles.ReserveManager,
                             Roles.ReserveSenior,
                             Roles.AdvertiseManager,

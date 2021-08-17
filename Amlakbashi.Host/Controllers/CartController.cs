@@ -65,7 +65,7 @@ namespace Amlakbashi.Host.Controllers
             return RedirectToAction("AccessDenied", "Errors");
         }
 
-        [Authorize(Policy = Policies.Payment_View)]
+        [Authorize(Policy = Policies.Payment_Actions)]
         public ActionResult Index(int? page, int status = -1, int uid = -1, long refid = -1)
         {
             try
@@ -299,7 +299,7 @@ namespace Amlakbashi.Host.Controllers
             return Redirect(string.Format("/{0}/{1}", redirect_controller, redirect_action));
         }
 
-        [Authorize(Policy = Policies.Payment_View)]
+        [Authorize(Policy = Policies.Payment_Actions)]
         public IActionResult CheckPasargadPaymentResult(int paymentId)
         {
             try

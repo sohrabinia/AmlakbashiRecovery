@@ -1,16 +1,16 @@
 ﻿@using Amlakbashi.Core.Common.Utilities;
+
 @inject IUserAccessor userAccessor;
+
 @model ReservePayment
 
 @{
-    var is_edit = Model.Id > 0;
-    ViewBag.Title = is_edit ? "ویرایش" : "ایجاد" + " پرداخت رزرو";
+    var isEdit = Model.Id > 0;
+    ViewBag.Title = isEdit ? "ویرایش" : "ایجاد" + " پرداخت رزرو";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
 
 <div class="title">@ViewBag.Title</div>
-
-
 @using (Html.BeginForm("AddEdit", "ReservePayment", FormMethod.Post, new { id = "add_edit_form" }))
 {
     @Html.HiddenFor(model => model.Id)
@@ -36,9 +36,9 @@
                 کد رزرو :
             </td>
             <td>
-                @if (is_edit)
+                @if (isEdit)
                 {
-                    <input name="ReserveID" readonly value="@Model.ReserveID"/>
+                    <input name="ReserveID" readonly value="@Model.ReserveID" />
                 }
                 else
                 {
@@ -52,9 +52,9 @@
                 کد کاربری پرداخت کننده :
             </td>
             <td>
-                @if (is_edit)
+                @if (isEdit)
                 {
-                    <input name="UserID" readonly value="@Model.UserID"/>
+                    <input name="UserID" readonly value="@Model.UserID" />
                 }
                 else
                 {
@@ -63,7 +63,7 @@
             </td>
             <td></td>
         </tr>
-        @if (is_edit)
+        @if (isEdit)
         {
             <tr>
                 <td class="label">
@@ -84,16 +84,20 @@
                 <select name="PaymentType">
                     @{
                         var payment_type_values = (ReservePayment.ReservePaymentType[])Enum.GetValues(typeof(ReservePayment.ReservePaymentType));
-                        var ids_allow = new List<int>() { 3, 12, 1667, 2122};
-                        if (!is_edit && !ids_allow.Contains(userAccessor.CurrentUser.Id))
+                        if (Model.PaymentMethod != (int)ReservePayment.ReservePaymentMethod.Podium)
                         {
-                            var allow_types = new List<ReservePayment.ReservePaymentType>()
-                            {
-                                ReservePayment.ReservePaymentType.GuestDeposite,
-                                ReservePayment.ReservePaymentType.GuestClearing
-                            };
-                            payment_type_values = payment_type_values.Where(x => allow_types.Contains(x)).ToArray();
+                            payment_type_values = payment_type_values.Where(w => w != ReservePayment.ReservePaymentType.WaitingForPodium).ToArray();
                         }
+                        //var ids_allow = new List<int>() { 3, 12, 2122 };
+                        //if (!isEdit && !ids_allow.Contains(userAccessor.CurrentUser.Id))
+                        //{
+                        //    var allow_types = new List<ReservePayment.ReservePaymentType>()
+                        //                    {
+                        //        ReservePayment.ReservePaymentType.GuestDeposite,
+                        //        ReservePayment.ReservePaymentType.GuestClearing
+                        //    };
+                        //    payment_type_values = payment_type_values.Where(x => allow_types.Contains(x)).ToArray();
+                        //}
                         <option value="-1">انتخاب کنید</option>
                         foreach (var value in payment_type_values)
                         {
@@ -109,7 +113,15 @@
                 مبلغ :
             </td>
             <td>
-                @Html.EditorFor(model => model.Price, new { id = "price" })
+                @if (Model.PaymentMethod == (int)ReservePayment.ReservePaymentMethod.Podium)
+                {
+                    <span>@Model.Price</span>
+                    <input type="hidden" name="Price" value="@Model.Price" />
+                }
+                else
+                {
+                    @Html.EditorFor(model => model.Price, new { id = "price" })
+                }
             </td>
         </tr>
         <tr>
@@ -124,7 +136,15 @@
                 شماره تراکنش :
             </td>
             <td>
-                @Html.EditorFor(model => model.TransactionID, new { id = "transaction_id" })
+                @if (Model.PaymentMethod == (int)ReservePayment.ReservePaymentMethod.Podium)
+                {
+                    <span>@Model.TransactionID</span>
+                    <input type="hidden" name="TransactionID" value="@Model.TransactionID" />
+                }
+                else
+                {
+                    @Html.EditorFor(model => model.TransactionID, new { id = "transaction_id" })
+                }
             </td>
             <td></td>
         </tr>
@@ -133,16 +153,21 @@
                 روش پرداخت :
             </td>
             <td>
-                <select name="PaymentMethod">
-                    @{
-                        var payment_method_values = (ReservePayment.ReservePaymentMethod[])Enum.GetValues(typeof(ReservePayment.ReservePaymentMethod));
-                        payment_method_values = payment_method_values.Where(x => x != ReservePayment.ReservePaymentMethod.AmlakbashiCredit).ToArray();
-                        foreach (var value in payment_method_values)
-                        {
-                            <option is-selected="@((int)value == Model.PaymentMethod)" value="@((int)value)">@(PaymentLocalization.GetPaymentMethodString((int)value))</option>
-                        }
-                    }
-                </select>
+                @if (Model.PaymentMethod == (int)ReservePayment.ReservePaymentMethod.Podium)
+                {
+                    @*<select name="PaymentMethod">
+                            <option value="@((int)ReservePayment.ReservePaymentMethod.Podium)">@(PaymentLocalization.GetPaymentMethodString((int)ReservePayment.ReservePaymentMethod.Podium))</option>
+                        </select>*@
+                    <span>@(PaymentLocalization.GetPaymentMethodString((int)ReservePayment.ReservePaymentMethod.Podium))</span>
+                    <input type="hidden" name="PaymentMethod" value="@((int)ReservePayment.ReservePaymentMethod.Podium)" />
+                }
+                else
+                {
+                    <select name="PaymentMethod">
+                        <option is-selected="@(Model.PaymentMethod == (int)ReservePayment.ReservePaymentMethod.BankCard)" value="@((int)ReservePayment.ReservePaymentMethod.BankCard)">@(PaymentLocalization.GetPaymentMethodString((int)ReservePayment.ReservePaymentMethod.BankCard))</option>
+                        <option is-selected="@(Model.PaymentMethod == (int)ReservePayment.ReservePaymentMethod.EPay)" value="@((int)ReservePayment.ReservePaymentMethod.EPay)">@(PaymentLocalization.GetPaymentMethodString((int)ReservePayment.ReservePaymentMethod.EPay))</option>
+                    </select>
+                }
             </td>
             <td></td>
         </tr>
@@ -155,8 +180,8 @@
 }
 
 @section ScriptBlock {
-<script type="text/javascript">
-    @{ 
+    <script type="text/javascript">
+    @{
         var has_message = ViewBag.OperationStatus != null;
     }
 
@@ -191,7 +216,7 @@
                 }
             },
             onClose: function () {
-                var is_edit = '@is_edit' === 'True';
+                var is_edit = '@isEdit' === 'True';
                 if (!is_edit)
                 {
                     $("#ReserveID").attr('value','');
@@ -328,5 +353,5 @@
             }
         });
     }
-</script>
+    </script>
 }

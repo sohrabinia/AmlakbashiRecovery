@@ -782,12 +782,16 @@ namespace Amlakbashi.Application.Services.UserServices
 
         public void UpdateUserRoles(string username, IList<string> selectedRoles)
         {
+            if (selectedRoles.Contains("SuperAdmin"))
+            {
+                return;
+            }
             var user = userManager.FindByNameAsync(username).Result;
             var allUserRoles = userManager.GetRolesAsync(user).Result;
             var addedRoles = selectedRoles.Where(s => allUserRoles.Contains(s) == false);
             var removedRoles = allUserRoles.Where(w => selectedRoles.Contains(w) == false);
-            var addResult = userManager.AddToRolesAsync(user, addedRoles).Result;
-            var removeResult = userManager.RemoveFromRolesAsync(user, removedRoles).Result;
+            userManager.AddToRolesAsync(user, addedRoles).Wait();
+            userManager.RemoveFromRolesAsync(user, removedRoles).Wait();
         }
 
         public IList<User> GetRoleUserList(string roleName)
