@@ -89,6 +89,25 @@
       "wwwroot/resource/css/general/home-page-search.css"
     ]
   },
+  {
+    "outputFileName": "wwwroot/css/master-admin.min.css",
+    "inputFiles": [
+      "wwwroot/resource/admin.css",
+      "wwwroot/resource/chosen_v1.4.2/chosen.css",
+      "wwwroot/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css",
+      "wwwroot/resource/resource/fontawesome-free-5.6.3-web/css/all.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.default.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.core.css",
+      "wwwroot/resource/resource/loader.min.css",
+      "wwwroot/Resource/persian-date-picker/persian-datepicker.min.css",
+      "wwwroot/resource/jquery-confirm/jquery-confirm.min.css",
+      "wwwroot/resource/css/general/message-popup.css&v=2",
+      "wwwroot/resource/star-rating/star-rating.css",
+      "wwwroot/resource/rating/themes/fontawesome-stars.css",
+      "wwwroot/resource/tmmegamenu/css/tmmegamenu.css",
+      "wwwroot/resource/css/general/acc-comment.css"
+    ]
+  },
   // ####################################################### Scripts
   {
     "outputFileName": "wwwroot/js/dashboard.min.js",

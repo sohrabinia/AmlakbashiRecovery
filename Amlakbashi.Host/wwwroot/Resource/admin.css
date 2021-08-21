@@ -287,7 +287,7 @@ td {
     height:70px;
 }
 
-input[type="text"], input[type="password"],input[type="number"]  {
+input[type="text"], input[type="password"], input[type="number"] {
     border: 1px solid #ccc;
     border-radius: 7px;
     font: 15px rnassim;

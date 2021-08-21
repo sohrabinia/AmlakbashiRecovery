@@ -28,7 +28,7 @@ namespace Amlakbashi.Accounting
         void UpdateReservePayment(ReservePayment editedData);
         bool ReservePaymentExists(long transactionId, int paymentMethod, long id = 0);
         IList<ReservePayment> FilterReservePayment(long reservePaymentId, long reserveId, long advertiseId,
-            int userId, int operatorId, int paymentType, long transactionId, int status);
+            int userId, int operatorId, int paymentType, int paymentMethod, long transactionId);
         long GetReservePaidAmount(long reserveId, Reserve.StatusStringType payType, long exceptPaymentId = -1);
         long GetReservePaidAmount(IList<ReservePayment> reserve_payments, Reserve.StatusStringType type_of_pay,
             long except_payment_id = -1);

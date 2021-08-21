@@ -85,10 +85,10 @@ namespace Amlakbashi.Accounting
 
         public IList<ReservePayment> FilterReservePayment(long reservePaymentId,
             long reserveId, long advertiseId, int userId, int operatorId,
-            int paymentType, long transactionId, int status)
+            int paymentType, int paymentMethod, long transactionId)
         {
             return reservePaymentService.Filter(reservePaymentId, reserveId, advertiseId,
-                userId, operatorId, paymentType, transactionId, status);
+                userId, operatorId, paymentType, paymentMethod, transactionId);
         }
 
         public ReservePayment FindReservePayment(long id)
