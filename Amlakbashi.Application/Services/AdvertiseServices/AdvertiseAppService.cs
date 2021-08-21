@@ -561,11 +561,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             mediator.Publish(new ChangeAdvertiseAddressEvent(shallowAcc, acc));
             if (removedPhotoIds.Any())
             {
-                mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+                mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds)).Wait();
             }
-            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
+            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id)).Wait();
             mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID,
-                    acc.Photos.Select(s => s.Id).ToList(), rootPath));
+                    acc.Photos.Select(s => s.Id).ToList(), rootPath)).Wait();
             return director;
         }
 
@@ -743,9 +743,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     }
                     mediator.Publish(new AddHotelChildEvent(data.Id, (long)data.ParentId));
                 }
-            }
-            if (data.Id > 0)
                 mediator.Publish(new ChangeAdvertisePriceEvent(data.Id));
+            }
             return director;
         }
 
@@ -806,14 +805,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                             removedPhotoIds = child.Photos.Select(s => s.Id).ToList();
                             child.Photos.Clear();
                         }
-                        //if (removedPhotoIds.Any())
-                        //{
-                        //    mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
-                        //}
-                        //mediator.Send(new RenameAdvertisePhotosCommand(child.Id));
-                        //mediator.Send(new GenerateThumbImageCommand(child.Id, child.PhotoID,
-                        //    child.Photos.Select(s => s.Id).ToList(), rootPath));
-                        
                     }
                     child.LastModifyDate = DateTime.Now;
                     Repository.Update(child);
@@ -843,11 +834,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     {
                         if (removedPhotoIds.Any())
                         {
-                            mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+                            mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds)).Wait();
                         }
-                        mediator.Send(new RenameAdvertisePhotosCommand(child.Id));
+                        mediator.Send(new RenameAdvertisePhotosCommand(child.Id)).Wait();
                         mediator.Send(new GenerateThumbImageCommand(child.Id, child.PhotoID,
-                            child.Photos.Select(s => s.Id).ToList(), rootPath));
+                            child.Photos.Select(s => s.Id).ToList(), rootPath)).Wait();
                     }
                 }
                 else
@@ -898,15 +889,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     }
                     if (photoIds != null && photoIds.Count() > 0)
                     {
-                        mediator.Send(new RenameAdvertisePhotosCommand(data.Id));
+                        mediator.Send(new RenameAdvertisePhotosCommand(data.Id)).Wait();
                         mediator.Send(new GenerateThumbImageCommand(data.Id, data.PhotoID,
-                            data.Photos.Select(s => s.Id).ToList(), rootPath));
+                            data.Photos.Select(s => s.Id).ToList(), rootPath)).Wait();
                     }
                     mediator.Publish(new AddComplexChildEvent(data.Id, (long)data.ParentId));
                 }
-            }
-            if (data.Id > 0)
                 mediator.Publish(new ChangeAdvertisePriceEvent(data.Id));
+            }
             return director;
         }
 
@@ -1023,11 +1013,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     }
                     if (removedPhotoIds.Any())
                     {
-                        mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+                        mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds)).Wait();
                     }
-                    mediator.Send(new RenameAdvertisePhotosCommand(data.Id));
+                    mediator.Send(new RenameAdvertisePhotosCommand(data.Id)).Wait();
                     mediator.Send(new GenerateThumbImageCommand(data.Id, acc.PhotoID,
-                            acc.Photos.Select(s => s.Id).ToList(), rootPath));
+                            acc.Photos.Select(s => s.Id).ToList(), rootPath)).Wait();
                 }
                 mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id, true));
             }
@@ -1035,8 +1025,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (type == DirectorType.Extra || type == DirectorType.ComplexUnit ||
                 type == DirectorType.HotelUnit)
             {
-                if (acc.Id > 0)
-                    mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id));
+                mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id));
             }
 
             Repository.Update(acc);
@@ -1483,19 +1472,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 var file = Repository.Find<File, long>(item);
                 acc.Photos.Add(file);
             }
-            //if (removedPhotoIds.Any())
-            //{
-            //    mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
-            //}
             acc.PhotoID = editedData.mainPhoto;
             acc.AlbumPhoto = editedData.ConvertAlbumToString();
             acc.LastModifyDate = DateTime.Now;
-            //mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
-            //var thumbStatus = mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID, editedData.album, rootPath)).Result;
-            //if (thumbStatus)
-            //{
-            //    acc.ImageThumbGenerateStatus = ImageThumbStatusEnum.Done;
-            //}
             var director = new AdvertiseDirector(acc, DirectorType.General);
             var hasImportantChange = director.HasImpotantChange(shallowAcc);
             if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
@@ -1512,10 +1491,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             if (removedPhotoIds.Any())
             {
-                mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds));
+                mediator.Send(new RemovePhotosByFileIdsCommand(removedPhotoIds)).Wait();
             }
-            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id));
-            mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID, editedData.album, rootPath));
+            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id)).Wait();
+            mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID, editedData.album, rootPath)).Wait();
             return true;
         }
 

@@ -157,8 +157,10 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 {
                     var accThumbPath = request.Path + "/content/accthumb/" + request.AdvertiseId;
 
+                    logger.Debug("Generate Thumb " + request.AdvertiseId + ": Start");
                     if (Directory.Exists(accThumbPath))
                     {
+                        logger.Debug("Generate Thumb " + request.AdvertiseId + ": Remove old thumbs");
                         Directory.Delete(accThumbPath, true);
                     }
 
@@ -172,12 +174,15 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                         files.Add(fileRepository.Find((long)request.MainPhotoId));
                     }
 
+                    logger.Debug("Generate Thumb " + request.AdvertiseId + ": " + files.Count + " files");
                     var watermarkedImageList = new List<string>();
                     var thumbs = new List<ImageThumbDTO>();
                     foreach (var file in files)
                     {
+                        logger.Debug("Generate Thumb " + request.AdvertiseId + ": set watermark - " + file.Id + " - " + file.FilePathWithoutTilde);
                         if (File.Exists(request.Path + file.FilePathWithoutTilde) == false)
                         {
+                            logger.Debug("Generate Thumb " + request.AdvertiseId + ": dont exist");
                             continue;
                         }
                         var waterPath = mediator.Send(new SetWatermarkCommand(file.Id, host.WebRootPath)).Result;
@@ -299,6 +304,8 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             File.Delete(item);
                         }
                     }
+
+                    logger.Debug("Generate Thumb " + request.AdvertiseId + ": finish");
                 }
             }
             catch (Exception exc)

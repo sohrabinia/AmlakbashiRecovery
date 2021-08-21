@@ -11,8 +11,8 @@ namespace Amlakbashi.Accounting.Services.Interfaces
     {
         IList<ReservePayment> GetAll();
         IQueryable<ReservePayment> GetAllAsIQueriable();
-        IList<ReservePayment> Filter(long reservePaymentId, long reserveId, long advertiseId, int userId,
-            int operatorId, int paymentType, long transactionId, int status);
+        IList<ReservePayment> Filter(long reservePaymentId, long reserveId, long advertiseId,
+            int userId, int operatorId, int paymentType, int paymentMethod, long transactionId);
         IList<ReservePayment> Filter(int paymentType);
         ReservePayment Find(long id);
         ReservePayment Insert(ReservePayment reservePayment);

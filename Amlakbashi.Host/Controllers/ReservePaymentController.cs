@@ -43,22 +43,23 @@ namespace Amlakbashi.Host.Controllers
         [Authorize(Policy = Policies.Reserve_View)]
         public ActionResult Index(int? page, long reserve_payment_id = -1, long reserve_id = -1,
             long advertise_id = -1,int user_id = -1, int operator_id = -1,
-            int payment_type = -1, long transaction_id = -1, int status = 0)
+            int payment_type = -1, int paymentMethod = -1, long transaction_id = -1, int status = 0)
         {
             try
             {
                 var model = accounting.FilterReservePayment(reserve_payment_id, reserve_id,
-                    advertise_id, user_id, operator_id, payment_type, transaction_id, status);
+                    advertise_id, user_id, operator_id, payment_type, paymentMethod, transaction_id);
                 var PageNumber = page ?? 1;
-                var onePageOfModel = model.ToPagedList(PageNumber, 10);
+                var onePageOfModel = model.ToPagedList(PageNumber, 20);
                 ViewBag.reserve_payment_id = reserve_payment_id;
                 ViewBag.reserve_id = reserve_id;
                 ViewBag.advertise_id = advertise_id;
                 ViewBag.user_id = user_id;
                 ViewBag.payment_type = payment_type;
+                ViewBag.paymentMethod = paymentMethod;
                 ViewBag.transaction_id = transaction_id;
                 ViewBag.status = status;
-                ViewBag.RowIndexStart = (PageNumber * 10) - 10;
+                ViewBag.RowIndexStart = (PageNumber * 20) - 20;
                 return View(onePageOfModel);
             }
             catch (Exception exc)

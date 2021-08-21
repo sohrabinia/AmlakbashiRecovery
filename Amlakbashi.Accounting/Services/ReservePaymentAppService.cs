@@ -26,7 +26,7 @@ namespace Amlakbashi.Accounting.Services
         }
 
         public IList<ReservePayment> Filter(long reservePaymentId, long reserveId, long advertiseId,
-            int userId, int operatorId, int paymentType, long transactionId, int status)
+            int userId, int operatorId, int paymentType, int paymentMethod, long transactionId)
         {
             IQueryable<ReservePayment> model = Repository.Query(q => q);
             if (reservePaymentId > 0)
@@ -66,7 +66,11 @@ namespace Amlakbashi.Accounting.Services
                     model = model.Where(x => x.PaymentType == paymentType);
                 }
             }
-            return model.OrderByDescending(x => x.ReserveID).ToList();
+            if (paymentMethod > -1)
+            {
+                model = model.Where(w => w.PaymentMethod == paymentMethod);
+            }
+            return model.OrderByDescending(x => x.CreateDate).ToList();
         }
 
         public IList<ReservePayment> Filter(int paymentType)
