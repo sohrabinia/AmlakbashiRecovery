@@ -23,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -133,11 +134,12 @@ namespace Amlakbashi.Host
                 x.MultipartBodyLengthLimit = 20971520;
             });
 
-            //services.AddStackExchangeRedisCache(options =>
-            //{
-            //    options.Configuration =
-            //        $"{Configuration.GetValue<string>("Redis:Server")}:{Configuration.GetValue<int>("Redis:Port")}";
-            //});
+            var redisConfigString = $"{Configuration.GetValue<string>("Redis:Server")}:{Configuration.GetValue<int>("Redis:Port")},allowAdmin=true,abortConnect=false";
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = redisConfigString;
+            });
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConfigString));
         }
 
         // ConfigureContainer is where you can register things directly

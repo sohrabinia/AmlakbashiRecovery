@@ -10,17 +10,13 @@ using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
-using Amlakbashi.Host.Filters;
 using log4net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using X.PagedList;
 using static Amlakbashi.Core.Entities.Advertise;
 using static Amlakbashi.Core.Entities.Region;
@@ -397,24 +393,25 @@ namespace Amlakbashi.Host.Controllers
                 if (!string.IsNullOrEmpty(phrase) && phrase.Last() == '-')
                     phrase = phrase.Remove(phrase.Length - 1, 1);
 
-                // #################
-                //var cachedName = $"category.item:r{regionId}:cd{countryDirection}:t{typeInt}";
-                //if (string.IsNullOrEmpty(Request.QueryString.Value))
-                //{
-                //    var cachedData = cacheManager.Get<CategoryItemDTO>(cachedName);
-                //    if (cachedData != null)
-                //    {
-                //        if (ajax)
-                //        {
-                //            return PartialView("_AdvertiseListItems", cachedData);
-                //        }
-                //        else
-                //        {
-                //            return View(cachedData);
-                //        }
-                //    }
-                //}
-                //##################
+                // read from redis cache
+                bool canUseCache = area < 1 && ((ajax == false && string.IsNullOrEmpty(Request.QueryString.Value)) ||
+                    (ajax == true && path.Contains("?") == false));
+                var cachedName = $"{CacheNames.Category_Item_}{category.Id}";
+                if (canUseCache)
+                {
+                    var cachedData = cacheManager.Get<CategoryItemDTO>(cachedName);
+                    if (cachedData != null)
+                    {
+                        if (ajax)
+                        {
+                            return PartialView("_AdvertiseListItems", cachedData);
+                        }
+                        else
+                        {
+                            return View(cachedData);
+                        }
+                    }
+                }
 
                 CategoryItemDTO categoryItemDTO = new CategoryItemDTO();
                 var model = categoryService.GetFilteredAdvertises(category.Id,
@@ -678,10 +675,10 @@ namespace Amlakbashi.Host.Controllers
                     categoryItemDTO.AdvertiseItems.Add(dto);
                 }
 
-                //if (string.IsNullOrEmpty(Request.QueryString.Value))
-                //{
-                //    cacheManager.Set(cachedName, categoryItemDTO);
-                //}
+                if (canUseCache)
+                {
+                    cacheManager.Set(cachedName, categoryItemDTO);
+                }
 
                 if (ajax)
                 {
@@ -723,7 +720,7 @@ namespace Amlakbashi.Host.Controllers
             int frompaypernight = -1, int topaypernight = -1,
             int fromMetrazh = -1, int toMetrazh = -1,
             int region = -1, int capacity = -1,
-            int room = -1, int elevator = -1, int pool = -1, 
+            int room = -1, int elevator = -1, int pool = -1,
             string empty_range_from = "", string empty_range_to = "",
             string phrase = "", bool hygieneProtocol = false, bool ajax = false)
         {

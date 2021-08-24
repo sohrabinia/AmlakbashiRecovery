@@ -501,14 +501,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             data.Mode = acc.Mode;
             level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : (acc.OwnershipType < 1 ? 3 : 4));
             var director = new AdvertiseDirector(data, DirectorType.General);
-            bool hasImportantChange = false;
             if (director.Validate(out errors, out groupErrors) == false)
                 return director;
             if (data.Id < 1)
             {
                 return director;
             }
-            var oldAcc = acc.ShallowCopy();
+            bool hasImportantChange = false;
             if (isEdit)
             {
                 hasImportantChange = director.HasImpotantChange(acc);
@@ -549,7 +548,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         {
                             acc.Status = AdvertiseStatus.ReadyToPublish;
                             mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, prevStatus));
-                            mediator.Publish(new ChangeAdvertiseActiveEvent(oldAcc, acc));
+                            mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
                         }
                         break;
                 }

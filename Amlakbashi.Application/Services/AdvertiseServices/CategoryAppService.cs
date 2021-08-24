@@ -102,24 +102,6 @@ namespace Amlakbashi.Application.Services.Category
             advertises = Repository.Query<Advertise, long>(q =>
                 q.Where(w => advertiseIds.Contains(w.Id)));
 
-            // #############
-            //IQueryable<Advertise> advertises;
-
-            //var cachedData = cacheManager.Get<IEnumerable<Advertise>>("category:" + categoryId + ":advertises");
-            //if (cachedData == null)
-            //{
-            //    var category = Repository.Find(categoryId);
-            //    var advertiseIds = category.Advertises.Select(s => s.Id).ToList();
-            //    advertises = Repository.Query<Advertise, long>(q => q.Where(w => advertiseIds.Contains(w.Id)));
-            //    cacheManager.Set("category:" + categoryId + ":advertises", advertises.AsEnumerable());
-            //}
-            //else
-            //{
-            //    advertises = cachedData.AsQueryable();
-            //}
-
-            // #############
-
             bool OccupiedTablesincluded = false;
             bool DiscountTablesincluded = false;
             bool Childrenincluded = false;

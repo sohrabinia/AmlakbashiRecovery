@@ -12,6 +12,7 @@ using Amlakbashi.Application.Services.SettingServices.SettingManager;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using Amlakbashi.Mediator.Events.AdvertiseEvents;
 using Microsoft.EntityFrameworkCore;
+using Amlakbashi.Mediator.Commands.CategoryCommands;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 {
@@ -139,20 +140,28 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
         public Task Handle(ChangeAdvertisePriceEvent notification, CancellationToken cancellationToken)
         {
             var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
-            acc.BasePrice = acc.DailyPrice;
-            if (acc.Mode == AdvertiseMode.Child)
+            if (acc.BasePrice != acc.DailyPrice)
             {
-                var parent = acc.Parent;
-                parent.BasePrice = parent.Childs.Min(m => m.DailyPrice);
-                advertiseRepository.Update(parent);
-            }
-            advertiseRepository.Update(acc);
-            advertiseRepository.Save();
-            if (acc.Categories != null)
-            {
-                foreach (var cat in acc.Categories)
+                acc.BasePrice = acc.DailyPrice;
+                advertiseRepository.Update(acc);
+                if (acc.Mode == AdvertiseMode.Child)
                 {
-                    mediator.Send(new UpdateCategoryPriceCommand(cat.Id));
+                    var parent = acc.Parent;
+                    parent.BasePrice = parent.Childs.Min(m => m.DailyPrice);
+                    advertiseRepository.Update(parent);
+                }
+                advertiseRepository.Save();
+                if (acc.Categories != null && acc.Categories.Any())
+                {
+                    foreach (var cat in acc.Categories)
+                    {
+                        mediator.Send(new UpdateCategoryPriceCommand(cat.Id));
+                    }
+                }
+                mediator.Send(new RemoveCategoryItemCacheCommand(acc.Id));
+                if (acc.Mode == AdvertiseMode.Child)
+                {
+                    mediator.Send(new RemoveCategoryItemCacheCommand((long)acc.ParentId));
                 }
             }
             return Task.CompletedTask;
@@ -247,7 +256,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
                 {
                     acc.Slug = string.IsNullOrEmpty(acc.Slug) ? acc.Id.ToString() + "-" + acc.OldSlug : acc.Slug;
                     acc.MetaTitle = string.IsNullOrEmpty(acc.MetaTitle) ? acc.Title + " - املاک باشی" : acc.MetaTitle;
-                    acc.MetaDescription = string.IsNullOrEmpty(acc.MetaDescription) ? 
+                    acc.MetaDescription = string.IsNullOrEmpty(acc.MetaDescription) ?
                         AdvertiseSeoLocalization.GetMetaDescription(acc, cityTitle, areaTitle) : acc.MetaDescription;
                 }
                 else
