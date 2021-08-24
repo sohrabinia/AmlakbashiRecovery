@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = "مدیریت کش ها";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<h2>پاک کردن کامل کش</h2>
+<br />
+<div>
+    <span>به منظور پاک کردن کامل کش های ذخیره شده در Redis، روی دکمه مقابل کلیک کنید:</span>
+    <button onclick="VerifyClearCache()" style="cursor: pointer; border-radius: 5px; padding: 10px; background-color: #EA4335; color: white; margin-right: 20px; font-size: medium; ">پاک کردن کش ها</button>
+</div>
+
+
+@section ScriptBlock{ 
+    <script>
+        function VerifyClearCache() {
+            showNoYesMessage('پاک کردن کش ها', 'آیا کش Redis به طور کامل پاک شود؟', function () {
+                myajax("admin/clearcache", "", function (ret) {
+                    if (ret.status == 0) {
+                        alertify.error("عملیات با خطای فنی مواجه شد");
+                    }
+                    if (ret.status == 1) {
+                        alertify.success('کش با موفقیت پاک شد');
+                    }
+                });
+            });
+        }
+    </script>
+}

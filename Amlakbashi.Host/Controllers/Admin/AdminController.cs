@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Amlakbashi.Core.Common.Utilities;
 using log4net;
-using Entities = Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Accounting;
@@ -14,6 +13,7 @@ using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
+using Amlakbashi.Core.Common.Caching;
 
 namespace Portal.Controllers
 {
@@ -24,17 +24,20 @@ namespace Portal.Controllers
         private readonly IAccountingFacade accounting;
         private readonly IAdvertiseAppService advertiseService;
         private readonly IUserAccessor userAccessor;
+        private readonly ICacheManager cacheManager;
         public AdminController(ILog logger,
             IAccountingFacade accounting,
             IAdvertiseAppService advertiseService,
             IUserAppService userService,
-            IUserAccessor userAccessor)
+            IUserAccessor userAccessor,
+            ICacheManager cacheManager)
         {
             this.logger = logger;
             this.userService = userService;
             this.advertiseService = advertiseService;
             this.accounting = accounting;
             this.userAccessor = userAccessor;
+            this.cacheManager = cacheManager;
         }
 
         [Authorize(Policy = Policies.Admin_General)]
@@ -549,6 +552,27 @@ namespace Portal.Controllers
             {
                 logger.Error("GetWaCoronaAdvTestMsgs", exc);
                 return GenerateJsonResult(new { status = 0, msg = "عملیات با خطای فنی مواجه شد" });
+            }
+        }
+
+        [Authorize(Policy = Policies.Send_Message_To_Users)]
+        public IActionResult CacheManagement()
+        {
+            return View();
+        }
+
+        [Authorize(Policy = Policies.Send_Message_To_Users)]
+        public JsonResult ClearCache()
+        {
+            try
+            {
+                cacheManager.Clear();
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Admin.ClearCache", exc);
+                return GenerateJsonResult(new { status = 0 });
             }
         }
 

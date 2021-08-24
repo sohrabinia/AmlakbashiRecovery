@@ -32,6 +32,7 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
+        // Type
         public enum AdvertiseRegion
         {
             Province = 0,

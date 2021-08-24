@@ -16,6 +16,7 @@ using Autofac;
 using log4net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;

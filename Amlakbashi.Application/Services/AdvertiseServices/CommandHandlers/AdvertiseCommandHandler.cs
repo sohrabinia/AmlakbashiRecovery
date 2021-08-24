@@ -13,6 +13,8 @@ using Amlakbashi.Application.Services.SettingServices.SettingManager;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using Microsoft.EntityFrameworkCore;
 using static Amlakbashi.Core.Entities.Reserve;
+using Amlakbashi.Mediator.Commands.CategoryCommands;
+using Amlakbashi.Core.Common.Caching;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
 {
@@ -28,27 +30,30 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
         IRequestHandler<UpdateInstantReserveStatusCommand>,
         IRequestHandler<IncreaseInstantReserveCancelCommand>,
         IRequestHandler<SetExtrinsicReserveForWaitForResponseCommand>,
-        IRequestHandler<InsertExtrinsicReserveByDateListCommand>
+        IRequestHandler<InsertExtrinsicReserveByDateListCommand>,
+        IRequestHandler<RemoveCategoryItemCacheCommand>
     {
-        private IMediator mediator;
+        private readonly IMediator mediator;
         private readonly IRepository<Advertise, long> advertiseRepository;
         private readonly ISettingManager setting;
+        private readonly ICacheManager cacheManager;
         public AdvertiseCommandHandler(IMediator mediator,
             IRepository<Advertise, long> advertiseRepository,
-            ISettingManager setting)
+            ISettingManager setting, ICacheManager cacheManager)
         {
             this.mediator = mediator;
             this.advertiseRepository = advertiseRepository;
             this.setting = setting;
+            this.cacheManager = cacheManager;
         }
 
         public Task<Unit> Handle(UpdateAdvertiseCategoriesCommand request, CancellationToken cancellationToken)
         {
             var accIds = advertiseRepository.Query(q => q.Where(
-                w => w.Id == request.advertiseId || (w.ParentId == request.advertiseId && w.Count < 1)).OrderBy(o => o.Id))
-                    .Select(s => s.Id).ToList();
-            var catIds = new List<int>();
+                w => w.Id == request.advertiseId || (w.ParentId == request.advertiseId && w.Count == 0))
+                .OrderBy(o => o.Id)).Select(s => s.Id).ToList();
 
+            var catIds = new List<int>();
             foreach (var accId in accIds)
             {
                 var acc = advertiseRepository.Find(accId);
@@ -57,6 +62,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                     catIds.AddRange(acc.Categories.Select(s => s.Id));
                 }
 
+                mediator.Send(new RemoveCategoryItemCacheCommand(accId));
                 acc.Categories.Clear();
                 if (acc.IsActive == false || acc.Count > 0)
                 {
@@ -82,7 +88,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                 acc.LastModifyDate = DateTime.Now;
                 advertiseRepository.Update(acc);
                 advertiseRepository.Save();
+                mediator.Send(new RemoveCategoryItemCacheCommand(accId));
             }
+
             catIds = catIds.Distinct().ToList();
             foreach (var catId in catIds)
             {
@@ -108,6 +116,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                     cat.LastModifyDate = DateTime.Now;
                     catIds.Add(cat.Id);
                 }
+                mediator.Send(new RemoveCategoryItemCacheCommand(accId));
                 acc.LastModifyDate = DateTime.Now;
                 acc.Categories.Clear();
                 advertiseRepository.Update(acc);
@@ -468,6 +477,20 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             advertiseRepository.Update(acc);
             advertiseRepository.Save();
             mediator.Send(new UpdateAdvertiseOccupiedCommand(request.AdvertiseId));
+            return Task.FromResult(Unit.Value);
+        }
+
+        public Task<Unit> Handle(RemoveCategoryItemCacheCommand request, CancellationToken cancellationToken)
+        {
+            var advertise = advertiseRepository.Find(request.AdvertiseId);
+            foreach (var category in advertise.Categories)
+            {
+                var advertiseList = category.Advertises.OrderByDescending(o => o.AdvertiseScore).Take(12);
+                if (advertiseList.Contains(advertise))
+                {
+                    cacheManager.Remove($"{CacheNames.Category_Item_}{category.Id}");
+                }
+            }
             return Task.FromResult(Unit.Value);
         }
     }
