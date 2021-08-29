@@ -1,7 +1,8 @@
 ﻿@using Amlakbashi.Core.DTOs.CategoryDTOs; 
 <div class="home-page__search-container">
     @*<div class="home-page__search-empty-space"></div>*@
-    <h1 class="home-page__search-title">اجاره روزانه خانه ، اجاره آنلاین ویلا و سوئیت در سراسر ایران</h1>
+    @*<h1 class="home-page__search-title">اجاره روزانه خانه ، اجاره آنلاین ویلا و سوئیت در سراسر ایران</h1>*@
+    <h1 class="home-page__search-title">اجاره روزانه، هفتگی و ماهانه خانه، ویلا، سوئیت و آپارتمان مبله</h1>
     <div class="home-page__search-box">
         @*<i onclick="openFirstSearchResult()" class="home-page__search-icon fa fa-search"></i>*@
         <input autocomplete="off" id="js-search-input-main" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="مقصد سفر شما کجاست؟" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)"  class="home-page__search-input" type="search" />
