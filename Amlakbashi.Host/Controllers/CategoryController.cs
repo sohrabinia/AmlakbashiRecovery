@@ -394,7 +394,8 @@ namespace Amlakbashi.Host.Controllers
                     phrase = phrase.Remove(phrase.Length - 1, 1);
 
                 // read from redis cache
-                bool canUseCache = area < 1 && ((ajax == false && string.IsNullOrEmpty(Request.QueryString.Value)) ||
+                bool canUseCache = string.IsNullOrEmpty(phrase) && area < 1 && 
+                    ((ajax == false && string.IsNullOrEmpty(Request.QueryString.Value)) ||
                     (ajax == true && path.Contains("?") == false));
                 var cachedName = $"{CacheNames.Category_Item_}{category.Id}";
                 if (canUseCache)

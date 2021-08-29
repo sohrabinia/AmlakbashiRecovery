@@ -31,6 +31,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs;
+using Amlakbashi.Core.Common.Caching;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -49,6 +50,7 @@ namespace Amlakbashi.Host.Controllers
         private readonly ILog logger;
         private readonly IUserAccessor userAccessor;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ICacheManager cacheManager;
         public AccomodationController(ILog logger,
             IAdvertiseAppService advertiseService,
             IExtrinsicReserveAppService extrinsicReserveService,
@@ -61,8 +63,8 @@ namespace Amlakbashi.Host.Controllers
             IReserveAppService reserveService,
             IUserAppService userService,
             IUserAccessor userAccessor,
-            IWebHostEnvironment webHostEnvironment
-            )
+            IWebHostEnvironment webHostEnvironment,
+            ICacheManager cacheManager)
         {
             this.logger = logger;
             this.advertiseService = advertiseService;
@@ -77,6 +79,7 @@ namespace Amlakbashi.Host.Controllers
             this.userService = userService;
             this.userAccessor = userAccessor;
             this.webHostEnvironment = webHostEnvironment;
+            this.cacheManager = cacheManager;
         }
 
         #region Admin Add/Edit Accommodation
@@ -1761,7 +1764,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "*" })]
+        //[ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult Item(string slug, string capacity = null,
             string empty_range_from = null, string empty_range_to = null)
         {
@@ -1775,9 +1778,18 @@ namespace Amlakbashi.Host.Controllers
                 var model = advertiseService.FindIncludingDeleted(id);
                 if (model.Slug.ToLower() != slug.ToLower())
                 {
-                    return NotFound("صفحه ی مورد نظر موجود نمی باشد .");
+                    return NotFound("صفحه ی مورد نظر موجود نمی باشد.");
                 }
                 advertiseService.UpdateAccView(id);
+                ViewBag.amp_version = false;
+
+                // get from redis cache
+                var cacheName = $"{CacheNames.Advertise_}{model.Id}";
+                var cachedData = cacheManager.Get<AccommodationItemDTO>(cacheName);
+                if (cachedData != null)
+                {
+                    return View(cachedData);
+                }
 
                 #region Initialize DTO
                 var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(model.UserID);
@@ -1791,7 +1803,6 @@ namespace Amlakbashi.Host.Controllers
                 accDTO.EmptyRangeTo = empty_range_to;
                 accDTO.RelatedLinkCapacity = capacity;
                 accDTO.IsPreview = false;
-                #endregion
 
                 if (accDTO.CanPublish == false)
                 {
@@ -1799,7 +1810,10 @@ namespace Amlakbashi.Host.Controllers
                     accDTO.RelatedCategories = new List<DynamicCategory>();
                     accDTO.RelatedCategories.Add(categoryService.GetAccItemLinks(model.Province, model.City, model.Area, model.TypeID).Last());
                 }
-                ViewBag.amp_version = false;
+                #endregion
+
+                // set into redis cache
+                cacheManager.Set(cacheName, accDTO);
                 return View(accDTO);
             }
             catch (Exception exc)

@@ -10,6 +10,7 @@ using static Amlakbashi.Core.Entities.Advertise;
 
 namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
 {
+    [Serializable]
     public class AccommodationItemDTO
     {
         public AccommodationItemDTO(AdvertiseMode advertiseMode)
@@ -226,7 +227,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
                 dto.Statistics.UserRatingTypeString.Add(item, Comment.GetUserRatingTypeString(item));
             }
 
-            Dictionary<User, List<ReportItem>> reports = new Dictionary<User, List<ReportItem>>();
+            //Dictionary<User, List<ReportItem>> reports = new Dictionary<User, List<ReportItem>>();
             List<ReportItem> reportItemsList = new List<ReportItem>();
             reportItemsList.AddRange(reportItems.Values.SelectMany(s => s));
             for (int i = 0; i < reportItemsList.Count(); i++)
@@ -248,7 +249,12 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             foreach (var user_id in user_ids)
             {
                 var user = commentsList.First(x => x.User.Id == user_id).User;
-                reports.Add(user, reportItemsList.Where(x => x.UserID == user_id).ToList());
+                //reports.Add(user, reportItemsList.Where(x => x.UserID == user_id).ToList());
+                dto.ReportItems.ReportList.Add(new UserReportitemsDTO()
+                {
+                    User = user,
+                    ReportItems = reportItemsList.Where(x => x.UserID == user_id).ToList()
+                });
             }
             if (reportItems.Count > 0)
             {
@@ -256,8 +262,9 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
                 dto.ReportItems.FloatRating = (float)reportItems.Values.Select(s => s.Sum(x => x.Score)).Sum() /
                     (float)reportItems.Values.Select(s => s.Count).Sum();
             }
-            dto.ReportItems.ReportList = reports;
-            dto.ReportItems.CountReport = reports.Count;
+            //dto.ReportItems.ReportList = reports;
+            //dto.ReportItems.CountReport = reports.Count;
+            dto.ReportItems.CountReport = dto.ReportItems.ReportList.Count;
             dto.FilteredAddress = AdvertiseMainLocalization.FilteredAddress(advertise.Address);
             dto.CityString = advertise.RegionCity == null ? null : advertise.RegionCity.PersianName;
             dto.HostUserRating = allUserReportItems.Count() > 0 ? (int)allUserReportItems.Average(x => x.Score) : 5;

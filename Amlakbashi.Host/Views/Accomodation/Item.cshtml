@@ -683,18 +683,18 @@ function updateReserveRequestButton() {
                 "description": "@(Model.TitleDesc.Description)",
                 "image": "https://www.amlakbashi.com@(string.Format("/عکس-آگهی-بزرگ/{0}", Model.Slug))",
                 "review": [
-                @for (int i = 0; i < Model.ReportItems.ReportList.Count; i++)
+                @for (int i = 0; i < Model.ReportItems.CountReport; i++)
                 {
                     var report = Model.ReportItems.ReportList.ElementAt(i);
-                    var author_user = report.Key;
+                    var author_user = report.User;
                     var author_name = author_user.FullName;
                     author_name = !string.IsNullOrEmpty(author_name) ? author_name : author_user.Id.ToString();
-                    var comment = Model.Comments.Where(w => w.Comment.SenderUserID == report.Key.Id).FirstOrDefault().Comment;
+                    var comment = Model.Comments.Where(w => w.Comment.SenderUserID == report.User.Id).FirstOrDefault().Comment;
                     var comment_str = comment != null ? comment.Text : "";
-                    var sum_scr = (float)report.Value.Sum(x => x.Score);
-                    var count_scr = (float)report.Value.Count();
+                    var sum_scr = (float)report.ReportItems.Sum(x => x.Score);
+                    var count_scr = (float)report.ReportItems.Count();
                     var average_score = sum_scr / count_scr;
-                    var date_published = report.Value.Max(x => x.LastModifyDate);
+                    var date_published = report.ReportItems.Max(x => x.LastModifyDate);
                     @:{
                     @:"@@type": "Review",
                     @:"author": "@(author_name)",

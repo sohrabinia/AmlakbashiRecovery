@@ -24,8 +24,8 @@ namespace Amlakbashi.Core.Common.Caching
             {
                 var options = new DistributedCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30),
-                    SlidingExpiration = TimeSpan.FromDays(1)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(90),
+                    SlidingExpiration = TimeSpan.FromDays(7)
                 };
                 cache.SetString(key, JsonConvert.SerializeObject(value), options);
                 return value;
@@ -87,6 +87,7 @@ namespace Amlakbashi.Core.Common.Caching
 
     public enum CacheNames
     {
-        Category_Item_
+        Category_Item_,
+        Advertise_
     }
 }
