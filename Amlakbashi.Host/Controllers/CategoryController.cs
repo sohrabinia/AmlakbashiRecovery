@@ -490,8 +490,7 @@ namespace Amlakbashi.Host.Controllers
                 categoryItemDTO.PagesCount = pages_count;
                 categoryItemDTO.CurrentPageNumber = page;
 
-                categoryItemDTO.Title = AdvertiseSeoLocalization.GetMetaTitle(category.MostAccType, category.CountAdvertise,
-                    (int)category.MinPrice, (int)category.Type, provinceString, cityString, null, countryDirectionString);
+                categoryItemDTO.Title = AdvertiseSeoLocalization.GetMetaTitle(category.MostAccType, (int)category.Type, provinceString, cityString, null, countryDirectionString);
                 categoryItemDTO.Keywords = AdvertiseSeoLocalization.GetKeywords((int)category.Type, provinceString, cityString, areaString, countryDirectionString);
                 categoryItemDTO.Description = AdvertiseSeoLocalization.GetDescription(category.MostAccType, (int)category.Type, provinceString, cityString, areaString, countryDirectionString);
                 categoryItemDTO.AccTypeUrlString = AdvertiseUrlLocalization.AdvertiseTypeToUrlString((int)category.Type);
