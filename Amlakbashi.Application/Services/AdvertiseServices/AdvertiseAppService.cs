@@ -2,7 +2,6 @@
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Infrastructure.AdvertiseBuilder;
 using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
-using Amlakbashi.Core.Common.Caching;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Common.Utilities;
 using System.Collections.Generic;
@@ -16,19 +15,15 @@ using MediatR;
 using Amlakbashi.Mediator.Events.AdvertiseEvents;
 using System.Transactions;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs;
-using AutoMapper;
 using Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs;
-using Amlakbashi.Application.Services.SettingServices.SettingManager;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using static Amlakbashi.Core.Entities.Reserve;
 using Amlakbashi.Mediator.Events.ReserveEvents;
 using Amlakbashi.Core.Common.Extensions;
-using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using static Amlakbashi.Core.Entities.ActionLog;
-using log4net;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -142,6 +137,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 acc.Status = AdvertiseStatus.Deleted;
                 Repository.Update(acc);
                 Repository.Save();
+                mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
                 mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
                 return true;
@@ -348,6 +344,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             advertise.Description = editedAd.Description;
             Repository.Update(advertise);
             Repository.Save();
+            mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
         }
 
         public void UpdateAccView(long accId)
@@ -476,6 +473,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     errors.Add("TypeID", null);
                     groupErrors.Add("امکان تغییر نوع آگهی وجود ندارد");
                 }
+                mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             }
             return director;
         }
@@ -552,6 +550,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         }
                         break;
                 }
+                mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             }
             acc.LastModifyDate = DateTime.Now;
             Repository.Update(acc);
@@ -627,6 +626,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         }
                         break;
                 }
+                mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             }
             else
             {
@@ -743,6 +743,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     mediator.Publish(new AddHotelChildEvent(data.Id, (long)data.ParentId));
                 }
                 mediator.Publish(new ChangeAdvertisePriceEvent(data.Id));
+                mediator.Send(new RemoveAdvertiseCacheCommand(parent.Id));
             }
             return director;
         }
@@ -895,6 +896,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     mediator.Publish(new AddComplexChildEvent(data.Id, (long)data.ParentId));
                 }
                 mediator.Publish(new ChangeAdvertisePriceEvent(data.Id));
+                mediator.Send(new RemoveAdvertiseCacheCommand(data.Id));
             }
             return director;
         }
@@ -941,11 +943,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         item.Status = AdvertiseStatus.Deleted;
                     }
                 }
-
                 director.Submit(ref acc);
                 Repository.Update(acc);
                 Repository.Save();
                 mediator.Publish(new AdvertiseUpdateEvent(shallowData, acc, ActionLog.ActionSourceEnum.AdminPanel, currentUserId));
+                mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             }
             return director;
         }
@@ -1030,6 +1032,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new AdvertiseUpdateEvent(shallowData, acc, ActionLog.ActionSourceEnum.AdminPanel, currentUserId));
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             return director;
         }
 
@@ -1077,7 +1080,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Save();
             if (dateUnix > 0)
             {
-                mediator.Publish(new ChangeAdvertiseStatusEvent(id, (AdvertiseStatus)prevAcc.Status));
+                mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
             }
         }
@@ -1090,6 +1093,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
         public void Publish(long id, int doerUserId, ActionSourceEnum actionSource)
@@ -1099,9 +1103,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.Status = AdvertiseStatus.Published;
             Repository.Update(acc);
             Repository.Save();
-            mediator.Publish(new ChangeAdvertiseStatusEvent(id, (AdvertiseStatus)prevAcc.Status));
+            mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
             mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
             mediator.Publish(new AdvertiseUpdateEvent(prevAcc, acc, actionSource, doerUserId));
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
         public void Suspend(long id)
@@ -1111,8 +1116,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.Status = AdvertiseStatus.Archived;
             Repository.Update(acc);
             Repository.Save();
-            mediator.Publish(new ChangeAdvertiseStatusEvent(id, (AdvertiseStatus)prevAcc.Status));
+            mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
             mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
         public AdvertiseStatus ToggleSuspension(long id)
@@ -1124,7 +1130,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 acc.Status = AdvertiseStatus.Published;
                 Repository.Update(acc);
                 Repository.Save();
-                mediator.Publish(new ChangeAdvertiseStatusEvent(id, (AdvertiseStatus)prevAcc.Status));
+                mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
             }
             else if (acc.Status == AdvertiseStatus.Published)
@@ -1132,10 +1138,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 acc.Status = AdvertiseStatus.Archived;
                 Repository.Update(acc);
                 Repository.Save();
-                mediator.Publish(new ChangeAdvertiseStatusEvent(id, (AdvertiseStatus)prevAcc.Status));
+                mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
             }
-            return (AdvertiseStatus)acc.Status;
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
+            return acc.Status;
         }
 
         public void NotVerify(long id, int currentUserId)
@@ -1145,12 +1152,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.Status = AdvertiseStatus.NotVerified;
             Repository.Update(acc);
             Repository.Save();
-            mediator.Publish(new ChangeAdvertiseStatusEvent(id, (AdvertiseStatus)prevAcc.Status));
+            mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
             mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
             if (currentUserId > 0)
             {
                 mediator.Publish(new AdvertiseUpdateEvent(prevAcc, acc, ActionLog.ActionSourceEnum.AdminPanel, currentUserId));
             }
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
         public void SetNotVerifyReasons(long id, List<Advertise.NotVerifyReasonsEnum> reasons)
@@ -1205,8 +1213,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
                 if (currInstantReserveAccess == User.InstantReserveAccessEnum.Verified)
                 {
-                    var currInstantReserveStatus = acc.InstantReserveStatus;
-                    if (currInstantReserveStatus != InstantReserveStatusEnum.Confirmed)
+                    if (acc.InstantReserveStatus != InstantReserveStatusEnum.Confirmed)
                     {
                         acc.InstantReserveStatus = InstantReserveStatusEnum.Confirmed;
                         Repository.Update(acc);
@@ -1277,6 +1284,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new ChangeStayDurationEvent(id));
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
         public void SetNorouzPrice(long id, int norouzPrice, int overCapacityPrice = 0)
@@ -1287,6 +1295,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new ChangeNorouzPriceEvent(id));
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
         public PriceInputDTO GetPrices(long id)
@@ -1310,7 +1319,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(acc);
             Repository.Save();
             if (acc.Id > 0)
+            {
+                mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
                 mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id));
+            }
             return true;
         }
 
@@ -1321,6 +1333,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new ChangeMaxInstantReserveStartEvent(id));
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
         public void AddToAdvertiseVisit(long id)
@@ -1414,6 +1427,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
             }
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             return true;
         }
 
@@ -1423,6 +1437,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             advertise.ExtraBlanketCount = data;
             Repository.Update(advertise);
             Repository.Save();
+            mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
         }
 
         public void UpdateElevator(long id, bool data)
@@ -1431,6 +1446,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             advertise.Elevator = data;
             Repository.Update(advertise);
             Repository.Save();
+            mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
         }
 
         public ApiPhotoDTO GetPhotoDTO(long id, out int accUserId)
@@ -1451,6 +1467,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 advertise.PhotoID = advertise.Photos.First().Id;
                 Repository.Update(advertise);
                 Repository.Save();
+                mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
             }
             return dto;
         }
@@ -1494,6 +1511,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             mediator.Send(new RenameAdvertisePhotosCommand(acc.Id)).Wait();
             mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID, editedData.album, rootPath)).Wait();
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             return true;
         }
 
@@ -1556,6 +1574,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
             }
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             return true;
         }
 
@@ -1597,6 +1616,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
             }
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             return true;
         }
 
@@ -1644,6 +1664,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
                 mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
             }
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             return true;
         }
 
@@ -1678,6 +1699,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.LastModifyDate = DateTime.Now;
             Repository.Update(acc);
             Repository.Save();
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             return true;
         }
 
@@ -1704,6 +1726,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new ChangeNorouzPriceEvent(id));
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
         public IEnumerable<Advertise> GetMostViewedAdvertisesInCity(int city_id, int province_id, int type_id, int count)
@@ -1782,6 +1805,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     child.InstantReserveStatus = status;
                 }
                 Repository.Update(item);
+                mediator.Send(new RemoveAdvertiseCacheCommand(item.Id));
             }
             Repository.Save();
         }
@@ -2030,6 +2054,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     cannotAddReason = "بیشتر از یک هفته از آخرین رزرو شما از این اقامتگاه گذشته و شما نمیتوانید در مورد این اقامنگاه نظر ثبت کنید";
                 }
             }
+            mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
             return canAddOrEdit;
         }
 
@@ -2072,6 +2097,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 Repository.Update(advertise);
                 Repository.Save();
             }
+            mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
         }
 
         public Dictionary<string, string> GetRulesDictionary(long id)
@@ -2241,6 +2267,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.HygieneProtocol = value;
             Repository.Update(acc);
             Repository.Save();
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
     }
 }

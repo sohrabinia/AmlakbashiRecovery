@@ -176,6 +176,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             }
             advertiseRepository.Update(acc);
             advertiseRepository.Save();
+            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             return Task.CompletedTask;
         }
 

@@ -31,7 +31,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
         IRequestHandler<IncreaseInstantReserveCancelCommand>,
         IRequestHandler<SetExtrinsicReserveForWaitForResponseCommand>,
         IRequestHandler<InsertExtrinsicReserveByDateListCommand>,
-        IRequestHandler<RemoveCategoryItemCacheCommand>
+        IRequestHandler<RemoveCategoryItemCacheCommand>,
+        IRequestHandler<RemoveAdvertiseCacheCommand>
     {
         private readonly IMediator mediator;
         private readonly IRepository<Advertise, long> advertiseRepository;
@@ -489,6 +490,24 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                 if (advertiseList.Contains(advertise))
                 {
                     cacheManager.Remove($"{CacheNames.Category_Item_}{category.Id}");
+                }
+            }
+            return Task.FromResult(Unit.Value);
+        }
+
+        public Task<Unit> Handle(RemoveAdvertiseCacheCommand request, CancellationToken cancellationToken)
+        {
+            var acc = advertiseRepository.Find(request.AdvertiseId);
+            cacheManager.Remove($"{CacheNames.Advertise_}{acc.Id}");
+            if (acc.Mode == AdvertiseMode.Child)
+            {
+                cacheManager.Remove($"{CacheNames.Advertise_}{acc.ParentId}");
+            }
+            else if (acc.Mode == AdvertiseMode.Parent)
+            {
+                foreach (var item in acc.Childs)
+                {
+                    cacheManager.Remove($"{CacheNames.Advertise_}{item.Id}");
                 }
             }
             return Task.FromResult(Unit.Value);
