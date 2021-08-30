@@ -11,14 +11,14 @@ namespace Amlakbashi.Mediator.Commands.AdvertiseCommands
     {
         public long AdvertiseId { get; set; }
         public long? MainPhotoId { get; set; }
-        public string Path { get; set; }
         public List<long> PhotoAlbumIds { get; set; }
-        public GenerateThumbImageCommand(long advertiseId, long? mainPhotoId, List<long> photoAlbumIds, string path)
+        public bool IsEdit { get; set; }
+        public GenerateThumbImageCommand(long advertiseId, long? mainPhotoId, List<long> photoAlbumIds, bool isEdit = false)
         {
             AdvertiseId = advertiseId;
             MainPhotoId = mainPhotoId;
             PhotoAlbumIds = photoAlbumIds;
-            Path = path;
+            IsEdit = isEdit;
         }
     }
 }

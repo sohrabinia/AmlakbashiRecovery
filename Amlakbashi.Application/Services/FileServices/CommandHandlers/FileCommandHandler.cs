@@ -62,7 +62,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 fileRepository.Save();
                 return Task.FromResult(Unit.Value);
             }
-            var extension = System.IO.Path.GetExtension(request.ImagePath);
+            var extension = Path.GetExtension(request.ImagePath);
             ImageCodecInfo format;
             EncoderParameters encoderParameters;
             switch (extension)
@@ -83,7 +83,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                     break;
             }
 
-            string file = System.IO.Path.GetFileNameWithoutExtension(request.ImagePath);
+            string file = Path.GetFileNameWithoutExtension(request.ImagePath);
             string NewPath = request.ImagePath.Replace(file, file + "-min");
 
             lock (objlock)
@@ -155,13 +155,6 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
             {
                 lock (objlock)
                 {
-                    var accThumbPath = request.Path + "/content/accthumb/" + request.AdvertiseId;
-
-                    if (Directory.Exists(accThumbPath))
-                    {
-                        Directory.Delete(accThumbPath, true);
-                    }
-
                     var files = new List<Entities.File>();
                     if (request.PhotoAlbumIds.Count > 0)
                     {
@@ -173,19 +166,21 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                     }
                     var watermarkedImageList = new List<string>();
                     var thumbs = new List<ImageThumbDTO>();
+                    var accThumbPath = Path.Combine(host.WebRootPath, "Content", "accthumb", request.AdvertiseId.ToString());
+
                     foreach (var file in files)
                     {
-                        if (File.Exists(request.Path + file.FilePathWithoutTilde) == false)
+                        var fileThumbPath = $"{accThumbPath}/{file.Id}";
+                        if (File.Exists(host.WebRootPath + file.FilePathWithoutTilde) == false ||
+                            (request.IsEdit == false && Directory.Exists(fileThumbPath)))
                         {
-                            logger.Debug("Generate Thumb " + request.AdvertiseId + ": dont exist file");
                             continue;
                         }
-                        var waterPath = mediator.Send(new SetWatermarkCommand(file.Id, host.WebRootPath)).Result;
-                        var watermarkedImagePath = string.IsNullOrEmpty(waterPath) ? 
-                            request.Path + file.FilePathWithoutTilde :
-                            request.Path + waterPath;
+                        var waterPath = mediator.Send(new SetWatermarkCommand(file.Id)).Result;
+                        var watermarkedImagePath = string.IsNullOrEmpty(waterPath) ?
+                            host.WebRootPath + file.FilePathWithoutTilde :
+                            host.WebRootPath + waterPath;
                         watermarkedImageList.Add(watermarkedImagePath);
-                        var fileThumbPath = accThumbPath + "/" + file.Id;
 
                         thumbs.Add(new ImageThumbDTO()
                         {
@@ -281,13 +276,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             using (Image origImage = Image.FromStream(stream))
                             using (Image thumbImage = ImageUtility.ResizeImageKeepAspectRatio(origImage, thumb.w, thumb.h))
                             {
-                                //var thumbImage = ImageUtility.ResizeImageKeepAspectRatio(origImage, thumb.w, thumb.h);
                                 ImageUtility.SaveThumb(thumbImage, thumb.thumbPath, thumb.OrigPath);
-                                //var format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
-                                //var encoderParameters = new EncoderParameters(1);
-                                //encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
-                                //thumbImage.Save(thumb.thumbPath, format, encoderParameters);
-                                //thumbImage.Dispose();
                             }
                         }
                     }
@@ -313,15 +302,15 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
             try
             {
                 var file = fileRepository.Find(request.FileId);
-                var filePath = request.ServerPath + file.FilePathWithoutTilde;
+                var filePath = host.WebRootPath + file.FilePathWithoutTilde;
                 string waterPath = string.Empty;
 
-                if (file == null || File.Exists(filePath) == false)
-                    return Task.FromResult(waterPath);
+                //if (file == null || File.Exists(filePath) == false)
+                //    return Task.FromResult(waterPath);
 
                 double ratio = 4.5;
                 using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                using (Image watermarkImage = Image.FromFile(request.ServerPath + "/resource/img/water_logo.png"))
+                using (Image watermarkImage = Image.FromFile(host.WebRootPath + "/resource/img/water_logo.png"))
                 using (Image image = Image.FromStream(stream))
                 {
                     int waterWidth = Convert.ToInt16((double)image.Width / ratio);
@@ -343,11 +332,11 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             ImageCodecInfo format = ImageUtility.GetEncoder(ImageFormat.Png);
                             EncoderParameters encoderParameters = new EncoderParameters(1);
                             encoderParameters.Param[0] = new EncoderParameter(Encoder.Compression, (long)EncoderValue.CompressionLZW);
-                            thumbnailBitmap.Save(request.ServerPath + logoPath, format, encoderParameters);
+                            thumbnailBitmap.Save(host.WebRootPath + logoPath, format, encoderParameters);
                         }
                     }
 
-                    using (Image NewWatermarkImage = Image.FromFile(request.ServerPath + logoPath))
+                    using (Image NewWatermarkImage = Image.FromFile(host.WebRootPath + logoPath))
                     using (Graphics imageGraphics = Graphics.FromImage(image))
                     using (TextureBrush watermarkBrush = new TextureBrush(NewWatermarkImage))
                     {
@@ -356,7 +345,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                         watermarkBrush.TranslateTransform(x, y);
                         imageGraphics.FillRectangle(watermarkBrush, new Rectangle(new Point(x, y), new Size(waterWidth + 1, waterHeight)));
                         waterPath = "/content/advertise/temp/" + file.FilePath.Substring(file.FilePath.LastIndexOf('/') + 1);
-                        var extension = System.IO.Path.GetExtension(request.ServerPath + waterPath);
+                        var extension = Path.GetExtension(host.WebRootPath + waterPath);
                         ImageCodecInfo format;
                         EncoderParameters encoderParameters;
                         switch (extension)
@@ -376,11 +365,11 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                                 encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 80L);
                                 break;
                         }
-                        image.Save(request.ServerPath + waterPath, format, encoderParameters);
+                        image.Save(host.WebRootPath + waterPath, format, encoderParameters);
                     }
-                    if (File.Exists(request.ServerPath + logoPath))
+                    if (File.Exists(host.WebRootPath + logoPath))
                     {
-                        File.Delete(request.ServerPath + logoPath);
+                        File.Delete(host.WebRootPath + logoPath);
                     }
                 }
                 return Task.FromResult(waterPath);
@@ -398,11 +387,11 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
             {
                 bool hasChange = false;
                 var files = fileRepository.Query(q => q.Where(w => request.PhotoIds.Contains(w.Id)));
+                var advertiseThumbPath = Path.Combine(host.WebRootPath, "Content", "accthumb", request.AdvertiseId.ToString());
                 lock (objlock)
                 {
                     foreach (var item in files)
                     {
-
                         if (item.Advertises.Count == 0)
                         {
                             fileRepository.Delete(item.Id);
@@ -412,11 +401,20 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             }
                             hasChange = true;
                         }
+                        var fileThumbPath = Path.Combine(advertiseThumbPath, item.Id.ToString());
+                        if (Directory.Exists(fileThumbPath))
+                        {
+                            Directory.Delete(fileThumbPath, true);
+                        }
                     }
                 }
                 if (hasChange)
                 {
                     fileRepository.Save();
+                }
+                if (Directory.EnumerateDirectories(advertiseThumbPath).Any() == false)
+                {
+                    Directory.Delete(advertiseThumbPath, true);
                 }
             }
             catch (Exception exc)

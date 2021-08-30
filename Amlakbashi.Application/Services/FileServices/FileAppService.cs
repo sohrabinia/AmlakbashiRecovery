@@ -155,11 +155,9 @@ namespace Amlakbashi.Application.Services.FileServices
         //    }
         //}
 
-        public void GenerateThumbImage(long accId, string rootPath)
+        public void GenerateThumbImage(long accId, long fileId)
         {
-            var acc = Repository.Find<Advertise, long>(accId);
-            mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID,
-                    acc.Photos.Select(s => s.Id).ToList(), rootPath));
+            mediator.Send(new GenerateThumbImageCommand(accId, null, new List<long>() { fileId }, true));
         }
     }
 }
