@@ -718,24 +718,6 @@ namespace Portal.Controllers
                         var encoderParameters = new EncoderParameters(1);
                         encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
 
-                        //switch (uploadfile.ContentType.ToLower())
-                        //{
-                        //    case "image/png":
-                        //        format = ImageUtility.GetEncoder(ImageFormat.Png);
-                        //        encoderParameters = new EncoderParameters(1);
-                        //        encoderParameters.Param[0] = new EncoderParameter(Encoder.Compression, (long)EncoderValue.CompressionLZW);
-                        //        break;
-                        //    case "image/gif":
-                        //        format = ImageUtility.GetEncoder(ImageFormat.Gif);
-                        //        encoderParameters = new EncoderParameters(0);
-                        //        break;
-                        //    default:
-                        //        format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
-                        //        encoderParameters = new EncoderParameters(1);
-                        //        encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
-                        //        break;
-                        //}
-
                         using (var imageToSave = Image.FromStream(uploadfile.OpenReadStream(), true, true))
                         {
                             imageToSave.Save(Path.Combine(host.WebRootPath, filepath), format, encoderParameters);
@@ -746,11 +728,11 @@ namespace Portal.Controllers
 
                         if (accId > 0)
                         {
-                            fileService.GenerateThumbImage(accId, host.WebRootPath);
+                            fileService.GenerateThumbImage(accId, id);
                         }
 
-                        System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
-                        foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
+                        DirectoryInfo IOdirectory = new DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
+                        foreach (FileInfo IOfile in IOdirectory.GetFiles())
                         {
                             IOfile.Delete();
                         }
@@ -764,28 +746,6 @@ namespace Portal.Controllers
                 return GenerateJsonResult(new { status = 0, message = "فرمت عکس مورد قبول نمی باشد ." });
             }
         }
-
-        //public JsonResult SetWatermark(long id)
-        //{
-        //    try
-        //    {
-        //        fileService.SetWatermarkForAdvertisePhotos(id, host.WebRootPath);
-        //        return GenerateJsonResult(new
-        //        {
-        //            status = 1,
-        //            val = "واترمارک با موفقیت انجام شد"
-        //        });
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("File.SetWatermark", exc);
-        //        return GenerateJsonResult(new
-        //        {
-        //            status = 0,
-        //            val = "خطایی رخ داد: " + exc.Message
-        //        });
-        //    }
-        //}
 
         [Authorize(Roles = Roles.TechnicalManager)]
         public JsonResult RemoveExtraPhoto()
