@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Amlakbashi.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,6 +8,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
     public class SitePaymentDTO
     {
         public long ReserveId { get; set; }
+        public Reserve.ReserveStatus ReserveStatus { get; set; }
         public int Days { get; set; }
         public long TotalPrice { get; set; }
         public long GuestPayedPrice { get; set; }

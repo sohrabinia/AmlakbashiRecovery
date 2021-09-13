@@ -23,15 +23,9 @@ using Amlakbashi.Host.Extensions;
 using X.PagedList;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
-using Amlakbashi.Data.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
@@ -1499,8 +1493,8 @@ namespace Amlakbashi.Host.Controllers
                     CouponID = couponId,
                     PrizePrice = prizePrice,
                     ReservePrice = reservePrice,
-                    ProductType = reserveId != null ? Entities.User.CreditTransactionType.Credit_Inc_Then_Res.ToString() :
-                        Entities.User.CreditTransactionType.Credit_Increase.ToString()
+                    ProductType = reserveId != null ? CreditTransaction.WalletTransactionTypeForPayment.Credit_Inc_Then_Res.ToString() :
+                        CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString()
                 };
                 accounting.InsertPayment(payment);
                 return GenerateJsonResult(new { status = 1, pid = payment.Id });
@@ -1533,10 +1527,10 @@ namespace Amlakbashi.Host.Controllers
                         msg = "لطفا یکی از فیلدهای دلیل افزودن مبلغ و شماره تراکنش را پر کنید"
                     });
                 }
-                var cause = string.IsNullOrEmpty(transaction_cause) ? Entities.User.CreditTransactionCause.Charge : Entities.User.CreditTransactionCause.Other;
+                var cause = string.IsNullOrEmpty(transaction_cause) ? CreditTransaction.WalletTransactionReason.Charge : CreditTransaction.WalletTransactionReason.Other;
                 long newCredit;
                 var creditTransactionId = accounting.IncreaseCredit(user_id, amount, transaction_id, 0,
-                    cause, out newCredit, transaction_cause, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
+                    out newCredit, cause, transaction_cause, null, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
 
                 var price_string = string.Format("{0:n0}", amount) + " تومان";
                 var new_credit_string = string.Format("{0:n0}", newCredit) + " تومان";
@@ -1554,7 +1548,7 @@ namespace Amlakbashi.Host.Controllers
                         Type = UserContactType.UserCreditIncrease,
                         TransactionId = creditTransactionId.ToString(),
                         Price = amount.ToString(),
-                        CauseString = Entities.User.GetCreditTransactionCauseString((int)cause, transaction_cause)
+                        CauseString = CreditTransaction.GetCreditTransactionCauseString(cause, transaction_cause)
                     });
                 }
                 return GenerateJsonResult(new
@@ -1592,7 +1586,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     return GenerateJsonResult(new { status = 0, msg = "لطفا دلیل کسر مبلغ را وارد کنید" });
                 }
-                var cause = Entities.User.CreditTransactionCause.Other;
+                var cause = Entities.CreditTransaction.WalletTransactionReason.Other;
                 long newCredit;
                 var creditTransactionId = accounting.DecreaseCredit(user_id,
                     amount, transaction_id, 0, out newCredit, cause, transaction_cause, 0,
@@ -1613,8 +1607,7 @@ namespace Amlakbashi.Host.Controllers
                         Type = UserContactType.UserCreditDecrease,
                         TransactionId = creditTransactionId.ToString(),
                         Price = Math.Abs(amount).ToString(),
-                        CauseString = Entities.User.GetCreditTransactionCauseString(
-                            (int)cause, transaction_cause)
+                        CauseString = Entities.CreditTransaction.GetCreditTransactionCauseString(cause, transaction_cause)
                     });
                 }
                 return GenerateJsonResult(new

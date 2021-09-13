@@ -19,6 +19,19 @@ namespace Amlakbashi.Data
             }
 
             context.Database.Migrate();
+
+            foreach (var item in context.CreditTransactions)
+            {
+                if (item.Price > 0)
+                {
+                    item.Type = Core.Entities.CreditTransaction.WalletTransactionType.Increase;
+                }
+                else
+                {
+                    item.Type = Core.Entities.CreditTransaction.WalletTransactionType.Decrease;
+                }
+            }
+            context.SaveChanges();
         }
     }
 }

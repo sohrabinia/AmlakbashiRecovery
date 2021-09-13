@@ -467,13 +467,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     {
                         mediator.Publish(new ChangeAdvertisePositionEvent(data.Id));
                     }
+                    mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
                 }
                 else
                 {
                     errors.Add("TypeID", null);
                     groupErrors.Add("امکان تغییر نوع آگهی وجود ندارد");
                 }
-                mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             }
             return director;
         }

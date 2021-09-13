@@ -442,7 +442,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 if (penaltyPrice > 0)
                 {
                     long newCredit;
-                    accounting.DecreaseCredit(hostUser.Id, penaltyPrice, 0, 0, out newCredit, User.CreditTransactionCause.Other, "جریمه لغو رزرو آنی کد " + reserve.Id, 0, doerUserId, ActionLog.ActionSourceEnum.AdminPanel);
+                    accounting.DecreaseCredit(hostUser.Id, penaltyPrice, 0, 0, out newCredit, CreditTransaction.WalletTransactionReason.Other, "جریمه لغو رزرو آنی کد " + reserve.Id, null, doerUserId, ActionLog.ActionSourceEnum.AdminPanel);
                 }
                 objReserve.InstantReserveCancelHost = true;
 
@@ -995,7 +995,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 }
             }
             var payment = accounting.FindPayment(paymentId);
-            if (payment.Status == 0)
+            if (payment.Status == Payment.PaymentStatus.NotPaid)
             {
                 msg = "وضعیت پرداخت ناموفق می باشد";
                 return false;

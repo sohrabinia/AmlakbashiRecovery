@@ -1,6 +1,6 @@
 ﻿@model Amlakbashi.Core.DTOs.PaymentDTOs.CheckPaymentDTO
 
-@if (Model == null && ViewBag.hasError)
+@if (Model == null)
 {
     <p style="text-align: center;">عملیات با خطا مواجه شد</p>
 }
@@ -43,7 +43,7 @@ else
     </div>
     <div>
         <span>مبلغ پرداخت:</span>
-        <span>@Model.Price</span>
+        <span>@Model.Amount</span>
     </div>
     if (Model.ReserveId > 0)
     {

@@ -1,0 +1,93 @@
+﻿@using Amlakbashi.Core.Common.Utilities
+
+@model CreditTransaction
+
+@{
+    ViewBag.Title = "ویرایش تراکنش کیف پول";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<div class="title">@ViewBag.Title</div>
+
+<form asp-action="editcredittransaction" asp-controller="wallet" method="post" asp-route-Id="@Model.Id">
+    <table>
+        <tr>
+            <td>شناسه:</td>
+            <td>
+                <span>@Model.Id</span>
+            </td>
+        </tr>
+        <tr>
+            <td>کد کاربر:</td>
+            <td>@Model.UserID</td>
+        </tr>
+        <tr>
+            <td>کد رزرو:</td>
+            <td>@Model.ReserveID</td>
+        </tr>
+        <tr>
+            <td>تاریخ تراکنش:</td>
+            <td>@DateTimeUtility.GregorianToPersianDate(Model.Date)</td>
+        </tr>
+        <tr>
+            <td>مبلغ تراکنش:</td>
+            @if (Model.CorrectiveWalletTransaction != null)
+            {
+                <td>
+                    @Model.Price
+                    <p>(مبلغ اصلاح شده: @(Model.Price + Model.CorrectiveWalletTransaction.Price))</p>
+                    <p>(تراکنش اصلاحی: <a asp-action="editcredittransaction" asp-controller="wallet" asp-route-id="@Model.CorrectiveWalletTransaction.Id">@Model.CorrectiveWalletTransaction.Id</a>)</p>
+                </td>
+            }
+            else
+            {
+                <td>
+                    <input asp-for="Price" />
+                    <p><small><i class="fa fa-exclamation-circle"></i> در صورت تغییر قیمت، تراکنش جدید ثبت می شود</small></p>
+                </td>
+            }
+        </tr>
+        <tr>
+            <td>شماره تراکنش/پیگیری:</td>
+            <td><input asp-for="BankTransactionID" type="text" /></td>
+        </tr>
+        <tr>
+            <td>نوع تراکنش:</td>
+            <td>
+                <select name="TransactionCause">
+                    @{
+                        var transactionCauses = (CreditTransaction.WalletTransactionReason[])Enum.GetValues(typeof(CreditTransaction.WalletTransactionReason));
+                        foreach (var value in transactionCauses)
+                        {
+                            <option is-selected="@(value == Model.TransactionCause)" value="@((int)value)">@(CreditTransaction.GetCreditTransactionCauseString(value))</option>
+                        }
+                    }
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>توضیحات:</td>
+            <td><input asp-for="TransactionCauseString" /></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <input type="submit" value="ذخیره" class="apply" />
+                <a class="cancel" asp-action="index" asp-controller="wallet">انصراف</a>
+            </td>
+        </tr>
+    </table>
+</form>
+
+@section ScriptBlock {
+    <script type="text/javascript">
+        @if (ViewBag.error != null)
+        {
+            @:alertify.error('@ViewBag.error');
+        }
+        @if (ViewBag.success != null && ViewBag.success == true)
+        {
+            @:alertify.success("تغییرات با موفقیت ذخیره شد");
+        }
+    </script>
+}

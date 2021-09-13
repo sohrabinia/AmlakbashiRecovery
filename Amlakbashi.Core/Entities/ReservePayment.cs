@@ -1,11 +1,6 @@
 ﻿using Amlakbashi.Core.Common.Entity;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Entities
 {
@@ -14,7 +9,7 @@ namespace Amlakbashi.Core.Entities
     /// </summary>
     public class ReservePayment : Entity<long>, ISoftDelete
     {
-        [Column("ReservePaymentID")]
+        [Column("Id")]
         public override long Id { get; set; }
         public int Status { get; set; }
         public long ReserveID { get; set; }
@@ -26,6 +21,7 @@ namespace Amlakbashi.Core.Entities
         public DateTime CreateDate { get; set; }
         public long Price { get; set; }
         public int PaymentMethod { get; set; }
+        public int? PaymentId { get; set; }
         public bool IsDeleted { get; set; }
 
         [ForeignKey("ReserveID")]
@@ -33,6 +29,9 @@ namespace Amlakbashi.Core.Entities
 
         [ForeignKey("UserID")]
         public virtual User User { get; set; }
+
+        [ForeignKey("PaymentId")]
+        public virtual Payment Payment { get; set; }
 
         public enum ReservePaymentType
         {

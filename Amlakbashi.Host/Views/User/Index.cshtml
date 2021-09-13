@@ -319,14 +319,14 @@
                     {
                         <td>
                             <a href="@Url.Action("Edit",new {uid= item.User.Id})"><span class="editicon" title="ویرایش"></span></a>
-                            <span class="deleteicon" onclick="deleteItem(@item.User.Id,this)" title="حذف"></span>
+                            @*<span class="deleteicon" onclick="deleteItem(@item.User.Id,this)" title="حذف"></span>*@
                             <a title="آگهی های کاربر" class="adminicon fa fa-home" href='/user/impersonate?userId=@(item.User.Id)&url=/post/accomodationmanager' target="_blank"></a>
                             <a title="کیف پول" class="adminicon fa fa-money-bill-alt" style="margin: 0 5px;" href='/user/impersonate?userId=@(item.User.Id)&url=/user/usercreditmanager' target="_blank"></a>
                             <a class="adminicon fa fa-heart" href="/user/impersonate?userId=@(item.User.Id)&url=/post/favoritemanager?userid=@item.User.Id" target="_blank"></a>
                             <a class="adminicon fa fa-eye" href="/user/impersonate?userId=@(item.User.Id)&url=/user/profilemanager" target="_blank"></a>
                             <span class="adminicon fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></span>
                             <span class="adminicon fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></span>
-                            <i onclick="incDecCredit(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="واریز/برداشت کیف پول"></i>
+                            <i onclick="UserWalletInfo(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="کیف پول"></i>
                             <a href="/user/impersonate?userId=@item.User.Id" class="fa fa-sign-in-alt" style="color:#242424; cursor:pointer;" title="ورود به عنوان کاربر" target="_blank"></a>
                             <a title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/index?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id">
                                 <i style="color:#242424" class="fa fa-book"></i>
@@ -339,14 +339,14 @@
                     {
                         <td>
                             <a href="@Url.Action("Edit",new {uid= item.User.Id})"><span class="editicon" title="ویرایش"></span></a>
-                            <span class="deleteicon" onclick="deleteItem(@item.User.Id,this)" title="حذف"></span>
+                            @*<span class="deleteicon" onclick="deleteItem(@item.User.Id,this)" title="حذف"></span>*@
                             <a class="adminicon fa fa-home impersonateDenied" href='#' style="color:lightgray;"></a>
                             <a title="کیف پول" class="adminicon fa fa-money-bill-alt impersonateDenied" style="margin: 0 5px; color: lightgray;" href='#'></a>
                             <a class="adminicon fa fa-heart impersonateDenied" href="#" style="color: lightgray;"></a>
                             <a class="adminicon fa fa-eye impersonateDenied" href="#" style="color:lightgray;"></a>
                             <span class="adminicon fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></span>
                             <span class="adminicon fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></span>
-                            <i onclick="incDecCredit(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="واریز/برداشت کیف پول"></i>
+                            <i onclick="UserWalletInfo(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="کیف پول"></i>
                             <a href="#" class="fa fa-sign-in-alt impersonateDenied" style="color:lightgray;" title="ورود به عنوان کاربر"></a>
                             <a title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/index?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id">
                                 <i style="color:#242424" class="fa fa-book"></i>
@@ -366,20 +366,20 @@
         page,
         uname = data.Uname,
         photo = data.Photo,
-    sort_order = data.SortOrder,
+        sort_order = data.SortOrder,
         ownership = data.Ownership,
-    mobile_status = data.MobileStatus,
+        mobile_status = data.MobileStatus,
         status = data.Status,
         advertise_count = data.AdvertiseCount,
-    complete_profile_status = data.CompleteProfileStatus,
+        complete_profile_status = data.CompleteProfileStatus,
         complete_profile_contact_status = data.CompleteProfileContactStatus,
-    user_general_type = data.UserGeneralType,
+        user_general_type = data.UserGeneralType,
         Province = data.Province,
-    City = data.City,
+        City = data.City,
         Area = data.Area,
         advertiseId = data.AdvertiseId,
         userFilterType = (int)data.UserFilterType,
-    card_status = data.CardStatus,
+        card_status = data.CardStatus,
         minReserveNorouzFromDate = data.MinReserveNorouzFromDate
     }),
     new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
@@ -512,33 +512,39 @@
         //}
 
         function publish_photo($id, obj) {
-            if (confirm("آیا از انتشار عکس این کاربر اطمینان دارید ؟"))
+            if (confirm("آیا از انتشار عکس این کاربر اطمینان دارید؟"))
             {
                 myajax("User/PhotoPublish", "uid=" + $id , function (ret) {
-                    if (ret.status==1) {
-                        alert("عکس کاربر با موفقیت انتشار داده شد.") ;
+                    if (ret.status == 1) {
+                        //alert("عکس کاربر با موفقیت انتشار داده شد");
+                        alertify.success("عکس کاربر با موفقیت انتشار داده شد");
+                    }
+                    else {
+                        alertify.error("عملیات انجام نشد");
                     }
                 });
             }
         }
 
         function disapprove_photo($id, obj) {
-            if (confirm("آیا از عدم تایید عکس این کاربر اطمینان دارید ؟"))
+            if (confirm("آیا از عدم تایید عکس این کاربر اطمینان دارید؟"))
             {
                 myajax("User/PhotoDisapprove", "uid=" + $id , function (ret) {
-                    if (ret.status==1) {
-                        alert("عکس کاربر در حالت عدم تایید قرار گرفت.") ;
+                    if (ret.status == 1) {
+                        //alert("عکس کاربر در حالت عدم تایید قرار گرفت");
+                        alertify.success("عکس کاربر در حالت عدم تایید قرار گرفت");
+                    }
+                    else {
+                        alertify.error("عملیات انجام نشد");
                     }
                 });
             }
         }
 
-        function incDecCredit(id) {
-            incDecMsg = showInfoMessage('واریز/برداشت کیف پول',
-                '<div style="display:flex;justify-content:space-between;">'
-                + '<div onclick="increaseCredit(' + id + ')" style="background-color:#34A853;color:white;border-radius:5px;padding:20px;cursor:pointer;margin: 20px;">واریز به کیف پول</div>'
-                + '<div onclick="decreaseCredit(' + id + ')" style="background-color:#EA4335;color:white;border-radius:5px;padding:20px;cursor:pointer;margin: 20px;">برداشت از کیف پول</div>'
-                + '</div>');
+        function UserWalletInfo(userId) {
+            incDecMsg = showInfoMessage('مدیریت کیف پول', '',
+                { contentUrl: '/wallet/GetUserWalletInfo?userId=' + userId, fullScreen: screen.width < 781 }
+            );
         }
 
         function getUserDesc(id) {
@@ -567,7 +573,6 @@
         }
 
         function submitUserDesc() {
-            debugger;
             var userId = $("#userIdInput").val();
             var desc = $("#userDescInput").val();
             $.ajax({
@@ -630,7 +635,6 @@
                                             }
                                         }
                                     });
-                                    debugger;
                                     $('#js-row-' + $id).find(".credit_label").html(ret.new_credit);
                                 }
                                 else if (ret.status == 0) {

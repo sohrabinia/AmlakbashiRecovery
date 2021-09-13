@@ -284,7 +284,7 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                var result = accounting.CheckShebaPaymentStatus(reservePaymentId);
+                var result = accounting.CheckShebaPaymentStatus(reservePaymentId, true);
                 return PartialView("_CheckPodiumPaymentStatus", result);
             }
             catch (Exception exc)

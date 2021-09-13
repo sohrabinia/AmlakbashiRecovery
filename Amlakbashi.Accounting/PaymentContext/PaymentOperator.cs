@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Accounting.PaymentContext.PaymentEngines.Interfaces;
+using Amlakbashi.Core.Common.Enums;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
 using System;
 using System.Collections.Generic;
@@ -13,35 +14,33 @@ namespace Amlakbashi.Accounting.PaymentContext
             this.pasargadEngine = pasargadEngine;
         }
 
-        public Dictionary<string, object> GeneratePaymentData(BanksEnum bank, int paymentId, long paymentTotalAmount, string redirectAddress, out string sign, out DateTime invoiceDate)
+        public Dictionary<string, object> GeneratePaymentData(BankEnum bank, int paymentId, long paymentTotalAmount, string redirectAddress, out string sign, out DateTime invoiceDate)
         {
             return GetEngine(bank).GeneratePaymentData(paymentId,
                 paymentTotalAmount, redirectAddress, out sign, out invoiceDate);
         }
 
-        public bool ReadPaymentResult(BanksEnum bank, string tref, out string result)
+        public CheckPaymentDTO ReadPaymentResult(BankEnum bank, string tref, out string result)
         {
             return GetEngine(bank).ReadPaymentResult(tref, out result);
         }
 
-        public CheckPaymentDTO ReadPaymentResult(BanksEnum bank, long paymentId, DateTime paymentDate)
+        public CheckPaymentDTO ReadPaymentResult(BankEnum bank, long paymentId, DateTime paymentDate)
         {
             return GetEngine(bank).ReadPaymentResult(paymentId, paymentDate);
         }
 
-        public bool VerifyPayment(BanksEnum bank, string paymentResult,
-            int paymentId, long totalPayingPrice,
-            out string referenceNumber, out long transactionReferenceID, out DateTime transactionDate)
+        public bool VerifyPayment(BankEnum bank, string paymentResult,
+            int paymentId, long totalPayingPrice)
         {
-            return GetEngine(bank).VerifyPayment(paymentResult, paymentId,
-                totalPayingPrice, out referenceNumber, out transactionReferenceID, out transactionDate);
+            return GetEngine(bank).VerifyPayment(paymentResult, paymentId, totalPayingPrice);
         }
 
-        private IPaymentEngine GetEngine(BanksEnum bank)
+        private IPaymentEngine GetEngine(BankEnum bank)
         {
             switch (bank)
             {   
-                case BanksEnum.Pasargad:
+                case BankEnum.Pasargad:
                     return pasargadEngine;
                 default:
                     return null;

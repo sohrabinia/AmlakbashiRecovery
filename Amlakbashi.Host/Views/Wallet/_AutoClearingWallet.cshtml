@@ -1,8 +1,8 @@
 ﻿
-@if (ViewBag.error != null)
+@if (ViewBag.error != null && ViewBag.error == true)
 {
     <div>
-        <span>@ViewBag.error</span>
+        <span>@ViewBag.errorMsg</span>
     </div>
 }
 else
@@ -20,11 +20,11 @@ else
         <span>@ViewBag.price ریال</span>
     </div>
     <div>
-        <label>ارسال پیامک به میزبان</label>
+        <label>ارسال پیامک به کاربر</label>
         <input type="checkbox" id="SendSmsCheckbox" name="sendSms" value="true" checked="checked" />
     </div>
     <div style="text-align: center;">
-        <button type="button" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;" onclick="DoAutoSiteClearingPayment()">پرداخت</button>
+        <button type="button" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;" onclick="DoAutoClearingWalletPayment()">پرداخت</button>
     </div>
     <div style="text-align: center;">
         <span id="PaymentResultWaitingSpan" style="visibility:hidden; color: darkorange;">لطفا منتظر بمانید ...</span>
@@ -32,13 +32,13 @@ else
 }
 
 <script>
-    function DoAutoSiteClearingPayment() {
+    function DoAutoClearingWalletPayment() {
         var sendSms = $("#SendSmsCheckbox").prop('checked');
         $.ajax({
-            url: "/reserve/AutoSiteClearingHost",
+            url: "/wallet/AutoClearingWallet",
             type: "post",
             data: {
-                reserveId: '@ViewBag.reserveId',
+                userId: '@ViewBag.userId',
                 sendSms: sendSms
             },
             beforeSend: function () {
@@ -50,7 +50,6 @@ else
                     showInfoMessage('پرداخت ناموفق', '<p style="color: red;">' + response.msg + '</p>');
                 }
                 else {
-                    reserveAdminHubConnection.invoke('reserveCleared', @ViewBag.reserveId);
                     showInfoMessage('پرداخت موفق', '<p style="color: blue;">' + response.msg + '</p>');
                     popupMsgList[1].btnClick(0, true);
                     popupMsgList[0].btnClick(0, true);

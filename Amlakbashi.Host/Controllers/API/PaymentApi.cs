@@ -25,7 +25,7 @@ namespace Amlakbashi.Host.Controllers.API
                     UserID = user.Id,
                     Date = DateTime.Now,
                     TotalPrice = price * 10,
-                    ProductType = Entities.User.CreditTransactionType.Credit_Increase.ToString()
+                    ProductType = CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString()
                 };
                 accounting.InsertPayment(payment);
                 return Redirect(GeneralData.WebsiteUrl + "/Cart/ConfirmAndPayment?id=" + payment.Id
