@@ -3,8 +3,6 @@ using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Accounting.Services.Interfaces
 {
@@ -18,7 +16,6 @@ namespace Amlakbashi.Accounting.Services.Interfaces
         Payment Find(int id);
         int Insert(Payment newPayment);
         void Update(Payment editedPayment);
-
         IQueryable<Payment> GetAllAsIQueryable();
     }
 }

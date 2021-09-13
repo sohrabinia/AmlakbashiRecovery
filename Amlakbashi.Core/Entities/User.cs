@@ -10,7 +10,6 @@ namespace Amlakbashi.Core.Entities
 {
     public class User : Entity<int>, ISoftDelete
     {
-        #region User
         [Column("UserID")]
         public override int Id { get; set; }
         public string FName { get; set; }
@@ -25,18 +24,6 @@ namespace Amlakbashi.Core.Entities
         public DateTime? CreateDate { get; set; }
         public DateTime? SendVerification { get; set; }
         public int AccessType { get; set; }
-        [NotMapped]
-        public string FullName
-        {
-            get
-            {
-                return (!string.IsNullOrEmpty(FName) ? FName + " " : "") +
-                    (!string.IsNullOrEmpty(LName) ? LName : "");
-            }
-        }
-        #endregion
-
-        #region User Contact
         public string Mobile { get; set; }
         public string Mobile2 { get; set; }
         public string Tell { get; set; }
@@ -47,37 +34,43 @@ namespace Amlakbashi.Core.Entities
         public string AppNotificationToken { get; set; }
         public string FcmAppNotificationToken { get; set; }
         public long LastNotifPermitionTicks { get; set; }
-        #endregion
-
-        #region Hostler
         public int OwnerShip { get; set; }
         public int AmlakbashiScore { get; set; }
         public long UserScore { get; set; }
         public int CancelInstantReserveLimit { get; set; } = 3;
         public InstantReserveAccessEnum InstantReserveAccess { get; set; }
+        public long? PhotoID { get; set; }
+        public int PhotoStatus { get; set; }
+        public string Address { get; set; }//Description
+        public long Credit { get; set; }
+        public long PrizeCredit { get; set; }
+        public int PresentorUserID { get; set; }
+        public bool PresentorPrizeGiven { get; set; }
+        public bool RecieveAppreciateDiscount { get; set; }
+        public string AdminLoginCode { get; set; }
+        public string ContactPhone { get; set; }
+        public bool IsDeleted { get; set; }
+
         [JsonIgnore]
         [InverseProperty("HostUser")]
         public virtual ICollection<Reserve> HostReserves { get; set; }
+
         [JsonIgnore]
         public virtual ICollection<Advertise> Advertises { get; set; }
-        #endregion
 
-        #region User Profile
-        public long? PhotoID { get; set; }
-        public int PhotoStatus { get; set; }
         [JsonIgnore]
         [ForeignKey("PhotoID")]
         public virtual File Photo { get; set; }
-        public string Address { get; set; }//Description
+
         [JsonIgnore]
         public virtual ICollection<UserFavorite> Favorite { get; set; }
-        public long Credit { get; set; }
-        public long PrizeCredit { get; set; }
+
         [JsonIgnore]
         public virtual ICollection<CreditTransaction> CreditTransactions { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<PrizeCreditTransaction> PrizeCreditTransactions { get; set; }
+
         [JsonIgnore]
         public virtual ICollection<DiscountCoupon> DiscountCoupons { get; set; }
 
@@ -95,33 +88,27 @@ namespace Amlakbashi.Core.Entities
 
         [JsonIgnore]
         public virtual ICollection<Payment> Payments { get; set; }
+
         [JsonIgnore]
         [InverseProperty("Guest")]
         public virtual ICollection<ReserveSupport> ReserveSupportsAsGuest { get; set; }
+
         [JsonIgnore]
         [InverseProperty("Supporter")]
         public virtual ICollection<ReserveSupport> ReserveSupportsAsSupporter { get; set; }
-        public int PresentorUserID { get; set; }
-        public bool PresentorPrizeGiven { get; set; }
-        public bool RecieveAppreciateDiscount { get; set; }
+        
         [JsonIgnore]
         [InverseProperty("GuestUser")]
         public virtual ICollection<Reserve> Reserves { get; set; }
-        #endregion
 
-        #region To Delete
-        public string AdminLoginCode { get; set; }
-        public string ContactPhone { get; set; }
-        #endregion
-        
-        public bool IsDeleted { get; set; }
-
-        public enum InstantReserveAccessEnum
+        [NotMapped]
+        public string FullName
         {
-            None = 0,
-            Verified = 1,
-            Banned = 2,
-            Requested = 3
+            get
+            {
+                return (!string.IsNullOrEmpty(FName) ? FName + " " : "") +
+                    (!string.IsNullOrEmpty(LName) ? LName : "");
+            }
         }
 
         public string GetPhoneNumber(PhoneType type)
@@ -181,94 +168,10 @@ namespace Amlakbashi.Core.Entities
             var international_number = PhoneUtility.LocalNumberToInternational(local_number, country_code);
             SetPhoneNumber(type, international_number);
         }
-        public enum PhoneType { MainMobile, LandLine, OtherMobile1, OtherMobile2, ThirdPerson }
-        public enum LoginPriorites { Mobile = 0, Email = 1 }
 
         public User ShallowCopy()
         {
             return (User)this.MemberwiseClone();
-        }
-
-        public enum UserState
-        {
-            Suspend = 0,
-            Acticved = 1,
-            InActived = 2,
-            ReserveBanned = 3,
-            Deleted = 4
-        }
-
-        public enum AccessTypeEnum
-        {
-            Full = 0,
-            ReserveBanned = 1,
-            LoginBanned = 2,
-        }
-
-        public enum UserPhotoState
-        {
-            not_set = 0,
-            ready_publish = 1,
-            publish = 2,
-            not_verified = 3
-        }
-
-        public enum OwnerType
-        {
-            real_reservation = 0,
-            reservation = 1,
-            owner = 3,
-            real_owner = 10
-        }
-
-        public enum UserGeneralTypeEnum
-        {
-            Guest = 0,
-            Host = 1
-        }
-
-        public enum CreditTransactionType
-        {
-            Credit_Increase = 1, Credit_Decrease = 2,
-            Credit_Inc_Then_Res
-        }
-
-        public enum CreditTransactionCause
-        {
-            Reserve = 1,
-            SitePortion = 2,
-            Charge = 3,
-            Clearing = 4,
-            Refund = 5,
-            ContactAdvertise = 6,
-            Other = 100
-        }
-
-        public enum UserFilterType
-        {
-            All = -1,
-            Guest = 0,
-            ActiveHost = 1,
-            Host = 2,
-            Staff = 3,
-            InstantReserveRequest = 4,
-            InstantReserveAllow = 5,
-            PhotoChangeRequest = 6
-        }
-
-        public static string GetAccessTypeString(AccessTypeEnum accessType)
-        {
-            switch (accessType)
-            {
-                case AccessTypeEnum.Full:
-                    return "دسترسی کامل";
-                case AccessTypeEnum.ReserveBanned:
-                    return "ممنوعیت درخواست رزرو";
-                case AccessTypeEnum.LoginBanned:
-                    return "ممنوعیت ورود به سایت";
-                default:
-                    return "";
-            }
         }
 
         public static string GetUserGeneralTypeString(int type)
@@ -325,39 +228,6 @@ namespace Amlakbashi.Core.Entities
             return list;
         }
 
-        public static string GetCreditTransactionCauseString(int transaction, string transactionCauseString = "")
-        {
-            switch ((CreditTransactionCause)transaction)
-            {
-                case CreditTransactionCause.Reserve:
-                    return "رزرو اقامتگاه";
-                case CreditTransactionCause.SitePortion:
-                    return "پرداخت درصد املاک باشی";
-                case CreditTransactionCause.Charge:
-                    return "شارژ کیف پول";
-                case CreditTransactionCause.Clearing:
-                    return "تسویه با میزبان";
-                case CreditTransactionCause.Refund:
-                    return "عودت به مهمان";
-                case CreditTransactionCause.ContactAdvertise:
-                    return "نمایش تماس";
-                case CreditTransactionCause.Other:
-                    return transactionCauseString;
-                default:
-                    return "";
-            }
-        }
-
-        public static string GetFullName(string fname, string lname)
-        {
-            var fullName = "";
-            if (!string.IsNullOrEmpty(fname))
-                fullName += fname + " ";
-            if (!string.IsNullOrEmpty(lname))
-                fullName += lname;
-            return fullName;
-        }
-
         public bool UserHasSimilarReserve(long advertiseId, DateTime startDate, DateTime endDate)
         {
             var reserves = Reserves.Where(x =>
@@ -383,6 +253,79 @@ namespace Amlakbashi.Core.Entities
             Error = 0,
             MobileConfirm = 1,
             EnterPassword = 2
+        }
+
+        public enum UserFilterType
+        {
+            All = -1,
+            Guest = 0,
+            ActiveHost = 1,
+            Host = 2,
+            Staff = 3,
+            InstantReserveRequest = 4,
+            InstantReserveAllow = 5,
+            PhotoChangeRequest = 6
+        }
+
+        public enum UserState
+        {
+            Suspend = 0,
+            Acticved = 1,
+            InActived = 2,
+            ReserveBanned = 3,
+            Deleted = 4
+        }
+
+        public enum AccessTypeEnum
+        {
+            Full = 0,
+            ReserveBanned = 1,
+            LoginBanned = 2,
+        }
+
+        public enum UserPhotoState
+        {
+            not_set = 0,
+            ready_publish = 1,
+            publish = 2,
+            not_verified = 3
+        }
+
+        public enum OwnerType
+        {
+            real_reservation = 0,
+            reservation = 1,
+            owner = 3,
+            real_owner = 10
+        }
+
+        public enum UserGeneralTypeEnum
+        {
+            Guest = 0,
+            Host = 1
+        }
+
+        public enum PhoneType 
+        { 
+            MainMobile, 
+            LandLine, 
+            OtherMobile1, 
+            OtherMobile2, 
+            ThirdPerson 
+        }
+
+        public enum LoginPriorites 
+        { 
+            Mobile = 0, 
+            Email = 1 
+        }
+
+        public enum InstantReserveAccessEnum
+        {
+            None = 0,
+            Verified = 1,
+            Banned = 2,
+            Requested = 3
         }
     }
 }

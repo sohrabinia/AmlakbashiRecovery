@@ -80,7 +80,7 @@
     <None Include="Views\Cart\Admin.cshtml" />
     <None Include="Views\Cart\Bank.cshtml" />
     <None Include="Views\Cart\Index.cshtml" />
-    <None Include="Views\Cart\PaymentIndex.cshtml" />
+    <None Include="Views\Payment\Index.cshtml" />
     <None Include="Views\Cart\PerformPay.cshtml" />
     <None Include="Views\Cart\TransactionResult.cshtml" />
     <None Include="Views\Category\DynamicEdit.cshtml" />

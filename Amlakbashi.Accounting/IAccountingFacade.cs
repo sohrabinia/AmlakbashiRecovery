@@ -1,18 +1,18 @@
 ﻿using Amlakbashi.Accounting.PaymentContext;
+using Amlakbashi.Core.Common.Enums;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.PaymentStatisticsDTOs;
+using Amlakbashi.Core.DTOs.WalletDTOs;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using static Amlakbashi.Core.Entities.ActionLog;
 using static Amlakbashi.Core.Entities.PrizeCreditTransaction;
 using static Amlakbashi.Core.Entities.Reserve;
 using static Amlakbashi.Core.Entities.ReservePayment;
-using static Amlakbashi.Core.Entities.User;
 
 namespace Amlakbashi.Accounting
 {
@@ -42,6 +42,7 @@ namespace Amlakbashi.Accounting
         IQueryable<Payment> GetAllPaymentsAsIQueriable();
         bool ReserveShouldRefund(long reserveId, Reserve.ReserveStatus status, out bool refundDone);
         bool ReserveCanClear(long reserveId);
+
         // DiscountCoupon Functions
         DiscountCoupon FindDiscountCoupon(long id);
         DiscountCoupon FindDiscountCoupon(int userId, DiscountCoupon.DiscountCouponType type);
@@ -52,28 +53,33 @@ namespace Amlakbashi.Accounting
         DiscountCoupon GetMostValuableDiscountCouponIfAny(int userId);
 
         // CreditTransaction Functions
+
+        void FilterCreditTransactions(CreditTransactionIndexDTO dto);
         IList<CreditTransaction> GetCreditListByUserId(int userId);
         CreditTransaction GetCanselInstantReserveCreditTransaction(int userId, int tranCause, long id);
         CreditTransaction FindCreditTransaction(long id);
-        long IncreaseCredit(int userId, long amount, long transactionId,
-            long reserveId, CreditTransactionCause transactionCause,
-            out long currentCredit, string transactionCauseString = null,
+        long IncreaseCredit(int userId, long amount, long transactionId, long reserveId,
+            out long currentCredit, CreditTransaction.WalletTransactionReason transactionCause,
+            string transactionCauseString = null, int? paymentId = null,
             int doerUserId = 0, ActionSourceEnum actionSource = ActionSourceEnum.Undefined);
-        long DecreaseCredit(int userId, long amount, long transactionId,
-            long reserveId, out long currentCredit, CreditTransactionCause transactionCause,
-            string transactionCouseString = null, long contactId = 0, int doerUserId = 0,
-            ActionLog.ActionSourceEnum actionSource = ActionLog.ActionSourceEnum.Undefined);
+        long DecreaseCredit(int userId, long amount, long transactionId, long reserveId,
+            out long currentCredit, CreditTransaction.WalletTransactionReason transactionCause,
+            string transactionCouseString = null, int? paymentId = null,
+            int doerUserId = 0, ActionSourceEnum actionSource = ActionSourceEnum.Undefined);
+        CreditTransaction EditCreditTransaction(CreditTransaction editedCreditTransaction, int operatorId,
+            ActionSourceEnum actionSource = ActionSourceEnum.AdminPanel);
 
         // PrizeCreditTransaction Functions
+
         long IncreasePrizeCredit(int userId, long amount, PrizeTransactionType type,
-            long reserveId, string customTitle, int doerUserId, ActionLog.ActionSourceEnum actionSource);
+            long reserveId, string customTitle, int doerUserId, ActionSourceEnum actionSource);
         long DecreasePrizeCredit(int userId, long amount, PrizeTransactionType type,
-            long reserveId, string customTitle, int doerUserId, ActionLog.ActionSourceEnum actionSource);
+            long reserveId, string customTitle, int doerUserId, ActionSourceEnum actionSource);
         void RefundPrizeCreditIfAny(long reserveId);
-        void GivePresentorPrizeIfAny(long reserveId, ActionLog.ActionSourceEnum actionSource, int doerUserId);
+        void GivePresentorPrizeIfAny(long reserveId, ActionSourceEnum actionSource, int doerUserId);
         long GetReservePrizeAvailable(long reserveTotalPrice, long userPrizeCredit);
-        void GiveAppreciateDiscountIfDeserve(long reserveId, ActionLog.ActionSourceEnum actionSource, int doerUserId);
-        void UsePrizeCreditForReserve(long reserveId, int doerUserId, ActionLog.ActionSourceEnum actionSource);
+        void GiveAppreciateDiscountIfDeserve(long reserveId, ActionSourceEnum actionSource, int doerUserId);
+        void UsePrizeCreditForReserve(long reserveId, int doerUserId, ActionSourceEnum actionSource);
 
         // Cart Functions
         IList<Cart> FilterCarts(int status = -1, int uid = -1, long refid = -1);
@@ -89,6 +95,7 @@ namespace Amlakbashi.Accounting
         CheckPaymentDTO CheckPaymentResult(int paymentId);
 
         // GroupPayment Functions
+
         IList<GroupPayment> FilterGroupPayment(int status);
         GroupPayment FindGroupPayment(int id);
         void InsertGroupPayment(GroupPayment newGroupPayment);
@@ -100,16 +107,17 @@ namespace Amlakbashi.Accounting
         void ScheduleSendMessageGroupPayment(UserContactDTO contactDTO, int delay);
 
         // Common
+
         long PayAmlakbashiPortion(long reserveId, ReservePaymentType payType,
             out bool alreadyPaid, out long price, ReservePaymentMethod paymentMethod, int userId, int doerUserId);
 
-        bool FinalizePayment(BanksEnum bank, int pid, int userId, DateTime date,
+        bool FinalizePayment(BankEnum bank, int pid, int userId, DateTime date,
             string tref, out string paymentResult, out string msg,
             out bool invalidInput, ActionSourceEnum actionSource, int doerUserId);
 
         bool TestFinalizePayment(int pid, int userId, out string msg);
 
-        Dictionary<string, object> GeneratePaymentData(BanksEnum bank, int pid, string redirectAddress);
+        Dictionary<string, object> GeneratePaymentData(BankEnum bank, int pid, string redirectAddress);
         GuestPayResult GuestPayReserve(int userId, long reserveId,
             int payReserveType, out long payment_id, int doerUserId,
             ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId);
@@ -124,8 +132,10 @@ namespace Amlakbashi.Accounting
         PaymentChartDTO GeneratePaymentChart(int year, int month, bool extra_filter = false, List<int> user_list = null);
 
         // Podium Services
+
         ShebaVerificationResultDTO VerifySheba(string sheba);
         ShebaPaymentResultDTO SiteClearingHostAutoPayment(long reserveId, int operatorId);
-        CheckShebaPaymentResultDTO CheckShebaPaymentStatus(long reservePaymentId);
+        ShebaPaymentResultDTO WalletClearingAutoPayment(int userId, int operatorId);
+        CheckShebaPaymentResultDTO CheckShebaPaymentStatus(long paymentId, bool isReservePayment = false);
     }
 }

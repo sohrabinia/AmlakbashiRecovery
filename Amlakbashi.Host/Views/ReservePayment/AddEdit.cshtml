@@ -88,16 +88,6 @@
                         {
                             payment_type_values = payment_type_values.Where(w => w != ReservePayment.ReservePaymentType.WaitingForPodium).ToArray();
                         }
-                        //var ids_allow = new List<int>() { 3, 12, 2122 };
-                        //if (!isEdit && !ids_allow.Contains(userAccessor.CurrentUser.Id))
-                        //{
-                        //    var allow_types = new List<ReservePayment.ReservePaymentType>()
-                        //                    {
-                        //        ReservePayment.ReservePaymentType.GuestDeposite,
-                        //        ReservePayment.ReservePaymentType.GuestClearing
-                        //    };
-                        //    payment_type_values = payment_type_values.Where(x => allow_types.Contains(x)).ToArray();
-                        //}
                         <option value="-1">انتخاب کنید</option>
                         foreach (var value in payment_type_values)
                         {

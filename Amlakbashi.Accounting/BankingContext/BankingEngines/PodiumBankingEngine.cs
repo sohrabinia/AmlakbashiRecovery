@@ -13,7 +13,7 @@ namespace Amlakbashi.Accounting.BankingContext.BankingEngines
             var result = new ShebaPaymentResultDTO();
             if (data.hasError == false && data.BankResult.IsSuccess)
             {
-                result.TransactionId = data.BankResult.Data;
+                result.TraceNumber = data.BankResult.Data;
                 result.Message = data.BankResult.Message;
             }
             else

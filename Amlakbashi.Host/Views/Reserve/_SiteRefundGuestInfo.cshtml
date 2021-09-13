@@ -2,6 +2,12 @@
 
 @model SitePaymentDTO
 
+<style>
+    #CanceledReserveClearingFrom div {
+        margin-bottom: 5px;
+    }
+</style>
+
 @if (Model == null)
 {
     <p>عملیات با خطا مواجه شد</p>
@@ -14,6 +20,10 @@ else
         <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('کد رزرو: @Model.ReserveId', 'کد رزرو')" /></span>
     </div>
     <div>
+            <span>وضعیت رزرو:</span>
+            <span>@ReserveLocalization.GetStatusString((int)Model.ReserveStatus, Reserve.StatusStringType.Site)</span>
+        </div>
+    <div>
         <span>مبلغ کل:</span>
         <span>@string.Format("{0:n0}", Model.TotalPrice) تومان</span>
     </div>
@@ -21,13 +31,31 @@ else
         <span>پرداختی توسط مهمان:</span>
         <span>@string.Format("{0:n0}", Model.GuestPayedPrice) تومان</span>
     </div>
-    <div>
+    @*<div>
         <span>مبلغ قابل پرداخت:</span>
         <span style="color: blue; font-size: x-large;">@string.Format("{0:n0}", Model.PayablePrice) تومان</span>
         <span><i class="fa fa-copy" style="cursor:pointer; color: #999;" onclick="copyStringToClipboard('@Model.PayablePriceRaw', 'مبلغ قابل پرداخت')" /></span>
-    </div>
+    </div>*@
     <br />
-    <div>
+    <form id="CanceledReserveClearingFrom" style="text-align: center;">
+            <input type="hidden" name="ReserveId" value="@Model.ReserveId" />
+            <div>
+                <label>سهم املاک باشی:</label>
+                <input type="text" name="siteClearingAmount" value="@(Model.ReserveStatus == Reserve.ReserveStatus.CanceledByGuest ? Model.TotalPrice / 10 : "")" />
+            </div>
+            @if (Model.ReserveStatus == Reserve.ReserveStatus.CanceledByGuest)
+            {
+                <div>
+                    <label>مبلغ تسویه مهمان:</label>
+                    <input type="text" name="guestClearingAmount" value="@(Model.ReserveStatus == Reserve.ReserveStatus.CanceledByHost ? Model.GuestPayedPrice : "")" />
+                </div>
+                <div>
+                    <label>مبلغ تسویه میزبان:</label>
+                    <input type="text" name="hostClearingAmount" value="" />
+                </div>
+            }
+        </form>
+    @*<div>
         <span>نام مهمان:</span>
         <span>@Model.UserName</span>
     </div>
@@ -47,28 +75,48 @@ else
     <div>
         <span>نام صاحب کارت:</span>
         <span id="BankCardNameSpan">@Model.BankCardName</span>
-    </div>
+    </div>*@
     <br />
     <div style="text-align:center;">
-        @{
+        @*@{
             var hasBankCard = Model.BankCardNumber != "ثبت نشده";
-        }
-        <button class="btn-set-card-bank" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans; display: @(!hasBankCard ? "inline" : "none");" onclick="registerBankCard()">ثبت کارت بانکی</button>
+        }*@
+        @*<button class="btn-set-card-bank" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans; display: @(!hasBankCard ? "inline" : "none");" onclick="registerBankCard()">ثبت کارت بانکی</button>*@
         @*<button class="btn-set-payment" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans; display: @(hasBankCard ? "inline" : "none");" onclick="autoSiteRefundGuest()">پرداخت خودکار</button>*@
-        <button class="btn-set-payment" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans; display: @(hasBankCard ? "inline" : "none");" onclick="manualSiteRefundGuest()">پرداخت دستی</button>
+        @*<button class="btn-set-payment" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans; display: @(hasBankCard ? "inline" : "none");" onclick="manualSiteRefundGuest()">پرداخت دستی</button>*@
+        <button class="btn-set-payment" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;" onclick="CanceledReserveClearing()">تسویه</button>
     </div>
 }
 
 <script>
-    function manualSiteRefundGuest() {
+    function CanceledReserveClearing() {
+        var form = $('#CanceledReserveClearingFrom');
+        $.ajax({
+            type: "post",
+            url: "/reserve/CanceledReserveClearing",
+            data: form.serialize(),
+            success: function (response) {
+                if (response.status == 0) {
+                    alertify.error(response.msg);
+                }
+                else {
+                    alertify.success(response.msg);
+                    reserveAdminHubConnection.invoke('reserveRefunded', @Model.ReserveId);
+                    popupMsgList[0].btnClick(0, true);
+                }
+            }
+        });
+    }
+
+    @*function manualSiteRefundGuest() {
         var queryString = "reserveId=" + @Model.ReserveId + "&price=" + @Model.PayablePrice + "&userType=" + '@Model.UserType';
         showInfoMessage('ثبت پرداخت', '',
             { contentUrl: '/Reserve/ManualSitePayment?' + queryString, fullScreen: screen.width < 781 }
         );
-    }
+    }*@
 
-    function autoSiteRefundGuest() {
-        @*showNoYesMessage('', 'آیا از واریز وجه به حساب میزبان مطمئنید؟',
+    @*function autoSiteRefundGuest() {
+        showNoYesMessage('', 'آیا از واریز وجه به حساب میزبان مطمئنید؟',
             function () {
                 $.ajax({
                 type: "get",
@@ -84,12 +132,12 @@ else
                     }
                 }
             });
-        })*@
-    }
+        })
+    }*@
 
-    function registerBankCard() {
+    @*function registerBankCard() {
         showInfoMessage('ثبت کارت بانکی', '',
             { contentUrl: '/Reserve/SetUserBankCard?userId=' + @Model.UserId, fullScreen: screen.width < 781 }
         );
-    }
+    }*@
 </script>

@@ -1,11 +1,14 @@
 ﻿@using Entities = Amlakbashi.Core.Entities;
+
+@model IEnumerable<CreditTransaction>
+
 @{
     ViewBag.Title = "کیف پول";
     ViewBag.UserCredit = true;
     Layout = "~/Views/Shared/_Dashboard.cshtml";
     var credit = ViewBag.Credit;
 }
-@model IEnumerable<CreditTransaction>
+
 <div class="user-credit__container">
     <div class="user-credit__current-credit-container">
         <div class="user-credit__add-credit-button" onclick="addToCredit()">
@@ -54,7 +57,7 @@
                         UserID = ViewBag.UserID,
                         Date = DateTime.MinValue,
                         Price = initial_credit,
-                        TransactionCause = (int)Entities.User.CreditTransactionCause.Other,
+                        TransactionCause = Entities.CreditTransaction.WalletTransactionReason.Other,
                         TransactionCauseString = "مانده از قبل",
                         RemainedPrice = initial_credit
                     };
@@ -69,7 +72,7 @@
                         UserID = ViewBag.UserID,
                         Date = DateTime.MinValue,
                         Price = initial_credit,
-                        TransactionCause = (int)Entities.User.CreditTransactionCause.Other,
+                        TransactionCause = Entities.CreditTransaction.WalletTransactionReason.Other,
                         TransactionCauseString = "بدهی از قبل",
                         RemainedPrice = initial_credit
                     };
@@ -90,28 +93,31 @@
                     <span>@(item.Date == DateTime.MinValue ? "" : ((DateTime)item.Date).ToString("HH:mm"))</span>
                 </div>
                 <div class="dashboard-table-cell">
-                    @switch ((Entities.User.CreditTransactionCause)item.TransactionCause)
+                    @switch (item.TransactionCause)
                     {
-                        case Entities.User.CreditTransactionCause.Reserve:
-                        case Entities.User.CreditTransactionCause.SitePortion:
-                            <span style="color:#4285F4;">@Entities.User.GetCreditTransactionCauseString(item.TransactionCause,item.TransactionCauseString)</span>
+                        case Entities.CreditTransaction.WalletTransactionReason.Reserve:
+                        case Entities.CreditTransaction.WalletTransactionReason.SitePortion:
+                            <span style="color:#4285F4;">@Entities.CreditTransaction.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
                             <span>کد رزرو: @item.ReserveID</span>
                             break;
-                        case Entities.User.CreditTransactionCause.Charge:
-                            <span style="color:#34A853;">@Entities.User.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
+                        case Entities.CreditTransaction.WalletTransactionReason.Charge:
+                            <span style="color:#34A853;">@Entities.CreditTransaction.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
                             <span>کد پیگیری: @item.BankTransactionID</span>
                             break;
-                        case Entities.User.CreditTransactionCause.Clearing:
-                        case Entities.User.CreditTransactionCause.Refund:
-                            <span style="color:#34A853;">@Entities.User.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
+                        case Entities.CreditTransaction.WalletTransactionReason.Clearing:
+                        case Entities.CreditTransaction.WalletTransactionReason.Refund:
+                            <span style="color:#34A853;">@Entities.CreditTransaction.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
                             <span>کد رزرو: @item.ReserveID</span>
                             break;
-                        case Entities.User.CreditTransactionCause.ContactAdvertise:
-                            <span style="color:#34A853;">@Entities.User.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
+                        case Entities.CreditTransaction.WalletTransactionReason.ContactAdvertise:
+                            <span style="color:#34A853;">@Entities.CreditTransaction.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
                             <span>نمایش تماس آگهی</span>
                             break;
-                        case Entities.User.CreditTransactionCause.Other:
-                            <span style="color:#4285F4;">@Entities.User.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
+                        case CreditTransaction.WalletTransactionReason.Corrective:
+                            <span>@Entities.CreditTransaction.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString) @item.ModifiedWalletTransactionId</span>
+                            break;
+                        case Entities.CreditTransaction.WalletTransactionReason.Other:
+                            <span style="color:#4285F4;">@Entities.CreditTransaction.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)</span>
                             if (item.BankTransactionID > 0)
                             {
                                 <span>کد پیگیری: @item.BankTransactionID</span>
@@ -127,7 +133,7 @@
                 {
                     <span style="color:#EA4335;" class="dashboard-table-cell">- @string.Format("{0:n0}", Math.Abs(item.Price)) تومان</span>
                 }
-                <span class="dashboard-table-cell">@string.Format("{0:n0}",item.RemainedPrice) تومان</span>
+                <span class="dashboard-table-cell">@string.Format("{0:n0}", item.RemainedPrice) تومان</span>
             </div>
         }
     </div>
@@ -142,7 +148,7 @@
                 '<div id="pay_type_container">' +
                 '<label>لطفا مبلغ را در کادر زیر وارد کنید و دکمه پرداخت را بزنید</label>' +
                 '<input type="text" onkeyup="convertToEnglishNumber(this)" id="add_credit_input"/> تومان' +
-                '<div id="js-persian-price-string">' +              
+                '<div id="js-persian-price-string">' +
                 '</div>' +
                 '</div>',
                 type: 'blue',

@@ -26,28 +26,28 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs
             dto.comment1 = "";
             dto.comment2 = "";
             dto.reasonColor = "";
-            switch ((User.CreditTransactionCause)transaction.TransactionCause)
+            switch (transaction.TransactionCause)
             {
-                case User.CreditTransactionCause.Reserve:
-                case User.CreditTransactionCause.SitePortion:
+                case CreditTransaction.WalletTransactionReason.Reserve:
+                case CreditTransaction.WalletTransactionReason.SitePortion:
                     dto.reasonColor = "#4285F4";
                     dto.comment1 = "کد رزرو: " + transaction.ReserveID;
                     break;
-                case User.CreditTransactionCause.Charge:
+                case CreditTransaction.WalletTransactionReason.Charge:
                     dto.reasonColor = "#34A853";
                     dto.comment1 = "کد پیگیری: " + transaction.BankTransactionID;
                     break;
-                case User.CreditTransactionCause.Clearing:
-                case User.CreditTransactionCause.Refund:
+                case CreditTransaction.WalletTransactionReason.Clearing:
+                case CreditTransaction.WalletTransactionReason.Refund:
                     dto.reasonColor = "#34A853";
                     dto.comment1 = "کد رزرو: " + transaction.ReserveID;
                     break;
-                case User.CreditTransactionCause.ContactAdvertise:
+                case CreditTransaction.WalletTransactionReason.ContactAdvertise:
                     dto.reasonColor = "#34A853";
-                    dto.comment1 = "کد آگهی: " + transaction.AdvertiseContactID;
+                    dto.comment1 = "کد آگهی: نامشخص";
                     dto.comment2 = "کد کاربر: " + transaction.UserID;
                     break;
-                case User.CreditTransactionCause.Other:
+                case CreditTransaction.WalletTransactionReason.Other:
                     dto.reasonColor = "#4285F4";
                     dto.comment1 = transaction.BankTransactionID > 0 ? "کد پیگیری: " + transaction.BankTransactionID : "";
                     break;
@@ -55,7 +55,7 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs
             dto.id = transaction.Id;
             dto.price = transaction.Price;
             dto.remainedPrice = transaction.RemainedPrice;
-            dto.reasonString = User.GetCreditTransactionCauseString(transaction.TransactionCause, transaction.TransactionCauseString);
+            dto.reasonString = CreditTransaction.GetCreditTransactionCauseString(transaction.TransactionCause, transaction.TransactionCauseString);
             dto.dateString = DateTimeUtility.ConvertDate(transaction.Date, true) + transaction.Date.ToString(" HH:mm");
             return dto;
         }

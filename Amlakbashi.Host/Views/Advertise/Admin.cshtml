@@ -1,8 +1,6 @@
-﻿@inject IUserAccessor userAccessor; 
-@{
+﻿@{
     ViewBag.Title = "مدیریت آگهی";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
-    var userId = userAccessor.CurrentUser.Id;
 }
 
 <div class="adminmain">
@@ -23,40 +21,6 @@
             </tr>
         </table>
     </div>
-    @*<div class="adminitem">
-            <table cellpadding="0" cellspacing="0">
-                <tr>
-                    <td width="80">
-                        <div class="adminicon" style="background-image:url('/resource/img/category2.png')"></div>
-                    </td>
-                    <td>
-                        <div style="padding:10px;">
-                            <a href="/AdvertiseType/Index" class="admintitle">مدیریت گروه های آگهی</a>
-                            <div class="adminabstract">
-                                در این قسمت میتوانید، برای آگهی های خود گروه درست کرده و  آگهی ها را دسته بندی کنید .
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>*@
-    @*<div class="adminitem">
-            <table cellpadding="0" cellspacing="0">
-                <tr>
-                    <td width="80">
-                        <div class="adminicon" style="background-image:url('/resource/img/trade.png')"></div>
-                    </td>
-                    <td>
-                        <div style="padding:10px;">
-                            <a href="/Trade/Index" class="admintitle">مدیریت معامله</a>
-                            <div class="adminabstract">
-                                در این قسمت می توانید انواع معامله را تعریف و مدیریت کنید و از آن در آگهی ها استفاده کنید .
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>*@
     <div class="adminitem">
         <table cellpadding="0" cellspacing="0">
             <tr>
@@ -76,16 +40,3 @@
     </div>
     <div style="clear:both; "></div>
 </div>
-
-@section ScriptBlock
-{
-    <script type="text/javascript">
-
-    </script>
-}
-
-@section StyleBlock{
-    <style>
-    </style>
-}
-

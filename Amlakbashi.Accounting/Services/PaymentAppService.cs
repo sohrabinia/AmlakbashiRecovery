@@ -25,9 +25,9 @@ namespace Amlakbashi.Accounting.Services
             if (status != -1)
             {
                 if (status == 0)
-                    model = model.Where(p => p.Status == 0);
+                    model = model.Where(p => p.Status == Payment.PaymentStatus.NotPaid);
                 else
-                    model = model.Where(p => p.Status == 1);
+                    model = model.Where(p => p.Status == Payment.PaymentStatus.Paid);
             }
             if (refid > 0)
                 model = model.Where(p => p.RefID == refid);
@@ -41,9 +41,9 @@ namespace Amlakbashi.Accounting.Services
             if (status != -1)
             {
                 if (status == 0)
-                    model = model.Where(p => p.Status == 0);
+                    model = model.Where(p => p.Status == Payment.PaymentStatus.NotPaid);
                 else
-                    model = model.Where(p => p.Status == 1);
+                    model = model.Where(p => p.Status == Payment.PaymentStatus.Paid);
             }
             return model;
         }
@@ -51,7 +51,7 @@ namespace Amlakbashi.Accounting.Services
         public IList<Payment> GetRange(DateTime fromDate, DateTime toDate, int status, IList<int> userIds = null,
             bool byTotalPrice = false)
         {
-            var data = Repository.Query(q => q.Where(w => w.Date >= fromDate && w.Date <= toDate && w.Status == status));
+            var data = Repository.Query(q => q.Where(w => w.Date >= fromDate && w.Date <= toDate && w.Status == (Payment.PaymentStatus)status));
             if (userIds != null && userIds.Count == 0)
             {
                 data = data.Where(w => userIds.Contains(w.UserID));
@@ -65,7 +65,7 @@ namespace Amlakbashi.Accounting.Services
 
         public int GetPaymentTriesCount(long reserveId, out string lastTryDateStr)
         {
-            var payments = Repository.Query(q=>q.Where(x => x.ReserveID == reserveId && x.Status != 1));
+            var payments = Repository.Query(q=>q.Where(x => x.ReserveID == reserveId && x.Status == Payment.PaymentStatus.NotPaid));
             if (payments.Any())
             {
                 var paymentsList = payments.OrderByDescending(x => x.Date).ToList();
@@ -95,14 +95,17 @@ namespace Amlakbashi.Accounting.Services
 
         public void Update(Payment editedPayment)
         {
-            var data = Repository.Find(editedPayment.Id);
-            data.Authority = editedPayment.Authority;
-            data.BankId = editedPayment.BankId;
-            data.Date = editedPayment.Date;
-            data.RefID = editedPayment.RefID;
-            data.Status = editedPayment.Status;
-            data.PayDate = editedPayment.PayDate;
-            Repository.Update(data);
+            var payment = Repository.Find(editedPayment.Id);
+            payment.Authority = editedPayment.Authority;
+            payment.BankId = editedPayment.BankId;
+            payment.Date = editedPayment.Date;
+            payment.RefID = editedPayment.RefID;
+            payment.Status = editedPayment.Status;
+            payment.PayDate = editedPayment.PayDate;
+            payment.WalletTransactionId = editedPayment.WalletTransactionId;
+            payment.ReservePaymentId = editedPayment.ReservePaymentId;
+            payment.TraceNumber = editedPayment.TraceNumber;
+            Repository.Update(payment);
             Repository.Save();
         }
 

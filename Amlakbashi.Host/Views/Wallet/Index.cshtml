@@ -1,0 +1,140 @@
+﻿@model Amlakbashi.Core.DTOs.WalletDTOs.CreditTransactionIndexDTO
+
+@{
+    ViewBag.Title = "مدیریت تراکنش های کیف پول";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+    int Idx = (Model.page - 1) * Model.pageModelCount;
+}
+
+<style>
+    .table-content-row:nth-child(2n+1) {
+        background-color: #eee;
+    }
+</style>
+
+<form asp-action="index" asp-controller="wallet" method="post">
+    <div>
+        <table>
+            <tr>
+                <td class="label">شناسه:</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@Model.creditTransactionId" name="creditTransactionId" />
+                </td>
+                <td class="label"> کد رزرو :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@Model.reserveId" name="reserveId" />
+                </td>
+                <td class="label"> کد کاربر :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@Model.userId" name="userId" />
+                </td>
+                <td class="label"> شماره تراکنش :</td>
+                <td class="minw">
+                    <input type="text" style="width:150px;" value="@Model.transactionId" name="transactionId" />
+                </td>
+                <td><input type="submit" class="filter" value="فیلتر" /></td>
+            </tr>
+            @*<tr>
+                    <td class="label"> شماره تراکنش :</td>
+                    <td class="minw">
+                        <input type="text" style="width:150px;" value="@ViewBag.transaction_id" name="transaction_id" />
+                    </td>
+                </tr>*@
+        </table>
+    </div>
+
+    <table>
+        <tr>
+            <th class="minw">
+                ردیف
+            </th>
+            <th>
+                شناسه
+            </th>
+            <th>
+                کد کاربر
+            </th>
+            <th>
+                کد رزرو
+            </th>
+            <th>
+                دلیل
+            </th>
+            <th>
+                شماره پیگیری
+            </th>
+            <th>
+                مبلغ تراکنش
+            </th>
+            <th>
+                باقی مانده
+            </th>
+            <th>
+                تاریخ
+            </th>
+            <th>
+                عملیات
+            </th>
+        </tr>
+
+        @foreach (var item in Model.CreditTransactionList)
+        {
+            Idx++;
+            <tr class="table-content-row">
+                <td>
+                    @Idx
+                </td>
+                <td>@item.Id</td>
+                <td>@item.UserID</td>
+                <td>@item.ReserveID</td>
+                <td>
+                    @CreditTransaction.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)
+                    @if (item.TransactionCause == CreditTransaction.WalletTransactionReason.Corrective)
+                    {
+                        <a asp-action="index" asp-controller="wallet" asp-route-creditTransactionId="@item.ModifiedWalletTransactionId">@item.ModifiedWalletTransactionId</a>
+                    }
+                    @if (item.CorrectiveWalletTransaction != null)
+                    {
+                        <p>(تراکنش اصلاحی: <a asp-action="index" asp-controller="wallet" asp-route-creditTransactionId="@item.CorrectiveWalletTransaction.Id">@item.CorrectiveWalletTransaction.Id</a>)</p>
+                    }
+                </td>
+                <td>@item.BankTransactionID</td>
+                <td>
+                    <p style="color: @(item.Price > 0 ? "limegreen" : "red");">@string.Format("{0:n0}", item.Price) تومان</p>
+                    @if (item.CorrectiveWalletTransaction != null)
+                    {
+                        <p>(@(string.Format("{0:n0}", item.Price + item.CorrectiveWalletTransaction.Price)) تومان)</p>
+                    }
+                </td>
+                <td>@string.Format("{0:n0}", item.RemainedPrice) تومان</td>
+                <td style="direction: ltr;">@Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(item.Date, false, true).ToString()</td>
+                <td>
+                    <a asp-action="editcredittransaction" asp-controller="wallet" asp-route-Id="@item.Id"><i style="font-size: large; color: black;" class="fas fa-edit" title="ویرایش"></i></a>
+                </td>
+            </tr>
+        }
+    </table>
+</form>
+
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model.CreditTransactionList, page => Url.Action("Index", "wallet", new
+    {
+        page,
+    reserveId = Model.reserveId,
+    userId = Model.userId,
+    transactionId = Model.transactionId,
+    creditTransactionId = Model.creditTransactionId
+}),
+    new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        function CheckPaymentStatus(reservePaymentId) {
+            showInfoMessage('وضعیت انتقال وجه', '',
+                { contentUrl: '/ReservePayment/CheckPodiumPaymentStatus?reservePaymentId=' + reservePaymentId, fullScreen: screen.width < 781 }
+            );
+        }
+    </script>
+}

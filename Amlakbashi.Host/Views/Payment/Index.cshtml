@@ -1,0 +1,200 @@
+﻿@using Amlakbashi.Core.DTOs.PaymentDTOs
+
+@model IEnumerable<Payment>
+
+@{
+    ViewBag.Title = "مدیریت پرداخت ها";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+    var data = ViewBag.dto as IEnumerable<PaymentIndexDTO>;
+    int Idx = (int)ViewBag.RowIndexStart;
+}
+
+<style>
+    .table-content-row:nth-child(2n+1) {
+        background-color: #eee;
+    }
+
+    .check-payment-btn {
+        border: 0;
+        background-color: transparent;
+        cursor: pointer;
+    }
+
+        .check-payment-btn i {
+            font-size: 16px;
+            color: black;
+            margin-right: 5px;
+        }
+
+    .sum-amount-container {
+        font: 14px Miransans;
+        color: #555;
+        display: flex;
+        padding: 10px;
+    }
+</style>
+
+<form asp-controller="payment" asp-action="index" method="post">
+    <div>
+        <table>
+            <tr>
+                <td class="label">وضعیت پرداخت:</td>
+                <td class="minw">
+                    <select name="status" style="width:120px;">
+                        <option value="-1">همه</option>
+                        <option is-selected="@(1 == (int)ViewBag.status)" value="1">پرداخت شده</option>
+                        <option is-selected="@(0 == (int)ViewBag.status)" value="0">پرداخت نشده</option>
+                    </select>
+                </td>
+                <td class="label">کاربر:</td>
+                <td class="minw">
+                    <input name="uid" type="text" value="@ViewBag.uid" style="width:150px;" />
+                </td>
+                <td class="label">از تاریخ:</td>
+                <td class="minw">
+                    <input name="fromDate" type="text" value="@ViewBag.from_str" style="width:150px;" />
+                </td>
+                <td class="label">تا تاریخ:</td>
+                <td class="minw">
+                    <input name="toDate" type="text" value="@ViewBag.to_str" style="width:150px;" />
+                </td>
+                <td><input type="submit" class="filter" value="فیلتر" /></td>
+                <td style="width:100%;"></td>
+            </tr>
+        </table>
+    </div>
+</form>
+
+<div class="sum-amount-container">
+    <table>
+        <tr>
+            <td>
+                <span>جمع دریافتی ها:</span>
+                <span>@string.Format("{0:n0}", ViewBag.incomeSum) ریال</span>
+            </td>
+            <td>
+                <span style="">جمع پرداختی ها:</span>
+                <span>@string.Format("{0:n0}", ViewBag.expenditureSum) ریال</span>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table>
+    <tr>
+        <th class="minw">
+            ردیف
+        </th>
+        <th>
+            شناسه
+        </th>
+        <th>
+            نوع
+        </th>
+        <th>
+            کاربر
+        </th>
+        <th>
+            شماره تراکنش
+        </th>
+        <th>
+            شماره ارجاع
+        </th>
+        <th>
+            شماره پیگیری
+        </th>
+        <th>
+            وضعیت
+        </th>
+        <th>
+            تاریخ ثبت
+        </th>
+        <th>
+            مبلغ
+        </th>
+        <th>
+            عملیات
+        </th>
+    </tr>
+
+    @foreach (var item in data)
+    {
+        Idx++;
+        <tr class="table-content-row">
+            <td>
+                @Idx
+            </td>
+            <td>
+                @item.Payment.Id
+            </td>
+            <td>
+                @if (item.Payment.Type == Payment.PaymentType.Income)
+                {
+                    <i style="color: limegreen;" class="fa fa-arrow-circle-up"></i>
+                }
+                else
+                {
+                    <i style="color: red;" class="fa fa-arrow-circle-down"></i>
+                }
+            </td>
+            <td>
+                <a style="text-decoration:none;" target="_blank" href="@string.Format("/user/index?code={0}" , item.Payment.UserID)">@item.UserPhoneNumber</a>
+            </td>
+            <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span style="overflow-y: hidden;">@item.Payment.Authority</span>
+            </td>
+            <td>
+                @item.Payment.RefID
+            </td>
+            <td>
+                @item.Payment.TraceNumber
+            </td>
+            <td>
+                @if (item.Payment.Status == Payment.PaymentStatus.Paid)
+                {
+                    <i style="color: limegreen;" class="fa fa-check-circle"></i>
+                }
+                else
+                {
+                    <i style="color: red;" class="fa fa-times-circle"></i>
+                }
+            </td>
+            <td>
+                @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(item.Payment.Date, false, true)
+            </td>
+            <td>
+                @string.Format("{0:n0}", item.Payment.TotalPrice) ریال
+            </td>
+            <td>
+                @if (item.Payment.Type == Payment.PaymentType.Income)
+                {
+                    <button class="check-payment-btn" type="button" onclick="CheckIncomePayment(@item.Payment.Id)"><i class="fas fa-sync"></i></button>
+                }
+                else
+                {
+                    <button class="check-payment-btn" type="button" onclick="CheckExpenditurePayment(@item.Payment.Id)"><i class="fas fa-sync"></i></button>
+                }
+            </td>
+        </tr>
+    }
+</table>
+
+<div class="mypagelist">
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Payment", new { page, status = (int)ViewBag.status, userId = (int)ViewBag.uid, fromDate = (string)ViewBag.from_str, toDate = (string)ViewBag.to_str }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        function CheckIncomePayment(id) {
+            showInfoMessage('اطلاعات تراکنش', '',
+                { contentUrl: '/Cart/CheckPasargadPaymentResult?paymentId=' + id, fullScreen: screen.width < 781 });
+        }
+
+        function CheckExpenditurePayment(id) {
+            showInfoMessage('وضعیت انتقال وجه', '',
+                { contentUrl: '/payment/CheckPodiumPaymentStatus?paymentId=' + id, fullScreen: screen.width < 781 }
+            );
+        }
+    </script>
+}

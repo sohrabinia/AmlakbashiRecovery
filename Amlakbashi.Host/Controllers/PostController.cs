@@ -35,10 +35,8 @@ namespace Amlakbashi.Host.Controllers
 {
     public class PostController : BaseController
     {
-        //public static List<int> most_view_city_category_ids = new List<int> { 55784, 85173, 55827, 55979, 55816, 55978, 55786 };
         public static List<int> most_view_city_category_ids = new List<int> { 55784, 85173, 55816, 55979, 55978, 55786, 55827 };
-        //public static List<string> most_view_city_names = new List<string> { "سوئیت و آپارتمان مبله تهران", "اجاره ویلا و سوئیت شمال", "سوئیت و آپارتمان مبله اصفهان", "سوئیت و آپارتمان مبله شیراز", "اجاره ویلا و سوئیت کردان", "اجاره ویلا و سوئیت رامسر", "سوئیت و آپارتمان مبله مشهد" };
-        public static List<string> most_view_city_names = new List<string> { "سوئیت و آپارتمان مبله تهران", "اجاره ویلا و سوئیت شمال", "اجاره ویلا و سوئیت کردان", "سوئیت و آپارتمان مبله شیراز", "اجاره ویلا و سوئیت رامسر", "سوئیت و آپارتمان مبله مشهد", "سوئیت و آپارتمان مبله اصفهان" };
+        public static List<string> most_view_city_names = new List<string> { "اجاره روزانه خانه در تهران", "اجاره ویلا و سوئیت شمال", "اجاره ویلا و سوئیت کردان", "سوئیت و آپارتمان مبله شیراز", "اجاره ویلا و سوئیت رامسر", "سوئیت و آپارتمان مبله مشهد", "سوئیت و آپارتمان مبله اصفهان" };
         public static List<string> most_view_city_image_names = new List<string> { "tehran", "mazandaran", "kordan", "shiraz", "ramsar", "mashhad", "esfahan" };
         private readonly ILog logger;
         private readonly IMapper mapper;

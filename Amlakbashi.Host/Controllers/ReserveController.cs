@@ -1202,7 +1202,7 @@ namespace Amlakbashi.Host.Controllers
                     BankCardName = bankCardName,
                     BankCardVerified = hostBankCard != null &&
                             hostBankCard.BankCardStatus == (int)BankCard.BankCardStatusEnum.Verified,
-                    BankCardId = hostBankCard.Id,
+                    BankCardId = hostBankCard != null ? hostBankCard.Id : 0,
                     ShebaVerified = hostBankCard != null &&
                             hostBankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.Verified,
                     ShebaNumber = hostBankCard != null &&
@@ -1243,6 +1243,7 @@ namespace Amlakbashi.Host.Controllers
                 SitePaymentDTO model = new SitePaymentDTO()
                 {
                     ReserveId = reserveId,
+                    ReserveStatus = reserve.Status,
                     TotalPrice = reserve.TotalPrice,
                     GuestPayedPrice = guestPayedPrice,
                     PayablePriceRaw = guestPayedPrice * 10,
@@ -1400,6 +1401,12 @@ namespace Amlakbashi.Host.Controllers
                     ((hostBankCard.FName != null ? hostBankCard.FName + " " : "") +
                     (hostBankCard.LName != null ? hostBankCard.LName : "")) : "";
 
+                if (hostBankCard == null || hostBankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.NotVerified)
+                {
+                    ViewBag.error = "شماره شبای کاربر تایید نشده است";
+                    return PartialView("_AutoSiteClearingHost");
+                }
+
                 ViewBag.reserveId = reserveId;
                 ViewBag.shebaNumber = hostBankCard.ShabaNumber;
                 ViewBag.bankCardName = bankCardName;
@@ -1409,7 +1416,7 @@ namespace Amlakbashi.Host.Controllers
             catch(Exception exc)
             {
                 logger.Error("Reserve.AutoSiteClearingHost", exc);
-                ViewBag.error = true;
+                ViewBag.error = "عملیات با خطای فنی مواجه شد";
                 return PartialView("_AutoSiteClearingHost");
             }
         }
@@ -1435,7 +1442,7 @@ namespace Amlakbashi.Host.Controllers
                         Type = UserContactType.SiteClearingHost,
                         Price = result.PayablePrice.ToString(),
                         ReserveId = reserveId.ToString(),
-                        TransactionId = result.TransactionId,
+                        TransactionId = result.TraceNumber,
                         AdvertiseId = result.AdvertiseId.ToString()
                     });
                 }
@@ -1544,6 +1551,80 @@ namespace Amlakbashi.Host.Controllers
                 {
                     status = 0,
                     msg = "عملیات با خطا مواجه شد"
+                });
+            }
+        }
+
+        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
+        [HttpPost]
+        public IActionResult CanceledReserveClearing(long reserveId, long guestClearingAmount,
+            long hostClearingAmount, long siteClearingAmount)
+        {
+            try
+            {
+                var reserve = reserveService.Find(reserveId);
+                var guestPayedPrice = accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(),
+                    Reserve.StatusStringType.Guest);
+
+                if (reserve.Status != ReserveStatus.CanceledByGuest && reserve.Status != ReserveStatus.CanceledByHost)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "عملیات امکان پذیر نمی باشد"
+                    });
+                }
+
+                if (reserve.Status == ReserveStatus.CanceledByGuest &&
+                    guestPayedPrice != (guestClearingAmount + hostClearingAmount + siteClearingAmount))
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "مبالغ وارد شده صحیح نمی باشد"
+                    });
+                }
+
+                long newCredit;
+                var guestRefundCreditTransactionId = accounting.IncreaseCredit(reserve.UserID, guestPayedPrice, 0,
+                    reserveId, out newCredit, CreditTransaction.WalletTransactionReason.Refund);
+
+                accounting.InsertReservePayment(userAccessor.CurrentUser.Id, reserveId, guestRefundCreditTransactionId, 0,
+                    ReservePaymentType.SiteRefundToGuest, guestPayedPrice,
+                    ReservePaymentMethod.AmlakbashiCredit, userAccessor.CurrentUser.Id);
+
+                var transactionCause = $"خسارت کنسلی رزرو {reserveId}";
+                if (reserve.Status == ReserveStatus.CanceledByGuest)
+                {
+                    var guestDecreaseAmount = guestPayedPrice - guestClearingAmount;
+                    accounting.DecreaseCredit(reserve.UserID, guestDecreaseAmount, 0, reserveId,
+                        out newCredit, CreditTransaction.WalletTransactionReason.Other, transactionCause);
+
+                    accounting.IncreaseCredit(reserve.HostUserID, hostClearingAmount, 0, reserveId,
+                        out newCredit, CreditTransaction.WalletTransactionReason.Other,  transactionCause);
+                }
+                else
+                {
+                    if (siteClearingAmount > 0)
+                    {
+                        accounting.DecreaseCredit(reserve.HostUserID, siteClearingAmount, 0, reserveId,
+                            out newCredit, CreditTransaction.WalletTransactionReason.Other, transactionCause);
+                    }
+                }
+
+                return GenerateJsonResult(new
+                {
+                    status = 1,
+                    msg = "تسویه رزرو کنسل شده با موفقیت انجام شد"
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Reserve.CanceledReserveClearing", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد"
                 });
             }
         }
@@ -1879,16 +1960,14 @@ namespace Amlakbashi.Host.Controllers
                 var reserve = reserveService.Find(reserve_id);
                 var advertise = reserve.Advertise;
                 var host_user = userService.Find(advertise.UserID);
-                var guestPaidAmount = accounting.GetReservePaidAmount(
-                    reserve.ReservePayments.ToList(), StatusStringType.Guest);
-                var payable_price = PriceUtility.CalculateHostPayablePrice(
-                    reserve.TotalPrice, guestPaidAmount, reserve.CouponPrice,
-                    reserve.PrizePrice);
-                //var start_date_persian = DateTimeUtility.GregorianToPersianDate(reserve.StartDate);
-                //var end_date_persian = DateTimeUtility.GregorianToPersianDate(reserve.EndDate);
+                var guestPaidAmount = accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(),
+                    StatusStringType.Guest);
+                var payable_price = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guestPaidAmount,
+                    reserve.CouponPrice, reserve.PrizePrice);
                 var days = (int)(reserve.EndDate - reserve.StartDate).TotalDays;
                 long newCredit;
-                var transaction_id = accounting.IncreaseCredit(advertise.UserID, payable_price, 0, reserve_id, Entities.User.CreditTransactionCause.Clearing, out newCredit);
+                var transaction_id = accounting.IncreaseCredit(advertise.UserID, payable_price, 0, reserve_id,
+                    out newCredit, CreditTransaction.WalletTransactionReason.Clearing);
                 if (accounting.InsertReservePayment(userAccessor.CurrentUser.Id,
                     reserve_id, transaction_id, 0,
                     ReservePayment.ReservePaymentType.SiteClearingToHost,
@@ -1960,12 +2039,9 @@ namespace Amlakbashi.Host.Controllers
                 var guest_user = userService.Find(reserve.UserID);
                 var guest_payed_price = accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(),
                     Reserve.StatusStringType.Guest);
-                //var payable_price = ReserveDepend.CalculateHostPayablePrice(reserve.TotalPrice, guest_payed_price);
-                //var start_date_persian = DateTimeUtility.GregorianToPersianDate(reserve.StartDate);
-                //var end_date_persian = DateTimeUtility.GregorianToPersianDate(reserve.EndDate);
-                //var days = (int)(reserve.EndDate - reserve.StartDate).TotalDays;
                 long newCredit;
-                var transaction_id = accounting.IncreaseCredit(reserve.UserID, guest_payed_price, 0, reserve_id, Entities.User.CreditTransactionCause.Refund, out newCredit);
+                var transaction_id = accounting.IncreaseCredit(reserve.UserID, guest_payed_price, 0, reserve_id,
+                    out newCredit, CreditTransaction.WalletTransactionReason.Refund);
                 if (accounting.InsertReservePayment(userAccessor.CurrentUser.Id,
                     reserve_id, transaction_id, 0,
                     ReservePayment.ReservePaymentType.SiteRefundToGuest,
@@ -2728,8 +2804,8 @@ namespace Amlakbashi.Host.Controllers
                 {
                     long newCredit;
                     var creditTransactionId = accounting.DecreaseCredit(reserve.UserID, price, 0, reserve.Id, out newCredit,
-                        Entities.User.CreditTransactionCause.Reserve, null,
-                        0, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
+                        CreditTransaction.WalletTransactionReason.Reserve, null,
+                        null, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
                     if (creditTransactionId < 1)
                     {
                         return GenerateJsonResult(new

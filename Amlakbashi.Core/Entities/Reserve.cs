@@ -553,7 +553,7 @@ namespace Amlakbashi.Core.Entities
 
         public int GetPaymentTriesCount(out string lastTryDateStr)
         {
-            var payments = Payments.Where(w => w.Status != 1);
+            var payments = Payments.Where(w => w.Status == Payment.PaymentStatus.NotPaid);
             if (payments.Any())
             {
                 var paymentsList = payments.OrderByDescending(x => x.Date).ToList();

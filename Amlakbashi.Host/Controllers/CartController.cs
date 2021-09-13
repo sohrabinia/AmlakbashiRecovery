@@ -11,20 +11,17 @@ using log4net;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using X.PagedList;
 using Amlakbashi.Core.Common.Utilities;
-using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.Common.StaticData;
-using Amlakbashi.Accounting.PaymentContext;
 using Amlakbashi.Host.Extensions;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using System.Dynamic;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
-using System.IO;
 using System.Text;
+using Amlakbashi.Core.Common.Enums;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -98,52 +95,6 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Authorize(Policy = Policies.Payment_View)]
-        public ActionResult PaymentIndex(int? page, long refid = 0, int status = -1, int uid = -1,
-            string from_str = "", string to_str = "")
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(from_str))
-                    from_str = DateTimeUtility.ConvertDate(DateTime.Now.AddMonths(-1));
-
-                if (string.IsNullOrEmpty(to_str))
-                    to_str = DateTimeUtility.ConvertDate(DateTime.Now.AddDays(1));
-
-                DateTime from_date = DateTimeUtility.ConvertDate(from_str);
-                DateTime to_date = DateTimeUtility.ConvertDate(to_str);
-                var model = accounting.FilterPayments(refid, status, uid, from_date, to_date);
-
-                long sum = model.Select(p => (long?)p.TotalPrice).Sum() ?? 0;
-                ViewBag.sum = sum;
-                ViewBag.uid = uid;
-                ViewBag.status = status;
-                ViewBag.from_str = from_str;
-                ViewBag.to_str = to_str;
-                var PageNumber = page ?? 1;
-                var onePageOfModel = model.ToPagedList(PageNumber, 20);
-                ViewBag.RowIndexStart = (PageNumber * 20) - 20;
-
-                List<PaymentIndexDTO> paymentDTOs = new List<PaymentIndexDTO>();
-                foreach (var item in onePageOfModel)
-                {
-                    var dto = new PaymentIndexDTO()
-                    {
-                        Payment = item,
-                        UserPhoneNumber = userService.Find(item.UserID).GetPhoneNumber(Entities.User.PhoneType.MainMobile)
-                    };
-                    paymentDTOs.Add(dto);
-                }
-                ViewBag.dto = paymentDTOs;
-                return View(onePageOfModel);
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Cart.PaymentIndex", exc);
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
-        }
-
         public ActionResult TransactionResult()
         {
             try
@@ -161,8 +112,8 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                Payment objpay = accounting.FindPayment(id);
-                if (objpay == null || objpay.Status == 1)
+                Payment payment = accounting.FindPayment(id);
+                if (payment == null || payment.Status == Payment.PaymentStatus.Paid)
                 {
                     return RedirectToRoute(new
                     {
@@ -171,7 +122,6 @@ namespace Amlakbashi.Host.Controllers
                     });
                 }
 
-                var amount = objpay.TotalPrice;
                 string redirectAddress;
                 if (useCustomRedirect)
                 {
@@ -179,7 +129,7 @@ namespace Amlakbashi.Host.Controllers
                         + "?user_id=" + user_id
                         + "&useCustomRedirect=" + "true"
                         + "&customRedirectUrl=" + customRedirectUrl
-                        + "&price=" + amount;
+                        + "&price=" + payment.TotalPrice;
                 }
                 else
                 {
@@ -187,8 +137,7 @@ namespace Amlakbashi.Host.Controllers
                     //var redirectAddress = "http://localhost:53552/Cart/VerifyPasargadPayment";
                     //var redirectAddress = "http://test.amlakbashi.com/Cart/VerifyPasargadPayment";
                 }
-                var result = accounting.GeneratePaymentData(BanksEnum.Pasargad,
-                    (int)id, redirectAddress);
+                var result = accounting.GeneratePaymentData(BankEnum.Pasargad, (int)id, redirectAddress);
                 return View("Bank", result);
             }
             catch (Exception exc)
@@ -203,8 +152,8 @@ namespace Amlakbashi.Host.Controllers
         [Authorize]
         public ActionResult PerformPay(int payment_id)
         {
-            var objpay = accounting.FindPayment(payment_id);
-            if (objpay == null || objpay.Status == 1)
+            var payment = accounting.FindPayment(payment_id);
+            if (payment == null || payment.Status == Payment.PaymentStatus.Paid)
             {
                 return RedirectToRoute(new
                 {
@@ -212,13 +161,13 @@ namespace Amlakbashi.Host.Controllers
                     action = "http404"
                 });
             }
-            objpay.Date = DateTime.Now;
-            objpay.Authority = "";
-            objpay.BankId = 0;
-            accounting.UpdatePayment(objpay);
-            ViewBag.PayPrice = objpay.TotalPrice;
-            ViewBag.PayDate = DateTimeUtility.ConvertDate(objpay.Date);
-            return View(objpay);
+            payment.Date = DateTime.Now;
+            payment.Authority = "";
+            payment.BankId = 0;
+            accounting.UpdatePayment(payment);
+            ViewBag.PayPrice = payment.TotalPrice;
+            ViewBag.PayDate = DateTimeUtility.ConvertDate(payment.Date);
+            return View(payment);
         }
 
         public ActionResult VerifyPasargadPayment(int user_id = 0, bool useCustomRedirect = false,
@@ -235,7 +184,7 @@ namespace Amlakbashi.Host.Controllers
             string paymentResult;
             bool invalidInput;
             bool payment_done = accounting.FinalizePayment(
-                BanksEnum.Pasargad, pid, user_id,
+                BankEnum.Pasargad, pid, user_id,
                 date, tref, out paymentResult, out msg, out invalidInput,
                 useCustomRedirect ? ActionLog.ActionSourceEnum.Application :
                 ActionLog.ActionSourceEnum.WebsiteDashboard, user_id);
@@ -273,12 +222,12 @@ namespace Amlakbashi.Host.Controllers
                 redirect_action = "reserveitemmanager?selecttype=1&category=2";
 
             }
-            else if (objpay.ProductType == Entities.User.CreditTransactionType.Credit_Increase.ToString())
+            else if (objpay.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString())
             {
                 redirect_controller = "user";
                 redirect_action = "usercreditmanager";
             }
-            else if (objpay.ProductType == Entities.User.CreditTransactionType.Credit_Inc_Then_Res.ToString())
+            else if (objpay.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Inc_Then_Res.ToString())
             {
                 redirect_controller = "reserve";
                 redirect_action = "reserveitemmanager?selecttype=1&category=2";
@@ -310,7 +259,6 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Cart.CheckPasargadPaymentResult", exc);
-                ViewBag.hasError = true;
                 return PartialView("_CheckPaymentResult");
             }
             
@@ -345,12 +293,12 @@ namespace Amlakbashi.Host.Controllers
                 redirect_action = "reserveitemmanager?selecttype=1&category=2";
 
             }
-            else if (objpay.ProductType == Entities.User.CreditTransactionType.Credit_Increase.ToString())
+            else if (objpay.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString())
             {
                 redirect_controller = "user";
                 redirect_action = "usercreditmanager";
             }
-            else if (objpay.ProductType == Entities.User.CreditTransactionType.Credit_Inc_Then_Res.ToString())
+            else if (objpay.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Inc_Then_Res.ToString())
             {
                 redirect_controller = "reserve";
                 redirect_action = "reserveitemmanager?selecttype=1&category=2";
