@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "مدیریت رزرو ها";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
-    var data = ViewBag.reserveAdmin;
+    var data = ViewBag.reserveAdmin as Amlakbashi.Core.DTOs.ReserveDTOs.ReserveAdminDTO;
 }
 
 @section StyleLink
@@ -198,7 +198,7 @@
                 <th>
                     پاسخ میزبان
                 </th>
-                <th>توضیحات پشیتبان</th>
+                <th>توضیحات پشتیبان</th>
                 <th>وضعیت پشتیبانی</th>
                 <th>
                     عملیات
@@ -284,6 +284,9 @@
                                         <span style="color:#4285F4">کیف هدیه: @string.Format("{0:n0}", item.prizePrice) ت</span><br />
                                     }
                                 </a>
+                                <div style="margin-top: 5px;">
+                                    <a asp-controller="payment" asp-action="index" asp-route-reserveId="@item.id" style="border-top: 1px solid gray; text-decoration: none;" target="_blank">لیست پرداخت های آنلاین</a>
+                                </div>
                             }
                         }
                     </td>
@@ -375,36 +378,10 @@
                             }
                         }
                     </td>
-                    @*<td style="text-overflow:clip;white-space:nowrap;">
-                            @{
-                                if (item.GuestCallDate != null)
-                                {
-                                    <span>@(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate((DateTime)item.GuestCallDate))</span><br />
-                                    <span>@(((DateTime)item.GuestCallDate).ToString("HH:mm"))</span>
-                                }
-                                else
-                                {
-                                    @:-
-                            }
-                            }
-                        </td>
-                        <td style="text-overflow:clip;white-space:nowrap;">
-                            @{
-                                if (item.HostCallDate != null)
-                                {
-                                    <span>@(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate((DateTime)item.HostCallDate))</span><br />
-                                    <span>@(((DateTime)item.HostCallDate).ToString("HH:mm"))</span>
-                                }
-                                else
-                                {
-                                    @:-
-                            }
-                            }
-                        </td>*@
                     <td style="width:90px">
                         <a href="@Url.Action("Edit",new {reserve_id= item.id})"><span class="editicon" title="ویرایش"></span></a>
                         @if (item.status == (int)Reserve.ReserveStatus.WaitForResponse ||
-                        item.status == (int)Reserve.ReserveStatus.WaitForReserve)
+                     item.status == (int)Reserve.ReserveStatus.WaitForReserve)
                         {
                             if (item.status == (int)Reserve.ReserveStatus.WaitForResponse)
                             {

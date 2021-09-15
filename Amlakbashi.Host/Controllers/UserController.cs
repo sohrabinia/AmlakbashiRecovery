@@ -453,7 +453,7 @@ namespace Amlakbashi.Host.Controllers
                 }
 
                 var PageNumber = page ?? 1;
-                var onePageOfModel = model.ToPagedList(PageNumber, 10);
+                var onePageOfModel = model.ToPagedList(PageNumber, 20);
 
                 UserIndexDTO userListDTO = new UserIndexDTO()
                 {
@@ -477,7 +477,7 @@ namespace Amlakbashi.Host.Controllers
                     UserFilterType = (Entities.User.UserFilterType)userFilterType,
                     CardStatus = card_status,
                     MinReserveNorouzFromDate = minReserveNorouzFromDate,
-                    RowIndexStart = (PageNumber * 10) - 10,
+                    RowIndexStart = (PageNumber * 20) - 20,
                     UserItems = new List<UserIndexItemDTO>()
                 };
 
@@ -512,6 +512,9 @@ namespace Amlakbashi.Host.Controllers
                 var model = userService.Find(uid);
                 var identityUser = userService.GetIdentityUser(model.MainMobile);
                 ViewBag.userState = identityUser.State;
+                ViewBag.emailAddress = identityUser.Email;
+                ViewBag.smsCode = identityUser.Code;
+                ViewBag.emailCode = identityUser.EmailCode;
                 ViewBag.instantReserveCancelCount = model.Advertises.Sum(x => x.InstantReserveCancels);
                 return View(model);
             }
@@ -825,10 +828,14 @@ namespace Amlakbashi.Host.Controllers
                 {
                     if (identityUser.EmailConfirmed && identityUser.State == Entities.User.UserState.Acticved)
                     {
-                        var emailCode = new Random().Next(111111, 999999).ToString();
-                        identityUser.EmailCode = emailCode;
-                        userService.UpdateIdentityUser(identityUser);
-                        string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد ورود شما در املاک باشی: {code}</div></div>";
+                        if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null ||
+                            (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 10, 0, 0))
+                        {
+                            identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
+                            identityUser.SendVerification = DateTime.Now;
+                            userService.UpdateIdentityUser(identityUser);
+                        }
+                        string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد ورود شما در املاک باشی: {identityUser.EmailCode}</div></div>";
 #if !DEBUG
                         EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
                             "تایید ایمیل ثبت نام", strbody);
@@ -896,6 +903,7 @@ namespace Amlakbashi.Host.Controllers
                     var code = new Random().Next(111111, 999999).ToString();
                     identityUser.EmailCode = code;
                     identityUser.Email = email;
+                    identityUser.SendVerification = DateTime.Now;
                     identityUser.EmailConfirmed = false;
                     userService.UpdateIdentityUser(identityUser);
                     string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
@@ -952,10 +960,14 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(mobileInternational);
                 if (identityUser != null)
                 {
-                    var code = new Random().Next(111111, 999999).ToString();
-                    identityUser.EmailCode = code;
-                    userService.UpdateIdentityUser(identityUser);
-                    string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
+                    if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null || 
+                        (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 10, 0, 0))
+                    {
+                        identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
+                        identityUser.SendVerification = DateTime.Now;
+                        userService.UpdateIdentityUser(identityUser);
+                    }
+                    string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {identityUser.EmailCode}</div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
                     "کد تایید فراموشی رمز عبور", strbody);
@@ -1342,6 +1354,7 @@ namespace Amlakbashi.Host.Controllers
                 var code = new Random().Next(111111, 999999).ToString();
                 identityUser.EmailCode = code;
                 identityUser.Email = email;
+                identityUser.SendVerification = DateTime.Now;
                 identityUser.EmailConfirmed = false;
                 userService.UpdateIdentityUser(identityUser);
                 string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";

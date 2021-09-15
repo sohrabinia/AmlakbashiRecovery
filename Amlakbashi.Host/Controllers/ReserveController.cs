@@ -1597,11 +1597,16 @@ namespace Amlakbashi.Host.Controllers
                 if (reserve.Status == ReserveStatus.CanceledByGuest)
                 {
                     var guestDecreaseAmount = guestPayedPrice - guestClearingAmount;
-                    accounting.DecreaseCredit(reserve.UserID, guestDecreaseAmount, 0, reserveId,
-                        out newCredit, CreditTransaction.WalletTransactionReason.Other, transactionCause);
-
-                    accounting.IncreaseCredit(reserve.HostUserID, hostClearingAmount, 0, reserveId,
-                        out newCredit, CreditTransaction.WalletTransactionReason.Other,  transactionCause);
+                    if (guestDecreaseAmount > 0)
+                    {
+                        accounting.DecreaseCredit(reserve.UserID, guestDecreaseAmount, 0, reserveId,
+                            out newCredit, CreditTransaction.WalletTransactionReason.Other, transactionCause);
+                    }
+                    if (hostClearingAmount > 0)
+                    {
+                        accounting.IncreaseCredit(reserve.HostUserID, hostClearingAmount, 0, reserveId,
+                            out newCredit, CreditTransaction.WalletTransactionReason.Other, transactionCause);
+                    }
                 }
                 else
                 {

@@ -48,15 +48,19 @@
                 </td>
                 <td class="label">کاربر:</td>
                 <td class="minw">
-                    <input name="uid" type="text" value="@ViewBag.uid" style="width:150px;" />
+                    <input name="uid" type="text" value="@ViewBag.uid" style="width:100px;" />
+                </td>
+                <td class="label">رزرو:</td>
+                <td class="minw">
+                    <input name="reserveId" type="text" value="@ViewBag.reserveId" style="width:100px;" />
                 </td>
                 <td class="label">از تاریخ:</td>
                 <td class="minw">
-                    <input name="fromDate" type="text" value="@ViewBag.from_str" style="width:150px;" />
+                    <input name="fromDate" type="text" value="@ViewBag.from_str" style="width:100px;" />
                 </td>
                 <td class="label">تا تاریخ:</td>
                 <td class="minw">
-                    <input name="toDate" type="text" value="@ViewBag.to_str" style="width:150px;" />
+                    <input name="toDate" type="text" value="@ViewBag.to_str" style="width:100px;" />
                 </td>
                 <td><input type="submit" class="filter" value="فیلتر" /></td>
                 <td style="width:100%;"></td>
@@ -144,7 +148,10 @@
                 <span style="overflow-y: hidden;">@item.Payment.Authority</span>
             </td>
             <td>
-                @item.Payment.RefID
+                @if (item.Payment.RefID > 0)
+                {
+                    @item.Payment.RefID
+                }
             </td>
             <td>
                 @item.Payment.TraceNumber

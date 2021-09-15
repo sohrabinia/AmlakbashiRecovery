@@ -1764,7 +1764,6 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        //[ResponseCache(Duration = 60 * 60, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult Item(string slug, string capacity = null,
             string empty_range_from = null, string empty_range_to = null)
         {
@@ -1784,11 +1783,15 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.amp_version = false;
 
                 // get from redis cache
+                var canUseCache = capacity == null && empty_range_from == null && empty_range_to == null;
                 var cacheName = $"{CacheNames.Advertise_}{model.Id}";
-                var cachedData = cacheManager.Get<AccommodationItemDTO>(cacheName);
-                if (cachedData != null)
+                if (canUseCache)
                 {
-                    return View(cachedData);
+                    var cachedData = cacheManager.Get<AccommodationItemDTO>(cacheName);
+                    if (cachedData != null)
+                    {
+                        return View(cachedData);
+                    }
                 }
 
                 #region Initialize DTO
@@ -1813,13 +1816,16 @@ namespace Amlakbashi.Host.Controllers
                 #endregion
 
                 // set into redis cache
-                cacheManager.Set(cacheName, accDTO);
+                if (canUseCache)
+                {
+                    cacheManager.Set(cacheName, accDTO);
+                }
                 return View(accDTO);
             }
             catch (Exception exc)
             {
                 logger.Error("Accommodation.Item", exc);
-                return NotFound("صفحه ی مورد نظر موجود نمی باشد .");
+                return NotFound("صفحه ی مورد نظر موجود نمی باشد.");
             }
         }
 

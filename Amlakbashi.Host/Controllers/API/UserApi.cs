@@ -8,16 +8,10 @@ using Amlakbashi.Core.DTOs.UserDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Core.Common.StaticData;
-using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
-using Amlakbashi.Data.Identity;
-using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 
@@ -1138,7 +1132,7 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var identityUser = userService.GetIdentityUser(GetUser().MainMobile);
-                var code = new Random().Next(1111, 9999).ToString();
+                var code = new Random().Next(111111, 999999).ToString();
                 identityUser.EmailCode = code;
                 if (identityUser.Email != email)
                 {
@@ -1149,7 +1143,7 @@ namespace Amlakbashi.Host.Controllers.API
 #if !DEBUG
                 string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
-                    "تایید ایمیل ثبت نام", strbody);
+                    "تایید ایمیل", strbody);
 #endif
                 return GenerateJsonResult(new { status = 1 });
             }

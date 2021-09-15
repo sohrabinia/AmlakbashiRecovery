@@ -8,7 +8,7 @@ namespace Amlakbashi.Accounting.Services.Interfaces
 {
     internal interface IPaymentAppService : IAppService<Payment, int>
     {
-        IList<Payment> Filter(long refid, int status, int uid, DateTime fromDate, DateTime toDate);
+        IList<Payment> Filter(long referenceNumber, int status, int userId, long reserveId, DateTime fromDate, DateTime toDate);
         IQueryable<Payment> Filter(int status, DateTime fromDate, DateTime toDate);
         IList<Payment> GetRange(DateTime fromDate, DateTime toDate, int status, IList<int> userIds = null,
             bool byTotalPrice = false);

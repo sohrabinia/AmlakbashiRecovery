@@ -3,21 +3,65 @@
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
 
-<div>admin home</div>
-
-@section ScriptBlock
-{
-    <script type="text/javascript">
-
-    </script>
-}
-
 @section StyleBlock{
     <style>
         div {
-            cursor:pointer;
-            text-align:center ;
+            text-align: center;
         }
     </style>
 }
 
+<div class="adminmain">
+    <div class="adminitem">
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="80">
+                    <div class="adminicon" style="background-image:url('/resource/img/advertise2.png')"></div>
+                </td>
+                <td>
+                    <div style="padding:10px;">
+                        <a href="/Advertise/Index" class="admintitle">مدیریت آگهی ها</a>
+                        <div class="adminabstract">
+                            در این قسمت میتوانید آگهی هایی که فرستاده شده است را مشاهده و آن ها را مدیریت کنید .
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="adminitem">
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="80">
+                    <div class="adminicon" style="background-image: url('/resource/img/category2.png')"></div>
+                </td>
+                <td>
+                    <div style="padding:10px;">
+                        <a href="/Reserve/Index" class="admintitle">مدیریت رزرو</a>
+                        <div class="adminabstract">
+                            در این قسمت می توانید درخواست های رزرو را مدیریت کنید .
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="adminitem">
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="80">
+                    <div class="adminicon" style="background-image:url('/resource/img/person.png')"></div>
+                </td>
+                <td>
+                    <div style="padding:10px;">
+                        <a href="/User/Index" class="admintitle">مدیریت کاربران</a>
+                        <div class="adminabstract">
+                            در این قسمت می توانید کاربر تعریف کرده و تمام کاربرهای سایت را مدیریت کنید .
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div style="clear:both; "></div>
+</div>

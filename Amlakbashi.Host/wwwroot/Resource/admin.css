@@ -307,13 +307,12 @@ textarea {
 }
  select {
     padding-right: 10px;
-    width: 280px;
     border: 1px solid #ccc;
     background:none ;
     border-radius: 7px;
     font: 15px rnassim;
     height: 37px;
-    width: 280px;
+    width: 150px;
     direction:rtl ;
     text-align:right ;
 }
