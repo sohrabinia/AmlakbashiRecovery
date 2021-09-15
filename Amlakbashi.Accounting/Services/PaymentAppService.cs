@@ -17,11 +17,13 @@ namespace Amlakbashi.Accounting.Services
         {
         }
 
-        public IList<Payment> Filter(long refid, int status, int uid, DateTime fromDate, DateTime toDate)
+        public IList<Payment> Filter(long referenceNumber, int status, int userId, long reserveId, DateTime fromDate, DateTime toDate)
         {
             var model = Repository.Query(q => q.Where(p => p.Date <= toDate && p.Date >= fromDate));
-            if (uid != -1)
-                model = model.Where(c => c.UserID == uid);
+            if (userId != -1)
+            {
+                model = model.Where(c => c.UserID == userId);
+            }
             if (status != -1)
             {
                 if (status == 0)
@@ -29,8 +31,14 @@ namespace Amlakbashi.Accounting.Services
                 else
                     model = model.Where(p => p.Status == Payment.PaymentStatus.Paid);
             }
-            if (refid > 0)
-                model = model.Where(p => p.RefID == refid);
+            if (referenceNumber > 0)
+            {
+                model = model.Where(p => p.RefID == referenceNumber);
+            }
+            if (reserveId > 0)
+            {
+                model = model.Where(p => p.ReserveID == reserveId);
+            }
             return model.OrderByDescending(p => p.Id).ToList();
         }
 

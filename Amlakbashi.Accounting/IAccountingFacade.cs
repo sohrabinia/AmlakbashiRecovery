@@ -85,7 +85,7 @@ namespace Amlakbashi.Accounting
         IList<Cart> FilterCarts(int status = -1, int uid = -1, long refid = -1);
 
         // Payment Functions
-        IList<Payment> FilterPayments(long refid, int status, int uid, DateTime fromDate, DateTime toDate);
+        IList<Payment> FilterPayments(long refid, int status, int uid, long reserveId, DateTime fromDate, DateTime toDate);
         IList<Payment> GetPaymentRange(DateTime fromDate, DateTime toDate, int status, IList<int> userIds = null,
             bool byTotalPrice = false);
         int GetPaymentTriesCount(long reserveId, out string lastTryDateStr);

@@ -493,9 +493,9 @@ namespace Amlakbashi.Accounting
         }
 
         // Payment Functions
-        public IList<Payment> FilterPayments(long refid, int status, int uid, DateTime fromDate, DateTime toDate)
+        public IList<Payment> FilterPayments(long refid, int status, int uid, long reserveId, DateTime fromDate, DateTime toDate)
         {
-            return paymentService.Filter(refid, status, uid, fromDate, toDate);
+            return paymentService.Filter(refid, status, uid, reserveId, fromDate, toDate);
         }
 
         public IList<Payment> GetPaymentRange(DateTime fromDate, DateTime toDate, int status, IList<int> userIds = null,
@@ -1182,6 +1182,7 @@ namespace Amlakbashi.Accounting
                 Method = Payment.PaymentMethod.Podium,
                 Type = Payment.PaymentType.Expenditure,
                 Status = Payment.PaymentStatus.NotPaid,
+                ReserveID = reserveId
             };
             paymentService.Insert(payment);
 

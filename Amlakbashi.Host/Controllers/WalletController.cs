@@ -33,7 +33,7 @@ namespace Amlakbashi.Host.Controllers
             this.userService = userService;
         }
 
-        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
+        [Authorize(Policy = Policies.Payment_View)]
         public IActionResult Index(CreditTransactionIndexDTO dto)
         {
             try
@@ -49,7 +49,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
+        [Authorize(Policy = Policies.Payment_Actions)]
         [HttpGet]
         public IActionResult EditCreditTransaction(long id)
         {
@@ -65,7 +65,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
+        [Authorize(Policy = Policies.Payment_Actions)]
         [HttpPost]
         public IActionResult EditCreditTransaction(CreditTransaction editedCreditTransaction)
         {
@@ -100,7 +100,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
+        [Authorize(Policy = Policies.Payment_Actions)]
         public IActionResult GetUserWalletInfo(int userId)
         {
             try
@@ -137,7 +137,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
+        [Authorize(Policy = Policies.Payment_Actions)]
         [HttpGet]
         public IActionResult AutoClearingWallet(int userId)
         {
@@ -177,7 +177,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
+        [Authorize(Policy = Policies.Payment_Actions)]
         [HttpPost]
         public IActionResult AutoClearingWallet(int userId, bool sendSms)
         {

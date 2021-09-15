@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using X.PagedList;
 using Entities = Amlakbashi.Core.Entities;
 
@@ -29,7 +28,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize(Policy = Policies.Payment_View)]
-        public ActionResult Index(int? page, long referenceNumber = 0, int status = -1, int userId = -1,
+        public ActionResult Index(int? page, long referenceNumber = 0, int status = -1, int userId = -1, long reserveId = 0,
             string fromDate = "", string toDate = "")
         {
             try
@@ -42,12 +41,13 @@ namespace Amlakbashi.Host.Controllers
 
                 DateTime from_date = DateTimeUtility.ConvertDate(fromDate);
                 DateTime to_date = DateTimeUtility.ConvertDate(toDate);
-                var model = accounting.FilterPayments(referenceNumber, status, userId, from_date, to_date);
+                var model = accounting.FilterPayments(referenceNumber, status, userId, reserveId, from_date, to_date);
 
                 ViewBag.incomeSum = model.Where(w => w.Type == Entities.Payment.PaymentType.Income).Select(p => (long?)p.TotalPrice).Sum() ?? 0;
                 ViewBag.expenditureSum = model.Where(w => w.Type == Entities.Payment.PaymentType.Expenditure).Select(p => (long?)p.TotalPrice).Sum() ?? 0;
                 ViewBag.uid = userId;
                 ViewBag.status = status;
+                ViewBag.reserveId = reserveId;
                 ViewBag.from_str = fromDate;
                 ViewBag.to_str = toDate;
                 var PageNumber = page ?? 1;
@@ -74,6 +74,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
+        [Authorize(Policy = Policies.Payment_Actions)]
         public IActionResult CheckPodiumPaymentStatus(long paymentId)
         {
             try

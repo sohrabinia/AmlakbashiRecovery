@@ -1,124 +1,103 @@
 ﻿@using Amlakbashi.Core.Common.Utilities;
 @using Amlakbashi.Core.DTOs.AccommodationDTOs;
 
+@model IEnumerable<Advertise>
+
 @{
     ViewBag.Title = "مدیریت آگهی ها";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
-}
-
-@model IEnumerable<Advertise>
-@{ 
     var data = ViewBag.dto as IEnumerable<AdvertiseIndexDTO>;
 }
 
+<style>
+    .dynamic-filter_box-items {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-between;
+    }
+</style>
+
 @using (Html.BeginForm("Index", "Advertise", FormMethod.Get))
 {
-    <div>
-        <table>
-            <tr>
-                <td class="label">کد آگهی</td>
-                <td class="minw"><input style="width:60px;padding:5px;" type="text" name="id" value="@ViewBag.id" /></td>
+    <table>
+        <tr>
+            <td class="label">کد آگهی:</td>
+            <td class="minw"><input style="width:150px;" type="text" name="id" value="@ViewBag.id" /></td>
 
-                <td class="label">کد کاربر :</td>
-                <td class="minw"><input type="text" name="userid" value="@ViewBag.userid" style="width:100px;" /></td>
+            <td class="label">کد کاربر:</td>
+            <td class="minw"><input type="text" name="userid" value="@ViewBag.userid" style="width:150px;" /></td>
 
-                <td class="label">وضعیت آگهی :</td>
-                <td class="minw">
-                    <select id="js-status-filter-select" name="status" style="width:120px;">
-                        <option value="-1">همه وضعیت ها</option>
-                        <option is-selected="@(0 == (int)ViewBag.status)" value="0">آماده انتشار</option>
-                        <option is-selected="@(1 == (int)ViewBag.status)" value="1">انتشار یافته</option>
-                        <option is-selected="@(2 == (int)ViewBag.status)" value="2">تعلیق شده</option>
-                        <option is-selected="@(6 == (int)ViewBag.status)" value="6">آگهی جدید</option>
-                        <option is-selected="@(5 == (int)ViewBag.status)" value="5">تکمیل نشده ها</option>
-                        <option is-selected="@(4 == (int)ViewBag.status)" value="4">تایید نشده</option>
-                        <option is-selected="@(3 == (int)ViewBag.status)" value="3">حذف شده ها</option>
-                    </select>
-                </td>
-            </tr>
-        </table>
-        <table>
-            <tr style="display: flex;align-items: baseline;">
-                <td>حداقل عکس: </td>
-                <td class="minw"><input style="width:60px;padding:5px;" type="number" name="imageCountMin" value="@ViewBag.imageCountMin" /></td>
-                <td>حداکثر عکس: </td>
-                <td class="minw"><input style="width:60px;padding:5px;" type="number" name="imageCountMax" value="@ViewBag.imageCountMax" /></td>
-                <td><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
-                <td>ترتیب : </td>
-                <td class="minw">
-                    <select id="js-sort-filter-select" name="sort" style="width:100px;">
-                        <option value="score" is-selected="@("score" == (string)ViewBag.sort)">امتیاز آگهی</option>
-                        <option value="date" is-selected="@("date" == (string)ViewBag.sort)">تاریخ ثبت </option>
-                        <option value="modify" is-selected="@("modify" == (string)ViewBag.sort)">تاریخ ویرایش </option>
-                        <option value="click" is-selected="@("click" == (string)ViewBag.sort)">کلیک </option>
-                        <option value="contact" is-selected="@("contact" == (string)ViewBag.sort)">نمایش تماس </option>
-                    </select>
-                </td>
-            </tr>
-        </table>
-        <div style="display:flex;flex-flow: row;margin: 0 0 10px 0;">
-            @await Component.InvokeAsync("RegionSelector", new { province = ViewBag.province, city = ViewBag.city, area = ViewBag.area })
-        </div>
-
-        <table>
-            <tr>
-                @*<td class="label">
-                        کاربر :
-                    </td>
-                    <td class="minw">
-                        <input type="text" name="userid" value="@ViewBag.userid" style="width:100px;" />
-                    </td>*@
-                @*<td class="label">
-                        ترتیب :
-                    </td>
-                    <td class="minw">
-                        <select id="js-sort-filter-select" name="sort" style="width:100px;">
-                            <option value="score" @IsSelected("score" == (string)ViewBag.sort)>امتیاز آگهی</option>
-                            <option value="date" @IsSelected("date" == (string)ViewBag.sort)>تاریخ ثبت </option>
-                            <option value="modify" @IsSelected("modify" == (string)ViewBag.sort)>تاریخ ویرایش </option>
-                            <option value="click" @IsSelected("click" == (string)ViewBag.sort)>کلیک </option>
-                            <option value="contact" @IsSelected("contact" == (string)ViewBag.sort)>نمایش تماس </option>
-                        </select>
-                    </td>*@
-            </tr>
-            <tr>
-                <td class="label"> حداقل رزرو نوروز از :</td>
-                <td class="minw">
-                    <input name="minReserveNorouzFromDate" class="js-filter-date-picker" type="text" id="minReserveNorouzFromDate" value="@(ViewBag.minReserveNorouzFromDate)" />
-                </td>
-                <td class="label">وضعیت رزرو آنی :</td>
-                <td class="minw">
-                    <select name="instantReserveStatus" style="width:120px;">
-                        <option value="-1">همه وضعیت ها</option>
-                        @{
-                            var instantReserveStatusArr = (Advertise.InstantReserveStatusEnum[])Enum.GetValues(typeof(Advertise.InstantReserveStatusEnum));
-                        }
-                        @foreach (var st in instantReserveStatusArr)
-                        {
-                            <option is-selected="@((int)st == (int)ViewBag.instantReserveStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetInstantReserveStatusString(st)</option>
-                        }
-                    </select>
-                </td>
-                <td class="label">وضعیت پروتکل بهداشتی :</td>
-                <td class="minw">
-                    <select name="hygieneProtocolStatus" style="width:120px;">
-                        <option value="-1">همه وضعیت ها</option>
-                        @{
-                            var hygieneProtocolStatusArr = (Advertise.HygieneProtocolStatus[])Enum.GetValues(typeof(Advertise.HygieneProtocolStatus));
-                        }
-                        @foreach (var st in hygieneProtocolStatusArr)
-                        {
-                            <option is-selected="@((int)st == (int)ViewBag.hygieneProtocolStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetHygieneProtocolStatusText(st)</option>
-                        }
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td><input type="submit" class="filter" value="فیلتر" /></td>
-                <td style="width:100%;"></td>
-            </tr>
-        </table>
-    </div>
+            <td class="label">وضعیت آگهی:</td>
+            <td class="minw">
+                <select id="js-status-filter-select" name="status" style="width:150px;">
+                    <option value="-1">همه وضعیت ها</option>
+                    <option is-selected="@(0 == (int)ViewBag.status)" value="0">آماده انتشار</option>
+                    <option is-selected="@(1 == (int)ViewBag.status)" value="1">انتشار یافته</option>
+                    <option is-selected="@(2 == (int)ViewBag.status)" value="2">تعلیق شده</option>
+                    <option is-selected="@(6 == (int)ViewBag.status)" value="6">آگهی جدید</option>
+                    <option is-selected="@(5 == (int)ViewBag.status)" value="5">تکمیل نشده ها</option>
+                    <option is-selected="@(4 == (int)ViewBag.status)" value="4">تایید نشده</option>
+                    <option is-selected="@(3 == (int)ViewBag.status)" value="3">حذف شده ها</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="label">حداقل عکس:</td>
+            <td class="minw"><input style="width:150px;" type="number" name="imageCountMin" value="@ViewBag.imageCountMin" /></td>
+            <td class="label">حداکثر عکس:</td>
+            <td class="minw"><input style="width:150px;" type="number" name="imageCountMax" value="@ViewBag.imageCountMax" /></td>
+            @*<td><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>*@
+            <td class="label">ترتیب:</td>
+            <td class="minw">
+                <select id="js-sort-filter-select" name="sort" style="width:150px;">
+                    <option value="score" is-selected="@("score" == (string)ViewBag.sort)">امتیاز آگهی</option>
+                    <option value="date" is-selected="@("date" == (string)ViewBag.sort)">تاریخ ثبت </option>
+                    <option value="modify" is-selected="@("modify" == (string)ViewBag.sort)">تاریخ ویرایش </option>
+                    <option value="click" is-selected="@("click" == (string)ViewBag.sort)">کلیک </option>
+                    <option value="contact" is-selected="@("contact" == (string)ViewBag.sort)">نمایش تماس </option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="label"> حداقل رزرو نوروز از :</td>
+            <td class="minw">
+                <input name="minReserveNorouzFromDate" class="js-filter-date-picker" type="text" id="minReserveNorouzFromDate" value="@(ViewBag.minReserveNorouzFromDate)" style="width: 150px;" />
+            </td>
+            <td class="label">وضعیت رزرو آنی :</td>
+            <td class="minw">
+                <select name="instantReserveStatus" style="width:150px;">
+                    <option value="-1">همه وضعیت ها</option>
+                    @{
+                        var instantReserveStatusArr = (Advertise.InstantReserveStatusEnum[])Enum.GetValues(typeof(Advertise.InstantReserveStatusEnum));
+                    }
+                    @foreach (var st in instantReserveStatusArr)
+                    {
+                        <option is-selected="@((int)st == (int)ViewBag.instantReserveStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetInstantReserveStatusString(st)</option>
+                    }
+                </select>
+            </td>
+            <td class="label">وضعیت پروتکل بهداشتی :</td>
+            <td class="minw">
+                <select name="hygieneProtocolStatus" style="width:150px;">
+                    <option value="-1">همه وضعیت ها</option>
+                    @{
+                        var hygieneProtocolStatusArr = (Advertise.HygieneProtocolStatus[])Enum.GetValues(typeof(Advertise.HygieneProtocolStatus));
+                    }
+                    @foreach (var st in hygieneProtocolStatusArr)
+                    {
+                        <option is-selected="@((int)st == (int)ViewBag.hygieneProtocolStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetHygieneProtocolStatusText(st)</option>
+                    }
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                @await Component.InvokeAsync("RegionSelector", new { province = ViewBag.province, city = ViewBag.city, area = ViewBag.area })
+            </td>
+            <td></td>
+            <td><input type="submit" class="filter" value="فیلتر" /></td>
+        </tr>
+    </table>
     <div style="overflow: auto;">
         <table class="adminTable">
             <tr>
@@ -183,12 +162,12 @@
                         <a href="@previewLink" target="_blank">@item.Advertise.Title</a>
                     </td>
                     <td>
-                            @if (!string.IsNullOrEmpty(item.CityPersianName))
-                            {
-                                <span>
-                                    @item.CityPersianName
-                                </span>
-                            }
+                        @if (!string.IsNullOrEmpty(item.CityPersianName))
+                        {
+                            <span>
+                                @item.CityPersianName
+                            </span>
+                        }
                     </td>
                     <td style="width:130px;">
                         @if (item.Advertise.UserID > 0)
@@ -246,7 +225,7 @@
                         {
                             <span class="fa-icon fa fa-times" onclick="NotVerifyAdvertise(@item.Advertise.Id,this)" title="عدم تایید"></span>
                         }
-                        <span class="deleteicon" onclick="deleteItem(@item.Advertise.Id,this)" title="حذف"></span>
+                        @*<span class="deleteicon" onclick="deleteItem(@item.Advertise.Id,this)" title="حذف"></span>*@
                     </td>
                 </tr>
             }
