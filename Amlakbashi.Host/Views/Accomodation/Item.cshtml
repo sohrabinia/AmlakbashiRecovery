@@ -6,6 +6,7 @@
 @model AccommodationItemDTO
 
 @{
+    Layout = "~/Views/Shared/_Master.cshtml";
     ViewBag.Title = Model.MetaTitleDesc.MetaTitle;
     ViewBag.isAccPage = true;
     ViewBag.CurrentPage = "AdvertiseItem";
@@ -14,7 +15,7 @@
     {
         ViewBag.Description = Model.MetaTitleDesc.MetaDescription;
     }
-    Layout = "~/Views/Shared/_Master.cshtml";
+
     var owner = Model.AccUser;
     var full_name = owner.FullName;
 
@@ -71,7 +72,21 @@
 }
 
 @section StyleLink {
-    <link rel="stylesheet" href="/css/acc-item.min.css" asp-append-version="true" />
+    <environment include="Development">
+        <link rel="stylesheet" href="/resource/css/general/jalali-date-picker.css" />
+        <link rel="stylesheet" href="/resource/lightbox/lightbox.css" />
+        <link rel="stylesheet" href="/resource/slick/slick.css" />
+        <link rel="stylesheet" href="/resource/slick/slick-theme.css" />
+        <link rel="stylesheet" href="/resource/css/portal/advertise-item.css" />
+        <link rel="stylesheet" href="/resource/css/portal/reserve-dialog.css" />
+        <link rel="stylesheet" href="/resource/css/portal/acc-blog-news.css" />
+        <link rel="stylesheet" href="/resource/css/general/master-search.css" />
+        <link rel="stylesheet" href="/resource/css/general/search-by-region.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="/css/acc-item.min.css" asp-append-version="true" />
+    </environment>
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
           integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
           crossorigin="" />
@@ -115,48 +130,32 @@
             <div class="advertise-page__slider-container-parent">
                 <div class="advertise-image-library advertise-page__slider-container">
                     @{
-                        var lazy_img_small = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 213, 120);
-                        var lazy_img_medium = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 249, 140);
-                        var lazy_img_large = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 331, 186);
-                        var lazy_img_xlarge = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 450, 253);
-                        var lazy_img_xxlarge = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 600, 338);
-                        var lazy_img_xxxlarge = string.Format("/file/resourceimgthumbpng?file_name={0}&w={1}&h={2}", "lazy-16_9", 700, 394);
                         for (int i = 0; i < album_photos.Count; i++)
                         {
                             var photo_id = album_photos[i];
                             string img_small, img_medium, img_large, img_xlarge, img_xxlarge, img_xxxlarge;
-                            //if (i == 0)
-                            //{
-                            //    img_small = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-کوچک/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 213, 120);
-                            //    img_medium = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-متوسط/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 249, 140);
-                            //    img_large = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-بزرگ/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 331, 186);
-                            //    img_xlarge = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-بزرگتر/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 450, 253);
-                            //    img_xxlarge = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-خیلی-بزرگ/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 600, 338);
-                            //    img_xxxlarge = photo_id > 0 ? string.Format("/عکس-آگهی-عریض-بزرگترین/{0}", Model.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394);
-                            //}
-                            //else
-                            //{
                             img_small = photo_id > 0 ? string.Format("/file/accthumbsmall?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 213, 120);
                             img_medium = photo_id > 0 ? string.Format("/file/accthumbmedium?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 249, 140);
                             img_large = photo_id > 0 ? string.Format("/file/accthumblarge?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 331, 186);
                             img_xlarge = photo_id > 0 ? string.Format("/file/accthumbxlarge?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 450, 253);
                             img_xxlarge = photo_id > 0 ? string.Format("/file/accthumbxxlarge?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 600, 338);
                             img_xxxlarge = photo_id > 0 ? string.Format("/file/accthumbxxxlarge?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394);
-                            //}
 
                             <a href="@string.Format("/file/getimage?fileid={0}", photo_id)" data-lightbox="advertise-gallery-set" class="advertise-page__slider-image-container" data-alt="@(Model.TitleDesc.Title)-@(i+1)" data-title="@(Model.TitleDesc.Title)-@(i+1)">
-                                <img data-srcset="@img_small 213w,
+                                @*<img data-srcset="@img_small 213w,
                                     @img_medium 249w,
                                     @img_large 331w,
                                     @img_xlarge 450w,
                                     @img_xxlarge 600w,
                                     @img_xxxlarge 700w"
+
                                      srcset='@(i == 0 ? img_small + " 213w," +
                                         img_medium + " 249w," +
                                         img_large + " 331w," +
                                         img_xlarge + " 450w," +
                                         img_xxlarge + " 600w," +
                                         img_xxxlarge + " 700w" : "")'
+
                                      sizes="(max-width: 312px) 213px,
                                      (max-width: 320px) 249px,
                                      (max-width: 400px) 249px,
@@ -167,11 +166,20 @@
                                      (max-width: 1100px) 450px,
                                      (max-width: 1200px) 700px,
                                      700px"
-                                     @*src="/file/resourceimagepng?file_name=lazy-16_9"*@
                                      @(i == 0 ? "" : "data-lazy=/file/resourceimagepng?file_name=lazy-16_9")
-                                     @*@(i == 0 ? "src=/file/resourceimagepng?file_name=lazy-16_9" : "")*@
                                      data-src="@img_small" @(i > 0 ? "data-" : "") alt="@(Model.TitleDesc.Title)-@(i+1)" @(i > 0 ? "data-" : "") title="@(Model.TitleDesc.Title)-@(i+1)"
-                                     class="advertise-page__slider-image lazy" style="@(i > 0 ? "display:none;" : "")">
+                                     class="advertise-page__slider-image lazy" style="@(i > 0 ? "display:none;" : "")">*@
+
+                                <img width="213" height="120" src="@img_small"
+                                     srcset='@(img_small + " 213w," +
+                                        img_medium + " 249w," +
+                                        img_large + " 331w," +
+                                        img_xlarge + " 450w," +
+                                        img_xxlarge + " 600w," +
+                                        img_xxxlarge + " 700w")'
+                                     @(i == 0 ? "" : "data-lazy=/file/resourceimagepng?file_name=lazy-16_9")
+                                     data-src="@img_small" @(i > 0 ? "data-" : "") alt="@(Model.TitleDesc.Title)-@(i+1)" @(i > 0 ? "data-" : "") title="@(Model.TitleDesc.Title)-@(i+1)"
+                                     class="advertise-page__slider-image lazy" style="@(i > 0 ? "display:none; " : "")width: 90%; height:auto;">
                             </a>
                         }
                     }

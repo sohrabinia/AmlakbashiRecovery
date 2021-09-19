@@ -48,11 +48,11 @@
     <meta name="samandehi" content="627725117" />
     @if (ViewBag.keywords != null)
     {
-        <meta name="keywords" content="@ViewBag.keywords" />
+    <meta name="keywords" content="@ViewBag.keywords" />
     }
     else
     {
-        <meta name="keywords" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
+    <meta name="keywords" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
     }
     @{
         var meta_description = ViewBag.Description != null ?
@@ -100,82 +100,89 @@
     </div>
     <div class="adloading"></div>
     @*@if (ViewBag.CurrentPage != "AdvertiseItem")
-    {
-        <div onclick="showPresentPopup()" class="present-prize__button">
-            <img class="lazy" data-srcset="/file/resourceimagegif?file_name=gift-75w 75w,
-                /file/resourceimagegif?file_name=gift-92w 92w"
-                 sizes="(max-width: 680px) 75px,
-                92px"
-                 data-src="/file/resourceimagegif?file_name=gift-75w" alt="gift" />
-        </div>
-    }*@
+        {
+            <div onclick="showPresentPopup()" class="present-prize__button">
+                <img class="lazy" data-srcset="/file/resourceimagegif?file_name=gift-75w 75w,
+                    /file/resourceimagegif?file_name=gift-92w 92w"
+                     sizes="(max-width: 680px) 75px,
+                    92px"
+                     data-src="/file/resourceimagegif?file_name=gift-75w" alt="gift" />
+            </div>
+        }*@
     <div class="master__page">
         @if (ViewBag.LockInPage == null || !ViewBag.LockInPage)
         {
-            <div class="master__header">
-                <div class="master_header-child master_header-logo">
-                    <a href="/" title="املاک باشی">
-                        <img srcset="/file/resourceimagepng?file_name=@(logoName)-400w 75w,
+        <div class="master__header">
+            <div class="master_header-child master_header-logo">
+                <a href="/" title="املاک باشی">
+                    @*<img srcset="/file/resourceimagepng?file_name=@(logoName)-400w 75w,
+                           /file/resourceimagepng?file_name=@(logoName)-680w 94w,
+                           /file/resourceimagepng?file_name=@(logoName)-900w 112w,
+                            /file/resourceimagepng?file_name=@(logoName)-1200w 135w"
+                        sizes="(max-width: 400px) 75px,
+                            (max-width: 680px) 94px,
+                            (max-width: 900px) 112px,
+                            135px"
+                        src="/file/resourceimagepng?file_name=@(logoName)-680w" alt="لوگوی املاک باشی" title="املاک باشی">*@
+
+                    <img width="75" height="33" src="/file/resourceimagepng?file_name=@(logoName)-400w"
+                         srcset="/file/resourceimagepng?file_name=@(logoName)-400w 75w,
                                 /file/resourceimagepng?file_name=@(logoName)-680w 94w,
                                 /file/resourceimagepng?file_name=@(logoName)-900w 112w,
                                  /file/resourceimagepng?file_name=@(logoName)-1200w 135w"
-                             sizes="(max-width: 400px) 75px,
-                                 (max-width: 680px) 94px,
-                                 (max-width: 900px) 112px,
-                                 135px"
-                             src="/file/resourceimagepng?file_name=@(logoName)-680w" alt="لوگوی املاک باشی" title="املاک باشی">
-                    </a>
-                    @if (ViewBag.CurrentPage == "AdvertiseCategory" || ViewBag.CurrentPage == "AdvertiseItem")
+                         alt="لوگوی املاک باشی" title="املاک باشی" style="width: 100%; height: auto;">
+                </a>
+                @if (ViewBag.CurrentPage == "AdvertiseCategory" || ViewBag.CurrentPage == "AdvertiseItem")
                     {
-                        @await Html.PartialAsync("_MasterSearch");
+                @await Html.PartialAsync("_MasterSearch");
                     }
-                </div>
-                <div class="master_header-child">
-                    <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account" style="">
-                        <p></p>
-                    </a>
-                </div>
-                <div class="master_header-child">
-                    <div onclick="toggleMenu()" class="master__header-menu">
-                        <i class="fa fa-bars"></i>
-                        <span>منو</span>
-                    </div>
+            </div>
+            <div class="master_header-child">
+                <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account" style="">
+                    <p></p>
+                </a>
+            </div>
+            <div class="master_header-child">
+                <div onclick="toggleMenu()" class="master__header-menu">
+                    <i class="fa fa-bars"></i>
+                    <span>منو</span>
                 </div>
             </div>
-            @RenderSection("TopPin", false)
-            <div class="master__menu">
-                @if (ViewBag.home == null || !ViewBag.home)
+        </div>
+        @RenderSection("TopPin", false)
+        <div class="master__menu">
+            @if (ViewBag.home == null || !ViewBag.home)
                 {
-                    <a class="master__menu-item" href="/">صفحه اول</a>
+            <a class="master__menu-item" href="/">صفحه اول</a>
                 }
-                @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+            @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
                 {
-                    <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=1"> رزرو های من </a>
-                    <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی </p>
-                    <a class="master__menu-item" href="/contact"> تماس با ما</a>
-                    <a class="master__menu-item js-present-prize-link" href="/post/presentandprize">هدیه سفر</a>
-                    <a class="master__menu-item" href="/accomodation/accbasicform"> ثبت آگهی</a>
+            <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=1"> رزرو های من </a>
+            <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی </p>
+            <a class="master__menu-item" href="/contact"> تماس با ما</a>
+            <a class="master__menu-item js-present-prize-link" href="/post/presentandprize">هدیه سفر</a>
+            <a class="master__menu-item" href="/accomodation/accbasicform"> ثبت آگهی</a>
                 }
                 else
                 {
-                    <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=2"> رزرو های من</a>
-                    <a class="master__menu-item" href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)"> آگهی های من</a>
-                    <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی</p>
-                    <a class="master__menu-item" href="/contact"> تماس با ما </a>
-                    <a class="master__menu-item" href="/post/downloadapp">نصب اپلیکیشن </a>
-                    <a class="master__menu-item" href="/accomodation/accbasicform"> ثبت آگهی</a>
-                    <a class="master__menu-item js-present-prize-link" href="/post/presentandprize">هدیه سفر</a>
+            <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=2"> رزرو های من</a>
+            <a class="master__menu-item" href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)"> آگهی های من</a>
+            <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی</p>
+            <a class="master__menu-item" href="/contact"> تماس با ما </a>
+            <a class="master__menu-item" href="/post/downloadapp">نصب اپلیکیشن </a>
+            <a class="master__menu-item" href="/accomodation/accbasicform"> ثبت آگهی</a>
+            <a class="master__menu-item js-present-prize-link" href="/post/presentandprize">هدیه سفر</a>
                 }
-            </div>
+        </div>
         }
         <div class="body">
             @RenderBody()
         </div>
         @if (ViewBag.isAccPage == null || !ViewBag.isAccPage)
         {
-            <div class="installPopup install-app-banner">
-                <p class="installBtn">نصب اپلیکیشن املاک باشی</p>
-            </div>
+        <div class="installPopup install-app-banner">
+            <p class="installBtn">نصب اپلیکیشن املاک باشی</p>
+        </div>
         }
         <div style="display: none" id="chat_hidden_holder"></div>
         <input type="hidden" value="0" id="js-support-chat-id">

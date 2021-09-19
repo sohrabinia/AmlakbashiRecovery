@@ -63,11 +63,10 @@
     outline-offset: 0;
 }
 /*.advertise-page__slider-container-parent {
-    width: 94%;
+    width: 320px;
     background-color: white;
     margin: 5px 0;
-}
-*/
+}*/
 .advertise-page__slider-container {
     width: 90%;
     /*height: 140px;*/
@@ -979,7 +978,7 @@ p.advertise-page__price-content{
     margin-left: 4%;
 }
 .slick-prev, .slick-next{
-    z-index:300 !important;
+    /*z-index:300 !important;*/
 }
 /******contact*******/
 .item__contact-popup {

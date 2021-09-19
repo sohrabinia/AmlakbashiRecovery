@@ -213,11 +213,10 @@ namespace Portal.Controllers
             {
                 var objFile = fileService.Find(FileID);
                 if (objFile == null)
+                {
                     return File("/resource/img/img202_500_300.png", "image/png");
-                //if (!System.IO.File.Exists(objFile.FilePath))
-                //{
-                //    return File("/resource/img/image-not-found-square.png", "image/png");
-                //}
+                }
+
                 var extension = Path.GetExtension(objFile.FilePath).Replace(".", "");
                 var strFormat = "image/" + (extension == "jpg" ? "jpeg" : extension);
                 if (System.IO.File.Exists(host.WebRootPath + "/" + objFile.FilePathWithoutTildeAndSlash))
