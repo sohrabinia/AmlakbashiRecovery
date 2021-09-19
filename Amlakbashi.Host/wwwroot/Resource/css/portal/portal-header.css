@@ -24,6 +24,11 @@
     display:flex;
 }
 
+.master_header-logo a{
+    width: 130px;
+    margin-left: 30px;
+}
+
 .master_header-account {
     background-color:transparent;
     font: 14px Miransans;
@@ -175,6 +180,11 @@
         margin-right:8px;
         width:215px;
     }
+
+    .master_header-logo a {
+        width: 110px;
+        margin-left: 0;
+    }
 }
 
 @media (max-width: 680px) {
@@ -227,6 +237,11 @@
         height: 25px;
         margin-right:6px;
         width:170px;
+    }
+
+    .master_header-logo a {
+        width: 90px;
+        margin-left: 0;
     }
 }
 @media (max-width: 550px) {
@@ -352,6 +367,11 @@
         margin-right:4px;
         width:91px;
         padding-left: 0;
+    }
+
+    .master_header-logo a {
+        width: 75px;
+        margin-left: 0;
     }
 }
 
