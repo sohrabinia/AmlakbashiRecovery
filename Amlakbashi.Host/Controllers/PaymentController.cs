@@ -43,8 +43,10 @@ namespace Amlakbashi.Host.Controllers
                 DateTime to_date = DateTimeUtility.ConvertDate(toDate);
                 var model = accounting.FilterPayments(referenceNumber, status, userId, reserveId, from_date, to_date);
 
-                ViewBag.incomeSum = model.Where(w => w.Type == Entities.Payment.PaymentType.Income).Select(p => (long?)p.TotalPrice).Sum() ?? 0;
-                ViewBag.expenditureSum = model.Where(w => w.Type == Entities.Payment.PaymentType.Expenditure).Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                ViewBag.incomeSum = model.Where(w => w.Type == Entities.Payment.PaymentType.Income &&
+                    w.Status == Entities.Payment.PaymentStatus.Paid).Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                ViewBag.expenditureSum = model.Where(w => w.Type == Entities.Payment.PaymentType.Expenditure &&
+                    w.Status == Entities.Payment.PaymentStatus.Paid).Select(p => (long?)p.TotalPrice).Sum() ?? 0;
                 ViewBag.uid = userId;
                 ViewBag.status = status;
                 ViewBag.reserveId = reserveId;

@@ -28,7 +28,6 @@ using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
-using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using static Amlakbashi.Core.Entities.ReservePayment;
 
 namespace Amlakbashi.Host.Controllers
@@ -113,7 +112,7 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                var itemPerPage = 10;
+                var itemPerPage = 20;
                 var model = reserveService.Filter(reserve_id, advertise_id, host_user_id, guest_user_id,
                     reserve_status, host_response_status, general_status, site_clearing_date, site_cleared_status,
                     reserve_from_date, reserve_to_date, reserve_end_date, stay_duration_from, stay_duration_to,
@@ -1210,8 +1209,7 @@ namespace Amlakbashi.Host.Controllers
                             hostBankCard.ShabaNumber : "",
                     UserName = hostName,
                     UserId = hostUser.Id,
-                    UserCredit = hostUser.Credit,
-                    UserType = UserType.Host
+                    UserCredit = hostUser.Credit
                 };
                 return PartialView("_SiteClearingHostInfo", model);
             }
@@ -1256,8 +1254,7 @@ namespace Amlakbashi.Host.Controllers
                     BankCardVerified = guestCard != null &&
                             guestCard.BankCardStatus == (int)BankCard.BankCardStatusEnum.Verified,
                     UserId = guest.Id,
-                    UserName = guestName,
-                    UserType = UserType.Guest
+                    UserName = guestName
                 };
                 return PartialView("_SiteRefundGuestInfo", model);
             }
@@ -1269,14 +1266,13 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize(Policy = Policies.Reserve_Payment_Actions)]
-        public IActionResult ManualSitePayment(long reserveId, long price, UserType userType)
+        public IActionResult ManualSitePayment(long reserveId, long price)
         {
             try
             {
                 ViewBag.reserveId = reserveId;
                 ViewBag.userId = userAccessor.CurrentUser.Id;
                 ViewBag.price = price;
-                ViewBag.userType = userType;
                 return PartialView("_ManualSitePayment");
             }
             catch (Exception exc)
@@ -1289,7 +1285,7 @@ namespace Amlakbashi.Host.Controllers
         [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         [HttpPost]
         public IActionResult ManualSitePayment(long reserveId, int userId, long transactionId,
-            long referenceId, int paymentMethod, long price, bool sendSms, UserType userType)
+            long referenceId, int paymentMethod, long price, bool sendSms)
         {
             try
             {
@@ -1303,27 +1299,22 @@ namespace Amlakbashi.Host.Controllers
                     });
                 }
 
-                if (userType == UserType.Host)
+                var bankCard = bankCardService.GetByUserId(reserve.HostUserID);
+                if (bankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.NotVerified)
                 {
-                    var bankCard = bankCardService.GetByUserId(reserve.HostUserID);
-                    if (bankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.NotVerified)
+                    return GenerateJsonResult(new
                     {
-                        return GenerateJsonResult(new
-                        {
-                            status = 0,
-                            msg = "شماره شبای کاربر تایید نشده است"
-                        });
-                    }
+                        status = 0,
+                        msg = "شماره شبای کاربر تایید نشده است"
+                    });
                 }
-
-                var destUser = userType == UserType.Host ? reserve.HostUser : reserve.GuestUser;
                 var user = userService.Find(userId);
                 if (user == null)
                 {
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        msg = "شناسه کاربری وارد شده وجود ندارد"
+                        msg = "شناسه کاربری وارد شده اشتباه است"
                     });
                 }
                 if (transactionId <= 0)
@@ -1336,9 +1327,7 @@ namespace Amlakbashi.Host.Controllers
                 }
 
                 var reservePayment = accounting.InsertReservePayment(userId, reserveId, transactionId, referenceId,
-                    userType == UserType.Host ?
-                    ReservePayment.ReservePaymentType.SiteClearingToHost :
-                    ReservePaymentType.SiteRefundToGuest, price,
+                    ReservePayment.ReservePaymentType.SiteClearingToHost, price,
                     (ReservePayment.ReservePaymentMethod)paymentMethod, userAccessor.CurrentUser.Id);
 
                 if (reservePayment == null)
@@ -1352,14 +1341,14 @@ namespace Amlakbashi.Host.Controllers
 
                 if (sendSms)
                 {
-                    var identityUser = userService.GetIdentityUser(destUser.MainMobile);
+                    var identityUser = userService.GetIdentityUser(reserve.HostUser.MainMobile);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserMainMobile = destUser.MainMobile,
-                        UserAppNotificationToken = destUser.AppNotificationToken,
+                        UserMainMobile = reserve.HostUser.MainMobile,
+                        UserAppNotificationToken = reserve.HostUser.AppNotificationToken,
                         UserEmail = identityUser.Email,
-                        UserFcmAppNotificationToken = destUser.FcmAppNotificationToken,
-                        UserNotificationToken = destUser.NotificationToken,
+                        UserFcmAppNotificationToken = reserve.HostUser.FcmAppNotificationToken,
+                        UserNotificationToken = reserve.HostUser.NotificationToken,
                         Type = UserContactType.SiteClearingHost,
                         Price = price.ToString(),
                         ReserveId = reserve.Id.ToString(),
@@ -1455,98 +1444,6 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.AutoSiteClearingHost", exc);
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "عملیات با خطا مواجه شد"
-                });
-            }
-        }
-
-        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
-        public IActionResult SetUserBankCard(int userId)
-        {
-            try
-            {
-                ViewBag.userId = userId;
-                return PartialView("_SetUserCardBank");
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Reserve.SetUserCardBank", exc);
-                return PartialView("_SetUserCardBank");
-            }
-        }
-
-        [Authorize(Policy = Policies.Reserve_Payment_Actions)]
-        [HttpPost]
-        public IActionResult SetUserBankCard(int userId, string bankCardNumber, string bankCardFname, string bankCardLname)
-        {
-            try
-            {
-                var user = userService.Find(userId);
-                var userCard = bankCardService.GetByUserId(userId);
-                if (userCard != null && string.IsNullOrEmpty(userCard.BankCardNumber) == false)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = 0,
-                        msg = "برای کاربر مورد نظر کارت بانکی ثبت شده است"
-                    });
-                }
-                if (string.IsNullOrEmpty(bankCardNumber) ||
-                    string.IsNullOrEmpty(bankCardFname) ||
-                    string.IsNullOrEmpty(bankCardLname))
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = 0,
-                        msg = "لطفا همه اطلاعات را وارد کنید"
-                    });
-                }
-                if (BankUtility.ValidateBankCardNumber(bankCardNumber) == false)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = 0,
-                        msg = "شماره کارت وارد شده صحیح نمی باشد"
-                    });
-                }
-
-                if (userCard != null)
-                {
-                    userCard.BankCardNumber = bankCardNumber;
-                    userCard.FName = bankCardFname;
-                    userCard.LName = bankCardLname;
-                    userCard.LastModifyDate = DateTime.Now;
-                    bankCardService.Update(userCard, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
-                }
-                else
-                {
-                    userCard = new BankCard()
-                    {
-                        BankCardNumber = bankCardNumber,
-                        FName = bankCardFname,
-                        LName = bankCardLname,
-                        BankCardStatus = (int)BankCard.BankCardStatusEnum.Verified,
-                        UserID = userId,
-                        CreateDate = DateTime.Now,
-                        LastModifyDate = DateTime.Now
-                    };
-                    bankCardService.Insert(userCard, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
-                }
-                return GenerateJsonResult(new
-                {
-                    status = 1,
-                    msg = "کارت بانکی با موفقیت ثبت شد",
-                    bankCardName = bankCardFname + " " + bankCardLname,
-                    bankCardNumber = string.Format("{0} {1} {2} {3}", bankCardNumber.Substring(0, 4),
-                        bankCardNumber.Substring(4, 4), bankCardNumber.Substring(8, 4), bankCardNumber.Substring(12))
-                });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Reserve.SetUserCardBank", exc);
                 return GenerateJsonResult(new
                 {
                     status = 0,

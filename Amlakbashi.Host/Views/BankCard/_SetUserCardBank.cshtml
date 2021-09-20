@@ -1,0 +1,67 @@
+﻿@model Amlakbashi.Core.DTOs.BankCardDTOs.SetBankCardDTO
+
+<style>
+    #SetBankCardForm div {
+        margin-bottom: 10px;
+    }
+    #SetBankCardForm button {
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 5px;
+        font: 1em miransans;
+    }
+</style>
+
+<form id="SetBankCardForm">
+    <input type="hidden" name="userId" value="@Model.UserId" />
+    <div>
+        <label>کد کاربر:</label>
+        <span>@Model.UserId</span>
+    </div>
+    <div>
+        <label>نام صاحب کارت:</label>
+        <input type="text" name="FName" value="@Model.FName" />
+    </div>
+    <div>
+        <label>نام خانوادگی صاحب کارت:</label>
+        <input type="text" name="LName" value="@Model.LName" />
+    </div>
+    <div>
+        <label>شماره کارت:</label>
+        <input type="text" name="BankCardNumber" value="@Model.BankCardNumber" />
+        <span> | </span>
+        <input type="checkbox" name="VerifyBankCardNumber" value="true" is-checked="Model.VerifyBankCardNumber" />
+        <span>تایید</span>
+    </div>
+    <div>
+        <label>شماره شبا:</label>
+        <input type="text" name="ShebaNumber" value="@Model.ShebaNumber" />
+        <span> | </span>
+        <input type="checkbox" name="VerifyShebaNumber" value="true" is-checked="Model.VerifyShebaNumber" />
+        <span>تایید</span>
+    </div>
+    <div style="text-align:center;">
+        <button type="button" onclick="submitBankCardForm()">ذخیره</button>
+    </div>
+</form>
+
+<script>
+    function submitBankCardForm() {
+        var form = $('#SetBankCardForm');
+        $.ajax({
+            type: "POST",
+            url: "/bankcard/SetUserBankCard",
+            data: form.serialize(),
+            success: function (response) {
+                if (response.status == 0) {
+                    alertify.error(response.msg);
+                }
+                else {
+                    alertify.success(response.msg);
+                    popupMsgList[1].btnClick(0, true);
+                    popupMsgList[0].btnClick(0, true);
+                }
+            }
+        });
+    }
+</script>

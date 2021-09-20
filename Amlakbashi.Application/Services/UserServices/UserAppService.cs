@@ -231,11 +231,12 @@ namespace Amlakbashi.Application.Services.UserServices
                 dto.bankFname == bankCardObj.FName &&
                 dto.bankLname == bankCardObj.LName)) == false;
 
-            if (hasChange &&
-                (dto.userGeneralType > (int)User.UserGeneralTypeEnum.Guest ||
-                !string.IsNullOrEmpty(dto.bankCardNumber) ||
-                !string.IsNullOrEmpty(dto.shabaNumber) ||
-                userHasRefunedInProgress))
+            //if (hasChange &&
+            //    (dto.userGeneralType > (int)User.UserGeneralTypeEnum.Guest ||
+            //    !string.IsNullOrEmpty(dto.bankCardNumber) ||
+            //    !string.IsNullOrEmpty(dto.shabaNumber) ||
+            //    userHasRefunedInProgress))
+            if (hasChange)
             {
                 if (dto.shabaNumber != null)
                 {

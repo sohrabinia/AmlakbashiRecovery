@@ -11,6 +11,54 @@
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/star-rating/star-rating.css&v=2">
 }
 
+<style>
+    .reserve-top-filter-container {
+        display: flex;
+        max-width: 1000px;
+        flex-flow: row;
+        margin: 0px;
+        justify-content: space-between;
+        padding: 10px;
+    }
+        .reserve-top-filter-container div {
+            display: flex;
+            flex-flow: row;
+            justify-content: space-around;
+            align-items: center;
+            width: 120px;
+            cursor: pointer;
+            border-radius: 5px;
+            padding: 5px;
+        }
+            .reserve-top-filter-container div i {
+                font-size: 18px;
+            }
+
+    .reserve-filters-container {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: wrap;
+        max-width: 100%;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .reserve-main-filter-container {
+        display: flex;
+        width: 180px;
+        flex-flow: row;
+        margin: 10px;
+        justify-content: space-between;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+        .reserve-main-filter-container div {
+            border: 1px solid #242424;
+            cursor: pointer;
+            border-radius: 5px;
+            padding: 5px;
+        }
+</style>
+
 @using (Html.BeginForm("Index", "Reserve", FormMethod.Get, new { id = "filter_form" }))
 {
     <input type="hidden" id="main_filter_input" name="mainFilter" value="@(ViewBag.mainFilter)" />
@@ -22,27 +70,50 @@
     <div style="overflow: auto">
         <table>
             <tr>
-                <td class="label"> کد رزرو :</td>
+                <td class="label">کد رزرو:</td>
                 <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.reserve_id" name="reserve_id" />
+                    <input type="text" style="width:100px;" value="@ViewBag.reserve_id" name="reserve_id" />
                 </td>
-                <td class="label"> کد آگهی :</td>
+                <td class="label">کد آگهی:</td>
                 <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.advertise_id" name="advertise_id" />
+                    <input type="text" style="width:100px;" value="@ViewBag.advertise_id" name="advertise_id" />
+                </td>
+                <td class="label"> پشتیبان :</td>
+                <td class="minw">
+                    <select name="supporter_id">
+                        <option value="-1">همه</option>
+                        @foreach (var supp in ViewBag.supporterList)
+                        {
+                            <option is-selected="@(ViewBag.supporter_id == supp.id)" value="@(supp.id)">@(supp.fullName)</option>
+                        }
+                    </select>
                 </td>
             </tr>
             <tr>
-                <td class="label"> کد کاربرِی میزبان :</td>
+                <td class="label">کد کاربری مهمان:</td>
                 <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.host_user_id" name="host_user_id" />
+                    <input type="text" style="width:100px;" value="@ViewBag.guest_user_id" name="guest_user_id" />
                 </td>
-                <td class="label"> کد کاربرِی مهمان :</td>
+                <td class="label">کد کاربری میزبان:</td>
                 <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.guest_user_id" name="guest_user_id" />
+                    <input type="text" style="width:100px;" value="@ViewBag.host_user_id" name="host_user_id" />
+                </td>
+                <td class="label">پاسخ میزبان:</td>
+                <td class="minw">
+                    <select name="host_response_status">
+                        <option value="-1"> همه رزرو ها</option>
+                        @{
+                            var host_response_values = (Reserve.HostResponseEnum[])Enum.GetValues(typeof(Reserve.HostResponseEnum));
+                            foreach (var value in host_response_values)
+                            {
+                                <option value="@((int)value)" is-selected="@((int)ViewBag.host_response_status == (int)value)">@ReserveLocalization.GetHostResponseString((int)value)</option>
+                            }
+                        }
+                    </select>
                 </td>
             </tr>
             <tr>
-                <td class="label"> وضعیت سفر :</td>
+                <td class="label">وضعیت سفر:</td>
                 <td class="minw">
                     <select name="reserve_status" id="reserve_status_input">
                         <option value="-1"> همه رزرو ها</option>
@@ -58,22 +129,7 @@
                         }
                     </select>
                 </td>
-                <td class="label">پاسخ میزبان :</td>
-                <td class="minw">
-                    <select name="host_response_status">
-                        <option value="-1"> همه رزرو ها</option>
-                        @{
-                            var host_response_values = (Reserve.HostResponseEnum[])Enum.GetValues(typeof(Reserve.HostResponseEnum));
-                            foreach (var value in host_response_values)
-                            {
-                                <option value="@((int)value)" is-selected="@((int)ViewBag.host_response_status == (int)value)">@ReserveLocalization.GetHostResponseString((int)value)</option>
-                            }
-                        }
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td class="label"> وضعیت :</td>
+                <td class="label">وضعیت پرداخت:</td>
                 <td class="minw">
                     <select name="general_status" id="general_status_input">
                         <option value="-1"> همه رزرو ها</option>
@@ -94,33 +150,21 @@
             <tr>
                 <td class="label"> زمان سفر از :</td>
                 <td class="minw">
-                    <input name="reserve_from_date" class="js-filter-date-picker" type="text" id="reserve_from_date_picker" value="@(ViewBag.reserve_from_date)" />
+                    <input name="reserve_from_date" class="js-filter-date-picker" type="text" id="reserve_from_date_picker" value="@(ViewBag.reserve_from_date)" style="width: 100px;" />
                 </td>
                 <td class="label"> زمان سفر تا :</td>
                 <td class="minw">
-                    <input name="reserve_to_date" class="js-filter-date-picker" type="text" id="reserve_to_date_picker" value="@(ViewBag.reserve_to_date)" />
+                    <input name="reserve_to_date" class="js-filter-date-picker" type="text" id="reserve_to_date_picker" value="@(ViewBag.reserve_to_date)" style="width: 100px;" />
                 </td>
-            </tr>
-            <tr>
                 <td class="label"> تاریخ پایان سفر :</td>
                 <td class="minw">
-                    <input name="reserve_end_date" class="js-filter-date-picker" type="text" id="reserve_end_date_picker" value="@(ViewBag.reserve_end_date)" />
-                </td>
-                <td class="label"> پشتیبان :</td>
-                <td class="minw">
-                    <select name="supporter_id">
-                        <option value="-1">همه</option>
-                        @foreach (var supp in ViewBag.supporterList)
-                        {
-                            <option is-selected="@(ViewBag.supporter_id == supp.id)" value="@(supp.id)">@(supp.fullName)</option>
-                        }
-                    </select>
+                    <input name="reserve_end_date" class="js-filter-date-picker" type="text" id="reserve_end_date_picker" value="@(ViewBag.reserve_end_date)" style="width: 100px;" />
                 </td>
             </tr>
             <tr>
                 <td class="label"> زمان تسویه سایت :</td>
                 <td class="minw">
-                    <input name="site_clearing_date" class="js-filter-date-picker" type="text" id="clearing_date_picker" value="@(ViewBag.site_clearing_date)" />
+                    <input name="site_clearing_date" class="js-filter-date-picker" type="text" id="clearing_date_picker" value="@(ViewBag.site_clearing_date)" style="width: 100px;" />
                 </td>
                 <td class="label">مدت سفر :</td>
                 <td class="minw">
@@ -129,8 +173,6 @@
                     <input type="text" style="width:70px;" value="@ViewBag.stay_duration_to" name="stay_duration_to" />
                     <span> روز</span>
                 </td>
-            </tr>
-            <tr>
                 <td class="label"> حساب بانکی میزبان :</td>
                 <td>
                     <select name="host_card_status">
@@ -140,40 +182,49 @@
                         <option value="2" is-selected="@(ViewBag.host_card_status == 2)">بدون حساب</option>
                     </select>
                 </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td><input type="submit" class="filter" value="فیلتر" /></td>
-                <td style="width:100%;"></td>
             </tr>
             <tr></tr>
         </table>
     </div>
-    <div style="display:flex;max-width:1000px;flex-flow:row;margin:10px;justify-content:space-between;padding: 10px;">
-        <div style="display:flex;flex-flow:row;justify-content:space-around;align-items:center;width:120px;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.reserve_status == 1 ? "#fdd835" : "#ccc");" onclick="toggleStatus(1)"><i style="font-size: 18px;" class="fa fa-book"></i><span>در انتظار پاسخ </span></div>
-        <div style="display:flex;flex-flow:row;justify-content:space-around;align-items:center;width:120px;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.reserve_status == 2 ? "#fdd835" : "#ccc");" onclick="toggleStatus(2)"><i style="font-size: 18px;" class="fa fa-book"></i><span>در انتظار پرداخت </span></div>
-        <div style="display:flex;flex-flow:row;justify-content:space-around;align-items:center;width:120px;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.reserve_end_date == Amlakbashi.Core.Common.Utilities.DateTimeUtility.PersianTodayString && ViewBag.general_status == 0 ? "#fdd835" : "#ccc");" onclick="toggleTodayFinishStay()"><i style="font-size: 18px;" class="fa fa-flag-checkered"></i><span>پایان سفر امروز </span></div>
-        <div style="display:flex;flex-flow:row;justify-content:space-around;align-items:center;width:120px;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.site_cleared_status == 1 && ViewBag.site_clearing_date == Amlakbashi.Core.Common.Utilities.DateTimeUtility.PersianTodayString ? "#fdd835" : "#ccc");" onclick="toggleSiteTodayClearing()"><i style="font-size: 18px;" class="fa fa-money-bill-alt"></i><span>تسویه امروز </span></div>
-        <div style="display:flex;flex-flow:row;justify-content:space-around;align-items:center;width:120px;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.shouldFollow ? "#fdd835" : "#ccc");" onclick="toggleShouldFollowReserves()"><i style="font-size: 18px;" class="fa fa-bullseye"></i><span>در حال پیگیری </span></div>
-        <div style="display:flex;flex-flow:row;justify-content:space-around;align-items:center;width:120px;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.disableAutoCancel ? "#fdd835" : "#ccc");" onclick="toggleDisableAutoCancelFilter()"><img src="/file/resourceimagepng?file_name=no-gear" width="18" height="18" /><span>عدم لغو خودکار</span></div>
-        <div style="display:flex;flex-flow:row;justify-content:space-around;align-items:center;width:120px;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.accVisited ? "#fdd835" : "#ccc");" onclick="toggleAccVisitFilter()"><img src="/file/resourceimagepng?file_name=acc-visit" width="18" height="18" /><span>بازدید اقامتگاه</span></div>
+
+    <div class="reserve-top-filter-container">
+        <div style="background-color:@(ViewBag.reserve_status == 1 ? "#fdd835" : "#ccc");" onclick="toggleStatus(1)"><i class="fa fa-book"></i><span>در انتظار پاسخ </span></div>
+        <div style="background-color:@(ViewBag.reserve_status == 2 ? "#fdd835" : "#ccc");" onclick="toggleStatus(2)"><i class="fa fa-book"></i><span>در انتظار پرداخت </span></div>
+        <div style="background-color:@(ViewBag.reserve_end_date == Amlakbashi.Core.Common.Utilities.DateTimeUtility.PersianTodayString && ViewBag.general_status == 0 ? "#fdd835" : "#ccc");" onclick="toggleTodayFinishStay()"><i class="fa fa-flag-checkered"></i><span>پایان سفر امروز </span></div>
+        <div style="background-color:@(ViewBag.site_cleared_status == 1 && ViewBag.site_clearing_date == Amlakbashi.Core.Common.Utilities.DateTimeUtility.PersianTodayString ? "#fdd835" : "#ccc");" onclick="toggleSiteTodayClearing()"><i class="fa fa-money-bill-alt"></i><span>تسویه امروز </span></div>
+        <div style="background-color:@(ViewBag.shouldFollow ? "#fdd835" : "#ccc");" onclick="toggleShouldFollowReserves()"><i class="fa fa-bullseye"></i><span>در حال پیگیری </span></div>
+        <div style="background-color:@(ViewBag.disableAutoCancel ? "#fdd835" : "#ccc");" onclick="toggleDisableAutoCancelFilter()"><img src="/file/resourceimagepng?file_name=no-gear" width="18" height="18" /><span>عدم لغو خودکار</span></div>
+        <div style="background-color:@(ViewBag.accVisited ? "#fdd835" : "#ccc");" onclick="toggleAccVisitFilter()"><img src="/file/resourceimagepng?file_name=acc-visit" width="18" height="18" /><span>بازدید اقامتگاه</span></div>
     </div>
-    <div style="display:flex;flex-flow:row;flex-wrap: wrap; max-width:100%;justify-content:space-between;">
-        <div style="display:flex;width:500px;flex-flow:row;margin:10px;justify-content:space-between;border:1px solid #ccc;padding: 10px;">
-            <div onclick="toggleMyReserves(0)" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.reserve_support_status == 0 ? "#fdd835" : "#ffffff")">همه</div>
-            <div onclick="toggleMyReserves(@((int)ReserveSupport.SupporterStatus.Free))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.reserve_support_status == (int)ReserveSupport.SupporterStatus.Free ? "#fdd835" : "#ffffff")">بدون پشتیبان</div>
-            <div onclick="toggleMyReserves(@((int)ReserveSupport.SupporterStatus.SupportingByYou))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.reserve_support_status == (int)ReserveSupport.SupporterStatus.SupportingByYou ? "#fdd835" : "#ffffff")">در حال پشتیبانی من</div>
-            <div onclick="toggleMyReserves(@((int)ReserveSupport.SupporterStatus.SupportingByOthers))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.reserve_support_status == (int)ReserveSupport.SupporterStatus.SupportingByOthers ? "#fdd835" : "#ffffff")">در حال پشتیبانی همکاران</div>
-            <div onclick="toggleMyReserves(@((int)ReserveSupport.SupporterStatus.Done))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.reserve_support_status == (int)ReserveSupport.SupporterStatus.Done ? "#fdd835" : "#ffffff")">انجام شده</div>
+
+    <div class="reserve-filters-container">
+        <div class="reserve-main-filter-container" style="width: 450px;">
+            <div onclick="toggleMyReserves(0)" style="background-color:@(ViewBag.reserve_support_status == 0 ? "#fdd835" : "#ffffff")">همه</div>
+            <div onclick="toggleMyReserves(@((int)ReserveSupport.SupporterStatus.Free))" style="background-color:@(ViewBag.reserve_support_status == (int)ReserveSupport.SupporterStatus.Free ? "#fdd835" : "#ffffff")">بدون پشتیبان</div>
+            <div onclick="toggleMyReserves(@((int)ReserveSupport.SupporterStatus.SupportingByYou))" style="background-color:@(ViewBag.reserve_support_status == (int)ReserveSupport.SupporterStatus.SupportingByYou ? "#fdd835" : "#ffffff")">در حال پشتیبانی من</div>
+            <div onclick="toggleMyReserves(@((int)ReserveSupport.SupporterStatus.SupportingByOthers))" style="background-color:@(ViewBag.reserve_support_status == (int)ReserveSupport.SupporterStatus.SupportingByOthers ? "#fdd835" : "#ffffff")">در حال پشتیبانی همکاران</div>
+            <div onclick="toggleMyReserves(@((int)ReserveSupport.SupporterStatus.Done))" style="background-color:@(ViewBag.reserve_support_status == (int)ReserveSupport.SupporterStatus.Done ? "#fdd835" : "#ffffff")">انجام شده</div>
         </div>
-        <div style="display:flex;width:200px;margin:10px;flex-flow:row;margin:10px;justify-content:space-between;border:1px solid #ccc;padding: 10px;">
-            <div onclick="toggleInstantResFilter(2)" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.instantReserveFilter == 2 ? "#fdd835" : "#ffffff")">همه</div>
-            <div onclick="toggleInstantResFilter(0)" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.instantReserveFilter == 0 ? "#fdd835" : "#ffffff")">رزرو عادی</div>
-            <div onclick="toggleInstantResFilter(1)" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.instantReserveFilter == 1 ? "#fdd835" : "#ffffff")">رزرو آنی</div>
+        <div class="reserve-main-filter-container">
+            <div onclick="toggleInstantResFilter(2)" style="background-color:@(ViewBag.instantReserveFilter == 2 ? "#fdd835" : "#ffffff")">همه</div>
+            <div onclick="toggleInstantResFilter(0)" style="background-color:@(ViewBag.instantReserveFilter == 0 ? "#fdd835" : "#ffffff")">رزرو عادی</div>
+            <div onclick="toggleInstantResFilter(1)" style="background-color:@(ViewBag.instantReserveFilter == 1 ? "#fdd835" : "#ffffff")">رزرو آنی</div>
+        </div>
+        <div class="reserve-main-filter-container">
+            <div onclick="toggleMainFilter(0)" style="background-color:@(ViewBag.mainFilter == 0 ? "#fdd835" : "#ffffff")">رزرو های فعال</div>
+            <div onclick="toggleMainFilter(1)" style="background-color:@(ViewBag.mainFilter == 1 ? "#fdd835" : "#ffffff")">همه</div>
+            <div onclick="toggleMainFilter(2)" style="background-color:@(ViewBag.mainFilter == 2 ? "#fdd835" : "#ffffff")">بایگانی</div>
         </div>
     </div>
-    <div style="display:flex;max-width:200px;flex-flow:row;margin:10px;justify-content:space-between;border:1px solid #ccc;padding: 10px;">
-        <div onclick="toggleMainFilter(0)" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.mainFilter == 0 ? "#fdd835" : "#ffffff")">رزرو های فعال</div>
-        <div onclick="toggleMainFilter(1)" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.mainFilter == 1 ? "#fdd835" : "#ffffff")">همه</div>
-        <div onclick="toggleMainFilter(2)" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(ViewBag.mainFilter == 2 ? "#fdd835" : "#ffffff")">بایگانی</div>
-    </div>
+
     <div style="overflow: auto">
         <table class="adminTable">
             <tr>
@@ -381,7 +432,7 @@
                     <td style="width:90px">
                         <a href="@Url.Action("Edit",new {reserve_id= item.id})"><span class="editicon" title="ویرایش"></span></a>
                         @if (item.status == (int)Reserve.ReserveStatus.WaitForResponse ||
-                     item.status == (int)Reserve.ReserveStatus.WaitForReserve)
+                item.status == (int)Reserve.ReserveStatus.WaitForReserve)
                         {
                             if (item.status == (int)Reserve.ReserveStatus.WaitForResponse)
                             {

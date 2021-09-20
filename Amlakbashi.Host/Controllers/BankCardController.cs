@@ -1,29 +1,33 @@
 ﻿using System;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using log4net;
-using AutoMapper;
 using Amlakbashi.Host.Controllers.Base;
 using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
+using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.DTOs.BankCardDTOs;
 
 namespace Amlakbashi.Host.Controllers
 {
     public class BankCardController : BaseController
     {
         private readonly IBankCardAppService bankCardService;
+        private readonly IUserAppService userService;
         private readonly IUserAccessor userAccessor;
         private readonly ILog logger;
-        private readonly IMapper mapper;
         public BankCardController(IBankCardAppService bankCardService,
-            IUserAccessor userAccessor, ILog logger, IMapper mapper)
+            IUserAppService userService,
+            IUserAccessor userAccessor,
+            ILog logger)
         {
             this.bankCardService = bankCardService;
+            this.userService = userService;
             this.userAccessor = userAccessor;
             this.logger = logger;
-            this.mapper = mapper;
         }
 
         [Authorize(Policy = Policies.User_Bank_Info)]
@@ -90,13 +94,123 @@ namespace Amlakbashi.Host.Controllers
                 var bankCard = bankCardService.Find(bankCardId);
                 bankCard.FName = bankCardFName;
                 bankCard.LName = bankCardLName;
-                bankCardService.Update(bankCard, userAccessor.CurrentUser.Id, Core.Entities.ActionLog.ActionSourceEnum.AdminPanel);
+                bankCardService.Update(bankCard, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
                 return GenerateJsonResult(new { status = 1 });
             }
             catch (Exception exc)
             {
                 logger.Error("BankCard.SetBankCardName", exc);
                 return GenerateJsonResult(new { status = 0 });
+            }
+        }
+
+        [Authorize(Policy = Policies.User_Bank_Info)]
+        public IActionResult SetUserBankCard(int userId)
+        {
+            try
+            {
+                var bankCard = bankCardService.GetByUserId(userId);
+                var dto = new SetBankCardDTO()
+                {
+                    UserId = userId
+                };
+                if (bankCard != null)
+                {
+                    dto.FName = bankCard.FName;
+                    dto.LName = bankCard.LName;
+                    dto.BankCardNumber = bankCard.BankCardNumber;
+                    dto.ShebaNumber = bankCard.ShabaNumber;
+                    dto.VerifyBankCardNumber = bankCard.BankCardStatus == 0 ? true : false;
+                    dto.VerifyShebaNumber = bankCard.ShabaStatus == 0 ? true : false;
+                }
+                return PartialView("_SetUserCardBank", dto);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("BankCard.SetUserCardBank", exc);
+                ViewBag.error = "عملیات با خطای فنی مواجه شد";
+                return PartialView("_SetUserCardBank");
+            }
+        }
+
+        [Authorize(Policy = Policies.User_Bank_Info)]
+        [HttpPost]
+        public IActionResult SetUserBankCard(SetBankCardDTO newBankCard)
+        {
+            try
+            {
+                var user = userService.Find(newBankCard.UserId);
+                var bankCard = bankCardService.GetByUserId(newBankCard.UserId);
+
+                if (string.IsNullOrEmpty(newBankCard.BankCardNumber) == false &&
+                    BankUtility.ValidateBankCardNumber(newBankCard.BankCardNumber) == false)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "شماره کارت وارد شده صحیح نمی باشد"
+                    });
+                }
+
+                if (string.IsNullOrEmpty(newBankCard.ShebaNumber) == false &&
+                    newBankCard.ShebaNumber.Length != 24)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "شماره شبا وارد شده صحیح نمی باشد"
+                    });
+                }
+
+                if (bankCard != null)
+                {
+                    bankCard.BankCardNumber = newBankCard.BankCardNumber;
+                    bankCard.FName = newBankCard.FName;
+                    bankCard.LName = newBankCard.LName;
+                    bankCard.ShabaNumber = newBankCard.ShebaNumber;
+                    bankCard.BankCardStatus = string.IsNullOrEmpty(newBankCard.BankCardNumber) == false &&
+                        newBankCard.VerifyBankCardNumber ? (int)BankCard.BankCardStatusEnum.Verified : 
+                        (int)BankCard.BankCardStatusEnum.NotVerified;
+                    bankCard.ShabaStatus = string.IsNullOrEmpty(newBankCard.ShebaNumber) == false &&
+                        newBankCard.VerifyShebaNumber ? (int)BankCard.BankCardStatusEnum.Verified : 
+                        (int)BankCard.BankCardStatusEnum.NotVerified;
+                    bankCard.LastModifyDate = DateTime.Now;
+                    bankCardService.Update(bankCard, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
+                }
+                else
+                {
+                    bankCard = new BankCard()
+                    {
+                        BankCardNumber = newBankCard.BankCardNumber,
+                        FName = newBankCard.FName,
+                        LName = newBankCard.LName,
+                        BankCardStatus = string.IsNullOrEmpty(newBankCard.BankCardNumber) == false &&
+                            newBankCard.VerifyBankCardNumber ? (int)BankCard.BankCardStatusEnum.Verified :
+                            (int)BankCard.BankCardStatusEnum.NotVerified,
+                        ShabaNumber = newBankCard.ShebaNumber,
+                        ShabaStatus = string.IsNullOrEmpty(newBankCard.ShebaNumber) == false &&
+                            newBankCard.VerifyShebaNumber ? (int)BankCard.BankCardStatusEnum.Verified :
+                            (int)BankCard.BankCardStatusEnum.NotVerified,
+                        UserID = newBankCard.UserId,
+                        CreateDate = DateTime.Now,
+                        LastModifyDate = DateTime.Now
+                    };
+                    bankCardService.Insert(bankCard, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
+                }
+                return GenerateJsonResult(new
+                {
+                    status = 1,
+                    msg = "تغییرات با موفقیت ذخیره شد"
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("BankCard.SetUserCardBank", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطا مواجه شد"
+                });
             }
         }
     }
