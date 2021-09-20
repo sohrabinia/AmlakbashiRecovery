@@ -24,12 +24,5 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public int UserId { get; set; }
         public long UserCredit { get; set; }
         public string UserName { get; set; }
-        public UserType UserType { get; set; }
-    }
-
-    public enum UserType
-    {
-        Host = 0,
-        Guest = 1
     }
 }

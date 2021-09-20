@@ -7,6 +7,14 @@
         border-radius: 5px;
         font: 1em miransans;
     }
+    .bankcard-info-container {
+        margin: 10px 50px;
+        border: 1px solid lightgray;
+        padding: 10px;
+    }
+    .row-margin {
+        margin-right: 50px;
+    }
 </style>
 
 @if (Model == null)
@@ -18,42 +26,47 @@ else
     <div>
         <span>کد کاربر:</span>
         <span>@Model.UserId</span>
-    </div>
-    <div>
-        <span>نام کاربر:</span>
+        <span class="row-margin">نام کاربر:</span>
         <span>@Model.UserName</span>
     </div>
-    <div>
-        @{
-            var bankCardNumberString = Model.BankCardNumber;
-            if (string.IsNullOrEmpty(Model.BankCardNumber) == false)
-            {
-                bankCardNumberString = String.Format("{0} {1} {2} {3}", Model.BankCardNumber.Substring(0, 4),
-                    Model.BankCardNumber.Substring(4, 4), Model.BankCardNumber.Substring(8, 4), Model.BankCardNumber.Substring(12));
+    <div class="bankcard-info-container">
+        <div>
+            @{
+                var bankCardNumberString = Model.BankCardNumber;
+                if (string.IsNullOrEmpty(Model.BankCardNumber) == false)
+                {
+                    bankCardNumberString = String.Format("{0} {1} {2} {3}", Model.BankCardNumber.Substring(0, 4),
+                        Model.BankCardNumber.Substring(4, 4), Model.BankCardNumber.Substring(8, 4), Model.BankCardNumber.Substring(12));
+                }
             }
-        }
-        <span>شماره کارت:</span>
-        <span style="color: @(Model.BankCardVerified ? "blue" : "red"); font-size:x-large; direction: ltr; unicode-bidi: embed;">@bankCardNumberString</span>
-        <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('@Model.BankCardNumber', 'شماره کارت')" /></span>
-    </div>
-    <div>
-        <span>نام صاحب کارت:</span>
-        <span id="BankCardNameSpan">@Model.BankCardName</span>
-    </div>
-    <div>
-        <span>شماره شبا:</span>
-        <span id="ShebaNumberSpan" style="color: @(Model.ShebaVerified ? "blue" : "red");">@Model.ShebaNumber</span>
-        @if (string.IsNullOrEmpty(Model.ShebaNumber) == false)
-        {
-            <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('@Model.ShebaNumber', 'شماره شبا')" /></span>
-            @if (Model.ShebaVerified == false || string.IsNullOrEmpty(Model.BankCardName))
+            <span>شماره کارت:</span>
+            <span style="color: @(Model.BankCardVerified ? "blue" : "red"); font-size:x-large; direction: ltr; unicode-bidi: embed;">@bankCardNumberString</span>
+            @if (string.IsNullOrEmpty(bankCardNumberString) == false)
             {
-                <span><i class="fa fa-sync" style="cursor: pointer; color: #999;" onclick="VerifySheba()" /></span>
-                <span style="visibility:hidden; color: darkorange; margin-left: 10px; font-size: small;" id="ShebaNumberWaitingSpan">لطفا صبر کنید ...</span>
+                <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('@Model.BankCardNumber', 'شماره کارت')" /></span>
             }
-        }
+        </div>
+        <div>
+            <span>نام صاحب کارت:</span>
+            <span id="BankCardNameSpan">@Model.BankCardName</span>
+        </div>
+        <div>
+            <span>شماره شبا:</span>
+            <span id="ShebaNumberSpan" style="color: @(Model.ShebaVerified ? "blue" : "red");">@Model.ShebaNumber</span>
+            @if (string.IsNullOrEmpty(Model.ShebaNumber) == false)
+            {
+                <span><i class="fa fa-copy" style="cursor: pointer; color: #999;" onclick="copyStringToClipboard('@Model.ShebaNumber', 'شماره شبا')" /></span>
+                @if (Model.ShebaVerified == false || string.IsNullOrEmpty(Model.BankCardName))
+                {
+                    <span><i class="fa fa-sync" style="cursor: pointer; color: #999;" onclick="VerifySheba()" /></span>
+                    <span style="visibility:hidden; color: darkorange; margin-left: 10px; font-size: small;" id="ShebaNumberWaitingSpan">لطفا صبر کنید</span>
+                }
+            }
+        </div>
+        <div style="text-align:center;">
+            <button class="wallet-info-btn" style="font-size: 12px;" onclick="SetUserBankCard()">ویرایش کارت بانکی</button>
+        </div>
     </div>
-    <br />
     <div>
         <span>موجودی کیف پول:</span>
         <span style="color: @(Model.WalletCredit < 0 ? "red" : Model.WalletCredit > 0 ? "limegreen" : "black");">@string.Format("{0:n0}", Model.WalletCredit) تومان</span>
@@ -96,5 +109,11 @@ else
                 alertify.error("عملیات با خطای فنی مواجه شد");
             }
         });
+    }
+
+    function SetUserBankCard() {
+        showInfoMessage('ویرایش اطلاعات کارت بانکی', '',
+            { contentUrl: '/bankcard/SetUserBankCard?userId=' + @Model.UserId, fullScreen: screen.width < 781 }
+        );
     }
 </script>

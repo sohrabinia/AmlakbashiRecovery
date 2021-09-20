@@ -85,35 +85,27 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
         {
             bool has_error = false;
             errors = new List<string>();
-            if (userGeneralType > (int)Entities.User.UserGeneralTypeEnum.Guest)
+            if (userGeneralType == (int)User.UserGeneralTypeEnum.Host)
             {
-                if (!string.IsNullOrEmpty(this.bankCardNumber) &&
-                    Regex.IsMatch(@"[a-zA-Zآ-ی]", this.bankCardNumber))
+                if (BankUtility.ValidateBankCardNumber(bankCardNumber) == false)
                 {
-
-                    errors.Add("شماره کارت بانکی نمیتواند شامل حروف باشد. لطفا اصلاح کنید");
+                    errors.Add("شماره کارت وارد شده صحیح نمی باشد");
                     has_error = true;
                 }
-                if (!string.IsNullOrEmpty(this.bankCardNumber) &&
-                    this.bankCardNumber.Length != 16)
-                {
-                    errors.Add("شماره کارت بانکی باید 16 رقم باشد. لطفا اصلاح کنید ");
-                    has_error = true;
-                }
-                if (!string.IsNullOrEmpty(this.shabaNumber))
-                {
-                    if (Regex.IsMatch(@"[a-zA-Zآ-ی]", this.shabaNumber))
-                    {
+                //if (!string.IsNullOrEmpty(this.bankCardNumber) &&
+                //    Regex.IsMatch(@"[a-zA-Zآ-ی]", this.bankCardNumber))
+                //{
 
-                        errors.Add("شماره شبا نمیتواند شامل حروف باشد. لطفا اصلاح کنید");
-                        has_error = true;
-                    }
-                    if (this.shabaNumber.Length != 24)
-                    {
-                        errors.Add("شماره شبا باید 24 رفم باشد. لطفا اصلاح کنید ");
-                        has_error = true;
-                    }
-                }
+                //    errors.Add("شماره کارت بانکی نمی تواند شامل حروف باشد");
+                //    has_error = true;
+                //}
+                //if (!string.IsNullOrEmpty(this.bankCardNumber) &&
+                //    this.bankCardNumber.Length != 16)
+                //{
+                //    errors.Add("شماره کارت بانکی باید 16 رقم باشد ");
+                //    has_error = true;
+                //}
+                
                 //TODO: handle this in app and then uncomment it
                 //if (string.IsNullOrEmpty(this.bankFname))
                 //{
@@ -125,6 +117,28 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                 //    errors.Add("لطفا نام خانوادگی صاحب حساب را وارد کنید");
                 //    has_error = true;
                 //}
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(bankCardNumber) == false && BankUtility.ValidateBankCardNumber(bankCardNumber) == false)
+                {
+                    errors.Add("شماره کارت وارد شده صحیح نمی باشد");
+                    has_error = true;
+                }
+            }
+            if (string.IsNullOrEmpty(this.shabaNumber) == false)
+            {
+                if (Regex.IsMatch(@"[a-zA-Zآ-ی]", this.shabaNumber))
+                {
+
+                    errors.Add("شماره شبا نمی تواند شامل حروف باشد");
+                    has_error = true;
+                }
+                if (this.shabaNumber.Length != 24)
+                {
+                    errors.Add("شماره شبا باید 24 رقم باشد ");
+                    has_error = true;
+                }
             }
             if (!PhoneUtility.ValidateCallableNumber(this.mobile1))
             {

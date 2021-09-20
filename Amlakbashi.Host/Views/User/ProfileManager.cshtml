@@ -144,20 +144,6 @@
                 </span>
             </div>
         }
-        @*<div class="profile__item ">
-                @if (string.IsNullOrEmpty(Model.email) == false)
-                {
-                    <span class="profile__label">ایمیل :</span>
-                    <span class="profile__text">
-                        @Model.email
-                    </span>
-                    <button type="button" onclick="showRegisterEmailForm()" class="profile__submit">تغییر ایمیل</button>
-                }
-                else
-                {
-                    <button type="button" onclick="showRegisterEmailForm()" class="profile__submit">ثبت ایمیل</button>
-                }
-            </div>*@
         <div class="profile__item ">
             <span class="profile__label">ایمیل :</span>
             <span>
@@ -165,76 +151,72 @@
                 <button type="button" onclick="showRegisterEmailForm()" style="border:0; margin-right: 20px;" class="btn-photo">@(string.IsNullOrEmpty(Model.email) ? "ثبت ایمیل" : "تغییر ایمیل")</button>
             </span>
         </div>
-        if (Model.userGeneralType > (int)Entities.User.UserGeneralTypeEnum.Guest ||
-        !string.IsNullOrEmpty(Model.bankCardNumber) ||
-        !string.IsNullOrEmpty(Model.shabaNumber) ||
-        (ViewBag.hasCanselReserve != null ? ViewBag.hasCanselReserve : false)
-        )
-        {
-            <div class="profile__title">اطلاعات حساب بانکی</div>
-            <div class="profile__item no-column">
-                <span class="profile__tip">اطلاعات حساب بانکی جهت انتقال وجه به حساب شما</span>
-                @*<span class="profile__text"></span>*@
-            </div>
-
-            <div class="profile__item ">
-                <span class="profile__label">
-                    نام صاحب حساب :
-                    <span style="color:red">*</span>
-                </span>
-                <span class="profile__text">
-                    <input id="bankFname" type="text" placeholder="نام صاحب حساب"
-                           name="bankFname" title="نام صاحب حساب"
-                           value="@Model.bankFname" class="mandatory"
-                           style="text-align:left;">
-                </span>
-            </div>
-            <div class="profile__item ">
-                <span class="profile__label">
-                    نام خانوادگی صاحب حساب :
-                    <span style="color:red">*</span>
-                </span>
-                <span class="profile__text">
-                    <input id="bankLname" type="text" placeholder="نام خانوادگی صاحب حساب"
-                           name="bankLname" title="نام خانوادگی صاحب حساب"
-                           value="@Model.bankLname" class="mandatory"
-                           style="text-align:left;">
-                </span>
-            </div>
-            <div class="profile__item ">
-                <span class="profile__label">
-                    شماره کارت بانکی :
-                    <span style="color:red">*</span>
-                </span>
-                <span class="profile__text">
-                    <input id="BankCardNumber" type="text" placeholder="شماره کارت بانکی"
-                           name="bankCardNumber" title="شماره کارت بانکی"
-                           onkeyup="validateNumber(this);" onchange="validateNumber(this)"
-                           value="@Model.bankCardNumber" class="mandatory"
-                           style="text-align:left;">
-                </span>
-            </div>
-
-            <div class="profile__item ">
-                <span class="profile__label">
-                    شماره شبا :
-                    <span style="color:red">*</span>
-                </span>
-                <span class="profile__text" style="display:flex">
-                    <input id="ShabaNumber" type="text" placeholder="شماره شبا"
-                           name="shabaNumber" class="mandatory" title="شماره شبا" onkeyup="validateNumber(this);"
-                           onchange="validateNumber(this)" value="@Model.shabaNumber"
-                           style="text-align:left;"><span style="margin:auto 5px">IR</span>
-                </span>
-            </div>
-        }
-        else
-        {
-            <input type="hidden" name="bankFname" value="@Model.bankFname">
-            <input type="hidden" name="bankLname" value="@Model.bankLname">
-            <input type="hidden" name="bankCardNumber" value="@Model.bankCardNumber">
-            <input type="hidden" name="shabaNumber" value="@Model.shabaNumber">
-        }
+        //if (Model.userGeneralType > (int)Entities.User.UserGeneralTypeEnum.Guest ||
+        //    string.IsNullOrEmpty(Model.bankCardNumber) == false ||
+        //    string.IsNullOrEmpty(Model.shabaNumber) == false ||
+        //    (ViewBag.hasCanselReserve != null ? ViewBag.hasCanselReserve : false))
+        //{
+        <div class="profile__title">اطلاعات حساب بانکی</div>
+        <div class="profile__item no-column">
+            <span class="profile__tip">اطلاعات حساب بانکی جهت انتقال وجه به حساب شما</span>
+        </div>
+        <div class="profile__item ">
+            <span class="profile__label">
+                نام صاحب حساب :
+                <span style="color:red">*</span>
+            </span>
+            <span class="profile__text">
+                <input id="bankFname" type="text" placeholder="نام صاحب حساب"
+                       name="bankFname" title="نام صاحب حساب"
+                       value="@Model.bankFname" class="mandatory"
+                       style="text-align:left;">
+            </span>
+        </div>
+        <div class="profile__item ">
+            <span class="profile__label">
+                نام خانوادگی صاحب حساب :
+                <span style="color:red">*</span>
+            </span>
+            <span class="profile__text">
+                <input id="bankLname" type="text" placeholder="نام خانوادگی صاحب حساب"
+                       name="bankLname" title="نام خانوادگی صاحب حساب"
+                       value="@Model.bankLname" class="mandatory"
+                       style="text-align:left;">
+            </span>
+        </div>
+        <div class="profile__item ">
+            <span class="profile__label">
+                شماره کارت بانکی :
+                <span style="color:red">*</span>
+            </span>
+            <span class="profile__text">
+                <input id="BankCardNumber" type="text" placeholder="شماره کارت بانکی"
+                       name="bankCardNumber" title="شماره کارت بانکی"
+                       onkeyup="validateNumber(this);" onchange="validateNumber(this)"
+                       value="@Model.bankCardNumber" class="mandatory"
+                       style="text-align:left;">
+            </span>
+        </div>
+        <div class="profile__item ">
+            <span class="profile__label">
+                شماره شبا :
+                <span style="color:red">*</span>
+            </span>
+            <span class="profile__text" style="display:flex">
+                <input id="ShabaNumber" type="text" placeholder="شماره شبا"
+                       name="shabaNumber" class="mandatory" title="شماره شبا" onkeyup="validateNumber(this);"
+                       onchange="validateNumber(this)" value="@Model.shabaNumber"
+                       style="text-align:left;"><span style="margin:auto 5px">IR</span>
+            </span>
+        </div>
+        @*}
+            else
+            {
+                <input type="hidden" name="bankFname" value="@Model.bankFname">
+                <input type="hidden" name="bankLname" value="@Model.bankLname">
+                <input type="hidden" name="bankCardNumber" value="@Model.bankCardNumber">
+                <input type="hidden" name="shabaNumber" value="@Model.shabaNumber">
+            }*@
         <input type="submit" value="ثبت ویرایش" class="profile__submit" />
     }
 </div>

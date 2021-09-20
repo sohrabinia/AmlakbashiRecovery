@@ -1,14 +1,18 @@
-﻿@using Amlakbashi.Core.DTOs.ReserveDTOs
-
+﻿
 <style>
     #ManualSitePaymentForm div {
         margin-bottom: 10px;
+    }
+    #ManualSitePaymentForm button {
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 5px;
+        font: 1em miransans;
     }
 </style>
 
 <form id="ManualSitePaymentForm">
     <input type="hidden" name="reserveId" value="@ViewBag.reserveId" />
-    <input type="hidden" name="userType" value="@ViewBag.userType" />
     <div>
         <label>کد رزرو:</label>
         <span>@ViewBag.reserveId</span>
@@ -37,11 +41,11 @@
         <input type="text" name="price" value="@ViewBag.price" />
     </div>
     <div>
-        <label>ارسال پیامک به @(ViewBag.userType == UserType.Host ? "میزبان" : "مهمان")</label>
+        <label>ارسال پیامک به میزبان</label>
         <input type="checkbox" name="sendSms" value="true" checked="checked" />
     </div>
     <div style="text-align:center;">
-        <button type="button" onclick="submitManualSitePaymentForm()" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;">ثبت پرداخت</button>
+        <button type="button" onclick="submitManualSitePaymentForm()">ثبت پرداخت</button>
     </div>
 </form>
 
@@ -58,14 +62,7 @@
                 }
                 else {
                     alertify.success(response.msg);
-                    @if (ViewBag.userType == UserType.Host)
-                    {
-                        @:reserveAdminHubConnection.invoke('reserveCleared', @ViewBag.reserveId);
-                    }
-                    else
-                    {
-                        @:reserveAdminHubConnection.invoke('reserveRefunded', @ViewBag.reserveId);
-                    }
+                    reserveAdminHubConnection.invoke('reserveCleared', @ViewBag.reserveId);
                     popupMsgList[1].btnClick(0, true);
                     popupMsgList[0].btnClick(0, true);
                 }

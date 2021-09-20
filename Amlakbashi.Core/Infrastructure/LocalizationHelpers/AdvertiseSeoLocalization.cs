@@ -11,7 +11,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             switch ((AdvertiseType)advertiseType)
             {
                 case AdvertiseType.All:
-                    return "اجاره روزانه ویلا ، سوئیت و آپارتمان مبله";
+                    return "اجاره روزانه ویلا، سوئیت و آپارتمان مبله";
                 case AdvertiseType.Apartment:
                     return "اجاره روزانه آپارتمان مبله";
                 case AdvertiseType.Villa:
@@ -63,7 +63,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                         output = "اجاره ویلا و سوئیت در " + location_string;
                         break;
                     default:
-                        output = "اجاره روزانه ویلا ، سوئیت و آپارتمان مبله در " + location_string;
+                        output = "اجاره روزانه ویلا، سوئیت و آپارتمان مبله در " + location_string;
                         break;
                 }
             }
@@ -72,7 +72,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                 switch ((AdvertiseType)advertiseType)
                 {
                     case AdvertiseType.All:
-                        output = "اجاره روزانه ویلا ، سوئیت و آپارتمان مبله در " + location_string;
+                        output = "اجاره روزانه ویلا، سوئیت و آپارتمان مبله در " + location_string;
                         break;
                     case AdvertiseType.Apartment:
                         output = "اجاره روزانه آپارتمان مبله " + location_string;
@@ -158,17 +158,19 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                 case AdvertiseType.All:
                     return GetKeywords((int)AdvertiseType.Apartment) + "," + GetKeywords((int)AdvertiseType.Villa) + "," + GetKeywords((int)AdvertiseType.Hotel);
                 case AdvertiseType.Apartment:
-                    str = "اجاره آپارتمان مبله,اجاره روزانه هفتگی و ماهانه خانه,اجاره روزانه هفنگی و ماهانه منزل,اجاره روزانه هفتگی و ماهانه سوئیت";
+                    str = "اجاره آپارتمان مبله، اجاره روزانه هفتگی ماهانه و سالانه خانه، اجاره روزانه هفتگی ماهانه و سالانه منزل، اجاره روزانه هفتگی ماهانه و سالانه سوئیت";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه آپارتمان مبله " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه آپارتمان مبله " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Villa:
-                    str = "اجاره ویلا,اجاره روزانه ویلا";
+                    str = "اجاره ویلا، اجاره روزانه ویلا";
                     foreach (var item in regionList)
                     {
-                        str += (",ویلا " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،ویلا " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     str += "ویلا استخردار";
                     return str;
@@ -176,70 +178,80 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     str = "رزرو هتل";
                     foreach (var item in regionList)
                     {
-                        str += (",رزرو هتل " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،رزرو هتل " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.HotelApartment:
                     str = "رزرو هتل آپارتمان";
                     foreach (var item in regionList)
                     {
-                        str += (",رزرو هتل آپارتمان " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،رزرو هتل آپارتمان " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Camp:
                     str = "رزرو کمپ";
                     foreach (var item in regionList)
                     {
-                        str += (",رزرو کمپ " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،رزرو کمپ " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.TourismAccommodation:
                     str = "رزرو اقامتگاه بومگردی";
                     foreach (var item in regionList)
                     {
-                        str += (",اقامتگاه بومگردی " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اقامتگاه بومگردی " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.House:
-                    str = "اجاره خانه ویلایی,اجاره روزانه هفتگی و ماهانه خانه,اجاره روزانه هفنگی و ماهانه منزل,اجاره روزانه هفتگی و ماهانه خانه ویلایی";
+                    str = "اجاره خانه ویلایی، اجاره روزانه هفتگی ماهانه و سالانه خانه، اجاره روزانه هفتگی ماهانه و سالانه منزل، اجاره روزانه هفتگی ماهانه و سالانه خانه ویلایی";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه خانه ویلایی " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه خانه ویلایی " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.SuitAndRoom:
                     str = "اجاره روزانه اتاق و سوئیت";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه اتاق و سوئیت " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه اتاق و سوئیت " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Inn:
                     str = "رزرو مسافرخانه";
                     foreach (var item in regionList)
                     {
-                        str += (",رزرو مسافرخانه " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،رزرو مسافرخانه " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Pansion:
                     str = "اجاره روزانه پانسیون";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه پانسیون " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه پانسیون " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Complex:
                     str = "اجاره روزانه مجتمع";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه مجتمع " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه مجتمع " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Hut:
                     str = "اجاره روزانه کلبه";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه کلبه " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه کلبه " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 default:
@@ -258,19 +270,21 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             switch ((AdvertiseType)advertiseType)
             {
                 case AdvertiseType.All:
-                    return GetKeywords((int)AdvertiseType.Apartment) + "," + GetKeywords((int)AdvertiseType.Villa) + "," + GetKeywords((int)AdvertiseType.Hotel);
+                    return GetKeywords((int)AdvertiseType.Apartment) + "،" + GetKeywords((int)AdvertiseType.Villa) + "،" + GetKeywords((int)AdvertiseType.Hotel);
                 case AdvertiseType.Apartment:
-                    str = string.Format("اجاره آپارتمان مبله {0},اجاره روزانه هفتگی و ماهانه خانه {0},اجاره روزانه هفنگی و ماهانه منزل {0}", location_string);
+                    str = string.Format("اجاره آپارتمان مبله {0}،اجاره روزانه، هفتگی، ماهانه و سالانه خانه {0}، اجاره روزانه، هفتگی، ماهانه و سالانه منزل {0}", location_string);
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه آپارتمان مبله " + location_string + " " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه آپارتمان مبله " + location_string + " " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Villa:
-                    str = "اجاره ویلا,اجاره روزانه ویلا";
+                    str = "اجاره ویلا، اجاره روزانه ویلا";
                     foreach (var item in regionList)
                     {
-                        str += (",ویلا " + location_string + " " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،ویلا " + location_string + " " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     str += "ویلا استخردار";
                     return str;
@@ -278,70 +292,80 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     str = "رزرو هتل";
                     foreach (var item in regionList)
                     {
-                        str += (",رزرو هتل " + location_string + " " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،رزرو هتل " + location_string + " " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.HotelApartment:
                     str = "رزرو هتل آپارتمان";
                     foreach (var item in regionList)
                     {
-                        str += (",رزرو هتل آپارتمان " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،رزرو هتل آپارتمان " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Camp:
                     str = "رزرو کمپ";
                     foreach (var item in regionList)
                     {
-                        str += (",رزرو کمپ " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،رزرو کمپ " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.TourismAccommodation:
                     str = "رزرو اقامتگاه بومگردی";
                     foreach (var item in regionList)
                     {
-                        str += (",اقامتگاه بومگردی " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اقامتگاه بومگردی " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.House:
-                    str = "اجاره خانه ویلایی,اجاره روزانه هفتگی و ماهانه خانه,اجاره روزانه هفنگی و ماهانه منزل,اجاره روزانه هفتگی و ماهانه خانه ویلایی";
+                    str = "اجاره خانه ویلایی، اجاره روزانه هفتگی ماهانه و سالانه خانه، اجاره روزانه هفتگی ماهانه و سالانه منزل،اجاره روزانه هفتگی ماهانه و سالانه خانه ویلایی";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه خانه ویلایی " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه خانه ویلایی " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.SuitAndRoom:
                     str = "اجاره روزانه اتاق و سوئیت";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه اتاق و سوئیت " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه اتاق و سوئیت " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Inn:
                     str = "رزرو مسافرخانه";
                     foreach (var item in regionList)
                     {
-                        str += (",رزرو مسافرخانه " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،رزرو مسافرخانه " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Pansion:
                     str = "اجاره روزانه پانسیون";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه پانسیون " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه پانسیون " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Complex:
                     str = "اجاره روزانه مجتمع";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه مجتمع " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه مجتمع " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 case AdvertiseType.Hut:
                     str = "اجاره روزانه کلبه";
                     foreach (var item in regionList)
                     {
-                        str += (",اجاره روزانه کلبه " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                        if (item != PositionType.none)
+                            str += ("،اجاره روزانه کلبه " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
                     }
                     return str;
                 default:
@@ -363,7 +387,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                 case AdvertiseType.All:
                     if (all)
                     {
-                        return string.Format("اجاره ویلا{0}، اجاره سوئیت{0}، اجاره آپارتمان مبله{0}، رزرو آنلاین ویلا{0}، اجاره روزانه ویلا{0}، اجاره روزانه{0}، اجاره خانه مسافر{0}، رزرو هتل و مسافرخانه و هتل آپارتمان در{0}، ", all ? "" : " " + region_string)
+                        return string.Format("اجاره ویلا{0}، اجاره سوئیت{0}، اجاره آپارتمان مبله{0}، رزرو آنلاین ویلا{0}، اجاره روزانه ویلا{0}، اجاره روزانه، هفتگی، ماهانه و سالانه{0}، اجاره خانه مسافر{0}، رزرو هتل و مسافرخانه و هتل آپارتمان در{0}، ", all ? "" : " " + region_string)
                         + end_string;
                     }
                     else
@@ -371,19 +395,19 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                         switch (mostAccType)
                         {
                             case 82:
-                                return string.Format("اجاره روزانه خانه{0}، اجاره ویلا و سوئیت{0}، اجاره روزانه آپارتمان{0}، رزرو هتل، مسافرخانه و  هتل آپارتمان{0}، منزل مبله{0}، اجاره اتاق{0}، اجاره آپارتمان یکروزه{0}، اجاره چند روزه سوئیت{0}، اجاره آپارتمان هفتگی{0}، اجاره آپارتمان ماهانه{0} از ارزان قیمت ترین تا لوکس ترین واحدها در سایت املاک باشی، ", all ? "" : " " + region_string);
+                                return string.Format("اجاره روزانه خانه{0}، اجاره ویلا و سوئیت{0}، اجاره روزانه آپارتمان{0}، رزرو هتل، مسافرخانه و هتل آپارتمان{0}، منزل مبله{0}، اجاره اتاق{0}، اجاره آپارتمان یک روزه{0}، اجاره چند روزه سوئیت{0}، اجاره آپارتمان هفتگی{0}، اجاره آپارتمان ماهانه{0}، اجاره آپارتمان سالانه{0}، از ارزان ترین تا لوکس ترین واحدها در سایت املاک باشی، ", all ? "" : " " + region_string);
                             case 83:
-                                return string.Format("اجاره ویلا{0}، اجاره سوئیت{0}، رزرو ویلا{0}، اجاره روزانه خانه{0}، اجاره روزانه ویلا{0}، اجاره روزانه آپارتمان{0}، رزرو هتل و هتل آپارتمان{0}، منزل مبله{0}، اجاره اتاق{0}، اجاره آپارتمان یکروزه{0}، اجاره چند روزه سوئیت{0}، اجاره ویلا استخردار،ساحلی، جنگلی{0} از ارزان قیمت ترین تا لوکس ترین ویلاها در سایت املاک باشی، ", all ? "" : " " + region_string);
+                                return string.Format("اجاره ویلا{0}، اجاره سوئیت{0}، رزرو ویلا{0}، اجاره روزانه خانه{0}، اجاره روزانه ویلا{0}، اجاره روزانه، هفتگی، ماهانه و سالانه آپارتمان{0}، رزرو هتل و هتل آپارتمان{0}، منزل مبله{0}، اجاره اتاق{0}، اجاره آپارتمان یک روزه{0}، اجاره چند روزه سوئیت{0}، اجاره ویلا استخردار، ساحلی، جنگلی{0}، از ارزان قیمت ترین تا لوکس ترین ویلاها در سایت املاک باشی، ", all ? "" : " " + region_string);
                             default:
-                                return string.Format("اجاره ویلا{0}، اجاره سوئیت{0}، اجاره آپارتمان مبله{0}، رزرو آنلاین ویلا{0}، اجاره روزانه ویلا{0}، اجاره روزانه{0}، اجاره خانه مسافر{0}، رزرو هتل و مسافرخانه و هتل آپارتمان در{0}، ", all ? "" : " " + region_string)
+                                return string.Format("اجاره ویلا{0}، اجاره سوئیت{0}، اجاره آپارتمان مبله{0}، رزرو آنلاین ویلا{0}، اجاره روزانه ویلا{0}، اجاره روزانه{0}، اجاره خانه مسافر{0}، رزرو هتل و مسافرخانه و هتل آپارتمان{0}، ", all ? "" : " " + region_string)
                                     + end_string;
                         }
                     }
                 case AdvertiseType.Apartment:
-                    return string.Format("اجاره روزانه خانه{0}، اجاره سوئیت در{0}، رزرو آنلاین آپارتمان مبله{0}، منزل مبله{0}، اجاره روزانه آپارتمان مبله{0}، اجاره آپارتمان مبله{0}، خانه مسافر{0}، اجاره اتاق{0}، اجاره آپارتمان یکروزه{0} ، اجاره آپارتمان هفتگی{0}، اجاره آپارتمان ماهانه", all ? "" : " " + region_string)
+                    return string.Format("اجاره روزانه خانه{0}، اجاره سوئیت در{0}، رزرو آنلاین آپارتمان مبله{0}، منزل مبله{0}، اجاره روزانه آپارتمان مبله{0}، اجاره آپارتمان مبله{0}، خانه مسافر{0}، اجاره اتاق{0}، اجاره آپارتمان یکروزه{0}، اجاره آپارتمان هفتگی{0}، اجاره آپارتمان سالانه{0}،اجاره آپارتمان ماهانه{0}", all ? "" : " " + region_string)
                         + end_string;
                 case AdvertiseType.Villa:
-                    return string.Format("اجاره ویلا{0}، رزرو آنلاین ویلا{0}، اجاره روزانه ویلا{0}، استخردار،ساحلی، جنگلی، از ارزانترین تا لوکس ترین ویلا", all ? "" : " " + region_string)
+                    return string.Format("اجاره ویلا{0}، رزرو آنلاین ویلا{0}، اجاره روزانه، هفتگی، ماهانه و سالانه ویلا{0}، استخردار، ساحلی، جنگلی، از ارزان ترین تا لوکس ترین ویلا", all ? "" : " " + region_string)
                         + end_string;
                 case AdvertiseType.Hotel:
                     return string.Format("رزرو آنلاین هتل جهت اسکان موقت و کوتاه مدت برای مسافران و مهمانان", all ? "" : " " + region_string)
@@ -398,22 +422,22 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return string.Format("رزرو آنلاین اقامتگاه بومگردی جهت اسکان موقت و کوتاه مدت برای مسافران و مهمانان", all ? "" : " " + region_string)
                         + end_string;
                 case AdvertiseType.House:
-                    return string.Format("اجاره خانه ویلایی{0}، رزرو آنلاین خانه ویلایی{0}، اجاره روزانه خانه ویلایی", all ? "" : " " + region_string)
+                    return string.Format("اجاره خانه ویلایی{0}، رزرو آنلاین خانه ویلایی{0}، اجاره روزانه، هفتگی، ماهانه و سالانه خانه ویلایی", all ? "" : " " + region_string)
                         + end_string;
                 case AdvertiseType.SuitAndRoom:
-                    return string.Format("اجاره سوئیت در{0}، اجاره روزانه خانه در{0}، آپارتمان مبله در{0}، اجاره اتاق و سوئیت{0}، رزرو آنلاین اتاق و سوئیت{0}، اجاره خانه{0}، منزل مبله{0}، اتاق و سوئیت{0}، اجاره روزانه اتاق و سوئیت", all ? "" : " " + region_string)
+                    return string.Format("اجاره سوئیت{0}، اجاره روزانه خانه{0}، آپارتمان مبله{0}، اجاره اتاق و سوئیت{0}، رزرو آنلاین اتاق و سوئیت{0}، اجاره خانه{0}، منزل مبله{0}، اتاق و سوئیت{0}، اجاره روزانه، هفتگی، ماهانه و سالانه اتاق و سوئیت", all ? "" : " " + region_string)
                         + end_string;
                 case AdvertiseType.Inn:
                     return string.Format("رزرو آنلاین مسافرخانه جهت اسکان موقت و کوتاه مدت برای مسافران و مهمانان", all ? "" : " " + region_string)
                         + end_string;
                 case AdvertiseType.Pansion:
-                    return string.Format("اجاره پانسیون{0}، رزرو آنلاین پانسیون{0}، اجاره روزانه پانسیون", all ? "" : " " + region_string)
+                    return string.Format("اجاره پانسیون{0}، رزرو آنلاین پانسیون{0}، اجاره روزانه، هفتگی، ماهانه و سالانه پانسیون", all ? "" : " " + region_string)
                         + end_string;
                 case AdvertiseType.Complex:
-                    return string.Format("اجاره مجتمع{0}، رزرو آنلاین مجتمع{0}، اجاره مجتمع مسکونی{0}، اجاره روزانه مجتمع مسکونی", all ? "" : " " + region_string)
+                    return string.Format("اجاره مجتمع{0}، رزرو آنلاین مجتمع{0}، اجاره مجتمع مسکونی{0}، اجاره روزانه، هفتگی، ماهانه و سالانه مجتمع مسکونی", all ? "" : " " + region_string)
                         + end_string;
                 case AdvertiseType.Hut:
-                    return string.Format("اجاره کلبه{0}، رزرو آنلاین کلبه{0}، اجاره روزانه کلبه", all ? "" : " " + region_string)
+                    return string.Format("اجاره کلبه{0}، رزرو آنلاین کلبه{0}، اجاره روزانه، هفتگی، ماهانه و سالانه کلبه", all ? "" : " " + region_string)
                         + end_string;
                 default:
                     return "";
@@ -427,7 +451,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                 string tmpTitle = "اجاره روزانه";
                 tmpTitle += " " + AdvertiseMainLocalization.GetAdvertiseTypePersianString((int)acc.TypeID);
 
-                tmpTitle += " " + AdvertiseMainLocalization.GetPositionTypeString((int)acc.Position) + "-";
+                tmpTitle += " " + AdvertiseMainLocalization.GetPositionTypeString((int)acc.Position);
 
                 if (acc.Room > 0)
                     tmpTitle += " " + acc.Room.ToString() + " خوابه";
@@ -444,28 +468,36 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                 if (acc.Area != null)
                 {
                     if (!string.IsNullOrEmpty(areaTitle))
-                        tmpTitle += " -" + areaTitle;
+                        tmpTitle += "، " + areaTitle;
                 }
 
                 if (acc.Pool != null && acc.Pool == true)
-                    tmpTitle += " -استخردار";
+                    tmpTitle += "، استخردار";
 
                 if (acc.Capacity > 0)
-                    tmpTitle += " ظرفیت " + acc.Capacity.ToString() + " نفر-";
+                    tmpTitle += "، ظرفیت " + acc.Capacity.ToString() + " نفر";
 
 
                 if ((acc.Elevator != null && acc.Elevator == true) || (int)acc.Parking > 70)
-                    tmpTitle += " دارای ";
+                {
+                    tmpTitle += "، دارای ";
+                    if (acc.Elevator != null && acc.Elevator == true)
+                        tmpTitle += " آسانسور";
 
-                if (acc.Elevator != null && acc.Elevator == true)
-                    tmpTitle += " آسانسور-";
+                    if ((acc.Elevator != null && acc.Elevator == true) && (int)acc.Parking > 70)
+                    {
+                        tmpTitle += " و ";
+                    }
 
-                if ((int)acc.Parking > 70)
-                    tmpTitle += " پارکینگ-";
+                    if ((int)acc.Parking > 70)
+                        tmpTitle += " پارکینگ";
+                }
 
-                tmpTitle += " یک روزه - چند روزه - هفتگی ماهانه-";
+                
 
-                tmpTitle += " | اجاره روزانه خانه، اجاره ویلا و سوئیت در سایت املاک باشی";
+                tmpTitle += " | یک روزه، چند روزه، هفتگی، ماهانه و سالانه";
+
+                tmpTitle += " | اجاره روزانه خانه، ویلا و سوئیت در سایت املاک باشی";
 
                 return tmpTitle;
             }
