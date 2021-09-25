@@ -260,8 +260,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     var item = list[resIndex];
                     dto.reserveList.Add(ReserveAdminItemDTO.Generate(item,
-                        reserveSupportManager.Analyze(checkItem,
-                        out tempCurrentReserveSupport, currentUserId),
+                        reserveSupportManager.Analyze(checkItem, out tempCurrentReserveSupport, currentUserId),
                         accounting.GetReservePaidAmount(item.ReservePayments.ToList(), StatusStringType.Guest),
                         accounting.ReserveCanClear(item.Id),
                         accounting.ReserveShouldRefund(item.Id, item.Status, out refundDone), refundDone));
@@ -1171,13 +1170,25 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserveId);
+                if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePayment.ReservePaymentType.SiteClearingToHost))
+                {
+                    return PartialView("_SiteClearingHostInfo");
+                }
+
                 var advertise = reserve.Advertise;
                 var hostUser = reserve.HostUser;
 
                 var guestPaidAmount = accounting.GetReservePaidAmount(reserveId, StatusStringType.Guest);
                 var payablePrice = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guestPaidAmount,
                     reserve.CouponPrice, reserve.PrizePrice);
-                var days = (int)(reserve.EndDate - reserve.StartDate).TotalDays;
+
+                long clearedDepositeAmount = 0;
+                if (reserve.ReservePayments.Any(a=>a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost))
+                {
+                    clearedDepositeAmount = reserve.ReservePayments.FirstOrDefault(f => f.PaymentType == (int)ReservePaymentType.SiteDepositeToHost).Price;
+                    payablePrice -= clearedDepositeAmount;
+                }
+
                 var hostName = string.IsNullOrEmpty(hostUser.FullName) ?
                     hostUser.GetPhoneNumber(Entities.User.PhoneType.MainMobile) : hostUser.FullName;
 
@@ -1189,10 +1200,11 @@ namespace Amlakbashi.Host.Controllers
                 SitePaymentDTO model = new SitePaymentDTO()
                 {
                     ReserveId = reserveId,
-                    Days = days,
+                    Days = (int)(reserve.EndDate - reserve.StartDate).TotalDays,
                     TotalPrice = reserve.TotalPrice,
                     GuestPayedPrice = guestPaidAmount,
-                    SitePortion = guestPaidAmount - payablePrice,
+                    SitePortion = reserve.TotalPrice / 10,
+                    ClearingDepositeAmount = clearedDepositeAmount,
                     PayablePrice = payablePrice,
                     PayablePriceRaw = payablePrice * 10,
                     BankCardNumber = hostBankCard != null &&
@@ -1289,6 +1301,15 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
+                if (price < 1)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "مبلغ پرداختی کمتر از حد مجاز است"
+                    });
+                }
+
                 var reserve = reserveService.Find(reserveId);
                 if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePayment.ReservePaymentType.SiteClearingToHost))
                 {
@@ -1296,6 +1317,15 @@ namespace Amlakbashi.Host.Controllers
                     {
                         status = 0,
                         msg = "این رزرو قبلا تسویه شده است. برای ثبت، ابتدا تسویه قبلی را بیعانه کنید"
+                    });
+                }
+
+                if (transactionId <= 0)
+                {
+                    return GenerateJsonResult(new
+                    {
+                        status = 0,
+                        msg = "لطفا شماره تراکنش را وارد کنید"
                     });
                 }
 
@@ -1317,18 +1347,27 @@ namespace Amlakbashi.Host.Controllers
                         msg = "شناسه کاربری وارد شده اشتباه است"
                     });
                 }
-                if (transactionId <= 0)
+
+                ReservePaymentType reservePaymentType;
+                if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.GuestClearing))
+                {
+                    reservePaymentType = ReservePaymentType.SiteClearingToHost;
+                }
+                else if(reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.GuestDeposite))
+                {
+                    reservePaymentType = ReservePaymentType.SiteDepositeToHost;
+                }
+                else
                 {
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        msg = "لطفا شماره تراکنش را وارد کنید"
+                        msg = "مهمان پرداختی برای این رزرو انجام نداده است"
                     });
                 }
 
                 var reservePayment = accounting.InsertReservePayment(userId, reserveId, transactionId, referenceId,
-                    ReservePayment.ReservePaymentType.SiteClearingToHost, price,
-                    (ReservePayment.ReservePaymentMethod)paymentMethod, userAccessor.CurrentUser.Id);
+                    reservePaymentType, price, (ReservePayment.ReservePaymentMethod)paymentMethod, userAccessor.CurrentUser.Id);
 
                 if (reservePayment == null)
                 {
@@ -1385,6 +1424,13 @@ namespace Amlakbashi.Host.Controllers
                 var payablePrice = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guestPaidAmount,
                     reserve.CouponPrice, reserve.PrizePrice);
 
+                long clearedDepositeAmount = 0;
+                if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost))
+                {
+                    clearedDepositeAmount = reserve.ReservePayments.FirstOrDefault(f => f.PaymentType == (int)ReservePaymentType.SiteDepositeToHost).Price;
+                    payablePrice -= clearedDepositeAmount;
+                }
+
                 var hostBankCard = bankCardService.GetByUserId(reserve.HostUserID);
                 var bankCardName = hostBankCard != null ?
                     ((hostBankCard.FName != null ? hostBankCard.FName + " " : "") +
@@ -1393,6 +1439,12 @@ namespace Amlakbashi.Host.Controllers
                 if (hostBankCard == null || hostBankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.NotVerified)
                 {
                     ViewBag.error = "شماره شبای کاربر تایید نشده است";
+                    return PartialView("_AutoSiteClearingHost");
+                }
+
+                if (payablePrice < 1)
+                {
+                    ViewBag.error = "مبلغ پرداختی کمتر از حد مجاز است";
                     return PartialView("_AutoSiteClearingHost");
                 }
 
@@ -1530,329 +1582,6 @@ namespace Amlakbashi.Host.Controllers
                 });
             }
         }
-
-        #region old site clearing and refund actions
-        //[Authorize(Policy = Policies.Reserve_Payment_Actions)]
-        //public JsonResult SiteClearingHost(long reserve_id, bool confirmed = false,
-        //int? user_id = null, long transaction_id = 0, long ref_id = 0,
-        //int method_id = 0, long price = 0, bool? send_sms = null)
-        //{
-        //    try
-        //    {
-        //        var reserve = reserveService.Find(reserve_id);
-        //        var advertise = reserve.Advertise;
-        //        var host_user = userService.Find(advertise.UserID);
-        //        var guestPaidAmount = accounting.GetReservePaidAmount(reserve_id,
-        //                StatusStringType.Guest);
-
-        //        var payable_price = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guestPaidAmount,
-        //            reserve.CouponPrice, reserve.PrizePrice);
-
-        //        var days = (int)(reserve.EndDate - reserve.StartDate).TotalDays;
-        //        if (!confirmed)
-        //        {
-        //            var host_name = host_user.FName + " " + host_user.LName;
-        //            if (string.IsNullOrEmpty(host_name))
-        //                host_name = host_user.GetPhoneNumber(Amlakbashi.Core.Entities.User.PhoneType.MainMobile);
-        //            var host_bank_card = bankCardService.GetByUserId(host_user.Id);
-        //            var bank_card_name = host_bank_card != null ?
-        //                ((host_bank_card.FName != null ? host_bank_card.FName + " " : "") +
-        //                (host_bank_card.LName != null ? host_bank_card.LName : "")) : "";
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 2,
-        //                days = days,
-        //                total_price = string.Format("{0:n0}", reserve.TotalPrice) + " تومان",
-        //                guest_payed_price = string.Format("{0:n0}", guestPaidAmount) + " تومان",
-        //                site_portion = string.Format("{0:n0}", guestPaidAmount - payable_price) + " تومان",
-        //                payable_price = string.Format("{0:n0}", payable_price) + " تومان",
-        //                payable_price_raw = payable_price * 10,
-        //                bank_card_number = host_bank_card != null &&
-        //                        !string.IsNullOrEmpty(host_bank_card.BankCardNumber) ?
-        //                        host_bank_card.BankCardNumber : "ثبت نشده",
-        //                bank_card_name = !string.IsNullOrEmpty(bank_card_name) ?
-        //                        bank_card_name : "بدون نام",
-        //                bank_card_verified = host_bank_card != null &&
-        //                        host_bank_card.BankCardStatus == (int)BankCard.BankCardStatusEnum.Verified,
-        //                shaba_verified = host_bank_card != null &&
-        //                        host_bank_card.ShabaStatus == (int)BankCard.BankCardStatusEnum.Verified,
-        //                host_credit = host_user.Credit,
-        //                shaba_number = host_bank_card != null &&
-        //                        !string.IsNullOrEmpty(host_bank_card.ShabaNumber) ?
-        //                        host_bank_card.ShabaNumber : "ثبت نشده",
-        //                host_name = host_name
-        //            });
-        //        }
-        //        if (user_id == null)
-        //        {
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 3,
-        //                error = "",
-        //                default_user_id = userAccessor.CurrentUser.Id,
-        //                default_transaction_id = "",
-        //                default_price = payable_price
-        //            });
-        //        }
-        //        var user = userService.Find(user_id);
-        //        if (user == null)
-        //        {
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 3,
-        //                error = "کاربری با این کد کاربری وجود ندارد",
-        //                default_user_id = userAccessor.CurrentUser.Id,
-        //                default_transaction_id = transaction_id <= 0 ? "" : transaction_id.ToString(),
-        //                default_price = payable_price
-        //            });
-        //        }
-        //        if (transaction_id <= 0)
-        //        {
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 3,
-        //                error = "لطفا شماره تراکنش را وارد کنید",
-        //                default_user_id = user_id,
-        //                default_transaction_id = "",
-        //                default_price = payable_price
-        //            });
-        //        }
-        //        if (send_sms == null)
-        //        {
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 4
-        //            });
-        //        }
-        //        if ((bool)send_sms)
-        //        {
-        //            var identityUser = userService.GetIdentityUser(host_user.MainMobile);
-        //            userService.SendMessage(new UserContactDTO()
-        //            {
-        //                UserMainMobile = host_user.MainMobile,
-        //                UserAppNotificationToken = host_user.AppNotificationToken,
-        //                UserEmail = identityUser.Email,
-        //                UserFcmAppNotificationToken = host_user.FcmAppNotificationToken,
-        //                UserNotificationToken = host_user.NotificationToken,
-        //                Type = UserContactType.SiteClearingHost,
-        //                Price = price.ToString(),
-        //                ReserveId = reserve.Id.ToString(),
-        //                TransactionId = transaction_id.ToString(),
-        //                AdvertiseId = reserve.AdvertiseID.ToString()
-        //            });
-        //        }
-        //        if (accounting.InsertReservePayment((int)user_id,
-        //            reserve_id, transaction_id, ref_id,
-        //            ReservePayment.ReservePaymentType.SiteClearingToHost,
-        //            price, (ReservePayment.ReservePaymentMethod)method_id,
-        //            userAccessor.CurrentUser.Id
-        //            ) == null)
-        //        {
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 0,
-        //                msg = "شماره تراکنش تکراری است"
-        //            });
-        //        }
-        //        return GenerateJsonResult(new
-        //        {
-        //            status = 1,
-        //            msg = "تسویه شد"
-        //        });
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("Reserve.SiteClearingHost", exc);
-        //        return GenerateJsonResult(new
-        //        {
-        //            status = 0,
-        //            msg = "متاسفانه عملیات با خطا مواجه شد"
-        //        });
-        //    }
-        //}
-
-        //[Authorize(Policy = Policies.Reserve_Payment_Actions)]
-        //public JsonResult SiteRefundGuest(long reserve_id, bool confirmed = false, int? user_id = null,
-        //    long transaction_id = 0, long ref_id = 0, int method_id = 0, long price = 0,
-        //    bool? send_sms = null, string new_bank_card_number = null,
-        //    string new_bank_card_fname = null, string new_bank_card_lname = null)
-        //{
-        //    try
-        //    {
-        //        var reserve = reserveService.Find(reserve_id);
-        //        var advertise = reserve.Advertise;
-        //        var guest_user = userService.Find(reserve.UserID);
-        //        var guest_user_card = bankCardService.GetByUserId(guest_user.Id);
-        //        var guest_payed_price = accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(),
-        //            Reserve.StatusStringType.Guest);
-
-        //        if (guest_user_card == null || string.IsNullOrEmpty(guest_user_card.BankCardNumber))
-        //        {
-        //            if (!string.IsNullOrEmpty(new_bank_card_number))
-        //            {
-        //                if (BankUtility.ValidateBankCardNumber(new_bank_card_number))
-        //                {
-        //                    if (string.IsNullOrEmpty(new_bank_card_fname) ||
-        //                        string.IsNullOrEmpty(new_bank_card_lname))
-        //                    {
-        //                        return GenerateJsonResult(new
-        //                        {
-        //                            status = 2,
-        //                            msg = "لطفا نام و نام خانوادگی صاحب کارت را وارد کنید"
-        //                        });
-        //                    }
-        //                    if (guest_user_card != null)
-        //                    {
-        //                        guest_user_card.BankCardNumber = new_bank_card_number;
-        //                        guest_user_card.FName = new_bank_card_fname;
-        //                        guest_user_card.LName = new_bank_card_lname;
-        //                        guest_user_card.LastModifyDate = DateTime.Now;
-        //                        bankCardService.Update(guest_user_card, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
-        //                    }
-        //                    else
-        //                    {
-        //                        guest_user_card = new BankCard()
-        //                        {
-        //                            BankCardNumber = new_bank_card_number,
-        //                            FName = new_bank_card_fname,
-        //                            LName = new_bank_card_lname,
-        //                            BankCardStatus = (int)BankCard.BankCardStatusEnum.Verified,
-        //                            UserID = guest_user.Id,
-        //                            CreateDate = DateTime.Now,
-        //                            LastModifyDate = DateTime.Now
-        //                        };
-        //                        bankCardService.Insert(guest_user_card, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    return GenerateJsonResult(new
-        //                    {
-        //                        status = 2,
-        //                        msg = "شماره کارت وارد شده نامعتبر میباشد"
-        //                    });
-        //                }
-        //            }
-        //            else
-        //            {
-        //                return GenerateJsonResult(new
-        //                {
-        //                    status = 2,
-        //                    msg = ""
-        //                });
-        //            }
-        //        }
-        //        if (!confirmed)
-        //        {
-        //            var guest_name = guest_user.FName + " " + guest_user.LName;
-        //            if (string.IsNullOrEmpty(guest_name))
-        //                guest_name = guest_user.GetPhoneNumber(Amlakbashi.Core.Entities.User.PhoneType.MainMobile);
-        //            var bank_card_name = guest_user_card != null ?
-        //                ((guest_user_card.FName != null ? guest_user_card.FName + " " : "") +
-        //                (guest_user_card.LName != null ? guest_user_card.LName : "")) : "";
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 3,
-        //                total_price = string.Format("{0:n0}", reserve.TotalPrice) + " تومان",
-        //                guest_payed_price = string.Format("{0:n0}", guest_payed_price) + " تومان",
-        //                guest_payed_price_raw = guest_payed_price * 10,
-        //                bank_card_number = guest_user_card != null &&
-        //                        !string.IsNullOrEmpty(guest_user_card.BankCardNumber) ?
-        //                        guest_user_card.BankCardNumber : "ثبت نشده",
-        //                bank_card_name = !string.IsNullOrEmpty(bank_card_name) ?
-        //                        bank_card_name : "بدون نام",
-        //                bank_card_verified = guest_user_card != null &&
-        //                        guest_user_card.BankCardStatus == (int)BankCard.BankCardStatusEnum.Verified,
-        //                guest_name = guest_name
-        //            });
-        //        }
-        //        if (user_id == null)
-        //        {
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 4,
-        //                error = "",
-        //                default_user_id = userAccessor.CurrentUser.Id,
-        //                default_transaction_id = "",
-        //                default_price = guest_payed_price
-        //            });
-        //        }
-        //        var user = userService.Find(user_id);
-        //        if (user == null)
-        //        {
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 4,
-        //                error = "کاربری با این کد کاربری وجود ندارد",
-        //                default_user_id = userAccessor.CurrentUser.Id,
-        //                default_transaction_id = transaction_id <= 0 ? "" : transaction_id.ToString(),
-        //                default_price = guest_payed_price
-        //            });
-        //        }
-        //        if (transaction_id <= 0)
-        //        {
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 4,
-        //                error = "لطفا شماره تراکنش را وارد کنید",
-        //                default_user_id = user_id,
-        //                default_transaction_id = "",
-        //                default_price = guest_payed_price
-        //            });
-        //        }
-        //        if (send_sms == null)
-        //        {
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 5
-        //            });
-        //        }
-        //        if ((bool)send_sms)
-        //        {
-        //            var identityUser = userService.GetIdentityUser(guest_user.MainMobile);
-        //            userService.SendMessage(new UserContactDTO()
-        //            {
-        //                UserMainMobile = guest_user.MainMobile,
-        //                UserAppNotificationToken = guest_user.AppNotificationToken,
-        //                UserEmail = identityUser.Email,
-        //                UserFcmAppNotificationToken = guest_user.FcmAppNotificationToken,
-        //                UserNotificationToken = guest_user.NotificationToken,
-        //                Type = UserContactType.SiteRefundGuest,
-        //                AdvertiseId = reserve.AdvertiseID.ToString(),
-        //                ReserveId = reserve.Id.ToString(),
-        //                TransactionId = transaction_id.ToString(),
-        //                Price = price.ToString()
-        //            });
-        //        }
-        //        if (accounting.InsertReservePayment((int)user_id,
-        //            reserve_id, transaction_id, ref_id,
-        //            ReservePayment.ReservePaymentType.SiteRefundToGuest,
-        //            price, (ReservePayment.ReservePaymentMethod)method_id,
-        //            userAccessor.CurrentUser.Id) == null)
-        //        {
-        //            return GenerateJsonResult(new
-        //            {
-        //                status = 0,
-        //                msg = "شماره تراکنش تکراری است"
-        //            });
-        //        }
-        //        return GenerateJsonResult(new
-        //        {
-        //            status = 1,
-        //            msg = "عودت شد"
-        //        });
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("Reserve.SiteRefundGuest", exc);
-        //        return GenerateJsonResult(new
-        //        {
-        //            status = 0,
-        //            msg = "متاسفانه عملیات با خطا مواجه شد"
-        //        });
-        //    }
-        //}
-        #endregion
 
         [Authorize(Policy = Policies.Reserve_Payment_Actions)]
         public JsonResult SiteClearingWithCredit(long reserve_id)

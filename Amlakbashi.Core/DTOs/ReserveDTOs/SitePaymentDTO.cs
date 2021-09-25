@@ -13,6 +13,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public long TotalPrice { get; set; }
         public long GuestPayedPrice { get; set; }
         public long SitePortion { get; set; }
+        public long ClearingDepositeAmount { get; set; }
         public long PayablePrice { get; set; }
         public long PayablePriceRaw { get; set; }
         public string BankCardNumber { get; set; }

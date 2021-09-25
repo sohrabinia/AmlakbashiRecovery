@@ -266,12 +266,12 @@ namespace Amlakbashi.Host.Controllers
 
 #if DEBUG
         [Authorize(Roles = Roles.TechnicalManager + "," + Roles.TechnicalEmployee)]
-        public ActionResult TestVerifyPasargad(int pid)
+        public ActionResult LocalPay(int payment_id)
         {
             try
             {
                 string msg;
-                if (accounting.TestFinalizePayment(pid, userAccessor.CurrentUser.Id, out msg))
+                if (accounting.TestFinalizePayment(payment_id, userAccessor.CurrentUser.Id, out msg))
                 {
                     TempData["payment_success_msg"] = msg;
                 }
@@ -284,7 +284,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 TempData["payment_error_msg"] = exc.Message;
             }
-            var objpay = accounting.FindPayment(pid);
+            var objpay = accounting.FindPayment(payment_id);
             string redirect_controller;
             string redirect_action;
             if (objpay.ProductType.Contains("Reserve"))

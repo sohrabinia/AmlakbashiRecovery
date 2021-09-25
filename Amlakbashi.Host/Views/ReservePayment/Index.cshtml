@@ -19,46 +19,26 @@
             <tr>
                 <td class="label"> کد پرداخت :</td>
                 <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.reserve_payment_id" name="reserve_payment_id" />
+                    <input type="text" style="width:100px;" value="@ViewBag.reserve_payment_id" name="reserve_payment_id" />
                 </td>
                 <td class="label"> کد رزرو :</td>
                 <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.reserve_id" name="reserve_id" />
+                    <input type="text" style="width:100px;" value="@ViewBag.reserve_id" name="reserve_id" />
                 </td>
                 <td class="label"> کد آگهی :</td>
                 <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.advertise_id" name="advertise_id" />
+                    <input type="text" style="width:100px;" value="@ViewBag.advertise_id" name="advertise_id" />
+                </td>
+                <td class="label"> کد کاربر :</td>
+                <td class="minw">
+                    <input type="text" style="width:100px;" value="@ViewBag.user_id" name="user_id" />
                 </td>
             </tr>
-            @*<tr>
-                <td class="label"> کد آگهی :</td>
-                <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.advertise_id" name="advertise_id" />
-                </td>
-                <td class="label"> کد کاربر :</td>
-                <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.user_id" name="user_id" />
-                </td>
-            </tr>*@
             <tr>
-                <td class="label"> کد کاربر :</td>
-                <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.user_id" name="user_id" />
-                </td>
                 <td class="label"> شماره تراکنش :</td>
                 <td class="minw">
-                    <input type="text" style="width:150px;" value="@ViewBag.transaction_id" name="transaction_id" />
+                    <input type="text" style="width:100px;" value="@ViewBag.transaction_id" name="transaction_id" />
                 </td>
-                <input type="hidden" name="status" value="0" />
-                @*<td class="label">وضعیت :</td>
-        <td class="minw">
-            <select name="status">
-                <option value="0" @IsSelected(ViewBag.status == 0)> پرداخت شده ها</option>
-                <option value="@((int)ReservePayment.ReservePaymentStatus.Deleted)" @IsSelected(ViewBag.status == (int)ReservePayment.ReservePaymentStatus.Deleted)> پاک شده ها</option>
-            </select>
-        </td>*@
-            </tr>
-            <tr>
                 <td class="label">نوع پرداخت :</td>
                 <td class="minw">
                     <select name="payment_type">
@@ -86,8 +66,8 @@
                         }
                     </select>
                 </td>
+                <td></td>
                 <td><input type="submit" class="filter" value="فیلتر" /></td>
-                <td style="width:100%;"></td>
             </tr>
         </table>
     </div>
@@ -203,7 +183,7 @@
                     { contentUrl: '/ReservePayment/CheckPodiumPaymentStatus?reservePaymentId=' + id, fullScreen: screen.width < 781 }
                 );
             }
-            
+
         }
     </script>
 }

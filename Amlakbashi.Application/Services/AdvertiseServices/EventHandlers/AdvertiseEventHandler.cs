@@ -140,7 +140,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
         public Task Handle(ChangeAdvertisePriceEvent notification, CancellationToken cancellationToken)
         {
             var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
-            if (acc.BasePrice != acc.DailyPrice)
+            if (acc.Mode != AdvertiseMode.Parent && acc.BasePrice != acc.DailyPrice)
             {
                 acc.BasePrice = acc.DailyPrice;
                 advertiseRepository.Update(acc);
@@ -392,7 +392,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             var areaTitle = child.RegionArea != null ? child.RegionArea.PersianName : null;
             child.OldSlug = AdvertiseUrlLocalization.GetOldSlug(child.Title, (int)child.TypeID);
             child.Slug = child.Id.ToString() + "-" + child.OldSlug;
-            child.MetaTitle = child.Title + " - املاک باشی";
+            child.MetaTitle = child.Title + " | املاک باشی";
             child.MetaDescription = AdvertiseSeoLocalization.GetMetaDescription(child, cityTitle, areaTitle);
 
             //save changes
