@@ -47,6 +47,11 @@ else
     <div>
         <span>سهم املاک باشی:</span>
         <span>@string.Format("{0:n0}", Model.SitePortion) تومان</span>
+        @if (Model.ClearingDepositeAmount > 0)
+        {
+            <span class="row-margin">بیعانه تسویه شده:</span>
+            <span>@string.Format("{0:n0}", Model.ClearingDepositeAmount) تومان</span>
+        }
     </div>
     <div>
         <span>مبلغ قابل پرداخت:</span>
@@ -58,7 +63,7 @@ else
         <span>نام میزبان:</span>
         <span>@Model.UserName</span>
         <span class="row-margin">موجودی کیف پول:</span>
-        <span style="color: @(Model.UserCredit < 0 ? "red" : Model.UserCredit > 0 ? "limegreen" : "black");">@Model.UserCredit</span>
+        <span style="color: @(Model.UserCredit < 0 ? "red" : Model.UserCredit > 0 ? "limegreen" : "black");">@string.Format("{0:n0}", Model.UserCredit) تومان</span>
     </div>
     <div class="bankcard-info-container">
         <div>

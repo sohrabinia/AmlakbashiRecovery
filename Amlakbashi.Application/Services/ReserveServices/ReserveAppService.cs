@@ -154,7 +154,9 @@ namespace Amlakbashi.Application.Services.ReserveServices
             }
             if (site_cleared_status == 0)//payed
             {
-                model = model.Where(w => w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteClearingToHost));
+                model = model.Where(w => w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteClearingToHost) ||
+                    (w.ReservePayments.Any(a=>a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost) &&
+                    w.ReservePayments.Any(a=>a.PaymentType == (int)ReservePaymentType.GuestClearing) == false));
             }
             else if (site_cleared_status == 1)//not payed
             {
@@ -162,14 +164,18 @@ namespace Amlakbashi.Application.Services.ReserveServices
                     w.Status == Reserve.ReserveStatus.Started ||
                     w.Status == Reserve.ReserveStatus.Completed ||
                     w.Status == Reserve.ReserveStatus.CashPay) &&
-                    !w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteClearingToHost));
+                    w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteClearingToHost) == false);
 
                 var matchedIds = new List<long>();
                 foreach (var item in model)
                 {
-                    var guestPaidAmount = accounting.GetReservePaidAmount(item.Id,
-                        StatusStringType.Guest);
-                    if (PriceUtility.CalculateHostPayablePrice(item.TotalPrice, guestPaidAmount, item.CouponPrice, item.PrizePrice) > 0)
+                    var guestPaidAmount = accounting.GetReservePaidAmount(item.Id, StatusStringType.Guest);
+                    var payablePrice = PriceUtility.CalculateHostPayablePrice(item.TotalPrice, guestPaidAmount, item.CouponPrice, item.PrizePrice);
+                    if (item.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost))
+                    {
+                        payablePrice -= item.ReservePayments.FirstOrDefault(f => f.PaymentType == (int)ReservePaymentType.SiteDepositeToHost).Price;
+                    }
+                    if (payablePrice > 0)
                     {
                         matchedIds.Add(item.Id);
                     }

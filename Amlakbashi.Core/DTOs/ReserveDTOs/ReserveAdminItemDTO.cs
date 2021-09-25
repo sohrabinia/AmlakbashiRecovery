@@ -63,11 +63,12 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                 ReservePayment.ReservePaymentType.GuestDeposite,
                 out depositePayDate, out depositeTransactionId,
                 reserve.UserID);
-            DateTime hostSitePortionDate;
-            long hostSitePortionTransactionId;
-            var hostSitePortionPrice = reserve.GetReservePaymentPrice(
-                ReservePayment.ReservePaymentType.GuestDeposite,
-                out hostSitePortionDate, out hostSitePortionTransactionId, linkAdvertise.UserID);
+            //DateTime hostSitePortionDate;
+            //long hostSitePortionTransactionId;
+            //var hostSitePortionPrice = reserve.GetReservePaymentPrice(
+            //    ReservePayment.ReservePaymentType.GuestDeposite,
+            //    out hostSitePortionDate, out hostSitePortionTransactionId, linkAdvertise.UserID);
+            var hostSitePortionPrice = reserve.TotalPrice / 10;
             DateTime totalPayDate;
             long totalTransactionId;
             var totalPaidPrice = reserve.GetReservePaymentPrice(
@@ -78,6 +79,11 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             var clearingPaidPrice = reserve.GetReservePaymentPrice(
                 ReservePayment.ReservePaymentType.SiteClearingToHost,
                 out clearingPayDate, out clearingTransactionId, 0);
+            DateTime hostClearingDepositeDate;
+            long hostClearingDepositeTransactionId;
+            var hostClearingDepositeAmount = reserve.GetReservePaymentPrice(
+                ReservePayment.ReservePaymentType.SiteDepositeToHost,
+                out hostClearingDepositeDate, out hostClearingDepositeTransactionId, 0);
             DateTime refundPayDate;
             long refundTransactionId;
             var refundPaidPrice = reserve.GetReservePaymentPrice(
@@ -93,43 +99,32 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                     transactionId = depositeTransactionId,
                     amount = depositePaidPrice,
                     dateString = DateTimeUtility.GregorianToPersianDate(depositePayDate).Remove(0, 2) +
-                    "_" + depositePayDate.ToString("HH:mm")
+                        " " + depositePayDate.ToString("HH:mm")
                 });
             }
             if (totalPaidPrice > 0)
             {
                 generatedPayments.Add(new PaymentHelperDTO()
                 {
-                    title = "کل مبلغ",
+                    title = "تسویه مهمان",
                     type = PaymentHelperDTO.PaymentType.Total,
                     transactionId = totalTransactionId,
                     amount = totalPaidPrice,
                     dateString = DateTimeUtility.GregorianToPersianDate(totalPayDate).Remove(0, 2) +
-                    "_" + totalPayDate.ToString("HH:mm")
+                        " " + totalPayDate.ToString("HH:mm")
                 });
             }
-            if (hostSitePortionPrice > 0)
+            if (clearingPaidPrice > 0 || hostClearingDepositeAmount > 0)
             {
-                generatedPayments.Add(new PaymentHelperDTO()
-                {
-                    title = "درصد سایت",
-                    type = PaymentHelperDTO.PaymentType.HostSitePortion,
-                    transactionId = hostSitePortionTransactionId,
-                    amount = hostSitePortionPrice,
-                    dateString = DateTimeUtility.GregorianToPersianDate(hostSitePortionDate).Remove(0, 2) +
-                    "_" + hostSitePortionDate.ToString("HH:mm")
-                });
-            }
-            if (clearingPaidPrice > 0)
-            {
+                var clearingToHostAmount = clearingPaidPrice + hostClearingDepositeAmount;
                 generatedPayments.Add(new PaymentHelperDTO()
                 {
                     type = PaymentHelperDTO.PaymentType.Clearing,
                     transactionId = clearingTransactionId,
-                    title = "سهم میزبان",
-                    amount = clearingPaidPrice,
-                    dateString = DateTimeUtility.GregorianToPersianDate(clearingPayDate).Remove(0, 2) +
-                    "_" + clearingPayDate.ToString("HH:mm")
+                    title = "تسویه میزبان",
+                    amount = clearingToHostAmount,
+                    dateString = DateTimeUtility.GregorianToPersianDate(clearingPaidPrice > 0 ? clearingPayDate : hostClearingDepositeDate)
+                    .Remove(0, 2) + " " + clearingPayDate.ToString("HH:mm")
                 });
             }
             if (refundPaidPrice > 0)
@@ -141,7 +136,19 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                     transactionId = refundTransactionId,
                     amount = refundPaidPrice,
                     dateString = DateTimeUtility.GregorianToPersianDate(refundPayDate).Remove(0, 2) +
-                    "_" + refundPayDate.ToString("HH:mm")
+                        " " + refundPayDate.ToString("HH:mm")
+                });
+            }
+            if (totalPaidPrice > 0 && hostSitePortionPrice > 0)
+            {
+                generatedPayments.Add(new PaymentHelperDTO()
+                {
+                    title = "درصد سایت",
+                    type = PaymentHelperDTO.PaymentType.HostSitePortion,
+                    //transactionId = hostSitePortionTransactionId,
+                    amount = hostSitePortionPrice,
+                    //dateString = DateTimeUtility.GregorianToPersianDate(hostSitePortionDate).Remove(0, 2) +
+                    //    "_" + hostSitePortionDate.ToString("HH:mm")
                 });
             }
             var hostPayablePrice = PriceUtility.CalculateHostPayablePrice(

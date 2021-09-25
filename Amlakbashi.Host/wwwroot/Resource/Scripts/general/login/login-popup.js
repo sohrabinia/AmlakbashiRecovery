@@ -2,7 +2,7 @@
 var input = document.querySelector("#mobile")
 var intl = window.intlTelInput(input, {
     preferredCountries: ["ir"],
-    utilsScript: "/file/getjs?src=/resource/scripts/general/login/utils.js"
+    utilsScript: "/resource/scripts/general/login/utils.js"
 });
 
 //------------------------

@@ -17,7 +17,7 @@ else
     </div>
     <div>
         <span>مبلغ پرداخت:</span>
-        <span>@ViewBag.price ریال</span>
+        <span>@string.Format("{0:n0}", ViewBag.price) ریال</span>
     </div>
     <div>
         <label>ارسال پیامک به میزبان</label>

@@ -154,8 +154,7 @@ namespace Amlakbashi.Accounting
         {
             var reserve = repository.FindReserve(reserveId);
             var reservePayments = reserve.ReservePayments;
-            if (reservePayments.Any(w =>
-                w.PaymentType == (int)ReservePaymentType.SiteClearingToHost))
+            if (reservePayments.Any(w => w.PaymentType == (int)ReservePaymentType.SiteClearingToHost))
             {
                 return false;
             }
@@ -167,7 +166,12 @@ namespace Amlakbashi.Accounting
                 return false;
             }
             var guest_payed = GetReservePaidAmount(reserveId, StatusStringType.Guest);
-            if (PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guest_payed, reserve.CouponPrice, reserve.PrizePrice) <= 0)
+            var payablePrice = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guest_payed, reserve.CouponPrice, reserve.PrizePrice);
+            if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost))
+            {
+                payablePrice -= reserve.ReservePayments.FirstOrDefault(f => f.PaymentType == (int)ReservePaymentType.SiteDepositeToHost).Price;
+            }
+            if (payablePrice <= 0)
                 return false;
             return true;
         }
@@ -1159,11 +1163,7 @@ namespace Amlakbashi.Accounting
             }
 
             var hostUser = reserve.HostUser;
-            var guestPaidAmount = GetReservePaidAmount(reserveId, StatusStringType.Guest);
-            var payablePrice = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guestPaidAmount,
-                reserve.CouponPrice, reserve.PrizePrice);
             var hostBankCard = repository.FindBankCardByUserId(hostUser.Id);
-
             if (hostBankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.NotVerified)
             {
                 return new ShebaPaymentResultDTO()
@@ -1171,6 +1171,35 @@ namespace Amlakbashi.Accounting
                     HasError = true,
                     ErrorMessage = "شماره شبای کاربر تایید نشده است"
                 };
+            }
+
+            ReservePaymentType reservePaymentType;
+            if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.GuestClearing))
+            {
+                reservePaymentType = ReservePaymentType.SiteClearingToHost;
+            }
+            else if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.GuestDeposite))
+            {
+                reservePaymentType = ReservePaymentType.SiteDepositeToHost;
+            }
+            else
+            {
+                return new ShebaPaymentResultDTO()
+                {
+                    HasError = true,
+                    ErrorMessage = "مهمان پرداختی برای این رزرو انجام نداده است"
+                };
+            }
+            
+            var guestPaidAmount = GetReservePaidAmount(reserveId, StatusStringType.Guest);
+            var payablePrice = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guestPaidAmount,
+                reserve.CouponPrice, reserve.PrizePrice);
+
+            long clearedDepositeAmount = 0;
+            if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost))
+            {
+                clearedDepositeAmount = reserve.ReservePayments.FirstOrDefault(f => f.PaymentType == (int)ReservePaymentType.SiteDepositeToHost).Price;
+                payablePrice -= clearedDepositeAmount;
             }
 
             var payment = new Payment()
@@ -1197,19 +1226,12 @@ namespace Amlakbashi.Accounting
                 CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
             };
             var result = bankingOperator.ShebaPayment(payDTO);
-            //var result = new ShebaPaymentResultDTO()
-            //{
-            //    HasError = false,
-            //    Message = "پرداخت با موفقیت انجام شد",
-            //    PayablePrice = payablePrice * 10,
-            //    TraceNumber = "98765351364"
-            //};
 
             if (result.HasError == false)
             {
                 var reservePayment = new ReservePayment()
                 {
-                    PaymentType = (int)ReservePayment.ReservePaymentType.SiteClearingToHost,
+                    PaymentType = (int)reservePaymentType,
                     ReserveID = reserveId,
                     UserID = operatorId,
                     Price = payablePrice,
@@ -1271,13 +1293,6 @@ namespace Amlakbashi.Accounting
                 CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
             };
             var result = bankingOperator.ShebaPayment(payDTO);
-            //var result = new ShebaPaymentResultDTO()
-            //{
-            //    HasError = false,
-            //    Message = "پرداخت با موفقیت انجام شد",
-            //    PayablePrice = user.Credit * 10,
-            //    TraceNumber = "98765351364"
-            //};
 
             if (result.HasError == false)
             {
