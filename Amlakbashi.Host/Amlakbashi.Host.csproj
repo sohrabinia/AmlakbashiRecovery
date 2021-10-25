@@ -8,6 +8,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\Content\advertisecache\**" />
+    <Compile Remove="wwwroot\Content\logocache\**" />
+    <Compile Remove="wwwroot\Content\test\**" />
+    <Compile Remove="wwwroot\Content\webp\**" />
+    <Content Remove="wwwroot\Content\advertisecache\**" />
+    <Content Remove="wwwroot\Content\logocache\**" />
+    <Content Remove="wwwroot\Content\test\**" />
+    <Content Remove="wwwroot\Content\webp\**" />
+    <EmbeddedResource Remove="wwwroot\Content\advertisecache\**" />
+    <EmbeddedResource Remove="wwwroot\Content\logocache\**" />
+    <EmbeddedResource Remove="wwwroot\Content\test\**" />
+    <EmbeddedResource Remove="wwwroot\Content\webp\**" />
+    <None Remove="wwwroot\Content\advertisecache\**" />
+    <None Remove="wwwroot\Content\logocache\**" />
+    <None Remove="wwwroot\Content\test\**" />
+    <None Remove="wwwroot\Content\webp\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\js\dashboard.min.js" />
   </ItemGroup>
 
@@ -243,14 +262,10 @@
     <Folder Include="Logs\HangfireLogs\" />
     <Folder Include="Logs\ImpersonationLogs\" />
     <Folder Include="Logs\Logs\" />
-    <Folder Include="wwwroot\Content\advertisecache\" />
     <Folder Include="wwwroot\Content\blogpost\" />
     <Folder Include="wwwroot\Content\ErrorLog\" />
     <Folder Include="wwwroot\Content\files\" />
     <Folder Include="wwwroot\Content\imgcache\" />
-    <Folder Include="wwwroot\Content\logocache\" />
-    <Folder Include="wwwroot\Content\test\" />
-    <Folder Include="wwwroot\Content\webp\" />
     <Folder Include="wwwroot\css\" />
     <Folder Include="wwwroot\Resource\packages\jquery-mobile\images\" />
   </ItemGroup>

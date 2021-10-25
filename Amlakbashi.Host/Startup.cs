@@ -11,6 +11,7 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Hangfire;
 using Hangfire.SqlServer;
+using log4net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -155,7 +156,7 @@ namespace Amlakbashi.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, BackgroundStartup backgroundStartup)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, BackgroundStartup backgroundStartup, ILog logger)
         {
             if (env.IsDevelopment())
             {
