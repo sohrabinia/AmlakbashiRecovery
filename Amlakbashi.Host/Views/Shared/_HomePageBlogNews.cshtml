@@ -1,22 +1,21 @@
 ﻿@model IEnumerable<BlogPost>
-@{
-}
+
 @if (Model != null && Model.Any())
 {
-<section class="home-page_style-box">
-    <a target="_blank" href="https://blog.amlakbashi.com" class="home-page__link text-border-bottom_style" rel="noreferrer">
-        <h3>جدیدترین مطالب وبلاگ</h3>
-        مشاهده همه
-    </a>
-    <div class="home-page__blog-news-container">
-        @foreach (var item in Model)
-        {
-            @await Html.PartialAsync("_BlogNewsItem", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) {
-                {"title", item.Title },
-                {"href", item.BlogLink },
-                {"photoId", item.PhotoID }
-            })
-        }
-    </div>
-</section>
+    <section class="home-page_style-box">
+        <a target="_blank" href="https://www.amlakbashi.com/mag" class="home-page__link text-border-bottom_style" rel="noreferrer">
+            <h3>جدیدترین مطالب وبلاگ</h3>
+            مشاهده همه
+        </a>
+        <div class="home-page__blog-news-container">
+            @foreach (var item in Model)
+            {
+                @await Html.PartialAsync("_BlogNewsItem", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) {
+                    {"title", item.Title },
+                    {"href", item.BlogLink },
+                    {"photoId", item.PhotoID }
+                })
+            }
+        </div>
+    </section>
 }
