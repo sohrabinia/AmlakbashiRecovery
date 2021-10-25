@@ -25,6 +25,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Suit
             BuildAdvertisePart<AmenitiesPart>();
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<OwnershipPart>();
+            BuildAdvertisePart<ElevatorPart>();
         }
     }
 }

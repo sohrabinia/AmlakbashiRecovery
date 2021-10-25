@@ -36,7 +36,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Hut
             BuildAdvertisePart<RoomPart>();
             BuildAdvertisePart<ParkingPart>();
             BuildAdvertisePart<FloorPart>();
-            BuildAdvertisePart<ElevatorPart>();
+            //BuildAdvertisePart<ElevatorPart>();
         }
     }
 }
