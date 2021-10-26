@@ -3,6 +3,7 @@ using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.Identity;
+using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using log4net;
 using Microsoft.AspNetCore.Authorization;
@@ -19,11 +20,14 @@ namespace Amlakbashi.Host.Controllers
     {
         private readonly IAccountingFacade accounting;
         private readonly IUserAppService userService;
+        private readonly IUserAccessor userAccessor;
         private readonly ILog logger;
-        public PaymentController(ILog logger, IAccountingFacade accounting, IUserAppService userService)
+        public PaymentController(ILog logger, IAccountingFacade accounting,
+            IUserAppService userService, IUserAccessor userAccessor)
         {
             this.accounting = accounting;
             this.userService = userService;
+            this.userAccessor = userAccessor;
             this.logger = logger;
         }
 
@@ -71,7 +75,7 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("Cart.PaymentIndex", exc);
+                logger.Error("Payment.Index", exc);
                 return Redirect(Request.Headers["Referer"].ToString());
             }
         }
@@ -86,8 +90,29 @@ namespace Amlakbashi.Host.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("ReservePayment.CheckPodiumPaymentStatus", exc);
+                logger.Error("Payment.CheckPodiumPaymentStatus", exc);
                 return PartialView("_CheckPodiumPaymentStatus");
+            }
+        }
+
+        [Authorize(Policy = Policies.Payment_Actions)]
+        public IActionResult RegisterNotPaidPayment(long paymentId)
+        {
+            try
+            {
+                var result = accounting.RegisterNotPaidPayment(paymentId, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new
+                {
+                    status = result ? 1 : 0
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Payment.RegisterNotPaidPayment", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0
+                });
             }
         }
     }

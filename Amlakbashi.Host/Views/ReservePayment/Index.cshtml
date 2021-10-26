@@ -9,6 +9,12 @@
     .table-content-row:nth-child(2n+1) {
         background-color: #eee;
     }
+    .pay-status-btn {
+        font-size: large;
+        color: black;
+        cursor: pointer;
+        margin-right: 5px;
+    }
 </style>
 
 @using (Html.BeginForm("Index", "ReservePayment", FormMethod.Post))
@@ -144,20 +150,12 @@
                 }
                 <td>@item.TransactionID</td>
                 <td>@string.Format("{0:n0}", item.Price) تومان</td>
-                @*<td>@Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(item.CreateDate)</td>*@
                 <td style="direction: ltr;">@Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(item.CreateDate, false, true).ToString()</td>
                 <td>
                     <a href="@Url.Action("AddEdit",new {reserve_payment_id = item.Id})"><i style="font-size: large; color: black;" class="fas fa-edit" title="ویرایش"></i></a>
                     @if (item.PaymentMethod == (int)ReservePayment.ReservePaymentMethod.Podium)
                     {
-                        @if (item.PaymentId != null)
-                        {
-                            <span style="font-size: large; color: black; cursor: pointer; margin-right: 5px;" class="fas fa-sync" onclick="CheckPaymentStatus(@item.PaymentId, true)"></span>
-                        }
-                        else
-                        {
-                            <span style="font-size: large; color: black; cursor: pointer; margin-right: 5px;" class="fas fa-sync" onclick="CheckPaymentStatus(@item.Id)"></span>
-                        }
+                        <span class="fas fa-sync pay-status-btn" onclick="CheckPaymentStatus(@item.PaymentId)"></span>
                     }
                 </td>
             </tr>
@@ -172,18 +170,10 @@
 @section ScriptBlock
 {
     <script type="text/javascript">
-        function CheckPaymentStatus(id, checkWithPayment) {
-            if (checkWithPayment) {
-                showInfoMessage('وضعیت انتقال وجه', '',
-                    { contentUrl: '/Payment/CheckPodiumPaymentStatus?paymentId=' + id, fullScreen: screen.width < 781 }
-                );
-            }
-            else {
-                showInfoMessage('وضعیت انتقال وجه', '',
-                    { contentUrl: '/ReservePayment/CheckPodiumPaymentStatus?reservePaymentId=' + id, fullScreen: screen.width < 781 }
-                );
-            }
-
+        function CheckPaymentStatus(id) {
+            showInfoMessage('وضعیت انتقال وجه', '',
+                { contentUrl: '/Payment/CheckPodiumPaymentStatus?paymentId=' + id, fullScreen: screen.width < 781 }
+            );
         }
     </script>
 }
