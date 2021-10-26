@@ -136,6 +136,7 @@ namespace Amlakbashi.Accounting
         ShebaVerificationResultDTO VerifySheba(string sheba);
         ShebaPaymentResultDTO SiteClearingHostAutoPayment(long reserveId, int operatorId);
         ShebaPaymentResultDTO WalletClearingAutoPayment(int userId, int operatorId);
-        CheckShebaPaymentResultDTO CheckShebaPaymentStatus(long paymentId, bool isReservePayment = false);
+        CheckShebaPaymentResultDTO CheckShebaPaymentStatus(long paymentId);
+        bool RegisterNotPaidPayment(long paymentId, int operatorId);
     }
 }

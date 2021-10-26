@@ -1,5 +1,14 @@
 ﻿@model Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs.CheckShebaPaymentResultDTO
 
+<style>
+    .pay-btn {
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 5px;
+        font: 1em miransans;
+    }
+</style>
+
 @if (Model == null)
 {
     <div>
@@ -26,4 +35,33 @@ else
         <span>شرح وضعیت:</span>
         <span>@Model.Value</span>
     </div>
+    <br />
+    @if (Model.PaymentStatus == Payment.PaymentStatus.NotPaid)
+    {
+        <div style="text-align: center;">
+            <p style="color: red;">پرداخت مورد نظر توسط بانک تایید شده، اما در پایگاه داده ثبت نشده است!</p>
+            <button class="pay-btn" onclick="RegisterNotPaidPayment()" type="button">ثبت پرداخت</button>
+        </div>
+    }
 }
+
+<script>
+    function RegisterNotPaidPayment() {
+        $.ajax({
+            type: "POST",
+            url: "/payment/RegisterNotPaidPayment",
+            data: {
+                paymentId: @Model.PaymentId
+            },
+            success: function (response) {
+                if (response.status == 0) {
+                    alertify.error("پرداخت ثبت نشد");
+                }
+                else {
+                    alertify.success("پرداخت با موفقیت ثبت شد");
+                    popupMsgList[0].btnClick(0, true);
+                }
+            }
+        });
+    }
+</script>

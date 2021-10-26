@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Amlakbashi.Core.Entities;
 
 namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
 {
@@ -9,5 +10,7 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
         public string RefrenceNumber { get; set; }
         public string Key { get; set; }
         public string Value { get; set; }
+        public Payment.PaymentStatus PaymentStatus { get; set; }
+        public int PaymentId { get; set; }
     }
 }
