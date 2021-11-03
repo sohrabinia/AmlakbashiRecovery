@@ -1,0 +1,166 @@
+﻿@model Amlakbashi.Core.DTOs.ReserveDTOs.ReserveIndexDetailsInfoDTO
+
+@if (Model == null)
+{
+    <p>داده ای پیدا نشد</p>
+}
+else
+{
+    <div class="box-more-options js-more-option">
+        <div class="status-payment">
+            <span><b>زمان درخواست:</b> @Model.CreateDateString |</span>
+            <span><b>مبلغ کل:</b> @string.Format("{0:n0}", Model.TotalPrice) |</span>
+
+            @if (Model.DepositePrice != Model.TotalPrice)
+            {
+                <span><b>بیعانه:</b> @string.Format("{0:n0}", Model.DepositePrice) |</span>
+            }
+
+            @if (Model.InstantReserve)
+            {
+                <span><b style="color:red;">رزرو آنی</b> |</span>
+            }
+            else
+            {
+                <span><b>پاسخ میزبان:</b> @Model.HostResponseString</span>
+                if ((Reserve.HostResponseEnum)Model.HostResponse != Reserve.HostResponseEnum.None)
+                {
+                    <span>(@Model.HostResponseDateString @Model.HostResponseTimeString)</span>
+                }
+            }
+        </div>
+
+        <div class="mobile-details-travel">
+            <span>جزییات سفر‌:</span> از @Model.StartDateString تا @Model.EndDateString | @Model.GuestCount نفر به مدت @Model.StayDays شب |
+        </div>
+
+        @if (Model.PaymentTryCount > 0 || Model.PaymentList.Count > 0)
+        {
+            <div class="status-payment">
+                @if (Model.PaymentTryCount > 0)
+                {
+                    <span style="color:#EA4335">@Model.PaymentTryCount تلاش برای پرداخت</span>
+                    <span>(@Model.LastPaymentTryDate) | </span>
+                }
+                @foreach (var paymentItem in Model.PaymentList)
+                {
+                    <span>@(paymentItem.title):</span>
+                    <span style="color:#34A853">@string.Format("{0:n0}", paymentItem.amount) ت</span>
+                    if (string.IsNullOrEmpty(paymentItem.dateString) == false)
+                    {
+                        <span>(@paymentItem.dateString)</span>
+                    }
+                    <span>|</span>
+                }
+            </div>
+        }
+
+        <div class="status-spport mobile-status-support">
+            وضعیت پیشتیبانی :
+            <p style="color:@(Model.SupportStateColor)">@(Model.SupportStateString)</p>
+            @if (Model.CanGrantSupport)
+            {
+                <p class="accept-support" onclick="doSupport(@(Model.Id),this)">انجام پشتیبانی</p>
+            }
+            @foreach (var rs in Model.Supporters)
+            {
+                <div class="user-support">
+                    @if (rs.imageId > 0)
+                    {
+                        <img src="@string.Format("/file/imgThumb?FileID={0}&w=200&h=200", rs.imageId)" alt="avatar" width="30" height="30" class="avatar-support">
+                    }
+                    else
+                    {
+                        <img src="/resource/img/avatar.gif" alt="avatar" width="30" height="30" class="avatar-support">
+                    }
+                    <p> @rs.name</p>
+                    @if (!string.IsNullOrEmpty(rs.transferReason))
+                    {
+                        <i style="cursor:pointer;color:#EA4335;" class="fa fa-info-circle" onclick="showInfoPopup('دلیل انتقال پشتیبانی', '@(rs.transferReason)')"></i>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- دکمه های عملیاتی -->
+        <i class="fas fa-edit" onclick="showReserveEditForm(@Model.Id)" title="ویرایش"></i>
+        <a asp-controller="reserve" asp-action="newindex" asp-route-GuestUserId="@Model.GuestUserId" class="fas fa-archive" title="رزرو های این مهمان"></a>
+        @if (Model.Status == (int)Reserve.ReserveStatus.WaitForResponse || Model.Status == (int)Reserve.ReserveStatus.WaitForReserve)
+        {
+            <i class="fas fa-times-circle" title="لغو رزرو توسط سیستم" onclick="cancelBySystem(@Model.Id, this)"></i>
+        }
+        <a asp-controller="reserve" asp-action="chat" asp-route-reserve_id="@Model.Id" target="_blank" class="fas fa-comments" title="چت ها"></a>
+        <i class="fas fa-comments-dollar" title="مذاکره لغو رزرو" onclick="showCancelDiscussion(@Model.Id)"></i>
+        <i class="fas fa-eye" title="افزودن درحال پیگیری" onclick="toggleShouldFollow(@Model.Id, this)" style="@(Model.ShouldFollow ? "color: limegreen;" : "")"></i>
+        @if (Model.Status == (int)Reserve.ReserveStatus.WaitForResponse || Model.Status == (int)Reserve.ReserveStatus.WaitForReserve)
+        {
+            <i class="fas fa-ban" title="عدم لغو سیستم" onclick="toggleDisableAutoCancel(@Model.Id, this)" data-value="@Model.DisableAutoCancel.ToString().ToLower()" style='@(Model.DisableAutoCancel ? "color: limegreen;" : "")'></i>
+        }
+        <i class="fas fa-map-marker-alt" title="بازدید مهمان از اقامتگاه" onclick="toggleAccVisited(@Model.Id, this)" data-value="@Model.AccVisitedByGuest.ToString().ToLower()" style='@(Model.AccVisitedByGuest ? "color: limegreen;" : "")'></i>
+        @if (Model.Status == (int)Reserve.ReserveStatus.WaitForResponse)
+        {
+            <i class="fas fa-phone-square" title="تماس سیستم با میزبان" onclick="callForRequest(@Model.Id)"></i>
+        }
+        else if (Model.Status == (int)Reserve.ReserveStatus.WaitForReserve)
+        {
+            <i class="fas fa-phone-square" title="تماس سیستم با مهمان" onclick="callForPayment(@Model.Id)"></i>
+        }
+
+        <i class="fas fa-donate" title="افزودن پرداخت مهمان" onclick="addGuestPayment(@Model.Id)"></i>
+        <a asp-controller="reservepayment" asp-action="index" asp-route-reserve_Id="@Model.Id" target="_blank" class="fas fa-file-invoice-dollar" title="لیست پرداخت ها"></a>
+        <a asp-controller="payment" asp-action="index" asp-route-reserveId="@Model.Id" target="_blank" class="fa fa-credit-card" title="لیست پرداخت های آنلاین"></a>
+        @if (Model.MustDoClearing)
+        {
+            <i class="fas fa-money-check-alt" onclick="showSiteClearingHostPopup(@Model.Id)" style="color:orange;" title="تسویه میزبان"></i>
+            <i class="fas fa-wallet" onclick="siteClearingHostWithCredit(@Model.Id, this)" style="color:orange;" title="تسویه میزبان با کیف پول"></i>
+        }
+        else if (Model.CanDoClearing)
+        {
+            <i class="fas fa-money-check-alt" onclick="showSiteClearingHostPopup(@Model.Id)" style="color:green;" title="تسویه میزبان"></i>
+            <i class="fas fa-wallet" onclick="siteClearingHostWithCredit(@Model.Id, this)" style="color:green;" title="تسویه میزبان با کیف پول"></i>
+        }
+        @if (Model.MustRefund)
+        {
+            <i class="fas fa-money-check-alt" style="color:red;" onclick="showSiteRefundGuestPopup(@Model.Id)" title="عودت به مهمان"></i>
+            <i class="fas fa-wallet" style="color:red;" onclick="siteRefundGuestWithCredit(@Model.Id, this)" title="عودت به مهمان با کیف پول"></i>
+        }
+        @if (Model.CanBePaidByHost)
+        {
+            <i class="fas fa-wallet" onclick="payReserveWithCreditHost(@Model.Id, this)" style="color:dodgerblue;" title="کسر درصد املاک باشی از کیف پول میزبان"></i>
+        }
+
+        <span onclick="showAdminDescriptionWindow(this)" class="view-description-support">توضیحات پشتیبان</span>
+    </div>
+
+    <div class="edit-box">
+        <i onclick="hideAdminEditWindow(this)" class="fas fa-times exit-box-edit"></i>
+        <i class="fas fa-spinner"></i>
+    </div>
+
+    <div class="box-description-suport">
+        <i onclick="hideAdminDescriptionWindow(this)" class="fas fa-times exit-description-support"></i>
+        <p class="accept-call" onclick="nextCallState(@(Model.Id), 'h', 'میزبان', this)" js-call-state="@(Model.HostCallState)">ثبت تماس میزبان</p>
+        <p class="accept-call" onclick="nextCallState(@(Model.Id), 'g', 'مهمان', this)" js-call-state="@(Model.GuestCallState)">ثبت تماس مهمان</p>
+        <div class="show-description">
+            @if (Model.SupportInfoCount > 0)
+            {
+                <p>توضیحات <span>(@Model.SupportInfoCount توضیح)</span></p>
+                <div class="box-description">
+                    @foreach (var item in Model.SupportInfoList)
+                    {
+                        <p><i class="fas fa-circle"></i>@item</p>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>برای این رزرو توضیحی ثبت نشده است</p>
+            }
+        </div>
+        <div class="add-description">
+            <label>افزودن توضیحات</label>
+            <textarea class="box-description"></textarea>
+            <button class="btn-register-form" type="button" onclick="addInfo‌ByElem(@Model.Id, this.previousSibling.previousSibling)">ثبت</button>
+        </div>
+    </div>
+}

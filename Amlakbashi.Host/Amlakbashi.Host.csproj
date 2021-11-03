@@ -178,6 +178,9 @@
     <None Include="Views\User\MobileLogin.cshtml" />
     <None Include="Views\User\UserCreditManager.cshtml" />
     <None Include="Views\User\_InstantReserveConfirm.cshtml" />
+    <None Include="wwwroot\js\admin\admin-table.js" />
+    <None Include="wwwroot\js\admin\reserve\admin-reserve-index.js" />
+    <None Include="wwwroot\js\admin\support-chat\admin-support-chat.js" />
     <None Include="wwwroot\js\dashboard.min.js" />
     <None Include="wwwroot\Resource\img\apartment.webp" />
     <None Include="wwwroot\Resource\img\dailyrent.webp" />
@@ -266,7 +269,8 @@
     <Folder Include="wwwroot\Content\ErrorLog\" />
     <Folder Include="wwwroot\Content\files\" />
     <Folder Include="wwwroot\Content\imgcache\" />
-    <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\css\admin\" />
+    <Folder Include="wwwroot\font\" />
     <Folder Include="wwwroot\Resource\packages\jquery-mobile\images\" />
   </ItemGroup>
 
