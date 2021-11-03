@@ -18,6 +18,8 @@ using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Mediator.Events.UserEvents;
 using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.DTOs.ReserveDTOs;
+using Amlakbashi.Core.Infrastructure.StyleHelpers;
+using Amlakbashi.Application.Services.ReserveServices.ReserveSupportManager;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
@@ -155,8 +157,8 @@ namespace Amlakbashi.Application.Services.ReserveServices
             if (site_cleared_status == 0)//payed
             {
                 model = model.Where(w => w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteClearingToHost) ||
-                    (w.ReservePayments.Any(a=>a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost) &&
-                    w.ReservePayments.Any(a=>a.PaymentType == (int)ReservePaymentType.GuestClearing) == false));
+                    (w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost) &&
+                    w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.GuestClearing) == false));
             }
             else if (site_cleared_status == 1)//not payed
             {
@@ -256,6 +258,217 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 model = model.Where(x => matchedIds.Contains(x.Id));
             }
             return model.ToList();
+        }
+
+        public void NewFilter(ReserveIndexDTO dto)
+        {
+            var reserves = Repository.Query(q => q.Include("GuestUser.ReserveSupportsAsGuest")
+                .Where(u => u.Status != Reserve.ReserveStatus.Deleted));
+            
+            if (dto.MainFilter == 0)
+            {
+                reserves = reserves.Where(x => !x.Archive);
+            }
+            else if (dto.MainFilter == 2)
+            {
+                reserves = reserves.Where(x => x.Archive);
+            }
+
+            if (dto.InstantReserveFilter == 0)
+            {
+                reserves = reserves.Where(x => !x.InstantReserve);
+            }
+            else if (dto.InstantReserveFilter == 1)
+            {
+                reserves = reserves.Where(x => x.InstantReserve);
+            }
+
+            if (dto.ShouldFollow)
+            {
+                reserves = reserves.Where(x => x.shouldFollow);
+            }
+            if (dto.DisableAutoCancel)
+            {
+                reserves = reserves.Where(x => x.DisableAutoCancel);
+            }
+            if (dto.AccVisited)
+            {
+                reserves = reserves.Where(x => x.AccVisitedByGuest);
+            }
+            if (dto.ReserveId > 0)
+            {
+                reserves = reserves.Where(x => x.Id == dto.ReserveId);
+            }
+            if (dto.AdvertiseId > 0)
+            {
+                reserves = reserves.Where(x => x.AdvertiseID == dto.AdvertiseId);
+            }
+            if (dto.GuestUserId > 0)
+            {
+                reserves = reserves.Where(x => x.UserID == dto.GuestUserId);
+            }
+            if (dto.ReserveStatus > -1)
+            {
+                reserves = reserves.Where(x => (int)x.Status == dto.ReserveStatus);
+            }
+            if (dto.HostResponseStatus > -1)
+            {
+                var hostResp = (HostResponseEnum)dto.HostResponseStatus;
+                reserves = reserves.Where(x => x.HostResponse == hostResp);
+            }
+            if (dto.GeneralStatus > -1)
+            {
+                if (dto.GeneralStatus == 0)
+                {
+                    reserves = reserves.Where(x => x.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.GuestClearing
+                        || a.PaymentType == (int)ReservePaymentType.GuestDeposite));
+                }
+            }
+            if (dto.HostUserId > 0)
+            {
+                reserves = reserves.Where(x => x.Advertise.UserID == dto.HostUserId);
+            }
+            if (!string.IsNullOrEmpty(dto.SiteClearingDate))
+            {
+                reserves = reserves.Where(x => x.Status == Reserve.ReserveStatus.Reserved ||
+                    x.Status == Reserve.ReserveStatus.Started ||
+                    x.Status == Reserve.ReserveStatus.Completed ||
+                    x.Status == Reserve.ReserveStatus.CashPay);
+                var gregorian_clearing_date = DateTimeUtility.PersianDateToGregorian(
+                    StringUtility.PersianNumberToEnglish(dto.SiteClearingDate).Replace('/', ','));
+                reserves = reserves.Where(w => (EF.Functions.DateDiffDay(w.StartDate, w.EndDate) > 1 ?
+                    w.StartDate.AddDays(2) : w.EndDate) <= gregorian_clearing_date);
+            }
+            if (dto.StayDurationFrom > 0)
+            {
+                reserves = reserves.Where(w => EF.Functions.DateDiffDay(w.StartDate, w.EndDate) >= dto.StayDurationFrom);
+            }
+            if (dto.StayDurationTo > 0)
+            {
+                reserves = reserves.Where(w => EF.Functions.DateDiffDay(w.StartDate, w.EndDate) <= dto.StayDurationTo);
+            }
+            if (!string.IsNullOrEmpty(dto.ReserveFromDate))
+            {
+                var gregorian_date = DateTimeUtility.PersianDateToGregorian(
+                    StringUtility.PersianNumberToEnglish(dto.ReserveFromDate).Replace('/', ','));
+                reserves = reserves.Where(x => x.StartDate >= gregorian_date);
+            }
+            if (!string.IsNullOrEmpty(dto.ReserveToDate))
+            {
+                var gregorian_date = DateTimeUtility.PersianDateToGregorian(
+                    StringUtility.PersianNumberToEnglish(dto.ReserveToDate).Replace('/', ','));
+                reserves = reserves.Where(x => x.EndDate <= gregorian_date);
+            }
+            if (!string.IsNullOrEmpty(dto.ReserveEndDate))
+            {
+                var gregorian_date = DateTimeUtility.PersianDateToGregorian(
+                    StringUtility.PersianNumberToEnglish(dto.ReserveEndDate).Replace('/', ','));
+                reserves = reserves.Where(x => x.EndDate == gregorian_date);
+            }
+            if (dto.SiteClearedStatus == 0)//payed
+            {
+                reserves = reserves.Where(w => w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteClearingToHost) ||
+                    (w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost) &&
+                    w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.GuestClearing) == false));
+            }
+            else if (dto.SiteClearedStatus == 1)//not payed
+            {
+                reserves = reserves.Where(w => (w.Status == Reserve.ReserveStatus.Reserved ||
+                    w.Status == Reserve.ReserveStatus.Started ||
+                    w.Status == Reserve.ReserveStatus.Completed ||
+                    w.Status == Reserve.ReserveStatus.CashPay) &&
+                    w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteClearingToHost) == false);
+
+                var matchedIds = new List<long>();
+                foreach (var item in reserves)
+                {
+                    var guestPaidAmount = accounting.GetReservePaidAmount(item.Id, StatusStringType.Guest);
+                    var payablePrice = PriceUtility.CalculateHostPayablePrice(item.TotalPrice, guestPaidAmount, item.CouponPrice, item.PrizePrice);
+                    if (item.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost))
+                    {
+                        payablePrice -= item.ReservePayments.FirstOrDefault(f => f.PaymentType == (int)ReservePaymentType.SiteDepositeToHost).Price;
+                    }
+                    if (payablePrice > 0)
+                    {
+                        matchedIds.Add(item.Id);
+                    }
+                }
+                reserves = reserves.Where(x => matchedIds.Contains(x.Id));
+            }
+            else if (dto.SiteClearedStatus == 2)//refund done
+            {
+                var matchedIds = new List<long>();
+                foreach (var item in reserves)
+                {
+                    bool refundDone;
+                    bool result;
+                    if (item.ReservePayments.Any(x => x.PaymentType == (int)ReservePaymentType.SiteRefundToGuest))
+                    {
+                        refundDone = true;
+                        result = true;
+                    }
+                    else
+                    {
+                        refundDone = false;
+                        result =
+                            item.Status == Reserve.ReserveStatus.WaitForResponse ||
+                            item.Status == Reserve.ReserveStatus.WaitForReserve ||
+                            item.Status == Reserve.ReserveStatus.Rejected ||
+                            item.Status == Reserve.ReserveStatus.Reserved ||
+                            item.Status == Reserve.ReserveStatus.CashPay ||
+                            item.Status == Reserve.ReserveStatus.Started ||
+                            item.Status == Reserve.ReserveStatus.Completed ||
+                            item.Status == Reserve.ReserveStatus.CancelRequestByHost ||
+                            item.Status == Reserve.ReserveStatus.CancelRequestByGuest ? false :
+                            item.ReservePayments.Any(x => x.PaymentType == (int)ReservePaymentType.GuestClearing ||
+                            x.PaymentType == (int)ReservePaymentType.GuestDeposite);
+                    }
+                    if (result && refundDone)
+                    {
+                        matchedIds.Add(item.Id);
+                    }
+                }
+                reserves = reserves.Where(x => matchedIds.Contains(x.Id));
+            }
+            else if (dto.SiteClearedStatus == 3)//should refund
+            {
+                var matchedIds = new List<long>();
+                var tempModel = reserves.Where(w => w.ReservePayments.Any(x =>
+                    x.PaymentType == (int)ReservePaymentType.GuestClearing ||
+                    x.PaymentType == (int)ReservePaymentType.GuestDeposite));
+                foreach (var item in tempModel)
+                {
+                    bool refundDone;
+                    bool result;
+                    if (item.ReservePayments.Any(x => x.PaymentType == (int)ReservePaymentType.SiteRefundToGuest))
+                    {
+                        refundDone = true;
+                        result = true;
+                    }
+                    else
+                    {
+                        refundDone = false;
+                        result =
+                            item.Status == Reserve.ReserveStatus.WaitForResponse ||
+                            item.Status == Reserve.ReserveStatus.WaitForReserve ||
+                            item.Status == Reserve.ReserveStatus.Rejected ||
+                            item.Status == Reserve.ReserveStatus.Reserved ||
+                            item.Status == Reserve.ReserveStatus.CashPay ||
+                            item.Status == Reserve.ReserveStatus.Started ||
+                            item.Status == Reserve.ReserveStatus.Completed ||
+                            item.Status == Reserve.ReserveStatus.CancelRequestByHost ||
+                            item.Status == Reserve.ReserveStatus.CancelRequestByGuest ? false :
+                            item.ReservePayments.Any(x => x.PaymentType == (int)ReservePaymentType.GuestClearing ||
+                            x.PaymentType == (int)ReservePaymentType.GuestDeposite);
+                    }
+                    if (result && !refundDone)
+                    {
+                        matchedIds.Add(item.Id);
+                    }
+                }
+                reserves = reserves.Where(x => matchedIds.Contains(x.Id));
+            }
+            dto.ReserveList = reserves.ToList();
         }
 
         public IList<Reserve> GetListByUserId(int userId,
@@ -371,6 +584,153 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 w.Status != ReserveStatus.Deleted)).ToList();
         }
 
+        public ReserveIndexDetailsInfoDTO GetReserveIndexDetailsInfo(Reserve reserve)
+        {
+            DateTime depositePayDate;
+            long depositeTransactionId;
+            var depositePaidPrice = reserve.GetReservePaymentPrice(ReservePayment.ReservePaymentType.GuestDeposite,
+                out depositePayDate, out depositeTransactionId,reserve.UserID);
+            var hostSitePortionPrice = reserve.TotalPrice / 10;
+            DateTime totalPayDate;
+            long totalTransactionId;
+            var totalPaidPrice = reserve.GetReservePaymentPrice(ReservePayment.ReservePaymentType.GuestClearing,
+                out totalPayDate, out totalTransactionId, 0);
+            DateTime clearingPayDate;
+            long clearingTransactionId;
+            var clearingPaidPrice = reserve.GetReservePaymentPrice(ReservePayment.ReservePaymentType.SiteClearingToHost,
+                out clearingPayDate, out clearingTransactionId, 0);
+            DateTime hostClearingDepositeDate;
+            long hostClearingDepositeTransactionId;
+            var hostClearingDepositeAmount = reserve.GetReservePaymentPrice(ReservePayment.ReservePaymentType.SiteDepositeToHost,
+                out hostClearingDepositeDate, out hostClearingDepositeTransactionId, 0);
+            DateTime refundPayDate;
+            long refundTransactionId;
+            var refundPaidPrice = reserve.GetReservePaymentPrice(ReservePayment.ReservePaymentType.SiteRefundToGuest,
+                out refundPayDate, out refundTransactionId, 0);
+            var generatedPayments = new List<PaymentHelperDTO>();
+            if (depositePaidPrice > 0)
+            {
+                generatedPayments.Add(new PaymentHelperDTO()
+                {
+                    title = "بیعانه",
+                    type = PaymentHelperDTO.PaymentType.Deposite,
+                    transactionId = depositeTransactionId,
+                    amount = depositePaidPrice,
+                    dateString = DateTimeUtility.GregorianToPersianDate(depositePayDate).Remove(0, 2) +
+                        " " + depositePayDate.ToString("HH:mm")
+                });
+            }
+            if (totalPaidPrice > 0)
+            {
+                generatedPayments.Add(new PaymentHelperDTO()
+                {
+                    title = "تسویه مهمان",
+                    type = PaymentHelperDTO.PaymentType.Total,
+                    transactionId = totalTransactionId,
+                    amount = totalPaidPrice,
+                    dateString = DateTimeUtility.GregorianToPersianDate(totalPayDate).Remove(0, 2) +
+                        " " + totalPayDate.ToString("HH:mm")
+                });
+            }
+            if (clearingPaidPrice > 0 || hostClearingDepositeAmount > 0)
+            {
+                var clearingToHostAmount = clearingPaidPrice + hostClearingDepositeAmount;
+                generatedPayments.Add(new PaymentHelperDTO()
+                {
+                    type = PaymentHelperDTO.PaymentType.Clearing,
+                    transactionId = clearingTransactionId,
+                    title = "تسویه میزبان",
+                    amount = clearingToHostAmount,
+                    dateString = DateTimeUtility.GregorianToPersianDate(clearingPaidPrice > 0 ? clearingPayDate : hostClearingDepositeDate)
+                    .Remove(0, 2) + " " + clearingPayDate.ToString("HH:mm")
+                });
+            }
+            if (refundPaidPrice > 0)
+            {
+                generatedPayments.Add(new PaymentHelperDTO()
+                {
+                    title = "عودت مهمان",
+                    type = PaymentHelperDTO.PaymentType.Refund,
+                    transactionId = refundTransactionId,
+                    amount = refundPaidPrice,
+                    dateString = DateTimeUtility.GregorianToPersianDate(refundPayDate).Remove(0, 2) +
+                        " " + refundPayDate.ToString("HH:mm")
+                });
+            }
+            if (totalPaidPrice > 0 && hostSitePortionPrice > 0)
+            {
+                generatedPayments.Add(new PaymentHelperDTO()
+                {
+                    title = "درصد سایت",
+                    type = PaymentHelperDTO.PaymentType.HostSitePortion,
+                    amount = hostSitePortionPrice,
+                });
+            }
+            var createDateString = DateTimeUtility.GregorianToPersianDate(reserve.CreateDate).Remove(0, 2);
+            string lastPayTryDate;
+            var reserveSupports = reserve.GetRelatedSupports();
+            var generatedSupporters = new List<SupporterHelperDTO>();
+            foreach (var rs in reserveSupports)
+            {
+                if (rs.SupporterID == null)
+                {
+                    continue;
+                }
+                var supportingReserves = rs.GetReserveIds(ReserveSupport.SupportReserveStatus.Supporting);
+                var similarReserves = rs.GetReserveIds(ReserveSupport.SupportReserveStatus.Similar);
+                if (supportingReserves.Contains(reserve.Id) ||
+                    similarReserves.Contains(reserve.Id))
+                {
+                    var supporterUser = rs.Supporter;
+                    var fullName = supporterUser.FullName;
+                    generatedSupporters.Add(new SupporterHelperDTO()
+                    {
+                        name = string.IsNullOrEmpty(fullName) ?
+                            supporterUser.Id.ToString() : fullName,
+                        imageId = supporterUser.PhotoID == null ? 0 : (long)supporterUser.PhotoID,
+                        color = similarReserves.Contains(reserve.Id) ? "#FF7F00;" : "#34A853",
+                        transferReason = rs.TransferReason
+                    });
+                }
+            }
+            return new ReserveIndexDetailsInfoDTO()
+            {
+                Id = reserve.Id,
+                TotalPrice = reserve.TotalPrice,
+                DepositePrice = reserve.DepositPrice,
+                TotalPaidPrice = totalPaidPrice,
+                DepositePaidPrice = depositePaidPrice,
+                StartDateString = DateTimeUtility.GregorianToPersianDate(
+                    reserve.StartDate).Remove(0, 2),
+                EndDateString = DateTimeUtility.GregorianToPersianDate(
+                    reserve.EndDate).Remove(0, 2),
+                GuestCount = reserve.NumberOfGuests,
+                StayDays = DateTimeUtility.GetDatRangeDays(reserve.StartDate, reserve.EndDate),
+                CreateDateString = createDateString + " " + reserve.CreateDate.ToString("HH:mm"),
+                GuestUserId = reserve.UserID,
+                Status = (int)reserve.Status,
+                GuestCallState = reserve.GuestCallState,
+                HostCallState = reserve.HostCallState,
+                GuestCallStateColor = ReserveStyleHelper.GetCallStateColor(reserve.GuestCallState),
+                HostCallStateColor = ReserveStyleHelper.GetCallStateColor(reserve.HostCallState),
+                SupportInfoCount = reserve.GetSupportInfoList().Length,
+                SupportInfoList = reserve.GetSupportInfoList().Reverse().ToList(),
+                PaymentList = generatedPayments,
+                PaymentTryCount = reserve.GetPaymentTriesCount(out lastPayTryDate),
+                LastPaymentTryDate = lastPayTryDate,
+                InstantReserve = reserve.InstantReserve,
+                HostResponse = (int)reserve.HostResponse,
+                HostResponseString = ReserveLocalization.GetHostResponseString((int)reserve.HostResponse),
+                HostResponseColor = ReserveStyleHelper.GetHostResponseColor((int)reserve.HostResponse),
+                HostResponseTimeString = reserve.HostResponseDate.ToString("HH:mm"),
+                HostResponseDateString = DateTimeUtility.GregorianToPersianDate(reserve.HostResponseDate).Remove(0, 2),
+                Supporters = generatedSupporters,
+                DisableAutoCancel = reserve.DisableAutoCancel,
+                AccVisitedByGuest = reserve.AccVisitedByGuest,
+                ShouldFollow = reserve.shouldFollow,
+            };
+        }
+
         public Reserve FirstHavingUserId(int userId, ReserveStatus status)
         {
             return Repository.Query(q => q.FirstOrDefault(f => f.Advertise.UserID == userId && f.Status == status));
@@ -466,6 +826,79 @@ namespace Amlakbashi.Application.Services.ReserveServices
             objReserve.CancelReason = reserve.CancelReason;
             objReserve.InstantReserveCancelHost = reserve.InstantReserveCancelHost;
             Repository.Update(objReserve);
+            Repository.Save();
+            msg = "";
+            return true;
+        }
+
+        public bool UpdateNew(ReserveIndexEditDTO dto, out string msg, int doerUserId, ActionSourceEnum actionSource)
+        {
+            var reserve = Repository.Query(q => q.Include("Advertise.User.Advertises").FirstOrDefault(f => f.Id == dto.Id));
+            var isPaidDeposit = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest) >=
+                reserve.DepositPrice - reserve.CouponPrice - reserve.PrizePrice;
+
+            if (isPaidDeposit == false && (dto.Status == ReserveStatus.Reserved || dto.Status == ReserveStatus.CashPay ||
+                dto.Status == ReserveStatus.Started || dto.Status == ReserveStatus.Completed ||
+                dto.Status == ReserveStatus.CancelRequestByGuest || dto.Status == ReserveStatus.CancelRequestByHost))
+            {
+                msg = "مبلغ بیعانه هنوز پرداخت نشده، تغییر به وضعیت " + ReserveLocalization.GetStatusString((int)dto.Status, Reserve.StatusStringType.Site) + " امکان پذیر نیست";
+                return false;
+            }
+
+            if (isPaidDeposit && (dto.Status == ReserveStatus.WaitForReserve || dto.Status == ReserveStatus.WaitForResponse ||
+                dto.Status == ReserveStatus.Rejected || dto.Status == ReserveStatus.CanceledBySystem))
+            {
+                msg = "وضعیت رزرو پرداخت شده نمی تواند به حالت " + ReserveLocalization.GetStatusString((int)dto.Status, Reserve.StatusStringType.Site) + " تغییر کند";
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(dto.PersinaStartDate) == false)
+            {
+                reserve.StartDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaStartDate);
+            }
+            if (string.IsNullOrEmpty(dto.PersinaEndDate) == false)
+            {
+                reserve.EndDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaEndDate);
+            }
+
+            if (reserve.InstantReserve &&
+                !reserve.InstantReserveCancelHost &&
+                dto.Status == Reserve.ReserveStatus.CanceledByHost &&
+                accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(), Reserve.StatusStringType.Guest) > 0)
+            {
+                var acc = reserve.Advertise;
+                var hostUser = reserve.HostUser;
+                var hostAccs = hostUser.Advertises;
+                var hostCancelCount = hostAccs.Sum(x => x.InstantReserveCancels);
+                int penaltyPrice = 0;
+                if (hostCancelCount == 0)
+                {
+                    penaltyPrice = (int)Math.Floor(reserve.TotalPrice * 0.1f);
+                }
+                else if (hostCancelCount > 0)
+                {
+                    penaltyPrice = (int)Math.Floor(reserve.TotalPrice * 0.15f);
+                }
+                if (penaltyPrice > 0)
+                {
+                    long newCredit;
+                    accounting.DecreaseCredit(hostUser.Id, penaltyPrice, 0, 0, out newCredit, CreditTransaction.WalletTransactionReason.Other, "جریمه لغو رزرو آنی کد " + dto.Id, null, doerUserId, ActionLog.ActionSourceEnum.AdminPanel);
+                }
+                reserve.InstantReserveCancelHost = true;
+
+                mediator.Send(new IncreaseInstantReserveCancelCommand(acc.Id));
+                if (hostCancelCount > hostUser.CancelInstantReserveLimit - 1)
+                {
+                    mediator.Send(new ChangeInstantReserveAccessCommand(hostUser.Id,
+                        User.InstantReserveAccessEnum.Banned, doerUserId, actionSource));
+                    mediator.Send(new UpdateInstantReserveStatusCommand(acc.Id, Advertise.InstantReserveStatusEnum.None, doerUserId, actionSource));
+                }
+            }
+            reserve.NumberOfGuests = dto.GuestCount;
+            reserve.TotalPrice = dto.TotalPrice;
+            reserve.DepositPrice = dto.DepositePrice;
+            reserve.CancelReason = dto.CancelReason;
+            Repository.Update(reserve);
             Repository.Save();
             msg = "";
             return true;

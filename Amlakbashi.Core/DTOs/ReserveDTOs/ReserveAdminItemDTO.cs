@@ -63,11 +63,6 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                 ReservePayment.ReservePaymentType.GuestDeposite,
                 out depositePayDate, out depositeTransactionId,
                 reserve.UserID);
-            //DateTime hostSitePortionDate;
-            //long hostSitePortionTransactionId;
-            //var hostSitePortionPrice = reserve.GetReservePaymentPrice(
-            //    ReservePayment.ReservePaymentType.GuestDeposite,
-            //    out hostSitePortionDate, out hostSitePortionTransactionId, linkAdvertise.UserID);
             var hostSitePortionPrice = reserve.TotalPrice / 10;
             DateTime totalPayDate;
             long totalTransactionId;

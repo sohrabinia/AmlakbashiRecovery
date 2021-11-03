@@ -1,0 +1,96 @@
+﻿.pagination-container {
+  width: 100%;
+  text-align: center;
+}
+
+.pagination-container .pagination {
+  display: inline-block;
+  padding-right: 0;
+  margin: 20px 0;
+  border-radius: 4px;
+}
+
+.pagination-container .pagination li {
+  display: inline-grid;
+  margin: 5px 10px;
+  text-align: center;
+}
+
+.pagination-container .pagination li a,
+.pagination-container .pagination li span {
+  position: relative;
+  display: block;
+  float: right;
+  margin-right: -1px;
+  color: #337ab7;
+  text-decoration: none;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  font: 12px Miransans;
+  padding: 0;
+  line-height: 2.5;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination-container .pagination .active span {
+  background-color: #fdd835;
+  color: #242424;
+  border: 1px solid #dddddd;
+  transform: scale(1.03);
+}
+
+/*.pagination-container .pagination .PagedList-skipToNext a {
+  color: #555;
+  width: 30px;
+  border: none;
+  background: none;
+}*/
+
+.admin-table {
+    width: 92%;
+    display: flex;
+    background: white;
+    margin: 0 auto;
+    border-radius: 0 0 5px 5px;
+    flex-flow: column;
+    box-shadow: 0 7px 8px 0 rgba(0, 0, 0, 0.04);
+}
+
+.admin-table-row-header {
+  background: gainsboro;
+  margin: 20px 12px 0 12px;
+  border-top: 1px solid #dedede;
+}
+
+aside.admin-table-row {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  margin: 0;
+  border-bottom: 1px solid #dedede;
+}
+
+aside.admin-table-row > p, aside.admin-table-row > div {
+  font: 13px Liransans;
+  text-align: center;
+  display: flex;
+  padding: 10px 0;
+  border-left: 1px solid #dedede;
+  overflow: hidden;
+  flex-flow: column wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+aside.admin-table-row > p:first-child, aside.admin-table-row > div:first-child {
+  border-right: 1px solid #dedede;
+}
+
+@media (max-width: 1400px) {
+    .admin-table {
+        width: 97%;
+    }
+}
