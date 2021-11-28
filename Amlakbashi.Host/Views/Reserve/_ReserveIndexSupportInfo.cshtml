@@ -1,0 +1,34 @@
+﻿@model Amlakbashi.Core.DTOs.ReserveDTOs.ReserveIndexSupportInfoDTO
+
+@if (Model == null)
+{
+    <p>عملیات با خطا مواجه شد</p>
+}
+else
+{
+    <div class="box-description-support">
+        <p class="accept-call" onclick="nextCallState(@(Model.Id), 'h', 'میزبان', this)" js-call-state="@(Model.HostCallState)">ثبت تماس میزبان</p>
+        <p class="accept-call" onclick="nextCallState(@(Model.Id), 'g', 'مهمان', this)" js-call-state="@(Model.GuestCallState)">ثبت تماس مهمان</p>
+        <div class="show-description">
+            @if (Model.SupportInfoCount > 0)
+            {
+                <p>توضیحات <span>(@Model.SupportInfoCount توضیح)</span></p>
+                <div class="box-description">
+                    @foreach (var item in Model.SupportInfoList)
+                    {
+                        <p><i class="fas fa-circle"></i>@item</p>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>برای این رزرو توضیحی ثبت نشده است</p>
+            }
+        </div>
+        <div class="add-description">
+            <label>افزودن توضیحات</label>
+            <textarea class="box-description"></textarea>
+            <button class="btn-register-form" type="button" onclick="addInfo‌ByElem(@Model.Id, this.previousSibling.previousSibling)">ثبت</button>
+        </div>
+    </div>
+}

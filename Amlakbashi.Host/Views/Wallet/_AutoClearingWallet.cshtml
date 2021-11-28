@@ -24,7 +24,7 @@ else
         <input type="checkbox" id="SendSmsCheckbox" name="sendSms" value="true" checked="checked" />
     </div>
     <div style="text-align: center;">
-        <button type="button" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;" onclick="DoAutoClearingWalletPayment()">پرداخت</button>
+        <button id="auto_payment_btn" type="button" style="cursor: pointer; padding: 10px; border-radius: 5px; font: 1em miransans;" onclick="DoAutoClearingWalletPayment()">پرداخت</button>
     </div>
     <div style="text-align: center;">
         <span id="PaymentResultWaitingSpan" style="visibility:hidden; color: darkorange;">لطفا منتظر بمانید ...</span>
@@ -43,9 +43,11 @@ else
             },
             beforeSend: function () {
                 $('#PaymentResultWaitingSpan').css("visibility", "visible");
+                $('#auto_payment_btn').prop('disabled', true);
             },
             success: function (response) {
                 $('#PaymentResultWaitingSpan').css("visibility", "hidden");
+                $('#auto_payment_btn').prop('disabled', true);
                 if (response.status == 0) {
                     showInfoMessage('پرداخت ناموفق', '<p style="color: red;">' + response.msg + '</p>');
                 }

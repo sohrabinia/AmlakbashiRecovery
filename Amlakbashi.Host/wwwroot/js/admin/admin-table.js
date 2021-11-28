@@ -4,11 +4,6 @@
     event.stopPropagation();
 });
 
-function hideAdminEditWindow(elem) {
-    $(".admin-table .admin-table-row .edit-box").css("display", "none");
-    hideDarkBackground();
-}
-
 function showAdminDescriptionWindow(elem) {
     $(elem).parent().siblings(".box-description-suport").css("display", "flex");
     showDarkBackground();

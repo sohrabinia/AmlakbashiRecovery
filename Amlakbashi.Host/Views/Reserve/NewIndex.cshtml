@@ -65,7 +65,7 @@
         @foreach (var item in Model.Data)
         {
             index++;
-            <aside class="admin-table-row">
+            <aside class="admin-table-row" id="js-@item.id">
                 @await Html.PartialAsync("_ReserveAdminMainInfo", item, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "index", index } })
             </aside>
         }

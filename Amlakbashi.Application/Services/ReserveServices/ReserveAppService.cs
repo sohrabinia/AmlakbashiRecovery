@@ -731,6 +731,24 @@ namespace Amlakbashi.Application.Services.ReserveServices
             };
         }
 
+        public ReserveIndexSupportInfoDTO GetReserveIndexSupportInfo(long reserveId)
+        {
+            var reserve = Repository.Find(reserveId);
+            if (reserve == null)
+            {
+                return null;
+            }
+            var supportInfoList = reserve.GetSupportInfoList().Reverse().ToList();
+            return new ReserveIndexSupportInfoDTO()
+            {
+                Id = reserveId,
+                HostCallState = reserve.HostCallState,
+                GuestCallState = reserve.GuestCallState,
+                SupportInfoList = supportInfoList,
+                SupportInfoCount = supportInfoList.Count
+            };
+        }
+
         public Reserve FirstHavingUserId(int userId, ReserveStatus status)
         {
             return Repository.Query(q => q.FirstOrDefault(f => f.Advertise.UserID == userId && f.Status == status));

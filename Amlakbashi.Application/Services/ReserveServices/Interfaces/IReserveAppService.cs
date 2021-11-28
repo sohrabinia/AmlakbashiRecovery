@@ -30,6 +30,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         IList<Reserve> GetListByUserId(int userId,
             Reserve.ReserveManagerSelectType selectType = Reserve.ReserveManagerSelectType.All);
         ReserveIndexDetailsInfoDTO GetReserveIndexDetailsInfo(Reserve reserve = null);
+        ReserveIndexSupportInfoDTO GetReserveIndexSupportInfo(long reserveId);
         Reserve Find(long id);
         Reserve GetReserveIncludingSupport(long id);
         IQueryable<Reserve> GetReservesIncludingSupport(List<long> ids);

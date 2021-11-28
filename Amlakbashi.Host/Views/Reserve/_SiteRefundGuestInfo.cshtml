@@ -102,7 +102,12 @@ else
                 else {
                     alertify.success(response.msg);
                     reserveAdminHubConnection.invoke('reserveRefunded', @Model.ReserveId);
-                    popupMsgList[0].btnClick(0, true);
+                    if (typeof hidePopup === 'function') {
+                        hidePopup();
+                    }
+                    else {
+                        popupMsgList[0].btnClick(0, true);
+                    }
                 }
             }
         });

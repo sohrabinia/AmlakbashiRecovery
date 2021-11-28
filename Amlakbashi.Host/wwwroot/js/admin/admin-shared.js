@@ -47,7 +47,8 @@ function closeNavigation(){
     $(".main-navigation_list-item").children(".style-submenu").addClass("js-submenu");
 };
 
-function loadHtmlContent(callerButton, targetContainer, url) {
+// collapse detail container
+function loadCollapse(callerButton, targetContainer, url) {
     var isOpen = $(targetContainer).children().length > 0;
     if (isOpen == false) {
         $("i", callerButton).toggleClass("fa-plus-square fa-spinner", 5000);
@@ -63,13 +64,100 @@ function loadHtmlContent(callerButton, targetContainer, url) {
     }
 }
 
+// popup
+let popupContainer = $(".main .popup-container");
+let popupContent = $(".main .popup-container .popup-content");
+let popupMain = $(".main .popup-container .popup-content .popup-main");
+let popupLoader = $(".main .popup-container .popup-loader");
+let popupBackBtn = $(".main .popup-container .popup-header .popup-back-btn");
+let popupPageStack = [];
 function loadPopup(url) {
-    showDarkBackground();
-    var popupWindow = $(".admin-table .admin-table-row .edit-box");
-    popupWindow.css("display", "flex");
-    popupWindow.load(url);
+    if (popupPageStack.indexOf(url) === -1) {
+        popupPageStack.push(url);
+    }
+    if (popupPageStack.length > 1) {
+        popupBackBtn.show();
+    }
+    popupLoader.show();
+    popupContainer.fadeIn(100);
+    popupMain.load(url, function (responseTxt, statusTxt, xhr) {
+        popupLoader.hide();
+        if (statusTxt == "success") {
+            // do somethings
+        }
+        if (statusTxt == "error") {
+            hidePopup();
+            errorAlert("عملیات با خطا مواجه شد");
+        }
+    });
+}
+function hidePopup() {
+    popupContainer.fadeOut(100, function () {
+        popupMain.empty();
+        popupPageStack = [];
+        popupBackBtn.hide();
+    });
+}
+function backPopup() {
+    popupPageStack.pop();
+    let lastIndex = popupPageStack.length - 1;
+    if (lastIndex >= 0) {
+        loadPopup(popupPageStack[lastIndex]);
+    }
+    if (lastIndex < 1) {
+        popupBackBtn.hide();
+    }
 }
 
+// confirm
+let confirmContainer = $(".main .confirm-container");
+let confirmContent = $(".main .confirm-container .confirm-content");
+let confirmMain = $(".main .confirm-container .confirm-content .confirm-main");
+let confirmAcceptCallback;
+function showConfirm(content, acceptCallback) {
+    confirmMain.html(content);
+    if (acceptCallback !== undefined) {
+        confirmAcceptCallback = acceptCallback;
+    }
+    confirmContainer.fadeIn(100);
+}
+function confirmReject() {
+    confirmContainer.fadeOut(100, function () {
+        confirmMain.empty();
+        confirmAcceptCallback = undefined;
+    });
+}
+function confirmAccept() {
+    confirmAcceptCallback();
+    confirmReject();
+}
+
+// alert
+let alertContainer = $(".alert-container");
+let alertContent = $(".alert-container .alert-content")
+let alertMain = $(".alert-container .alert-content .alert-main");
+let alertSign = $(".alert-container .alert-content .alert-sign");
+function showAlert(content, color) {
+    alertMain.html(content);
+    if (color) {
+        alertContent.css('border-color', color);
+        alertSign.css('color', color);
+    }
+    alertContainer.fadeIn(100);
+}
+function alertClose() {
+    alertContainer.fadeOut(100, function () {
+        alertMain.empty();
+    });
+}
+function errorAlert(content) {
+    showAlert(content, '#FF3C3C');
+}
+function successAlert(content) {
+    showAlert(content, '#50C878');
+}
+
+// submit forms
 function submitForm(formId, url, successCallback, beforeCallback, completeCallback) {
     var formData = $('#' + formId).serialize();
     $.ajax({
@@ -103,4 +191,8 @@ function submitForm(formId, url, successCallback, beforeCallback, completeCallba
             }
         }
     })
+}
+
+function test() {
+    successAlert("reza najmi");
 }

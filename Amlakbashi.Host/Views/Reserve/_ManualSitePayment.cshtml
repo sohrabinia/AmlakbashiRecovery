@@ -63,8 +63,14 @@
                 else {
                     alertify.success(response.msg);
                     reserveAdminHubConnection.invoke('reserveCleared', @ViewBag.reserveId);
-                    popupMsgList[1].btnClick(0, true);
-                    popupMsgList[0].btnClick(0, true);
+                    if (typeof hidePopup === 'function') {
+                        hidePopup();
+                    }
+                    else {
+                        popupMsgList[1].btnClick(0, true);
+                        popupMsgList[0].btnClick(0, true);
+                    }
+                    
                 }
             }
         });

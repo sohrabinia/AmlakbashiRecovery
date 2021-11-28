@@ -171,33 +171,26 @@ aside.admin-table-row .box-more-options .status-payment {
   font-family: Miransans;
 }*/
 
-aside.admin-table-row .box-description-suport {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 5px;
-  box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.3);
-  padding: 12px;
-  display: none;
+/* Support Info */
+.box-description-support {
+  /*position: fixed;*/
+  /*top: 50%;*/
+  /*left: 50%;*/
+  /*transform: translate(-50%, -50%);*/
+  /*background: white;*/
+  /*border-radius: 5px;*/
+  /*box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.3);*/
+  /*padding: 12px;*/
+  display: flex;
   flex-flow: row wrap;
-  z-index: 3333;
+  /*z-index: 1000;*/
   font: 14px Liransans;
-  max-width: 600px;
-  overflow: hidden;
+  /*max-width: 600px;*/
+  /*overflow: hidden;*/
   justify-content: space-between;
 }
 
-aside.admin-table-row .box-description-suport i.fas.fa-times {
-  width: 100%;
-  text-align: left;
-  font-size: 22px;
-  margin-bottom: 12px;
-  cursor: pointer;
-}
-
-aside.admin-table-row .box-description-suport .accept-call {
+.box-description-support .accept-call {
   background: #fff;
   border: 1px solid #dcdcde;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
@@ -209,21 +202,21 @@ aside.admin-table-row .box-description-suport .accept-call {
   transition: 0.3s;
 }
 
-aside.admin-table-row .box-description-suport .accept-call:hover {
+.box-description-support .accept-call:hover {
   transform: scale(1.02);
 }
 
-aside.admin-table-row .box-description-suport .show-description {
+.box-description-support .show-description {
   width: 100%;
   text-align: right;
   line-height: 2.5;
 }
 
-aside.admin-table-row .box-description-suport .show-description > p {
+.box-description-support .show-description > p {
   font-family: Miransans;
 }
 
-aside.admin-table-row .box-description-suport .show-description .box-description {
+.box-description-support .show-description .box-description {
   background: #f0f0f1;
   border-radius: 5px;
   padding: 12px 12px 20px 12px;
@@ -233,16 +226,16 @@ aside.admin-table-row .box-description-suport .show-description .box-description
   overflow-y: scroll;
 }
 
-aside.admin-table-row .box-description-suport .show-description .box-description p {
+.box-description-support .show-description .box-description p {
   font-size: 14px;
 }
 
-aside.admin-table-row .box-description-suport .show-description .box-description p i {
+.box-description-support .show-description .box-description p i {
   font-size: 10px;
   margin-left: 10px;
 }
 
-aside.admin-table-row .box-description-suport .add-description {
+.box-description-support .add-description {
   display: flex;
   flex-flow: column;
   margin-top: 20px;
@@ -250,12 +243,12 @@ aside.admin-table-row .box-description-suport .add-description {
   text-align: right;
 }
 
-aside.admin-table-row .box-description-suport .add-description label {
+.box-description-support .add-description label {
   font-family: Miransans;
   width: 100%;
 }
 
-aside.admin-table-row .box-description-suport .add-description textarea {
+.box-description-support .add-description textarea {
   border: 1px solid #dcdcde;
   margin-top: 5px;
   resize: none;
@@ -264,7 +257,7 @@ aside.admin-table-row .box-description-suport .add-description textarea {
   padding: 8px;
 }
 
-aside.admin-table-row .box-description-suport .add-description button {
+.box-description-support .add-description button {
   background: #fdd835;
   border: 1px solid #dcdcde;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
@@ -278,40 +271,14 @@ aside.admin-table-row .box-description-suport .add-description button {
   align-self: center;
 }
 
-aside.admin-table-row .edit-box {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  height: 95%;
-  width: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 5px;
-  box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.3);
-  padding: 12px;
-  display: none;
-  flex-flow: row wrap;
-  z-index: 3333;
-  font: 15px Liransans;
-  overflow: hidden;
-  overflow-y: scroll;
-}
-
-aside.admin-table-row .edit-box i.fas.fa-times {
-  width: 100%;
-  text-align: left;
-  font-size: 22px;
-  cursor: pointer;
-}
-
-aside.admin-table-row .edit-box form{
+.edit-box form{
   display: flex;
   flex-flow: row wrap;
   align-items: center;
   width: 100%;
 }
 
-aside.admin-table-row .edit-box .box-input {
+.edit-box .box-input {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
@@ -320,7 +287,7 @@ aside.admin-table-row .edit-box .box-input {
   margin: 10px 0;
 }
 
-aside.admin-table-row .edit-box .box-input .title-item, aside.admin-table-row .edit-box .box-input .style-input {
+.edit-box .box-input .title-item, .edit-box .box-input .style-input {
   margin: 10px;
   border-radius: 5px;
   line-height: 2.5;
@@ -329,17 +296,17 @@ aside.admin-table-row .edit-box .box-input .title-item, aside.admin-table-row .e
   font: 14px Liransans;
 }
 
-aside.admin-table-row .edit-box .box-input .title-item {
+.edit-box .box-input .title-item {
   width: 100px;
   text-align: right;
 }
 
-aside.admin-table-row .edit-box .box-input .style-input {
+.edit-box .box-input .style-input {
   width: 55%;
   border: 1px solid #dedede;
 }
 
-aside.admin-table-row .edit-box .box-input.textarea-box {
+.edit-box .box-input.textarea-box {
   width: 100%;
   display: flex;
   flex-flow: column;
@@ -349,7 +316,7 @@ aside.admin-table-row .edit-box .box-input.textarea-box {
   font: 14px Liransans;
 }
 
-aside.admin-table-row .edit-box .box-input.textarea-box textarea.cancel-reason {
+.edit-box .box-input.textarea-box textarea.cancel-reason {
   width: 94%;
   height: 120px;
   margin-bottom: 10px;
@@ -360,13 +327,12 @@ aside.admin-table-row .edit-box .box-input.textarea-box textarea.cancel-reason {
   border: 1px solid #dedede;
 }
 
-aside.admin-table-row .edit-box .box-button-container{
-    display:flex;
-    flex-flow: column;
+.edit-box .box-button-container {
     width: 100%;
+    text-align: center;
 }
 
-aside.admin-table-row .edit-box .box-button-container button {
+.edit-box .box-button-container button {
     background: #fdd835;
     border: 1px solid #dcdcde;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
@@ -380,25 +346,19 @@ aside.admin-table-row .edit-box .box-button-container button {
     align-self: center;
 }
 
-aside.admin-table-row .edit-box .box-button-container i{
+.edit-box .box-button-container i{
     font-size: 20px;
     margin: 10px;
     display: none;
 }
 
-aside.admin-table-row .edit-box .fa-spinner {
+.edit-box .fa-spinner {
     font-size: 50px;
     margin: 100px;
 }
 
 .mobile-details-travel, .mobile-status-support {
     display: none;
-}
-
-@media (max-width: 1345px) {
-    aside.admin-table-row .edit-box, aside.admin-table-row .box-description-suport {
-        width: 75%;
-    }
 }
 
 @media (max-width: 1300px) {
@@ -455,9 +415,6 @@ aside.admin-table-row .edit-box .fa-spinner {
     width: 25px;
     height: 25px;
     margin-left: 5px;
-  }
-  aside.admin-table-row .edit-box, aside.admin-table-row .box-description-suport {
-    width: 90%;
   }
 }
 
@@ -557,23 +514,14 @@ aside.admin-table-row .edit-box .fa-spinner {
 }
 
 @media (max-width: 600px) {
-  aside.admin-table-row .edit-box {
-    /*justify-content: flex-start;*/
-    /*align-items: flex-start;*/
-    /*flex-flow: column wrap;*/
-  }
-  aside.admin-table-row .edit-box div {
+  .edit-box div {
     padding: 10px;
   }
-  aside.admin-table-row .edit-box .box-input {
+  .edit-box .box-input {
     width: 100%;
   }
-  aside.admin-table-row .edit-box .box-input.textarea-box textarea.cancel-reason {
+  .edit-box .box-input.textarea-box textarea.cancel-reason {
     margin: 0 !important;
-  }
-  aside.admin-table-row .edit-box i.fas.fa-times {
-    width: 97%;
-    margin-top: 10px;
   }
 }
 
