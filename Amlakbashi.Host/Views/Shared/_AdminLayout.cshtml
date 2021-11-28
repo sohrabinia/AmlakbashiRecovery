@@ -1,0 +1,265 @@
+﻿@inject IUserAccessor userAccessor;
+
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
+      gtag('config', 'AW-706947688');
+    @RenderSection("GtagAddition", false)
+    </script>
+
+    <title>@ViewBag.Title - املاک باشی</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="offline" href="/offline.html">
+    <meta name="theme-color" content="#fdd835" />
+    <link rel='index' title='املاک باشی' href='@string.Format("http{0}://{1}", Context.Request.Scheme, Context.Request.Host)' />
+    <meta name="coverage" content="Worldwide" />
+    <meta name="robots" content="index,follow,all" />
+    <meta name="googlebot" content="index,follow" />
+    <meta name="revisit-after" content="1 days" />
+    <meta name="alexaVerifyID" content="jz4RhWgXn7cMuI-LPQu9Xi3BmX4" />
+    <meta name="keywords" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
+    <meta name="description" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
+    @Html.Raw(ViewBag.ItemMetaDescription)
+    @Html.Raw(ViewBag.ItemMetaKeywords)
+
+    <link rel="stylesheet" href="/css/admin/admin-shared.css">
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/fontawesome-free-5.6.3-web/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/alertify.js-0.3.11/themes/alertify.default.css" />
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/alertify.js-0.3.11/themes/alertify.core.css" />
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/loader.min.css">
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/Resource/persian-date-picker/persian-datepicker.min.css" />
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/jquery-confirm/jquery-confirm.min.css" />
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/message-popup.css&v=2" />
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/star-rating/star-rating.css" />
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/rating/themes/fontawesome-stars.css" />
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/tmmegamenu/css/tmmegamenu.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/acc-comment.css" />
+
+    @RenderSection("StyleLink", required: false)
+    @RenderSection("StyleBlock", required: false)
+    @RenderSection("HeaderAddition", required: false)
+</head>
+<body>
+    <div class="js-bg"></div>
+    <header class="dashboard_header-style">
+        <div class="account-box-style">
+            <i class="fas fa-bars js-berger-menu"></i>
+        </div>
+        <img class="header-logo-style" src="/image/logo/amlakbashi-logo-900w.png" alt="logo">
+        <div class="profile-style hide-mobile-profile">
+            @if (userAccessor.CurrentUser.PhotoID > 0)
+            {
+                <img class="avatar" src="@($"/file/imgThumbOld?FileID={userAccessor.CurrentUser.PhotoID}&w=200&h=200")">
+            }
+            else
+            {
+                <img class="avatar" src="/image/icons/avatar.gif">
+            }
+            <p>@userAccessor.CurrentUser.FullName</p>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="box-setting-profile">
+            <a class="change-profile" href="/user/profilemanager" target="_blank"> <i class="fas fa-user-edit"></i> پروفایل من </a>
+            <a class="exit-prifle" href="/user/signout"> <i class="fas fa-sign-out-alt"></i> خروج </a>
+        </div>
+    </header>
+    <section class="admin-container">
+        <nav class="dashboard__navigatoin js-show-menu">
+            <ul class="dashboard-main-navigation_list">
+                <li class="main-navigation_list-item">
+                    <a href="#">
+                        <img src="/image/icons/admin/advertise.png" alt="advertise"> آگهی ها
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="js-submenu style-submenu">
+                        <li class="submenu-child-item">
+                            <a href="/advertise/index">آگهی ها</a>
+                        </li>
+                        <li class="submenu-child-item">
+                            <a href="/category/dynamicindex">صفحات داینامیک</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a href="#">
+                        <img src="/image/icons/admin/service.png" alt="reserve"> رزرو ها
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="js-submenu style-submenu">
+                        <li class="submenu-child-item"><a href="/reserve/index">مدیریت رزرو </a></li>
+                        <li class="submenu-child-item"><a href="/reserve/newindex">مدیریت رزرو (پنل جدید) </a></li>
+                        <li class="submenu-child-item"><a href="/chat/index">مدیریت چت ها</a></li>
+                        <li class="submenu-child-item"><a href="/comment/index">مدیریت نظرات</a></li>
+                    </ul>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a href="/user/index">
+                        <img src="/image/icons/admin/user.png" alt="users"> کاربران
+                    </a>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a href="/bankcard/index">
+                        <img src="/image/icons/admin/bankCard.png" alt="bank_account"> حساب بانکی
+                    </a>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a href="/supportchat/index">
+                        <img src="/image/icons/admin/Message-icon-grey.png" alt="support_chat"> چت پشتیبانی
+                    </a>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a>
+                        <img src="/image/icons/admin/buy.png" alt="financial"> مالی
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="js-submenu style-submenu">
+                        <li class="submenu-child-item"><a href="/payment/index">پرداخت های آنلاین</a> </li>
+                        <li class="submenu-child-item"><a href="/reservepayment/index">پرداخت رزروها</a> </li>
+                        <li class="submenu-child-item"><a href="/wallet/index">تراکنش های کیف پول</a> </li>
+                    </ul>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a href="/blogpost/index">
+                        <img src="/image/icons/admin/post.png" alt="blog_post"> پست وبلاگ
+                    </a>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a>
+                        <img src="/image/icons/admin/statistic.png" alt="statistics">آمار
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="js-submenu style-submenu">
+                        <li class="submenu-child-item"><a href="/admin/paymentchart">آمار مالی</a></li>
+                        <li class="submenu-child-item"><a href="/admin/reservefinancechart">آمار مالی رزروها</a></li>
+                        <li class="submenu-child-item"><a href="/admin/paymentcomparisonchart">مقایسه ماه به ماه مالی</a></li>
+                        <li class="submenu-child-item"><a href="/admin/userchart">آمار کاربران</a></li>
+                        <li class="submenu-child-item"><a href="/admin/advertisechart">آمار ثبت آگهی</a></li>
+                    </ul>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a href="/file/index">
+                        <img src="/image/icons/admin/file.png" alt="files"> فایل ها
+                    </a>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a href="/post/index">
+                        <img src="/image/icons/admin/post.png" alt="post">پست ها
+                    </a>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a href="/admin/sms">
+                        <img src="/image/icons/admin/Message-icon-grey.png" alt="send_sms"> ارسال اس ام اس
+                    </a>
+                </li>
+                <li class="main-navigation_list-item">
+                    <a href="/actionlog/index">
+                        <img src="/image/icons/admin/log.png" alt="edit_log"> لاگ تغییرات
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <section class="main">
+            @RenderBody()
+            <div class="popup-container">
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <i onclick="hidePopup()" class="fas fa-times popup-close-btn"></i>
+                        <i onclick="backPopup()" class="fas fa-arrow-right popup-back-btn"></i>
+                    </div>
+                    <div class="popup-loader"><i class="fas fa-spinner"></i></div>
+                    <div class="popup-main"></div>
+                </div>
+            </div>
+            <div class="confirm-container">
+                <div class="confirm-content">
+                    <div class="confirm-main"></div>
+                    <div class="confirm-footer">
+                        <button type="button" class="confirm-reject-btn" onclick="confirmReject()">خیر</button>
+                        <button type="button" class="confirm-accept-btn" onclick="confirmAccept()">بله</button>
+                    </div>
+                </div>
+            </div>
+            <div class="alert-container">
+                <div class="alert-content">
+                    <i class="fa fa-info-circle alert-sign"></i>
+                    <div class="alert-main"></div>
+                    <i class="fas fa-times alert-close-btn" onclick="alertClose()"></i>
+                </div>
+            </div>
+        </section>
+    </section>
+    <div style="z-index:2147483648;display:none;" id="loading-icon" class="loading-contianer">
+        <div class="ui active large loader loading-icon"></div>
+    </div>
+
+    <script src="/file/getjs?src=/resource/scripts/jquery-2.1.1.min.js"></script>
+    <script src="/file/getjs?src=/scripts/jquery.unobtrusive-ajax.min.js&v=1"></script>
+    <script src="/file/getjs?src=/resource/highcharts/highcharts.js"></script>
+    <script src="/file/getjs?src=/resource/alertify.js-0.3.11/src/alertify.js"></script>
+    <script src="/file/getjs?src=~/resource/jquery-confirm/jquery-confirm.min.js"></script>
+    <script src="/file/getjs?src=~/resource/persian-date-picker/persian-datepicker.js"></script>
+    <script src="/file/getjs?src=~/resource/persian-date-picker/persian-date.min.js"></script>
+    <script src="/file/getjs?src=/resource/drop-zone-2019/dropzone.js"></script>
+    <script src="/file/getjs?src=/resource/rating/jquery.barrating.min.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/accommodation-edit-form.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/ajax-helper.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/client-helper.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/date-time-helper.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/detail-button.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/increase-decrease-button.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/input-validation-helper.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/lazy-loading.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/loading-indicator.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/more-text-button.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/price-string-generator.js&v=1"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/rating-detail.js&v=1"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/string-replace-all.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/textarea-autoexpand.js"></script>
+    <script src="/file/getjs?src=/resource/scripts/admin/user-rating-admin.js&v=1"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/message-popup.js&v=4"></script>
+    <script src="/file/getjs?src=/resource/scripts/general/confirm-alert-helper.js"></script>
+    <script src="/file/getjs?src=/resource/Scripts/jquery.onmutate.min.js"></script>
+    <script src="/js/admin/admin-shared.js"></script>
+
+    @RenderSection("ScriptLink", required: false)
+    @RenderSection("ScriptBlock", required: false)
+
+    <script type="text/javascript">
+        var registered_service_worker;
+        document.addEventListener("DOMContentLoaded", function () {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker.getRegistration("/service_worker.js").then(registration => {
+                        if (registration == undefined) {
+                            navigator.serviceWorker.register('/service_worker.js')
+                                .then(reg => {
+                                    console.log('Service worker registered! 😎', reg);
+                                    registered_service_worker = reg;
+                                })
+                                .catch(err => {
+                                    console.log('😥 Service worker registration failed: ', err);
+                                });
+                        }
+                        else {
+                            registered_service_worker = registration;
+                        }
+                    });
+                });
+            }
+            else {
+            }
+        });
+    </script>
+</body>
+</html>

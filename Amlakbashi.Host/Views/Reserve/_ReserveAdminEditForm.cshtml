@@ -1,0 +1,71 @@
+﻿@model Amlakbashi.Core.DTOs.ReserveDTOs.ReserveIndexEditDTO
+
+@if (Model == null)
+{
+    <p>عملیات با خطا مواجه شد</p>
+}
+else
+{
+    <div class="edit-box">
+        <form id="reserve_edit_form" class="reserve-edit-form" asp-antiforgery="true">
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <div class="deposit-amount box-input">
+                <label class="title-item">تاریخ شروع :</label>
+                <input name="PersinaStartDate" class="style-input" type="text" value="@Model.PersinaStartDate">
+            </div>
+            <div class="deposit-amount box-input">
+                <label class="title-item">تاریخ پایان :</label>
+                <input name="PersinaEndDate" class="style-input" type="text" value="@Model.PersinaEndDate">
+            </div>
+            <div class="deposit-amount box-input">
+                <label class="title-item">تعداد نفرات :</label>
+                <input name="GuestCount" class="style-input" type="number" value="@Model.GuestCount">
+            </div>
+            <div class="total-amount box-input">
+                <label class="title-item">مبلغ کل :</label>
+                <input name="TotalPrice" class="style-input" type="number" value="@Model.TotalPrice">
+            </div>
+            <div class="deposit-amount box-input">
+                <label class="title-item">مبلغ بیعانه :</label>
+                <input name="DepositePrice" class="style-input" type="number" value="@Model.DepositePrice">
+            </div>
+            <div class="box-input respons-host">
+                <label class="title-item"> پاسخ میزبان :</label>
+                <select class="style-input" name="HostResponse">
+                    @{
+                        var host_response_values = (Reserve.HostResponseEnum[])Enum.GetValues(typeof(Reserve.HostResponseEnum));
+                        foreach (var value in host_response_values)
+                        {
+                            <option is-selected="@(value == Model.HostResponse)" value="@((int)value)">@(ReserveLocalization.GetHostResponseString((int)value))</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="box-input status">
+                <label class="title-item">  وضعیت : </label>
+                <select class="style-input" name="Status">
+                    @{
+                        var status_values = (Reserve.ReserveStatus[])Enum.GetValues(typeof(Reserve.ReserveStatus));
+                        foreach (var value in status_values)
+                        {
+                            if (value != Reserve.ReserveStatus.Deleted && value != Reserve.ReserveStatus.Default)
+                            {
+                                <option is-selected="@(value == Model.Status)" value="@((int)value)">@(ReserveLocalization.GetStatusString((int)value, Reserve.StatusStringType.Site))</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="box-input textarea-box">
+                <label class="title-item">  دلیل کنسلی : </label>
+                <textarea name="CanselReason" class="cancel-reason">@Model.CancelReason</textarea>
+            </div>
+            <div class="box-button-container">
+                <div>
+                    <button onclick="SubmitReserveEditForm()" type="button">ثبت</button>
+                    <i class="fas fa-spinner"></i>
+                </div>
+            </div>
+        </form>
+    </div>
+}

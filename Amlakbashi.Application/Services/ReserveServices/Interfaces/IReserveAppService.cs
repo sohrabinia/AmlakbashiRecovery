@@ -3,8 +3,6 @@ using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Amlakbashi.Core.DTOs.ReserveDTOs;
 using static Amlakbashi.Core.Entities.ActionLog;
 using static Amlakbashi.Core.Entities.Reserve;
@@ -24,12 +22,15 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
             int supporter_id = -1, int host_card_status = -1,
             int mainFilter = 0, int instantReserveFilter = 2,
             bool disableAutoCancel = false, bool accVisited = false);
+        void NewFilter(ReserveIndexDTO dto);
         IList<Reserve> GetListByUserId(int userId, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, int category, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, Reserve.ReserveStatus status, bool RatingShownToGuest,
             bool isHost = false);
         IList<Reserve> GetListByUserId(int userId,
             Reserve.ReserveManagerSelectType selectType = Reserve.ReserveManagerSelectType.All);
+        ReserveIndexDetailsInfoDTO GetReserveIndexDetailsInfo(Reserve reserve = null);
+        ReserveIndexSupportInfoDTO GetReserveIndexSupportInfo(long reserveId);
         Reserve Find(long id);
         Reserve GetReserveIncludingSupport(long id);
         IQueryable<Reserve> GetReservesIncludingSupport(List<long> ids);
@@ -37,9 +38,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         IList<Reserve> GetByUserId(int userId);
         Reserve FirstHavingUserId(int userId, Reserve.ReserveStatus status);
         Reserve GetRelatedReserveByUser(int userId, out bool isHost);
-        bool Update(Reserve reserve, string start_date,
-            string end_date, out string msg, int doerUserId,
+        bool Update(Reserve reserve, string start_date, string end_date, out string msg, int doerUserId,
             ActionSourceEnum actionSource);
+        bool UpdateNew(ReserveIndexEditDTO dto, out string msg, int doerUserId, ActionSourceEnum actionSource);
         void SetStatus(long reserveId, ReserveStatus status, bool sendSms,
             ActionLog.ActionSourceEnum actionSource, int doerUserId, bool force = false);
         bool SetHostResponse(long reserveId, HostResponseEnum response,

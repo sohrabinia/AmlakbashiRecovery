@@ -1,0 +1,109 @@
+﻿@model Amlakbashi.Core.DTOs.ReserveDTOs.ReserveAdminItemDTO
+
+<p class="number-row">@ViewBag.index</p>
+<p class="code-reserve">@Model.id </p>
+
+<div class="information-travel">
+    <div class="box-codes">
+        <p>  کد آگهی :</p>
+        <a href="/Advertise/Index?status=-1&id=@(Model.parentAccomodationId > 0 ? Model.parentAccomodationId : Model.accommodationId)">@Model.accommodationId @(Model.parentAccomodationId > 0 ? " >> " + Model.parentAccomodationId : "")</a>
+        <i class="fas fa-copy" onclick="copyStringToClipboard('@(Model.accommodationId)', 'کد آگهی @(Model.accommodationId)')"></i>
+    </div>
+    <div class="box-codes">
+        <p>  کد میزبان : </p>
+        <a href="/User/Index?code=@Model.hostUserId">@Model.hostUserId</a>
+        <i class="fas fa-copy" onclick="copyStringToClipboard('@(Model.hostUserId)', 'کد میزبان @(Model.hostUserId)')"></i>
+        <i class="fas fa-phone-square" onclick="showCallPopup(@(Model.hostUserId),@(Model.id),'میزبان')"></i>
+    </div>
+    <div class="box-codes">
+        <p>  کد مهمان :</p>
+        <a href="/User/Index?code=@Model.guestUserId">@Model.guestUserId</a>
+        <i class="fas fa-copy" onclick="copyStringToClipboard('@(Model.guestUserId)', 'کد مهمان @(Model.guestUserId)')"></i>
+        <i class="fas fa-phone-square" onclick="showCallPopup(@(Model.guestUserId),@(Model.id),'مهمان')"></i>
+    </div>
+</div>
+
+<div class="details-travel">
+    <p>از @Model.startDateString تا @Model.endDateString</p>
+    <p>به مدت @Model.stayDays شب</p>
+    <p>تعداد @Model.guestCount نفر </p>
+</div>
+
+<p class="status" style="color:@Model.statusColor;">@Model.statusString</p>
+
+<div class="status-spport">
+    @if (Model.canGrantSupport)
+    {
+        <p class="accept-support" onclick="doSupport(@(Model.id),this)">انجام پشتیبانی</p>
+    }
+    <p class="support-state" style="color:@(Model.supportStateColor)">@(Model.supportStateString)</p>
+    @foreach (var rs in Model.supporters)
+    {
+        <div class="user-support">
+            @if (rs.imageId > 0)
+            {
+                <img src="@string.Format("/file/imgThumb?FileID={0}&w=200&h=200", rs.imageId)" alt="avatar" width="30" height="30" class="avatar-support">
+            }
+            else
+            {
+                <img src="/resource/img/avatar.gif" alt="avatar" width="30" height="30" class="avatar-support">
+            }
+            <p> @rs.name</p>
+            @if (!string.IsNullOrEmpty(rs.transferReason))
+            {
+                <i style="cursor:pointer;color:#EA4335;" class="fa fa-info-circle" onclick="showInfoPopup('دلیل انتقال پشتیبانی', '@(rs.transferReason)')"></i>
+            }
+        </div>
+    }
+</div>
+
+<div class="force-options">
+    @if (Model.totalChatCount > 0)
+    {
+        <a class="chat-info-btn" asp-controller="reserve" asp-action="chat" asp-route-reserve_id="@Model.id" target="_blank">
+            @if (Model.newChatCount > 0)
+            {
+                <small style="color: red; font-weight: bold;"> !</small>
+            }
+            else
+            {
+                <small> @Model.totalChatCount</small>
+            }
+            <span class="fas fa-comments" title="چت ها"></span>
+        </a>
+    }
+    @if (Model.paymentTryCount > 0)
+    {
+        if (Model.payments != null && Model.payments.Count > 0)
+        {
+            <a target="_blank" href="/reservepayment/index?reserve_id=@(Model.id)" title="لیست پرداخت ها"><small>@Model.paymentTryCount </small><span style="color: green;" class="fas fa-file-invoice-dollar"></span></a>
+        }
+        else
+        {
+            <a target="_blank" href="/reservepayment/index?reserve_id=@(Model.id)" title="لیست پرداخت ها"><small>@Model.paymentTryCount </small><span style="color: red;" class="fas fa-file-invoice-dollar"></span></a>
+        }
+    }
+    @if (Model.mustDoClearing)
+    {
+        <i class="fas fa-money-check-alt clearing-btn" onclick="showSiteClearingHostPopup(@Model.id)" style="color:orange;" title="تسویه میزبان"></i>
+        <i class="fas fa-wallet clearing-btn" onclick="siteClearingHostWithCredit(@Model.id, this)" style="color:orange;" title="تسویه میزبان با کیف پول"></i>
+    }
+    else if (Model.canDoClearing)
+    {
+        <i class="fas fa-money-check-alt clearing-btn" onclick="showSiteClearingHostPopup(@Model.id)" style="color:green;" title="تسویه میزبان"></i>
+        <i class="fas fa-wallet clearing-btn" onclick="siteClearingHostWithCredit(@Model.id, this)" style="color:green;" title="تسویه میزبان با کیف پول"></i>
+    }
+    @if (Model.mustRefund)
+    {
+        <i class="fas fa-money-check-alt refund-btn" style="color:red;" onclick="showSiteRefundGuestPopup(@Model.id)" title="عودت به مهمان"></i>
+        <i class="fas fa-wallet refund-btn" style="color:red;" onclick="siteRefundGuestWithCredit(@Model.id, this)" title="عودت به مهمان با کیف پول"></i>
+    }
+    @if (Model.canBePaidByHost)
+    {
+        <i class="fas fa-wallet pay-reserve-with-credit-host-btn" onclick="payReserveWithCreditHost(@Model.id, this)" style="color:dodgerblue;" title="کسر درصد املاک باشی از کیف پول میزبان"></i>
+    }
+</div>
+
+@* قسمت موارد بیشتر *@
+<p class="button-more-options" onclick="showMoreOptionBox(this, @Model.id)">  <i class="fas fa-plus-square"></i></p>
+<div class="box-more-options-container js-more-option"></div>

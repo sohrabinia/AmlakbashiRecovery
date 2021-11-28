@@ -3,9 +3,16 @@
     var informations = Model.GetCancelDiscussionList().Reverse();
  }
 <div style="display:flex;flex-flow:column;">
-    @foreach (var item in informations)
+    @if (Model == null || informations == null || informations.Count() == 0)
     {
-        <div style="direction:rtl; text-align: right;">@item</div>
+        <p>موردی برای نمایش وجود ندارد</p>
+    }
+    else
+    {
+        foreach (var item in informations)
+        {
+            <div style="direction:rtl; text-align: right;">@item</div>
+        }
     }
 </div>
 

@@ -558,8 +558,8 @@ namespace Amlakbashi.Core.Entities
             {
                 var paymentsList = payments.OrderByDescending(x => x.Date).ToList();
                 var lastDate = paymentsList.Last().Date;
-                lastTryDateStr = DateTimeUtility.GregorianToPersianDate(lastDate);
-                lastTryDateStr += ("_" + lastDate.ToString("HH:mm"));
+                lastTryDateStr = DateTimeUtility.GregorianToPersianDate(lastDate).Remove(0, 2);
+                lastTryDateStr += (" " + lastDate.ToString("HH:mm"));
                 return paymentsList.Count;
             }
             else
