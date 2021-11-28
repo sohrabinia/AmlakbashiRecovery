@@ -83,14 +83,14 @@ else
         var payMethod = $('#js-payment-method').val();
         var transactionIdVal = $('#js-transaction-id-input').val();
         if (payMethod == 2 && transactionIdVal < 1) {
-            showErrorMessage('خطا', 'لطفا شماره تراکنش را وارد کنید');
+            errorAlert('لطفا شماره تراکنش را وارد کنید');
             return;
         }
         var payType = $('#js-payment-type').val();
         var priceVal = $('#js-price-input').val();
         var typeText = payType == 0 ? 'بیعانه'  : 'کل مبلغ';
         var methodString = payMethod == 1 ? 'کیف پول' : 'کارت به کارت';
-        showNoYesMessage('افزودن پرداخت مهمان',
+        @*showNoYesMessage('افزودن پرداخت مهمان',
             '<div>' +
             '<div>نوع پرداخت: ' + typeText + '</div>'+
             '<div>مبلغ: ' + getPriceString(priceVal) + '</div>'+
@@ -111,6 +111,26 @@ else
                 }
                 if (typeof onAddGuestPaymentDone != 'undefined') {
                     onAddGuestPaymentDone();
+                }
+            });
+            });*@
+        var confirmContent = '<div>' +
+            '<div>نوع پرداخت: ' + typeText + '</div>' +
+            '<div>مبلغ: ' + getPriceString(priceVal) + '</div>' +
+            '<div>روش پرداخت: ' + methodString + '</div>' +
+            (payMethod == 1 ? '' : ('<div>شماره تراکنش: ' + transactionIdVal + '</div>')) +
+            '<div>آیا پرداخت اضافه شود؟</div>' +
+            '</div>';
+        showConfirm(confirmContent, function () {
+            myajax('reserve/addguestpayment', 'id=' + @Model.Id + '&type=' + payType + '&method=' + payMethod
+            + '&price=' + priceVal + '&transactionId=' + transactionIdVal, function(ret) {
+                if (ret.status == 0) {
+                    errorAlert(ret.msg);
+                    return;
+                }
+                else {
+                    successAlert('پرداخت با موفقیت اضافه شد');
+                    hidePopup();
                 }
             });
         });

@@ -4,7 +4,6 @@
 <p class="code-reserve">@Model.id </p>
 
 <div class="information-travel">
-    @*<p class="time">زمان درخواست: @item.createDateString</p>*@
     <div class="box-codes">
         <p>  کد آگهی :</p>
         <a href="/Advertise/Index?status=-1&id=@(Model.parentAccomodationId > 0 ? Model.parentAccomodationId : Model.accommodationId)">@Model.accommodationId @(Model.parentAccomodationId > 0 ? " >> " + Model.parentAccomodationId : "")</a>
@@ -33,11 +32,11 @@
 <p class="status" style="color:@Model.statusColor;">@Model.statusString</p>
 
 <div class="status-spport">
-    <p style="color:@(Model.supportStateColor)">@(Model.supportStateString)</p>
     @if (Model.canGrantSupport)
     {
         <p class="accept-support" onclick="doSupport(@(Model.id),this)">انجام پشتیبانی</p>
     }
+    <p class="support-state" style="color:@(Model.supportStateColor)">@(Model.supportStateString)</p>
     @foreach (var rs in Model.supporters)
     {
         <div class="user-support">
@@ -61,7 +60,7 @@
 <div class="force-options">
     @if (Model.totalChatCount > 0)
     {
-        <a asp-controller="reserve" asp-action="chat" asp-route-reserve_id="@Model.id" target="_blank">
+        <a class="chat-info-btn" asp-controller="reserve" asp-action="chat" asp-route-reserve_id="@Model.id" target="_blank">
             @if (Model.newChatCount > 0)
             {
                 <small style="color: red; font-weight: bold;"> !</small>
@@ -86,22 +85,22 @@
     }
     @if (Model.mustDoClearing)
     {
-        <i class="fas fa-money-check-alt" onclick="showSiteClearingHostPopup(@Model.id)" style="color:orange;" title="تسویه میزبان"></i>
-        <i class="fas fa-wallet" onclick="siteClearingHostWithCredit(@Model.id, this)" style="color:orange;" title="تسویه میزبان با کیف پول"></i>
+        <i class="fas fa-money-check-alt clearing-btn" onclick="showSiteClearingHostPopup(@Model.id)" style="color:orange;" title="تسویه میزبان"></i>
+        <i class="fas fa-wallet clearing-btn" onclick="siteClearingHostWithCredit(@Model.id, this)" style="color:orange;" title="تسویه میزبان با کیف پول"></i>
     }
     else if (Model.canDoClearing)
     {
-        <i class="fas fa-money-check-alt" onclick="showSiteClearingHostPopup(@Model.id)" style="color:green;" title="تسویه میزبان"></i>
-        <i class="fas fa-wallet" onclick="siteClearingHostWithCredit(@Model.id, this)" style="color:green;" title="تسویه میزبان با کیف پول"></i>
+        <i class="fas fa-money-check-alt clearing-btn" onclick="showSiteClearingHostPopup(@Model.id)" style="color:green;" title="تسویه میزبان"></i>
+        <i class="fas fa-wallet clearing-btn" onclick="siteClearingHostWithCredit(@Model.id, this)" style="color:green;" title="تسویه میزبان با کیف پول"></i>
     }
     @if (Model.mustRefund)
     {
-        <i class="fas fa-money-check-alt" style="color:red;" onclick="showSiteRefundGuestPopup(@Model.id)" title="عودت به مهمان"></i>
-        <i class="fas fa-wallet" style="color:red;" onclick="siteRefundGuestWithCredit(@Model.id, this)" title="عودت به مهمان با کیف پول"></i>
+        <i class="fas fa-money-check-alt refund-btn" style="color:red;" onclick="showSiteRefundGuestPopup(@Model.id)" title="عودت به مهمان"></i>
+        <i class="fas fa-wallet refund-btn" style="color:red;" onclick="siteRefundGuestWithCredit(@Model.id, this)" title="عودت به مهمان با کیف پول"></i>
     }
     @if (Model.canBePaidByHost)
     {
-        <i class="fas fa-wallet" onclick="payReserveWithCreditHost(@Model.id, this)" style="color:dodgerblue;" title="کسر درصد املاک باشی از کیف پول میزبان"></i>
+        <i class="fas fa-wallet pay-reserve-with-credit-host-btn" onclick="payReserveWithCreditHost(@Model.id, this)" style="color:dodgerblue;" title="کسر درصد املاک باشی از کیف پول میزبان"></i>
     }
 </div>
 

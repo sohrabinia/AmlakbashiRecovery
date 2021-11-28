@@ -1,9 +1,8 @@
-﻿// Declare a proxy to reference the hub.
-const reserveAdminHubConnection = new signalR.HubConnectionBuilder()
+﻿const reserveAdminHubConnection = new signalR.HubConnectionBuilder()
     .withUrl("/reserveadminhub")
     .build();
 
-// Create a function that the hub can call to broadcast messages.
+// ???
 reserveAdminHubConnection.on('addSupporterInfo', (reserve_id, text) => {
     var $reserve_elem = $('#js-' + reserve_id);
     if ($reserve_elem.length > 0) {
@@ -20,99 +19,93 @@ reserveAdminHubConnection.on('addSupporterInfo', (reserve_id, text) => {
 });
 
 reserveAdminHubConnection.on('toggleShouldFollow', (reserve_id, new_status) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        var $_elem = $reserve_elem.find('.should-follow-button');
+    var reserveElem = $('#js-' + reserve_id);
+    if (reserveElem.length > 0) {
+        var shouldFollowBtn = reserveElem.find('.should-follow-btn');
         if (new_status) {
-            $_elem.css('color', '#34A853');
+            shouldFollowBtn.css('color', 'limegreen');
         }
         else {
-            $_elem.css('color', '#242424');
+            shouldFollowBtn.css('color', '');
         }
     }
 });
 
 reserveAdminHubConnection.on('changeStatus', (reserve_id, status_string, status_color) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        $status_label = $reserve_elem.find(".reserve-status-label");
-        $status_label.html(status_string);
-        $status_label.css('color', status_color);
-    }
-});
-
-reserveAdminHubConnection.on('deleteReserve', (reserve_id) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        $reserve_elem.remove();
+    var reserveElem = $('#js-' + reserve_id);
+    if (reserveElem.length > 0) {
+        statusLabel = reserveElem.find(".status");
+        statusLabel.html(status_string);
+        statusLabel.css('color', status_color);
     }
 });
 
 reserveAdminHubConnection.on('payReserveWithCreditHost', (reserve_id) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        $reserve_elem.find('.payReserveWithCreditHost').remove();
+    var reserveElem = $('#js-' + reserve_id);
+    if (reserveElem.length > 0) {
+        reserveElem.find('.pay-reserve-with-credit-host-btn').remove();
     }
 });
 
 reserveAdminHubConnection.on('reserveCleared', (reserve_id) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        $reserve_elem.find('.clearing_button').remove();
+    var reserveElem = $('#js-' + reserve_id);
+    if (reserveElem.length > 0) {
+        reserveElem.find('.clearing-btn').remove();
     }
 });
 
 reserveAdminHubConnection.on('reserveRefunded', (reserve_id) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        $reserve_elem.find('.refund_button').remove();
+    var reserveElem = $('#js-' + reserve_id);
+    if (reserveElem.length > 0) {
+        reserveElem.find('.refund-btn').remove();
     }
 });
 
 reserveAdminHubConnection.on('chatRead', (reserve_id, count) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        $reserve_elem.find('.js-chat-info').css('background-color', '#4485F2');
-        $reserve_elem.find('.js-chat-info').html(count);
+    var reserveElem = $('#js-' + reserve_id);
+    if (reserveElem.length > 0) {
+        let chatBtn = reserveElem.find('.chat-info-btn small');
+        chatBtn.css('color', '');
+        chatBtn.html(count);
     }
 });
 
 reserveAdminHubConnection.on('changeChatCount', (reserve_id, count, notReadCount) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        var $chat_info = $reserve_elem.find('.js-chat-info');
+    var reserveElem = $('#js-' + reserve_id);
+    if (reserveElem.length > 0) {
+        var chatBtn = reserveElem.find('.chat-info-btn small');
         if (count == 0) {
-            $chat_info.css('display', 'none');
+            chatBtn.css('display', 'none');
         }
         else {
-            $chat_info.css('display', 'unset');
+            chatBtn.css('display', 'unset');
             if (notReadCount > 0) {
-                $chat_info.css('background-color', '#EA4335');
-                $chat_info.html('!');
+                chatBtn.css('color', 'red');
+                chatBtn.html('!');
             }
             else {
-                $chat_info.css('background-color', '#4485F2');
-                $chat_info.html(count);
+                chatBtn.css('color', '');
+                chatBtn.html(count);
             }
         }
     }
 });
 
 reserveAdminHubConnection.on('reserveSupporterAdded', (reserve_id, supporterName, supporterPhoto) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        $reserve_elem.find('.support_state').css("color", "#34A853");
-        $reserve_elem.find('.support_state').html('در حال پشتیبانی');
-
-        $reserve_elem.find('.support_state_td').append('<div style="display:flex;flex-flow:row; justify-content: center; align-items:center;">'
+    var reserveElem = $('#js-' + reserve_id);
+    if (reserveElem.length > 0) {
+        let supportStateElem = reserveElem.find('.support-state');
+        supportStateElem.html('در حال پشتیبانی');
+        reserveElem.find('.status-spport').append('<div style="display:flex; flex-flow:row; justify-content: center; align-items:center;">'
             + (supporterPhoto != '' ?
-                ('<img style="border-radius: 90px" width="20" height="20" src="' + supporterPhoto + '" />')
-                : '<i class="fa fa-user-circle" style="font-size:20px"></i>')
-            + '<div style="margin: 0 5px;color:#34A853;">' + supporterName + '</div>'
+                ('<img src="' + supporterPhoto + '" />')
+                : '<i class="fa fa-user-circle"></i>')
+            + '<div>' + supporterName + '</div>'
             + '</div>');
     }
 });
 
+// ???
 reserveAdminHubConnection.on('changeCallState', (reserve_id, hostOrGuest, new_state, new_state_color) => {
     var $reserve_elem = $('#js-' + reserve_id);
     if ($reserve_elem.length > 0) {
@@ -121,7 +114,6 @@ reserveAdminHubConnection.on('changeCallState', (reserve_id, hostOrGuest, new_st
     }
 });
 
-// Start the connection.
 reserveAdminHubConnection.start()
     .then(() => console.log('reserve admin hub connected!'))
     .catch(console.error);

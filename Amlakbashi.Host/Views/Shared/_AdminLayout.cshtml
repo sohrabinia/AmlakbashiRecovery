@@ -171,6 +171,32 @@
         </nav>
         <section class="main">
             @RenderBody()
+            <div class="popup-container">
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <i onclick="hidePopup()" class="fas fa-times popup-close-btn"></i>
+                        <i onclick="backPopup()" class="fas fa-arrow-right popup-back-btn"></i>
+                    </div>
+                    <div class="popup-loader"><i class="fas fa-spinner"></i></div>
+                    <div class="popup-main"></div>
+                </div>
+            </div>
+            <div class="confirm-container">
+                <div class="confirm-content">
+                    <div class="confirm-main"></div>
+                    <div class="confirm-footer">
+                        <button type="button" class="confirm-reject-btn" onclick="confirmReject()">خیر</button>
+                        <button type="button" class="confirm-accept-btn" onclick="confirmAccept()">بله</button>
+                    </div>
+                </div>
+            </div>
+            <div class="alert-container">
+                <div class="alert-content">
+                    <i class="fa fa-info-circle alert-sign"></i>
+                    <div class="alert-main"></div>
+                    <i class="fas fa-times alert-close-btn" onclick="alertClose()"></i>
+                </div>
+            </div>
         </section>
     </section>
     <div style="z-index:2147483648;display:none;" id="loading-icon" class="loading-contianer">

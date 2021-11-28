@@ -651,20 +651,20 @@
             }
         });
 
-        function deleteItem($id, obj) {
-            if (confirm("آیا از حذف این آیتم اطمینان دارید ؟"))
-            {
-                myajax("Reserve/Delete", "reserve_id=" + $id , function (ret) {
-                    if (ret.status == 1) {
-                        reserveAdminHubConnection.invoke("deleteReserve", $id);
-                        alertify.success('رزرو با کد ' + $id + ' حذف شد');
-                    }
-                    else {
-                        showErrorMessage('خطا', ret.val);
-                    }
-                });
-            }
-        }
+        //function deleteItem($id, obj) {
+        //    if (confirm("آیا از حذف این آیتم اطمینان دارید ؟"))
+        //    {
+        //        myajax("Reserve/Delete", "reserve_id=" + $id , function (ret) {
+        //            if (ret.status == 1) {
+        //                reserveAdminHubConnection.invoke("deleteReserve", $id);
+        //                alertify.success('رزرو با کد ' + $id + ' حذف شد');
+        //            }
+        //            else {
+        //                showErrorMessage('خطا', ret.val);
+        //            }
+        //        });
+        //    }
+        //}
 
         function callForRequest($id) {
             if (confirm("آیا با میزبان، تماس پاسخ درخواست رزرو گرفته شود؟"))

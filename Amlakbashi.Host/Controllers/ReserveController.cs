@@ -647,10 +647,10 @@ namespace Amlakbashi.Host.Controllers
                         msg = msg
                     });
                 }
-                if (reserveService.SetHostResponse(reserve.Id, reserve.HostResponse, true,
+                if (reserveService.SetHostResponse(dto.Id, dto.HostResponse, true,
                     ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id, true) == false)
                 {
-                    reserveService.SetStatus(reserve.Id, reserve.Status, true,
+                    reserveService.SetStatus(dto.Id, dto.Status, true,
                         ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id, true);
                 }
                 if (reserve.HostResponse == HostResponseEnum.Accepted)
@@ -673,21 +673,35 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Authorize(Roles = Roles.SuperAdmin)]
-        public JsonResult Delete(long reserve_id)
+        public IActionResult GetSupportInfo(long reserveId)
         {
             try
             {
-                string msg;
-                var done = reserveService.Delete(reserve_id, out msg);
-                return GenerateJsonResult(new { status = done ? 1 : 0, val = msg });
+                var dto = reserveService.GetReserveIndexSupportInfo(reserveId);
+                return PartialView("_ReserveIndexSupportInfo", dto);
             }
             catch (Exception exc)
             {
-                logger.Error("Reserve.Delete", exc);
-                return GenerateJsonResult(new { status = 0, val = "" });
+                logger.Error("Reserve.GetReserveSupportInfo", exc);
+                return PartialView("_ReserveIndexSupportInfo");
             }
         }
+
+        //[Authorize(Roles = Roles.SuperAdmin)]
+        //public JsonResult Delete(long reserve_id)
+        //{
+        //    try
+        //    {
+        //        string msg;
+        //        var done = reserveService.Delete(reserve_id, out msg);
+        //        return GenerateJsonResult(new { status = done ? 1 : 0, val = msg });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("Reserve.Delete", exc);
+        //        return GenerateJsonResult(new { status = 0, val = "" });
+        //    }
+        //}
 
         [HttpGet]
         [Authorize]
