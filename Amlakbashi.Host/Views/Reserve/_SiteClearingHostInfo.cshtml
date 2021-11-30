@@ -117,7 +117,6 @@ else
 <script>
     var hasLoadPopup = typeof loadPopup === 'function';
     function ManualSiteClearingHost() {
-        debugger;
         var queryString = "reserveId=" + @Model.ReserveId + "&price=" + @Model.PayablePrice;
         if (hasLoadPopup) {
             loadPopup('/Reserve/ManualSitePayment?' + queryString);

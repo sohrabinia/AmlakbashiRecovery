@@ -15,9 +15,9 @@ function hideAdminDescriptionWindow(elem) {
     hideDarkBackground();
 }
 
-$(".view-description-support").click(function (event) {
-    showAdminDescriptionWindow(this);
-});
+//$(".view-description-support").click(function (event) {
+//    showAdminDescriptionWindow(this);
+//});
 
 $(".exit-description-support").click(function () {
     hideAdminDescriptionWindow(this);
