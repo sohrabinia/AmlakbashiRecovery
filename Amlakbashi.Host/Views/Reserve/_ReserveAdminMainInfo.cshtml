@@ -25,9 +25,9 @@
 </div>
 
 <div class="details-travel">
-    <p>از @Model.startDateString تا @Model.endDateString</p>
-    <p>به مدت @Model.stayDays شب</p>
-    <p>تعداد @Model.guestCount نفر </p>
+    <p>@Model.startDateString الی @Model.endDateString (@Model.stayDays شب)</p>
+    <p>تعداد @Model.guestCount نفر</p>
+    <p>مبلغ @string.Format("{0:n0}", Model.totalPrice) @(Model.depositePrice != Model.totalPrice ? string.Format("(بیعانه: {0:n0})", Model.depositePrice) : "")</p>
 </div>
 
 <p class="status" style="color:@Model.statusColor;">@Model.statusString</p>

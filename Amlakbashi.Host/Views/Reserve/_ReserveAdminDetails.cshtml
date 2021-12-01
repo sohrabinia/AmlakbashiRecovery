@@ -100,10 +100,7 @@ else
             <a asp-controller="reserve" asp-action="chat" asp-route-reserve_id="@Model.Id" target="_blank" class="fas fa-comments" title="چت ها"></a>
             <i class="fas fa-comments-dollar" title="مذاکره لغو رزرو" onclick="showCancelDiscussion(@Model.Id)"></i>
             <i class="fas fa-eye should-follow-btn" title="درحال پیگیری" onclick="toggleShouldFollow(@Model.Id, this)" style="@(Model.ShouldFollow ? "color: limegreen;" : "")"></i>
-            @if (Model.Status == (int)Reserve.ReserveStatus.WaitForResponse || Model.Status == (int)Reserve.ReserveStatus.WaitForReserve)
-            {
-                <i class="fas fa-ban" title="عدم لغو سیستم" onclick="toggleDisableAutoCancel(@Model.Id, this)" data-value="@Model.DisableAutoCancel.ToString().ToLower()" style='@(Model.DisableAutoCancel ? "color: limegreen;" : "")'></i>
-            }
+            <i class="fas fa-ban" title="عدم لغو سیستم" onclick="toggleDisableAutoCancel(@Model.Id, this)" data-value="@Model.DisableAutoCancel.ToString().ToLower()" style='@(Model.DisableAutoCancel ? "color: limegreen;" : "")'></i>
             <i class="fas fa-map-marker-alt" title="بازدید مهمان از اقامتگاه" onclick="toggleAccVisited(@Model.Id, this)" data-value="@Model.AccVisitedByGuest.ToString().ToLower()" style='@(Model.AccVisitedByGuest ? "color: limegreen;" : "")'></i>
             @if (Model.Status == (int)Reserve.ReserveStatus.WaitForResponse)
             {

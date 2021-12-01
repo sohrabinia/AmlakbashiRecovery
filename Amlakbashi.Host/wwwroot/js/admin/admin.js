@@ -47,6 +47,25 @@ function closeNavigation(){
     $(".main-navigation_list-item").children(".style-submenu").addClass("js-submenu");
 };
 
+function showDarkBackground() {
+    $('.js-bg').addClass("bg-show-menu");
+    $('body').css("overflow", "hidden");
+}
+
+function hideDarkBackground() {
+    $('.js-bg').removeClass("bg-show-menu");
+    $('body').css("overflow", "auto");
+}
+
+// more filter popup
+$(".more-filter").click(function (event) {
+    $(".more-filter-container").fadeIn(100);
+});
+
+$(".more-filter-container .button-exit").click(function () {
+    $(".more-filter-container").fadeOut(100);
+});
+
 // collapse detail container
 function loadCollapse(callerButton, targetContainer, url) {
     var isOpen = $(targetContainer).children().length > 0;
@@ -191,8 +210,4 @@ function submitForm(formId, url, successCallback, beforeCallback, completeCallba
             }
         }
     })
-}
-
-function test() {
-    successAlert("reza najmi");
 }
