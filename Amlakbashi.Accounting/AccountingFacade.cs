@@ -1320,7 +1320,7 @@ namespace Amlakbashi.Accounting
                     HasError = false,
                     Message = "پرداخت با موفقیت انجام شد",
                     ErrorMessage = "پرداخت انجام نشد",
-                    PayablePrice = user.Credit * 10,
+                    PayablePrice = user.Credit,
                     TraceNumber = "123456789"
                 };
             }
@@ -1331,6 +1331,7 @@ namespace Amlakbashi.Accounting
 
             if (result.HasError == false)
             {
+                result.PayablePrice = user.Credit;
                 long newCredit;
                 var transactionCause = "تسویه کیف پول";
                 var creditTransactionId = DecreaseCredit(user.Id, user.Credit, long.Parse(result.TraceNumber), 0, out newCredit,

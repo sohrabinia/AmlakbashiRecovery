@@ -445,3 +445,11 @@ function SubmitReserveEditForm() {
 function showSupportInfo(reserveId) {
     loadPopup("/reserve/getsupportinfo?reserveId=" + reserveId);
 }
+
+$(".box-filter .submit-btn").click(function (event) {
+    $('#more_filter_form [name="ReserveId"]').val($('.box-filter .bar-filter [name="ReserveId"').val());
+    $('#more_filter_form [name="AdvertiseId"]').val($('.box-filter .bar-filter [name="AdvertiseId"').val());
+    $('#more_filter_form [name="HostUserId"]').val($('.box-filter .bar-filter [name="HostUserId"').val());
+    $('#more_filter_form [name="GuestUserId"]').val($('.box-filter .bar-filter [name="GuestUserId"').val());
+    $('#more_filter_form').submit();
+});

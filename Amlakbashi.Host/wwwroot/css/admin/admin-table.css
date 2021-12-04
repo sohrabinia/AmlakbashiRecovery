@@ -42,13 +42,6 @@
   transform: scale(1.03);
 }
 
-/*.pagination-container .pagination .PagedList-skipToNext a {
-  color: #555;
-  width: 30px;
-  border: none;
-  background: none;
-}*/
-
 .admin-table {
     width: 92%;
     display: flex;

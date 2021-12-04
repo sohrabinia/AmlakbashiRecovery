@@ -9,10 +9,13 @@
 
 @section StyleLink
 {
-    <link rel="stylesheet" href="/css/admin/general/admin-filter.css">
-    <link rel="stylesheet" href="/css/admin/general/admin-table.css">
-    <link rel="stylesheet" href="/css/admin/reserve/admin-reserve-index.css">
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/star-rating/star-rating.css&v=2">
+    <environment include="Development">
+        <link rel="stylesheet" href="/css/admin/reserve/admin-reserve-index.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/star-rating/star-rating.css&v=2" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="/css/min/admin-reserve.min.css" asp-append-version="true">
+    </environment>
 }
 
 <div class="admin-top-pin-container">
@@ -27,20 +30,24 @@
             <span class="bar-filter-item" onclick="toggleDisableAutoCancelFilter('@((!Model.DisableAutoCancel).ToString().ToLower())')" style="background-color:@(Model.DisableAutoCancel ? "#fdd835" : "")">عدم لغو خودکار</span>
             <span class="bar-filter-item" onclick="toggleAccVisitFilter('@((!Model.AccVisited).ToString().ToLower())')" style="background-color:@(Model.AccVisited ? "#fdd835" : "")">بازدید اقامتگاه</span>
         </div>
-        <div class="bar-filter">
-            <span><i class="fas fa-user-alt"></i>فیلتر پشتیبانی :</span>
-            <span class="bar-filter-item" onclick="toggleMyReserves(0)" style="background-color:@(Model.ReserveSupportStatus == 0 ? "#fdd835" : "")">همه</span>
-            <span class="bar-filter-item" onclick="toggleMyReserves(1)" style="background-color:@(Model.ReserveSupportStatus == 1 ? "#fdd835" : "")">بدون پشتیبان</span>
-            <span class="bar-filter-item" onclick="toggleMyReserves(3)" style="background-color:@(Model.ReserveSupportStatus == 3 ? "#fdd835" : "")">در حال پشتیبانی من</span>
-            <span class="bar-filter-item" onclick="toggleMyReserves(2)" style="background-color:@(Model.ReserveSupportStatus == 2 ? "#fdd835" : "")">در حال پشتیبانی همکاران</span>
-            <span class="bar-filter-item" onclick="toggleMyReserves(4)" style="background-color:@(Model.ReserveSupportStatus == 4 ? "#fdd835" : "")">انجام شده</span>
-        </div>
+        @*<div class="bar-filter">
+                <span><i class="fas fa-user-alt"></i>فیلتر پشتیبانی :</span>
+                <span class="bar-filter-item" onclick="toggleMyReserves(0)" style="background-color:@(Model.ReserveSupportStatus == 0 ? "#fdd835" : "")">همه</span>
+                <span class="bar-filter-item" onclick="toggleMyReserves(1)" style="background-color:@(Model.ReserveSupportStatus == 1 ? "#fdd835" : "")">بدون پشتیبان</span>
+                <span class="bar-filter-item" onclick="toggleMyReserves(3)" style="background-color:@(Model.ReserveSupportStatus == 3 ? "#fdd835" : "")">در حال پشتیبانی من</span>
+                <span class="bar-filter-item" onclick="toggleMyReserves(2)" style="background-color:@(Model.ReserveSupportStatus == 2 ? "#fdd835" : "")">در حال پشتیبانی همکاران</span>
+                <span class="bar-filter-item" onclick="toggleMyReserves(4)" style="background-color:@(Model.ReserveSupportStatus == 4 ? "#fdd835" : "")">انجام شده</span>
+            </div>*@
         <div class="box-filter">
-            <div class="more-filter">فیلتر بیشتر</div>
-            @*<div class="status-reserve">
-                    <label for="status-reserve"> نمایش رزرو های بایگانی شده</label>
-                    <input type="checkbox" name="status-reserve">
-                </div>*@
+            <button class="more-filter">فیلتر بیشتر</button>
+            <div class="bar-filter">
+                <span><i class="fas fa-filter"></i>فیلتر :</span>
+                <input class="input-stlye" type="text" value="@(Model.ReserveId > 0 ? Model.ReserveId : "")" name="ReserveId" placeholder="کد رزرو">
+                <input class="input-stlye" type="text" value="@(Model.AdvertiseId > 0 ? Model.AdvertiseId : "")" name="AdvertiseId" placeholder="کد آگهی">
+                <input class="input-stlye" type="text" value="@(Model.HostUserId > 0 ? Model.HostUserId : "")" name="HostUserId" placeholder="کد میزبان">
+                <input class="input-stlye" type="text" value="@(Model.GuestUserId > 0 ? Model.GuestUserId : "")" name="GuestUserId" placeholder="کد مهمان">
+                <button class="fas fa-angle-double-left submit-btn"></button>
+            </div>
         </div>
     </div>
     <aside class="admin-table-row admin-table-row-header">
@@ -49,7 +56,7 @@
         <p class="information-travel">اطلاعات سفر</p>
         <p class="details-travel">جزئیات سفر</p>
         <p class="status">وضعیت</p>
-        <p class="status-spport">وضعیت پشتیبانی</p>
+        <p class="support-desc">پشتیبانی</p>
         <p class="force-options">عملیات</p>
         <p class="button-more-options">سایر</p>
     </aside>
@@ -101,157 +108,163 @@
 </div>
 
 <div class="more-filter-container">
-    <form id="more_filter_form" class="more-filter-form" asp-controller="reserve" asp-action="newindex" method="get">
-        <input type="hidden" id="show_my_reserves_input" name="ReserveSupportStatus" value="@Model.ReserveSupportStatus" />
-        <input type="hidden" id="should_follow_input" name="ShouldFollow" value="@Model.ShouldFollow.ToString().ToLower()" />
-        <input type="hidden" id="disableAutoCancelFilter" name="DisableAutoCancel" value="@Model.DisableAutoCancel.ToString().ToLower()" />
-        <input type="hidden" id="accVisitedFilter" name="AccVisited" value="@Model.AccVisited.ToString().ToLower()" />
-        <div class="options-filter-box">
-            <div class="box-1">
-                <div class="item-filter-box">
-                    <label class="title-filter">کد رزرو</label>
-                    <input class="input-stlye" type="text" value="@Model.ReserveId" name="ReserveId">
+    <div class="more-filter-content">
+        <form id="more_filter_form" class="more-filter-form" asp-controller="reserve" asp-action="newindex" method="get">
+            <input type="hidden" id="show_my_reserves_input" name="ReserveSupportStatus" value="@Model.ReserveSupportStatus" />
+            <input type="hidden" id="should_follow_input" name="ShouldFollow" value="@Model.ShouldFollow.ToString().ToLower()" />
+            <input type="hidden" id="disableAutoCancelFilter" name="DisableAutoCancel" value="@Model.DisableAutoCancel.ToString().ToLower()" />
+            <input type="hidden" id="accVisitedFilter" name="AccVisited" value="@Model.AccVisited.ToString().ToLower()" />
+            <div class="options-filter-box">
+                <div class="more-filter-row">
+                    <div class="item-filter-box">
+                        <label class="title-filter">کد رزرو</label>
+                        <input class="input-stlye" type="text" value="@Model.ReserveId" name="ReserveId">
+                    </div>
+                    <div class="item-filter-box">
+                        <label class="title-filter">کد آگهی</label>
+                        <input class="input-stlye" type="text" value="@Model.AdvertiseId" name="AdvertiseId">
+                    </div>
+                    <div class="item-filter-box">
+                        <label class="title-filter">کد کاربرِی میزبان</label>
+                        <input class="input-stlye" type="text" value="@Model.HostUserId" name="HostUserId">
+                    </div>
+                    <div class="item-filter-box">
+                        <label class="title-filter">کد کاربرِی مهمان</label>
+                        <input class="input-stlye" type="text" value="@Model.GuestUserId" name="GuestUserId">
+                    </div>
                 </div>
-                <div class="item-filter-box">
-                    <label class="title-filter">کد آگهی</label>
-                    <input class="input-stlye" type="text" value="@Model.AdvertiseId" name="AdvertiseId">
-                </div>
-                <div class="item-filter-box">
-                    <label class="title-filter">کد کاربرِی میزبان</label>
-                    <input class="input-stlye" type="text" value="@Model.HostUserId" name="HostUserId">
-                </div>
-                <div class="item-filter-box">
-                    <label class="title-filter">کد کاربرِی مهمان</label>
-                    <input class="input-stlye" type="text" value="@Model.GuestUserId" name="GuestUserId">
-                </div>
-            </div>
-            <div class="box-2">
-                <div class="item-filter-box">
-                    <label for="status" class="title-filter"> وضعیت پرداخت </label>
-                    <select class="input-stlye" name="GeneralStatus" id="general_status_input">
-                        <option value="-1"> همه رزرو ها</option>
-                        <option value="0" is-selected="@(Model.GeneralStatus == 0)">پرداخت شده ها</option>
-                    </select>
-                </div>
-                <div class="item-filter-box">
-                    <label for="status-travel" class="title-filter"> وضعیت سفر</label>
-                    <select class="input-stlye" name="ReserveStatus" id="reserve-status-input">
-                        <option value="-1"> همه رزرو ها</option>
-                        @{
-                            var status_values = (Reserve.ReserveStatus[])Enum.GetValues(typeof(Reserve.ReserveStatus));
-                            foreach (var value in status_values)
-                            {
-                                if (value != Reserve.ReserveStatus.Deleted && value != Reserve.ReserveStatus.Default)
+                <div class="more-filter-row">
+                    <div class="item-filter-box">
+                        <label for="status" class="title-filter"> وضعیت پرداخت </label>
+                        <select class="input-stlye" name="GeneralStatus" id="general_status_input">
+                            <option value="-1"> همه رزرو ها</option>
+                            <option value="0" is-selected="@(Model.GeneralStatus == 0)">پرداخت شده ها</option>
+                        </select>
+                    </div>
+                    <div class="item-filter-box">
+                        <label for="status-travel" class="title-filter"> وضعیت سفر</label>
+                        <select class="input-stlye" name="ReserveStatus" id="reserve-status-input">
+                            <option value="-1"> همه رزرو ها</option>
+                            @{
+                                var status_values = (Reserve.ReserveStatus[])Enum.GetValues(typeof(Reserve.ReserveStatus));
+                                foreach (var value in status_values)
                                 {
-                                    <option value="@((int)value)" is-selected="@(Model.ReserveStatus == (int)value)">@ReserveLocalization.GetStatusString((int)value, Reserve.StatusStringType.Site)</option>
+                                    if (value != Reserve.ReserveStatus.Deleted && value != Reserve.ReserveStatus.Default)
+                                    {
+                                        <option value="@((int)value)" is-selected="@(Model.ReserveStatus == (int)value)">@ReserveLocalization.GetStatusString((int)value, Reserve.StatusStringType.Site)</option>
+                                    }
                                 }
                             }
-                        }
-                    </select>
-                </div>
-                <div class="item-filter-box">
-                    <label class="title-filter">وضعیت تسویه </label>
-                    <select class="input-stlye" name="SiteClearedStatus" id="cleared_status_input">
-                        <option value="-1"> همه رزرو ها</option>
-                        <option value="0" is-selected="@(Model.SiteClearedStatus == 0)">تسویه شده</option>
-                        <option value="1" is-selected="@(Model.SiteClearedStatus == 1)">تسویه نشده</option>
-                        <option value="2" is-selected="@(Model.SiteClearedStatus == 2)">عودت داده شده</option>
-                        <option value="3" is-selected="@(Model.SiteClearedStatus == 3)">در انتظار عودت</option>
-                    </select>
-                </div>
-                <div class="item-filter-box">
-                    <label for="respons" class="title-filter"> پاسخ میزبان</label>
-                    <select class="input-stlye" name="HostResponseStatus">
-                        <option value="-1"> همه رزرو ها</option>
-                        @{
-                            var host_response_values = (Reserve.HostResponseEnum[])Enum.GetValues(typeof(Reserve.HostResponseEnum));
-                            foreach (var value in host_response_values)
-                            {
-                                <option value="@((int)value)" is-selected="@(Model.HostResponseStatus == (int)value)">@ReserveLocalization.GetHostResponseString((int)value)</option>
+                        </select>
+                    </div>
+                    <div class="item-filter-box">
+                        <label class="title-filter">وضعیت تسویه </label>
+                        <select class="input-stlye" name="SiteClearedStatus" id="cleared_status_input">
+                            <option value="-1"> همه رزرو ها</option>
+                            <option value="0" is-selected="@(Model.SiteClearedStatus == 0)">تسویه شده</option>
+                            <option value="1" is-selected="@(Model.SiteClearedStatus == 1)">تسویه نشده</option>
+                            <option value="2" is-selected="@(Model.SiteClearedStatus == 2)">عودت داده شده</option>
+                            <option value="3" is-selected="@(Model.SiteClearedStatus == 3)">در انتظار عودت</option>
+                        </select>
+                    </div>
+                    <div class="item-filter-box">
+                        <label for="respons" class="title-filter"> پاسخ میزبان</label>
+                        <select class="input-stlye" name="HostResponseStatus">
+                            <option value="-1"> همه رزرو ها</option>
+                            @{
+                                var host_response_values = (Reserve.HostResponseEnum[])Enum.GetValues(typeof(Reserve.HostResponseEnum));
+                                foreach (var value in host_response_values)
+                                {
+                                    <option value="@((int)value)" is-selected="@(Model.HostResponseStatus == (int)value)">@ReserveLocalization.GetHostResponseString((int)value)</option>
+                                }
                             }
-                        }
-                    </select>
+                        </select>
+                    </div>
+                </div>
+                <div class="more-filter-row">
+                    <div class="item-filter-box">
+                        <p class="title-filter">زمان سفر از</p>
+                        <input type="text" class="input-stlye js-filter-date-picker" name="ReserveFromDate" value="@Model.ReserveFromDate" id="reserve_from_date_picker" />
+                    </div>
+                    <div class="item-filter-box">
+                        <p class="title-filter">زمان سفر تا</p>
+                        <input type="text" class="input-stlye js-filter-date-picker" name="ReserveToDate" value="@Model.ReserveToDate" id="reserve_to_date_picker" />
+                    </div>
+                    <div class="item-filter-box">
+                        <p class="title-filter">تاریخ پایان سفر</p>
+                        <input type="text" class="input-stlye js-filter-date-picker" name="ReserveEndDate" value="@Model.ReserveEndDate" id="reserve_end_date_picker" />
+                    </div>
+                    <div class="item-filter-box">
+                        <p class="title-filter">زمان تسویه</p>
+                        <input type="text" class="input-stlye js-filter-date-picker" name="SiteClearingDate" value="@Model.SiteClearingDate" id="clearing_date_picker" />
+                    </div>
+                </div>
+                <div class="more-filter-row">
+                    <div class="item-filter-box">
+                        <label class="title-filter"> پشتیبان </label>
+                        <select class="input-stlye" name="SupporterId">
+                            <option value="-1">همه</option>
+                            @foreach (var supp in Model.SupporterList)
+                            {
+                                <option is-selected="@(Model.SupporterId == supp.id)" value="@(supp.id)">@(supp.fullName)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="item-filter-box">
+                        <label class="title-filter"> حساب بانکی میزبان  </label>
+                        <select class="input-stlye" name="HostCardStatus">
+                            <option value="-1">همه</option>
+                            <option value="0" is-selected="@(Model.HostCardStatus == 0)">دارای شماره شبا</option>
+                            <option value="1" is-selected="@(Model.HostCardStatus == 1)">فقط شماره کارت</option>
+                            <option value="2" is-selected="@(Model.HostCardStatus == 2)">بدون حساب</option>
+                        </select>
+                    </div>
+                    <div class="item-filter-box">
+                        <label class="title-filter"> عادی / آنی </label>
+                        <select class="input-stlye" name="InstantReserveFilter">
+                            <option value="2" is-selected="@(Model.InstantReserveFilter == 2)">همه </option>
+                            <option value="0" is-selected="@(Model.InstantReserveFilter == 0)">رزرو عادی</option>
+                            <option value="1" is-selected="@(Model.InstantReserveFilter == 1)">رزرو آنی</option>
+                        </select>
+                    </div>
+                    <div class="item-filter-box">
+                        <label class="title-filter"> فعال / بایگانی </label>
+                        <select class="input-stlye" name="MainFilter">
+                            <option value="1" is-selected="@(Model.MainFilter == 1)">همه </option>
+                            <option value="0" is-selected="@(Model.MainFilter == 0)">فعال</option>
+                            <option value="2" is-selected="@(Model.MainFilter == 2)">بایگانی</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="more-filter-row">
+                    <div class="item-filter-box travel-time-interval">
+                        <p>مدت زمان سفر:</p>
+                        <input class="input-stlye" type="text" value="@Model.StayDurationFrom" name="StayDurationFrom">
+                        <label>تا</label>
+                        <input class="input-stlye" type="text" value="@Model.StayDurationTo" name="StayDurationTo">
+                        روز
+                    </div>
                 </div>
             </div>
-            <div class="box-3">
-                <div class="item-filter-box">
-                    <p class="title-filter">زمان سفر از</p>
-                    <input type="text" class="input-stlye js-filter-date-picker" name="ReserveFromDate" value="@Model.ReserveFromDate" id="reserve_from_date_picker" />
-                </div>
-                <div class="item-filter-box">
-                    <p class="title-filter">زمان سفر تا</p>
-                    <input type="text" class="input-stlye js-filter-date-picker" name="ReserveToDate" value="@Model.ReserveToDate" id="reserve_to_date_picker" />
-                </div>
-                <div class="item-filter-box">
-                    <p class="title-filter">تاریخ پایان سفر</p>
-                    <input type="text" class="input-stlye js-filter-date-picker" name="ReserveEndDate" value="@Model.ReserveEndDate" id="reserve_end_date_picker" />
-                </div>
-                <div class="item-filter-box">
-                    <p class="title-filter">زمان تسویه</p>
-                    <input type="text" class="input-stlye js-filter-date-picker" name="SiteClearingDate" value="@Model.SiteClearingDate" id="clearing_date_picker" />
-                </div>
+            <div class="button-box">
+                <button type="button" class="button-exit">بستن</button>
+                <button type="submit" class="button-filter">فیلتر</button>
             </div>
-            <div class="box-4">
-                <div class="item-filter-box">
-                    <label class="title-filter"> پشتیبان </label>
-                    <select class="input-stlye" name="SupporterId">
-                        <option value="-1">همه</option>
-                        @foreach (var supp in Model.SupporterList)
-                        {
-                            <option is-selected="@(Model.SupporterId == supp.id)" value="@(supp.id)">@(supp.fullName)</option>
-                        }
-                    </select>
-                </div>
-                <div class="item-filter-box">
-                    <label class="title-filter"> حساب بانکی میزبان  </label>
-                    <select class="input-stlye" name="HostCardStatus">
-                        <option value="-1">همه</option>
-                        <option value="0" is-selected="@(Model.HostCardStatus == 0)">دارای شماره شبا</option>
-                        <option value="1" is-selected="@(Model.HostCardStatus == 1)">فقط شماره کارت</option>
-                        <option value="2" is-selected="@(Model.HostCardStatus == 2)">بدون حساب</option>
-                    </select>
-                </div>
-                <div class="item-filter-box">
-                    <label class="title-filter"> عادی / آنی </label>
-                    <select class="input-stlye" name="InstantReserveFilter">
-                        <option value="2" is-selected="@(Model.InstantReserveFilter == 2)">همه </option>
-                        <option value="0" is-selected="@(Model.InstantReserveFilter == 0)">رزرو عادی</option>
-                        <option value="1" is-selected="@(Model.InstantReserveFilter == 1)">رزرو آنی</option>
-                    </select>
-                </div>
-                <div class="item-filter-box">
-                    <label class="title-filter"> فعال / بایگانی </label>
-                    <select class="input-stlye" name="MainFilter">
-                        <option value="1" is-selected="@(Model.MainFilter == 1)">همه </option>
-                        <option value="0" is-selected="@(Model.MainFilter == 0)">فعال</option>
-                        <option value="2" is-selected="@(Model.MainFilter == 2)">بایگانی</option>
-                    </select>
-                </div>
-            </div>
-            <div class="box-5">
-                <div class="item-filter-box container__travel-time-interval">
-                    <p class="title-filter"> مدت زمان سفر :</p>
-                    <input class="input-stlye" type="number" value="@Model.StayDurationFrom" name="StayDurationFrom">
-                    <label>تا</label>
-                    <input class="input-stlye" type="number" value="@Model.StayDurationTo" name="StayDurationTo">
-                    روز
-                </div>
-            </div>
-        </div>
-        <div class="button-box">
-            <p class="button-exit">بستن</p>
-            <button type="submit" class="button-filter">فیلتر</button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 @section ScriptLink
 {
-    <script src="/js/signalr/dist/browser/signalr.min.js"></script>
-    <script src="/js/admin/admin-table.js"></script>
-    <script src="/js/admin/reserve/admin-reserve-index.js"></script>
-    <script src="/js/admin/reserve/admin-reserve-index-filter.js"></script>
-    <script src="/js/admin/reserve/admin-reserve-index-signalr.js"></script>
+    <environment include="Development">
+        <script src="/js/signalr/dist/browser/signalr.min.js" asp-append-version="true"></script>
+        <script src="/js/admin/reserve/admin-reserve-index.js" asp-append-version="true"></script>
+        <script src="/js/admin/reserve/admin-reserve-index-filter.js" asp-append-version="true"></script>
+        <script src="/js/admin/reserve/admin-reserve-index-signalr.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/min/admin-reserve.min.js" asp-append-version="true"></script>
+    </environment>
 }
 
 @section ScriptBlock

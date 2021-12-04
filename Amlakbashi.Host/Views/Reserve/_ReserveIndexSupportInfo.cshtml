@@ -12,7 +12,7 @@ else
         <div class="show-description">
             @if (Model.SupportInfoCount > 0)
             {
-                <p>توضیحات <span>(@Model.SupportInfoCount توضیح)</span></p>
+                <p>توضیحات <span>(@Model.SupportInfoCount مورد)</span></p>
                 <div class="box-description">
                     @foreach (var item in Model.SupportInfoList)
                     {
@@ -26,7 +26,7 @@ else
             }
         </div>
         <div class="add-description">
-            <label>افزودن توضیحات</label>
+            <label>افزودن توضیح جدید</label>
             <textarea class="box-description"></textarea>
             <button class="btn-register-form" type="button" onclick="addInfo‌ByElem(@Model.Id, this.previousSibling.previousSibling)">ثبت</button>
         </div>

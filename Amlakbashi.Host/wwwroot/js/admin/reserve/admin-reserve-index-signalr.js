@@ -2,18 +2,17 @@
     .withUrl("/reserveadminhub")
     .build();
 
-// ???
 reserveAdminHubConnection.on('addSupporterInfo', (reserve_id, text) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        var $info_count_elem = $reserve_elem.find('.js-info-count');
-        var new_count = parseInt($info_count_elem.html().match(/\d+/)[0]) + 1;
-        $reserve_elem.find('.js-info-count').html('(' + new_count + ' توضیح)');
+    var reserveElem = $('#js-' + reserve_id);
+    if (reserveElem.length > 0) {
+        var infoCountElem = reserveElem.find('.support-desc-btn small');
+        var newCount = parseInt(infoCountElem.html()) + 1;
+        infoCountElem.html(newCount);
         if (text.includes('توسط سیستم با میزبان تماس گرفته شد')) {
-            $reserve_elem.find('.js-system-called-host').css('color', '#34A853');
+            reserveElem.find('.js-system-called-host').css('color', 'limegreen');
         }
         else if (text.includes('توسط سیستم با مهمان تماس گرفته شد')) {
-            $reserve_elem.find('.js-system-called-guest').css('color', '#34A853');
+            reserveElem.find('.js-system-called-guest').css('color', 'limegreen');
         }
     }
 });
@@ -105,12 +104,11 @@ reserveAdminHubConnection.on('reserveSupporterAdded', (reserve_id, supporterName
     }
 });
 
-// ???
 reserveAdminHubConnection.on('changeCallState', (reserve_id, hostOrGuest, new_state, new_state_color) => {
-    var $reserve_elem = $('#js-' + reserve_id);
-    if ($reserve_elem.length > 0) {
-        $reserve_elem.find('.call_state_' + hostOrGuest).css("color", new_state_color);
-        $reserve_elem.find('.call_state_' + hostOrGuest).attr('js-call-state', new_state);
+    var reserveElem = $('#js-' + reserve_id);
+    if (reserveElem.length > 0) {
+        reserveElem.find('.call-state-' + hostOrGuest).css("color", new_state_color);
+        reserveElem.find('.call-state-' + hostOrGuest).attr('js-call-state', new_state);
     }
 });
 

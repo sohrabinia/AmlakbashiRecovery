@@ -1,6 +1,7 @@
 ﻿@model Amlakbashi.Core.DTOs.ReserveDTOs.ReserveAdminItemDTO
 
 <p class="number-row">@ViewBag.index</p>
+
 <p class="code-reserve">@Model.id </p>
 
 <div class="information-travel">
@@ -24,37 +25,17 @@
 </div>
 
 <div class="details-travel">
-    <p>از @Model.startDateString تا @Model.endDateString</p>
-    <p>به مدت @Model.stayDays شب</p>
-    <p>تعداد @Model.guestCount نفر </p>
+    <p>@Model.startDateString الی @Model.endDateString (@Model.stayDays شب)</p>
+    <p>تعداد @Model.guestCount نفر</p>
+    <p>مبلغ @string.Format("{0:n0}", Model.totalPrice) @(Model.depositePrice != Model.totalPrice ? string.Format("(بیعانه: {0:n0})", Model.depositePrice) : "")</p>
 </div>
 
 <p class="status" style="color:@Model.statusColor;">@Model.statusString</p>
 
-<div class="status-spport">
-    @if (Model.canGrantSupport)
-    {
-        <p class="accept-support" onclick="doSupport(@(Model.id),this)">انجام پشتیبانی</p>
-    }
-    <p class="support-state" style="color:@(Model.supportStateColor)">@(Model.supportStateString)</p>
-    @foreach (var rs in Model.supporters)
-    {
-        <div class="user-support">
-            @if (rs.imageId > 0)
-            {
-                <img src="@string.Format("/file/imgThumb?FileID={0}&w=200&h=200", rs.imageId)" alt="avatar" width="30" height="30" class="avatar-support">
-            }
-            else
-            {
-                <img src="/resource/img/avatar.gif" alt="avatar" width="30" height="30" class="avatar-support">
-            }
-            <p> @rs.name</p>
-            @if (!string.IsNullOrEmpty(rs.transferReason))
-            {
-                <i style="cursor:pointer;color:#EA4335;" class="fa fa-info-circle" onclick="showInfoPopup('دلیل انتقال پشتیبانی', '@(rs.transferReason)')"></i>
-            }
-        </div>
-    }
+<div class="support-desc">
+    <button onclick="nextCallState(@(Model.id), 'h', 'میزبان', this)" js-call-state="@(Model.hostCallState)" style="color:@Model.hostCallStateColor" class="support-call-btn call-state-h"><i class="fas fa-phone"></i> میزبان</button>
+    <button onclick="nextCallState(@(Model.id), 'g', 'مهمان', this)" js-call-state="@(Model.guestCallState)" style="color:@Model.guestCallStateColor" class="support-call-btn call-state-g"><i class="fas fa-phone"></i> مهمان</button>
+    <button onclick="showSupportInfo(@Model.id)" class="support-desc-btn">توضیحات (<small class="js-info-count">@Model.supportInfoCount</small>)</button>
 </div>
 
 <div class="force-options">

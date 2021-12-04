@@ -33,18 +33,26 @@
     @Html.Raw(ViewBag.ItemMetaDescription)
     @Html.Raw(ViewBag.ItemMetaKeywords)
 
-    <link rel="stylesheet" href="/css/admin/admin-shared.css">
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/resource/fontawesome-free-5.6.3-web/css/all.css" />
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/alertify.js-0.3.11/themes/alertify.default.css" />
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/alertify.js-0.3.11/themes/alertify.core.css" />
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/loader.min.css">
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=~/Resource/persian-date-picker/persian-datepicker.min.css" />
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/jquery-confirm/jquery-confirm.min.css" />
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/message-popup.css&v=2" />
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/star-rating/star-rating.css" />
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/rating/themes/fontawesome-stars.css" />
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/tmmegamenu/css/tmmegamenu.css" media="all" />
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/acc-comment.css" />
+    <environment include="Development">
+        <link rel="stylesheet" href="/css/admin/admin.css" asp-append-version="true">
+        <link rel="stylesheet" href="/css/admin/admin-popup.css" asp-append-version="true">
+        <link rel="stylesheet" href="/css/admin/admin-filter.css" asp-append-version="true">
+        <link rel="stylesheet" href="/css/admin/admin-table.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/fontawesome-free-5.6.3-web/css/all.css" />
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/alertify.js-0.3.11/themes/alertify.default.css" />
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/alertify.js-0.3.11/themes/alertify.core.css" />
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/loader.min.css">
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/persian-date-picker/persian-datepicker.min.css" />
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/jquery-confirm/jquery-confirm.min.css" />
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/message-popup.css&v=2" />
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/star-rating/star-rating.css" />
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/rating/themes/fontawesome-stars.css" />
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/tmmegamenu/css/tmmegamenu.css" media="all" />
+        <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/acc-comment.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="/css/min/admin.min.css" asp-append-version="true">
+    </environment>
 
     @RenderSection("StyleLink", required: false)
     @RenderSection("StyleBlock", required: false)
@@ -203,34 +211,40 @@
         <div class="ui active large loader loading-icon"></div>
     </div>
 
-    <script src="/file/getjs?src=/resource/scripts/jquery-2.1.1.min.js"></script>
-    <script src="/file/getjs?src=/scripts/jquery.unobtrusive-ajax.min.js&v=1"></script>
-    <script src="/file/getjs?src=/resource/highcharts/highcharts.js"></script>
-    <script src="/file/getjs?src=/resource/alertify.js-0.3.11/src/alertify.js"></script>
-    <script src="/file/getjs?src=~/resource/jquery-confirm/jquery-confirm.min.js"></script>
-    <script src="/file/getjs?src=~/resource/persian-date-picker/persian-datepicker.js"></script>
-    <script src="/file/getjs?src=~/resource/persian-date-picker/persian-date.min.js"></script>
-    <script src="/file/getjs?src=/resource/drop-zone-2019/dropzone.js"></script>
-    <script src="/file/getjs?src=/resource/rating/jquery.barrating.min.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/accommodation-edit-form.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/ajax-helper.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/client-helper.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/date-time-helper.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/detail-button.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/increase-decrease-button.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/input-validation-helper.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/lazy-loading.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/loading-indicator.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/more-text-button.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/price-string-generator.js&v=1"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/rating-detail.js&v=1"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/string-replace-all.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/textarea-autoexpand.js"></script>
-    <script src="/file/getjs?src=/resource/scripts/admin/user-rating-admin.js&v=1"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/message-popup.js&v=4"></script>
-    <script src="/file/getjs?src=/resource/scripts/general/confirm-alert-helper.js"></script>
-    <script src="/file/getjs?src=/resource/Scripts/jquery.onmutate.min.js"></script>
-    <script src="/js/admin/admin-shared.js"></script>
+    <environment include="Development">
+        <script src="/file/getjs?src=/resource/scripts/jquery-2.1.1.min.js"></script>
+        <script src="/file/getjs?src=/scripts/jquery.unobtrusive-ajax.min.js&v=1"></script>
+        <script src="/file/getjs?src=/resource/highcharts/highcharts.js"></script>
+        <script src="/file/getjs?src=/resource/alertify.js-0.3.11/src/alertify.js"></script>
+        <script src="/file/getjs?src=~/resource/jquery-confirm/jquery-confirm.min.js"></script>
+        <script src="/file/getjs?src=~/resource/persian-date-picker/persian-datepicker.js"></script>
+        <script src="/file/getjs?src=~/resource/persian-date-picker/persian-date.min.js"></script>
+        <script src="/file/getjs?src=/resource/drop-zone-2019/dropzone.js"></script>
+        <script src="/file/getjs?src=/resource/rating/jquery.barrating.min.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/accommodation-edit-form.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/ajax-helper.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/client-helper.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/date-time-helper.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/detail-button.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/increase-decrease-button.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/input-validation-helper.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/lazy-loading.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/loading-indicator.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/more-text-button.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/price-string-generator.js&v=1"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/rating-detail.js&v=1"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/string-replace-all.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/textarea-autoexpand.js"></script>
+        <script src="/file/getjs?src=/resource/scripts/admin/user-rating-admin.js&v=1"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/message-popup.js&v=4"></script>
+        <script src="/file/getjs?src=/resource/scripts/general/confirm-alert-helper.js"></script>
+        <script src="/file/getjs?src=/resource/Scripts/jquery.onmutate.min.js"></script>
+        <script src="/js/admin/admin.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/min/admin.min.js"></script>
+    </environment>
+    
 
     @RenderSection("ScriptLink", required: false)
     @RenderSection("ScriptBlock", required: false)

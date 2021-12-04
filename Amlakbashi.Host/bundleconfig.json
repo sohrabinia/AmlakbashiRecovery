@@ -108,6 +108,33 @@
       "wwwroot/resource/css/general/acc-comment.css"
     ]
   },
+  {
+    "outputFileName": "wwwroot/css/min/admin.min.css",
+    "inputFiles": [
+      "wwwroot/css/admin/admin.css",
+      "wwwroot/css/admin/admin-popup.css",
+      "wwwroot/css/admin/admin-filter.css",
+      "wwwroot/css/admin/admin-table.css",
+      "wwwroot/resource/fontawesome-free-5.6.3-web/css/all.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.default.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.core.css",
+      "wwwroot/resource/loader.min.css",
+      "wwwroot/resource/persian-date-picker/persian-datepicker.min.css",
+      "wwwroot/resource/jquery-confirm/jquery-confirm.min.css",
+      "wwwroot/resource/css/general/message-popup.css",
+      "wwwroot/resource/star-rating/star-rating.css",
+      "wwwroot/resource/rating/themes/fontawesome-stars.css",
+      "wwwroot/resource/tmmegamenu/css/tmmegamenu.css",
+      "wwwroot/resource/css/general/acc-comment.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/min/admin-reserve.min.css",
+    "inputFiles": [
+      "wwwroot/css/admin/reserve/admin-reserve-index.css",
+      "wwwroot/resource/star-rating/star-rating.css"
+    ]
+  },
   // ####################################################### Scripts
   {
     "outputFileName": "wwwroot/js/dashboard.min.js",
@@ -245,6 +272,48 @@
       "wwwroot/resource/scripts/general/jalali-date-picker.js",
       "wwwroot/resource/scripts/general/home-page-search.js",
       "wwwroot/resource/scripts/general/increase-decrease-button.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/min/admin.min.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/jquery-2.1.1.min.js",
+      "wwwroot/scripts/jquery.unobtrusive-ajax.min.js",
+      "wwwroot/resource/highcharts/highcharts.js",
+      "wwwroot/resource/alertify.js-0.3.11/src/alertify.js",
+      "wwwroot/resource/jquery-confirm/jquery-confirm.min.js",
+      "wwwroot/resource/persian-date-picker/persian-datepicker.js",
+      "wwwroot/resource/persian-date-picker/persian-date.min.js",
+      //"wwwroot/resource/drop-zone-2019/dropzone.js",
+      "wwwroot/resource/rating/jquery.barrating.min.js",
+      "wwwroot/resource/scripts/general/accommodation-edit-form.js",
+      "wwwroot/resource/scripts/general/ajax-helper.js",
+      "wwwroot/resource/scripts/general/client-helper.js",
+      "wwwroot/resource/scripts/general/date-time-helper.js",
+      "wwwroot/resource/scripts/general/detail-button.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/scripts/general/input-validation-helper.js",
+      "wwwroot/resource/scripts/general/lazy-loading.js",
+      "wwwroot/resource/scripts/general/loading-indicator.js",
+      "wwwroot/resource/scripts/general/more-text-button.js",
+      "wwwroot/resource/scripts/general/price-string-generator.js",
+      "wwwroot/resource/scripts/general/rating-detail.js",
+      "wwwroot/resource/scripts/general/string-replace-all.js",
+      "wwwroot/resource/scripts/general/textarea-autoexpand.js",
+      "wwwroot/resource/scripts/admin/user-rating-admin.js",
+      "wwwroot/resource/scripts/general/message-popup.js",
+      "wwwroot/resource/scripts/general/confirm-alert-helper.js",
+      "wwwroot/resource/Scripts/jquery.onmutate.min.js",
+      "wwwroot/js/admin/admin.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/min/admin-reserve.min.js",
+    "inputFiles": [
+      "wwwroot/js/signalr/dist/browser/signalr.min.js",
+      "wwwroot/js/admin/reserve/admin-reserve-index.js",
+      "wwwroot/js/admin/reserve/admin-reserve-index-filter.js",
+      "wwwroot/js/admin/reserve/admin-reserve-index-signalr.js"
     ]
   }
 ]
