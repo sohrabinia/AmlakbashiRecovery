@@ -19,7 +19,6 @@ using Amlakbashi.Mediator.Events.UserEvents;
 using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.DTOs.ReserveDTOs;
 using Amlakbashi.Core.Infrastructure.StyleHelpers;
-using Amlakbashi.Application.Services.ReserveServices.ReserveSupportManager;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
@@ -27,12 +26,15 @@ namespace Amlakbashi.Application.Services.ReserveServices
     {
         private readonly IMediator mediator;
         private readonly IAccountingFacade accounting;
+        private readonly IReserveSupportAppService reserveSupportService;
         public ReserveAppService(IRepository<Reserve, long> repository,
             IMediator mediator,
-            IAccountingFacade accounting) : base(repository)
+            IAccountingFacade accounting,
+            IReserveSupportAppService reserveSupportService) : base(repository)
         {
             this.mediator = mediator;
             this.accounting = accounting;
+            this.reserveSupportService = reserveSupportService;
         }
 
         public IList<Reserve> Filter(long reserve_id = -1, long advertise_id = -1,
@@ -260,11 +262,10 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return model.ToList();
         }
 
-        public void NewFilter(ReserveIndexDTO dto)
+        public IList<Reserve> NewFilter(ReserveIndexDTO dto, int currentUserId)
         {
-            var reserves = Repository.Query(q => q.Include("GuestUser.ReserveSupportsAsGuest")
-                .Where(u => u.Status != Reserve.ReserveStatus.Deleted));
-            
+            var reserves = Repository.Query(q => q.Where(w => w.Status != Reserve.ReserveStatus.Deleted));
+
             if (dto.MainFilter == 0)
             {
                 reserves = reserves.Where(x => !x.Archive);
@@ -468,7 +469,97 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 }
                 reserves = reserves.Where(x => matchedIds.Contains(x.Id));
             }
-            dto.ReserveList = reserves.ToList();
+            if (dto.ReserveSupportStatus > 0)
+            {
+                reserves = reserves.Include("GuestUser.ReserveSupportsAsGuest");
+                var st = (ReserveSupport.SupporterStatus)dto.ReserveSupportStatus;
+                if (st == ReserveSupport.SupporterStatus.SupportingByYou)
+                {
+                    dto.SupporterId = currentUserId;
+                }
+                else
+                {
+                    if (st != ReserveSupport.SupporterStatus.Done)
+                    {
+                        dto.SupporterId = -1;
+                    }
+                    var now = DateTime.Now.Date;
+                    reserves = reserves.Where(x => x.EndDate > now);
+                    reserves = reserveSupportService.FilterBySupporterStatus(currentUserId, reserves, st);
+                }
+            }
+            if (dto.SupporterId > 0)
+            {
+                IList<ReserveSupport> reserveSupports = reserveSupportService.GetListBySupporterId(dto.SupporterId);
+                var reserve_ids = new List<long>();
+                foreach (var reserveSupport in reserveSupports)
+                {
+                    reserve_ids.AddRange(reserveSupport.GetAllReserveIds());
+                }
+                reserve_ids = reserve_ids.Distinct().ToList();
+                reserves = reserves.Where(x => reserve_ids.Contains(x.Id));
+            }
+            if (dto.HostCardStatus > -1)
+            {
+                reserves = reserves.Include("HostUser.BankCards").Include("ReservePayments");
+                var filteredIds = new List<long>();
+                if (dto.HostCardStatus == 0) //shaba
+                {
+                    foreach (var item in reserves)
+                    {
+                        if (item.HostUser.BankCards.Count > 0 && !string.IsNullOrEmpty(item.HostUser.BankCards.First().ShabaNumber))
+                        {
+                            filteredIds.Add(item.Id);
+                        }
+                    }
+                }
+                else if (dto.HostCardStatus == 1) // bank card
+                {
+                    foreach (var item in reserves)
+                    {
+                        if (item.HostUser.BankCards.Count > 0 && string.IsNullOrEmpty(item.HostUser.BankCards.First().ShabaNumber) &&
+                            !string.IsNullOrEmpty(item.HostUser.BankCards.First().BankCardNumber))
+                        {
+                            filteredIds.Add(item.Id);
+                        }
+                    }
+                }
+                else if (dto.HostCardStatus == 2) // none
+                {
+                    foreach (var item in reserves)
+                    {
+                        if (item.Id == 310978)
+                        {
+                            var test = item.HostUser.BankCards;
+                        }
+                        if (item.HostUser.BankCards.Count == 0 ||
+                            (string.IsNullOrEmpty(item.HostUser.BankCards.First().ShabaNumber) &&
+                            string.IsNullOrEmpty(item.HostUser.BankCards.First().BankCardNumber)))
+                        {
+                            filteredIds.Add(item.Id);
+                        }
+                    }
+                }
+                reserves = reserves.Where(x => filteredIds.Contains(x.Id));
+                //foreach (var item in reserves)
+                //{
+                //    item.Temp_HostPayablePrice = PriceUtility.CalculateHostPayablePrice(item.TotalPrice,
+                //        accounting.GetReservePaidAmount(item.ReservePayments.ToList(),
+                //            StatusStringType.Guest), item.CouponPrice, item.PrizePrice);
+                //}
+                //reserves = reserves.OrderByDescending(x => x.Temp_HostPayablePrice);
+            }
+            //else
+            //{
+            //    reserves = reserves.OrderByDescending(x => x.Id);
+            //}
+            dto.PagingInfo = new Core.DTOs.PagingDTO()
+            {
+                CurrentPage = dto.Page,
+                TotalItems = reserves.Count(),
+                PageItems = dto.PageItemCount
+            };
+            return reserves.OrderByDescending(x => x.Id).Skip((dto.Page - 1) * dto.PageItemCount).Take(dto.PageItemCount).ToList();
         }
 
         public IList<Reserve> GetListByUserId(int userId,

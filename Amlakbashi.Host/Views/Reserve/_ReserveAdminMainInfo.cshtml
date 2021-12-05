@@ -2,7 +2,13 @@
 
 <p class="number-row">@ViewBag.index</p>
 
-<p class="code-reserve">@Model.id </p>
+<p class="code-reserve">
+    @if (Model.instantReserve)
+    {
+        <i class='fas fa-bolt'></i>
+    }
+    @Model.id
+</p>
 
 <div class="information-travel">
     <div class="box-codes">

@@ -1,9 +1,10 @@
-using Amlakbashi.Application;
+﻿using Amlakbashi.Application;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Data;
 using Amlakbashi.Data.Identity;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Configurations;
+using Amlakbashi.Host.Extensions;
 using AntiXssMiddleware.Middleware;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -15,6 +16,7 @@ using log4net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.StaticFiles;
@@ -102,6 +104,18 @@ namespace Amlakbashi.Host
                 {
                     var refererUrl = context.Request.Path;
                     context.Response.Redirect("/errors/accessdenied?originUrl=" + refererUrl);
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    if (context.Request.IsAjaxRequest())
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    }
+                    else
+                    {
+                        context.Response.Redirect("/errors/accessdenied");
+                    }
                     return Task.CompletedTask;
                 };
             });

@@ -106,7 +106,12 @@ function loadPopup(url) {
         }
         if (statusTxt == "error") {
             hidePopup();
-            errorAlert("عملیات با خطا مواجه شد");
+            if (xhr.status === 401) {
+                errorAlert("شما مجوز دسترسی به این مکان را ندارید");
+            }
+            else {
+                errorAlert("عملیات با خطا مواجه شد");
+            }
         }
     });
 }

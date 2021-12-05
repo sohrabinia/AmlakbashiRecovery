@@ -8,8 +8,8 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
 {
     public class ReserveIndexDTO
     {
-        public IEnumerable<Reserve> ReserveList { get; set; }
-        public List<ReserveAdminItemDTO> Data { get; set; }
+        public List<ReserveAdminItemDTO> ReserveList { get; set; }
+        public PagingDTO PagingInfo { get; set; }
         public int Page { get; set; } = 1;
         public int PageItemCount { get; set; } = 20;
         public int RowIndexStart { get { return (Page * PageItemCount) - PageItemCount; } }
