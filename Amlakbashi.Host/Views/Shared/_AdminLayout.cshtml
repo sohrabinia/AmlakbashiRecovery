@@ -59,7 +59,7 @@
     @RenderSection("HeaderAddition", required: false)
 </head>
 <body>
-    <div class="js-bg"></div>
+    @*<div class="js-bg"></div>*@
     <header class="dashboard_header-style">
         <div class="account-box-style">
             <i class="fas fa-bars js-berger-menu"></i>
@@ -205,6 +205,7 @@
                     <i class="fas fa-times alert-close-btn" onclick="alertClose()"></i>
                 </div>
             </div>
+            <div class="js-loader"><i class="fa fa-spinner"></i></div>
         </section>
     </section>
     <div style="z-index:2147483648;display:none;" id="loading-icon" class="loading-contianer">

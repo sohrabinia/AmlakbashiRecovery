@@ -13,13 +13,19 @@ aside.admin-table-row .code-reserve {
   width: 8%;
 }
 
-aside.admin-table-row .code-reserve i{
+aside.admin-table-row .code-reserve i.fa-bolt{
     color: orangered;
     border: 1px solid orangered;
     font-size: 12px;
     border-radius: 100px;
     padding: 3px 5px;
     margin-bottom: 3px;
+}
+
+aside.admin-table-row .code-reserve i.fa-copy{
+    margin-top: 3px;
+    font-size: 15px;
+    cursor: pointer;
 }
 
 aside.admin-table-row .information-travel, aside.admin-table-row .details-travel {

@@ -8,6 +8,7 @@
         <i class='fas fa-bolt'></i>
     }
     @Model.id
+    <i class="fas fa-copy" onclick="copyStringToClipboard('@(Model.id)', 'کد رزرو @(Model.id)')"></i>
 </p>
 
 <div class="information-travel">
@@ -20,13 +21,13 @@
         <p>  کد میزبان : </p>
         <a href="/User/Index?code=@Model.hostUserId">@Model.hostUserId</a>
         <i class="fas fa-copy" onclick="copyStringToClipboard('@(Model.hostUserId)', 'کد میزبان @(Model.hostUserId)')"></i>
-        <i class="fas fa-phone-square" onclick="showCallPopup(@(Model.hostUserId),@(Model.id),'میزبان')"></i>
+        <i class="fas fa-phone-square" onclick="showCallPopup(@(Model.hostUserId), @(Model.id), 'میزبان')"></i>
     </div>
     <div class="box-codes">
         <p>  کد مهمان :</p>
         <a href="/User/Index?code=@Model.guestUserId">@Model.guestUserId</a>
         <i class="fas fa-copy" onclick="copyStringToClipboard('@(Model.guestUserId)', 'کد مهمان @(Model.guestUserId)')"></i>
-        <i class="fas fa-phone-square" onclick="showCallPopup(@(Model.guestUserId),@(Model.id),'مهمان')"></i>
+        <i class="fas fa-phone-square" onclick="showCallPopup(@(Model.guestUserId), @(Model.id), 'مهمان')"></i>
     </div>
 </div>
 

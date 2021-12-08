@@ -254,7 +254,7 @@
                     پاسخ میزبان
                 </th>
                 <th>توضیحات پشتیبان</th>
-                <th>وضعیت پشتیبانی</th>
+                @*<th>وضعیت پشتیبانی</th>*@
                 <th>
                     عملیات
                 </th>
@@ -303,7 +303,7 @@
                         <span style="color:@(item.totalPaidPrice > 0 ? "#34A853" : "#242424")">مبلغ: @string.Format("{0:n0}", item.totalPrice) ت</span><br />
                         @if (item.depositePrice != item.totalPrice)
                         {
-                            <span style="color:@(item.depositePaidPrice > 0 || item.totalPaidPrice > 0 ? "#34A853" : "#242424")">بیعانه: @string.Format("{0:n0}", item.depositePrice) ت</span>
+                            <span>بیعانه: @string.Format("{0:n0}", item.depositePrice) ت</span>
                         }
                     </td>
                     <td>
@@ -387,19 +387,19 @@
                         @if (item.instantReserve)
                         {
                             <div style="display:flex;flex-flow:row;padding:10px;justify-content:space-between;">
-                                <i style="font-size:20px;color:#DF7549" class="fas fa-bolt"></i>
-                                <span style="color:#DF7549;">رزرو آنی</span>
+                                @*<i style="font-size:20px;color:#DF7549" class="fas fa-bolt"></i>*@
+                                <span>رزرو آنی</span>
                             </div>
                         }
                         else
                         {
-                            <span style="color:@item.hostResponseColor">@item.hostResponseString</span>
-                            if ((Reserve.HostResponseEnum)item.hostResponse != Reserve.HostResponseEnum.None)
+                            <span>@item.hostResponseString</span>
+                            @*if ((Reserve.HostResponseEnum)item.hostResponse != Reserve.HostResponseEnum.None)
                             {
                                 <br />
                                 <span>@(item.hostResponseDateString)</span><br />
                                 <span>@(item.hostResponseTimeString)</span>
-                            }
+                            }*@
                         }
                     </td>
                     <td style="width: 100px">
@@ -407,9 +407,9 @@
                         <div class="call_state_g" js-call-state="@(item.guestCallState)" style="cursor:pointer;font:10px Miransans;color:@(item.guestCallStateColor);" onclick="nextCallState(@(item.id), 'g', 'مهمان', this)">✆ثبت تماس مهمان</div>
                         <i onclick="showAddInfoDialog(@(item.id))" class="fa fa-plus" style="color:#242424;cursor:pointer;" title="افزودن توضیحات"></i>
                         <i onclick="showInfo(@(item.id))" class="fa fa-eye" style="color:#242424;cursor:pointer;" title="نمایش توضیحات"></i>
-                        <span class="js-info-count">(@(item.supportInfoCount) توضیح)</span>
+                        @*<span class="js-info-count">(@(item.supportInfoCount) توضیح)</span>*@
                     </td>
-                    <td class="support_state_td">
+                    @*<td class="support_state_td">
                         @{
                             if (item.canGrantSupport)
                             {
@@ -435,7 +435,7 @@
                                 </div>
                             }
                         }
-                    </td>
+                    </td>*@
                     <td style="width:90px">
                         <a href="@Url.Action("Edit",new {reserve_id= item.id})"><span class="editicon" title="ویرایش"></span></a>
                         @if (item.status == (int)Reserve.ReserveStatus.WaitForResponse || item.status == (int)Reserve.ReserveStatus.WaitForReserve)

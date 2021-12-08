@@ -293,6 +293,24 @@ input, select {
     animation: spin 1.5s linear infinite;
 }
 
+.admin-container .main .js-loader {
+    display: none;
+    position: fixed;
+    z-index: 4000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    text-align: center;
+}
+
+.admin-container .main .js-loader .fa-spinner {
+    font-size: 100px;
+    color: white;
+    margin: 20% auto;
+}
+
 @media (max-width: 1400px) {
     .admin-top-pin-container {
         width: 97%;

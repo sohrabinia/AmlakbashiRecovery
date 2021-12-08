@@ -61,7 +61,7 @@ else
                 <span style="color:@(Model.SupportStateColor)">@(Model.SupportStateString)</span>
                 @if (Model.CanGrantSupport)
                 {
-                    <button class="accept-support" onclick="doSupport(@(Model.Id),this)">انجام پشتیبانی</button>
+                    <button class="accept-support" onclick="doSupport(@(Model.Id), this)">انجام پشتیبانی</button>
                 }
             </div>
             @if (Model.Supporters.Count > 0)
