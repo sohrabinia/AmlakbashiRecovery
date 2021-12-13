@@ -30,7 +30,7 @@ else
             }
         </div>
 
-        <div class="more-option-row mobile-details-travel">
+        <div class="more-option-row mobile">
             <span>جزییات سفر‌:</span> از @Model.StartDateString تا @Model.EndDateString | @Model.GuestCount نفر به مدت @Model.StayDays شب |
         </div>
 
@@ -109,6 +109,10 @@ else
             else if (Model.Status == (int)Reserve.ReserveStatus.WaitForReserve)
             {
                 <i class="fas fa-phone-square js-system-called-guest" title="تماس سیستم با مهمان" onclick="callForPayment(@Model.Id)"></i>
+            }
+            @if (Model.Status == (int)Reserve.ReserveStatus.Completed)
+            {
+                <i class="fa fa-star" title="امتیاز و نظر" onclick="editRating(@Model.Id)"></i>
             }
 
             <i class="fas fa-donate" title="افزودن پرداخت مهمان" onclick="addGuestPayment(@Model.Id)"></i>

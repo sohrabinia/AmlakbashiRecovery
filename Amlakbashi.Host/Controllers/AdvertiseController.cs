@@ -5,6 +5,7 @@ using Amlakbashi.Application.Services.ReserveServices.Interfaces;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.AccommodationDTOs;
+using Amlakbashi.Core.DTOs.AdvertiseDTOs;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
@@ -104,11 +105,11 @@ namespace Amlakbashi.Host.Controllers
                 var onePageOfModel = model.ToPagedList(PageNumber, 20);
                 ViewBag.RowIndexStart = (PageNumber * 20) - 20;
 
-                List<AdvertiseIndexDTO> advertiseDTOs = new List<AdvertiseIndexDTO>();
+                List<AdvertiseOldIndexDTO> advertiseDTOs = new List<AdvertiseOldIndexDTO>();
                 foreach (var item in onePageOfModel)
                 {
                     var user = userService.Find(item.UserID);
-                    var dto = new AdvertiseIndexDTO()
+                    var dto = new AdvertiseOldIndexDTO()
                     {
                         Advertise = item,
                         UserPhoneNumber = user != null ? user.GetPhoneNumber(Entities.User.PhoneType.MainMobile) : "کاربر حذف شده",
@@ -124,6 +125,51 @@ namespace Amlakbashi.Host.Controllers
             {
                 logger.Error("Advertise.Index", exc);
                 return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize(Policy = Policies.Advertise_View)]
+        public IActionResult NewIndex(AdvertiseIndexDTO dto)
+        {
+            try
+            {
+
+                advertiseService.FilterNew(dto);
+                return View(dto);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.NewIndex", exc);
+                return View();
+            }
+        }
+
+        [Authorize(Policy = Policies.Advertise_View)]
+        public IActionResult GetAdvertiseIndexDetails(long advertiseId)
+        {
+            try
+            {
+                var advertise = advertiseService.Find(advertiseId);
+                if (advertise == null)
+                {
+                    return PartialView("_AdvertiseIndexDetailInfo");
+                }
+                AdvertiseIndexDetailDTO dto = advertise;
+                if (advertise.User != null)
+                {
+                    dto.UserPhoneNumber = advertise.User.GetPhoneNumber(Entities.User.PhoneType.MainMobile);
+                    dto.UserScore = advertise.User.UserScore;
+                }
+                if (advertise.RegionCity != null)
+                {
+                    dto.CityPersianName = advertise.RegionCity.PersianName;
+                }
+                return PartialView("_AdvertiseIndexDetailInfo", dto);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.GetAdvertiseIndexDetails", exc);
+                return PartialView("_AdvertiseIndexDetailInfo");
             }
         }
 

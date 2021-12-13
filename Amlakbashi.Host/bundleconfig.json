@@ -135,11 +135,16 @@
       "wwwroot/resource/star-rating/star-rating.css"
     ]
   },
+  {
+    "outputFileName": "wwwroot/css/min/admin-advertise.min.css",
+    "inputFiles": [
+      "wwwroot/css/admin/advertise/admin-advertise-index.css"
+    ]
+  },
   // ####################################################### Scripts
   {
     "outputFileName": "wwwroot/js/dashboard.min.js",
     "inputFiles": [
-      //"wwwroot/resource/scripts/jquery-2.1.1.min.js",
       "wwwroot/lib/jquery/dist/jquery.min.js",
       "wwwroot/lib/dropzone/dropzone.js",
       "wwwroot/resource/scripts/jquery.maskedinput.min.js",
@@ -314,6 +319,12 @@
       "wwwroot/js/admin/reserve/admin-reserve-index.js",
       "wwwroot/js/admin/reserve/admin-reserve-index-filter.js",
       "wwwroot/js/admin/reserve/admin-reserve-index-signalr.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/min/admin-advertise.min.js",
+    "inputFiles": [
+      "wwwroot/js/admin/advertise/admin-advertise-index.js"
     ]
   }
 ]

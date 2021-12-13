@@ -47,6 +47,23 @@ function closeNavigation(){
     $(".main-navigation_list-item").children(".style-submenu").addClass("js-submenu");
 };
 
+$(".js-filter-date-picker").persianDatepicker({
+    altField: '#to_date-alt',
+    format: 'YYYY/MM/DD',
+    altFormat: 'YYYY/MM/DD',
+    autoClose: true,
+    toolbox: {
+        calendarSwitch: { enabled: false },
+        todayButton: { enabled: true },
+        submitButton: { enabled: true, text: { fa: "بستن", en: close } }
+    },
+    navigator: {
+        scroll: { enabled: false },
+        text: { btnNextText: '<', btnPrevText: '>' },
+    },
+    initialValue: false
+});
+
 function showDarkBackground() {
     //$('.js-bg').addClass("bg-show-menu");
     $('.js-loader').show();
@@ -197,9 +214,15 @@ function alertClose() {
     });
 }
 function errorAlert(content) {
+    if (!content) {
+        content = 'عملیات انجام نشد';
+    }
     showAlert(content, '#FF3C3C');
 }
 function successAlert(content) {
+    if (!content) {
+        content = 'عملیات با موفقیت انجام شد';
+    }
     showAlert(content, '#50C878');
 }
 

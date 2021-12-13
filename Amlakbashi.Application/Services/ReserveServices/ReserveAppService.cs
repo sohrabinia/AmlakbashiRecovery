@@ -553,13 +553,10 @@ namespace Amlakbashi.Application.Services.ReserveServices
             //{
             //    reserves = reserves.OrderByDescending(x => x.Id);
             //}
-            dto.PagingInfo = new Core.DTOs.PagingDTO()
-            {
-                CurrentPage = dto.Page,
-                TotalItems = reserves.Count(),
-                PageItems = dto.PageItemCount
-            };
-            return reserves.OrderByDescending(x => x.Id).Skip((dto.Page - 1) * dto.PageItemCount).Take(dto.PageItemCount).ToList();
+
+            dto.PagingInfo = new Core.DTOs.PagingDTO(dto.Page, reserves.Count());
+
+            return reserves.OrderByDescending(x => x.Id).Skip((dto.Page - 1) * dto.PagingInfo.PageItemCount).Take(dto.PagingInfo.PageItemCount).ToList();
         }
 
         public IList<Reserve> GetListByUserId(int userId,

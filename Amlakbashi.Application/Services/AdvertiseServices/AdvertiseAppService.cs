@@ -29,6 +29,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Mediator.Commands.FileCommands;
+using Amlakbashi.Core.DTOs.AdvertiseDTOs;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
@@ -210,6 +211,97 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
             List<Advertise> advertises = model.ToList();
             return advertises;
+        }
+
+        public void FilterNew(AdvertiseIndexDTO dto)
+        {
+            IQueryable<Advertise> model = Repository.Query(q => q);
+            model = model.Where(w => w.Mode != AdvertiseMode.Child);
+            if (dto.Status != AdvertiseStatus.Unset)
+            {
+                model = model.Where(a => a.Status == dto.Status);
+            }
+            else
+            {
+                model = model.Where(a => a.Status != AdvertiseStatus.Deleted);
+            }
+            if (dto.Id > 0)
+            {
+                model = model.Where(w => w.Id == dto.Id || w.Childs.Any(x => x.Id == dto.Id));
+            }
+            if (dto.UserId != -1)
+            {
+                model = model.Where(w => w.UserID == dto.UserId);
+            }
+            if (dto.Type > 0)
+            {
+                model = model.Where(a => a.TypeID == (AdvertiseType)dto.Type);
+            }
+            if (dto.HygieneProtocolStatus > -1)
+            {
+                var st = (Advertise.HygieneProtocolStatus)dto.HygieneProtocolStatus;
+                model = model.Where(w => w.HygieneProtocol == st);
+            }
+            if (dto.InstatntReserveStatus > -1)
+            {
+                model = model.Where(x => x.InstantReserveStatus == (Advertise.InstantReserveStatusEnum)dto.InstatntReserveStatus);
+            }
+            if (string.IsNullOrEmpty(dto.MinReserveNorouzFromDate) == false)
+            {
+                var gregorianDate = DateTimeUtility.PersianDateToGregorian(
+                        StringUtility.PersianNumberToEnglish(dto.MinReserveNorouzFromDate).Replace('/', ','));
+                var minReserveNorouzDateUnix = DateTimeUtility.DateValueOfJS(gregorianDate);
+                model = model.Where(x => x.unixNorouzMinRequestDate >= minReserveNorouzDateUnix);
+            }
+            if (dto.Area > -1)
+            {
+                model = model.Where(x => x.Area == dto.Area);
+            }
+            else if (dto.City > -1)
+            {
+                model = model.Where(x => x.City == dto.City);
+            }
+            else if (dto.Province > -1)
+            {
+                model = model.Where(x => x.Province == dto.Province);
+            }
+            if (dto.ImageCountMin > 0)
+            {
+                model = model.Where(x => x.Photos.Count > dto.ImageCountMin);
+            }
+            if (dto.ImageCountMax > 0)
+            {
+                model = model.Where(x => x.Photos.Count <= dto.ImageCountMax + 1);
+            }
+            if (dto.Sort == "contact")
+                model = model.OrderByDescending(a => a.ContactClick).ThenByDescending(a => a.WebVisit);
+            else if (dto.Sort == "modify")
+                model = model.OrderByDescending(a => a.LastModifyDate).ThenByDescending(a => a.CreateDate);
+            else if (dto.Sort == "click")
+                model = model.OrderByDescending(a => a.WebVisit).ThenByDescending(a => a.ContactClick);
+            else if (dto.Sort == "score")
+                model = model.OrderByDescending(a => a.AdvertiseScore);
+            else
+                model = model.OrderByDescending(a => a.CreateDate);
+
+            dto.PagingInfo = new Core.DTOs.PagingDTO(dto.Page, model.Count());
+            model = model.Skip((dto.Page - 1) * dto.PagingInfo.PageItemCount).Take(dto.PagingInfo.PageItemCount);
+
+            dto.AdvertiseList = new List<AdvertiseIndexItemDTO>();
+            foreach (var item in model)
+            {
+                AdvertiseIndexItemDTO dtoItem = item;
+                if (item.User != null)
+                {
+                    dtoItem.UserPhoneNumber = item.User.GetPhoneNumber(User.PhoneType.MainMobile);
+                    dtoItem.UserScore = item.User.UserScore;
+                }
+                if (item.RegionCity != null)
+                {
+                    dtoItem.CityPersianName = item.RegionCity.PersianName;
+                }
+                dto.AdvertiseList.Add(dtoItem);
+            }
         }
 
         public IList<Advertise> Filter(string statusString, int userid, long id)

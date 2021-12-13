@@ -10,6 +10,7 @@ using System.Linq;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs;
 using System;
 using static Amlakbashi.Core.Entities.ActionLog;
+using Amlakbashi.Core.DTOs.AdvertiseDTOs;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
 {
@@ -29,6 +30,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void AddSupporterInfo(long id, string text, User supporter);
         IList<Advertise> Filter(AdvertiseStatus status, int adtype, int userid, string sort, long id, int instantReserveStatus,
             long minReserveNorouzDateUnix, int imageCountMin, int imageCountMax, int province, int city, int area, int hygieneProtocolStatus);
+        void FilterNew(AdvertiseIndexDTO dto);
         IList<Advertise> Filter(string statusString, int userid, long id);
         IList<Advertise> FilterAdmin(int province = 0, int city = 0, int area = 0, int adtype = 0,
             bool defaultProvince = false, int adStatus = -1);

@@ -1,4 +1,5 @@
-﻿.admin-table {
+﻿/* Table */
+.admin-table {
     width: 92%;
     display: flex;
     background: white;
@@ -38,6 +39,71 @@ aside.admin-table-row > p:first-child, aside.admin-table-row > div:first-child {
   border-right: 1px solid #dedede;
 }
 
+aside.admin-table-row .box-more-options-container {
+    padding: 0;
+    width: 100%;
+}
+
+aside.admin-table-row .js-more-option{
+    display: none;
+}
+
+aside.admin-table-row .box-more-options {
+  background: #f6f7f7;
+  border: 1px solid #dedede;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px 0;
+  width: 100%;
+}
+
+aside.admin-table-row .box-more-options .more-option-row {
+    width: 100%;
+    text-align: right;
+    margin: 0 10px;
+    border-bottom: 1px solid #dedede;
+    line-height: 3;
+    font: 13px Liransans;
+    padding: 15px;
+}
+
+aside.admin-table-row .box-more-options .function-buttons {
+    border-bottom: 0px !important;
+}
+
+aside.admin-table-row .box-more-options .function-buttons i, aside.admin-table-row .box-more-options .function-buttons a {
+  font-size: 20px;
+  color: #50575e;
+  line-height: 1;
+  font-size: 22px;
+  text-align: center;
+  text-shadow: none;
+  padding: 0;
+  margin: 0 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+aside.admin-table-row .box-more-options .function-buttons i:hover, aside.admin-table-row .box-more-options .function-buttons a:hover {
+  font-size: 23px;
+  color: #dab200;
+}
+
+aside.admin-table-row .box-more-options .mobile {
+  display: none;
+}
+
+aside.admin-table-row .box-more-options .tablet {
+  display: none;
+}
+
+aside.admin-table-row .more-options-btn {
+  font-size: 20px;
+}
+
+/* Pagination */
 .pagination-container {
   width: 100%;
   text-align: center;
@@ -85,5 +151,21 @@ aside.admin-table-row > p:first-child, aside.admin-table-row > div:first-child {
 @media (max-width: 1400px) {
     .admin-table {
         width: 97%;
+    }
+}
+
+@media (max-width: 960px){
+    aside.admin-table-row .box-more-options .tablet {
+        display: block;
+    }
+}
+
+@media (max-width: 680px){
+    aside.admin-table-row .box-more-options .mobile {
+        display: block;
+    }
+
+    aside.admin-table-row .box-more-options .function-buttons i, aside.admin-table-row .box-more-options .function-buttons a {
+        margin: 0 0 20px 7%;
     }
 }

@@ -1,0 +1,159 @@
+﻿@model Amlakbashi.Core.DTOs.AdvertiseDTOs.AdvertiseIndexDTO
+
+@{
+    ViewBag.Title = "مدیریت آگهی ها";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section StyleLink
+{
+    <environment include="Development">
+        <link rel="stylesheet" href="/css/admin/advertise/admin-advertise-index.css" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="/css/min/admin-advertise.min.css" asp-append-version="true">
+    </environment>
+}
+
+@if (Model == null)
+{
+    <p>عملیات با خطا مواجه شد</p>
+}
+else
+{
+    <div class="admin-top-pin-container">
+        <div class="admin-filter-container">
+            @*<div class="bar-filter">
+                    <span><i class="fas fa-user-alt"></i>فیلتر پشتیبانی :</span>
+                    <span class="bar-filter-item" onclick="toggleMyReserves(0)" style="background-color:@(Model.ReserveSupportStatus == 0 ? "#fdd835" : "")">همه</span>
+                    <span class="bar-filter-item" onclick="toggleMyReserves(1)" style="background-color:@(Model.ReserveSupportStatus == 1 ? "#fdd835" : "")">بدون پشتیبان</span>
+                    <span class="bar-filter-item" onclick="toggleMyReserves(3)" style="background-color:@(Model.ReserveSupportStatus == 3 ? "#fdd835" : "")">در حال پشتیبانی من</span>
+                    <span class="bar-filter-item" onclick="toggleMyReserves(2)" style="background-color:@(Model.ReserveSupportStatus == 2 ? "#fdd835" : "")">در حال پشتیبانی همکاران</span>
+                    <span class="bar-filter-item" onclick="toggleMyReserves(4)" style="background-color:@(Model.ReserveSupportStatus == 4 ? "#fdd835" : "")">انجام شده</span>
+                </div>*@
+            <div class="box-filter">
+                <button class="more-filter">فیلتر بیشتر</button>
+                <div class="bar-filter">
+                    <span><i class="fas fa-filter"></i>فیلتر :</span>
+                    <input class="input-stlye" type="text" value="@(Model.Id > 0 ? Model.Id : "")" name="AdvertiseId" placeholder="کد آگهی">
+                    <input class="input-stlye" type="text" value="@(Model.UserId > 0 ? Model.UserId : "")" name="HostUserId" placeholder="کد کاربر">
+                    <button class="fas fa-angle-double-left submit-btn"></button>
+                </div>
+            </div>
+        </div>
+        <aside class="admin-table-row admin-table-row-header">
+            <p class="column-row">ردیف</p>
+            <p class="column-id">کد آگهی</p>
+            <p class="column-title">عنوان آگهی</p>
+            <p class="column-city">شهر</p>
+            <p class="column-user">کاربر</p>
+            <p class="column-desc">توضیحات</p>
+            <p class="column-more">سایر</p>
+        </aside>
+    </div>
+
+    <div class="admin-table">
+        @await Html.PartialAsync("_AdvertiseIndexMainInfo", Model)
+    </div>
+
+    <div class="more-filter-container">
+        <div class="more-filter-content">
+            <form id="more_filter_form" class="more-filter-form" asp-controller="advertise" asp-action="newindex" method="get">
+                <div class="options-filter-box">
+                    <div class="more-filter-row">
+                        <div class="item-filter-box">
+                            <label class="title-filter">کد آگهی</label>
+                            <input class="input-stlye" type="text" value="@(Model.Id > 0 ? Model.Id : "")" name="Id">
+                        </div>
+                        <div class="item-filter-box">
+                            <label class="title-filter">کد کاربر</label>
+                            <input class="input-stlye" type="text" value="@(Model.UserId > 0 ? Model.UserId : "")" name="UserId">
+                        </div>
+                        <div class="item-filter-box">
+                            <label class="title-filter">وضعیت آگهی</label>
+                            <select class="input-stlye" id="js-status-filter-select" name="Status">
+                                <option value="-1">همه وضعیت ها</option>
+                                <option is-selected="@(0 == (int)Model.Status)" value="0">آماده انتشار</option>
+                                <option is-selected="@(1 == (int)Model.Status)" value="1">انتشار یافته</option>
+                                <option is-selected="@(2 == (int)Model.Status)" value="2">تعلیق شده</option>
+                                <option is-selected="@(6 == (int)Model.Status)" value="6">آگهی جدید</option>
+                                <option is-selected="@(5 == (int)Model.Status)" value="5">تکمیل نشده ها</option>
+                                <option is-selected="@(4 == (int)Model.Status)" value="4">تایید نشده</option>
+                                <option is-selected="@(3 == (int)Model.Status)" value="3">حذف شده ها</option>
+                            </select>
+                        </div>
+                        <div class="item-filter-box">
+                            <label class="title-filter">وضعیت رزرو آنی</label>
+                            <select name="InstatntReserveStatus" class="input-stlye">
+                                <option value="-1">همه وضعیت ها</option>
+                                @{
+                                    var instantReserveStatusArr = (Advertise.InstantReserveStatusEnum[])Enum.GetValues(typeof(Advertise.InstantReserveStatusEnum));
+                                }
+                                @foreach (var st in instantReserveStatusArr)
+                                {
+                                    <option is-selected="@((int)st == Model.InstatntReserveStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetInstantReserveStatusString(st)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="more-filter-row">
+                        <div class="item-filter-box">
+                            <label for="status" class="title-filter">حداقل عکس</label>
+                            <input class="input-stlye" type="number" name="ImageCountMin" value="@Model.ImageCountMin" />
+                        </div>
+                        <div class="item-filter-box">
+                            <label for="status-travel" class="title-filter">حداکثر عکس</label>
+                            <input class="input-stlye" type="number" name="ImageCountMax" value="@Model.ImageCountMax" />
+                        </div>
+                        <div class="item-filter-box">
+                            <label class="title-filter">وضعیت پروتکل بهداشتی</label>
+                            <select class="input-stlye" name="HygieneProtocolStatus">
+                                <option value="-1">همه وضعیت ها</option>
+                                @{
+                                    var hygieneProtocolStatusArr = (Advertise.HygieneProtocolStatus[])Enum.GetValues(typeof(Advertise.HygieneProtocolStatus));
+                                }
+                                @foreach (var st in hygieneProtocolStatusArr)
+                                {
+                                    <option is-selected="@((int)st == Model.HygieneProtocolStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetHygieneProtocolStatusText(st)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="item-filter-box">
+                            <label for="respons" class="title-filter">ترتیب</label>
+                            <select id="js-sort-filter-select" name="Sort" class="input-stlye">
+                                <option value="score" is-selected="@("score" == Model.Sort)">امتیاز آگهی</option>
+                                <option value="date" is-selected="@("date" == Model.Sort)">تاریخ ثبت </option>
+                                <option value="modify" is-selected="@("modify" == Model.Sort)">تاریخ ویرایش </option>
+                                <option value="click" is-selected="@("click" == Model.Sort)">کلیک </option>
+                                <option value="contact" is-selected="@("contact" == Model.Sort)">نمایش تماس </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="more-filter-row">
+                        <div class="item-filter-box">
+                            <label class="title-filter">حداقل رزرو نوروز از</label>
+                            <input name="MinReserveNorouzFromDate" class="input-stlye js-filter-date-picker" type="text" id="minReserveNorouzFromDate" value="@(Model.MinReserveNorouzFromDate)" />
+                        </div>
+                    </div>
+                    <div class="more-filter-row">
+                        @await Component.InvokeAsync("RegionSelector", new { province = Model.Province, city = Model.City, area = Model.Area })
+                    </div>
+                </div>
+                <div class="button-box">
+                    <button type="button" class="button-exit">بستن</button>
+                    <button type="submit" class="button-filter">فیلتر</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section ScriptLink
+{
+    <environment include="Development">
+        <script src="~/js/admin/advertise/admin-advertise-index.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/min/admin-advertise.min.js" asp-append-version="true"></script>
+    </environment>
+}

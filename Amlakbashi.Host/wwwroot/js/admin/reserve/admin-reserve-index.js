@@ -1,4 +1,28 @@
-﻿function copyStringToClipboard(str, name) {
+﻿function showMoreOptionBox(callerButton, reserveId) {
+    loadCollapse(callerButton, $(callerButton).next()[0], '/reserve/GetReserveAdminDetails?reserveId=' + reserveId);
+}
+
+function showReserveEditForm(reserveId) {
+    loadPopup("/reserve/popupedit?reserveId=" + reserveId);
+}
+
+function SubmitReserveEditForm() {
+    submitPopup("/reserve/popupedit");
+}
+
+function showSupportInfo(reserveId) {
+    loadPopup("/reserve/getsupportinfo?reserveId=" + reserveId);
+}
+
+$(".box-filter .submit-btn").click(function (event) {
+    $('#more_filter_form [name="ReserveId"]').val($('.box-filter .bar-filter [name="ReserveId"').val());
+    $('#more_filter_form [name="AdvertiseId"]').val($('.box-filter .bar-filter [name="AdvertiseId"').val());
+    $('#more_filter_form [name="HostUserId"]').val($('.box-filter .bar-filter [name="HostUserId"').val());
+    $('#more_filter_form [name="GuestUserId"]').val($('.box-filter .bar-filter [name="GuestUserId"').val());
+    $('#more_filter_form').submit();
+});
+
+function copyStringToClipboard(str, name) {
     // Create new element
     var el = document.createElement('textarea');
     // Set value (string to be copied)
@@ -161,23 +185,6 @@ function payReserveWithCreditHost($id, obj) {
         });
     });
 }
-
-$(".js-filter-date-picker").persianDatepicker({
-    altField: '#to_date-alt',
-    format: 'YYYY/MM/DD',
-    altFormat: 'YYYY/MM/DD',
-    autoClose: true,
-    toolbox: {
-        calendarSwitch: { enabled: false },
-        todayButton: { enabled: true },
-        submitButton: { enabled: true, text: { fa: "بستن", en: close } }
-    },
-    navigator: {
-        scroll: { enabled: false },
-        text: { btnNextText: '<', btnPrevText: '>' },
-    },
-    initialValue: false
-});
 
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
@@ -348,7 +355,6 @@ function showCallPopup(user_id, reserve_id, guestOrHostStr) {
 }
 
 function showInfoPopup(title, msg) {
-    //showInfoMessage(title, msg);
     showPopup(msg);
 }
 
@@ -396,27 +402,3 @@ function toggleAccVisited(id, elem) {
         });
     });
 }
-
-function showMoreOptionBox(callerButton, reserveId) {
-    loadCollapse(callerButton, $(callerButton).next()[0], '/reserve/GetReserveAdminDetails?reserveId=' + reserveId);
-}
-
-function showReserveEditForm(reserveId) {
-    loadPopup("/reserve/popupedit?reserveId=" + reserveId);
-}
-
-function SubmitReserveEditForm() {
-    submitPopup("/reserve/popupedit");
-}
-
-function showSupportInfo(reserveId) {
-    loadPopup("/reserve/getsupportinfo?reserveId=" + reserveId);
-}
-
-$(".box-filter .submit-btn").click(function (event) {
-    $('#more_filter_form [name="ReserveId"]').val($('.box-filter .bar-filter [name="ReserveId"').val());
-    $('#more_filter_form [name="AdvertiseId"]').val($('.box-filter .bar-filter [name="AdvertiseId"').val());
-    $('#more_filter_form [name="HostUserId"]').val($('.box-filter .bar-filter [name="HostUserId"').val());
-    $('#more_filter_form [name="GuestUserId"]').val($('.box-filter .bar-filter [name="GuestUserId"').val());
-    $('#more_filter_form').submit();
-});

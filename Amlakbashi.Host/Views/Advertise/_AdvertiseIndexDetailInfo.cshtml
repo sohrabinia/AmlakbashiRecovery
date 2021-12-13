@@ -1,0 +1,57 @@
+﻿@model Amlakbashi.Core.DTOs.AdvertiseDTOs.AdvertiseIndexDetailDTO
+
+@if (Model == null)
+{
+    <p>داده ای پیدا نشد</p>
+}
+else
+{
+    <div class="box-more-options js-more-option">
+        <div class="more-option-row">
+            <span><b>تاریخ ثبت:</b> @Model.CreateDate |</span>
+            <span><b>قیمت:</b> @Model.DailyPrice |</span>
+            <span><b>امتیاز آگهی:</b> @Model.AdvertiseScore |</span>
+            <span><b>تعداد مشاهده:</b> @Model.WebVisit |</span>
+            <span><b>شروع رزرو نوروزی:</b> @Model.NorouzMinReserveDate</span>
+        </div>
+
+        <div class="more-option-row mobile">
+            <span><b>اطلاعات کاربر:</b></span>
+            @if (Model.UserId > 0)
+            {
+                <a href='/user/index?code=@Model.UserId'>شماره موبایل: @Model.UserPhoneNumber |</a>
+                <span>کد کاربر: @Model.UserId |</span>
+                <span>امتیاز: @Model.UserScore |</span>
+            }
+            else
+            {
+                @: بدون کاربر
+            }
+        </div>
+
+        <div class="more-option-row tablet">
+            <span><b>توضیحات:</b></span>
+            <i onclick="showAddInfoDialog(@Model.Id)" class="fa fa-plus" style="color:#242424;cursor:pointer;" title="افزودن توضیحات"></i>
+            <i onclick="showInfo(@Model.Id)" class="fa fa-eye" style="color:#242424;cursor:pointer;" title="نمایش توضیحات"></i>
+            <span class="js-info-count">(@Model.SupportInfoCount توضیح)</span>
+        </div>
+
+        <!-- دکمه های عملیاتی -->
+        <div class="more-option-row function-buttons">
+            <a href="/accomodation/adminbasicform?id=@Model.Id" class="fa fa-user-plus" title="کارشناسی آگهی" target="_blank"></a>
+            <a href="/advertise/edit?id=@Model.Id" class="fa fa-edit" target="_blank" title="ویرایش"></a>
+            @if (Model.Status == Advertise.AdvertiseStatus.FirstReady || Model.Status == Advertise.AdvertiseStatus.ReadyToPublish || Model.Status == Advertise.AdvertiseStatus.Archived || Model.Status == Advertise.AdvertiseStatus.Deleted)
+            {
+                <i class="fa fa-check-circle" onclick="PublishAdvertise(@Model.Id,this)" title="انتشار"></i>
+            }
+            @if (Model.Status == Advertise.AdvertiseStatus.Published || Model.Status == Advertise.AdvertiseStatus.ReadyToPublish || Model.Status == Advertise.AdvertiseStatus.FirstReady)
+            {
+                <i class="fa fa-power-off" onclick="SuspenAdvertise(@Model.Id,this)" title="تعلیق"></i>
+            }
+            @if (Model.Status != Advertise.AdvertiseStatus.NotVerified)
+            {
+                <i class="fa fa-times" onclick="NotVerifyAdvertise(@Model.Id,this)" title="عدم تایید"></i>
+            }
+        </div>
+    </div>
+}

@@ -4,7 +4,7 @@
 <html lang="fa">
 <head>
     <!-- Global Site Tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js"></script>
+    @*<script async src="https://www.googletagmanager.com/gtag/js"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -12,7 +12,7 @@
       gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
       gtag('config', 'AW-706947688');
     @RenderSection("GtagAddition", false)
-    </script>
+    </script>*@
 
     <title>@ViewBag.Title - املاک باشی</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,7 +59,7 @@
     @RenderSection("HeaderAddition", required: false)
 </head>
 <body>
-    @*<div class="js-bg"></div>*@
+    <div class="js-bg"></div>
     <header class="dashboard_header-style">
         <div class="account-box-style">
             <i class="fas fa-bars js-berger-menu"></i>
@@ -93,6 +93,9 @@
                     <ul class="js-submenu style-submenu">
                         <li class="submenu-child-item">
                             <a href="/advertise/index">آگهی ها</a>
+                        </li>
+                        <li class="submenu-child-item">
+                            <a href="/advertise/newindex">آگهی ها (پنل جدید)</a>
                         </li>
                         <li class="submenu-child-item">
                             <a href="/category/dynamicindex">صفحات داینامیک</a>
@@ -240,10 +243,10 @@
         <script src="/file/getjs?src=/resource/scripts/general/message-popup.js&v=4"></script>
         <script src="/file/getjs?src=/resource/scripts/general/confirm-alert-helper.js"></script>
         <script src="/file/getjs?src=/resource/Scripts/jquery.onmutate.min.js"></script>
-        <script src="/js/admin/admin.js"></script>
+        <script src="/js/admin/admin.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">
-        <script src="/js/min/admin.min.js"></script>
+        <script src="/js/min/admin.min.js" asp-append-version="true"></script>
     </environment>
     
 

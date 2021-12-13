@@ -11,8 +11,6 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public List<ReserveAdminItemDTO> ReserveList { get; set; }
         public PagingDTO PagingInfo { get; set; }
         public int Page { get; set; } = 1;
-        public int PageItemCount { get; set; } = 20;
-        public int RowIndexStart { get { return (Page * PageItemCount) - PageItemCount; } }
         public long ReserveId { get; set; } = 0;
         public long AdvertiseId { get; set; } = 0;
         public int HostUserId { get; set; } = 0;

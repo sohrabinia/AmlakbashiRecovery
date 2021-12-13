@@ -22,7 +22,6 @@
 }
 else
 {
-    var index = Model.RowIndexStart;
     var today = Amlakbashi.Core.Common.Utilities.DateTimeUtility.PersianTodayString;
     <div class="admin-top-pin-container">
         <div class="admin-filter-container">
@@ -69,46 +68,7 @@ else
     </div>
 
     <div class="admin-table">
-        @if (Model.ReserveList.Any() == false)
-        {
-            <p style="margin: 30px;">موردی برای نمایش وجود ندارد</p>
-        }
-        else
-        {
-            @foreach (var item in Model.ReserveList)
-            {
-                index++;
-                <aside class="admin-table-row" id="js-@item.id">
-                    @await Html.PartialAsync("_ReserveAdminMainInfo", item, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "index", index } })
-                </aside>
-            }
-
-            <div action="newindex" paging-info="@Model.PagingInfo" parameters="new
-                    {
-        ReserveId = Model.ReserveId,
-        AdvertiseId = Model.AdvertiseId,
-        HostUserId = Model.HostUserId,
-        GuestUserId = Model.GuestUserId,
-        ReserveStatus = Model.ReserveStatus,
-        HostResponseStatus = Model.HostResponseStatus,
-        GeneralStatus = Model.GeneralStatus,
-        SiteClearedStatus = Model.SiteClearedStatus,
-        SiteClearingDate = Model.SiteClearingDate,
-        ReserveFromDate = Model.ReserveFromDate,
-        ReserveToDate = Model.ReserveToDate,
-        ReserveEndDate = Model.ReserveEndDate,
-        StayDurationFrom = Model.StayDurationFrom,
-        StayDurationTo = Model.StayDurationTo,
-        ReserveSupportStatus = Model.ReserveSupportStatus,
-        ShouldFollow = Model.ShouldFollow,
-        SupporterId = Model.SupporterId,
-        HostCardStatus = Model.HostCardStatus,
-        MainFilter = Model.MainFilter,
-        InstantReserveFilter = Model.InstantReserveFilter,
-        DisableAutoCancel = Model.DisableAutoCancel,
-        AccVisited = Model.AccVisited
-                    }"></div>
-        }
+        @await Html.PartialAsync("_ReserveAdminMainInfo", Model)
     </div>
 
     <div class="more-filter-container">
