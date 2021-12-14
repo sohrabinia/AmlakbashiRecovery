@@ -2719,18 +2719,25 @@ namespace Amlakbashi.Host.Controllers
             {
                 return GenerateJsonResult(new { status = 0, msg = "لطفا کد را وارد کنید" });
             }
-            if (code.ToLower() != "inst8" && code.ToLower() != "amb5")
+            var lowerCode = code.ToLower();
+            var discountCodeType = lowerCode == "amb5" ? DiscountCoupon.DiscountCouponType.Moupon :
+                lowerCode == "inst8" ? DiscountCoupon.DiscountCouponType.Instagram :
+                lowerCode == "yalda1400" ? DiscountCoupon.DiscountCouponType.Yalda1400 : DiscountCoupon.DiscountCouponType.Unset;
+            
+            if (discountCodeType == DiscountCoupon.DiscountCouponType.Unset)
             {
                 return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
             }
+
             var startDate = DateTime.Parse("10/28/2020");
             var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
-            if (identityUser.CreateDate.Value.Date < startDate.Date)
+            if ((discountCodeType == DiscountCoupon.DiscountCouponType.Moupon ||
+                discountCodeType == DiscountCoupon.DiscountCouponType.Instagram) &&
+                identityUser.CreateDate.Value.Date < startDate.Date)
             {
-                return GenerateJsonResult(new { status = 0, msg = "شما مجوز استفاده از کد تخفیف را ندارید" });
+                return GenerateJsonResult(new { status = 0, msg = "شما مجوز استفاده از این کد تخفیف را ندارید" });
             }
-            var discountCodeType = code.ToLower() == "amb5" ? DiscountCoupon.DiscountCouponType.Moupon :
-                DiscountCoupon.DiscountCouponType.Instagram;
+            
             var coupon = accounting.FindDiscountCoupon(userAccessor.CurrentUser.Id, discountCodeType);
             if (coupon == null)
             {
@@ -2740,7 +2747,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 if (coupon.UsingReserveID > 0)
                 {
-                    return GenerateJsonResult(new { status = 0, msg = "این کد استفاده شده است" });
+                    return GenerateJsonResult(new { status = 0, msg = "این کد تخفیف استفاده شده است" });
                 }
             }
             var reserve = reserveService.Find(reserveId);
