@@ -17,8 +17,7 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public long UnixNorouzMinReserveDate { get; set; }
         public int SupportInfoCount { get; set; }
         public Advertise.AdvertiseStatus Status { get; set; }
-        public string UserPhoneNumber { get; set; } = "کاربر حذف شده";
-        public long UserScore { get; set; } = 0;
+        public string UserFullName { get; set; } = "کاربر حذف شده";
         public string CityPersianName { get; set; }
 
         public static implicit operator AdvertiseIndexItemDTO (Advertise advertise)

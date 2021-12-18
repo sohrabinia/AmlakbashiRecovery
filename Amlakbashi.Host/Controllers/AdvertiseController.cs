@@ -133,7 +133,6 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-
                 advertiseService.FilterNew(dto);
                 return View(dto);
             }
@@ -157,8 +156,7 @@ namespace Amlakbashi.Host.Controllers
                 AdvertiseIndexDetailDTO dto = advertise;
                 if (advertise.User != null)
                 {
-                    dto.UserPhoneNumber = advertise.User.GetPhoneNumber(Entities.User.PhoneType.MainMobile);
-                    dto.UserScore = advertise.User.UserScore;
+                    dto.UserFullName = advertise.User.FullName;
                 }
                 if (advertise.RegionCity != null)
                 {
@@ -221,7 +219,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var status = advertiseService.Delete(id);
-                return GenerateJsonResult(new { status = status, msg = status ? "" : "این آگهی دارای درخواست رزرو فعال است" });
+                return GenerateJsonResult(new { status = status, msg = status ? "" : "این آگهی دارای درخواست رزرو ثبت شده است" });
             }
             catch (Exception exc)
             {

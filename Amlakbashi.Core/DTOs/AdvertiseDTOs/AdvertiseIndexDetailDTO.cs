@@ -2,6 +2,7 @@
 using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
@@ -16,7 +17,7 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public int WebVisit { get; set; }
         public string NorouzMinReserveDate { get; set; }
         public int SupportInfoCount { get; set; }
-        public string UserPhoneNumber { get; set; } = "کاربر حذف شده";
+        public string UserFullName { get; set; } = "کاربر حذف شده";
         public long UserScore { get; set; } = 0;
         public string CityPersianName { get; set; }
         public int UserId { get; set; }

@@ -11,7 +11,7 @@ else
             <span><b>تاریخ ثبت:</b> @Model.CreateDate |</span>
             <span><b>قیمت:</b> @Model.DailyPrice |</span>
             <span><b>امتیاز آگهی:</b> @Model.AdvertiseScore |</span>
-            <span><b>تعداد مشاهده:</b> @Model.WebVisit |</span>
+            <span><b>کلیک:</b> @Model.WebVisit |</span>
             <span><b>شروع رزرو نوروزی:</b> @Model.NorouzMinReserveDate</span>
         </div>
 
@@ -19,9 +19,8 @@ else
             <span><b>اطلاعات کاربر:</b></span>
             @if (Model.UserId > 0)
             {
-                <a href='/user/index?code=@Model.UserId'>شماره موبایل: @Model.UserPhoneNumber |</a>
-                <span>کد کاربر: @Model.UserId |</span>
-                <span>امتیاز: @Model.UserScore |</span>
+                <a href='/user/index?code=@Model.UserId'>@Model.UserFullName |</a>
+                <span>کد کاربر: @Model.UserId</span>
             }
             else
             {
@@ -52,6 +51,7 @@ else
             {
                 <i class="fa fa-times" onclick="NotVerifyAdvertise(@Model.Id,this)" title="عدم تایید"></i>
             }
+            <i class="fa fa-trash" onclick="deleteAdvertise(@Model.Id)" title="حذف آگهی"></i>
         </div>
     </div>
 }

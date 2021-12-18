@@ -261,6 +261,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Area\App\" />
     <Folder Include="Logs\HangfireLogs\" />
     <Folder Include="Logs\ImpersonationLogs\" />
     <Folder Include="Logs\Logs\" />

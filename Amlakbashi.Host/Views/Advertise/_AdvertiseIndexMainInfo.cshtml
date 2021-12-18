@@ -34,9 +34,8 @@ else
                 @if (item.UserId > 0)
                 {
                     <div style="direction:ltr">
-                        <a target="_blank" href='/user/index?code=@item.UserId'>@item.UserPhoneNumber</a>
-                        <br />کد: @item.UserId
-                        <br />امتیاز: @item.UserScore
+                        <a target="_blank" href="/user/index?code=@item.UserId">@item.UserFullName</a>
+                        <br />@item.UserId
                     </div>
 
                 }

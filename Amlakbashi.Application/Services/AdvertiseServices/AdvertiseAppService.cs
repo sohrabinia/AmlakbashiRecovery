@@ -131,8 +131,28 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
         public bool Delete(long id)
         {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            if (acc != null && acc.Reserves.Any(a => a.IsActiveReserve) == false)
+            var acc = Repository.Find(id);
+            if (acc == null)
+            {
+                return false;
+            }
+            bool canDelete = false;
+            if (acc.Mode != AdvertiseMode.Parent)
+            {
+                canDelete = acc.Reserves.Any() == false;
+            }
+            else
+            {
+                if (acc.Childs == null || acc.Childs.Count == 0)
+                {
+                    canDelete = true;
+                }
+                else
+                {
+                    canDelete = acc.Childs.All(x => x.Reserves.Any() == false);
+                }
+            }
+            if (canDelete)
             {
                 var prevAcc = acc.ShallowCopy();
                 acc.Status = AdvertiseStatus.Deleted;
@@ -293,8 +313,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 AdvertiseIndexItemDTO dtoItem = item;
                 if (item.User != null)
                 {
-                    dtoItem.UserPhoneNumber = item.User.GetPhoneNumber(User.PhoneType.MainMobile);
-                    dtoItem.UserScore = item.User.UserScore;
+                    dtoItem.UserFullName = item.User.FullName;
                 }
                 if (item.RegionCity != null)
                 {

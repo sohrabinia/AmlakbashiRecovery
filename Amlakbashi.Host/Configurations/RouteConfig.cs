@@ -7,6 +7,7 @@ namespace Amlakbashi.Host.Configurations
     {
         public static void Config(IEndpointRouteBuilder endpointRouteBuilder)
         {
+            AreaRouteConfig.Config(endpointRouteBuilder);
             ControllerRouteConfig.Config(endpointRouteBuilder);
             HubRouteConfig.Config(endpointRouteBuilder);
         }

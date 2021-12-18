@@ -5,22 +5,23 @@
 $(".box-filter .submit-btn").click(function (event) {
     $('#more_filter_form [name="Id"]').val($('.box-filter .bar-filter [name="AdvertiseId"').val());
     $('#more_filter_form [name="UserId"]').val($('.box-filter .bar-filter [name="HostUserId"').val());
+    $('#more_filter_form [name="Status"]').val($('.box-filter .bar-filter [name="Status"').val());
     $('#more_filter_form').submit();
 });
 
-//function deleteItem($id, obj) {
-//    showNoYesMessage(' حذف آگهی', 'آیا از حذف این آگهی مطمئن هستید؟', function () {
-//        myajax("Advertise/Delete", "id=" + $id, function (ret) {
-//            if (ret.status == 0) {
-//                alertify.error(ret.msg);
-//            }
-//            if (ret.status == 1) {
-//                alertify.success('آگهی با موفقیت حذف شد');
-//                $(elem).parent().parent().parent().parent().parent().remove();
-//            }
-//        });
-//    });
-//}
+function deleteAdvertise($id) {
+    showConfirm('آیا از حذف این آگهی مطمئن هستید؟', function () {
+        sendGetAjax("/Advertise/Delete", "id=" + $id, function (ret) {
+            if (ret.status == 1) {
+                $('#js-' + $id).remove();
+                successAlert();
+            }
+            else {
+                errorAlert(ret.msg);
+            }
+        });
+    });
+}
 
 function confirmHygieneProtocol($id, obj) {
     showConfirm("آیا رعایت پروتکل بهداشتی در این اقامتگاه مورد تایید است؟", function () {
