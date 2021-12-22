@@ -1,0 +1,193 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs;
+@using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+
+@model IEnumerable<AccommodationCardDTO>
+
+@{
+    var for_advertise_page = (ViewBag.for_advertise_page != null && ViewBag.for_advertise_page) || (ViewData["for_advertise_page"] != null && bool.Parse(ViewData["for_advertise_page"].ToString()));
+    ;
+    bool all_images_lazy = ViewData["all_images_lazy"] != null ? bool.Parse(ViewData["all_images_lazy"].ToString()) : false;
+
+    var vBag = ViewData["ViewBag"] != null ?
+        ViewData["ViewBag"] : ViewBag;
+}
+
+@{
+    if (Model.Count() > 0)
+    {
+        var counter = 0;
+        foreach (var item in Model)
+        {
+            counter++;
+            //var contact_available = AdvertiseDepend.IsContactAvailable(item);
+            //var img_src = item.PhotoID > 0 ? string.Format("/عکس-آگهی/{0}", item.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
+            var img_src = item.PhotoID > 0 ? string.Format("/file/accthumbcard?accid={0}&fileid={1}", item.AdvertiseID, item.PhotoID) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
+            var city_name = item.RegionString;
+            var capacity = item.MinCapacity == item.MaxCapacity ? item.MinCapacity + " نفر" : item.MinCapacity + "-" + item.MaxCapacity + " نفر";
+            var rating = item.OverallRate;
+            var favourited = item.Favourited;
+            var initial_loaded_img = !all_images_lazy && counter <= (Context.Request.IsMobileBrowser() ? 1 : 4);
+            var img_src_to_show = initial_loaded_img ? img_src : "/file/resourceimagepng?file_name=lazy-16_9";
+            var img_data_source = initial_loaded_img ? "" : " data-src=" + img_src;
+            int queryStringIndex = 0;
+            var url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(item.Slug);
+            bool isParent = item.AdvertiseType == Advertise.AdvertiseType.HotelApartment ||
+                            item.AdvertiseType == Advertise.AdvertiseType.Complex ||
+                            item.AdvertiseType == Advertise.AdvertiseType.Hotel ||
+                            item.AdvertiseType == Advertise.AdvertiseType.Pansion ||
+                            item.AdvertiseType == Advertise.AdvertiseType.Inn ||
+                            item.AdvertiseType == Advertise.AdvertiseType.TourismAccommodation ||
+                            item.AdvertiseType == Advertise.AdvertiseType.Camp ? true : false;
+            if (!string.IsNullOrEmpty(vBag.capacity) && int.Parse(vBag.capacity) > 0)
+            {
+                if (queryStringIndex < 1)
+                {
+                    url += "?";
+                }
+                else
+                {
+                    url += "&";
+                }
+                queryStringIndex++;
+                url += ("capacity=" + vBag.capacity);
+            }
+            if (!string.IsNullOrEmpty(vBag.empty_range_from))
+            {
+                if (queryStringIndex < 1)
+                {
+                    url += "?";
+                }
+                else
+                {
+                    url += "&";
+                }
+                queryStringIndex++;
+                url += ("empty_range_from=" + vBag.empty_range_from);
+            }
+            if (!string.IsNullOrEmpty(vBag.empty_range_to))
+            {
+                if (queryStringIndex < 1)
+                {
+                    url += "?";
+                }
+                else
+                {
+                    url += "&";
+                }
+                queryStringIndex++;
+                url += ("empty_range_to=" + vBag.empty_range_to);
+            }
+            <a target="_blank" href="/app/advertise/item/@item.AdvertiseID" class="home-page__category-item-container-large@(for_advertise_page ? " advertise-category__advertise-item-container" : "")" id="advertise_@(item.AdvertiseID)">
+                @*<div class="advertise-item__icon-list" style="position: absolute;width: unset;display: inline;flex-flow: column;">*@
+                @{
+                    int discount = item.DiscountPercent;
+                    string date_string = item.DiscountDateString;
+                    if (discount > 0)
+                    {
+                        <p class="advertise-item__discount-label home-page_discount-style"><i class="fa fa-percent"></i>@(discount) تخفیف @date_string</p>
+                    }
+                }
+                @*@if (AdvertiseDepend.IsNorouzSpecial(item))
+                    {
+                        <img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32" />
+                    }*@
+                @*@if (item.TodayIsEmpty)
+                    {
+                        <i class="fa fa-home" style="color: white;font-size: 24px;margin: 3px;text-shadow: 0px 2px 5px #333;"></i>
+                    }*@
+                @*</div>*@
+                <img class="home-page__advertise-image @(initial_loaded_img ? "" : "lazy")" src="@img_src_to_show" @img_data_source width="240" height="144" alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")' />
+                @if (!initial_loaded_img)
+                {
+                    <noscript>
+                        <img class="home-page__advertise-image" src="@img_src" width="240" height="144" alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")'>
+                    </noscript>
+                }
+            <div class="home-page__advertise-item-container">
+                <div class="style-box-status-room">
+                    @if (item.instantReserveAvailable)
+                    {<p style="color:white;font-size:11px"><i style="font-size:13px;" class="fa fa-bolt"></i> رزرو آنی</p>}
+                    @if (item.TodayIsEmpty)
+                    {<p style="color:white;font-size:11px;background-color:#6b6767;"><i class="fa fa-home" style="font-size: 13px;"></i>خالی امشب</p> }
+                    @*@if (item.NorouzPrice > 0)
+            {
+                <div style="margin:1px 2px;background-color:white;border: 1px solid #898888;width:max-content;border-radius:5px;padding:5px;">
+                    <div style="color:#242424;font-size:11px"><img style="margin-left:2px" width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />نوروزی</div>
+                </div>
+            }*@
+                </div>
+                <p class="home-page__advertise-city"><i class="fa fa-map-marker-alt"></i> @(city_name)</p>
+                @*@if (contact_available)
+        {
+            <i class="fa fa-phone fa-rotate-90 home-page__advertise-contact-icon"></i>
+        }*@
+                @if (ViewBag.TitleHTag == 2)
+                {
+                    <h2 class="home-page__advertise-title">@item.Title</h2>
+                }
+                else
+                {
+                    <h3 class="home-page__advertise-title">@item.Title</h3>
+                }
+                <p class="home-page__advertise-price">کد آگهی: @(item.AdvertiseID)</p>
+                <p id="js-daily-price" class="home-page__advertise-price">شروع قیمت: @(string.Format("{0:n0}", item.DailyPrice)) تومان</p>
+                @*<p class="home-page__advertise-price">قیمت نوروز: @(item.NorouzPrice > 0 ? string.Format("{0:n0} تومان", item.NorouzPrice) : "تعیین نشده")</p>*@
+                <p class="home-page__advertise-capacity">
+                    @if (!isParent)
+                    {
+                        <i class="fa fa-bed"></i> @(item.Room > 0 ? item.Room + " خوابه" : "بدون اتاق") <i class="fa fa-users"></i> @:ظرفیت @capacity
+                    }
+                    else
+                    {
+                        @:
+                    }
+
+                </p>
+                <!--<p class="home-page__advertise-price">کد آگهی: @(item.AdvertiseID)</p>
+    <div class="home-page_details-advertise">
+        @if (item.HasChild)
+        {
+            <p class="home-page__advertise-price"> @(item.AdvertiseTypeString)</p>
+        }
+        else
+        {
+            <p><i class="fa fa-bed"></i> @(item.Room > 0 ? item.Room + " خوابه" : "بدون اتاق")&nbsp;&nbsp;&nbsp;</p>
+            <p><i class="fa fa-users"></i> ظرفیت @capacity</p>
+        }-->
+                @*</div>*@
+                <div class="box-min-max-night home-page__advertise-bottom-container">
+                    @if (item.minReserveDays > 0)
+                    {<p>حداقل @item.minReserveDays شب</p>}
+                    @if (item.maxReserveDays > 0)
+                    {<p>حداکثر @item.maxReserveDays شب</p>}
+                </div>
+                <div class="home-page__advertise-bottom-container  home-page-rating-style">
+                    @if (rating == 0)
+                    {
+                        <P class="home-page__advertise-no-comment">بدون نظر</P>
+                    }
+                    else
+                    {
+                        @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", rating } })
+                        @*<select class="average-rating">
+                    <option @IsSelected(rating == 1) value="1">خیلی ضعیف</option>
+                    <option @IsSelected(rating == 2) value="2">ضعیف</option>
+                    <option @IsSelected(rating == 3) value="3">متوسط</option>
+                    <option @IsSelected(rating == 4) value="4">خوب</option>
+                    <option @IsSelected(rating == 5) value="5">خیلی خوب</option>
+                </select>*@
+                    }
+                    <div class="home-page__favourite-button" advertise_id="@item.AdvertiseID">
+                        <i class="fa fa-heart"></i>
+                    </div>
+                </div>
+            </div>
+            </a>
+        }
+
+    }
+    @*if (!for_advertise_page)
+        {
+            @:</div>
+        }*@
+}

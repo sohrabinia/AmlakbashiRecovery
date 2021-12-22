@@ -1,0 +1,357 @@
+﻿@using Entities = Amlakbashi.Core.Entities;
+@model Amlakbashi.Core.DTOs.UserDTOs.UserDTO
+
+@{
+    ViewBag.Title = "پروفایل";
+    ViewBag.profile = true;
+    Layout = "_AppDashboardLayout";
+}
+
+<div class="profile">
+    @if (ViewBag.msg != null)
+    {
+        <div class="profile__msg">@ViewBag.msg</div>
+    }
+
+    @if (ViewBag.suc != null)
+    {
+        <div class="profile__suc">@ViewBag.suc</div>
+    }
+
+    <form asp-area="app" asp-controller="user" asp-action="profilemanager" method="post" id="ManageForm" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="@Model.id" />
+        <input type="hidden" name="mainMobile" value="@Model.mainMobile" />
+        <input type="hidden" name="userGeneralType" value="@Model.userGeneralType" />
+
+        <div class="profile__photo">
+            @if (ViewBag.photoId > 0)
+            {
+                <img src='@string.Format("/file/imgThumb?FileID={0}&w=200&h=200", ViewBag.photoId)' />
+                <img id="blah" src="#" alt="your image" style="display:none" />
+                <div style="margin-top:20px;">
+                    <label for="file" class="btn-photo">تغییر عکس</label>
+                    <input id="file" name="photoid" style="visibility:hidden;" type="file" />
+                    <span class="filename"></span>
+                </div>
+                switch ((Entities.User.UserPhotoState)ViewBag.photoStatus)
+                {
+                    case Entities.User.UserPhotoState.not_verified:
+                        <span style="color: red">این عکس پروفایل مورد تایید نیست. لطفا عکس پرسنلی از خودتان آپلود کنید.</span>
+                        break;
+                    case Entities.User.UserPhotoState.ready_publish:
+                        <span style="color: #ffbb00">عکس پروفایل شما بعد از تایید کارشناس نمایش داده خواهد شد</span>
+                        break;
+                    default:
+                        <span style="color: red">عکس پرسنلی از خودتان</span>
+                        break;
+                }
+            }
+            else
+            {
+                <i class="fa fa-user"></i>
+                <img id="blah" src="#" alt="your image" style="display:none" />
+                <div style="margin-top:20px;">
+                    <label for="file" class="btn-photo">افزودن عکس</label>
+                    <input id="file" style="visibility:hidden;" name="photoid" type="file" />
+                    <span class="filename"></span>
+                </div>
+            }
+        </div>
+        <div class="profile__title">مشخصات کاربری</div>
+        <div class="profile__item no-column">
+            <span class="profile__label">کد کاربری :</span>
+            <span class="profile__text">@Model.id</span>
+        </div>
+        <div class="profile__item no-column">
+            <span class="profile__label">شماره موبایل اصلی :</span>
+            <span class="profile__text" style="direction:ltr">@(Model.mainMobile)</span>
+        </div>
+
+        <div class="profile__item ">
+            <span class="profile__label">نام :<span style="color:red">*</span></span>
+            <span class="profile__text">
+                <input type="text" id="profile_fname" placeholder="نام" name="fname" title="نام" class="mandatory"
+                       @{ if (!string.IsNullOrEmpty(Model.fname)) { @: value="@(Model.fname)"
+                       } }>
+            </span>
+        </div>
+        <div class="profile__item ">
+            <span class="profile__label">نام خانوادگی :<span style="color:red">*</span></span>
+            <span class="profile__text">
+                <input type="text" id="profile_lname" placeholder="نام خانوادگی" name="lname" title="نام خانوادگی" class="mandatory"
+                       @{ if (!string.IsNullOrEmpty(Model.lname)) { @: value="@(Model.lname)"
+                       } }>
+            </span>
+        </div>
+        <div class="profile__item ">
+            <a asp-controller="user" asp-action="changepassword" style="margin-top:20px;" class="btn-photo">@(Model.hasPassword ? "تغییر" : "تعیین") رمز عبور</a>
+        </div>
+        <div class="profile__title">اطلاعات تماس</div>
+        <div class="profile__item ">
+            <span class="profile__label">
+                شماره موبایل :
+                <span style="color:red">*</span>
+            </span>
+            <span class="profile__text">
+                <input id="profile_mobile" type="text" style="direction:ltr"
+                       placeholder="شماره موبایل" name="mobile1" title="شماره موبایل"
+                       onkeyup="validateNumber(this);" onchange="validateNumber(this)"
+                       value="@(Model.mobile1)" class="mandatory">
+            </span>
+        </div>
+        @if (Model.userGeneralType > (int)Entities.User.UserGeneralTypeEnum.Guest)
+        {
+        <div class="profile__item ">
+            <span class="profile__label">
+                شماره موبایل ۲ :
+            </span>
+            <span class="profile__text">
+                <input id="mobile2" type="text" style="direction:ltr"
+                       placeholder="شماره موبایل ۲" name="mobile2" title="شماره موبایل ۲"
+                       onkeyup="validateNumber(this);" onchange="validateNumber(this)"
+                       value="@(Model.mobile2)">
+            </span>
+        </div>
+        <div class="profile__title">ارتباط ضروری ما با شما</div>
+        <div class="profile__item no-column">
+            <span class="profile__tip">این اطلاعات فقط جهت ارتباط ما با شما در مواقع ضروری است و در سایت نمایش داده نمی شود</span>
+            @*<span class="profile__text"></span>*@
+        </div>
+        <div class="profile__item ">
+            <span class="profile__label">
+                تلفن ثابت :
+            </span>
+            <span class="profile__text">
+                <input id="Tell" type="text" style="direction:ltr"
+                       placeholder="تلفن ثابت" name="tell" title="تلفن ثابت"
+                       onkeyup="validateNumber(this);" onchange="validateNumber(this)"
+                       value="@(Model.tell)">
+            </span>
+        </div>
+
+        <div class="profile__item ">
+            <span class="profile__label">
+                تلفن شخص ثالث :
+                <span style="color:red">*</span>
+            </span>
+            <span class="profile__text">
+                <input id="ThirdPersonTell" style="direction:ltr" type="text"
+                       placeholder="تلفن شخص ثالث" name="thirdPersonTell"
+                       title="تلفن شخص ثالث" onkeyup="validateNumber(this);"
+                       onchange="validateNumber(this)"
+                       value="@(Model.thirdPersonTell)" class="mandatory">
+            </span>
+        </div>
+        }
+        <div class="profile__item ">
+            <span class="profile__label">ایمیل :</span>
+            <span>
+                <span class="profile__text" id="emailSpan">@(string.IsNullOrEmpty(Model.email) ? "آدرس ایمیل ثبت نشده است" : Model.email)</span>
+                <button type="button" onclick="showRegisterEmailForm()" style="border:0; margin-right: 20px;" class="btn-photo">@(string.IsNullOrEmpty(Model.email) ? "ثبت ایمیل" : "تغییر ایمیل")</button>
+            </span>
+        </div>
+        <div class="profile__title">اطلاعات حساب بانکی</div>
+        <div class="profile__item no-column">
+            <span class="profile__tip">اطلاعات حساب بانکی جهت انتقال وجه به حساب شما</span>
+        </div>
+        <div class="profile__item ">
+            <span class="profile__label">
+                نام صاحب حساب :
+                <span style="color:red">*</span>
+            </span>
+            <span class="profile__text">
+                <input id="bankFname" type="text" placeholder="نام صاحب حساب"
+                       name="bankFname" title="نام صاحب حساب"
+                       value="@Model.bankFname" class="mandatory"
+                       style="text-align:left;">
+            </span>
+        </div>
+        <div class="profile__item ">
+            <span class="profile__label">
+                نام خانوادگی صاحب حساب :
+                <span style="color:red">*</span>
+            </span>
+            <span class="profile__text">
+                <input id="bankLname" type="text" placeholder="نام خانوادگی صاحب حساب"
+                       name="bankLname" title="نام خانوادگی صاحب حساب"
+                       value="@Model.bankLname" class="mandatory"
+                       style="text-align:left;">
+            </span>
+        </div>
+        <div class="profile__item ">
+            <span class="profile__label">
+                شماره کارت بانکی :
+                <span style="color:red">*</span>
+            </span>
+            <span class="profile__text">
+                <input id="BankCardNumber" type="text" placeholder="شماره کارت بانکی"
+                       name="bankCardNumber" title="شماره کارت بانکی"
+                       onkeyup="validateNumber(this);" onchange="validateNumber(this)"
+                       value="@Model.bankCardNumber" class="mandatory"
+                       style="text-align:left;">
+            </span>
+        </div>
+        <div class="profile__item ">
+            <span class="profile__label">
+                شماره شبا :
+                <span style="color:red">*</span>
+            </span>
+            <span class="profile__text" style="display:flex">
+                <input id="ShabaNumber" type="text" placeholder="شماره شبا"
+                       name="shabaNumber" class="mandatory" title="شماره شبا" onkeyup="validateNumber(this);"
+                       onchange="validateNumber(this)" value="@Model.shabaNumber"
+                       style="text-align:left;"><span style="margin:auto 5px">IR</span>
+            </span>
+        </div>
+        @*}
+            else
+            {
+                <input type="hidden" name="bankFname" value="@Model.bankFname">
+                <input type="hidden" name="bankLname" value="@Model.bankLname">
+                <input type="hidden" name="bankCardNumber" value="@Model.bankCardNumber">
+                <input type="hidden" name="shabaNumber" value="@Model.shabaNumber">
+            }*@
+        <input type="submit" value="ثبت ویرایش" class="profile__submit" />
+    </form>
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        var success = '';
+        try
+        {
+            var success = '@(TempData["alert_success"])';
+        }
+        catch(exc)
+        {
+        }
+        if (success != '')
+        {
+            $.confirm({
+                title: '',
+                content: success,
+                type: 'green',
+                typeAnimated: true,
+                buttons: {
+                    باشه: function () {
+                    }
+                }
+            });
+        }
+
+        $(function () {
+            $("input:file").change(function () {
+                var fileName = $(this).val().replace(/C:\\fakepath\\/i, '');
+                $(".filename").html(fileName);
+                readURL(this);
+            });
+        });
+
+        function readURL(input) {
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#blah').attr('src', e.target.result);
+                    $(".profile__photo img").hide();
+                    $(".fa-user").hide();
+                    $('#blah').show();
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $("form").submit(function () {
+            if ($("#profile_fname").val() == "") {
+                alertify.error("لطفا نام خود را وارد کنید");
+                $("#profile_fname").focus();
+                return false;
+            }
+            if ($("#profile_lname").val() == "") {
+                alertify.error("لطفا نام خانوادگی خود را وارد کنید");
+                $("#profile_lname").focus();
+                return false;
+            }
+            if ($("#profile_mobile").val() == "") {
+                alertify.error("لطفا تلفن همراه خود را وارد کنید");
+                $("#profile_mobile").focus();
+                return false;
+            }
+            if (!validateMobile($('#profile_mobile').val())) {
+                alertify.error("لطفا تلفن همراه خود را درست و با اعداد انگلیسی وارد نمایید");
+                $("#profile_mobile").focus();
+                return false;
+            }
+            var mobile2 = $('#mobile2').val();
+            if (mobile2 != null && mobile2 != '') {
+                if (!validateMobile(mobile2)) {
+                    alertify.error("لطفا تلفن همراه خود را درست و با اعداد انگلیسی وارد نمایید");
+                    $("#mobile2").focus();
+                    return false;
+                }
+            }
+            if ($('#profile_mobile').val() == $('#mobile2').val()) {
+                alertify.error("شماره های تلفن همراه نمیتوانند یکی باشند");
+                $("#mobile2").focus();
+                return false;
+            }
+            if ($('#Tell').val() != '' && !validateTell($('#Tell').val()) && !validateMobile($('#Tell').val())) {
+                alertify.error("لطفا تلفن ثابت خود را درست و با اعداد انگلیسی وارد نمایید");
+                $("#Tell").focus();
+                return false;
+            }
+            t_p_tell = $('#ThirdPersonTell').val();
+            if (!validateTell(t_p_tell) && !validateMobile(t_p_tell)) {
+                alertify.error("لطفا تلفن شخص ثالث را درست و با اعداد انگلیسی وارد نمایید");
+                $("#ThirdPersonTell").focus();
+                return false;
+            }
+
+            if (t_p_tell != null && t_p_tell != '')
+            {
+                if (t_p_tell == $("#profile_mobile").val() || t_p_tell == $("#mobile2").val() || t_p_tell == $("#Tell").val())
+                {
+                    alertify.error("تلفن شخص ثالث باید با شماره های دیگر متفاوت باشد");
+                    $("#ThirdPersonTell").focus();
+                    return false;
+                }
+            }
+            var bankCardNumber = $("#BankCardNumber").val();
+            if (bankCardNumber.length == 0)
+            {
+                alertify.error("شماره کارت بانکی اجباری میباشد.");
+                $("#BankCardNumber").focus();
+                return false;
+            }
+            if (bankCardNumber.length != 16)
+            {
+                alertify.error("شماره کارت بانکی باید 16 رقم باشد. لطفا بررسی کنید.");
+                $("#BankCardNumber").focus();
+                return false;
+            }
+            var shabaNumber = $("#ShabaNumber").val();
+            if (shabaNumber.length == 0) {
+                alertify.error("شماره شبا اجباری میباشد.");
+                $("#ShabaNumber").focus();
+                return false;
+            }
+            if (shabaNumber != '' && shabaNumber.length != 24) {
+                alertify.error("شماره شبا باید 24 رقم باشد. لطفا بررسی کنید.");
+                $("#ShabaNumber").focus();
+                return false;
+            }
+            $("#email").val($("#email").val().replaceAll(" ", ""));
+            if ($("#email").val() != null && $("#email").val() != '' && !validateEmail($("#email").val()))
+            {
+                alertify.error("ایمیل اشتباه است، لطفا بررسی کنید");
+                $("#email").focus();
+                return false;
+            }
+
+            return true;
+        });
+    </script>
+}

@@ -2721,8 +2721,7 @@ namespace Amlakbashi.Host.Controllers
             }
             var lowerCode = code.ToLower();
             var discountCodeType = lowerCode == "amb5" ? DiscountCoupon.DiscountCouponType.Moupon :
-                lowerCode == "inst8" ? DiscountCoupon.DiscountCouponType.Instagram :
-                lowerCode == "yalda1400" ? DiscountCoupon.DiscountCouponType.Yalda1400 : DiscountCoupon.DiscountCouponType.Unset;
+                lowerCode == "inst8" ? DiscountCoupon.DiscountCouponType.Instagram : DiscountCoupon.DiscountCouponType.Unset;
             
             if (discountCodeType == DiscountCoupon.DiscountCouponType.Unset)
             {

@@ -21,17 +21,17 @@
                 case Advertise.AdvertiseType.TourismAccommodation:
                 case Advertise.AdvertiseType.Inn:
                 case Advertise.AdvertiseType.Pansion:
-                    @await Html.PartialAsync("_ReserveHotel", Model)
+                    @await Html.PartialAsync("/Views/Accomodation/_ReserveHotel.cshtml", Model)
                     break;
                 case Advertise.AdvertiseType.HotelApartment:
                 case Advertise.AdvertiseType.Complex:
-                    @await Html.PartialAsync("_ReserveComplex", Model)
+                    @await Html.PartialAsync("/Views/Accomodation/_ReserveComplex.cshtml", Model)
                     break;
             }
         }
         else
         {
-            {@await Html.PartialAsync("~/views/accomodation/_Reserve.cshtml", Model.ReservePopupData)}
+            {@await Html.PartialAsync("/views/accomodation/_Reserve.cshtml", Model.ReservePopupData)}
         }
     </div>
 }

@@ -1,0 +1,77 @@
+﻿@using Amlakbashi.Core.DTOs.ReserveDTOs;
+@model IEnumerable<Reserve>
+
+@{
+    ViewBag.Title = "صورتحساب مالی";
+    ViewBag.Invoice = true;
+    Layout = "_AppDashboardLayout";
+    var currentRowNumber = ViewBag.firstRowNumber;
+    var data = ViewBag.dto as IEnumerable<InvoiceItemDTO>;
+}
+
+@section StyleLink
+{
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/dailyrent.css">
+}
+
+@section StyleBlock {
+    <style>
+        .dashboard-table-first-row span {
+            border-left: 1px solid white;
+        }
+        .dashboard-table-row span {
+            border-left: 1px solid #ccc;
+        }
+        .dashboard-table-row span:last-child {
+            border:none;
+        }
+        .dashboard-table-row div * {
+            border:none;
+        }
+        .dashboard-table-first-row span:last-child {
+            border:none;
+        }
+        .dashboard-table-row:nth-child(2n+1) {
+            background-color:#f7f7f7;
+        }
+    </style>
+}
+
+<div class="invoice__container" style="width:100%;overflow:scroll;">
+    <div class="dashboard-table" style="width:fit-content">
+        <div class="dashboard-table-first-row">
+            <span style="min-width:45px;width:45px;margin:0;" class="dashboard-table-cell">ردیف</span>
+            <span style="min-width:55px;width:55px;margin:0;" class="dashboard-table-cell">کد رزرو</span>
+            <span style="min-width:65px;width:65px;margin:0;" class="dashboard-table-cell">مدت رزرو</span>
+            <span style="min-width:65px;width:65px;margin:0;" class="dashboard-table-cell">تاریخ سفر</span>
+            <span style="min-width:65px;width:65px;margin:0;" class="dashboard-table-cell">تاریخ درخواست رزرو</span>
+            <span style="min-width:65px;width:65px;margin:0;" class="dashboard-table-cell">نام مهمان</span>
+            <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">مبلغ کل</span>
+            <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">پرداختی مهمان به سایت</span>
+            <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">پرداختی از کیف پول میزبان</span>
+            <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">سهم املاک باشی (10%)</span>
+            <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">جریمه لغو رزرو</span>
+            <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">مبلغ قابل پرداخت</span>
+            @*<span class="dashboard-table-cell">زمان تسویه حساب با میزبان</span>*@
+            <span class="dashboard-table-cell">وضعیت تسویه با شما</span>
+            @*<span class="dashboard-table-cell">مانده</span>*@
+        </div>
+        @foreach (var item in data)
+        {
+            @await Html.PartialAsync("_InvoiceItem", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                new ModelStateDictionary()) {
+                { "currentRowNumber", currentRowNumber}})
+
+            currentRowNumber--;
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="adpagelist">
+        @Html.PagedListPager((IPagedList)Model, page => $"/app/reserve/invoice?page={page}", new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })
+    </div>
+</div>
+@section ScriptBlock{
+    <script type="text/javascript">
+    </script>
+}

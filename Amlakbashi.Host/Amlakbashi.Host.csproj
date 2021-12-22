@@ -27,6 +27,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Areas\App\Views\AppAdvertise\Favorites.cshtml" />
+    <Content Remove="Areas\App\Views\AppAdvertise\List.cshtml" />
+    <Content Remove="Areas\App\Views\AppCategory\Item.cshtml" />
+    <Content Remove="Areas\App\Views\AppHome\dashboard.cshtml" />
+    <Content Remove="Areas\App\Views\AppHome\Main.cshtml" />
+    <Content Remove="Areas\App\Views\AppReserve\Invoice.cshtml" />
+    <Content Remove="Areas\App\Views\AppReserve\_InvoiceItem.cshtml" />
+    <Content Remove="Areas\App\Views\AppUser\ProfileManager.cshtml" />
+    <Content Remove="Areas\App\Views\AppWallet\Prize.cshtml" />
+    <Content Remove="Areas\App\Views\AppWallet\UserWalletManager.cshtml" />
     <Content Remove="wwwroot\js\dashboard.min.js" />
   </ItemGroup>
 
@@ -36,6 +46,16 @@
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="Areas\App\Views\AppAdvertise\List.cshtml" />
+    <None Include="Areas\App\Views\AppAdvertise\Favorites.cshtml" />
+    <None Include="Areas\App\Views\AppCategory\Item.cshtml" />
+    <None Include="Areas\App\Views\AppHome\Dashboard.cshtml" />
+    <None Include="Areas\App\Views\AppHome\Main.cshtml" />
+    <None Include="Areas\App\Views\AppReserve\Invoice.cshtml" />
+    <None Include="Areas\App\Views\AppReserve\_InvoiceItem.cshtml" />
+    <None Include="Areas\App\Views\AppUser\ProfileManager.cshtml" />
+    <None Include="Areas\App\Views\AppWallet\Prize.cshtml" />
+    <None Include="Areas\App\Views\AppWallet\UserWalletManager.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAddressInput.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAmenitiesInput.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAvailableInput.cshtml" />
@@ -141,15 +161,15 @@
     <None Include="Views\Post\SamandehiRedirect.cshtml" />
     <None Include="Views\Post\Search.cshtml" />
     <None Include="Views\Post\SearchAccID.cshtml" />
-    <None Include="Views\Post\_EditFast.cshtml" />
-    <None Include="Views\Post\_InstantReserve.cshtml" />
-    <None Include="Views\Post\_MinAndMaxDay.cshtml" />
+    <None Include="Views\Shared\_EditFast.cshtml" />
+    <None Include="Views\Shared\_InstantReserve.cshtml" />
+    <None Include="Views\Shared\_MinAndMaxDay.cshtml" />
     <None Include="Views\Post\_News.cshtml" />
-    <None Include="Views\Post\_RadioButtonForm.cshtml" />
-    <None Include="Views\Post\_RoomComplex.cshtml" />
-    <None Include="Views\Post\_TitleBanner.cshtml" />
-    <None Include="Views\Post\_TitleList.cshtml" />
-    <None Include="Views\Post\_TitleRoomsCard.cshtml" />
+    <None Include="Views\Shared\_RadioButtonForm.cshtml" />
+    <None Include="Views\Shared\_RoomComplex.cshtml" />
+    <None Include="Views\Shared\_TitleBanner.cshtml" />
+    <None Include="Views\Shared\_TitleList.cshtml" />
+    <None Include="Views\Shared\_TitleRoomsCard.cshtml" />
     <None Include="Views\ReservePayment\AddEdit.cshtml" />
     <None Include="Views\ReservePayment\Index.cshtml" />
     <None Include="Views\Reserve\Admin.cshtml" />
@@ -261,7 +281,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Area\App\" />
     <Folder Include="Logs\HangfireLogs\" />
     <Folder Include="Logs\ImpersonationLogs\" />
     <Folder Include="Logs\Logs\" />

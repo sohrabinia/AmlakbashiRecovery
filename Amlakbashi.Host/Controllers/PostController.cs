@@ -531,6 +531,7 @@ namespace Amlakbashi.Host.Controllers
             return Redirect("/errors/Http404");
         }
 
+        [Authorize]
         public ActionResult FavoriteManager(int aid = -1)
         {
             try
@@ -709,7 +710,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_DownloadAppPopup");
         }
 
-        //[Authorize]
+        [Authorize]
         public ActionResult PresentAndPrize(int userId = 0)
         {
             var user = userId > 0 ? userService.Find(userId) : userAccessor.CurrentUser;
