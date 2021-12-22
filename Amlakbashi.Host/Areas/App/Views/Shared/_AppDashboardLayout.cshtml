@@ -7,14 +7,14 @@
 <head>
     <!-- Global Site Tag (gtag.js) - Google Analytics -->
     @*<script async src="https://www.googletagmanager.com/gtag/js"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
-      gtag('config', 'AW-706947688');
-    @RenderSection("GtagAddition", false)
-    </script>*@
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
+          gtag('config', 'AW-706947688');
+        @RenderSection("GtagAddition", false)
+        </script>*@
     <!-- Event snippet for Purchased (Tracking) conversion page -->
     @*<script>
         gtag('event', 'conversion', {
@@ -105,7 +105,7 @@
                      src="~/Resource/img/amlakbashi-logo-900w.png"
                      alt="logo">
             </a>
-            <a href="@(userAccessor.CurrentUser.UserGeneralType != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id): string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id))" class="add-advertise-box">
+            <a href="@(userAccessor.CurrentUser.UserGeneralType != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? "/app/reserve/list?category=0&selectType=2" : "/app/reserve/list?category=1&selectType=1")" class="add-advertise-box">
                 <p class="add-advertise-style"> رزرو های من </p>
             </a>
         </header>
@@ -114,7 +114,7 @@
                 <ul class="dashboard-main-navigation_list">
                     <li class="main-navigation_list-item list-item__account-style">
                         @if (User.Identity.IsAuthenticated &&
-                         userAccessor.CurrentUser.PhotoID > 0)
+                        userAccessor.CurrentUser.PhotoID > 0)
                         {
                             <img width="48" height="48" src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=200", userAccessor.CurrentUser.PhotoID)' alt="avatar" class="list-item__avatar">
                         }
@@ -143,37 +143,30 @@
                     </li>
                     <li class="main-navigation_list-item"><a asp-area="app" asp-controller="home" asp-action="main"><i class="fa fa-home"></i> صفحه اصلی</a></li>
                     <li class="main-navigation_list-item @(ViewBag.dashboard != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="home" asp-action="dashboard"><i class="fa fa-tachometer-alt"></i> حساب کاربری</a></li>
-                    <li class="main-navigation_list-item @(ViewBag.advertise!=null ? "menu__item--active" : "")"><a href="/accomodation/accbasicform"><i class="fa fa-plus"></i> افزودن آگهی</a></li>
-                    @if (User.Identity.IsAuthenticated)
+                    <li class="main-navigation_list-item @(ViewBag.advertise!=null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="updatebasic"><i class="fa fa-plus"></i> افزودن آگهی</a></li>
+                    @if (userAccessor.CurrentUser.UserGeneralType != (int)Entities.User.UserGeneralTypeEnum.Guest)
                     {
-                        if (userAccessor.CurrentUser.UserGeneralType != (int)Entities.User.UserGeneralTypeEnum.Guest)
-                        {
-                            <li class="main-navigation_list-item @(ViewBag.personal != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="list"><i class="fas fa-list-alt"></i> آگهی های من</a></li>
-                            <li class="main-navigation_list-item @(ViewBag.advertise_comment != null ? "menu__item--active" : "")"><a href="/comment/advertisecommentmanager"><i class="fa fa-th-list"></i> نظرات آگهی ها <vc:not-seen-comment-count></vc:not-seen-comment-count></a></li>
-                        }
-                        if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
-                        {
-                            <li class="main-navigation_list-item @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id)"><i class="fa fa-book"></i> رزرو ها</a></li>
-                        }
-                        else
-                        {
-                            <li class="main-navigation_list-item @(ViewBag.reserveHost != null ? "menu__item--active" : "")"><a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id)"><i class="fa fa-book"></i> رزرو بعنوان میزبان </li>
-                            <li class="main-navigation_list-item  @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id)"><i class="fa fa-book"></i> رزرو به عنوان مهمان</a></li>
-                        }
-                        if (userAccessor.CurrentUser.UserGeneralType > 0)
-                        {
-                            <li class="main-navigation_list-item @(ViewBag.Invoice != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="invoice"><i class="fa fa-list"></i> صورت حساب رزرو ها</a></li>
-                        }
-                        <li class="main-navigation_list-item @(ViewBag.presentandprize != null ? "menu__item--active " : "")"><a asp-area="app" asp-controller="wallet" asp-action="prize"><i class="fas fa-gift"></i> هدیه سفر</a></li>
-                        <li class="main-navigation_list-item @(ViewBag.profile != null ? "menu__item--active " : "")"><a asp-area="app" asp-controller="user" asp-action="profilemanager"><i class="fas fa-user"></i>پروفایل من</a></li>
-                        <li class="main-navigation_list-item @(ViewBag.UserCredit != null ? "menu__item--active " : "")"><a asp-area="app" asp-controller="wallet" asp-action="userwalletmanager"><i class="fa fa-money-bill-alt"></i> کیف پول</a></li>
-                        <li class="main-navigation_list-item @(ViewBag.favorite != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="favorites"><i class="fas fa-heart"></i> علاقه مندی های من</a></li>
-                        <li class="main-navigation_list-item"><a asp-area="app" asp-controller="user" asp-action="signout"><i class="fas fa-sign-out-alt"></i>خروج از حساب کاربری</a></li>
+                        <li class="main-navigation_list-item @(ViewBag.personal != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="list"><i class="fas fa-list-alt"></i> آگهی های من</a></li>
+                        <li class="main-navigation_list-item @(ViewBag.advertise_comment != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="comment" asp-action="list"><i class="fa fa-th-list"></i> نظرات آگهی ها <vc:not-seen-comment-count></vc:not-seen-comment-count></a></li>
+                    }
+                    @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+                    {
+                        <li class="main-navigation_list-item @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="list" asp-route-selecttype="1" asp-route-category="1"><i class="fa fa-book"></i> رزرو ها</a></li>
                     }
                     else
                     {
-                        <li class="main-navigation_list-item"><a href="/user/Mobilelogin"><i class="fas fa-sign-out-alt"></i>خروج از حساب کاربری</a></li>
+                        <li class="main-navigation_list-item @(ViewBag.reserveHost != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="list" asp-route-selecttype="2" asp-route-category="0"><i class="fa fa-book"></i> رزرو بعنوان میزبان </a></li>
+                        <li class="main-navigation_list-item  @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="list" asp-route-selecttype="1" asp-route-category="1"><i class="fa fa-book"></i> رزرو به عنوان مهمان</a></li>
                     }
+                    @if (userAccessor.CurrentUser.UserGeneralType > 0)
+                    {
+                        <li class="main-navigation_list-item @(ViewBag.Invoice != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="invoice"><i class="fa fa-list"></i> صورت حساب رزرو ها</a></li>
+                    }
+                    <li class="main-navigation_list-item @(ViewBag.presentandprize != null ? "menu__item--active " : "")"><a asp-area="app" asp-controller="wallet" asp-action="prize"><i class="fas fa-gift"></i> هدیه سفر</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.profile != null ? "menu__item--active " : "")"><a asp-area="app" asp-controller="user" asp-action="profilemanager"><i class="fas fa-user"></i>پروفایل من</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.UserCredit != null ? "menu__item--active " : "")"><a asp-area="app" asp-controller="wallet" asp-action="userwalletmanager"><i class="fa fa-money-bill-alt"></i> کیف پول</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.favorite != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="favorites"><i class="fas fa-heart"></i> علاقه مندی های من</a></li>
+                    <li class="main-navigation_list-item"><a asp-area="app" asp-controller="user" asp-action="signout"><i class="fas fa-sign-out-alt"></i>خروج از حساب کاربری</a></li>
                 </ul>
             </nav>
             <main class="main">

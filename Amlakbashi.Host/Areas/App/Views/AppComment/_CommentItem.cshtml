@@ -1,0 +1,38 @@
+﻿@using Amlakbashi.Core.DTOs.CommentDTOs;
+
+@model CommentOverviewDTO
+
+@{
+    var img_src = Model.photoId > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.photoId, 240, 144) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
+}
+
+<div class="advertise-comment-manager__item">
+    <a href="@Model.url" target="_blank">
+        <img class="advertise-comment-manager__image" src="@img_src"
+             width="240" height="144" />
+    </a>
+    <a href="~/comment/advertisecommentdetail?id=@Model.advertiseId" class="advertise-comment-manager__label-container">
+        <div class="advertise-comment-manager__label">@Model.title</div>
+        <div class="advertise-comment-manager__label">کد آگهی: @Model.advertiseId - @Model.typeString</div>
+        @if (!string.IsNullOrEmpty(Model.parentTitle))
+        {
+            <div class="advertise-comment-manager__label">@Model.parentTitle</div>
+        }
+        @if (!string.IsNullOrEmpty(Model.selfTitle))
+        {
+            <div class="advertise-comment-manager__label">@Model.selfTitle</div>
+        }
+        <div class="advertise-comment-manager__button-area">
+            <div class="advertise-comment-manager__label">
+                <span>تعداد نظرات: @Model.commentCount</span>
+                <span style='color:#EA4335'>@(Model.newCommentCount > 0 ? " (" + Model.newCommentCount + " نظر جدید)" : "")</span>
+            </div>
+            <div style="display:flex;flex-flow:row;">
+                <div class="advertise-comment-manager__label">امتیاز: </div>
+                @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", Model.overallScore } })
+                <div class="advertise-comment-manager__label" style="margin-right:5px">@Model.rateCount نفر</div>
+            </div>
+            <div class="advertise-comment-manager__button">مشاهده و پاسخ نظرات</div>
+        </div>
+    </a>
+</div>

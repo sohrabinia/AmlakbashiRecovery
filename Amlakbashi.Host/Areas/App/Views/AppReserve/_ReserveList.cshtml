@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Amlakbashi.Core.DTOs.ReserveDTOs.ReserveDashboardItemDTO>
+
+<div class="reserve-dashboard__item-root">
+    @if (Model.Any() == false)
+    {
+        if (ViewData["reserveId"].ToString() != "" &&
+            ViewData["reserveId"].ToString() != "-1" &&
+            ViewData["reserveId"].ToString() != "0")
+        {
+            <div style="display:flex;justify-content:center;flex-flow:column;align-items:center;width:100%;">
+                <div style="color:#242424;font: 15px Miransans;width:100%;text-align:center;">کد رزرو مورد نظر یافت نشد</div>
+                <a href="/reserve/reserveitemmanager" style="font:13px Miransans;color:#242424;padding:10px;margin:10px;border:1px solid #242424;border-radius:5px;">تمام رزرو ها</a>
+            </div>
+        }
+        else if (ViewData["categoryString"].ToString() != "")
+        {
+            <div style="display:flex;justify-content:center;flex-flow:column;align-items:center;width:100%;">
+                <div style="color:#242424;font: 15px Miransans;width:100%;text-align:center;">@ViewData["categoryString"] ندارید</div>
+            </div>
+        }
+        else
+        {
+            <div style="display:flex;justify-content:center;flex-flow:column;align-items:center;width:100%;">
+                <div style="color:#242424;font: 15px Miransans;width:100%;text-align:center;">هیچ درخواست رزروی یافت نشد</div>
+            </div>
+        }
+    }
+    @if (ViewBag.category != null && ViewBag.category == 4)
+    {
+        var recentCanseledReserves = Model.Where(w => w.isRecently).OrderBy(o => Reserve.GetUnseccessfulReservePriority((int)o.status));
+        var oldCanseledReserves = Model.Where(w => w.isRecently == false);
+        if (recentCanseledReserves.Count() > 0)
+        {
+            <div>
+                <p class="unseccessful-reserve-header">درخواست های ناموفق اخیر</p>
+                @foreach (var item in recentCanseledReserves)
+                {
+                    <div class="reserve-dashboard__item-container js-reserve-@(item.reserveId)">
+                        @await Html.PartialAsync("_ReserveItem", item)
+                    </div>
+                }
+            </div>
+        }
+        <div style="margin-top: 20px;">
+            <p class="unseccessful-reserve-header">آرشیو درخواست های ناموفق</p>
+            @foreach (var item in oldCanseledReserves)
+            {
+                <div class="reserve-dashboard__item-container js-reserve-@(item.reserveId)">
+                    @await Html.PartialAsync("_ReserveItem", item)
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <div class="reserve-dashboard__item-container js-reserve-@(item.reserveId)">
+                @await Html.PartialAsync("_ReserveItem", item)
+            </div>
+        }
+    }
+</div>

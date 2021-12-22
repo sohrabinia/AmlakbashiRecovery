@@ -6,11 +6,13 @@ using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.AccommodationDTOs;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+using Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.AdvertiseBuilder;
 using Amlakbashi.Host.Authentication;
 using log4net;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -30,6 +32,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
         private readonly IReportItemAppService reportItemService;
         private readonly IUserAccessor userAccessor;
         private readonly ICacheManager cacheManager;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILog logger;
         public AppAdvertiseController(IAdvertiseAppService advertiseService,
             ICategoryAppService categoryService,
@@ -37,6 +40,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             IReportItemAppService reportItemService,
             IUserAccessor userAccessor,
             ICacheManager cacheManager,
+            IWebHostEnvironment webHostEnvironment,
             ILog logger)
         {
             this.advertiseService = advertiseService;
@@ -45,6 +49,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             this.reportItemService = reportItemService;
             this.userAccessor = userAccessor;
             this.cacheManager = cacheManager;
+            this.webHostEnvironment = webHostEnvironment;
             this.logger = logger;
         }
 
@@ -174,6 +179,612 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 logger.Error("Post.FavoriteManager", exc);
                 return Redirect("/errors/http404");
             }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult UpdateBasic(long id = -1)
+        {
+            try
+            {
+                bool isEdit;
+                int level;
+                var director = advertiseService.GetBasicForm(id, out isEdit, out level);
+                var model = new BasicFormDTO();
+                model = BasicFormDTO.Generate(director, id);
+                if (director.Mode == Advertise.AdvertiseMode.Parent && isEdit)
+                {
+                    ViewBag.childs = advertiseService.GetAccChilds(id);
+                }
+                ViewBag.isEdit = isEdit;
+                ViewBag.type = director.AdvertiseType;
+                ViewBag.level = level;
+                return View(model);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AccBasicForm", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult UpdateBasic(Advertise data, bool isEdit = false, int tab = 0)
+        {
+            try
+            {
+                Dictionary<string, string> errors;
+                List<string> groupErrors;
+                int level;
+                var director = advertiseService.SubmitBasicForm(data, userAccessor.CurrentUser.Id, out errors, out groupErrors, out level);
+                if (errors.Any() || groupErrors.Any())
+                {
+                    ModelState.Clear();
+                    foreach (var item in errors)
+                    {
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
+                    }
+                    if (isEdit)
+                    {
+                        ViewBag.childs = advertiseService.GetAccChilds(data.Id);
+                    }
+                    ViewBag.errors = groupErrors;
+                    ViewBag.isEdit = isEdit;
+                    ViewBag.type = director.AdvertiseType;
+                    ViewBag.level = level;
+                    return View(BasicFormDTO.Generate(director, data.Id));
+                }
+                switch (tab)
+                {
+                    case 2:
+                        return RedirectToAction(nameof(UpdateGeneral), new
+                        {
+                            id = data.Id
+                        });
+                    case 3:
+                        return RedirectToAction(nameof(UpdateExtra), new
+                        {
+                            id = data.Id
+                        });
+                    case 4:
+                        if (director.AdvertiseType == Advertise.AdvertiseType.Complex || director.AdvertiseType == Advertise.AdvertiseType.HotelApartment)
+                        {
+                            return RedirectToAction(nameof(UpdateComplexUnit), new
+                            {
+                                parentId = data.Id,
+                                id = -1
+                            });
+                        }
+                        else
+                        {
+                            return RedirectToAction(nameof(UpdateHotelRoom), new
+                            {
+                                parentId = data.Id,
+                                id = -1
+                            });
+                        }
+                    default:
+                        return RedirectToAction(nameof(UpdateGeneral), new
+                        {
+                            id = data.Id
+                        });
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AccBasicForm", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult UpdateGeneral(long id)
+        {
+            try
+            {
+                bool isEdit;
+                int level;
+                var director = advertiseService.GetGeneralForm(id, out isEdit, out level);
+                var model = new GeneralFormDTO();
+                model = GeneralFormDTO.Generate(director, id);
+                if (director.Mode == Advertise.AdvertiseMode.Parent && isEdit)
+                {
+                    ViewBag.childs = advertiseService.GetAccChilds(id);
+                }
+                ViewBag.isEdit = isEdit;
+                ViewBag.type = director.AdvertiseType;
+                ViewBag.level = level;
+                return View(model);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AccGeneralForm", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult UpdateGeneral(Advertise data, bool isEdit = false, int tab = 0)
+        {
+            try
+            {
+                if (data.Area < 1)
+                {
+                    data.Area = null;
+                }
+                if (data.PhotoID < 1)
+                {
+                    data.PhotoID = null;
+                }
+                Dictionary<string, string> errors;
+                List<string> groupErrors;
+                int level;
+                var director = advertiseService.SubmitGeneralForm(data, out errors, out groupErrors, out level,
+                    webHostEnvironment.WebRootPath, isEdit);
+                if (errors.Any())
+                {
+                    ModelState.Clear();
+                    foreach (var item in errors)
+                    {
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
+                    }
+                    if (isEdit)
+                    {
+                        ViewBag.childs = advertiseService.GetAccChilds(data.Id);
+                    }
+                    ViewBag.errors = groupErrors;
+                    ViewBag.isEdit = isEdit;
+                    ViewBag.type = director.AdvertiseType;
+                    ViewBag.level = level;
+                    return View(GeneralFormDTO.Generate(director, data.Id));
+                }
+                switch (tab)
+                {
+                    case 1:
+                        return RedirectToAction(nameof(UpdateBasic), new
+                        {
+                            id = data.Id
+                        });
+                    case 3:
+                        return RedirectToAction(nameof(UpdateExtra), new
+                        {
+                            id = data.Id
+                        });
+                    case 4:
+                        if (director.AdvertiseType == Advertise.AdvertiseType.Complex || director.AdvertiseType == Advertise.AdvertiseType.HotelApartment)
+                        {
+                            return RedirectToAction(nameof(UpdateComplexUnit), new
+                            {
+                                parentId = data.Id,
+                                id = -1
+                            });
+                        }
+                        else
+                        {
+                            return RedirectToAction(nameof(UpdateHotelRoom), new
+                            {
+                                parentId = data.Id,
+                                id = -1
+                            });
+                        }
+                    default:
+                        return RedirectToAction(nameof(UpdateExtra), new
+                        {
+                            id = data.Id
+                        });
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AccGeneralForm", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult UpdateExtra(long id)
+        {
+            try
+            {
+                bool isEdit;
+                int level;
+                var director = advertiseService.GetExtraForm(id, out isEdit, out level);
+                var model = new ExtraFormDTO();
+                model = ExtraFormDTO.Generate(director, id);
+                if (director.Mode == Advertise.AdvertiseMode.Parent && isEdit)
+                {
+                    ViewBag.childs = advertiseService.GetAccChilds(id);
+                }
+                ViewBag.isEdit = isEdit;
+                ViewBag.type = director.AdvertiseType;
+                ViewBag.level = level;
+                return View(model);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AccExtraForm", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult UpdateExtra(Advertise data, PoolInputDTO poolDTO, bool isEdit = false, int tab = 0)
+        {
+            try
+            {
+                Dictionary<string, string> errors;
+                List<string> groupErrors;
+                int level;
+                if (data.Pool == true)
+                {
+                    data.PoolFeatures = poolDTO.ConvertToEnum();
+                }
+                else
+                {
+                    data.PoolFeatures = Advertise.PoolFeaturesEnum.None;
+                }
+                var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors, out level, isEdit);
+                if (errors.Any())
+                {
+                    ModelState.Clear();
+                    foreach (var item in errors)
+                    {
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
+                    }
+                    if (isEdit)
+                    {
+                        ViewBag.childs = advertiseService.GetAccChilds(data.Id);
+                    }
+                    ViewBag.isEdit = isEdit;
+                    ViewBag.errors = groupErrors;
+                    ViewBag.type = director.AdvertiseType;
+                    ViewBag.level = level;
+                    return View(ExtraFormDTO.Generate(director, data.Id));
+                }
+                var isAdd = data.Status == Advertise.AdvertiseStatus.NotCompleted;
+                if (tab > 0)
+                {
+                    switch (tab)
+                    {
+                        case 1:
+                            return RedirectToAction(nameof(UpdateBasic), new
+                            {
+                                id = data.Id
+                            });
+                        case 2:
+                            return RedirectToAction(nameof(UpdateGeneral), new
+                            {
+                                id = data.Id
+                            });
+                        case 4:
+                            if (director.AdvertiseType == Advertise.AdvertiseType.Complex || director.AdvertiseType == Advertise.AdvertiseType.HotelApartment)
+                            {
+                                return RedirectToAction(nameof(UpdateComplexUnit), new
+                                {
+                                    parentId = data.Id,
+                                    id = -1
+                                });
+                            }
+                            else
+                            {
+                                return RedirectToAction(nameof(UpdateHotelRoom), new
+                                {
+                                    parentId = data.Id,
+                                    id = -1
+                                });
+                            }
+                    }
+                }
+                switch (director.Mode)
+                {
+                    case Advertise.AdvertiseMode.Parent:
+                        if (director.AdvertiseType == Advertise.AdvertiseType.Complex || director.AdvertiseType == Advertise.AdvertiseType.HotelApartment)
+                        {
+                            return RedirectToAction(nameof(UpdateComplexUnit), new
+                            {
+                                parentId = data.Id
+                            });
+                        }
+                        else
+                        {
+                            return RedirectToAction(nameof(UpdateHotelRoom), new
+                            {
+                                parentId = data.Id
+                            });
+                        }
+                    default:
+                        var user = userAccessor.CurrentUser;
+                        if (string.IsNullOrEmpty(user.Mobile2) ||
+                            string.IsNullOrEmpty(user.Tell) ||
+                            string.IsNullOrEmpty(user.ThirdPersonTell))
+                        {
+                            var success_str = "آگهی شما با موفقیت " + (isAdd ? "ثبت" : "ویرایش") + " و پس از تایید کارشناس " + (isAdd ? "" : "دوباره ") + "نمایش داده میشود، لطفا اطلاعات مورد نیاز را تکمیل کنید";
+                            TempData["alert_success"] = success_str;
+                            return RedirectToAction("ProfileManager", "User", new { UserID = user.Id });
+                        }
+                        else
+                        {
+                            var success_str = "آگهی شما با موفقیت " + (isAdd ? "ثبت" : "ویرایش") + " و پس از تایید کارشناس " + (isAdd ? "" : "دوباره ") + "نمایش داده میشود . \n";
+                            TempData["alert"] = success_str;
+                            return Redirect("/dashboard");
+                        }
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AccExtraForm", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult UpdateHotelRoom(long parentId, long id = 0)
+        {
+            try
+            {
+                var childs = advertiseService.GetAccChilds(parentId);
+                if (id == -1)
+                {
+                    var ids = childs.Values.SelectMany(m => m.Keys.Select(s => s)).ToList();
+                    if (ids.Count > 0)
+                    {
+                        id = ids.First();
+                    }
+                    else
+                    {
+                        id = 0;
+                    }
+                }
+                bool isEdit;
+                var director = advertiseService.GetHotelForm(id, parentId, out isEdit);
+                var model = new HotelUnitFormDTO();
+                if (director.AdvertiseType > Advertise.AdvertiseType.None)
+                {
+                    model = HotelUnitFormDTO.Generate(director, id, parentId);
+                }
+                else
+                {
+                    model.Id = id;
+                    model.ParentId = parentId;
+                    model.Type = director.AdvertiseType;
+                }
+                ViewBag.isEdit = isEdit;
+                ViewBag.childs = childs;
+                return View(model);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AccHotelForm", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult UpdateHotelRoom(Advertise data, bool isEdit = false, bool saveAndNewRoom = false, int tab = -1)
+        {
+            try
+            {
+                if (tab >= 0)
+                {
+                    saveAndNewRoom = true;
+                }
+                Dictionary<string, string> errors;
+                List<string> groupErrors;
+                var director = advertiseService.SubmitHotelForm(data, userAccessor.CurrentUser.Id, out errors, out groupErrors, saveAndNewRoom);
+                if (errors.Any())
+                {
+                    ModelState.Clear();
+                    foreach (var item in errors)
+                    {
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
+                    }
+                    ViewBag.isEdit = isEdit;
+                    ViewBag.errors = groupErrors;
+                    ViewBag.childs = advertiseService.GetAccChilds((long)data.ParentId);
+                    return View(HotelUnitFormDTO.Generate(director, data.Id, (long)data.ParentId));
+                }
+                if (tab >= 0)
+                {
+                    switch (tab)
+                    {
+                        case 1:
+                            return RedirectToAction(nameof(UpdateBasic), new
+                            {
+                                id = data.ParentId
+                            });
+                        case 2:
+                            return RedirectToAction(nameof(UpdateGeneral), new
+                            {
+                                id = data.ParentId
+                            });
+                        case 3:
+                            return RedirectToAction(nameof(UpdateExtra), new
+                            {
+                                id = data.ParentId
+                            });
+                        default:
+                            return RedirectToAction(nameof(UpdateHotelRoom), new
+                            {
+                                id = tab,
+                                parentId = data.ParentId
+                            });
+                    }
+                }
+                if (saveAndNewRoom)
+                {
+                    return RedirectToAction(nameof(UpdateHotelRoom), new
+                    {
+                        parentId = data.ParentId
+                    });
+                }
+                return Redirect("/dashboard");
+
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AccHotelForm", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult UpdateComplexUnit(long parentId, long id = 0)
+        {
+            try
+            {
+                var childs = advertiseService.GetAccChilds(parentId);
+                if (id == -1)
+                {
+                    var ids = childs.Values.SelectMany(m => m.Keys.Select(s => s)).ToList();
+                    if (ids.Count > 0)
+                    {
+                        id = ids.First();
+                    }
+                    else
+                    {
+                        id = 0;
+                    }
+                }
+                bool isEdit;
+                Advertise.AdvertiseType parentType;
+                var director = advertiseService.GetComplexForm(id, parentId, out parentType, out isEdit);
+                var model = new ComplexUnitFormDTO(parentType);
+                if (director.AdvertiseType > Advertise.AdvertiseType.None)
+                {
+                    model = ComplexUnitFormDTO.Generate(director, id, parentId, parentType);
+                }
+                else
+                {
+                    model.Id = id;
+                    model.ParentId = parentId;
+                    model.ParentType = parentType;
+                }
+                ViewBag.isEdit = isEdit;
+                ViewBag.post = false;
+                ViewBag.childs = childs;
+                return View(model);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AccComplexForm", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult UpdateComplexUnit(Advertise data, PoolInputDTO poolDTO, bool isEdit = false, bool saveAndNewRoom = false, int tab = -1)
+        {
+            try
+            {
+                if (tab >= 0)
+                {
+                    saveAndNewRoom = true;
+                }
+                if (data.PhotoID < 1)
+                {
+                    data.PhotoID = null;
+                }
+                if (data.Pool == true)
+                {
+                    data.PoolFeatures = poolDTO.ConvertToEnum();
+                }
+                else
+                {
+                    data.PoolFeatures = Advertise.PoolFeaturesEnum.None;
+                }
+                Dictionary<string, string> errors;
+                List<string> groupErrors;
+                Advertise.AdvertiseType parentType;
+                var director = advertiseService.SubmitComplexForm(data, userAccessor.CurrentUser.Id, out errors, out groupErrors, saveAndNewRoom, out parentType,
+                    webHostEnvironment.WebRootPath);
+                if (errors.Any())
+                {
+                    ModelState.Clear();
+                    foreach (var item in errors)
+                    {
+                        ModelState.AddModelError(item.Key, item.Value == null ? "" : item.Value);
+                    }
+                    ViewBag.isEdit = isEdit;
+                    ViewBag.errors = groupErrors;
+                    ViewBag.post = true;
+                    ViewBag.childs = advertiseService.GetAccChilds((long)data.ParentId);
+                    return View(ComplexUnitFormDTO.Generate(director, data.Id, (long)data.ParentId, parentType));
+                }
+                if (tab >= 0)
+                {
+                    switch (tab)
+                    {
+                        case 1:
+                            return RedirectToAction(nameof(UpdateBasic), new
+                            {
+                                id = data.ParentId
+                            });
+                        case 2:
+                            return RedirectToAction(nameof(UpdateGeneral), new
+                            {
+                                id = data.ParentId
+                            });
+                        case 3:
+                            return RedirectToAction(nameof(UpdateExtra), new
+                            {
+                                id = data.ParentId
+                            });
+                        default:
+                            return RedirectToAction(nameof(UpdateComplexUnit), new
+                            {
+                                id = tab,
+                                parentId = data.ParentId
+                            });
+                    }
+                }
+                if (saveAndNewRoom)
+                {
+                    return RedirectToAction(nameof(UpdateComplexUnit), new
+                    {
+                        parentId = data.ParentId
+                    });
+                }
+                return Redirect("/dashboard");
+            }
+            catch (Exception exc)
+            {
+                logger.Error("AccComplexForm", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult SelectComplexUnitType(long parentId, int childType)
+        {
+            var paradigmAdvertise = new Advertise()
+            {
+                TypeID = (Advertise.AdvertiseType)childType,
+                Floor = Advertise.FloorItems.Unset
+            };
+            var childs = advertiseService.GetAccChilds(parentId);
+            if (childs != null && childs.Count > 0 && childs.Keys.Contains((Advertise.AdvertiseType)childType))
+            {
+                var paradigmId = childs[(Advertise.AdvertiseType)childType].Keys.Last();
+                paradigmAdvertise = advertiseService.Find(paradigmId);
+            }
+            var director = new AdvertiseDirector(paradigmAdvertise, DirectorType.ComplexUnit);
+            var model = ComplexUnitFormDTO.Generate(director, 0, parentId, Advertise.AdvertiseType.Complex);
+            if (model.floor != null)
+            {
+                model.floor.Floor = Advertise.FloorItems.Unset;
+            }
+            model.titleAndDesc = new TitleDescInputDTO(false);
+            return PartialView("_AccComplexTypeForm", model);
         }
     }
 }

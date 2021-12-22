@@ -1,10 +1,13 @@
 ﻿using Amlakbashi.Accounting;
+using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
 using Amlakbashi.Application.Services.ReserveServices.Interfaces;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.ReserveDTOs;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Host.Area.App.Controllers.Base;
 using Amlakbashi.Host.Authentication;
+using Amlakbashi.Host.Extensions;
+using log4net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -21,14 +24,91 @@ namespace Amlakbashi.Host.Areas.App.Controllers
     {
         private readonly IUserAccessor userAccessor;
         private readonly IReserveAppService reserveService;
+        private readonly IAdvertiseAppService advertiseService;
+        private readonly IChatAppService chatService;
         private readonly IAccountingFacade accounting;
+        private readonly ILog logger;
         public AppReserveController(IUserAccessor userAccessor,
             IReserveAppService reserveService,
-            IAccountingFacade accounting)
+            IAdvertiseAppService advertiseService,
+            IChatAppService chatService,
+            IAccountingFacade accounting,
+            ILog logger)
         {
             this.userAccessor = userAccessor;
             this.reserveService = reserveService;
+            this.advertiseService = advertiseService;
+            this.chatService = chatService;
             this.accounting = accounting;
+            this.logger = logger;
+        }
+
+        [HttpGet]
+        [Authorize]
+        public ActionResult List(string reserve_id = "", int status = -1, int category = -1,
+            long initialPayId = 0, Reserve.ReserveManagerSelectType selectType = Reserve.ReserveManagerSelectType.All,
+            string msg = "")
+        {
+            try
+            {
+                var currentUser = userAccessor.CurrentUser;
+                if (reserve_id != null)
+                    reserve_id = StringUtility.PersianNumberToEnglish(reserve_id);
+                if (selectType == Reserve.ReserveManagerSelectType.All)
+                {
+                    selectType = currentUser.UserGeneralType > 0 ?
+                        Reserve.ReserveManagerSelectType.Host : Reserve.ReserveManagerSelectType.Guest;
+                }
+                Dictionary<Reserve.ReserveCategory, int> countDict;
+                var reserves = reserveService.GetReserveDashboardItems(currentUser,
+                    selectType, category, reserve_id, status, out countDict);
+                if (initialPayId > 0)
+                {
+                    var res = reserveService.Find(initialPayId);
+                    ViewBag.totalPrice = res.TotalPrice;
+                    ViewBag.depositePrice = res.DepositPrice;
+                }
+
+                var model = new List<ReserveDashboardItemDTO>();
+                var index = 0;
+                var isHost = selectType == Reserve.ReserveManagerSelectType.Host;
+                var isGuest = !isHost;
+                foreach (var reserve in reserves)
+                {
+                    var advertise = reserve.Advertise;
+                    var paidAmount = accounting.GetReservePaidAmount(reserve.Id, Reserve.StatusStringType.Guest);
+                    var unreadChatCount = chatService.GetNotReadCountByReserveId(reserve.Id, currentUser.Id);
+                    var rulesDict = advertiseService.GetRulesDictionary(advertise.Id);
+                    var item = ReserveDashboardItemDTO.Generate(
+                        reserve, index, isGuest, isHost, userAccessor.CurrentUser.Id,
+                        paidAmount + reserve.CouponPrice + reserve.PrizePrice,
+                        unreadChatCount, rulesDict);
+                    model.Add(item);
+                    index++;
+                }
+                long reserveIdLong = -1;
+                if (!string.IsNullOrEmpty(reserve_id))
+                    reserveIdLong = long.Parse(reserve_id);
+                ViewBag.user_id = userAccessor.CurrentUser.Id;
+                ViewBag.reserve_id = reserveIdLong <= 0 ? "" : reserve_id.ToString();
+                ViewBag.status = status;
+                ViewBag.category = category;
+                ViewBag.initialPayId = initialPayId;
+                ViewBag.selectType = selectType;
+                ViewBag.countDict = countDict;
+                ViewBag.msg = msg;
+                var payment_reserve_id = TempData.GetObjectFromJson<long>("payment_reserve_id");
+                if (payment_reserve_id > 0)
+                {
+                    ViewBag.paymentReserve = reserveService.Find(payment_reserve_id);
+                }
+                return View(model);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Reserve.ReserveItemManager", exc);
+                return StatusCode(404, "صفحه ی مورد نظر موجود نمی باشد .");
+            }
         }
 
         [HttpGet]

@@ -48,4 +48,5 @@ Disallow: /amlak/index
 Disallow: /amlak/edit
 Disallow: /content
 Disallow: /accomodation/preview
+Disallow: /app
 
