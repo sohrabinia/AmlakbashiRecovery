@@ -18,6 +18,7 @@ namespace Amlakbashi.Core.DTOs.HomePageDTOs
         public DynamicCategory category;
         public string categoryUrl;
         public string categoryH1Title;
+        public int RegionId { get; set; }
         public List<AccommodationCardDTO> AdvertiseItems { get; set; }
     }
 }

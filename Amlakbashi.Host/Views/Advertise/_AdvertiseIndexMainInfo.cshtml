@@ -1,0 +1,79 @@
+﻿@model Amlakbashi.Core.DTOs.AdvertiseDTOs.AdvertiseIndexDTO
+
+@if (Model.AdvertiseList.Any() == false)
+{
+    <p style="margin: 30px;">موردی برای نمایش وجود ندارد</p>
+}
+else
+{
+    var index = Model.PagingInfo.PageRowStart;
+    @foreach (var item in Model.AdvertiseList)
+    {
+        index++;
+        <aside class="admin-table-row" id="js-@item.Id">
+            <div class="column-row">
+                @index
+            </div>
+
+            <div class="column-id">
+                @item.Id
+            </div>
+
+            <div class="column-title">
+                @if (string.IsNullOrEmpty(item.Title) == false)
+                {
+                    <a href="/accomodation/adminpreview?id=@item.Id" target="_blank">@item.Title</a>
+                }
+            </div>
+
+            <div class="column-city">
+                @item.CityPersianName
+            </div>
+
+            <div class="column-user">
+                @if (item.UserId > 0)
+                {
+                    <div style="direction:ltr">
+                        <a target="_blank" href="/user/index?code=@item.UserId">@item.UserFullName</a>
+                        <br />@item.UserId
+                    </div>
+
+                }
+                else
+                {
+                    @: بدون کاربر
+                }
+            </div>
+
+            <div class="column-desc">
+                <div>
+                    <button onclick="showAddInfoDialog(@item.Id)" class="fa fa-plus" title="افزودن توضیحات"></button>
+                    <button onclick="showInfo(@item.Id)" class="fa fa-eye" title="نمایش توضیحات"></button>
+                </div>
+                <span class="js-info-count">(@item.SupportInfoCount توضیح)</span>
+            </div>
+
+            @* قسمت موارد بیشتر *@
+            <div class="column-more" onclick="showMoreOptionBox(this, @item.Id)">  <i class="fas fa-plus-square more-options-btn"></i></div>
+            <div class="box-more-options-container js-more-option"></div>
+        </aside>
+    }
+
+    <div action="newindex" paging-info="@Model.PagingInfo" parameters="new
+                    {
+                         Status = Model.Status,
+                         Type = Model.Type,
+                         UserId = Model.UserId,
+                         Province = Model.Province,
+                         City = Model.City,
+                         Area = Model.Area,
+                         Sort = Model.Sort,
+                         InstantReserveStatus = Model.InstatntReserveStatus,
+                         HygieneProtocolStatus = Model.HygieneProtocolStatus,
+                         MinReserveNorouzFromDate = Model.MinReserveNorouzFromDate,
+                         ImageCountMin = Model.ImageCountMin,
+                         ImageCountMax = Model.ImageCountMax
+                    }"></div>
+}
+
+

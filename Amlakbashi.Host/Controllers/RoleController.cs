@@ -19,14 +19,18 @@ namespace Amlakbashi.Host.Controllers
             this.userService = userService;
         }
 
+#if !DEBUG
         [Authorize(Policy = Policies.Roles_View)]
+#endif
         public IActionResult Index()
         {
             var roles = userService.GetAllRoles();
             return View(roles);
         }
 
+#if !DEBUG
         [Authorize(Policy = Policies.Roles_Edit)]
+#endif
         [HttpGet]
         public IActionResult EditUserRole(int userId)
         {
@@ -44,7 +48,9 @@ namespace Amlakbashi.Host.Controllers
             return View(dto);
         }
 
+#if !DEBUG
         [Authorize(Policy = Policies.Roles_Edit)]
+#endif
         [HttpPost]
         public IActionResult EditUserRole(string mainMobile, List<string> selectedRoles)
         {
@@ -52,7 +58,9 @@ namespace Amlakbashi.Host.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+#if !DEBUG
         [Authorize(Policy = Policies.Roles_View)]
+#endif
         public IActionResult RoleUserList(string roleName)
         {
             ViewBag.roleName = roleName;

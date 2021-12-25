@@ -22,7 +22,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
             int supporter_id = -1, int host_card_status = -1,
             int mainFilter = 0, int instantReserveFilter = 2,
             bool disableAutoCancel = false, bool accVisited = false);
-        void NewFilter(ReserveIndexDTO dto);
+        IList<Reserve> NewFilter(ReserveIndexDTO dto, int currentUserId);
         IList<Reserve> GetListByUserId(int userId, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, int category, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, Reserve.ReserveStatus status, bool RatingShownToGuest,

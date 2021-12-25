@@ -1,0 +1,112 @@
+﻿@model Amlakbashi.Core.DTOs.ReserveDTOs.InvoiceItemDTO
+
+@{
+    int? currentRowNumber =
+        ViewBag.currentRowNumber != null ?
+        ViewBag.currentRowNumber : null;
+}
+
+<div class="dashboard-table-row">
+    @if (currentRowNumber != null)
+    {
+        <span style="min-width:45px;width:45px;margin:0;" class="dashboard-table-cell">@currentRowNumber</span>
+    }
+    <span style="min-width:55px;width:55px;margin:0;" class="dashboard-table-cell">@Model.id</span>
+    <span style="min-width:65px;width:65px;margin:0;" class="dashboard-table-cell">@Model.stayDays شب</span>
+    <span style="min-width:65px;width:65px;margin:0;" class="dashboard-table-cell">@(Model.startDateString + " تا " + Model.endDateString)</span>
+    <span style="min-width:65px;width:65px;margin:0;" class="dashboard-table-cell">@(Model.createDateString)</span>
+    <span style="min-width:65px;width:65px;margin:0;" class="dashboard-table-cell">@Model.guestName</span>
+    <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">@(string.Format("{0:n0}", Model.totalPrice))<br />تومان</span>
+    @if (Model.guestPaidPrice <= 0)
+    {
+        <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">-</span>
+    }
+    else
+    {
+        <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">@(string.Format("{0:n0}", Model.guestPaidPrice))<br />تومان</span>
+    }
+    @if (Model.hostPaidPrice <= 0)
+    {
+        <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">-</span>
+    }
+    else
+    {
+        <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">@(string.Format("{0:n0}", Model.hostPaidPrice))<br />تومان</span>
+    }
+    @if (Model.guestPaidPrice + Model.hostPaidPrice <= 0)
+    {
+        <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">-</span>
+    }
+    else
+    {
+        <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">@(string.Format("{0:n0}", Model.sitePortion))<br />تومان</span>
+    }
+    @if (Model.instantReservePenaltyPrice <= 0)
+    {
+        <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">-</span>
+    }
+    else
+    {
+        <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">@(string.Format("{0:n0}", Model.instantReservePenaltyPrice))<br />تومان</span>
+    }
+    @if (Model.hostPayablePrice <= 0)
+    {
+        <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">-</span>
+    }
+    else
+    {
+        <span style="min-width:75px;width:75px;margin:0;" class="dashboard-table-cell">@(string.Format("{0:n0}", Model.hostPayablePrice))<br />تومان</span>
+    }
+    @if (Model.isCleared)
+    {
+        if (Model.hostPayablePrice == 0)
+        {
+            <span class="dashboard-table-cell" style="color:#34A853;min-width:105px;width:105px;margin:0;">-</span>
+        }
+        else if (Model.hostPayablePrice < 0)
+        {
+            <span class="dashboard-table-cell" style="color:#EA4335;min-width:105px;width:105px;margin:0;">شما مبلغ @(string.Format("{0:n0}", Model.sitePortion)) تومان بدهکار هستید</span>
+        }
+        else
+        {
+            <div class="dashboard-table-cell" style="min-width:105px;width:105px;margin:0;">
+                <span style="color:#34A853;">@Model.clearingDateString تسویه شده</span>
+                <span>کد پیگیری @Model.clearingTransactionId</span>
+            </div>
+        }
+    }
+    else
+    {
+        if (Model.clearingDate.Date > DateTime.Now.Date)
+        {
+            <span style="color:#4285F4;min-width:105px;width:105px;margin:0;" class="dashboard-table-cell">در تاریخ @(Amlakbashi.Core.Common.Utilities.DateTimeUtility.GregorianToPersianDate(Model.clearingDate)) تسویه خواهد شد</span>
+        }
+        else if (Model.clearingDate.Date == DateTime.Now.Date)
+        {
+            <span style="color:#4285F4;min-width:105px;width:105px;margin:0;" class="dashboard-table-cell">امروز تسویه خواهد شد</span>
+        }
+        else if (Model.guestPaidPrice <= 0 && Model.hostPaidPrice <= 0)
+        {
+            if (Model.hasInstantReservePenalty)
+            {
+                <span style="min-width:105px;width:105px;margin:0;" class="dashboard-table-cell">-</span>
+            }
+            else
+            {
+                <span style="color:#EA4335;min-width:105px;width:105px;margin:0;" class="dashboard-table-cell">لغو شده</span>
+            }
+        }
+        else
+        {
+            if (Model.hostPaidPrice >= Model.sitePortion)
+            {
+                <span style="min-width:105px;width:105px;margin:0;" class="dashboard-table-cell">-</span>
+            }
+            else
+            {
+                <span style="color:#EA4335;min-width:105px;width:105px;margin:0;" class="dashboard-table-cell">تسویه نشده</span>
+            }
+        }
+    }
+</div>
+

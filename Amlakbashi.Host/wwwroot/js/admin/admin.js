@@ -47,14 +47,33 @@ function closeNavigation(){
     $(".main-navigation_list-item").children(".style-submenu").addClass("js-submenu");
 };
 
+$(".js-filter-date-picker").persianDatepicker({
+    altField: '#to_date-alt',
+    format: 'YYYY/MM/DD',
+    altFormat: 'YYYY/MM/DD',
+    autoClose: true,
+    toolbox: {
+        calendarSwitch: { enabled: false },
+        todayButton: { enabled: true },
+        submitButton: { enabled: true, text: { fa: "بستن", en: close } }
+    },
+    navigator: {
+        scroll: { enabled: false },
+        text: { btnNextText: '<', btnPrevText: '>' },
+    },
+    initialValue: false
+});
+
 function showDarkBackground() {
-    $('.js-bg').addClass("bg-show-menu");
-    $('body').css("overflow", "hidden");
+    //$('.js-bg').addClass("bg-show-menu");
+    $('.js-loader').show();
+    //$('body').css("overflow", "hidden");
 }
 
 function hideDarkBackground() {
-    $('.js-bg').removeClass("bg-show-menu");
-    $('body').css("overflow", "auto");
+    //$('.js-bg').removeClass("bg-show-menu");
+    $('.js-loader').hide();
+    //$('body').css("overflow", "auto");
 }
 
 // more filter popup
@@ -106,9 +125,18 @@ function loadPopup(url) {
         }
         if (statusTxt == "error") {
             hidePopup();
-            errorAlert("عملیات با خطا مواجه شد");
+            if (xhr.status === 401) {
+                errorAlert("شما مجوز دسترسی به این قسمت را ندارید");
+            }
+            else {
+                errorAlert("عملیات با خطا مواجه شد");
+            }
         }
     });
+}
+function showPopup(content) {
+    popupMain.html(content);
+    popupContainer.fadeIn(100);
 }
 function hidePopup() {
     popupContainer.fadeOut(100, function () {
@@ -127,6 +155,14 @@ function backPopup() {
         popupBackBtn.hide();
     }
 }
+function submitPopup(url, successCallback) {
+    let form = popupMain.find('form');
+    if (form) {
+        let formData = form.serialize();
+        sendPostAjax(url, formData, successCallback, function () { popupLoader.show(); }, hidePopup);
+        //sendPostAjax(url, formData, successCallback, null, hidePopup);
+    }
+}
 
 // confirm
 let confirmContainer = $(".main .confirm-container");
@@ -135,20 +171,28 @@ let confirmMain = $(".main .confirm-container .confirm-content .confirm-main");
 let confirmAcceptCallback;
 function showConfirm(content, acceptCallback) {
     confirmMain.html(content);
-    if (acceptCallback !== undefined) {
+    if (typeof acceptCallback === 'function') {
         confirmAcceptCallback = acceptCallback;
     }
     confirmContainer.fadeIn(100);
 }
-function confirmReject() {
+function confirmReject(acceptCallback) {
     confirmContainer.fadeOut(100, function () {
         confirmMain.empty();
         confirmAcceptCallback = undefined;
+        if (typeof acceptCallback === 'function') {
+            acceptCallback();
+        }
     });
 }
 function confirmAccept() {
-    confirmAcceptCallback();
-    confirmReject();
+    if (typeof confirmAcceptCallback === 'function') {
+        confirmReject(confirmAcceptCallback);
+    }
+    else {
+        confirmReject();
+        errorAlert('اشکال در فراخوانی تابع');
+    }
 }
 
 // alert
@@ -170,44 +214,67 @@ function alertClose() {
     });
 }
 function errorAlert(content) {
+    if (!content) {
+        content = 'عملیات انجام نشد';
+    }
     showAlert(content, '#FF3C3C');
 }
 function successAlert(content) {
+    if (!content) {
+        content = 'عملیات با موفقیت انجام شد';
+    }
     showAlert(content, '#50C878');
 }
 
-// submit forms
-function submitForm(formId, url, successCallback, beforeCallback, completeCallback) {
-    var formData = $('#' + formId).serialize();
+// ajax
+function sendPostAjax(url, data, successCallback, beforeSendCallback, completeCallback) {
+    sendAjaxRequest(url, data, 'post', successCallback, beforeSendCallback, completeCallback);
+}
+
+function sendGetAjax(url, data, successCallback, beforeSendCallback, completeCallback) {
+    sendAjaxRequest(url, data, 'get', successCallback, beforeSendCallback, completeCallback);
+}
+
+function sendAjaxRequest(url, data, type, successCallback, beforeSendCallback, completeCallback) {
     $.ajax({
         url: url,
-        type: "post",
-        data: formData,
+        type: type,
+        data: data,
+        cache: false,
         beforeSend: function () {
-            if (beforeCallback != undefined) {
-                beforeCallback();
+            if (typeof beforeSendCallback === 'function') {
+                beforeSendCallback();
+            }
+            else {
+                showDarkBackground();
             }
         },
         success: function (response) {
-            if (successCallback != undefined) {
+            if (typeof successCallback === 'function') {
                 successCallback(response);
             }
             else {
-                if (response.status == 1) {
-                    alertify.success("عملیات با موفقیت انجام شد");
+                if (response.status === 1) {
+                    successAlert('عملیات با موفقیت انجام شد');
                 }
                 else {
-                    alertify.error(response.msg);
+                    errorAlert(response.msg);
                 }
             }
         },
         error: function (error) {
-            alertify.error("عملیات با خطا مواجه شد");
+            if (error.status === 401) {
+                errorAlert('شما مجوز دسترسی به این قسمت را ندارید');
+            }
+            else {
+                errorAlert('عملیات با خطا مواجه شد<br/>' + error.status + ' - ' + error.statusText + '<br/>' + error.responseText);
+            }
         },
         complete: function (response) {
-            if (completeCallback != undefined) {
+            hideDarkBackground();
+            if (typeof completeCallback === 'function') {
                 completeCallback();
             }
         }
-    })
+    });
 }

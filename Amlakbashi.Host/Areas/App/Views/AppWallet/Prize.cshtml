@@ -1,0 +1,7 @@
+﻿@{ 
+    ViewBag.Title = "هدیه سفر";
+    Layout = "_AppDashboardLayout";
+    ViewBag.presentandprize = true;
+}
+
+@await Html.PartialAsync("_PresentAndPrize", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "presentorCode", ViewBag.presentorCode }, { "refreshOnLogin", ViewBag.refreshOnLogin != null ? ViewBag.refreshOnLogin : false } })

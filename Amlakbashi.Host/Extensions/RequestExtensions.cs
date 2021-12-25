@@ -28,5 +28,12 @@ namespace Amlakbashi.Host.Extensions
         {
             return request.Headers["User-Agent"];
         }
+
+        public static bool IsAjaxRequest(this HttpRequest request)
+        {
+
+            return string.Equals(request.Query["X-Requested-With"], "XMLHttpRequest", StringComparison.Ordinal) ||
+                string.Equals(request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.Ordinal);
+        }
     }
 }

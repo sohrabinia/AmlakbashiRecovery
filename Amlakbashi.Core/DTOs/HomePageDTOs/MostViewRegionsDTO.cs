@@ -13,5 +13,6 @@ namespace Amlakbashi.Core.DTOs.HomePageDTOs
         public string Url { get; set; }
         public string CityName { get; set; }
         public string ImageName { get; set; }
+        public int RegionId { get; set; }
     }
 }

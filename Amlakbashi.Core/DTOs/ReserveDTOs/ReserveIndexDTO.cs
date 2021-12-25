@@ -8,15 +8,13 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
 {
     public class ReserveIndexDTO
     {
-        public IEnumerable<Reserve> ReserveList { get; set; }
-        public List<ReserveAdminItemDTO> Data { get; set; }
+        public List<ReserveAdminItemDTO> ReserveList { get; set; }
+        public PagingDTO PagingInfo { get; set; }
         public int Page { get; set; } = 1;
-        public int PageItemCount { get; set; } = 20;
-        public int RowIndexStart { get { return (Page * PageItemCount) - PageItemCount; } }
-        public long ReserveId { get; set; } = -1;
-        public long AdvertiseId { get; set; } = -1;
-        public int HostUserId { get; set; } = -1;
-        public int GuestUserId { get; set; } = -1;
+        public long ReserveId { get; set; } = 0;
+        public long AdvertiseId { get; set; } = 0;
+        public int HostUserId { get; set; } = 0;
+        public int GuestUserId { get; set; } = 0;
         public int ReserveStatus { get; set; } = -1;
         public int HostResponseStatus { get; set; } = -1;
         public int GeneralStatus { get; set; } = -1;
@@ -25,8 +23,8 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public string ReserveFromDate { get; set; } = "";
         public string ReserveToDate { get; set; } = "";
         public string ReserveEndDate { get; set; } = "";
-        public int StayDurationFrom { get; set; } = -1;
-        public int StayDurationTo { get; set; } = -1;
+        public int StayDurationFrom { get; set; } = 0;
+        public int StayDurationTo { get; set; } = 0;
         public int ReserveSupportStatus { get; set; } = 0;
         public bool ShouldFollow { get; set; } = false;
         public int SupporterId { get; set; } = -1;

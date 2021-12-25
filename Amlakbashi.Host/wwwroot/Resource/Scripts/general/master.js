@@ -375,6 +375,9 @@ function hidePresentPopup() {
 }
 
 function check_user_login() {
+    if ($('.master_header-account').hasClass('app')) {
+        return;
+    }
     myajax("user/isuserauthenticated", "", function (ret) {
         if (ret.val) {
             isUserLoggedIn = true;

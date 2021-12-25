@@ -1,0 +1,326 @@
+﻿@using Amlakbashi.Core.Common.Utilities;
+@model Amlakbashi.Core.DTOs.ReserveDTOs.ReserveDashboardItemDTO
+
+@{
+    string adv_link = string.Format("/{0}/{1}", "اجاره-روزانه", Model.advertiseSlug);
+    var img_src = Model.advertisePhotoId > 0 ? string.Format("/عکس-آگهی/{0}", Model.advertiseSlug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
+
+    var panedingList = new List<int>()
+    {
+        (int)Reserve.ReserveStatus.WaitForResponse,
+        (int)Reserve.ReserveStatus.WaitForReserve
+    };
+}
+
+<input type="hidden" class="js-reserve-item-index" value="@Model.index" />
+<input type="hidden" class="js-is_guest" value="@Model.isGuest.ToString()" />
+<input type="hidden" class="js-is_host" value="@Model.isHostler.ToString()" />
+<input type="hidden" class="js-user_id" value="@Model.userId.ToString()" />
+<div class="style-image-advertise">
+    <img src="@img_src" class="reserve-dashboard__image-room_reserve" style="cursor:pointer;" onclick="window.location.href='@adv_link'" />
+    <div class="reserve-dashboard__item-container-label reserve-dashboard__title_advertise">@Model.advertiseTitle</div>
+</div>
+<div class="wrapper-right__reserve @(Model.status == Reserve.ReserveStatus.Rejected && Model.paidAmount <= 0 ?"box-wrapper-right" :"")">
+    <div class="reserve-dashboard__wrapper-top">
+        <span class="dashboard-reserve__details-reserve">
+            <span class="reserve-dashboard__item-container-label status_reserve">وضعیت</span>
+            <span class="reserve-dashboard__item-container-status reserve-dashboard__item-container-labe" style="color:@Model.statusColor">@Model.statusString</span>
+        </span>
+        <span class="dashboard-reserve__details-reserve">
+            <span class="reserve-dashboard__item-container-label code_Reserve">کد رزرو</span>
+            <span class="reserve-dashboard__item-container-label">@Model.reserveId</span>
+        </span>
+        <span class="dashboard-reserve__details-reserve">
+            <span class="reserve-dashboard__item-container-label">کد آگهی</span>
+            <span class="reserve-dashboard__item-container-label">@Model.advertiseId</span>
+        </span>
+    </div>
+    <div class="reserve-dashboard__wrapper-middle">
+        <span class="reserve-dashboard__item-container-label"> از @Model.startDateString به مدت @Model.staydays شب - <strong class="enrolment-guest">@Model.guestCount نفر</strong></span>
+        <span class="reserve-dashboard__item-container-label">مبلغ رزرو: <span class="reserve-dashboard___price">@string.Format("{0:n0}", Model.totalPrice) تومان</span></span>
+    </div>
+    @if (Model.isGuest)
+    {
+        switch ((Reserve.ReserveStatus)Model.status)
+        {
+            case Reserve.ReserveStatus.Reserved:
+            case Reserve.ReserveStatus.Started:
+                <div class="reserve-dashboard__wrapper-bottom">
+                    <span class="reserve-dashboard__item-container-label">پرداختی شما: @string.Format("{0:n0}", Model.paidAmount) تومان</span>
+                    <span class="reserve-dashboard__item-container-label">  باقیمانده: @string.Format("{0:n0}", Model.remainedAmount) تومان</span>
+                </div>
+                break;
+        }
+    }
+    @if (Model.isHostler)
+    {
+        switch (Model.status)
+        {
+            case Reserve.ReserveStatus.Reserved:
+            case Reserve.ReserveStatus.Started:
+                <div class="reserve-dashboard__wrapper-bottom">
+                    <span class="reserve-dashboard__item-container-label">پرداختی مهمان :@string.Format("{0:n0}", Model.paidAmount) تومان </span>
+                    <span class="reserve-dashboard__item-container-label"> مبلغ باقیمانده: @string.Format("{0:n0}", Model.remainedAmount) تومان</span>
+                </div>
+                break;
+        }
+    }
+</div>
+<div class="reserve-dashboard__vetrical_line" style="display:@(((Model.status == Reserve.ReserveStatus.Rejected && Model.paidAmount <= 0) || (Model.status == Reserve.ReserveStatus.Rejected && Model.isGuest )) ? "none" : "flex")"></div>
+<div id="reserve-dashboard__item-container-button-container" data-id="@Model.reserveId" class="reserve-dashboard__item-container-button-container" style="display:@(((Model.status == Reserve.ReserveStatus.Rejected && Model.paidAmount <= 0) || (Model.status == Reserve.ReserveStatus.Rejected && Model.isGuest ))? "none" : "flex")">
+    @if (Model.isGuest)
+    {
+        switch (Model.status)
+        {
+            case Reserve.ReserveStatus.Reserved:
+            case Reserve.ReserveStatus.CashPay:
+            case Reserve.ReserveStatus.Started:
+            case Reserve.ReserveStatus.Completed:
+                <a class="billing_dashboard_reserve reserve-dashboard__item-container-button" target="_blank" href="/reserve/generateguestreceipt?reserve_id=@(Model.reserveId)">
+                    @*<i class="fa fa-clipboard-list"></i>*@
+                    صدور رسید رزرو
+                </a>
+                break;
+            case Reserve.ReserveStatus.WaitForReserve:
+                <a class="dashboard_reserve__billing reserve-dashboard__item-container-button" target="_blank" href="/reserve/generateguestreceipt?reserve_id=@(Model.reserveId)">
+                    @*<i class="fa fa-clipboard-list"></i>*@
+                    صدور پیش فاکتور
+                </a>
+                break;
+        }
+        if (panedingList.Contains((int)Model.status))
+        {
+            <div class="js-box-rules dashboard_reserve__rules reserve-dashboard__item-container-button">
+                <div id="js-showMassage-rules-@Model.reserveId" onclick='@(Html.Raw(String.Format("showRules({0}, {1})", Model.rulesString, Model.reserveId)))'>
+                    @*<i class="fa fa-list-alt"></i>*@
+                    قوانین اقامتگاه
+                </div>
+                <span></span>
+            </div>
+            @*<div style="display:none;">
+                    <div style="display:flex;flex-flow:column;">
+                        @Html.Raw(rules_string)
+                    </div>
+                </div>*@
+        }
+    }
+    @if (Model.isHostler)
+    {
+        if (Model.status == Reserve.ReserveStatus.WaitForResponse)
+        {
+            <div onclick="ReserveAccept(@(Model.reserveId),@((int)Reserve.HostResponseEnum.Accepted),@Model.advertiseId,@(Model.userId))" class="reserve-dashboard__accept_reserver reserve-dashboard__item-container-button">
+                @*<i class="fa fa-check"></i>*@
+                قبول درخواست رزرو
+            </div>
+            <div onclick="cancleReserve(@(Model.reserveId),@(Model.advertiseId))" class="reserve-dashboard__cancle_reserver reserve-dashboard__item-container-button">
+                @*<i class="fa fa-ban"></i>*@
+                رد درخواست رزرو
+            </div>
+        }
+        else if (Model.status == Reserve.ReserveStatus.CashPay)
+        {
+            <div onclick="confirmCashPay(@(Model.reserveId),true)" class="reserve-dashboard__item-container-button bottun_bill_reserve ">
+                @*<i class="fa fa-check"></i>*@
+                مبلغ را به صورت نقدی دریافت کردم
+            </div>
+            <div onclick="confirmCashPay(@(Model.reserveId),false)" class="reserve-dashboard__item-container-button bottun_bill_reserve">
+                @*<i class="fa fa-ban"></i>*@
+                مبلغ را به صورت نقدی دریافت نکردم
+            </div> 
+        }
+        else if (Model.status == Reserve.ReserveStatus.CancelRequestByHost)
+        {
+            <div onclick="refuseCancelReserve(@Model.reserveId,true)" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
+                انصراف از لغو
+            </div>
+        }
+        switch ((Reserve.ReserveStatus)Model.status)
+        {
+            case Reserve.ReserveStatus.Reserved:
+            case Reserve.ReserveStatus.CashPay:
+            case Reserve.ReserveStatus.Started:
+            case Reserve.ReserveStatus.CancelRequestByGuest:
+            case Reserve.ReserveStatus.CancelRequestByHost:
+                if (Model.paidAmount > 0)
+                {
+                    <div onclick="contactUser(@(Model.guestUserId), null, '',@Model.reserveId, @(Model.isGuest ? Json.Serialize(true) : Json.Serialize(false)))" class="reserve-dashboard__item-container-button reserve_dashboard__contactUser">
+                        @*<i class="fa fa-phone"></i>*@
+                        تماس با مهمان
+                    </div>
+                }
+                break;
+        }
+    }
+    @if (panedingList.Contains((int)Model.status))
+    {
+        @*<div class="bg-chat-reserve">
+            <div class="bg-chat"></div>*@
+        <div class="bg-chat-reserve"></div>
+        <div class="dashboard-reserve_chat-box">
+            <div class="reserve-header_chat-box">
+                @if (Model.audiencePhotoId > 0)
+                {
+                    <img class="reserve-chat-avatar" width="40" height="40" src="/عکس-پروفایل_کوچک-@(Model.audiencePhotoId)" />
+                }
+                else
+                {
+                    <i class="fa fa-user-circle"></i>
+                }
+                <i class="fa fa-times close-chat-box"></i>
+            </div>
+            <div class="reserve-main_chat-box"></div>
+            <div class="reserve-bottom_chat-box">
+                <i id="chat_box_button" onclick="sendMessage(@(Model.reserveId))" class="fa fa-play chat-reserve_icon"></i>
+                <input id="chat_box_input" class="chat-reserve__box-text" js-reserve-id="@(Model.reserveId)" onkeyup="chat_box_inputkeyup()" type="text" placeholder="پیام خود را اینجا بنویسید" />
+            </div>
+        </div>
+        if (Model.isHostler)
+        {
+            <div onclick="chat(@(Model.reserveId) ,this)" class="reserve-dashboard__item-container-button chat_button">
+                <div>
+                    @*<i class="fa fa-comments"></i>*@
+                    چت با مهمان
+                    @{
+                        if (Model.unreadChatCount > 0)
+                        {
+                            @:<span class="reserve-dashboard__new-message-text">&nbsp;@Model.unreadChatCount </span>
+                        }
+                    }
+                </div>
+            </div>
+        }
+        if (Model.isGuest)
+        {
+            <div onclick="chat(@(Model.reserveId),this)" class="reserve-dashboard__item-container-button  @( Model.status == Reserve.ReserveStatus.WaitForResponse ? "chat_button" : "chatButton")">
+                <div>
+                    @*<i class="fa fa-comments"></i>*@
+                    چت با میزبان
+                    @{
+                        if (Model.unreadChatCount > 0)
+                        {
+                            @:<span class="reserve-dashboard__new-message-text" style="color:white;">&nbsp;@Model.unreadChatCount</span>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    }
+    @if (Model.isGuest)
+    {
+        if (Model.status == Reserve.ReserveStatus.WaitForReserve)
+        {
+            <div onclick="payAndReserve(@Model.reserveId,@Model.totalPrice, @Model.depositePrice)" class="reserve_dashbpard__payment reserve-dashboard__item-container-button">
+                @*<i class="fa fa-credit-card"></i>*@
+                پرداخت
+            </div>
+            @*<div onclick="payAndReserveWithCredit(@Model.Id,@Model.TotalPrice, @Model.DepositPrice)" class="reserve-dashboard__item-container-button" style="background-color:#34A853">
+                    <i class="fa fa-money-bill-alt"></i>
+                    <span>پرداخت از کیف پول</span>
+                </div>*@
+        }
+        else if (Model.status == Reserve.ReserveStatus.Reserved ||
+            Model.status == Reserve.ReserveStatus.CashPay)
+        {
+            if (Model.paidAmount >= Model.totalPrice)
+            {
+                @*<span class="reserve-dashboard__item-container-hint">هنگام تحویل واحد روی دکمه <span style="color:#34A853">شروع سفر</span> کلیک کنید</span>*@
+                <div onclick="start(@Model.reserveId)" class="reserve-dashboard__item-container-button bottun_start_travel">
+                    @*<i class="fa fa-play"></i>*@
+                    شروع سفر
+                </div>
+            }
+            else
+            {
+                @*<span class="reserve-dashboard__item-container-hint">جهت تسویه حساب و تحویل واحد یکی از گزینه های زیر را انتخاب کنید</span>*@
+                <div onclick="payAndReserve(@Model.reserveId)" class="reserve-dashboard__item-container-button bottun_bill_reserve ">
+                    @*<i class="fa fa-credit-card"></i>*@
+                    تسویه
+                </div>
+                @*<div onclick="payWithCredit(1,@Model.Id,@Model.TotalPrice,@Model.DepositPrice,@Model.UserID,@payed_price)" class="reserve-dashboard__item-container-button" style="background-color:#34A853">
+                        <i class="fa fa-money-bill-alt"></i>
+                        <span>شروع سفر (پرداخت از کیف پول)</span>
+                    </div>*@
+                @*if (Model.Status != (int)Reserve.ReserveStatus.CashPay)
+                    {
+                        <div onclick="cashPay(@Model.Id)" class="reserve-dashboard__item-container-button bottun_bill_reserve ">
+                            <i class="fa fa-money"></i>
+                            <span>شروع سفر (تسویه نقدی با میزبان)</span>
+                        </div>
+                    }*@
+            }
+
+        }
+        else if (Model.status == Reserve.ReserveStatus.Started)
+        {
+            <div onclick="finish(@Model.reserveId)" class="reserve-dashboard__item-container-button bottun_end_reserve">
+                @*<i class="fa fa-flag-checkered"></i>*@
+                پایان سفر
+            </div>
+        }
+        else if (Model.status == Reserve.ReserveStatus.CancelRequestByGuest)
+        {
+            <div onclick="refuseCancelReserve(@Model.reserveId,false)" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
+                انصراف از لغو
+            </div>
+        }
+        @*else if (Model.Status == (int)Reserve.ReserveStatus.Completed)
+            {
+                <div onclick="rating(@Model.Id)" class="reserve-dashboard__item-container-button" style="background-color:#4285F4">
+                    <span>نظرسنجی</span>
+                </div>
+            }*@
+        if (Model.status == Reserve.ReserveStatus.Started ||
+            Model.status == Reserve.ReserveStatus.Completed)
+        {
+            <div class="reserve-dashboard__item-container-button @(Model.status == Reserve.ReserveStatus.Completed ? "dashboard-reserve__survey" : "reserve__survey")" onclick="rating(@Model.reserveId)">
+                نظرسنجی
+            </div>
+        }
+        switch ((Reserve.ReserveStatus)Model.status)
+        {
+            case Reserve.ReserveStatus.Reserved:
+            case Reserve.ReserveStatus.CashPay:
+            case Reserve.ReserveStatus.Started:
+            case Reserve.ReserveStatus.CancelRequestByGuest:
+            case Reserve.ReserveStatus.CancelRequestByHost:
+                //case Reserve.ReserveStatus.WaitForReserve:
+                if (Model.paidAmount >= Model.depositePrice)
+                {
+                    <div onclick="contactUser(@(Model.hostlerUserId),null,'@(Model.status == Reserve.ReserveStatus.WaitForReserve ? "مبلغ بیعانه را حتما به حساب سایت واریز کنید در غیر اینصورت هیچگونه مسئولیتی شامل حال املاک باشی نمیگردد" : "")', @Model.reserveId, @(Model.isGuest ? Json.Serialize(true) : Json.Serialize(false)))" class="reserve-dashboard__item-container-button @((Model.status == Reserve.ReserveStatus.Started) ? "call_contant" : "contentCall")">
+                        @*<i class="fa fa-phone"></i>*@
+                        تماس با میزبان
+                    </div>
+                }
+                break;
+        }
+    }
+    @if (Model.cancelIsAvailable)
+    {
+<div onclick="cancelReserve(@Model.reserveId,@(Model.isHostler ? "true" : "false"), @(Model.instantReserve ? "true" : "false"), @((int)Model.status > 4 && (int)Model.status < 9 ? "true" : "false"))" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
+    @*<i class="fa fa-times"></i>*@
+    @if (Model.status == Reserve.ReserveStatus.WaitForReserve || Model.status == Reserve.ReserveStatus.WaitForResponse)
+    {
+        @:لغو رزرو
+    }
+    else
+    {
+        @:درخواست لغو رزرو
+    }
+</div>
+    }
+    @if (Model.isHostler && Model.status != Reserve.ReserveStatus.Rejected)
+    {
+        <div onclick="showInvoicePopup(@Model.reserveId)" class="bill_reserve reserve-dashboard__item-container-button">
+            @*<i class="fa fa-clipboard-list"></i>*@
+            صورت حساب رزرو
+        </div>
+    }
+
+    @if (Model.status == Reserve.ReserveStatus.Rejected && Model.paidAmount > 0)
+    {
+        <div onclick="showInvoicePopup(@Model.reserveId)" class="bill_reserve reserve-dashboard__item-container-button">
+            @*<i class="fa fa-clipboard-list"></i>*@
+            صورت حساب رزرو
+        </div>
+    }
+</div>

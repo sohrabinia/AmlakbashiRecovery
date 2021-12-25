@@ -92,13 +92,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveSupportManager
             }
         }
 
-        public SupporterStatus Analyze(long reserveId,
-            out ReserveSupport currentReserveSupport, int yourUserID = 0)
-        {
-            var supports = reserveSupportService.GetRelatedSupports(reserveId);
-            return Analyze(reserveId, supports, out currentReserveSupport, yourUserID);
-        }
-
         public SupporterStatus Analyze(Reserve reserve,
             out ReserveSupport currentReserveSupport, int yourUserID = 0)
         {
@@ -106,9 +99,8 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveSupportManager
             return Analyze(reserve.Id, supports, out currentReserveSupport, yourUserID);
         }
 
-        public SupporterStatus Analyze(long reserveId,
-    IList<ReserveSupport> supports,
-out ReserveSupport currentReserveSupport, int yourUserID = 0)
+        public SupporterStatus Analyze(long reserveId, IList<ReserveSupport> supports, 
+            out ReserveSupport currentReserveSupport, int yourUserID = 0)
         {
             if (!supports.Any() || !supports.Any(x => x.SupporterID > 0))
             {
@@ -237,14 +229,6 @@ out ReserveSupport currentReserveSupport, int yourUserID = 0)
             }
             reserveSupportService.Update(currentSupport);
             reserveSupportService.UpdateSupporterSupportsActionDate(supporterId);
-        }
-
-        public bool IsInSupporterStatus(long reserveId,
-            SupporterStatus supporterStatus, int yourUserID)
-        {
-            var reserve = reserveService.Find(reserveId);
-            return IsInSupporterStatus(reserve,
-                supporterStatus, yourUserID);
         }
 
         public bool IsInSupporterStatus(Reserve reserve,

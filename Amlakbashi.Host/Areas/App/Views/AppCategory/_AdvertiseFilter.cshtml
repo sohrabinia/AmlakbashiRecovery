@@ -1,0 +1,44 @@
+﻿@using Amlakbashi.Core.DTOs.CategoryDTOs;
+
+@model CategoryItemDTO
+
+<form style="display:none;" id="advertise-filter-form" class="advertise-filter__form" target="_top" action="/app/category/category">
+    <input type="hidden" name="page" value="1" />
+    <input type="hidden" name="norouz_special" value="@(Model.NorouzSpecial.ToString())" />
+    <input type="hidden" name="discount_homes" value="@(Model.DiscountHomes.ToString())" />
+    <input type="hidden" name="instant_reserve" value="@(Model.InstantReserve.ToString())" />
+    <input type="hidden" name="today_empty_homes" value="@(Model.TodayEmptyHomes.ToString())" />
+    <input type="hidden" name="hygieneProtocol" value="@(Model.HygieneProtocol.ToString())" />
+    <input type="hidden" name="country_direction" value="@((int)Model.Category.CountryDirection)" />
+    <input type="hidden" name="Province" value="@Model.Category.Province" />
+    <input type="hidden" name="City" value="@Model.Category.City" />
+    <input type="hidden" name="Area" value="@Model.Area" />
+    <input type="hidden" name="capacity" id="js-capacity-input-filter" value="@(Model.Capacity == null ? -1 : Model.Capacity)" />
+    <input type="hidden" name="empty_range_from" id="from_date_date_picker-filter" value="@(string.IsNullOrEmpty(Model.EmptyRangeFrom) == false ? Model.EmptyRangeFrom : "")" />
+    <input type="hidden" name="empty_range_to" id="to_date_date_picker-filter" value="@(string.IsNullOrEmpty(Model.EmptyRangeTo) == false ? Model.EmptyRangeTo : "")" />
+    <input type="hidden" name="Type" id="js-acctype-input-filter" value="@Model.Type" />
+    <input type="hidden" name="t" id="js-t-input-filter" value="@Model.T" />
+    <input type="hidden" name="region" id="js-position-input-filter" value="@(Model.Region == null ? "-1" : Model.Region)" />
+    <input type="hidden" name="frompaypernight" id="js-pricemin-input-filter" value="@(Model.FromPayPerNight == null ? "-1" : Model.FromPayPerNight)" />
+    <input type="hidden" name="topaypernight" id="js-pricemax-input-filter" value="@(Model.ToPayPerNight == null ? "-1" : Model.ToPayPerNight)" />
+    <input type="hidden" name="room" id="js-room-input-filter" value="@(Model.Room == null ? "-1" : Model.Room)" />
+    <input type="hidden" name="roomList" id="js-roomlist-input-filter" value="@(string.IsNullOrEmpty(Model.RoomList) ? "" : Model.RoomList)" />
+    <input type="hidden" name="parking" id="js-parking-input-filter" value="@(Model.Parking < 1 ? "-1" : Model.Parking)" />
+    <input type="hidden" name="pool" id="js-pool-input-filter" value="@(Model.Pool == null ? "-1" : Model.Pool)" />
+    <input type="hidden" name="elevator" id="js-elevator-input-filter" value="@(Model.Elevator == null ? "-1" : Model.Elevator)" />
+    <input type="hidden" name="priceRangeType" id="js-pricetype-input-filter" value="@(Model.PriceRangeType)" />
+    <input type="hidden" name="perWC" id="js-perwc-input-filter" value="@(Model.WcType == 127 || Model.WcType == 128 ? "1" : "0")" />
+    <input type="hidden" name="euWC" id="js-euwc-input-filter" value="@(Model.WcType == 129 || Model.WcType == 128 ? "1" : "0")" />
+    <input type="hidden" name="wifi" id="js-wifi-input-filter" value="@(Model.Wifi)" />
+    <input type="hidden" name="washingMachine" id="js-washingmachine-input-filter" value="@(Model.WashingMachine)" />
+    <input type="hidden" name="jacuzzi" id="js-jacuzzi-input-filter" value="@(Model.Jacuzzi)" />
+    <input type="hidden" name="poolTable" id="js-pooltable-input-filter" value="@(Model.PoolTable)" />
+    <input type="hidden" name="foosball" id="js-foosball-input-filter" value="@(Model.Foosball)" />
+    <input type="hidden" name="teaMaker" id="js-teamaker-input-filter" value="@(Model.TeaMaker)" />
+    <input type="hidden" name="rules_pets" id="js-pets-input-filter" value="@(Model.RulesPets)" />
+    <input type="hidden" name="rules_party" id="js-party-input-filter" value="@(Model.RulesParty)" />
+    <input type="hidden" name="rules_smoking" id="js-smoking-input-filter" value="@(Model.RulesSmoking)" />
+    <input type="hidden" name="sort" id="js-sort-order-input-filter" value="@(Model.Sort)" />
+    <input type="hidden" name="phrase" id="js-phrase-input-filter" value="@(Model.Phrase != null ? Model.Phrase : "")" />
+    <input type="hidden" name="ajax" id="js-ajax-filter" value="true" />
+</form>

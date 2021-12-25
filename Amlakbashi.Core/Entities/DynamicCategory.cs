@@ -68,16 +68,11 @@ namespace Amlakbashi.Core.Entities
             return (DynamicCategory)this.MemberwiseClone();
         }
 
-        public static List<DynamicCategory> GetListClone(List<DynamicCategory> source)
+        public int GetRegionId()
         {
-            return source.Select(item => item.Clone())
-                    .ToList();
-        }
-
-        public enum CalculationBehaviour
-        {
-            Auto = 0,
-            Manual = 1
+            return Area != null ? (int)Area :
+                City != null ? (int)City :
+                Province != null ? (int)Province : 0;
         }
     }
 }

@@ -265,7 +265,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
 #if DEBUG
-        [Authorize(Roles = Roles.TechnicalManager + "," + Roles.TechnicalEmployee)]
+        //[Authorize(Roles = Roles.TechnicalManager + "," + Roles.TechnicalEmployee)]
         public ActionResult LocalPay(int payment_id)
         {
             try

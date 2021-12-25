@@ -42,7 +42,7 @@
             <div class="comment__new-item">
                 <div class="comment__new-label">متن نظر خود را @(comment == null || string.IsNullOrEmpty(comment.Text) ? "وارد" : "ویرایش") کنید</div>
                 <div class="comment__new-value">
-                    <textarea name="text" class="js-cm-text">@(comment != null ? comment.Text : "")</textarea>
+                    <textarea style="width:472px; height:107px;" name="text" class="js-cm-text">@(comment != null ? comment.Text : "")</textarea>
                 </div>
             </div>
             <div class="comment__new-submit">

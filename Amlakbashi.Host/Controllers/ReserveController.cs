@@ -267,7 +267,6 @@ namespace Amlakbashi.Host.Controllers
                     resIndex++;
                 }
                 ViewBag.reserveAdmin = dto;
-
                 ViewBag.RowIndexStart = (PageNumber * itemPerPage) - itemPerPage;
                 return View(onePageOfModel);
             }
@@ -283,104 +282,7 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                reserveService.NewFilter(dto);
-                var model = dto.ReserveList.AsQueryable();
-
-                if (dto.ReserveSupportStatus > 0)
-                {
-                    var st = (ReserveSupport.SupporterStatus)dto.ReserveSupportStatus;
-                    if (st == ReserveSupport.SupporterStatus.SupportingByYou)
-                    {
-                        dto.SupporterId = userAccessor.CurrentUser.Id;
-                    }
-                    else
-                    {
-                        if (st != ReserveSupport.SupporterStatus.Done)
-                        {
-                            dto.SupporterId = -1;
-                        }
-                        var now = DateTime.Now.Date;
-                        model = model.Where(x => x.EndDate > now);
-                        model = model.Where(x => x.Status != Reserve.ReserveStatus.Deleted);
-                        model = reserveSupportManager.FilterBySupporterStatus(
-                            userAccessor.CurrentUser.Id, model, st);
-                    }
-                }
-                if (dto.SupporterId > 0)
-                {
-                    IList<ReserveSupport> reserveSupports = reserveSupportService.GetListBySupporterId(dto.SupporterId);
-                    var reserve_ids = new List<long>();
-                    foreach (var reserveSupport in reserveSupports)
-                    {
-                        reserve_ids.AddRange(reserveSupport.GetAllReserveIds());
-                    }
-                    reserve_ids = reserve_ids.Distinct().ToList();
-                    model = model.Where(x => x.Status != Reserve.ReserveStatus.Deleted);
-                    model = model.Where(x => reserve_ids.Contains(x.Id));
-                }
-
-                List<Reserve> finalModel;
-                if (dto.HostCardStatus > -1)
-                {
-                    IQueryable<BankCard> bankCards = bankCardService.GetAll();
-                    var filteredIds = new List<long>();
-                    BankCard bankCard;
-                    if (dto.HostCardStatus == 0) //shaba
-                    {
-                        foreach (var item in model)
-                        {
-                            bankCard = bankCards.FirstOrDefault(x => x.UserID == item.Advertise.UserID);
-                            if (bankCard != null &&
-                                !string.IsNullOrEmpty(bankCard.ShabaNumber))
-                            {
-                                filteredIds.Add(item.Id);
-                            }
-                        }
-                    }
-                    else if (dto.HostCardStatus == 1) // bank card
-                    {
-                        foreach (var item in model)
-                        {
-                            bankCard = bankCards.FirstOrDefault(x => x.UserID == item.Advertise.UserID);
-                            if (bankCard != null &&
-                                string.IsNullOrEmpty(bankCard.ShabaNumber) &&
-                                !string.IsNullOrEmpty(bankCard.BankCardNumber))
-                            {
-                                filteredIds.Add(item.Id);
-                            }
-                        }
-                    }
-                    else if (dto.HostCardStatus == 2) // none
-                    {
-                        foreach (var item in model)
-                        {
-                            bankCard = bankCards.FirstOrDefault(x => x.UserID == item.Advertise.UserID);
-                            if (bankCard == null ||
-                                (string.IsNullOrEmpty(bankCard.ShabaNumber) &&
-                                string.IsNullOrEmpty(bankCard.BankCardNumber)))
-                            {
-                                filteredIds.Add(item.Id);
-                            }
-                        }
-                    }
-                    model = model.Where(x => filteredIds.Contains(x.Id));
-                    finalModel = model.ToList();
-                    foreach (var item in finalModel)
-                    {
-                        item.Temp_HostPayablePrice = PriceUtility.CalculateHostPayablePrice(item.TotalPrice,
-                            accounting.GetReservePaidAmount(item.ReservePayments.ToList(),
-                                StatusStringType.Guest),
-                            item.CouponPrice, item.PrizePrice);
-                    }
-                    finalModel = finalModel.OrderByDescending(x => x.Temp_HostPayablePrice).ToList();
-                }
-                else
-                {
-                    model = model.OrderByDescending(x => x.Id);
-                    finalModel = model.ToList();
-                }
-
-                dto.ReserveList = finalModel.ToPagedList(dto.Page, dto.PageItemCount);
+                var reserves = reserveService.NewFilter(dto, userAccessor.CurrentUser.Id);
 
                 var supporterList = new List<UserFullNameDTO>();
                 var supporters = userService.GetAllEmployees().Select(s => s.PhoneNumber);
@@ -392,30 +294,25 @@ namespace Amlakbashi.Host.Controllers
                 }
                 dto.SupporterList = supporterList;
 
-                dto.Data = new List<ReserveAdminItemDTO>();
-                var list = dto.ReserveList.ToList();
+                dto.ReserveList = new List<ReserveAdminItemDTO>();
                 ReserveSupport tempCurrentReserveSupport;
                 bool refundDone;
                 var currentUserId = userAccessor.CurrentUser.Id;
-                var reserveToCheck = reserveService.GetReservesIncludingSupport(list.Select(s => s.Id).ToList()).ToList();
-                var resIndex = 0;
-                foreach (var checkItem in reserveToCheck)
+                foreach (var item in reserves)
                 {
-                    var item = list[resIndex];
-                    dto.Data.Add(ReserveAdminItemDTO.Generate(item,
-                        reserveSupportManager.Analyze(checkItem, out tempCurrentReserveSupport, currentUserId),
+                    dto.ReserveList.Add(ReserveAdminItemDTO.Generate(item,
+                        reserveSupportManager.Analyze(item, out tempCurrentReserveSupport, currentUserId),
                         accounting.GetReservePaidAmount(item.ReservePayments.ToList(), StatusStringType.Guest),
                         accounting.ReserveCanClear(item.Id),
                         accounting.ReserveShouldRefund(item.Id, item.Status, out refundDone), refundDone));
-                    resIndex++;
                 }
 
                 return View(dto);
             }
             catch (Exception exc)
             {
-                logger.Error("Reserve.Index", exc);
-                return Redirect(Request.Headers["referer"].ToString());
+                logger.Error("Reserve.NewIndex", exc);
+                return View();
             }
         }
 
@@ -2822,18 +2719,24 @@ namespace Amlakbashi.Host.Controllers
             {
                 return GenerateJsonResult(new { status = 0, msg = "لطفا کد را وارد کنید" });
             }
-            if (code.ToLower() != "inst8" && code.ToLower() != "amb5")
+            var lowerCode = code.ToLower();
+            var discountCodeType = lowerCode == "amb5" ? DiscountCoupon.DiscountCouponType.Moupon :
+                lowerCode == "inst8" ? DiscountCoupon.DiscountCouponType.Instagram : DiscountCoupon.DiscountCouponType.Unset;
+            
+            if (discountCodeType == DiscountCoupon.DiscountCouponType.Unset)
             {
                 return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
             }
+
             var startDate = DateTime.Parse("10/28/2020");
             var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
-            if (identityUser.CreateDate.Value.Date < startDate.Date)
+            if ((discountCodeType == DiscountCoupon.DiscountCouponType.Moupon ||
+                discountCodeType == DiscountCoupon.DiscountCouponType.Instagram) &&
+                identityUser.CreateDate.Value.Date < startDate.Date)
             {
-                return GenerateJsonResult(new { status = 0, msg = "شما مجوز استفاده از کد تخفیف را ندارید" });
+                return GenerateJsonResult(new { status = 0, msg = "شما مجوز استفاده از این کد تخفیف را ندارید" });
             }
-            var discountCodeType = code.ToLower() == "amb5" ? DiscountCoupon.DiscountCouponType.Moupon :
-                DiscountCoupon.DiscountCouponType.Instagram;
+            
             var coupon = accounting.FindDiscountCoupon(userAccessor.CurrentUser.Id, discountCodeType);
             if (coupon == null)
             {
@@ -2843,7 +2746,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 if (coupon.UsingReserveID > 0)
                 {
-                    return GenerateJsonResult(new { status = 0, msg = "این کد استفاده شده است" });
+                    return GenerateJsonResult(new { status = 0, msg = "این کد تخفیف استفاده شده است" });
                 }
             }
             var reserve = reserveService.Find(reserveId);

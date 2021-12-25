@@ -16,5 +16,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         IList<ReserveSupport> GetRelatedSupports(long reserveId);
         IList<ReserveSupport> GetRelatedSupports(Reserve reserve);
         IList<ReserveSupport> GetListBySupporterId(int supporterId);
+        IQueryable<Reserve> FilterBySupporterStatus(int yourUserID,
+            IQueryable<Reserve> reserves, ReserveSupport.SupporterStatus supporterStatus);
+        bool IsInSupporterStatus(Reserve reserve,
+            ReserveSupport.SupporterStatus supporterStatus, int yourUserID);
     }
 }

@@ -1,0 +1,597 @@
+﻿@using Entities = Amlakbashi.Core.Entities;
+@using Amlakbashi.Host.Authentication;
+@inject IUserAccessor userAccessor;
+
+<!DOCTYPE html>
+<html class="theme3">
+<head>
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    @*<script async src="https://www.googletagmanager.com/gtag/js"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
+          gtag('config', 'AW-706947688');
+        @RenderSection("GtagAddition", false)
+        </script>*@
+    <!-- Event snippet for Purchased (Tracking) conversion page -->
+    @*<script>
+        gtag('event', 'conversion', {
+            'send_to': 'AW-850965714/5NVbCJTHpZ0BENLp4pUD',
+            'transaction_id': ''
+        });
+        </script>*@
+    <title>@ViewBag.Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="offline" href="/offline.html">
+    <meta name="theme-color" content="#fdd835" />
+    <link rel='index' title='املاک باشی' href='@string.Format("http{0}://{1}", Context.Request.Scheme, Context.Request.Host)' />
+    <meta name="viewport" content="width=device-width, minimum-scale=0.25, maximum-scale=1.0, initial-scale=1.0" />
+    <meta name="coverage" content="Worldwide" />
+    <meta name="robots" content="index,follow,all" />
+    <meta name="googlebot" content="index,follow" />
+    <meta name="revisit-after" content="1 days" />
+    <meta name="alexaVerifyID" content="jz4RhWgXn7cMuI-LPQu9Xi3BmX4" />
+    <meta name="msvalidate.01" content="0035A31DCA7DA125B1F904CB5DE15660" />
+    @if (ViewBag.keywords != null)
+    {
+        <meta name="keywords" content="@ViewBag.keywords" />
+    }
+    else
+    {
+        <meta name="keywords" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
+    }
+    @if (ViewBag.Description != null)
+    {
+        <meta name="description" content="@ViewBag.Description" />
+    }
+    else
+    {
+        <meta name="description" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
+    }
+    <meta name="enamad" content="344312021" />
+    <environment include="Development">
+        <link rel="stylesheet" type="text/css" href="/resource/dailyrent.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/tmmegamenu/css/tmmegamenu.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/bootstrap/css/bootstrap-rtl.min.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/ticker/ticker-style.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/chosen_v1.4.2/chosen.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.default.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.core.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/intlTelInput.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/login-Popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/dashboard.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/chat-popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/message-popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/loader.min.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/jquery-confirm/jquery-confirm.min.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/rating/themes/fontawesome-stars.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/star-rating/star-rating.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/jalali-date-picker.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/dashboardAccount.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/popup-calendar.css" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" type="text/css" href="/css/dashboard.min.css" asp-append-version="true">
+    </environment>
+    @RenderSection("StyleLink", required: false)
+    @RenderSection("StyleBlock", required: false)
+</head>
+<body>
+    @{
+        ViewBag.MessageCount = 0;
+        var selectType = ViewBag.selectType;
+    }
+    @await Html.PartialAsync("_LoginPopup")
+    <div id="loading-icon" class="loading-contianer" style="z-index:2147483647">
+        <div class="ui active large loader loading-icon"></div>
+    </div>
+    <div class="page">
+        <div class="js-bg"></div>
+        <header class="dashboard_header-style">
+            <div class="account-box-style">
+                <i class="fas fa-bars js-berger-menu"></i>
+            </div>
+            <a class="header-logo-style" asp-area="app" asp-controller="home" asp-action="main">
+                <img srcset="~/Resource/img/amlakbashi-logo-900w.png 900w,
+                ~/Resource/img/amlakbashi-logo-680w.png 680w"
+                     sizes="(max-width: 500px) 680px,
+                    900px"
+                     src="~/Resource/img/amlakbashi-logo-900w.png"
+                     alt="logo">
+            </a>
+            <a href="@(userAccessor.CurrentUser.UserGeneralType != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? "/app/reserve/list?category=0&selectType=2" : "/app/reserve/list?category=1&selectType=1")" class="add-advertise-box">
+                <p class="add-advertise-style"> رزرو های من </p>
+            </a>
+        </header>
+        <div class="body">
+            <nav class="dashboard__navigatoin js-show-menu">
+                <ul class="dashboard-main-navigation_list">
+                    <li class="main-navigation_list-item list-item__account-style">
+                        @if (User.Identity.IsAuthenticated &&
+                        userAccessor.CurrentUser.PhotoID > 0)
+                        {
+                            <img width="48" height="48" src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=200", userAccessor.CurrentUser.PhotoID)' alt="avatar" class="list-item__avatar">
+                        }
+                        else
+                        {
+                            <i class="fa fa-user-circle list-item__avatar"> </i>
+                        }
+                        @*<i class="fa fa-plus-circle  add-profile" aria-hidden="true"></i>*@
+                        <P>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                if (string.IsNullOrEmpty(userAccessor.CurrentUser.FullName))
+                                {
+                                    @: کاربر @userAccessor.CurrentUser.Id
+                                }
+                                else
+                                {
+                                    @userAccessor.CurrentUser.FullName
+                                }
+                            }
+                            else
+                            {
+                                @:حساب کاربری
+                            }
+                        </P>
+                    </li>
+                    <li class="main-navigation_list-item"><a asp-area="app" asp-controller="home" asp-action="main"><i class="fa fa-home"></i> صفحه اصلی</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.dashboard != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="home" asp-action="dashboard"><i class="fa fa-tachometer-alt"></i> حساب کاربری</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.advertise!=null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="updatebasic"><i class="fa fa-plus"></i> افزودن آگهی</a></li>
+                    @if (userAccessor.CurrentUser.UserGeneralType != (int)Entities.User.UserGeneralTypeEnum.Guest)
+                    {
+                        <li class="main-navigation_list-item @(ViewBag.personal != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="list"><i class="fas fa-list-alt"></i> آگهی های من</a></li>
+                        <li class="main-navigation_list-item @(ViewBag.advertise_comment != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="comment" asp-action="list"><i class="fa fa-th-list"></i> نظرات آگهی ها <vc:not-seen-comment-count></vc:not-seen-comment-count></a></li>
+                    }
+                    @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+                    {
+                        <li class="main-navigation_list-item @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="list" asp-route-selecttype="1" asp-route-category="1"><i class="fa fa-book"></i> رزرو ها</a></li>
+                    }
+                    else
+                    {
+                        <li class="main-navigation_list-item @(ViewBag.reserveHost != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="list" asp-route-selecttype="2" asp-route-category="0"><i class="fa fa-book"></i> رزرو بعنوان میزبان </a></li>
+                        <li class="main-navigation_list-item  @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="list" asp-route-selecttype="1" asp-route-category="1"><i class="fa fa-book"></i> رزرو به عنوان مهمان</a></li>
+                    }
+                    @if (userAccessor.CurrentUser.UserGeneralType > 0)
+                    {
+                        <li class="main-navigation_list-item @(ViewBag.Invoice != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="invoice"><i class="fa fa-list"></i> صورت حساب رزرو ها</a></li>
+                    }
+                    <li class="main-navigation_list-item @(ViewBag.presentandprize != null ? "menu__item--active " : "")"><a asp-area="app" asp-controller="wallet" asp-action="prize"><i class="fas fa-gift"></i> هدیه سفر</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.profile != null ? "menu__item--active " : "")"><a asp-area="app" asp-controller="user" asp-action="profilemanager"><i class="fas fa-user"></i>پروفایل من</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.UserCredit != null ? "menu__item--active " : "")"><a asp-area="app" asp-controller="wallet" asp-action="userwalletmanager"><i class="fa fa-money-bill-alt"></i> کیف پول</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.favorite != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="favorites"><i class="fas fa-heart"></i> علاقه مندی های من</a></li>
+                    <li class="main-navigation_list-item"><a asp-area="app" asp-controller="user" asp-action="signout"><i class="fas fa-sign-out-alt"></i>خروج از حساب کاربری</a></li>
+                </ul>
+            </nav>
+            <main class="main">
+                <div class="main-top-space" style="height:10px; width:100% ;">
+                </div>
+                @RenderBody()
+            </main>
+        </div>
+        <div class="footer">
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty((string)ViewBag.alert_msg))
+    {
+        <div class="alert-msg">
+            <div class="alert__text black">
+                @ViewBag.alert_msg
+            </div>
+            <button onclick="close_alert()" class="alert__btn">بستن</button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty((string)ViewBag.alert_success))
+    {
+        <div class="alert-msg">
+            <div class="alert__text" style="color:green;">
+                @ViewBag.alert_success
+            </div>
+            <button onclick="close_alert()" class="alert__btn">بستن</button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty((string)ViewBag.alert_error))
+    {
+        <div class="alert-msg">
+            <div class="alert__text" style="color:red;">
+                @ViewBag.alert_error
+            </div>
+            <button onclick="close_alert()" class="alert__btn">بستن</button>
+        </div>
+    }
+
+    <environment include="Development">
+        <script src="/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
+        <script src="/lib/dropzone/dropzone.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/jquery.maskedinput.min.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/jquery.nicescroll.min.js" asp-append-version="true"></script>
+        <script src="/resource/ticker/jquery.ticker.js" asp-append-version="true"></script>
+        <script src="/resource/chosen_v1.4.2/chosen.jquery.min.js" asp-append-version="true"></script>
+        <script src="/resource/alertify.js-0.3.11/src/alertify.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/lazy-loading.js" asp-append-version="true"></script>
+        <script src="/resource/jquery-confirm/jquery-confirm.min.js" asp-append-version="true"></script>
+        <script src="/resource/persian-date-picker/persian-datepicker.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-converter.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-handler.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-picker.js" asp-append-version="true"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.js" asp-append-version="true"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.plus.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/jquery.plugin.min.js" asp-append-version="true"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.all.js" asp-append-version="true"></script>
+        <script src="/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.persian.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/jquery.onmutate.min.js" asp-append-version="true"></script>
+        <script src="/resource/rating/jquery.barrating.min.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/ajax-helper.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/client-helper.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/detail-button.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/increase-decrease-button.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/input-validation-helper.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/loading-indicator.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/login/intlTelInput.min.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/login/login-popup.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/more-text-button.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/price-string-generator.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/rating-detail.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/string-replace-all.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/textarea-autoexpand.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/user-rating.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/message-popup.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/confirm-alert-helper.js" asp-append-version="true"></script>
+        <script src="/scripts/jquery.unobtrusive-ajax.min.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/dashboard-navigation.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/registerEmail.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/dashboard.min.js" asp-append-version="true"></script>
+    </environment>
+    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-database.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyCaqJAXNu2zAqMJLqk1EF45PAx6QYtcqZg",
+            authDomain: "amlakbashi-7e6b2.firebaseapp.com",
+            databaseURL: "https://amlakbashi-7e6b2.firebaseio.com",
+            projectId: "amlakbashi-7e6b2",
+            storageBucket: "amlakbashi-7e6b2.appspot.com",
+            messagingSenderId: "173434342546"
+        };
+        firebase.initializeApp(config);
+    </script>
+    @RenderSection("ScriptLink", required: false)
+    <script type="text/javascript">
+        function open_menu() {
+            $(".menu").removeClass("menu--close");
+            $(".open-menu-dashboard").hide();
+            $(".close-menu-dashboard").show();
+        }
+
+        function close_menu() {
+            $(".menu").addClass("menu--close");
+            $(".open-menu-dashboard").show();
+            $(".close-menu-dashboard").hide();
+        }
+
+        function AdvanceSearch() {
+            $("#AdvanceSearchForm").submit();
+        }
+
+        function AdvanceSearchMobile($this) {
+            if ($($this).val() == "amlak") {
+                window.location.href = "/املاک/مستقلات";
+            } else if ($($this).val() == "daily") {
+                window.location.href = "/اجاره-روزانه/اجاره-ویلا-سوئیت-آپارتمان";
+            }
+        }
+
+        $(document).ready(function () {
+            @*@{
+                var reserveToRate = ReserveDepend.GetReserveToRate();
+                if (reserveToRate != null)
+                {
+                    @:ratingDialog(@(reserveToRate.ReserveID));
+                }
+            }*@
+            setTimeout(getReserveToRate, 5000);
+            setTimeout(initializePresentPrize, 1000);
+        });
+
+        function getReserveToRate() {
+            myajax('reserve/getreservetorate', null, function (ret) {
+                if (ret.status == 1) {
+                    ratingDialog(ret.reserveToRate);
+                }
+            }, false);
+        }
+
+        function initializePresentPrize() {
+            var shown = checkPresentShown();
+            if (!shown) {
+                $('.present-prize__button').css('display', 'flex');
+            }
+            else {
+                $('.present-prize__button').css('display', 'none');
+            }
+        }
+
+        function checkPresentShown() {
+            var shown = getCookie("reserveprizeshown") === "yes";
+            return shown;
+        }
+
+        function setPresentShown(temp) {
+            if (temp) {
+                setCookieForHours("reserveprizeshown", "yes", 3);
+            }
+            else {
+                setCookie("reserveprizeshown", "yes", 365);
+            }
+        }
+        var presentPopupAfterLogin = false;
+        presentPrizePopup = null;
+
+        function showPresentPopup() {
+            $('.present-prize__button').hide();
+            var setting = {};
+            setting.contentUrl = '/post/getpresentandprizepopup?containonlogin=true';
+            var buttons = [{
+                title: 'نمایش نده',
+                color: 'white',
+                bgColor: '#EA4335',
+                onclick: function () {
+                    setPresentShown(false);
+                }
+            },
+            {
+                title: 'بعدا',
+                color: 'white',
+                bgColor: '#34A853',
+                onclick: function () {
+                    setPresentShown(true);
+                }
+            }];
+            setting.buttons = buttons;
+            setting.color = '#4485F2';
+            showMessagePopup('هدیه سفر', '', setting);
+        }
+
+        function hidePresentPopup() {
+            if (presentPrizePopup) {
+                presentPrizePopup.close();
+            }
+        }
+
+        function setCookie(c_name, value, exdays) { var exdate = new Date(); exdate.setDate(exdate.getDate() + exdays); var c_value = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toUTCString()); document.cookie = c_name + "=" + c_value; }
+
+        Date.prototype.addHours = function (h) {
+            this.setTime(this.getTime() + (h * 60 * 60 * 1000));
+            return this;
+        }
+
+        function setCookieForHours(c_name, value, exHours) {
+            var exdate = new Date();
+            exdate = exdate.addHours(exHours);
+            var c_value = escape(value) + ((exHours == null) ? "" :
+                "; expires=" + exdate.toUTCString());
+            document.cookie = c_name + "=" + c_value;
+        }
+
+        function getCookie(c_name) {
+            var c_value = document.cookie;
+            var c_start = c_value.indexOf(" " + c_name + "=");
+            if (c_start == -1) {
+                c_start = c_value.indexOf(c_name + "=");
+            }
+            if (c_start == -1) {
+                c_value = null;
+            }
+            else {
+                c_start = c_value.indexOf("=", c_start) + 1;
+                var c_end = c_value.indexOf(";", c_start);
+                if (c_end == -1) {
+                    c_end = c_value.length;
+                }
+                c_value = unescape(c_value.substring(c_start, c_end));
+            } return c_value;
+        }
+    </script>
+
+    <script type="text/javascript">
+        // Retrieve Firebase Messaging object.
+        const messaging = firebase.messaging();
+        // Add the public key generated from the console here.
+        messaging.usePublicVapidKey("BEqrg-tXWz1Cugk_uBMJq0P-z6etCVnnBcwdc4_EYsNcOYGmWseqvi2fUTPqi6pCqVGlAv4-KxiEFCAzZ6JRNu4");
+        function check_user_login() {
+            myajax("user/isuserauthenticated", "", function (ret) {
+                if (ret.val) {
+                    myajax("user/isuserloginbanned", "", function (ret) {
+                        if (ret.val) {
+                            myajax("user/logoutajax", "", function (ret) {
+                                location.href = "/";
+                            });
+                        }
+                        else {
+                            if (Notification.permission !== "granted" &&
+                                Notification.permission !== "denied") {
+                                myajax('user/getpermissionrequestdate', '', function (ret) {
+                                    var date;
+                                    if (ret.ticks !== 0) {
+                                        var now_ticks = ((new Date().getTime() * 10000) + 621355968000000000);
+                                        var last_ticks = ret.ticks;
+                                        var diff = now_ticks - last_ticks;
+                                        var one_day_passed = diff > 864000000000;
+                                    }
+                                    if (ret.status === 0 || ret.ticks === 0 || one_day_passed) {
+                                        showNoYesMessage("امکان اطلاع رسانی رزرو", "کاربر گرامی، لطفا جهت اطلاع رسانی از مراحل رزرو، پیغامی را که بعد از تایید نمایش داده میشود را تایید فرمایید",
+                                            function () {
+                                                messaging.requestPermission().then(function () {
+                                                    console.log('Notification permission granted.');
+                                                    // Get Instance ID token. Initially this makes a network call, once retrieved
+                                                    // subsequent calls to getToken will return from cache.
+                                                    messaging.getToken().then(function (currentToken) {
+                                                        if (currentToken) {
+                                                            sendTokenToServer(currentToken);
+                                                        } else {
+                                                            // Show permission request.
+                                                            console.log('No Instance ID token available. Request permission to generate one.');
+                                                            // Show permission UI.
+                                                            sendTokenToServer(null);
+                                                        }
+                                                    }).catch(function (err) {
+                                                        console.log('An error occurred while retrieving token. ', err);
+                                                        sendTokenToServer(null);
+                                                    });
+                                                }).catch(function (err) {
+                                                    console.log('Unable to get permission to notify.', err);
+                                                    sendTokenToServer(null);
+                                                });
+                                            }, function () {
+                                                var t = ((new Date().getTime() * 10000) + 621355968000000000);
+                                                myajax('user/setpermissionrequestdate', 'ticks=' + t, function (ret) { }, false);
+                                            }, { yesText: 'باشه', noText: 'بعدا سوال شود' });
+                                    }
+                                }, false);
+                            }
+                            else if (Notification.permission === "granted") {
+                                messaging.getToken().then(function (currentToken) {
+                                    if (currentToken) {
+                                        sendTokenToServer(currentToken);
+                                    } else {
+                                        // Show permission request.
+                                        console.log('No Instance ID token available. Request permission to generate one.');
+                                        // Show permission UI.
+                                        sendTokenToServer(null);
+                                    }
+                                }).catch(function (err) {
+                                    console.log('An error occurred while retrieving token. ', err);
+                                    sendTokenToServer(null);
+                                });
+                            }
+                            else {
+                                sendTokenToServer(null);
+                            }
+                            //messaging.onMessage(function (payload) {
+                            //    console.log('Message received. ', payload);
+                            //    var actions = [];
+                            //    if (payload.data.btn1) {
+                            //        actions.push(
+                            //            { action: payload.data.btn1, title: payload.data.btn1_title }
+                            //        );
+                            //    }
+                            //    if (payload.data.btn2) {
+                            //        actions.push(
+                            //            { action: payload.data.btn2, title: payload.data.btn2_title }
+                            //        );
+                            //    }
+                            //    if (payload.data.btn3) {
+                            //        actions.push(
+                            //            { action: payload.data.btn3, title: payload.data.btn3_title }
+                            //        );
+                            //    }
+                            //    if (payload.data.btn4) {
+                            //        actions.push(
+                            //            { action: payload.data.btn4, title: payload.data.btn4_title }
+                            //        );
+                            //    }
+                            //    var notificationOptions = {
+                            //        body: payload.notification.body,
+                            //        icon: '/Resource/img/siteicons/icon-144x144.png',
+                            //        badge: '/Resource/img/siteicons/badge.png',
+                            //        data: payload.data,
+                            //        actions: actions,
+                            //        vibrate: [200, 100, 200, 100, 200, 100, 200]
+                            //    };
+                            //    registered_service_worker.showNotification(payload.notification.title,
+                            //        notificationOptions);
+                            //});
+                        }
+                    }, false);
+                }
+            }, false);
+            // Callback fired if Instance ID token is updated.
+            messaging.onTokenRefresh(function () {
+                messaging.getToken().then(function (refreshedToken) {
+                    console.log('Token refreshed.');
+                    // Send Instance ID token to app server.
+                    sendTokenToServer(refreshedToken);
+                }).catch(function (err) {
+                    console.log('Unable to retrieve refreshed token ', err);
+                });
+            });
+        }
+
+        function sendTokenToServer(token) {
+            myajax("user/updateusernotificationtoken", "token=" + token, function (ret) {
+            }, false);
+        }
+
+
+        $('body').prepend('<a href="#" class="back-to-top"></a>');
+        var amountScrolled = 300;
+
+        $(window).scroll(function () {
+            if ($(window).scrollTop() > amountScrolled) {
+                $('a.back-to-top').fadeIn('slow');
+            } else {
+                $('a.back-to-top').fadeOut('slow');
+            }
+        });
+        $('a.back-to-top').click(function () {
+            $('html, body').animate({
+                scrollTop: 0
+            }, 700);
+            return false;
+        });
+
+        function close_alert() {
+            $(".alert-msg").hide();
+        }
+
+    </script>
+    <script type="text/javascript">
+        var registered_service_worker;
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.getRegistration("/service_worker.js").then(registration => {
+                    if (registration == undefined) {
+                        navigator.serviceWorker.register('/service_worker.js')
+                            .then(reg => {
+                                console.log('Service worker registered! 😎', reg);
+                                registered_service_worker = reg;
+                                messaging.useServiceWorker(reg);
+                                check_user_login();
+                            })
+                            .catch(err => {
+                                console.log('😥 Service worker registration failed: ', err);
+                                check_user_login();
+                                sendTokenToServer(null);
+                            });
+                    }
+                    else {
+                        registered_service_worker = registration;
+                        messaging.useServiceWorker(registration);
+                        check_user_login();
+                    }
+                });
+            });
+        }
+        else {
+            //check_user_login();
+            sendTokenToServer(null);
+        }
+    </script>
+    @RenderSection("ScriptBlock", required: false)
+    @*****   end script   ****@
+
+</body>
+</html>

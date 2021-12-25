@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.DTOs.AccommodationDTOs
 {
-    public class AdvertiseIndexDTO
+    public class AdvertiseOldIndexDTO
     {
         public Advertise Advertise { get; set; }
         public string UserPhoneNumber { get; set; }

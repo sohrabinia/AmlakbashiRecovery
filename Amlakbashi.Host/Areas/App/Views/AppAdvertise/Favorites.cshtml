@@ -1,0 +1,38 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs;
+@model IEnumerable<AccommodationCardDTO>
+
+@{
+    ViewBag.Title = "علاقه مندی های من";
+    Layout = "_AppDashboardLayout";
+}
+
+@section StyleLink
+{
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/dailyrent.css">
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/star-rating/star-rating.css&v=2">
+}
+
+<input type="hidden" value="20" id="skipsize" />
+<input type="hidden" value="@ViewBag.userId" id="userid" />
+
+<h1 class="dashboard-box-favorite">علاقه مندی های من</h1>
+<div class="accommodationList dashboard-favorite-item">
+    @await Html.PartialAsync("_AdvertiseList", Model)
+</div>
+
+@section ScriptBlock
+{
+    <script type="text/javascript">
+        findLazyImages();
+        $('.average-rating').barrating({
+            theme: 'fontawesome-stars',
+            readonly: true,
+            initialRating: null
+        });
+        $(".home-page__favourite-button").click(function (e) {
+            ToggleFavorite($(this), $(this).attr("advertise_id"));
+            //e.stopPropagation();
+            return false;
+        });
+    </script>
+}

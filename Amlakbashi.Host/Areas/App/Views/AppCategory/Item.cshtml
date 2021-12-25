@@ -1,0 +1,1177 @@
+﻿@using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+@using Amlakbashi.Core.DTOs.CategoryDTOs;
+
+@model CategoryItemDTO
+
+@{
+    ViewBag.CurrentPage = "AdvertiseCategory";
+    string phrase = Model.Phrase == null ? null : Model.Phrase.Replace("-", " ");
+    ViewBag.Title = Model.Title;
+    ViewBag.keywords = Model.Keywords;
+    ViewBag.Description = Model.Description;
+    Layout = "~/Areas/App/Views/Shared/_AppLayout.cshtml";
+    ViewBag.region_filter_status = (int)Region.RegionStatus.HasAdvertise;
+
+    var related_categories = (Model.RelatedCategories == null ? new List<DynamicCategory>() : Model.RelatedCategories);
+
+    ViewBag.region_filter_item_class = "advertise-filter__item";
+    ViewBag.region_filter_label_class = "advertise-filter__title";
+    ViewBag.region_filter_property_class = "advertise-filter__property";
+
+    var next_page_available = Model.PagesCount > Model.CurrentPageNumber;
+    var previous_page_available = Model.CurrentPageNumber > 1;
+    var next_page = Model.CurrentPageNumber + 1;
+    var previous_page = Model.CurrentPageNumber - 1;
+    var capacity = string.IsNullOrEmpty(Model.Capacity) ? 0 : int.Parse(Model.Capacity);
+    var types = Advertise.GetAdvertiseTypes(Advertise.AdvertisePageType.Filter);
+
+    var moreFilterCount = 0;
+    if (Model.PriceString != "")
+    {
+        moreFilterCount++;
+    }
+
+    var accTypeString = Model.AccTypeString;
+    if (accTypeString != "")
+    {
+        moreFilterCount++;
+    }
+
+    if (Model.Region != null && Model.Region != "-1")
+    {
+        moreFilterCount++;
+    }
+    if (!string.IsNullOrEmpty(Model.RoomList))
+    {
+        moreFilterCount++;
+    }
+    if (Model.Parking == 1)
+    {
+        moreFilterCount++;
+    }
+    if (Model.RulesPets == 1)
+    {
+        moreFilterCount++;
+    }
+    if (Model.RulesParty == 1)
+    {
+        moreFilterCount++;
+    }
+    if (Model.RulesSmoking == 1)
+    {
+        moreFilterCount++;
+    }
+    if (Model.Pool == "1")
+    {
+        moreFilterCount++;
+    }
+    if (Model.Elevator == "1")
+    {
+        moreFilterCount++;
+    }
+    if (Model.WcType != -1)
+    {
+        if (Model.WcType == 128)
+        {
+            moreFilterCount++;
+        }
+        moreFilterCount++;
+    }
+    if (Model.Wifi == 1)
+    {
+        moreFilterCount++;
+    }
+    if (Model.WashingMachine == 1)
+    {
+        moreFilterCount++;
+    }
+    if (Model.Jacuzzi == 1)
+    {
+        moreFilterCount++;
+    }
+    if (Model.PoolTable == 1)
+    {
+        moreFilterCount++;
+    }
+    if (Model.Foosball == 1)
+    {
+        moreFilterCount++;
+    }
+    if (Model.TeaMaker == 1)
+    {
+        moreFilterCount++;
+    }
+}
+
+@section StyleBlock {
+    .advertise-category__description * {
+    font: 13px Miransans !important;
+    }
+
+    .master__header {
+    z-index: 4;
+    }
+    .style-video{
+    display:block;
+    margin:0 auto;
+    margin-top:10px;
+    width:40%;
+    }
+    @@media (max-width: 680px){
+    .style-video{
+    width:80%;
+    }
+    }
+    @@media (max-width: 480px){
+    .style-video{
+    width:100%;
+    }
+    }
+    .advertise-list__filter-location-box .dynamic-filter_box-items {
+    display: flex;
+    margin-top: -15px;
+    margin-bottom: 5px;
+    }
+}
+
+@section StyleLink {
+    <link rel="stylesheet" href="/css/cat-item.min.css" asp-append-version="true" />
+}
+
+@section TopPin {
+    <div class="advertise-list__pin-filter-container">
+        <div class="advertise-list__pin-filter-top">
+            <div class="advertise-list__pin-filter-right">
+                <div id="divDateFilter" onclick="showDateFilter()" class="advertise-list__pin-filter-item" style="background-color:@(Model.DateString != "" ? "#fdd835" : "white")">
+                    <i class="fa fa-calendar-alt"></i>
+                    <span>@(Model.DateString == "" ? "تاریخ سفر" : Model.DateString)</span>
+                </div>
+                <div class="advertise-list__filter-box-item" id="js-date-filter-item">
+                    <div class="advertise-list__filter-popup-header">
+                        <div class="advertise-list__filter-header-text">تاریخ ورود و خروج</div>
+                        <div onclick="hideAllFilterItems()" class="advertise-list__filter-close-btn"><i class="fa fa-times"></i></div>
+                    </div>
+                    <input type="hidden" id="from_date_date_picker" value="@(!string.IsNullOrEmpty(Model.EmptyRangeFrom) ? Model.EmptyRangeFrom : "")" />
+                    <input type="hidden" id="to_date_date_picker" value="@(!string.IsNullOrEmpty(Model.EmptyRangeTo) ? Model.EmptyRangeTo : "")" />
+                    @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" } })
+                    <div style="margin-top:-1vh;text-align: center;border: 1px solid #ccc;border-radius: 5px;">از <span id="js-from-date-label">@(!string.IsNullOrEmpty(Model.EmptyRangeFrom) ? Model.EmptyRangeFrom : "-")</span> تا <span id="js-to-date-label">@(!string.IsNullOrEmpty(Model.EmptyRangeTo) ? Model.EmptyRangeTo : "-")</span></div>
+                    <div class="advertise-list__filter-btn-container">
+                        <div onclick="removeDateFilter()" style="background-color:#EA4335;">حذف فیلتر</div>
+                        <div onclick="doDateFilter()" style="background-color:#34A853;">اعمال فیلتر</div>
+                    </div>
+                </div>
+                <div id="divCapacityFilter" onclick="showCapacityFilter()" class="advertise-list__pin-filter-item" style="background-color:@(capacity > 0 ? "#fdd835" : "white")">
+                    <i class="fa fa-users"></i>
+                    <span>@(capacity < 1 ? "نفرات" : capacity + " نفر")</span>
+                </div>
+                <div class="advertise-list__filter-box-item" id="js-capacity-filter-item">
+                    <div class="advertise-list__filter-popup-header">
+                        <div class="advertise-list__filter-header-text">تعداد مهمان</div>
+                        <div onclick="hideAllFilterItems()" class="advertise-list__filter-close-btn"><i class="fa fa-times"></i></div>
+                    </div>
+                    <div style="width:unset;min-height: 0px;display: flex;align-items: center;margin: 20px 0;justify-content:space-around;">
+                        <div style="margin: 10px;width:100px;font:13px Miransans;">تعداد نفرات:</div>
+                        <div style="display:flex;align-items:center;width:120px;">
+                            <i class="fa fa-plus" style="border-radius:60px;width:33px;height:29px;text-align:center;border:1px solid #242424;padding:5px;cursor:pointer;margin:0 5px;box-shadow:1px 2px 3px 0 rgba(0,0,0,.1);" onclick="onClickIncDecButton(this)" data-action="plus"></i>
+                            <input style="width:45%;border:none;text-align:center;" value="@capacity" id="js-capacity-input" class="inc_dec_number" type="number" name="Metrazh" min="0">
+                            <i class="fa fa-minus" style="border-radius:60px;width:33px;height:29px;text-align:center;border:1px solid #242424;padding:5px;cursor:pointer;margin:0 5px;box-shadow:1px 2px 3px 0 rgba(0,0,0,.1);" onclick="onClickIncDecButton(this)" data-action="minus"></i>
+                        </div>
+                    </div>
+                    <div class="advertise-list__filter-btn-container">
+                        <div onclick="removeCapacityFilter()" style="background-color:#EA4335;">حذف فیلتر</div>
+                        <div onclick="doCapacityFilter()" style="background-color:#34A853;">اعمال فیلتر</div>
+                    </div>
+                </div>
+                <div id="divRegionFilter" onclick="showRegionFilter()" class="advertise-list__pin-filter-item" style="background-color:@(Model.RegionString != "" ? "#fdd835" : "white")">
+                    <i class="fa fa-map-marker-alt"></i>
+                    <span>@(Model.RegionString == "" ? "مقصد سفر" : Model.RegionString)</span>
+                </div>
+                <div class="advertise-list__filter-box-item" id="js-region-filter-item">
+                    <div class="advertise-list__filter-popup-header">
+                        <div class="advertise-list__filter-header-text">مقصد سفر</div>
+                        <div onclick="hideAllFilterItems()" class="advertise-list__filter-close-btn"><i class="fa fa-times"></i></div>
+                    </div>
+                    <div class="advertise-list__region-filter-container">
+                        <div class="advertise-list__filter-location-box" style="display:flex;flex-wrap:wrap;align-items:center;">
+                            @await Html.PartialAsync("_AdvertiseRegionSelector", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) {
+                            { "mandatory", false},
+                            { "provinceName", "accItemProvince"},
+                            { "cityName", "accItemCity"},
+                            { "areaName", "accItemArea"},
+                            { "province", Model.Category.Province},
+                            { "city", Model.Category.City},
+                            { "area", Model.Area},
+                            { "region_filter_status", 1 },
+                           {"provinces", Model.Provinces },
+                           {"cities", Model.Cities },
+                           {"areas", Model.Areas },
+                           { "selectEnabled", true }
+                        })
+                        </div>
+                    </div>
+                    <div class="advertise-list__filter-btn-container">
+                        <div onclick="removeRegionFilter()" style="background-color:#EA4335;">حذف فیلتر</div>
+                        <div onclick="doRegionFilter()" style="background-color:#34A853;">اعمال فیلتر</div>
+                    </div>
+                </div>
+            </div>
+            <div class="advertise-list__pin-filter-left">
+                <div onclick="showMoreFilter()" class="advertise-list__pin-filter-item">
+                    <i class="fa fa-filter"></i>
+                    <span>فیلتر بیشتر</span>
+                </div>
+                <div class="advertise-list__filter-box-item" id="js-more-filter-item">
+                    <div class="advertise-list__filter-popup-header">
+                        <div class="advertise-list__filter-header-text">فیلتر بیشتر</div>
+                        <div onclick="hideAllFilterItems()" class="advertise-list__filter-close-btn"><i class="fa fa-times"></i></div>
+                    </div>
+                    <div class="advertise-list__more-filter-parent">
+                        <div class="advertise-list__more-filter-item">
+                            <div onclick="toggleAccTypeContainer(this)" class="advertise-list__more-filter-expand-btn">
+                                <span>نوع اقامتگاه</span>
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                            <div id="js-acctype-container" class="advertise-list__filter-select-container" style="display:none">
+                                <div onclick="changeAccTypeValue(this)" class="advertise-list__filter-select-item@(Model.T > 0 ? (Model.T == 81 ? " filter-selected-item" : "") : (Model.Category.Type == Advertise.AdvertiseType.All ? " filter-selected-item" : ""))" data-value="81">
+                                    <span>همه</span>
+                                    <i class="fa fa-check"></i>
+                                </div>
+                                @foreach (var typeFilterItem in types)
+                                {
+                                    <div onclick="changeAccTypeValue(this)" class="advertise-list__filter-select-item@(Model.T > 0 ? (Model.T == (int)typeFilterItem ? " filter-selected-item" : "") : (typeFilterItem == Model.Category.Type ? " filter-selected-item" : ""))" data-value="@((int)typeFilterItem)">
+                                        <span>@AdvertiseMainLocalization.GetAdvertiseTypeUserString(typeFilterItem)</span>
+                                        <i class="fa fa-check"></i>
+                                    </div>
+                                }
+                            </div>
+                            <input type="hidden" id="js-acctype-input" value="@Model.Category.Type" />
+                        </div>
+
+                        <div class="advertise-list__more-filter-item">
+                            <div onclick="togglePositionsContainer(this)" class="advertise-list__more-filter-expand-btn">
+                                <span>موقعیت اقامتگاه</span>
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                            <div id="js-positions-container" class="advertise-list__filter-select-container" style="display:none">
+                                @foreach (var positionFilterItem in Model.PositionItems)
+                                {
+                                    if (positionFilterItem == Advertise.PositionType.none)
+                                    {
+                                        continue;
+                                    }
+                                    <div class="advertise-list__filter-select-item@((Model.Region != null && ((int)positionFilterItem).ToString() == Model.Region.ToString()) ? " filter-selected-item" : "")" data-value="@((int)positionFilterItem)">
+                                        <span>@AdvertiseMainLocalization.GetPositionTypeString((int)positionFilterItem)</span>
+                                        <i class="fa fa-check"></i>
+                                    </div>
+                                }
+                            </div>
+                            <input type="hidden" id="js-position-input" value="@(Model.Region == null ? "-1" : Model.Region)" />
+                        </div>
+
+                        <div class="advertise-list__more-filter-item">
+                            <div onclick="togglePriceRangeContainer(this)" class="advertise-list__more-filter-expand-btn">
+                                <span>محدوده قیمت</span>
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                            <div id="js-pricerange-container" style="display:none">
+                                <div class="advertise-list__radio-container">
+                                    <input type="hidden" id="js-pricerange-filter-type-input" value="@Model.PriceRangeType" />
+                                    <div class="advertise-list__radio-item">
+                                        <input onchange="changePriceRangeType(0)" is-checked="@(Model.PriceRangeType == 0)" type="radio" id="js-price-range-type-0" name="js-price-range-type" value="0" />
+                                        <label for="js-price-range-type-0">پایه</label>
+                                    </div>
+                                    <div class="advertise-list__radio-item">
+                                        <input onchange="changePriceRangeType(1)" is-checked="@(Model.PriceRangeType == 1)" type="radio" id="js-price-range-type-1" name="js-price-range-type" value="1" />
+                                        <label for="js-price-range-type-1">روزهای تعطیل</label>
+                                    </div>
+                                    <div class="advertise-list__radio-item">
+                                        <input onchange="changePriceRangeType(2)" is-checked="@(Model.PriceRangeType == 2)" type="radio" id="js-price-range-type-2" name="js-price-range-type" value="2" />
+                                        <label for="js-price-range-type-2">پیک تعطیلات</label>
+                                    </div>
+                                    <div class="advertise-list__radio-item">
+                                        <input onchange="changePriceRangeType(3)" is-checked="@(Model.PriceRangeType == 3)" type="radio" id="js-price-range-type-3" name="js-price-range-type" value="3" />
+                                        <label for="js-price-range-type-3">اجاره ماهانه</label>
+                                    </div>
+                                </div>
+                                <div style="display: flex;justify-content: space-around;margin-bottom:10px;">
+                                    <div style="border-radius:5px;padding:5px;font:13px Liransans;display: flex;flex-flow: column;">
+                                        <span>حداقل قیمت:</span>
+                                        <select id="js-pricemin-input">
+                                            @if (Model.PriceRangeType == 3)
+                                            {
+                                                for (int i = 0; i < Model.MonthlyPriceOptions.Length; i++)
+                                                {
+                                                    var priceValue = Model.MonthlyPriceOptions[i];
+                                                    <option is-selected="@(priceValue == Model.PriceMin)" value="@priceValue">@(priceValue == 150000000 ? "بیشتر از پنجاه میلیون" : string.Format("{0:n0}", priceValue) +" تومان")</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for (int i = 0; i < Model.PriceOptions.Length; i++)
+                                                {
+                                                    var priceValue = Model.PriceOptions[i];
+                                                    <option is-selected="@(priceValue == Model.PriceMin)" value="@priceValue">@string.Format("{0:n0}", priceValue) تومان</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div style="border-radius:5px;padding:5px;font:13px Liransans;display: flex;flex-flow: column;">
+                                        <span>حداکثر قیمت:</span>
+                                        <select id="js-pricemax-input">
+                                            @if (Model.PriceRangeType == 3)
+                                            {
+                                                for (int i = 0; i < Model.MonthlyPriceOptions.Length; i++)
+                                                {
+                                                    var priceValue = Model.MonthlyPriceOptions[i];
+                                                    <option is-selected="@(priceValue == Model.PriceMax)" value="@priceValue">@(priceValue == 150000000 ? "بیشتر از پنجاه میلیون" : string.Format("{0:n0}", priceValue) + " تومان")</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                for (int i = 0; i < Model.PriceOptions.Length; i++)
+                                                {
+                                                    var priceValue = Model.PriceOptions[i];
+                                                    <option is-selected="@(priceValue == Model.PriceMax)" value="@priceValue">@string.Format("{0:n0}", priceValue) تومان</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="advertise-list__more-filter-item">
+                            <div onclick="toggleRoomContainer(this)" class="advertise-list__more-filter-expand-btn">
+                                <span>اتاق خواب</span>
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                            <div id="js-room-container" class="advertise-list__filter-select-container" style="display:none" multi="multi">
+                                <div class="advertise-list__filter-select-item@((Model.RoomListIds != null && Model.RoomListIds.Contains(0)) ? " filter-selected-item" : "")" data-value="0">
+                                    <span>بدون اتاق خواب</span>
+                                    <i class="fa fa-check"></i>
+                                </div>
+                                @for (int i = 1; i <= 4; i++)
+                                {
+                                    <div class="advertise-list__filter-select-item@((Model.RoomListIds != null && Model.RoomListIds.Contains(i)) ? " filter-selected-item" : "")" data-value="@(i)">
+                                        <span>@(i + " خوابه")</span>
+                                        <i class="fa fa-check"></i>
+                                    </div>
+                                }
+                                <div class="advertise-list__filter-select-item@((Model.RoomListIds != null && Model.RoomListIds.Contains(5)) ? " filter-selected-item" : "")" data-value="5">
+                                    <span>بیشتر از 4 خواب</span>
+                                    <i class="fa fa-check"></i>
+                                </div>
+                            </div>
+                            <input type="hidden" id="js-roomlist-input" value="@(string.IsNullOrEmpty(Model.RoomList) ? "" : Model.RoomList)" />
+                        </div>
+
+                        <div class="advertise-list__more-filter-item">
+                            <div onclick="toggleFacilitiesContainer(this)" class="advertise-list__more-filter-expand-btn">
+                                <span>امکانات</span>
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                            <div id="js-facilities-container" class="advertise-list__filter-select-container" style="display:none">
+                                <div style="display:flex;flex-wrap:wrap;">
+                                    <input type="hidden" id="js-pool-input" value="@(Model.Pool == null ? "-1" : Model.Pool)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>استخر</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Pool != "1" ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-elevator-input" value="@(Model.Elevator == null ? "-1" : Model.Elevator)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>آسانسور</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Elevator != "1" ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-parking-input" value="@(Model.Parking)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>پارکینگ</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Parking != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-perwc-input" value="@(Model.WcType == 127 || Model.WcType == 128  ? 1 : -1)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>سرویس ایرانی</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.WcType == 127 || Model.WcType == 128  ? "checked-3" : "unchecked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-euwc-input" value="@(Model.WcType == 129 || Model.WcType == 128  ? 1 : -1)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>سرویس فرنگی</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.WcType == 129 || Model.WcType == 128  ? "checked-3" : "unchecked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-wifi-input" value="@(Model.Wifi)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>وای فای</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Wifi != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-washingmachine-input" value="@(Model.WashingMachine)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>ماشین لباسشویی</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.WashingMachine != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-jacuzzi-input" value="@(Model.Jacuzzi)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>جکوزی</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Jacuzzi != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-pooltable-input" value="@(Model.PoolTable)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>بیلیارد</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.PoolTable != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-foosball-input" value="@(Model.Foosball)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>فوتبال دستی</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Foosball != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-teamaker-input" value="@(Model.TeaMaker)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>چای ساز</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.TeaMaker != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="advertise-list__more-filter-item">
+                            <div onclick="toggleRulesContainer(this)" class="advertise-list__more-filter-expand-btn">
+                                <span>قوانین اقامتگاه</span>
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                            <div id="js-rules-container" class="advertise-list__filter-select-container" style="display:none">
+                                <div style="display:flex;flex-wrap:wrap;">
+                                    <input type="hidden" id="js-pets-input" value="@(Model.RulesPets)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>حیوان خانگی مجاز</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.RulesPets != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                </div>
+                                <div style="display:flex;flex-wrap:wrap;">
+                                    <input type="hidden" id="js-party-input" value="@(Model.RulesParty)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>مهمانی گرفتن مجاز</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.RulesParty != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                </div>
+                                <div style="display:flex;flex-wrap:wrap;">
+                                    <input type="hidden" id="js-smoking-input" value="@(Model.RulesSmoking)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>استعمال دخانیات مجاز</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.RulesSmoking != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="advertise-list__filter-btn-container">
+                        <div onclick="removeMoreFilter()" style="background-color:#EA4335;">حذف همه فیلترها</div>
+                        <div onclick="doMoreFilter()" style="background-color:#34A853;">اعمال فیلتر</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="advertise-list__pin-filter-list-bottom">
+            @if (moreFilterCount > 0)
+            {
+                if (accTypeString != "")
+                {
+                    <div onclick="removeAccTypeFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>@accTypeString</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.Region != null && Model.Region != "-1")
+                {
+                    <div onclick="removePositionFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>@AdvertiseMainLocalization.GetPositionTypeString(int.Parse(Model.Region))</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.PriceString != "")
+                {
+                    <div onclick="removePriceRangeFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>@Model.PriceString</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                @*if (roomString != "")
+                    {
+                        <div onclick="removeRoomFilter()" class="advertise-list__pin-filter-list-item">
+                            <span>@roomString</span>
+                            <i class="fa fa-times"></i>
+                        </div>
+                    }*@
+                if (Model.RoomListIds != null)
+                {
+
+                    foreach (var roomItem in Model.RoomListIds)
+                    {
+                        var roomString = roomItem == 0 ? "بدون اتاق خواب" :
+                            (roomItem > 4 ? "بیشتر از 4 خواب" :
+                                roomItem + " خوابه");
+                        <div onclick="removeRoomListFilter(@roomItem)" class="advertise-list__pin-filter-list-item">
+                            <span>@roomString</span>
+                            <i class="fa fa-times"></i>
+                        </div>
+                    }
+                }
+                if (Model.Parking == 1)
+                {
+                    <div onclick="removeParkingFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>پارکینگ</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.RulesPets == 1)
+                {
+                    <div onclick="removePetsFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>حیوان خانگی</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.RulesParty == 1)
+                {
+                    <div onclick="removePartyFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>مهمانی گرفتن</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.RulesSmoking == 1)
+                {
+                    <div onclick="removeSmokingFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>استعمال دخانیات</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.Pool != null && Model.Pool == "1")
+                {
+                    <div onclick="removePoolFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>استخر</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.Elevator != null && Model.Elevator == "1")
+                {
+                    <div onclick="removeElevatorFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>آسانسور</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.WcType == 127 || Model.WcType == 128)
+                {
+                    <div onclick="removePerWCFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>سرویس ایرانی</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.WcType == 129 || Model.WcType == 128)
+                {
+                    <div onclick="removeEuWCFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>سرویس فرنگی</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.Wifi == 1)
+                {
+                    <div onclick="removeWifiFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>وای فای</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.WashingMachine == 1)
+                {
+                    <div onclick="removeWashingMachineFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>لباسشویی</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.Jacuzzi == 1)
+                {
+                    <div onclick="removeJacuzziFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>جکوزی</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.PoolTable == 1)
+                {
+                    <div onclick="removePoolTableFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>بیلیارد</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.Foosball == 1)
+                {
+                    <div onclick="removeFoosballFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>فوتبال دستی</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.TeaMaker == 1)
+                {
+                    <div onclick="removeTeaMakerFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>چای ساز</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}
+
+@await Html.PartialAsync("_AdvertiseFilter", Model)
+
+@*@if (category != null && category.Province == 793)
+    {
+        <div style="font: 12px Miransans;
+            margin: 10px 5% 0 5%;
+            padding: 5px;
+            /*border-top: 1px solid #242424;
+            border-bottom: 1px solid #242424;*/
+            /*background-image: url(/resource/img/corona-stay-home-pattern.png);*/
+            background-color: #fffaed;
+            background-repeat:repeat;
+            box-shadow:0 2px 4px 0 rgba(0,0,0,.3), 0 2px 8px 0 rgba(0,0,0,.1);
+            text-align: center;">
+            <div>کاربر گرامی رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است</div>
+            <div style="display:flex;justify-content:space-evenly;">
+                <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/794/اصفهان/رزرو-هتل">هتل</a>
+                <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/794/اصفهان/بومگردی">اقامتگاه بومگردی</a>
+            </div>
+        </div>
+    }*@
+
+@*<div class="advertise-category__special-filter-container" style="width:90%;margin:auto;">*@
+@*<a class="advertise-category__norouz_button" href="/category/category?type=@(category.Type)&a_m_p_version=false&province=@(category.Province)&city=@(category.City)&area=@(Model.Area)&norouz_special=@(norouz_special ? "false" : "true")&today_empty_homes=@(today_empty_homes ? "true" : "false")&discount_homes=@(discount_homes ? "true" : "false")">
+        <img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32" />
+        <span>اقامتگاه های ویژه نوروز</span>
+        <img width="16" height="16" rel="checkbox" src="/file/resourceimagepng?file_name=@(norouz_special ? "checked" : "unchecked")" />
+    </a>*@
+@*@{
+        var category_type = category != null ? category.Type : 0;
+        var amp_version = "false";
+        var _province_ = category != null ? category.Province : 0;
+        var _city_ = category != null ? category.City : 0;
+        var _area_ = category != null ? Model.Area : 0;
+        var _countrydirection_= category != null ? category.CountryDirection : 0;
+        var norouz_spc = norouz_special ? "true" : "false";
+        var today_empt = today_empty_homes ? "true" : "false";
+        var discount_hms = discount_homes ? "false" : "true";
+        var format_string = "/category/category?" +
+            "type={0}" +
+            "&a_m_p_version={1}" +
+            "&province={2}" +
+            "&city={3}" +
+            "&area={4}" +
+            "&norouz_special={5}" +
+            "&today_empty_homes={6}" +
+            "&discount_homes={7}" +
+            "&country_direction={8}";
+        var discount_homes_url = string.Format(format_string,
+            category_type, amp_version, _province_, _city_, _area_,
+                norouz_special, today_empt, discount_hms, _countrydirection_);
+
+        norouz_spc = norouz_special ? "true" : "false";
+        today_empt = today_empty_homes ? "false" : "true";
+        discount_hms = discount_homes ? "true" : "false";
+
+        var empty_homes_url = string.Format(format_string,
+            category_type, amp_version, _province_, _city_, _area_,
+            norouz_special, today_empt, discount_hms, _countrydirection_);
+    }*@
+@*<div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="toggleNorouzSpecial()">
+        <img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32" />
+        <span>ویژه نوروز</span>
+        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(norouz_special ? "checked-3" : "unchecked-3")" />
+    </div>*@
+@*<div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="toggleDiscount()">
+        <i class="fa fa-percent" style="color:#EA4335;text-shadow: none;"></i>
+        <span>تخفیف دار</span>
+        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(discount_homes ? "checked-3" : "unchecked-3")" />
+    </div>
+    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="toggleInstantReserve()">
+        <i class="fa fa-bolt" style="color:#DF7549;text-shadow: none;"></i>
+        <span>رزرو آنی</span>
+        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(instant_reserve ? "checked-3" : "unchecked-3")" />
+    </div>
+    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="toggleTodayEmpty()">
+        <i class="fa fa-home"></i>
+        <span>خالی امشب</span>
+        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(today_empty_homes ? "checked-3" : "unchecked-3")" />
+    </div>*@
+@*</div>*@
+
+@{
+    var u_ = "https://www.amlakbashi.com" + Model.RawUrl;
+    var img_ = "https://www.amlakbashi.com" + (Model.AdvertiseItems.Any() && Model.AdvertiseItems.First().PhotoID > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.AdvertiseItems.First().PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394));
+}
+
+@*<div class="share-post__container">
+    <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(Model.Title)" target="_blank" rel="noreferrer" title="اشتراک گذاری در تلگرام">
+        <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram" style="background-color: #259DCF;">
+    </a>
+    <a class="share-post__item" href="whatsapp://send?text=@(Model.Title) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(Model.Title) @(u_)')" title="اشتراک گذاری در واتس اپ">
+        <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp" style="background-color: #1BD741;">
+    </a>
+    <a class="share-post__item" href="http://twitter.com/share?text=@(Model.Title);url=@(u_)" target="_blank" rel="noreferrer" title="توئیت کردن اقامتگاه">
+        <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter" style="background-color: #55ACEE;">
+    </a>
+    <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(Model.Title)" target="_blank" rel="noreferrer" title="اشتراک گذاری در فیسبوک">
+        <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook" style="background-color: #3b5998;">
+    </a>
+    <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(Model.Title)" target="_blank" rel="noreferrer" title="پین کردن در پینترست">
+        <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest" style="background-color: #BD081C;">
+    </a>
+    <a class="share-post__item" href="mailto:?subject=@(Model.Title);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" title="اشتراک گذاری با ایمیل">
+        <i class="fa fa-envelope share-post__icon" style="font-size:24px;padding:8px;color:white;background-color:#3d3d3d;"></i>
+    </a>
+</div>*@
+
+<div class="container" style="max-width:1100px">
+    <div class="dynamic__header-container">
+        <div class="dynamic-title">
+            <div class="dynamic-text" style="width: 100%;">
+                <h1 style="text-align: center;width: 100%;">@(!string.IsNullOrEmpty(phrase) ? "جستجوی عبارت \"" + phrase + "\"" : Model.CategoryH1Title)@(string.IsNullOrEmpty(Model.AreaString) ? "" : " - " + Model.AreaString)</h1>
+            </div>
+        </div>
+    </div>
+    <div class="advertise-filter__inpage-filter">
+        <div class="advertise-filter__extra-filter-container">
+            <div id="instant-reserve-filter-button" onclick="toggleInstantReserve()" style="background-color:@(Model.InstantReserve ? "#fdd835" : "white");" class="advertise-list__pin-filter-item">
+                <i class="fa fa-bolt"></i>
+                <span>رزرو آنی</span>
+            </div>
+            <div id="today-empty-filter-button" onclick="toggleTodayEmpty()" style="background-color:@(Model.TodayEmptyHomes ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+                <i class="fa fa-home"></i>
+                <span>خالی امشب</span>
+            </div>
+            <div id="discount-homes-filter-button" onclick="toggleDiscount()" style="background-color:@(Model.DiscountHomes ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+                <i class="fa fa-percent"></i>
+                <span>تخفیف دار</span>
+            </div>
+            @*<div id="norouz-special-filter-button" onclick="toggleNorouz()" style="background-color:@(norouz_special ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+                    <img width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
+                    <span>ویژه نوروز</span>
+                </div>*@
+            <div id="corona-special-filter-button" onclick="toggleHygieneProtocol()" style="background-color:@(Model.HygieneProtocol ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+                <img width="16" height="16" rel="ضدعفونی شده" title="ضدعفونی شده" src="/file/resourceimagepng?file_name=no-virus" />
+                <span>ضدعفونی شده</span>
+            </div>
+        </div>
+        <div class="advertise-filter__inpage-filter-left">
+            <div onclick="toggleSortPopup()" id="sort-filter-button" class="advertise-list__pin-filter-item">
+                @*<img alt="sort" src="/file/resourceimagepng?file_name=icons/20_sort" />*@
+                <i class="fa fa-sort"></i>
+                @if (Model.Sort == 0)
+                {
+                    <span>مرتب سازی</span>
+                }
+                else if (Model.Sort == 1)
+                {
+                    <span>گران ترین</span>
+                }
+                else if (Model.Sort == 2)
+                {
+                    <span>ارزان ترین</span>
+                }
+                else if (Model.Sort == 3)
+                {
+                    <span>امتیاز کاربران</span>
+                }
+                else
+                {
+                    <span>نظافت</span>
+                }
+            </div>
+            <div class="advertise-list__sort-popup-parent" style="display:none">
+                <div onclick="hideSortPopup()" class="advertise-list__filter-popup-header">
+                    <div class="advertise-list__filter-header-text">مرتب سازی</div>
+                    <div class="advertise-list__filter-close-btn"><i class="fa fa-times"></i></div>
+                </div>
+                <div class="advertise-list__sort-popup-container">
+                    <div id="sortItem0" onclick="changeSortOrder(0)" class="advertise-list__sort-popup-item@(Model.Sort == 0 ? " sort-item-selected" : "")">
+                        <span>پیش فرض</span>
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <div id="sortItem1" onclick="changeSortOrder(1)" class="advertise-list__sort-popup-item@(Model.Sort == 1 ? " sort-item-selected" : "")">
+                        <span>گران ترین</span>
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <div id="sortItem2" onclick="changeSortOrder(2)" class="advertise-list__sort-popup-item@(Model.Sort == 2 ? " sort-item-selected" : "")">
+                        <span>ارزان ترین</span>
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <div id="sortItem3" onclick="changeSortOrder(3)" class="advertise-list__sort-popup-item@(Model.Sort == 3 ? " sort-item-selected" : "")">
+                        <span>امتیاز کاربران</span>
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <div id="sortItem4" onclick="changeSortOrder(4)" class="advertise-list__sort-popup-item@(Model.Sort == 4 ? " sort-item-selected" : "")">
+                        <span>نظافت</span>
+                        <i class="fa fa-check"></i>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div id="accListContainer">
+        @await Html.PartialAsync("_AdvertiseListItems", Model)
+    </div>
+</div>
+@if (Model.Category != null && !string.IsNullOrEmpty(Model.Category.CategoryPostTitle) && 
+    string.IsNullOrEmpty(Model.Category.CategoryPostText) == false)
+{
+    <div class="advertise-category__description" style="white-space:unset;border-radius: 5px;">
+        <header>
+            <h2 style="margin:10px;font:15px Biransans;">@Model.Category.CategoryPostTitle</h2>
+        </header>
+        @Html.Raw(Model.Category.CategoryPostText)
+    </div>
+}
+<div class="advertise-category-link__title">سوالات متداول</div>
+<div class="advertise-list__faq-container">
+    <p class="public__header-text">
+        <strong>@Model.CategoryFaqTrustQuestion</strong>
+        <i class="fa fa-chevron-left"></i>
+    </p>
+    <p class="public__content-text">@Model.CategoryFaqTrustAnswer</p>
+    <p class="public__header-text">
+        <strong>@Model.CategoryFaqPriceQuestion</strong>
+        <i class="fa fa-chevron-left"></i>
+    </p>
+    <p class="public__content-text">@Model.CategoryFaqPriceAnswer</p>
+    @if (!string.IsNullOrEmpty(Model.Category.CityAreaListString))
+    {
+        <p class="public__header-text">
+            <strong>@Model.CategoryFaqAreasQuestion</strong>
+            <i class="fa fa-chevron-left"></i>
+        </p>
+        <p class="public__content-text">@Model.CategoryFaqAreasAnswer</p>
+    }
+    <p class="public__header-text">
+        <strong>@Model.CategoryFaqEvidenceQuestion</strong>
+        <i class="fa fa-chevron-left"></i>
+    </p>
+    <p class="public__content-text">@Model.CategoryFaqEvidenceAnswer</p>
+    <p class="public__header-text">
+        <strong>@Model.CategoryFaqReserveQuestion</strong>
+        <i class="fa fa-chevron-left"></i>
+    </p>
+    <div class="public__content-text">
+        @Model.CategoryFaqReserveAnswer
+        <br />
+        <div style="text-align:center; margin: 20px;">
+            <a href="https://www.aparat.com/v/vS7Oe" target="_blank" rel="noreferrer"><i class="fas fa-play-circle"></i> مشاهده در آپارات</a>
+        </div>
+        
+        @*<iframe class="style-video" src="https://www.aparat.com/video/video/embed/videohash/vS7Oe/vt/frame" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>*@
+    </div>
+    <p class="public__header-text">
+        <strong>@Model.CategoryFaqHostQuestion</strong>
+        <i class="fa fa-chevron-left"></i>
+    </p>
+    <p class="public__content-text">@Model.CategoryFaqHostAnswer</p>
+</div>
+@section HeaderAddition
+{
+    @{
+        string canonicalUrl;
+        if (!string.IsNullOrEmpty(phrase))
+        {
+            canonicalUrl = "https://www.amlakbashi.com/ایران";
+        }
+        else
+        {
+            canonicalUrl = "https://www.amlakbashi.com" + (Model.Category == null || Model.Area < 1 ? Model.RawUrl :
+                "/s/" + Model.Category.City + "/" + Model.CityString + (Model.Category.Type == Advertise.AdvertiseType.All ? "" : "/" + Model.AccTypeUrlString));
+        }
+    }
+    @if (Model.AdvertiseItems.Any())
+    {
+        <link rel="canonical" href="@(canonicalUrl)" />
+        @*if (Model.CurrentPageNumber > 1)
+            {
+                <link rel="prev" href="@(canonicalUrl)@(Model.CurrentPageNumber == 2 ? "" : "?page=" + (Model.CurrentPageNumber - 1).ToString())" />
+            }
+            <link rel="canonical" href="@(canonicalUrl)@(Model.CurrentPageNumber > 1 ? "?page=" + Model.CurrentPageNumber : "")" ) />
+            if (Model.PagesCount > Model.CurrentPageNumber)
+            {
+                <link rel="next" href="@(canonicalUrl)?page=@(Model.CurrentPageNumber + 1)" />
+            }*@
+    }
+    else
+    {
+        <meta name="robots" content="noindex, follow">
+    }
+    @*<link rel="amphtml" href="https://www.amlakbashi.com/amp@(Model.RawUrl)" />*@
+    <meta property="og:url" content="https://www.amlakbashi.com@(Model.RawUrl)" />
+    <meta property="og:image" content='@("https://www.amlakbashi.com" + (Model.AdvertiseItems.Any() && Model.AdvertiseItems.First().PhotoID > 0 ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.AdvertiseItems.First().PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
+}
+
+@section ScriptLink {
+    <script type="text/javascript" src="/js/min/app-category.min.js" asp-append-version="true"></script>
+}
+
+@section ScriptBlock
+{
+    <script defer="defer" type="text/javascript">
+        if (!(new Date().getHours() > 3)) {
+            pastDayOffset = -1;
+        }
+        allowSelectRegion = true;
+        initialProvince = '@Model.Category.Province';
+        initialCity = '@Model.Category.City';
+        initialArea = '@Model.Area';
+    </script>
+    <script type="text/javascript">
+        var categoryId = @(Model.Category == null ? 0 : Model.Category.Id);
+        var categoryArea = @(Model.Category == null ? 0 : Model.Area);
+        var categoryCity = @(Model.Category == null || Model.Category.City == null ? 0 : Model.Category.City);
+        var next_page = @(next_page);
+        var previous_page = @(previous_page);
+        var norouz_special = @(Model.NorouzSpecial ? "true" : "false" );
+        var discount_homes = @(Model.DiscountHomes ? "true" : "false" );
+        var instant_reserve = @(Model.InstantReserve ? "true" : "false");
+        var today_empty_homes = @(Model.TodayEmptyHomes ? "true" : "false" );
+        var hygieneProtocol = @(Model.HygieneProtocol ? "true" : "false" );
+        var empty_range_from = @(string.IsNullOrEmpty(Model.EmptyRangeFrom) ? "undefined" : Html.Raw("'" + Model.EmptyRangeFrom + "'"));
+        var empty_range_to = @(string.IsNullOrEmpty(Model.EmptyRangeTo) ? "undefined" : Html.Raw("'" + Model.EmptyRangeTo + "'"));
+        currentGuestCount = @(capacity);
+
+        @if (moreFilterCount > 0)
+        {
+            @:$('.body').attr("data-more-filter", "true");
+        }
+
+        @*var shouldRemoveDates = @(string.IsNullOrEmpty(Model.EmptyRangeFrom) ||
+            string.IsNullOrEmpty(Model.EmptyRangeTo) ? "true" : "false");*@
+
+//function checkCoronaMsgShown() {
+//    var shown = getCookie("coronamsgshown") === "yes";
+//    return shown;
+//}
+
+//function setCoronaMsgShown() {
+//    setCookie("coronamsgshown", "yes", 1);
+//}
+
+        @*$(document).ready(function(){
+            if (!checkCoronaMsgShown()) {
+                setTimeout(function(){
+                    if ('@(category == null || (category.Province != 1 && category.Province != 352))' === 'True') {
+                        showInfoMessage('', 'به دلیل جلوگیری از شیوع بیماری کرونا تا اطلاع ثانوی امکان رزرو وجود ندارد');
+                        setCoronaMsgShown();
+                    }
+                }, 1000);
+            }
+        });*@
+
+    @*@{
+            var url_splitted = ((string)Model.RawUrl).Substring(1).Split('/');
+        }*@
+        @{
+        var pos = 2;
+    }
+
+        //$("form#advertise-filter-form").submit(function (e) {
+        //    var form = $(this);
+        //    if ($('#js-ajax-filter').val() == "true") {
+        //        e.preventDefault();
+        //        $.ajax({
+        //            type: "POST",
+        //            url: "/category/category",
+        //            data: form.serialize(),
+        //            beforeSend: function () {
+        //                $('img.home-page__advertise-image').attr('src', '/resource/img/lazy-16_9.png');
+        //                //$('img.home-page__advertise-image').attr('src', '/resource/images/loader.gif');
+        //            },
+        //            success: function (response) {
+        //                $("#accListContainer").html(response);
+        //                window.history.pushState({ path: window.location.href }, null, getConstUrl());
+        //                $('html, body').animate({ scrollTop: $('#accListContainer').offset().top - 250 }, 800);
+        //                setFilterSign();
+        //            },
+        //            error: function (xhr) {
+        //                alert("error");
+        //            }
+        //        });
+        //    }
+        //    else {
+        //    }
+        //});
+    </script>
+
+    <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org",
+        "@@type": "BreadcrumbList",
+        "itemListElement": [
+        {
+        "@@type": "ListItem",
+        "position": 1,
+        "name": "املاک باشی",
+        "item": "https://www.amlakbashi.com"
+        }
+        @(pos > 1 ? "," : "" )
+        {
+        "@@type": "ListItem",
+        "position": @pos,
+        "name": "اجاره روزانه",
+        "item": "https://www.amlakbashi.com/ایران"
+        }
+        @{pos++;}
+        @if (Model.Category.City > 0)
+        {
+            @(pos > 1 ? "," : "" )
+            @:{
+            @:"@@type": "ListItem",
+            @:"position": @pos,
+            @:"name": "@Model.CityString",
+            @:"item": "https://www.amlakbashi.com/s/@(Model.Category.City)/@(Model.CityString)"
+            @:}
+            pos++;
+        }
+        @if (Model.Category.City > 0 && Model.Category.Type != Advertise.AdvertiseType.All)
+        {
+            @(pos > 1 ? "," : "" )
+            @:{
+            @:"@@type": "ListItem",
+            @:"position": @pos,
+            @:"name": "@Model.AccTypeUrlString.Replace("-", " ")",
+            @:"item": "https://www.amlakbashi.com/s/@(Model.Category.City)/@(Model.CityString)/@(Model.AccTypeUrlString)"
+            @:}
+            pos++;
+        }
+        ]
+        }
+    </script>
+    <script>
+    if ('@(Model.Category != null)' === 'True') {
+        gtag('event', 'select_content', {
+            "content_type": "product_list",
+            "items": [
+                {
+                    "id": "@(Model.Category != null ? Model.Category.Id : 0)",
+                    "name": "@(Model.Category != null ? Model.Category.Title : "")",
+                    "category": "@(Model.Category != null ? (Model.Category.Province > 0 ? (Model.Category.City > 0 ? Model.ProvinceString + "/" + Model.CityString : "استان " + Model.ProvinceString) : (Model.Category.CountryDirection > 0 ? Model.CountryDirectionString : "کل کشور")) : "")"
+                }
+            ]
+        });
+    }
+    else {
+        gtag('event', 'select_content', {
+            "content_type": "product_list",
+            "items": [
+                {
+                    "id": "0",
+                    "name": "اجاره ویلا شمال",
+                    "category": "شمال"
+                }
+            ]
+        });
+    }
+    </script>
+    @{
+        var items = Model.AdvertiseItems.ToList();
+        var itemCount = items.Count;
+        if (itemCount > 0)
+        {
+            @:<script type="application/ld+json">
+                @:{
+                @:"@@context": "https://schema.org",
+                @:"@@type": "ItemList",
+                @:"itemListElement": [
+                for (int i = 0; i < itemCount; i++)
+                {
+                    var item = items[i];
+                    var img_src = item.PhotoID > 0 ? string.Format("/عکس-آگهی/{0}", item.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
+                    var position = i + 1;
+                    var title = item.Title;
+                    var description = item.Description;
+                    var count_review = item.RateCount;
+                    var rate = item.OverallRate;
+
+                    @:{
+                    @:"@@type": "ListItem",
+                    @:"position": "@(position)",
+                    @:"item": {
+                    @:"@@type": "Hotel",
+                    @:"url": "@( "https://www.amlakbashi.com" + Model.RawUrl + "#advertise_" + item.AdvertiseID)",
+                    @:"name": "@(title)",
+                    @:"image": [
+                    @:"https://www.amlakbashi.com@(img_src)"
+                    @:],
+                    @:"description": "@(description)"
+                    if (count_review > 0)
+                    {
+                        @:,
+                        @:"aggregateRating": {
+                        @:"@@type": "AggregateRating",
+                        @:"ratingValue": "@(rate)",
+                        @:"ratingCount": "@(count_review)",
+                        @:"bestRating": "5",
+                        @:"worstRating": "0"
+                        @:}
+                    }
+                    @:,
+                    @:"priceRange" : "از شبی @(item.DailyPrice) تومان"
+                    @:,
+                    @:"address" : {
+                    @:"addressLocality" : "@(!string.IsNullOrEmpty(item.areaName) ? item.cityName : item.provinceName)",
+                    @:"addressRegion" : "@(!string.IsNullOrEmpty(item.areaName) ? item.areaName : item.cityName)",
+                    @:"addressCountry" : "Iran",
+                    @:"@@type" : "PostalAddress",
+                    @:"streetAddress" : "@AdvertiseMainLocalization.FilteredAddress(item.address)",
+                    @:"postalCode" : "14717"
+                    @:}
+                    @:,
+                    @:"telephone" : "026-32565304"
+
+                    @:}
+                    @:} @(i < itemCount - 1 ? "," : "")
+                }
+                @:]
+                @:}
+                @:
+            @:</script>
+        }
+
+        <script type="application/ld+json">
+            {"@@context":"https://schema.org",
+            "@@type":"FAQPage",
+            "mainEntity":[
+            {"@@type":"Question",
+            "name":"@(Model.CategoryFaqTrustQuestion)",
+            "acceptedAnswer":[
+            {"@@type":"Answer",
+            "text":"@(Model.CategoryFaqTrustAnswer)"
+            }
+            ]
+            },
+            {"@@type":"Question",
+            "name":"@(Model.CategoryFaqPriceQuestion)",
+            "acceptedAnswer":[
+            {"@@type":"Answer",
+            "text":"@(Model.CategoryFaqPriceAnswer)"
+            }
+            ]
+            },
+            @if (!string.IsNullOrEmpty(Model.Category.CityAreaListString))
+            {
+                @:{
+                @:"@@type":"Question",
+                @:"name":"@(Model.CategoryFaqAreasQuestion)",
+                @:"acceptedAnswer":[{
+                @:"@@type":"Answer",
+                @:"text":"@(Model.CategoryFaqAreasAnswer)"}]},
+            }
+            {"@@type":"Question","name":"@(Model.CategoryFaqEvidenceQuestion)",
+            "acceptedAnswer":[{"@@type":"Answer",
+            "text":"@(Model.CategoryFaqEvidenceAnswer)"}]},
+            {"@@type":"Question",
+            "name":"@(Model.CategoryFaqReserveQuestion)",
+            "acceptedAnswer":[{"@@type":"Answer",
+            "text":"@(Model.CategoryFaqReserveAnswer)"}]}]},
+            {"@@type":"Question",
+            "name":"@(Model.CategoryFaqHostQuestion)",
+            "acceptedAnswer":[{"@@type":"Answer",
+            "text":"@(Model.CategoryFaqHostAnswer)"}]}]},
+        </script>
+    }
+}

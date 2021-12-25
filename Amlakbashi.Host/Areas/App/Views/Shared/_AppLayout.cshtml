@@ -1,0 +1,346 @@
+﻿@using Entities = Amlakbashi.Core.Entities;
+@inject IUserAccessor userAccessor;
+
+@{
+    var isHomePage = ViewBag.HomePage != null && ViewBag.HomePage;
+    var logoName = "amlakbashi-logo";
+}
+
+<!DOCTYPE html>
+<html class="theme3" lang="fa">
+<head>
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    @*<script async src="https://www.googletagmanager.com/gtag/js" defer></script>
+        <script async defer>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
+            gtag('config', 'AW-706947688');
+        </script>*@
+    <!-- Event snippet for Purchased (Tracking) conversion page -->
+    @*<script async defer>
+        gtag('event', 'conversion', {
+            'send_to': 'AW-850965714/5NVbCJTHpZ0BENLp4pUD',
+            'transaction_id': ''
+        });
+        </script>*@
+    @*<script> !function (e, t, a) { "use strict"; var s = t.head || t.getElementsByTagName("head")[0], p = t.createElement("script"); e.iwmfBadge = a, p.async = true, p.src = "https://cdn.iwmf.ir/js/people-votes/people-vote-2-2.js", s.appendChild(p) }(window, document, "o-bottom-left"); </script>*@
+    @RenderSection("HeaderAddition", required: false)
+    <title>@ViewBag.Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/file/getpngfile?file_name=/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="offline" href="/offline.html">
+    <meta name="theme-color" content="#fdd835" />
+    <link rel='index' title='املاک باشی' href='@string.Format("{0}://{1}", Context.Request.Scheme, Context.Request.Host)' />
+    <link rel='dns-prefetch' href='//googletagmanager.com' />
+    @*<link rel='dns-prefetch' href='//client.crisp.chat' />*@
+    <link rel='dns-prefetch' href='//google-analytics.com' />
+    @*<link rel='dns-prefetch' href='//settings.crisp.chat' />*@
+    <meta name="viewport" content="width=device-width, initial-scale= 1" />
+    <meta name="coverage" content="Worldwide" />
+    <meta name="robots" content="index,follow,all" />
+    <meta name="googlebot" content="index,follow" />
+    <meta name="revisit-after" content="1 days" />
+    <meta name="alexaVerifyID" content="jz4RhWgXn7cMuI-LPQu9Xi3BmX4" />
+    <meta name="msvalidate.01" content="583A6B33B54859D70022EF7B578CF394" />
+    <meta name="samandehi" content="627725117" />
+    @if (ViewBag.keywords != null)
+    {
+        <meta name="keywords" content="@ViewBag.keywords" />
+    }
+    else
+    {
+        <meta name="keywords" content="املاک باشی - سایت اجاره ویلا و اجاره روزانه سوئیت و آپارتمان مبله" />
+    }
+    @{
+        var meta_description = ViewBag.Description != null ?
+            ViewBag.Description :
+            "املاک باشی - اجاره روزانه ویلا و اجاره روزانه سوئیت و آپارتمان مبله";
+    }
+    <meta name="description" content="@meta_description" />
+    <meta property="og:locale" content="fa_IR" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="املاک باشی" />
+    <meta property="og:title" content="@ViewBag.Title" />
+    <meta property="og:description" content="@meta_description" />
+    <meta name="enamad" content="344312021" />
+
+    @RenderSection("StyleLink", required: false)
+    <environment include="Development">
+        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.default.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/alertify.js-0.3.11/themes/alertify.core.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/fa-icons.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/rating/themes/fontawesome-stars.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/star-rating/star-rating.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/chat-popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-footer.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/message-popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/intlTelInput.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/login/login-Popup.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/footer.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css" asp-append-version="true" />
+
+        <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-shared.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/portal/portal-header.css" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" type="text/css" href="/css/master.min.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/css/master-critical.min.css" asp-append-version="true">
+    </environment>
+    <style>
+        @RenderSection("StyleBlock", required: false)
+    </style>
+</head>
+<body>
+    @await Html.PartialAsync("_ImpersonateContainer", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hidden", true } })
+    <div id="loading-icon" class="loading-contianer">
+        <div class="ui active large loader loading-icon"></div>
+    </div>
+    <div class="adloading"></div>
+    @*@if (ViewBag.CurrentPage != "AdvertiseItem")
+        {
+            <div onclick="showPresentPopup()" class="present-prize__button">
+                <img class="lazy" data-srcset="/file/resourceimagegif?file_name=gift-75w 75w,
+                    /file/resourceimagegif?file_name=gift-92w 92w"
+                     sizes="(max-width: 680px) 75px,
+                    92px"
+                     data-src="/file/resourceimagegif?file_name=gift-75w" alt="gift" />
+            </div>
+        }*@
+    <div class="master__page">
+        @if (ViewBag.LockInPage == null || !ViewBag.LockInPage)
+        {
+            <div class="master__header">
+                <div class="master_header-child master_header-logo">
+                    <a href="/app/home/main" title="املاک باشی">
+                        @*<img srcset="/file/resourceimagepng?file_name=@(logoName)-400w 75w,
+                               /file/resourceimagepng?file_name=@(logoName)-680w 94w,
+                               /file/resourceimagepng?file_name=@(logoName)-900w 112w,
+                                /file/resourceimagepng?file_name=@(logoName)-1200w 135w"
+                            sizes="(max-width: 400px) 75px,
+                                (max-width: 680px) 94px,
+                                (max-width: 900px) 112px,
+                                135px"
+                            src="/file/resourceimagepng?file_name=@(logoName)-680w" alt="لوگوی املاک باشی" title="املاک باشی">*@
+
+                        <img width="75" height="33" src="/file/resourceimagepng?file_name=@(logoName)-400w"
+                             srcset="/file/resourceimagepng?file_name=@(logoName)-400w 75w,
+                                /file/resourceimagepng?file_name=@(logoName)-680w 94w,
+                                /file/resourceimagepng?file_name=@(logoName)-900w 112w,
+                                 /file/resourceimagepng?file_name=@(logoName)-1200w 135w"
+                             alt="لوگوی املاک باشی" title="املاک باشی" style="width: 100%; height: auto;">
+                    </a>
+                    @if (ViewBag.CurrentPage == "AdvertiseCategory" || ViewBag.CurrentPage == "AdvertiseItem")
+                    {
+                        @await Html.PartialAsync("_MasterSearch");
+                    }
+                </div>
+                <div class="master_header-child">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a id="dashboard_button" asp-area="app" asp-controller="home" asp-action="dashboard" class="master_header-account app">
+                            <p><i class="fa fa-user"></i> حساب من </p>
+                        </a>
+                    }
+                    else
+                    {
+                        <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account">
+                            <p></p>
+                        </a>
+                    }
+                </div>
+                <div class="master_header-child">
+                    <div onclick="toggleMenu()" class="master__header-menu">
+                        <i class="fa fa-bars"></i>
+                        <span>منو</span>
+                    </div>
+                </div>
+            </div>
+            @RenderSection("TopPin", false)
+            <div class="master__menu">
+                @if (ViewBag.home == null || !ViewBag.home)
+                {
+                    <a class="master__menu-item" href="/">صفحه اول</a>
+                }
+                @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+                {
+                    <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=1"> رزرو های من </a>
+                    <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی </p>
+                    <a class="master__menu-item" href="/contact"> تماس با ما</a>
+                    <a class="master__menu-item js-present-prize-link" href="/post/presentandprize">هدیه سفر</a>
+                    <a class="master__menu-item" href="/accomodation/accbasicform"> ثبت آگهی</a>
+                }
+                else
+                {
+                    <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=2"> رزرو های من</a>
+                    <a class="master__menu-item" href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)"> آگهی های من</a>
+                    <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی</p>
+                    <a class="master__menu-item" href="/contact"> تماس با ما </a>
+                    <a class="master__menu-item" href="/post/downloadapp">نصب اپلیکیشن </a>
+                    <a class="master__menu-item" href="/accomodation/accbasicform"> ثبت آگهی</a>
+                    <a class="master__menu-item js-present-prize-link" href="/post/presentandprize">هدیه سفر</a>
+                }
+            </div>
+        }
+        <div class="body">
+            @RenderBody()
+        </div>
+        @*@if (ViewBag.isAccPage == null || !ViewBag.isAccPage)
+            {
+            <div class="installPopup install-app-banner">
+                <p class="installBtn">نصب اپلیکیشن املاک باشی</p>
+            </div>
+            }*@
+        <div style="display: none" id="chat_hidden_holder"></div>
+        <input type="hidden" value="0" id="js-support-chat-id">
+        <environment include="Development">
+            <script src="/resource/scripts/general/message-popup.js" defer asp-append-version="true"></script>
+            <script src="/resource/alertify.js-0.3.11/src/alertify.js" defer asp-append-version="true"></script>
+            <script src="/resource/rating/jquery.barrating.min.js" defer asp-append-version="true"></script>
+            <script src="/resource/Scripts/jquery.scrollTo.min.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/string-replace-all.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/ajax-helper.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/client-helper.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/loading-indicator.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/user-rating.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/input-validation-helper.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/master.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/lazy-loading.js" defer asp-append-version="true"></script>
+            <script src="/resource/Scripts/general/login/intlTelInput.min.js" defer asp-append-version="true"></script>
+            <script src="/resource/scripts/general/login/login-popup.js" defer asp-append-version="true"></script>
+
+            @*<script src="/resource/scripts/jquery-2.1.1.min.js" asp-append-version="true"></script>*@
+            <script src="/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
+            <script src="/resource/scripts/firebase-5.9.4/firebase-app.js" asp-append-version="true"></script>
+            <script src="/resource/scripts/firebase-5.9.4/firebase-messaging.js" asp-append-version="true"></script>
+            <script src="/resource/scripts/firebase/firebase-initialization.js" asp-append-version="true"></script>
+        </environment>
+        <environment exclude="Development">
+            <script src="/js/master-defer.min.js" defer asp-append-version="true"></script>
+            <script src="/js/master.min.js" asp-append-version="true"></script>
+        </environment>
+        <script src="/js/signalr/dist/browser/signalr.min.js" asp-append-version="true"></script>
+        <script type="text/javascript">
+            var lockInPage = @(ViewBag.LockInPage != null && ViewBag.LockInPage == true ? "true" : "false");
+            var isHomePage = @(ViewBag.home == null || !ViewBag.home ? "false" : "true");
+        </script>
+        @RenderSection("ScriptLink", required: false)
+        @RenderSection("ScriptBlock", required: false)
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var installBtnShown = false;
+                var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                var isAndroid = false;
+                var isIos = false;
+                if (/android/i.test(userAgent)) {
+                    isAndroid = true;
+                }
+                else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                    isIos = true;
+                }
+                if (isAndroid || isIos) {
+                    var shown = checkAppPopupShown();
+                    if (!shown) {
+
+                        setTimeout(function () {
+                            $('.installPopup').slideDown();
+                            installBtnShown = true;
+
+                            $('.installBtn').click(function () {
+                                $('.installPopup').slideUp();
+                                installBtnShown = false;
+
+                                showNoYesMessage('نصب اپلیکیشن املاک باشی', '',
+                                    function () {
+                                        setAppPopupShown(true);
+                                    },
+                                    function () {
+                                        setAppPopupShown(false);
+                                    }
+                                    , {
+                                        contentUrl: '/post/downloadapppopup?ios=' + isIos,
+                                        yesText: 'بعدا',
+                                        noText: 'نمایش نده'
+                                    }
+                                );
+                            });
+
+                            document.addEventListener("scroll", function () {
+                                if (installBtnShown && window.pageYOffset > 1000) {
+                                    $('.installPopup').slideUp();
+                                    installBtnShown = false;
+                                }
+                            });
+                        }, 5000);
+                    }
+                }
+            });
+
+            function setCookie(c_name, value, exdays) {
+                var exdate = new Date();
+                exdate.setDate(exdate.getDate() + exdays);
+                var c_value = escape(value) + ((exdays == null) ? "" :
+                    "; expires=" + exdate.toUTCString());
+                document.cookie = c_name + "=" + c_value;
+            }
+
+            Date.prototype.addHours = function (h) {
+                this.setTime(this.getTime() + (h * 60 * 60 * 1000));
+                return this;
+            }
+
+            function setCookieForHours(c_name, value, exHours) {
+                var exdate = new Date();
+                exdate = exdate.addHours(exHours);
+                var c_value = escape(value) + ((exHours == null) ? "" :
+                    "; expires=" + exdate.toUTCString());
+                document.cookie = c_name + "=" + c_value;
+            }
+
+            function getCookie(c_name) {
+                var c_value = document.cookie;
+                var c_start = c_value.indexOf(" " + c_name + "=");
+                if (c_start == -1) {
+                    c_start = c_value.indexOf(c_name + "=");
+                }
+                if (c_start == -1) {
+                    c_value = null;
+                }
+                else {
+                    c_start = c_value.indexOf("=", c_start) + 1;
+                    var c_end = c_value.indexOf(";", c_start);
+                    if (c_end == -1) {
+                        c_end = c_value.length;
+                    }
+                    c_value = unescape(c_value.substring(c_start, c_end));
+                } return c_value;
+            }
+
+            function checkAppPopupShown() {
+                var shown = getCookie("apppopupshown") === "yes";
+                return shown;
+            }
+
+            function setAppPopupShown(temp) {
+                if (temp) {
+                    setCookieForHours("apppopupshown", "yes", 3);
+                }
+                else {
+                    setCookie("apppopupshown", "yes", 30);
+                }
+            }
+        </script>
+    </div>
+
+    <!--<div style="min-height:681.44px;" class="footer partialContents" data-onLoad="onLoadFooter" data-url="/post/getfooter">
+        <div style="width:100%;display:flex;flex-flow:row;background-color:white;">-->
+    @*<img src="/file/loading" style="margin: auto;" />*@
+    <!--</div>
+    </div>-->
+    @*@await Html.PartialAsync("_footer")*@
+    @await Html.PartialAsync("_LoginPopup")
+</body>
+</html>

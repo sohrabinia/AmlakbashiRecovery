@@ -6,7 +6,7 @@
 @{
     ViewBag.Title = "مدیریت آگهی ها";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
-    var data = ViewBag.dto as IEnumerable<AdvertiseIndexDTO>;
+    var data = ViewBag.dto as IEnumerable<AdvertiseOldIndexDTO>;
 }
 
 <style>
@@ -404,6 +404,7 @@
             },
             initialValue: true
         });
+
         $("#minReserveNorouzFromDate").val('@ViewBag.minReserveNorouzFromDate');
 
         $('#js-status-filter-select').change(function () {

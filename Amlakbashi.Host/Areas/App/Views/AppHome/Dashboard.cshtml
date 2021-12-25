@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "داشبورد";
+    ViewBag.dashboard = true;
+    Layout = "_AppDashboardLayout";
+}
+
+<div class="acc-container">
+    <div class="dashboard-container">
+        @{
+            var PostAcc = "/app/advertise/list";
+            var Wallet = "/app/wallet/userwalletmanager";
+            var Reserve = "/app/reserve/list?";
+            var profile = "/app/user/profilemanager";
+            var gifTtravel = "/app/wallet/prize";
+            var favorite = "/app/advertise/favorites";
+            var registerAdvertise = "/app/advertise/updatebasic";
+            var invoice = "/app/reserve/invoice";
+        }
+        @if (ViewBag.userGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
+        {
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "رزرو های من  " }, { "href", $"{Reserve}?selecttype=1&category=1" }, { "class", "fa-book" } })
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "پروفایل من " }, { "href", profile }, { "class", "fa-user" } })
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "هدیه سفر " }, { "href", gifTtravel }, { "class", "fa-gift" } })
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "علاقه مندی های من" }, { "href", favorite }, { "class", "fa-heart" } })
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "کیف پول " }, { "href", Wallet }, { "class", "fa-money-bill-alt" } })
+
+        }
+        else
+        {
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "رزرو های من  " }, { "href", $"{Reserve}?selecttype=2&category=0" }, { "class", "fa-book" } })
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", " آگهی های من" }, { "href", PostAcc }, { "class", "fa-th-list" } })
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "پروفایل من " }, { "href", profile }, { "class", "fa-user" } })
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", " ثبت آگهی جدید" }, { "href", registerAdvertise }, { "class", "fa-plus" } })
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "صورت حساب رزرو ها " }, { "href", invoice }, { "class", "fa-list" } })
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "کیف پول " }, { "href", Wallet }, { "class", "fa-money-bill-alt" } })
+            @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+        new ModelStateDictionary()) { { "title", "هدیه سفر " }, { "href", gifTtravel }, { "class", "fa-gift" } })
+        }
+    </div>
+</div>

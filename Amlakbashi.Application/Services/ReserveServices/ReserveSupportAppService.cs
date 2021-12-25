@@ -9,13 +9,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Amlakbashi.Mediator.Commands.ReserveCommands;
+using MediatR;
+using Amlakbashi.Core.Common.Extensions;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
     internal class ReserveSupportAppService : AppServiceBase<ReserveSupport, int>, IReserveSupportAppService
     {
-        public ReserveSupportAppService(IRepository<ReserveSupport, int> repository) : base(repository)
+        private readonly IMediator mediator;
+        public ReserveSupportAppService(IRepository<ReserveSupport, int> repository, IMediator mediator) : base(repository)
         {
+            this.mediator = mediator;
         }
 
         public void Insert(ReserveSupport item)
@@ -137,6 +142,71 @@ namespace Amlakbashi.Application.Services.ReserveServices
         public IList<ReserveSupport> GetListBySupporterId(int supporterId)
         {
             return Repository.Query(q => q.Where(w => w.SupporterID == supporterId)).ToList();
+        }
+
+        public IQueryable<Reserve> FilterBySupporterStatus(int yourUserID,
+            IQueryable<Reserve> reserves, ReserveSupport.SupporterStatus supporterStatus)
+        {
+            var reserve_ids = new List<long>();
+            foreach (var reserve in reserves)
+            {
+                if (IsInSupporterStatus(reserve, supporterStatus, yourUserID))
+                {
+                    reserve_ids.Add(reserve.Id);
+                }
+            }
+            return reserves.Where(x => reserve_ids.Contains(x.Id));
+        }
+
+        public bool IsInSupporterStatus(Reserve reserve,
+            ReserveSupport.SupporterStatus supporterStatus, int yourUserID)
+        {
+            ReserveSupport currentReserveSupport;
+            var supports = GetRelatedSupports(reserve);
+            var count = supports.Count;
+            if (count < 1 || !supports.Any(x => x.SupporterID > 0))
+            {
+                if (count < 1)
+                {
+                    mediator.Enqueue(new ReserveAddHandleCommand(reserve.Id)); // why enqueue?
+                }
+                currentReserveSupport = null;
+                if (supporterStatus == ReserveSupport.SupporterStatus.Free)
+                    return true;
+            }
+            currentReserveSupport = supports.FirstOrDefault(x => x.SupporterID > 0 && (
+                x.Status == ReserveSupport.SupportStatus.Supporting || x.Status == ReserveSupport.SupportStatus.Done));
+            if (currentReserveSupport == null)
+            {
+                var rs = supports.FirstOrDefault(x => x.SupporterID > 0);
+                if (rs != null && rs.Status == ReserveSupport.SupportStatus.Expired)
+                {
+                    currentReserveSupport = rs;
+                    if (supporterStatus == ReserveSupport.SupporterStatus.Expired)
+                        return true;
+                }
+                if (supporterStatus == ReserveSupport.SupporterStatus.Free)
+                    return true;
+            }
+            else
+            {
+                if (currentReserveSupport.Status == ReserveSupport.SupportStatus.Done)
+                {
+                    if (supporterStatus == ReserveSupport.SupporterStatus.Done)
+                        return true;
+                }
+                if (currentReserveSupport.SupporterID == yourUserID)
+                {
+                    if (supporterStatus == ReserveSupport.SupporterStatus.SupportingByYou)
+                        return true;
+                }
+                else
+                {
+                    if (supporterStatus == ReserveSupport.SupporterStatus.SupportingByOthers)
+                        return true;
+                }
+            }
+            return false;
         }
     }
 }

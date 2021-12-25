@@ -5,23 +5,23 @@
 <div class="reserve-complex__category-container">
     @if (Model.ApartmentChildren.Count > 0)
     {
-        @await Html.PartialAsync("ReserveComplexPartials/_ReserveComplexApartment", Model)
+        @await Html.PartialAsync("/Views/Accomodation/ReserveComplexPartials/_ReserveComplexApartment.cshtml", Model)
     }
     @if (Model.SuitChildren.Count > 0)
     {
-        @await Html.PartialAsync("ReserveComplexPartials/_ReserveComplexSuit", Model)
+        @await Html.PartialAsync("/Views/Accomodation/ReserveComplexPartials/_ReserveComplexSuit.cshtml", Model)
     }
     @if (Model.HouseChildren.Count > 0)
     {
-        @await Html.PartialAsync("ReserveComplexPartials/_ReserveComplexHouse", Model)
+        @await Html.PartialAsync("/Views/Accomodation/ReserveComplexPartials/_ReserveComplexHouse.cshtml", Model)
     }
     @if (Model.VillaChildren.Count > 0)
     {
-        @await Html.PartialAsync("ReserveComplexPartials/_ReserveComplexVilla", Model)
+        @await Html.PartialAsync("/Views/Accomodation/ReserveComplexPartials/_ReserveComplexVilla.cshtml", Model)
     }
     @if (Model.HutChildren.Count > 0)
     {
-        @await Html.PartialAsync("ReserveComplexPartials/_ReserveComplexHut", Model)
+        @await Html.PartialAsync("/Views/Accomodation/ReserveComplexPartials/_ReserveComplexHut.cshtml", Model)
     }
     @*@if (Model.HotelChildren.Count > 0)
     {
