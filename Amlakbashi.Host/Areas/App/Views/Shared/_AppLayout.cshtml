@@ -95,7 +95,7 @@
     </style>
 </head>
 <body>
-    @await Html.PartialAsync("_ImpersonateContainer", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hidden", true } })
+    @*@await Html.PartialAsync("_ImpersonateContainer", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hidden", true } })*@
     <div id="loading-icon" class="loading-contianer">
         <div class="ui active large loader loading-icon"></div>
     </div>
@@ -147,7 +147,7 @@
                     }
                     else
                     {
-                        <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account">
+                        <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account is-app">
                             <p></p>
                         </a>
                     }
@@ -160,30 +160,27 @@
                 </div>
             </div>
             @RenderSection("TopPin", false)
-            <div class="master__menu">
-                @if (ViewBag.home == null || !ViewBag.home)
-                {
-                    <a class="master__menu-item" href="/">صفحه اول</a>
-                }
-                @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
-                {
-                    <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=1"> رزرو های من </a>
-                    <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی </p>
-                    <a class="master__menu-item" href="/contact"> تماس با ما</a>
-                    <a class="master__menu-item js-present-prize-link" href="/post/presentandprize">هدیه سفر</a>
-                    <a class="master__menu-item" href="/accomodation/accbasicform"> ثبت آگهی</a>
-                }
-                else
-                {
-                    <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=2"> رزرو های من</a>
-                    <a class="master__menu-item" href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)"> آگهی های من</a>
-                    <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی</p>
-                    <a class="master__menu-item" href="/contact"> تماس با ما </a>
-                    <a class="master__menu-item" href="/post/downloadapp">نصب اپلیکیشن </a>
-                    <a class="master__menu-item" href="/accomodation/accbasicform"> ثبت آگهی</a>
-                    <a class="master__menu-item js-present-prize-link" href="/post/presentandprize">هدیه سفر</a>
-                }
-            </div>
+    <div class="master__menu">
+        @if (ViewBag.home == null || !ViewBag.home)
+        {
+            <a class="master__menu-item" href="/app/home/main">خانه</a>
+        }
+        @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+        {
+            <a class="master__menu-item" href="/app/reserve/list?selectType=1">رزرو ها</a>
+            <a class="master__menu-item" href="/app/advertise/updatebasic">ثبت آگهی</a>
+            @*<p class="master__menu-item" onclick="searchAdvertiseId()">جستجو آگهی</p>*@
+            @*<a class="master__menu-item" href="/contact"> تماس با ما</a>*@
+        }
+        else
+        {
+            <a class="master__menu-item" href="/app/reserve/list?selectType=2">رزرو ها</a>
+            <a class="master__menu-item" href="/app/advertise/list">آگهی ها</a>
+            <a class="master__menu-item" href="/app/advertise/updatebasic">ثبت آگهی</a>
+            @*<p class="master__menu-item" onclick="searchAdvertiseId()">جستجو آگهی</p>*@
+            @*<a class="master__menu-item" href="/contact"> تماس با ما </a>*@
+        }
+    </div>
         }
         <div class="body">
             @RenderBody()

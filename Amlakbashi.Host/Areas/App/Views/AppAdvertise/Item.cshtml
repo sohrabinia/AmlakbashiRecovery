@@ -93,19 +93,19 @@
 }
 
 <div class="share-post__container" style="flex-flow: row;left: 0;bottom: 0;right: 0;overflow: auto;background-color: white;width: fit-content;height: 70px;align-items: center;position: fixed;max-width: 100%;">
-    <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(t_)" target="_blank" rel="noreferrer" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;width: 40px;height: 40px;">
+    <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(t_)" rel="noreferrer" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;width: 40px;height: 40px;">
         <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram">
     </a>
     <a class="share-post__item" href="whatsapp://send?text=@(t_) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(t_) @(u_)')" title="اشتراک گذاری در واتس اپ" style="background-color: #1BD741;width: 40px;height: 40px;">
         <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp">
     </a>
-    <a class="share-post__item" href="http://twitter.com/share?text=@(t_);url=@(u_)" target="_blank" rel="noreferrer" title="توئیت کردن اقامتگاه" style="background-color: #55ACEE;width: 40px;height: 40px;">
+    <a class="share-post__item" href="http://twitter.com/share?text=@(t_);url=@(u_)" rel="noreferrer" title="توئیت کردن اقامتگاه" style="background-color: #55ACEE;width: 40px;height: 40px;">
         <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter">
     </a>
-    <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(t_)" target="_blank" rel="noreferrer" title="اشتراک گذاری در فیسبوک" style="background-color: #3b5998;width: 40px;height: 40px;">
+    <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(t_)" rel="noreferrer" title="اشتراک گذاری در فیسبوک" style="background-color: #3b5998;width: 40px;height: 40px;">
         <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook">
     </a>
-    <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(t_)" target="_blank" rel="noreferrer" title="پین کردن در پینترست" style="background-color: #BD081C;width: 40px;height: 40px;">
+    <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(t_)" rel="noreferrer" title="پین کردن در پینترست" style="background-color: #BD081C;width: 40px;height: 40px;">
         <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest">
     </a>
     <a class="share-post__item" href="mailto:?subject=@(t_);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" rel="noreferrer" title="اشتراک گذاری با ایمیل" style="width: 40px;height: 40px;">
@@ -325,9 +325,9 @@
         }
 
         @* Related Links *@
-        <div class="advertise-page__property-box advertise-page__comment-box">
+        @*<div class="advertise-page__property-box advertise-page__comment-box">
             @await Html.PartialAsync("/Views/Accomodation/AccPagePartials/_AccPageRelatedLinks.cshtml", Model)
-        </div>
+        </div>*@
 
         <div class="advertise-page__stick-reserve">
         </div>
@@ -344,13 +344,13 @@
     //relatedUrl += (!string.IsNullOrEmpty(Model.EmptyRangeTo) ? "&empty_range_to=" + Model.EmptyRangeTo : "");
 }
 
-<p class="item__related-title">آگهی های مرتبط:</p>
+@*<p class="item__related-title">آگهی های مرتبط:</p>*@
 
-<div style="min-height: 381.56px;" class="advertise-page__related-container partialContents" data-url="@relatedUrl" data-onload="findLazyImages">
+@*<div style="min-height: 381.56px;" class="advertise-page__related-container partialContents" data-url="@relatedUrl" data-onload="findLazyImages">
 </div>
 
 <div class="acc__blog-post-root partialContents" data-url="/accomodation/accblognews?id=@Model.Id" data-onload="findLazyImages">
-</div>
+</div>*@
 
 @* Parents Reserve *@
 @if (Model.CanPublish && Model.AdvertiseMode == Advertise.AdvertiseMode.Parent)
@@ -412,13 +412,13 @@
         <script src="/resource/Scripts/general/jalali-date-picker.js" asp-append-version="true"></script>
         <script src="/resource/scripts/general/rating-detail.js" asp-append-version="true"></script>
         <script src="/resource/scripts/general/price-string-generator.js" asp-append-version="true"></script>
-        <script src="/resource/scripts/page/accommodation-item-page.js" asp-append-version="true"></script>
+        <script src="/js/app/advertise/item.js" asp-append-version="true"></script>
         <script src="/resource/scripts/general/detail-button.js" asp-append-version="true"></script>
         <script src="/resource/scripts/general/increase-decrease-button.js" asp-append-version="true"></script>
         <script src="/resource/Scripts/dashboard/registerEmail.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">
-        <script src="/js/acc-item.min.js" asp-append-version="true"></script>
+        <script src="/js/min/app-advertise-item.js" asp-append-version="true"></script>
     </environment>
 }
 

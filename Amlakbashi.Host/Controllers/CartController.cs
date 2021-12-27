@@ -150,7 +150,7 @@ namespace Amlakbashi.Host.Controllers
 
 
         [Authorize]
-        public ActionResult PerformPay(int payment_id)
+        public ActionResult PerformPay(int payment_id, string redirectUrl = null)
         {
             var payment = accounting.FindPayment(payment_id);
             if (payment == null || payment.Status == Payment.PaymentStatus.Paid)
@@ -167,6 +167,7 @@ namespace Amlakbashi.Host.Controllers
             accounting.UpdatePayment(payment);
             ViewBag.PayPrice = payment.TotalPrice;
             ViewBag.PayDate = DateTimeUtility.ConvertDate(payment.Date);
+            ViewBag.redirectUrl = redirectUrl;
             return View(payment);
         }
 

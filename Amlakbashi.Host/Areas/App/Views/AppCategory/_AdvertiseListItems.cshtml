@@ -134,7 +134,7 @@
                 queryStringIndex++;
                 url += ("empty_range_to=" + Model.EmptyRangeTo);
             }
-                <a target="_blank" href="@url" class="home-page__category-item-container-large@(Model.ForAdvertisePage ? " advertise-category__advertise-item-container" : "")" id="advertise_@(item.AdvertiseID)">
+                <a href="@url" class="home-page__category-item-container-large@(Model.ForAdvertisePage ? " advertise-category__advertise-item-container" : "")" id="advertise_@(item.AdvertiseID)">
                     @*<div class="advertise-item__icon-list" style="position: absolute;width: unset;display: inline;flex-flow: column;">*@
                     @{
                         int discount = item.DiscountPercent;
@@ -287,7 +287,7 @@
     </div>
 }
 
-@if (related_categories.Count() > 0)
+@*@if (related_categories.Count() > 0)
 {
     <div class="advertise-category-link__title">موارد مشابه</div>
     <div class="advertise-category-link__container">
@@ -297,7 +297,7 @@
                 new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "queryString", queryString } })
         }
     </div>
-}
+}*@
 
 @*<script>
     nowUrl = "@Model.UrlWithParameters".replaceAll("&amp;", "&");

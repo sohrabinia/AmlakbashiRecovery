@@ -39,9 +39,9 @@
     <Content Remove="Areas\App\Views\AppReserve\_InvoiceItem.cshtml" />
     <Content Remove="Areas\App\Views\AppReserve\_ReserveItem.cshtml" />
     <Content Remove="Areas\App\Views\AppReserve\_ReserveList.cshtml" />
-    <Content Remove="Areas\App\Views\AppUser\ProfileManager.cshtml" />
+    <Content Remove="Areas\App\Views\AppUser\Profile.cshtml" />
+    <Content Remove="Areas\App\Views\AppWallet\List.cshtml" />
     <Content Remove="Areas\App\Views\AppWallet\Prize.cshtml" />
-    <Content Remove="Areas\App\Views\AppWallet\UserWalletManager.cshtml" />
     <Content Remove="wwwroot\js\dashboard.min.js" />
   </ItemGroup>
 
@@ -63,9 +63,9 @@
     <None Include="Areas\App\Views\AppReserve\_InvoiceItem.cshtml" />
     <None Include="Areas\App\Views\AppReserve\_ReserveItem.cshtml" />
     <None Include="Areas\App\Views\AppReserve\_ReserveList.cshtml" />
-    <None Include="Areas\App\Views\AppUser\ProfileManager.cshtml" />
+    <None Include="Areas\App\Views\AppUser\Profile.cshtml" />
     <None Include="Areas\App\Views\AppWallet\Prize.cshtml" />
-    <None Include="Areas\App\Views\AppWallet\UserWalletManager.cshtml" />
+    <None Include="Areas\App\Views\AppWallet\List.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAddressInput.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAmenitiesInput.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAvailableInput.cshtml" />

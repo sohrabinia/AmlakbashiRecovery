@@ -1,13 +1,20 @@
 ﻿@model Payment
+
 @{
     ViewBag.Title = "سبد خرید";
     Layout = "~/Views/Shared/_Master.cshtml";
-
+    var confirmPaymentUrl = $"/cart/confirmandpayment?id={Model.Id}&bank=2";
+    if (ViewBag.redirectUrl != null)
+    {
+        confirmPaymentUrl += "&useCustomRedirect=true&customRedirectUrl=" + ViewBag.redirectUrl;
+    }
 }
+
 @section StyleLink
 {
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/cart.css">
 }
+
 <div class="container">
     <div @*class="row"*@>
 
@@ -23,7 +30,8 @@
                         break;
                 }
                 <div style="padding: 5px 0 15px 0;">مبلغ پرداختی : @string.Format("{0:n0}",ViewBag.PayPrice) ریال</div>
-                <a class="btn btn-lg btn-block btn-success" target="_blank" href="@Url.Action("ConfirmAndPayment", new { id = Model.Id , bank = 2})" style="font-family: Miransans;background-color: #fdd835;color: #242424;padding: 5px;border-radius: 5px;"> تایید و پرداخت </a>
+                @*<a class="btn btn-lg btn-block btn-success" target="_blank" href="@Url.Action("ConfirmAndPayment", new { id = Model.Id , bank = 2})" style="font-family: Miransans;background-color: #fdd835;color: #242424;padding: 5px;border-radius: 5px;"> تایید و پرداخت </a>*@
+                <a class="btn btn-lg btn-block btn-success" target="_blank" href="@confirmPaymentUrl" style="font-family: Miransans;background-color: #fdd835;color: #242424;padding: 5px;border-radius: 5px;"> تایید و پرداخت </a>
             </div>
 
         </div>

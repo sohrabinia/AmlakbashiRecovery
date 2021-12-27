@@ -9,7 +9,6 @@
     ViewBag.Title = Model.Title;
     ViewBag.keywords = Model.Keywords;
     ViewBag.Description = Model.Description;
-    Layout = "~/Areas/App/Views/Shared/_AppLayout.cshtml";
     ViewBag.region_filter_status = (int)Region.RegionStatus.HasAdvertise;
 
     var related_categories = (Model.RelatedCategories == null ? new List<DynamicCategory>() : Model.RelatedCategories);
@@ -703,19 +702,19 @@
 }
 
 @*<div class="share-post__container">
-    <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(Model.Title)" target="_blank" rel="noreferrer" title="اشتراک گذاری در تلگرام">
+    <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(Model.Title)" rel="noreferrer" title="اشتراک گذاری در تلگرام">
         <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram" style="background-color: #259DCF;">
     </a>
     <a class="share-post__item" href="whatsapp://send?text=@(Model.Title) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(Model.Title) @(u_)')" title="اشتراک گذاری در واتس اپ">
         <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp" style="background-color: #1BD741;">
     </a>
-    <a class="share-post__item" href="http://twitter.com/share?text=@(Model.Title);url=@(u_)" target="_blank" rel="noreferrer" title="توئیت کردن اقامتگاه">
+    <a class="share-post__item" href="http://twitter.com/share?text=@(Model.Title);url=@(u_)" rel="noreferrer" title="توئیت کردن اقامتگاه">
         <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter" style="background-color: #55ACEE;">
     </a>
-    <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(Model.Title)" target="_blank" rel="noreferrer" title="اشتراک گذاری در فیسبوک">
+    <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(Model.Title)" rel="noreferrer" title="اشتراک گذاری در فیسبوک">
         <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook" style="background-color: #3b5998;">
     </a>
-    <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(Model.Title)" target="_blank" rel="noreferrer" title="پین کردن در پینترست">
+    <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(Model.Title)" rel="noreferrer" title="پین کردن در پینترست">
         <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest" style="background-color: #BD081C;">
     </a>
     <a class="share-post__item" href="mailto:?subject=@(Model.Title);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" title="اشتراک گذاری با ایمیل">
@@ -814,7 +813,8 @@
         @await Html.PartialAsync("_AdvertiseListItems", Model)
     </div>
 </div>
-@if (Model.Category != null && !string.IsNullOrEmpty(Model.Category.CategoryPostTitle) && 
+
+@*@if (Model.Category != null && !string.IsNullOrEmpty(Model.Category.CategoryPostTitle) && 
     string.IsNullOrEmpty(Model.Category.CategoryPostText) == false)
 {
     <div class="advertise-category__description" style="white-space:unset;border-radius: 5px;">
@@ -823,8 +823,9 @@
         </header>
         @Html.Raw(Model.Category.CategoryPostText)
     </div>
-}
-<div class="advertise-category-link__title">سوالات متداول</div>
+}*@
+
+<!--<div class="advertise-category-link__title">سوالات متداول</div>
 <div class="advertise-list__faq-container">
     <p class="public__header-text">
         <strong>@Model.CategoryFaqTrustQuestion</strong>
@@ -857,17 +858,18 @@
         @Model.CategoryFaqReserveAnswer
         <br />
         <div style="text-align:center; margin: 20px;">
-            <a href="https://www.aparat.com/v/vS7Oe" target="_blank" rel="noreferrer"><i class="fas fa-play-circle"></i> مشاهده در آپارات</a>
-        </div>
+            <a href="https://www.aparat.com/v/vS7Oe" rel="noreferrer"><i class="fas fa-play-circle"></i> مشاهده در آپارات</a>
+        </div>-->
         
         @*<iframe class="style-video" src="https://www.aparat.com/video/video/embed/videohash/vS7Oe/vt/frame" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>*@
-    </div>
+    <!--</div>
     <p class="public__header-text">
         <strong>@Model.CategoryFaqHostQuestion</strong>
         <i class="fa fa-chevron-left"></i>
     </p>
     <p class="public__content-text">@Model.CategoryFaqHostAnswer</p>
-</div>
+</div>-->
+
 @section HeaderAddition
 {
     @{

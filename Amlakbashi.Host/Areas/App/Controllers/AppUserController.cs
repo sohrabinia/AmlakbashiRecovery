@@ -54,7 +54,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
 
         [Authorize]
         [HttpGet]
-        public ActionResult ProfileManager()
+        public ActionResult Profile()
         {
             try
             {
@@ -85,7 +85,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult ProfileManager(UserDTO user)
+        public ActionResult Profile(UserDTO user)
         {
             try
             {
@@ -157,12 +157,12 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                     TempData["msg"] = errors.First();
                 }
 
-                return RedirectToAction("profilemanager");
+                return RedirectToAction(nameof(Profile));
             }
             catch (Exception exc)
             {
-                logger.Error("User.ProfileManager", exc);
-                return RedirectToAction("profilemanager");
+                logger.Error("User.Profile", exc);
+                return RedirectToAction(nameof(Profile));
             }
         }
     }

@@ -25,8 +25,6 @@
                 <option value="enable" is-selected="@((string)ViewBag.type == "enable")">تایید شده</option>
                 <option value="disable" is-selected="@((string)ViewBag.type == "disable")">غیر فعال</option>
                 <option value="ready" is-selected="@((string)ViewBag.type == "ready")">در انتظار تایید</option>
-                @*<option value="ready" is-selected="@((string)ViewBag.type == "notcomplete")">تکمیل نشده</option>*@
-                @*<option value="ready" is-selected="@((string)ViewBag.type == "notready")">تایید نشده</option>*@
             </select>
         </span>
     </span>
@@ -49,7 +47,7 @@
             <!-- Start-wrapper-right-banner -->
             <div class="wrapper-right-banner div-unset">
                 <div class="avatar-item">
-                    <a target="_blank" href="@item.previewUrl"><img src="@item.photoUrl" alt="عکس اتاق" /></a>
+                    <a href="/app/advertise/item/@item.id"><img src="@item.photoUrl" alt="عکس اتاق" /></a>
                     @if (item.userRating <= 0)
                     {
                         <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
@@ -58,10 +56,10 @@
                         @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
                      new ModelStateDictionary()) { { "score", item.userRating } })
                     </div>
-                    <a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="background:@( item.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>
                 </div>
             </div>
             <!-- End-wrapper-right-banner -->
+
             <!-- Start-wrapper-left-banner d-->
             <div id="banner-status-@item.id" class="wrapper-left-banner div-unset">
                 <div class="flex-style">
@@ -81,7 +79,7 @@
                 </div>
                 <div class="flex-style quick-access-desktop" style="justify-content:@(item.mainType == AccMainType.Single ? "space-between" : item.status == Advertise.AdvertiseStatus.NotCompleted?"flex-start": "flex-end");">
                     @*<button type="button" data-type='@item.mainType.ToString().ToLower()' class="button_fast-reserve" > رزرو آنی</button>*@
-                    <a href="@item.editUrl" target="_blank" class="completed-advertise-button" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"flex":"none")">
+                    <a href="/app/advertise/updatebasic?id=@item.id" class="completed-advertise-button" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"flex":"none")">
                         <p>اطلاعات را تکمیل کنید</p>
                     </a>
                     <form style="display:@(item.mainType == AccMainType.Single && item.status != Advertise.AdvertiseStatus.NotCompleted ?  "block" : "none" );">
@@ -97,15 +95,16 @@
                         <!--<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item icons-desktop"--> @*onclick="showNorouzPopup(@item.id)"*@ <!--href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img class="noroz-style-icon" width="30" height="30" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>-->
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
                         @*<a title="حذف" onclick="deleteButton(@item.id ,this)" class="icons-item trash-icon icons-desktop"><i class="fa fa-trash"></i></a>*@
-                        <a href="@item.editUrl" class="icons-item edit-icon-banner icons-desktop" target="_blank"><i class="fas fa-pencil-alt"></i></a>
+                        <a href="/app/advertise/updatebasic?id=@item.id" class="icons-item edit-icon-banner icons-desktop"><i class="fas fa-pencil-alt"></i></a>
                         <a title="تنظیمات " data-type='@item.mainType.ToString().ToLower()' class="icons-item setting-icon icons-desktop"><i class="fa fa-cog"></i></a>
                     </div>
                 </div>
             </div>
             <!-- End-wrapper-left-banner -->
+
             <!-- Start-quick-access -->
             <div class="quick-access">
-                <a href="@item.editUrl" target="_blank" class="completed-advertise-button" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"flex":"none")">
+                <a href="/app/advertise/updatebasic?id=@item.id" class="completed-advertise-button" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"flex":"none")">
                     <p>اطلاعات را تکمیل کنید</p>
                 </a>
                 <form style="display:@(item.mainType == AccMainType.Single && item.status != Advertise.AdvertiseStatus.NotCompleted ?  "block" : "none" );">
@@ -121,7 +120,7 @@
                             <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-xs" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="24" height="24" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_24x24" /></a>*@
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
                         @*<a title="حذف " class="icons-item trash-icon" onclick="deleteButton(@item.id , this)"><i class="fa fa-trash"></i></a>*@
-                        <a href="@item.editUrl" class="icons-item edit-icon-banner" target="_blank"><i class="fas fa-pencil-alt"></i></a>
+                        <a href="/app/advertise/updatebasic?id=@item.id" class="icons-item edit-icon-banner"><i class="fas fa-pencil-alt"></i></a>
                         <a title="تنظیمات " data-type='@item.mainType.ToString().ToLower()' class="icons-item setting-icon"><i class="fa fa-cog"></i></a>
                     </div>
                 </div>
@@ -129,6 +128,7 @@
             <!-- End-quick-access -->
         </section>
         <!-- End-banner-single -->
+
         <!--start-banner-details- -->
         <section data-id="@item.id" id="banner-details-@item.id" class="banner-details">
             <!-- Start-edit-fast  -->

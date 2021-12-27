@@ -25,7 +25,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
 
         [HttpGet]
         [Authorize]
-        public IActionResult UserWalletManager()
+        public IActionResult List()
         {
             var user = userAccessor.CurrentUser;
             ViewBag.Credit = user.Credit;

@@ -5,7 +5,7 @@
     ViewBag.Title = (ViewBag.isEdit ? "ویرایش" : "ثبت") + " اقامتگاه";
     ViewBag.keywords = "ثبت رزرو, ثبت رایگاه آگهی, ثبت آپارتمان مبله, ثبت سوئیت, ثبت ویلا اجاره ای, ثبت آگهی رزرو";
     ViewBag.Description = "ثبت رایگان اقامتگاه برای اجاره روزانه و هفتگی - ثبت آگهی آپارتمان و سوئیت مبله - ثبت اجاره ویلا - ثبت آگهی هتل و مسافرخانه";
-    Layout = "~/Views/Shared/_Dashboard.cshtml";
+    Layout = "_AppDashboardLayout";
     var childs = ViewBag.childs as Dictionary<Advertise.AdvertiseType, Dictionary<long, string>>;
     ViewBag.elevator = Model.elevator;
 }
@@ -51,7 +51,7 @@
         </div>
     }
 
-    <form asp-area="app" asp-controller="advertise" asp-action="updatebasic" asp-route-id="@Model.Id" asp-route-parentId="@Model.ParentId" method="post" id="AccForm" enctype="multipart/form-data">
+    <form asp-area="app" asp-controller="advertise" asp-action="UpdateComplexUnit" asp-route-id="@Model.Id" asp-route-parentId="@Model.ParentId" method="post" id="AccForm" enctype="multipart/form-data">
         <input type="hidden" value="false" name="saveAndNewRoom" id="saveFormInput" />
         <input type="hidden" value="@(ViewBag.isEdit == true ? "true" : "false" )" name="isEdit" />
         <input type="hidden" value="0" name="Tab" id="tabInput" />
@@ -86,7 +86,6 @@
         </div>
         <div class="static-advertise__btns-box">
             <p class="static-advertise__btn-item" id="prev_step_button" onclick="checkHaveChange(3, @Model.ParentId)"><i class="fa fa-chevron-right"></i> مرحله قبل</p>
-            <a href="/accomodation/accComplexForm?id=-1&parentid=@Model.ParentId" @(Model.Id > 0 ? "style=display:none;" : "block") class="static-advertise__btn-item static-advertise__btn-cancle"> انصراف  </a>
             <p class="static-advertise__btn-item static-advertise__btn-next"><i class="fas fa-check-circle"></i> اتمام فرآیند </p>
         </div>
     </form>
@@ -98,7 +97,7 @@
             crossorigin=""></script>
     <script src="~/Resource/Scripts/general/accommodation-edit-form.js" asp-append-version="true"></script>
     <script src="~/Resource/Scripts/dashboard/numberInput.js" asp-append-version="true"></script>
-    <script src="~/Resource/Scripts/dashboard/acc-public-form.js" asp-append-version="true"></script>
+    <script src="~/js/app/advertise/update.js" asp-append-version="true"></script>
     <script src="~/Resource/Scripts/dashboard/complexForm.js" asp-append-version="true"></script>
 }
 
