@@ -300,7 +300,7 @@
                     <td>
                         <span>از @item.startDateString تا @item.endDateString</span><br />
                         <span>@item.guestCount نفر به مدت @item.stayDays شب</span><br />
-                        <span style="color:@(item.totalPaidPrice > 0 ? "#34A853" : "#242424")">مبلغ: @string.Format("{0:n0}", item.totalPrice) ت</span><br />
+                        <span>مبلغ: @string.Format("{0:n0}", item.totalPrice) ت</span><br />
                         @if (item.depositePrice != item.totalPrice)
                         {
                             <span>بیعانه: @string.Format("{0:n0}", item.depositePrice) ت</span>
@@ -342,9 +342,6 @@
                                         <span style="color:#4285F4">کیف هدیه: @string.Format("{0:n0}", item.prizePrice) ت</span><br />
                                     }
                                 </a>
-                                <div style="margin-top: 5px;">
-                                    <a asp-controller="payment" asp-action="index" asp-route-reserveId="@item.id" style="border-top: 1px solid gray; text-decoration: none;" target="_blank">لیست پرداخت های آنلاین</a>
-                                </div>
                             }
                         }
                     </td>
@@ -402,8 +399,8 @@
                         }
                     </td>*@
                     <td style="width: 100px">
-                        <div class="call_state_h" js-call-state="@(item.hostCallState)" style="cursor:pointer;font:10px Miransans;color:@(item.hostCallStateColor);" onclick="nextCallState(@(item.id), 'h', 'میزبان', this)">✆ثبت تماس میزبان</div>
-                        <div class="call_state_g" js-call-state="@(item.guestCallState)" style="cursor:pointer;font:10px Miransans;color:@(item.guestCallStateColor);" onclick="nextCallState(@(item.id), 'g', 'مهمان', this)">✆ثبت تماس مهمان</div>
+                        <div class="call_state_h" js-call-state="@(item.hostCallState)" style="cursor:pointer;font:10px Miransans;" onclick="nextCallState(@(item.id), 'h', 'میزبان', this)">✆ثبت تماس میزبان</div>
+                        <div class="call_state_g" js-call-state="@(item.guestCallState)" style="cursor:pointer;font:10px Miransans;" onclick="nextCallState(@(item.id), 'g', 'مهمان', this)">✆ثبت تماس مهمان</div>
                         <i onclick="showAddInfoDialog(@(item.id))" class="fa fa-plus" style="color:#242424;cursor:pointer;" title="افزودن توضیحات"></i>
                         <i onclick="showInfo(@(item.id))" class="fa fa-eye" style="color:#242424;cursor:pointer;" title="نمایش توضیحات"></i>
                         @*<span class="js-info-count">(@(item.supportInfoCount) توضیح)</span>*@

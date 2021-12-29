@@ -64,17 +64,33 @@ $(".js-filter-date-picker").persianDatepicker({
     initialValue: false
 });
 
+// general loader
 function showDarkBackground() {
-    //$('.js-bg').addClass("bg-show-menu");
     $('.js-loader').show();
-    //$('body').css("overflow", "hidden");
 }
 
 function hideDarkBackground() {
-    //$('.js-bg').removeClass("bg-show-menu");
     $('.js-loader').hide();
-    //$('body').css("overflow", "auto");
 }
+
+// quick filter
+$(".box-filter .submit-btn").click(function (event) {
+    quickFilterProcess();
+});
+
+let quickFilterFocus = false;
+$(".quick-filter input, .quick-filter select").focus(function () {
+    quickFilterFocus = true;
+});
+$(".quick-filter input, .quick-filter select").blur(function () {
+    quickFilterFocus = false;
+});
+document.addEventListener('keypress', function (e) {
+    var key = e.keyCode || e.which;
+    if (key == 13 && quickFilterFocus) {
+        quickFilterProcess();
+    }
+});
 
 // more filter popup
 $(".more-filter").click(function (event) {

@@ -256,7 +256,7 @@
                     <th>شماره شبا</th>
                 }
                 @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ||
-                    data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
+                   data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
                 {
                     <th>
                         رزرو آنی
@@ -335,26 +335,26 @@
                     }
                     @if (item.State == Entities.User.UserState.Acticved || item.State == Entities.User.UserState.ReserveBanned)
                     {
-                <td class="operation-icons">
-                    <a href="@Url.Action("Edit",new {uid= item.User.Id})" class="fas fa-edit" title="ویرایش"></a>
-                    <a title="آگهی های کاربر" class="fa fa-home" href='/user/impersonate?userId=@(item.User.Id)&url=/post/accomodationmanager' target="_blank"></a>
-                    <a class="fa fa-book" title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/index?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id"></a>
-                    <i onclick="UserWalletInfo(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="کیف پول"></i>
-                    <a asp-controller="wallet" asp-action="index" asp-route-userId="@item.User.Id" title="تراکنش های کیف پول" class="fa fa-money-bill-alt" target="_blank"></a>
-                    <a class="fa fa-user" href="/user/impersonate?userId=@(item.User.Id)&url=/user/profilemanager" target="_blank" title="پروفایل کاربر"></a>
-                    <a href="/user/impersonate?userId=@item.User.Id" class="fa fa-sign-in-alt" title="ورود به عنوان کاربر" target="_blank"></a>
-                    <i class="fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></i>
-                    <i class="fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></i>
-                    <i onclick="getUserDesc(@item.User.Id)" class="fa fa-question-circle" title="توضیحات"></i>
-                    <a asp-controller="role" asp-action="edituserrole" asp-route-userId="@item.User.Id" class="fa fa-id-card" title="مدیریت رول ها"></a>
-                </td>
+                        <td class="operation-icons">
+                            <a href="@Url.Action("Edit",new {uid= item.User.Id})" class="fas fa-edit" title="ویرایش"></a>
+                            <a title="آگهی های کاربر" class="fa fa-home" href='/user/impersonate?userId=@(item.User.Id)&url=/post/accomodationmanager' target="_blank"></a>
+                            <a class="fa fa-book" title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/newindex?@(item.User.UserGeneralType == 0 ? "Guest" : "Host")UserId=@item.User.Id"></a>
+                            <i onclick="UserWalletInfo(@item.User.Id)" class="fa fa-credit-card" style="cursor:pointer" title="کیف پول"></i>
+                            <a asp-controller="wallet" asp-action="index" asp-route-userId="@item.User.Id" title="تراکنش های کیف پول" class="fa fa-money-bill-alt" target="_blank"></a>
+                            <a class="fa fa-user" href="/user/impersonate?userId=@(item.User.Id)&url=/user/profilemanager" target="_blank" title="پروفایل کاربر"></a>
+                            <a href="/user/impersonate?userId=@item.User.Id" class="fa fa-sign-in-alt" title="ورود به عنوان کاربر" target="_blank"></a>
+                            <i class="fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></i>
+                            <i class="fa fa-times-circle" onclick="disapprove_photo(@item.User.Id,this)" title="عدم تایید عکس"></i>
+                            <i onclick="getUserDesc(@item.User.Id)" class="fa fa-question-circle" title="توضیحات"></i>
+                            <a asp-controller="role" asp-action="edituserrole" asp-route-userId="@item.User.Id" class="fa fa-id-card" title="مدیریت رول ها"></a>
+                        </td>
                     }
                     else
                     {
                         <td class="operation-icons">
                             <a href="@Url.Action("Edit",new {uid= item.User.Id})" class="fas fa-edit" title="ویرایش"></a>
                             <a title="آگهی های کاربر" class="fa fa-home" asp-controller="advertise" asp-action="index" asp-route-userId="@item.User.Id" target="_blank"></a>
-                            <a class="fa fa-book" title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/index?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id"></a>
+                            <a class="fa fa-book" title="رزرو های این @(item.User.UserGeneralType == 0 ? "مهمان" : "میزبان")" target="_blank" href="/reserve/newindex?@(item.User.UserGeneralType == 0 ? "guest" : "host")_user_id=@item.User.Id"></a>
                             <i onclick="UserWalletInfo(@item.User.Id)" class="fa fa-credit-card" title="کیف پول"></i>
                             <a asp-controller="wallet" asp-action="index" asp-route-userId="@item.User.Id" title="تراکنش های کیف پول" class="fa fa-money-bill-alt" target="_blank"></a>
                             <i class="fa fa-check-circle" onclick="publish_photo(@item.User.Id,this)" title="انتشار عکس"></i>

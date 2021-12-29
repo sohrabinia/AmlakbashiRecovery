@@ -81,6 +81,25 @@
     </environment>
     @RenderSection("StyleLink", required: false)
     @RenderSection("StyleBlock", required: false)
+    <style>
+        .app-loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            background-color: rgba(0,0,0,0.6);
+            text-align: center;
+        }
+        .app-loader i.fa-spinner{
+            font-size: 100px; 
+            color: white; 
+            margin: 20% auto; 
+            animation: spin 1.5s linear infinite;
+        }
+    </style>
 </head>
 <body>
     @{
@@ -88,6 +107,7 @@
         var selectType = ViewBag.selectType;
     }
     @await Html.PartialAsync("_LoginPopup")
+    <div class="app-loader"><i class="fa fa-spinner"></i></div>
     <div id="loading-icon" class="loading-contianer" style="z-index:2147483647">
         <div class="ui active large loader loading-icon"></div>
     </div>
@@ -173,8 +193,6 @@
                 </div>
                 @RenderBody()
             </main>
-        </div>
-        <div class="footer">
         </div>
     </div>
 
@@ -269,6 +287,11 @@
     </script>
     @RenderSection("ScriptLink", required: false)
     <script type="text/javascript">
+
+        window.addEventListener('beforeunload', function () {
+            $('.app-loader').show();
+        });
+
         function open_menu() {
             $(".menu").removeClass("menu--close");
             $(".open-menu-dashboard").hide();
@@ -585,7 +608,7 @@
             });
         }
         else {
-            //check_user_login();
+            check_user_login();
             sendTokenToServer(null);
         }
     </script>

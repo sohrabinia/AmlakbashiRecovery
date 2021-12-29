@@ -93,9 +93,29 @@
     <style>
         @RenderSection("StyleBlock", required: false)
     </style>
+    <style>
+        .app-loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            background-color: rgba(0,0,0,0.6);
+            text-align: center;
+        }
+        .app-loader i.fa-spinner{
+            font-size: 100px; 
+            color: white; 
+            margin: 20% auto; 
+            animation: spin 1.5s linear infinite;
+        }
+    </style>
 </head>
 <body>
     @*@await Html.PartialAsync("_ImpersonateContainer", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hidden", true } })*@
+    <div class="app-loader"><i class="fa fa-spinner"></i></div>
     <div id="loading-icon" class="loading-contianer">
         <div class="ui active large loader loading-icon"></div>
     </div>
@@ -139,48 +159,39 @@
                     }
                 </div>
                 <div class="master_header-child">
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <a id="dashboard_button" asp-area="app" asp-controller="home" asp-action="dashboard" class="master_header-account app">
-                            <p><i class="fa fa-user"></i> حساب من </p>
-                        </a>
-                    }
-                    else
-                    {
-                        <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account is-app">
-                            <p></p>
-                        </a>
-                    }
+                    <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account is-app">
+                        <p></p>
+                    </a>
                 </div>
-                <div class="master_header-child">
-                    <div onclick="toggleMenu()" class="master__header-menu">
-                        <i class="fa fa-bars"></i>
-                        <span>منو</span>
-                    </div>
-                </div>
+                @*<div class="master_header-child">
+                        <div onclick="toggleMenu()" class="master__header-menu">
+                            <i class="fa fa-bars"></i>
+                            <span>منو</span>
+                        </div>
+                    </div>*@
             </div>
             @RenderSection("TopPin", false)
-    <div class="master__menu">
-        @if (ViewBag.home == null || !ViewBag.home)
-        {
-            <a class="master__menu-item" href="/app/home/main">خانه</a>
-        }
-        @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
-        {
-            <a class="master__menu-item" href="/app/reserve/list?selectType=1">رزرو ها</a>
-            <a class="master__menu-item" href="/app/advertise/updatebasic">ثبت آگهی</a>
-            @*<p class="master__menu-item" onclick="searchAdvertiseId()">جستجو آگهی</p>*@
-            @*<a class="master__menu-item" href="/contact"> تماس با ما</a>*@
-        }
-        else
-        {
-            <a class="master__menu-item" href="/app/reserve/list?selectType=2">رزرو ها</a>
-            <a class="master__menu-item" href="/app/advertise/list">آگهی ها</a>
-            <a class="master__menu-item" href="/app/advertise/updatebasic">ثبت آگهی</a>
-            @*<p class="master__menu-item" onclick="searchAdvertiseId()">جستجو آگهی</p>*@
-            @*<a class="master__menu-item" href="/contact"> تماس با ما </a>*@
-        }
-    </div>
+            <div class="master__menu">
+                @if (ViewBag.home == null || !ViewBag.home)
+                {
+                    <a class="master__menu-item" href="/app/home/main">خانه</a>
+                }
+                @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+                {
+                    <a class="master__menu-item" href="/app/reserve/list?selectType=1">رزرو ها</a>
+                    <a class="master__menu-item" href="/app/advertise/updatebasic">ثبت آگهی</a>
+                    @*<p class="master__menu-item" onclick="searchAdvertiseId()">جستجو آگهی</p>*@
+                    @*<a class="master__menu-item" href="/contact"> تماس با ما</a>*@
+                }
+                else
+                {
+                    <a class="master__menu-item" href="/app/reserve/list?selectType=2">رزرو ها</a>
+                    <a class="master__menu-item" href="/app/advertise/list">آگهی ها</a>
+                    <a class="master__menu-item" href="/app/advertise/updatebasic">ثبت آگهی</a>
+                    @*<p class="master__menu-item" onclick="searchAdvertiseId()">جستجو آگهی</p>*@
+                    @*<a class="master__menu-item" href="/contact"> تماس با ما </a>*@
+                }
+            </div>
         }
         <div class="body">
             @RenderBody()
@@ -193,6 +204,7 @@
             }*@
         <div style="display: none" id="chat_hidden_holder"></div>
         <input type="hidden" value="0" id="js-support-chat-id">
+
         <environment include="Development">
             <script src="/resource/scripts/general/message-popup.js" defer asp-append-version="true"></script>
             <script src="/resource/alertify.js-0.3.11/src/alertify.js" defer asp-append-version="true"></script>
@@ -228,6 +240,11 @@
         @RenderSection("ScriptBlock", required: false)
         <script type="text/javascript">
             $(document).ready(function () {
+
+                window.addEventListener('beforeunload', function () {
+                    $('.app-loader').show();
+                });
+
                 var installBtnShown = false;
                 var userAgent = navigator.userAgent || navigator.vendor || window.opera;
                 var isAndroid = false;

@@ -22,6 +22,16 @@
     font-display: swap;
 }
 
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 * {
     direction: rtl;
     font: 1em Miransans;
@@ -548,7 +558,7 @@ p.home-page__advertise-capacity .fa-users {
 
 .support-chat__button {
     position: fixed;
-    z-index: 99999;
+    z-index: 5000;
     right: 14px;
     bottom: 30px;
     display: -webkit-box;

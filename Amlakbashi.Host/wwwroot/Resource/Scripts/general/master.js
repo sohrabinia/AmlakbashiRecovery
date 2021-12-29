@@ -375,9 +375,7 @@ function hidePresentPopup() {
 }
 
 function check_user_login() {
-    if ($('.master_header-account').hasClass('app')) {
-        return;
-    }
+    let isApp = $('.master_header-account').hasClass('is-app');
     myajax("user/isuserauthenticated", "", function (ret) {
         if (ret.val) {
             isUserLoggedIn = true;
@@ -396,7 +394,12 @@ function check_user_login() {
                     $('.js-present-prize-link').attr('onclick', 'showPresentPopup()');
                 }
                 else {
-                    $('.master_header-account').attr('href', "/dashboard");
+                    if (isApp) {
+                        $('.master_header-account').attr('href', "/app/home/dashboard");
+                    }
+                    else {
+                        $('.master_header-account').attr('href', "/dashboard");
+                    }
                     $('.master_header-account').attr('onclick', '');
                     $('.master_header-account').children('p').html('<i class="fa fa-user"></i> حساب من ');
                     current_user_id = ret.user_id;

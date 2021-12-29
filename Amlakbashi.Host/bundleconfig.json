@@ -327,8 +327,9 @@
       "wwwroot/js/admin/advertise/admin-advertise-index.js"
     ]
   },
+  // App
   {
-    "outputFileName": "wwwroot/js/min/app-category.min.js",
+    "outputFileName": "wwwroot/js/min/app-category-item.min.js",
     "inputFiles": [
       "wwwroot/resource/scripts/jquery.plugin.min.js",
       "wwwroot/resource/scripts/general/detail-button.js",
@@ -349,7 +350,7 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/js/min/app-advertise-item.js",
+    "outputFileName": "wwwroot/js/min/app-advertise-item.min.js",
     "inputFiles": [
       "wwwroot/resource/Scripts/jquery.plugin.min.js",
       "wwwroot/resource/slick/slick.js",
@@ -369,7 +370,7 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/js/min/app-main.js",
+    "outputFileName": "wwwroot/js/min/app-main.min.js",
     "inputFiles": [
       "wwwroot/resource/scripts/general/jalali-date-converter.js",
       "wwwroot/resource/scripts/general/jalali-date-handler.js",

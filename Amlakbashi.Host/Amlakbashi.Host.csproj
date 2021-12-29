@@ -26,6 +26,7 @@
     <None Remove="wwwroot\Content\webp\**" />
   </ItemGroup>
 
+  <!--
   <ItemGroup>
     <Content Remove="Areas\App\Views\AppAdvertise\Favorites.cshtml" />
     <Content Remove="Areas\App\Views\AppAdvertise\List.cshtml" />
@@ -44,6 +45,7 @@
     <Content Remove="Areas\App\Views\AppWallet\Prize.cshtml" />
     <Content Remove="wwwroot\js\dashboard.min.js" />
   </ItemGroup>
+  -->
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\js\dashboard.min.js" />
