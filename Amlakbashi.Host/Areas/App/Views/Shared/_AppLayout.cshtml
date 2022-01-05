@@ -241,8 +241,17 @@
         <script type="text/javascript">
             $(document).ready(function () {
 
+                let showLoader = false;
+                $('a').click(function (event) {
+                    var target = $(this).attr("href");
+                    if (target && target.startsWith('/app/')) {
+                        showLoader = true;
+                    }
+                });
                 window.addEventListener('beforeunload', function () {
-                    $('.app-loader').show();
+                    if (showLoader) {
+                        $('.app-loader').show();
+                    }
                 });
 
                 var installBtnShown = false;

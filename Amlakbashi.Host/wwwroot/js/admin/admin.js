@@ -175,8 +175,8 @@ function submitPopup(url, successCallback) {
     let form = popupMain.find('form');
     if (form) {
         let formData = form.serialize();
-        sendPostAjax(url, formData, successCallback, function () { popupLoader.show(); }, hidePopup);
-        //sendPostAjax(url, formData, successCallback, null, hidePopup);
+        //sendPostAjax(url, formData, successCallback, function () { popupLoader.show(); }, hidePopup);
+        sendPostAjax(url, formData, successCallback, null, hidePopup);
     }
 }
 

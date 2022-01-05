@@ -148,8 +148,6 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-
-        [Authorize]
         public ActionResult PerformPay(int payment_id, string redirectUrl = null)
         {
             var payment = accounting.FindPayment(payment_id);
@@ -267,7 +265,7 @@ namespace Amlakbashi.Host.Controllers
 
 #if DEBUG
         //[Authorize(Roles = Roles.TechnicalManager + "," + Roles.TechnicalEmployee)]
-        public ActionResult LocalPay(int payment_id)
+        public ActionResult LocalPay(int payment_id, string redirectUrl = null)
         {
             try
             {
@@ -286,6 +284,10 @@ namespace Amlakbashi.Host.Controllers
                 TempData["payment_error_msg"] = exc.Message;
             }
             var objpay = accounting.FindPayment(payment_id);
+            if (string.IsNullOrEmpty(redirectUrl) == false)
+            {
+                return Redirect(redirectUrl);
+            }
             string redirect_controller;
             string redirect_action;
             if (objpay.ProductType.Contains("Reserve"))

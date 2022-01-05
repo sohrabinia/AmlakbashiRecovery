@@ -288,8 +288,17 @@
     @RenderSection("ScriptLink", required: false)
     <script type="text/javascript">
 
+        let showLoader = false;
+        $('a').click(function (event) {
+            var target = $(this).attr("href");
+            if (target && target.startsWith('/app/')) {
+                showLoader = true;
+            }
+        });
         window.addEventListener('beforeunload', function () {
-            $('.app-loader').show();
+            if (showLoader) {
+                $('.app-loader').show();
+            }
         });
 
         function open_menu() {

@@ -214,10 +214,6 @@
                 @*<i class="fa fa-credit-card"></i>*@
                 پرداخت
             </div>
-            @*<div onclick="payAndReserveWithCredit(@Model.Id,@Model.TotalPrice, @Model.DepositPrice)" class="reserve-dashboard__item-container-button" style="background-color:#34A853">
-                    <i class="fa fa-money-bill-alt"></i>
-                    <span>پرداخت از کیف پول</span>
-                </div>*@
         }
         else if (Model.status == Reserve.ReserveStatus.Reserved ||
             Model.status == Reserve.ReserveStatus.CashPay)

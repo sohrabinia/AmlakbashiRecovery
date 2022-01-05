@@ -171,7 +171,7 @@
                         }
                         myajax("User/IncreaseCredit", "price=" + price, function (ret) {
                             if (ret.status == 1) {
-                                window.location.href = "/cart/performpay?payment_id=" + ret.pid + "&redirectUrl=/app/wallet/list";
+                                window.location.href = "/cart/performpay?payment_id=" + ret.pid + "&redirectUrl=amlakbashi://app";
                             }
                             else {
                                 $.confirm({
