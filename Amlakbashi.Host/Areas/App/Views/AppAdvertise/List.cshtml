@@ -321,7 +321,7 @@
 
 <div id="pagenation-stylee" class="row">
     <div class="adpagelist">
-        @Html.PagedListPager((IPagedList)Model.accList, page => Url.Action("accomodationmanager", "post", new { page, type = (string)ViewBag.type }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5 })
+        @Html.PagedListPager((IPagedList)Model.accList, page => $"/app/advertise/list?page={page}&type={(string)ViewBag.type}", new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5 })
     </div>
 </div>
 

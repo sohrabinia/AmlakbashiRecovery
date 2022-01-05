@@ -46,7 +46,6 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             this.logger = logger;
         }
 
-        [HttpGet]
         [Authorize]
         public ActionResult List(string reserve_id = "", int status = -1, int category = -1,
             long initialPayId = 0, Reserve.ReserveManagerSelectType selectType = Reserve.ReserveManagerSelectType.All,
@@ -175,7 +174,13 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             }
         }
 
-        [HttpGet]
+        [Authorize]
+        public ActionResult Voucher(long reserve_id)
+        {
+            var model = reserveService.GenerateVoucher(reserve_id, userAccessor.CurrentUser.Id);
+            return View(model);
+        }
+
         [Authorize]
         public ActionResult Invoice(int? page)
         {

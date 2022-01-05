@@ -18,7 +18,7 @@
         <div class="profile__suc">@ViewBag.suc</div>
     }
 
-    <form asp-area="app" asp-controller="user" asp-action="profilemanager" method="post" id="ManageForm" enctype="multipart/form-data">
+    <form asp-area="app" asp-controller="user" asp-action="profile" method="post" id="ManageForm" enctype="multipart/form-data">
         <input type="hidden" name="id" value="@Model.id" />
         <input type="hidden" name="mainMobile" value="@Model.mainMobile" />
         <input type="hidden" name="userGeneralType" value="@Model.userGeneralType" />

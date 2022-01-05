@@ -151,8 +151,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             bool done = false;
             try
             {
-                if (request.status == ReserveStatus.Started ||
-                    request.status == ReserveStatus.Completed)
+                if (request.status == ReserveStatus.Started)
                 {
                     if (request.force == false && accounting.IsReservePaidCompletely(request.reserveId) == false)
                     {

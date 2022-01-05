@@ -645,6 +645,10 @@ namespace Amlakbashi.Host.Controllers
                 var index = 0;
                 var isHost = selectType == ReserveManagerSelectType.Host;
                 var isGuest = !isHost;
+                if (reserves != null && category == 2)
+                {
+                    reserves = reserves.OrderBy(o => o.StartDate).ToList();
+                }
                 foreach (var reserve in reserves)
                 {
                     var advertise = reserve.Advertise;
@@ -2084,9 +2088,9 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize]
         [HttpGet]
-        public ActionResult GenerateGuestReceipt(long reserve_id)
+        public ActionResult GenerateGuestReceipt(long reserveId)
         {
-            var model = reserveService.GenerateVoucher(reserve_id, userAccessor.CurrentUser.Id);
+            var model = reserveService.GenerateVoucher(reserveId, userAccessor.CurrentUser.Id);
             if (model == null)
             {
                 return RedirectToAction("AccessDenied", "Errors");

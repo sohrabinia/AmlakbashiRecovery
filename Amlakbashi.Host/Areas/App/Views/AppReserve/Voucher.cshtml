@@ -1,0 +1,109 @@
+﻿@using Amlakbashi.Core.Common.Utilities;
+@model Amlakbashi.Core.DTOs.ReserveDTOs.VoucherDTO
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/resource/css/dashboard/voucher.css" rel="stylesheet" asp-append-version="true">
+</head>
+<body>
+    @if (Model != null)
+    {
+        <section class="voucher-body">
+            <sectoin class="table-box">
+                <div class="style-table-box">
+                    <div class="style-title" style="display:flex;justify-content:space-between;padding: 0 8px;"><p>مشخصات اقامتگاه</p><p>کد رزرو: @Model.reserveId</p></div>
+                    <table class="container-room">
+                        <tr>
+                            <td>کد اقامتگاه</td>
+                            <td>نوع اقامتگاه</td>
+                            <td>ظرفیت اقامتگاه</td>
+                        </tr>
+                        <tr>
+                            <td class="text-style">@Model.accId</td>
+                            <td class="text-style">@Model.accTypeString</td>
+                            <td class="text-style">@Model.accCapacity نفر</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #fdd8354a
+                        ;" class="text-style" colspan="3">
+                                @Model.accAddress
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="style-table-box">
+                    <p class="style-title">مشخصات رزرو</p>
+                    <table class="container-details-date">
+                        <tr>
+                            <td>تاریخ رزرو</td>
+                            <td>تاریخ ورود</td>
+                            <td>تاریخ خروج</td>
+                            <td colspan="2">مدت اقامت</td>
+                        </tr>
+                        <tr>
+                            <td class="text-style">@Model.requestDateString</td>
+                            <td class="text-style">@Model.startDateString</td>
+                            <td class="text-style">@Model.endDateString</td>
+                            <td colspan="2" class="text-style">@Model.reserveDaysString</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="style-table-box">
+                    <p class="style-title">مشخصات میزبان</p>
+                    <table class="container-details-room">
+                        <tr>
+                            <td> نام میزبان</td>
+                            <td> کد کاربری</td>
+                            <td>شماره تلفن</td>
+                            @*<td>تخت اضافه</td>*@
+                        </tr>
+                        <tr>
+                            <td class="text-style">@Model.hostFullName</td>
+                            <td class="text-style">@Model.hostUserId</td>
+                            <td class="text-style">@Model.hostMobile</td>
+                            @*<td class="text-style">ندارد</td>*@
+                        </tr>
+                    </table>
+                </div>
+                <div class="style-table-box">
+                    <p class="style-title"> مشخصات مهمان</p>
+                    <table class="container-details-person">
+                        <tr>
+                            <td>  رزرو توسط خانم / آقا</td>
+                            <td> کد کاربری</td>
+                            <td> شماره همراه</td>
+                            <td> تعداد نفرات</td>
+                        </tr>
+                        <tr>
+                            <td class="text-style">@Model.guestFullName</td>
+                            <td class="text-style">@Model.guestUserId</td>
+                            <td class="text-style">@Model.guestMobile</td>
+                            <td class="text-style">@Model.guestCount</td>
+                        </tr>
+                    </table>
+                </div>
+            </sectoin>
+            <section class="slider">
+                <div class="logo">
+                    <img src="/resource/img/amlakbashi-logo-black-1200w.png">
+                </div>
+                <div class="about-page">
+                    <p>این برگه جهت رزرو اتاق صادر گردیده و هیچگونه اعتبار دیگری ندارد</p>
+                    <p>this form is issued fo room reservation and it has not any other value</p>
+                </div>
+                <p>مبلغ رزرو : @StringUtility.EnglishNumberToPersian(string.Format("{0:n0}", Model.reserveTotalPrice)) تومان</p>
+                <p>پرداختی به سایت : @StringUtility.EnglishNumberToPersian(string.Format("{0:n0}", Model.reservePaidAmount)) تومان</p>
+                <p>مبلغ باقیمانده : @StringUtility.EnglishNumberToPersian(string.Format("{0:n0}", Model.reserveRemainedAmount)) تومان</p>
+                @*<p>جمع کل :</p>*@
+
+                <div class="name-and-sign">نام و امضای متقاضی</div>
+                <div class="name-and-sign">نام و امضای صادر کننده</div>
+            </section>
+        </section>
+    }
+</body>
+</html>
