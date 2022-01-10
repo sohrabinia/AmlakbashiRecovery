@@ -175,9 +175,9 @@ namespace Amlakbashi.Host.Areas.App.Controllers
         }
 
         [Authorize]
-        public ActionResult Voucher(long reserve_id)
+        public ActionResult Voucher(long reserveId)
         {
-            var model = reserveService.GenerateVoucher(reserve_id, userAccessor.CurrentUser.Id);
+            var model = reserveService.GenerateVoucher(reserveId, userAccessor.CurrentUser.Id);
             return View(model);
         }
 

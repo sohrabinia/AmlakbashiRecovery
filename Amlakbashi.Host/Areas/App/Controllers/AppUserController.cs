@@ -14,6 +14,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+using Microsoft.AspNetCore.Identity;
+using Amlakbashi.Core.Identity.Entities;
 
 namespace Amlakbashi.Host.Areas.App.Controllers
 {
@@ -26,6 +29,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
         private readonly IBankCardAppService bankCardService;
         private readonly IReserveAppService reserveService;
         private readonly IFileAppService fileService;
+        private readonly SignInManager<AppUser> signInManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ILog logger;
         public AppUserController(IUserAccessor userAccessor,
@@ -33,6 +37,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             IBankCardAppService bankCardService,
             IReserveAppService reserveService,
             IFileAppService fileService,
+            SignInManager<AppUser> signInManager,
             IWebHostEnvironment webHostEnvironment,
             ILog logger)
         {
@@ -41,6 +46,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             this.bankCardService = bankCardService;
             this.reserveService = reserveService;
             this.fileService = fileService;
+            this.signInManager = signInManager;
             this.webHostEnvironment = webHostEnvironment;
             this.logger = logger;
         }
@@ -163,6 +169,63 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             {
                 logger.Error("User.Profile", exc);
                 return RedirectToAction(nameof(Profile));
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult Password()
+        {
+            try
+            {
+                var identityUser = userService.GetIdentityUser(User.Identity.Name);
+                ViewBag.hasPass = string.IsNullOrEmpty(identityUser.PasswordHash) ? false : true;
+                return View();
+            }
+            catch (Exception exc)
+            {
+                logger.Error("App.User.Password(get)", exc);
+                return Redirect(Request.Headers["referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public IActionResult Password(string currentPassword, string newPassword, string confirmPassword)
+        {
+            try
+            {
+                var identityUser = userService.GetIdentityUser(User.Identity.Name);
+                ViewBag.hasPass = string.IsNullOrEmpty(identityUser.PasswordHash) ? false : true;
+                if (string.IsNullOrEmpty(newPassword) || newPassword != confirmPassword)
+                {
+                    ViewBag.errors = new List<string>()
+                    {
+                        "لطفا رمز عبور و تکرار آن را به درستی وارد کنید"
+                    };
+                    return View();
+                }
+                var result = userService.ChangePassword(User.Identity.Name, currentPassword, newPassword);
+                if (result.Succeeded)
+                {
+                    var user = userService.GetIdentityUser(User.Identity.Name);
+                    userService.SignOut();
+                    signInManager.SignInAsync(user, true).Wait();
+                    TempData["suc"] = "تغییر رمز عبور با موفقیت انجام شد";
+                    return Redirect("/app/user/profile");
+                }
+                var errorList = new List<string>();
+                foreach (var item in result.Errors)
+                {
+                    errorList.Add(UserLocalization.GetIdentityPasswordErrorString(item.Code, item.Description));
+                }
+                ViewBag.errors = errorList;
+                return View();
+            }
+            catch (Exception exc)
+            {
+                logger.Error("App.User.Password(post)", exc);
+                return Redirect(Request.Headers["referer"].ToString());
             }
         }
     }

@@ -527,8 +527,6 @@ function chat_box_inputkeyup() {
     }
 }
 
-var is_sending_chat = false;
-
 function showSupportChat() {
     hideSupportChatInform();
     var id = parseInt($('#js-support-chat-id').val());
@@ -564,6 +562,8 @@ function openChatInput() {
     chatInputIsOpen = true;
 }
 
+var is_sending_chat = false;
+
 function sendSupportChatMessage(id, text, questionNumber) {
     if (id == undefined) {
         id = parseInt($('#js-support-chat-id').val());
@@ -595,7 +595,6 @@ function sendSupportChatMessage(id, text, questionNumber) {
         success: function (ret) {
             is_sending_chat = false;
             if (ret.status == 1) {
-                debugger;
                 $('#js-support-chat-id').val(ret.id);
                 portalHubConnection.invoke('reloadSupportChat', ret.id, 0, current_user_id);
                 $(".support-chat__text-input").focus();

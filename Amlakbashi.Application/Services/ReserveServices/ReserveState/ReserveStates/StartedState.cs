@@ -42,28 +42,25 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
         public override void OnTransition(Reserve.ReserveStatus prevStatus, bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId)
         {
             var reserve = Repository.Find(ReserveId);
-            if (reserve.StartDate.Date == DateTime.Now.Date)
+            reserve.Status = ReserveStatus.Started;
+            Repository.Update(reserve);
+            Repository.Save();
+            if (sendSms)
             {
-                reserve.Status = ReserveStatus.Started;
-                Repository.Update(reserve);
-                Repository.Save();
-                if (sendSms)
+                var identityUser = userManager.FindByNameAsync(reserve.GuestUser.MainMobile).Result;
+                var contact = new UserContactDTO()
                 {
-                    var identityUser = userManager.FindByNameAsync(reserve.GuestUser.MainMobile).Result;
-                    var contact = new UserContactDTO()
-                    {
-                        UserMainMobile = reserve.GuestUser.MainMobile,
-                        UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
-                        UserEmail = identityUser.Email,
-                        EmailConfirmed = identityUser.EmailConfirmed,
-                        UserFcmAppNotificationToken = reserve.GuestUser.FcmAppNotificationToken,
-                        UserNotificationToken = reserve.GuestUser.NotificationToken,
-                        Type = UserContactType.GuestStayStarted,
-                        AdvertiseId = reserve.AdvertiseID.ToString(),
-                        ReserveId = reserve.Id.ToString()
-                    };
-                    mediator.Enqueue(new SendMessageCommand(contact));
-                }
+                    UserMainMobile = reserve.GuestUser.MainMobile,
+                    UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
+                    UserEmail = identityUser.Email,
+                    EmailConfirmed = identityUser.EmailConfirmed,
+                    UserFcmAppNotificationToken = reserve.GuestUser.FcmAppNotificationToken,
+                    UserNotificationToken = reserve.GuestUser.NotificationToken,
+                    Type = UserContactType.GuestStayStarted,
+                    AdvertiseId = reserve.AdvertiseID.ToString(),
+                    ReserveId = reserve.Id.ToString()
+                };
+                mediator.Enqueue(new SendMessageCommand(contact));
             }
         }
     }

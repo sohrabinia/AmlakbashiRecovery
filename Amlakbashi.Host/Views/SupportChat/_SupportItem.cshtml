@@ -49,7 +49,7 @@
 <div class="support-chat-index__reserve">
     @if (Model.reserveId > 0)
     {
-        <a target="_blank" href="/reserve/index?reserve_id=@(Model.reserveId)">کد رزرو: @Model.reserveId</a>
+        <a target="_blank" href="/reserve/newindex?reserveid=@(Model.reserveId)">کد رزرو: @Model.reserveId</a>
         <a target="_blank" href="/advertise/index?id=@(Model.advertiseId)">کد آگهی: @Model.advertiseId</a>
         if (Model.reserveSupporterId > 0)
         {

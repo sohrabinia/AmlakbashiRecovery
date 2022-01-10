@@ -84,7 +84,7 @@
             </span>
         </div>
         <div class="profile__item ">
-            <a asp-controller="user" asp-action="changepassword" style="margin-top:20px;" class="btn-photo">@(Model.hasPassword ? "تغییر" : "تعیین") رمز عبور</a>
+            <a asp-area="app" asp-controller="user" asp-action="password" style="margin-top:20px;" class="btn-photo">@(Model.hasPassword ? "تغییر" : "تعیین") رمز عبور</a>
         </div>
         <div class="profile__title">اطلاعات تماس</div>
         <div class="profile__item ">

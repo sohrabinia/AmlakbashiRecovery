@@ -990,39 +990,41 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 return false;
             }
 
-            //if (string.IsNullOrEmpty(dto.PersinaStartDate) == false)
-            //{
-            //    reserve.StartDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaStartDate);
-            //}
+            if (string.IsNullOrEmpty(dto.PersinaStartDate) == false)
+            {
+                reserve.StartDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaStartDate);
+            }
+
             //if (string.IsNullOrEmpty(dto.PersinaEndDate) == false)
             //{
             //    reserve.EndDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaEndDate);
             //}
 
-            if (string.IsNullOrEmpty(dto.PersinaStartDate) == false)
-            {
-                var startDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaStartDate);
-                if (reserve.StartDate != startDate)
-                {
-                    reserve.StartDate = startDate;
-                    var beforeStart = new DateTime(
-                        reserve.StartDate.Year,
-                        reserve.StartDate.Month,
-                        reserve.StartDate.Day,
-                        12, 0, 0) - DateTime.Now;
-                    if (beforeStart.TotalMilliseconds <= 0)
-                    {
-                        mediator.Send(new SetReserveStatusCommand(reserve.Id, ReserveStatus.Started,
-                            true, actionSource, doerUserId));
-                    }
-                    else
-                    {
-                        var onStart = beforeStart.Add(new TimeSpan(2, 0, 0));
-                        mediator.Schedule(new SetReserveStatusCommand(reserve.Id,
-                            ReserveStatus.Started, true, actionSource, doerUserId), onStart);
-                    }
-                }
-            }
+            //if (string.IsNullOrEmpty(dto.PersinaStartDate) == false)
+            //{
+            //    var startDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaStartDate);
+            //    if (reserve.StartDate != startDate)
+            //    {
+            //        reserve.StartDate = startDate;
+            //        var beforeStart = new DateTime(
+            //            reserve.StartDate.Year,
+            //            reserve.StartDate.Month,
+            //            reserve.StartDate.Day,
+            //            12, 0, 0) - DateTime.Now;
+            //        if (beforeStart.TotalMilliseconds <= 0)
+            //        {
+            //            mediator.Send(new SetReserveStatusCommand(reserve.Id, ReserveStatus.Started,
+            //                true, actionSource, doerUserId));
+            //        }
+            //        else
+            //        {
+            //            var onStart = beforeStart.Add(new TimeSpan(2, 0, 0));
+            //            mediator.Schedule(new SetReserveStatusCommand(reserve.Id,
+            //                ReserveStatus.Started, true, actionSource, doerUserId), onStart);
+            //        }
+            //    }
+            //}
+
             if (string.IsNullOrEmpty(dto.PersinaEndDate) == false)
             {
                 var endDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaEndDate);

@@ -48,6 +48,7 @@ function doHomePageSearch() {
         regionHref += "capacity=" + guestCount;
         firstQueryAdded = true;
     }
+    $('.app-loader').show();
     window.location.href = regionHref;
 }
 

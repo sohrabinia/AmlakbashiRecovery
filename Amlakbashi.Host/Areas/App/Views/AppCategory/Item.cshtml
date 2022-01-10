@@ -134,7 +134,16 @@
 }
 
 @section StyleLink {
-    <link rel="stylesheet" href="/css/cat-item.min.css" asp-append-version="true" />
+    <environment include="Development">
+        <link rel="stylesheet" href="/resource/css/general/jalali-date-picker.css" asp-append-version="true" />
+        <link rel="stylesheet" href="/resource/css/portal/advertise-list.css" asp-append-version="true" />
+        <link rel="stylesheet" href="/resource/css/portal/post-list.css" asp-append-version="true" />
+        <link rel="stylesheet" href="/resource/css/general/master-search.css" asp-append-version="true" />
+        <link rel="stylesheet" href="/resource/css/general/search-by-region.css" asp-append-version="true" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="/css/cat-item.min.css" asp-append-version="true" />
+    </environment>
 }
 
 @section TopPin {
@@ -702,25 +711,25 @@
 }
 
 @*<div class="share-post__container">
-    <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(Model.Title)" rel="noreferrer" title="اشتراک گذاری در تلگرام">
-        <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram" style="background-color: #259DCF;">
-    </a>
-    <a class="share-post__item" href="whatsapp://send?text=@(Model.Title) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(Model.Title) @(u_)')" title="اشتراک گذاری در واتس اپ">
-        <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp" style="background-color: #1BD741;">
-    </a>
-    <a class="share-post__item" href="http://twitter.com/share?text=@(Model.Title);url=@(u_)" rel="noreferrer" title="توئیت کردن اقامتگاه">
-        <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter" style="background-color: #55ACEE;">
-    </a>
-    <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(Model.Title)" rel="noreferrer" title="اشتراک گذاری در فیسبوک">
-        <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook" style="background-color: #3b5998;">
-    </a>
-    <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(Model.Title)" rel="noreferrer" title="پین کردن در پینترست">
-        <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest" style="background-color: #BD081C;">
-    </a>
-    <a class="share-post__item" href="mailto:?subject=@(Model.Title);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" title="اشتراک گذاری با ایمیل">
-        <i class="fa fa-envelope share-post__icon" style="font-size:24px;padding:8px;color:white;background-color:#3d3d3d;"></i>
-    </a>
-</div>*@
+        <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(Model.Title)" rel="noreferrer" title="اشتراک گذاری در تلگرام">
+            <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram" style="background-color: #259DCF;">
+        </a>
+        <a class="share-post__item" href="whatsapp://send?text=@(Model.Title) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(Model.Title) @(u_)')" title="اشتراک گذاری در واتس اپ">
+            <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp" style="background-color: #1BD741;">
+        </a>
+        <a class="share-post__item" href="http://twitter.com/share?text=@(Model.Title);url=@(u_)" rel="noreferrer" title="توئیت کردن اقامتگاه">
+            <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter" style="background-color: #55ACEE;">
+        </a>
+        <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(Model.Title)" rel="noreferrer" title="اشتراک گذاری در فیسبوک">
+            <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook" style="background-color: #3b5998;">
+        </a>
+        <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(Model.Title)" rel="noreferrer" title="پین کردن در پینترست">
+            <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest" style="background-color: #BD081C;">
+        </a>
+        <a class="share-post__item" href="mailto:?subject=@(Model.Title);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" title="اشتراک گذاری با ایمیل">
+            <i class="fa fa-envelope share-post__icon" style="font-size:24px;padding:8px;color:white;background-color:#3d3d3d;"></i>
+        </a>
+    </div>*@
 
 <div class="container" style="max-width:1100px">
     <div class="dynamic__header-container">
@@ -814,16 +823,16 @@
     </div>
 </div>
 
-@*@if (Model.Category != null && !string.IsNullOrEmpty(Model.Category.CategoryPostTitle) && 
-    string.IsNullOrEmpty(Model.Category.CategoryPostText) == false)
-{
-    <div class="advertise-category__description" style="white-space:unset;border-radius: 5px;">
-        <header>
-            <h2 style="margin:10px;font:15px Biransans;">@Model.Category.CategoryPostTitle</h2>
-        </header>
-        @Html.Raw(Model.Category.CategoryPostText)
-    </div>
-}*@
+@*@if (Model.Category != null && !string.IsNullOrEmpty(Model.Category.CategoryPostTitle) &&
+        string.IsNullOrEmpty(Model.Category.CategoryPostText) == false)
+    {
+        <div class="advertise-category__description" style="white-space:unset;border-radius: 5px;">
+            <header>
+                <h2 style="margin:10px;font:15px Biransans;">@Model.Category.CategoryPostTitle</h2>
+            </header>
+            @Html.Raw(Model.Category.CategoryPostText)
+        </div>
+    }*@
 
 <!--<div class="advertise-category-link__title">سوالات متداول</div>
 <div class="advertise-list__faq-container">
@@ -860,9 +869,8 @@
         <div style="text-align:center; margin: 20px;">
             <a href="https://www.aparat.com/v/vS7Oe" rel="noreferrer"><i class="fas fa-play-circle"></i> مشاهده در آپارات</a>
         </div>-->
-        
-        @*<iframe class="style-video" src="https://www.aparat.com/video/video/embed/videohash/vS7Oe/vt/frame" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>*@
-    <!--</div>
+@*<iframe class="style-video" src="https://www.aparat.com/video/video/embed/videohash/vS7Oe/vt/frame" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>*@
+<!--</div>
     <p class="public__header-text">
         <strong>@Model.CategoryFaqHostQuestion</strong>
         <i class="fa fa-chevron-left"></i>
@@ -907,7 +915,27 @@
 }
 
 @section ScriptLink {
-    <script type="text/javascript" src="/js/min/app-category-item.min.js" asp-append-version="true"></script>
+    <environment include="Development">
+        <script src="/resource/scripts/jquery.plugin.min.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/detail-button.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/jalali-date-converter.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/jalali-date-handler.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/jalali-date-picker.js" asp-append-version="true"></script>
+        <script src="/js/app/master-search.js" asp-append-version="true"></script>
+        <script src="/js/app/search-by-region.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/increase-decrease-button.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/price-slider.js" asp-append-version="true"></script>
+        <script src="/resource/scripts/general/price-string-generator.js" asp-append-version="true"></script>
+        <script src="/js/app/category/accommodation-list-page.js" asp-append-version="true"></script>
+        <script src="/js/app/category/custom-filter-elements.js" asp-append-version="true"></script>
+        <script src="/js/app/category/filter-subject.js" asp-append-version="true"></script>
+        <script src="/js/app/category/filter-ui-manager.js" asp-append-version="true"></script>
+        <script src="/js/app/category/filter-data-manager.js" asp-append-version="true"></script>
+        <script src="/js/app/category/filter-submit-manager.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script type="text/javascript" src="/js/min/app-category-item.min.js" asp-append-version="true"></script>
+    </environment>
 }
 
 @section ScriptBlock
