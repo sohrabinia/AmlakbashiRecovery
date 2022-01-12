@@ -58,8 +58,6 @@ function moreComments() {
     }
 }
 
-var sharePostState = false;
-
 $(document).mouseup(function (e) {
     var container = $('#main-date-picker');
 
@@ -72,22 +70,11 @@ $(document).mouseup(function (e) {
         }
         container.hide();
     }
-
-    container = $('.share-post__container');
-    if (!container.is(e.target) && container.has(e.target).length === 0) {
-        if (sharePostState) {
-            sharePostState = false;
-            $('.share-post__container').slideUp();
-        }
-    }
 });
 
 $(".share-post__button").on("click", function () {
-    if (!sharePostState) {
-        sharePostState = true;
-        $(".share-post__container").slideDown();
-        $('.share-post__container').css('display', 'flex');
-    }
+    var popup = document.getElementById("share_popup");
+    popup.classList.toggle("show");
 });
 
 function hideReservePopup() {

@@ -167,132 +167,7 @@ a {
     align-items: baseline;
     border-radius: 4px;
 }
-
 /*****end master*****/
-
-/*****login popup*****/
-
-/*.login__root{
-}
-
-.login__message-container {
-    color: red;
-    direction: rtl;
-    font: 16px Biransans;
-    margin-top: 20px;
-    text-align: center;
-}
-
-.login-confirm-message {
-    font:13px Miransans;
-    color: black;
-    text-align: center;
-    padding:20px;
-}
-
-.login-confirm-message-red-label {
-    font-size: 17px;
-    color: red;
-}
-
-.login__please-enter-mobile {
-    font-family: Miransans;
-    font-size: 13px;
-    color: black;
-    text-align: center;
-    padding-top: 37px;
-    padding-left: 40px;
-    padding-right: 40px;
-}
-
-.login__container{
-    display: flex;
-    position: fixed;
-    top: 20px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    max-width: 500px;
-    min-height:500px;
-    z-index: 10000000002;
-    margin: auto;
-    display:none;
-    overflow-y: scroll;
-    padding-bottom:20px;
-}
-
-.login__container::-webkit-scrollbar {
- display: none;
-}
-
-.login__bg{
-    background-color: black;
-    position: fixed;
-    opacity: 0.6;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 10000000001;
-    display:none;
-}
-
-.login__box-button {
-    background: #FDD835;
-    border: 0 none;
-    color: #242424;
-    cursor: pointer;
-    display: block;
-    margin: 20px auto;
-    margin-top: 25px;
-    padding: 5px 10px;*/
-/*width: 330px;*/
-/*font: 15px Miransans;
-    text-decoration: none;
-    width:80%;
-    text-align: center;
-}
-.login_form {
-    text-align:center;
-}
-.login__box {
-    background: #EAEAEA;
-    color: #fff;
-    font-family: Helvetica;
-    padding: 5px 0;
-    margin: auto;
-    width: 500px;
-}
-.login__box-input {
-    background:#fff;
-    border: 0 none;
-    color: #333;
-    display: block;
-    margin: 20px auto;
-    padding:7px 15px;
-    width: 300px;
-    text-align:center;
-    font:15px Miransans;
-}
-
-.login__resend-message {
-    font:13px/23px Miransans;
-    color: black;
-    text-align: center;
-    padding:8px 20px;
-}
-
-.login__resend-button {
-    color:#242424;
-    font:13px Miransans;
-    padding:10px;
-}*/
-
-/*****end login popup*****/
-
-
 
 /*****home page category*****/
 .home-page__category-item-container-large {
@@ -313,22 +188,8 @@ a {
 }
 
 .home-page__category-item-container-large:hover {
-    /*opacity: .7;*/
     transform:scale(1.02);
 }
-/*.home-page__category-item-container-large {
-    height:60px;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(hsla(0, 0%, 12%, 1)), to(hsla(0, 0%, 12%, 0)));
-    background-image: -webkit-linear-gradient(hsla(0, 0%, 12%, 1), hsla(0, 0%, 12%, 0));
-    background-image: -o-linear-gradient(hsla(0, 0%, 12%, 1), hsla(0, 0%, 12%, 0));
-    background-image: linear-gradient(hsla(0, 0%, 12%, 1), hsla(0, 0%, 12%, 0));
-    display:table-cell;
-    vertical-align:top;
-    width:240px;
-    position: absolute;
-    top:0;
-    left:0;
-}*/
 /*****end home page category*****/
 
 /*****home page advertise*****/
@@ -370,9 +231,6 @@ a {
     color: #242424;
     margin:0;
 }
-/*.advertise-page__related-container{
-    justify-content:center !important;
-}*/
 .home-page-rating-style .star-rating__parent, .home-page__advertise-no-comment {
     position: absolute;
     bottom: 0;
@@ -406,7 +264,6 @@ a {
 }
 .style-box-status-room p {
     margin: 1px 2px;
-    /*background-color: #DF7549;*/
     background-color: green;
     width: max-content;
     border-radius: 5px;
@@ -466,7 +323,6 @@ p.home-page__advertise-capacity {
     font: 12px Liransans;
     display: flex;
     height: 15px;
-    /* justify-content: space-between; */
     align-items: center;
     color: #2f3c46;
 }
@@ -510,41 +366,54 @@ p.home-page__advertise-capacity .fa-users {
 /*****end home page advertise*****/
 
 /*****share post*****/
-.share-post__button {
-    position: fixed;
-    z-index: 1000;
-    left: 14px;
-    bottom: 14px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #fdd835;
-    border-radius: 60px;
-    width: 54px;
-    height: 54px;
-    cursor: pointer;
-}
-
-.share-post__container {
-    display: none;
-    z-index: 1000;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    flex-flow: column-reverse;
-    position: fixed;
-    left: 18px;
-    bottom: 80px;
-}
-
 .share-post__item {
-    border-radius: 60px;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50px;
     margin: 5px;
     cursor: pointer;
+    text-align: center;
+    color: white;
+    font-size: 20px;
 }
-
+.share-post__item i {
+    color: white;
+}
 .share-post__icon {
     border-radius: 60px;
     padding: 5px;
+}
+.share-post__button {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+.share-post__button .share-popup {
+  visibility: hidden;
+  background-color: white;
+  width: 160px;
+  text-align: center;
+  border: 2px solid #555;
+  border-radius: 6px;
+  padding: 8px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 10%;
+}
+.share-post__button .share-popup::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 5%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+.share-post__button .show {
+  visibility: visible;
 }
 /*****end share post*****/
 
@@ -577,10 +446,6 @@ p.home-page__advertise-capacity .fa-users {
     font: 0.9em Liransans;
     height: 60px;
     opacity: .95;
-    /*background-image: linear-gradient(to right ,#f9ca2c, #fdd835);*/
-    /*background-image: -webkit-gradient(linear,left top, right top,from(#fce188),to(#ffe068));*/
-    /*background-image: -o-linear-gradient(left,#fce188,#ffe068);*/
-    /*background-image: linear-gradient(to right,#fce188,#ffe068);*/
     width: 57px;
     height: 57px;
     -webkit-box-shadow: 5px 5px 5px 0px #888888;
@@ -588,7 +453,6 @@ p.home-page__advertise-capacity .fa-users {
 }
 
     .support-chat__button:hover {
-        /*background-image: linear-gradient(to right,#ffe068,#fce188);*/
         background-image: none;
         background-color: #ffeca0;
     }
@@ -758,14 +622,6 @@ a::after {
 h1 {
     font: 1.15em Miransans;
 }
-
-/*h1, h2, h3, h4, h5, h6{
-    font-size:inherit ;
-    font-weight:inherit ;
-    margin:0 ;
-    padding:0 ;
-    line-height:inherit ;
-}*/
 
 a:hover {
     text-decoration: none;
