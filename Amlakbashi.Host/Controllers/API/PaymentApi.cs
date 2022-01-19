@@ -28,13 +28,10 @@ namespace Amlakbashi.Host.Controllers.API
                     ProductType = CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString()
                 };
                 accounting.InsertPayment(payment);
-                return Redirect(GeneralData.WebsiteUrl + "/Cart/ConfirmAndPayment?id=" + payment.Id
-                    + "&bank=2" + "&useCustomRedirect=true"
-                    + "&user_id=" + user.Id
-                    + "&customRedirectUrl=" + redirectUrl
-                    + "&price=" + price);
+                return Redirect(GeneralData.WebsiteUrl + "/Cart/PerformPay?paymentId=" + payment.Id
+                    + "&redirectUrl=" + redirectUrl);
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 logger.Error("PaymentApi.UserIncreaseCredit", exc);
                 return null;
@@ -54,18 +51,15 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     case GuestPayResult.ReadyToPay:
                         reserveAutoCancelService.UpdateScheduledTime(reserve_id);
-                        return Redirect(GeneralData.WebsiteUrl + "/Cart/ConfirmAndPayment?id="
-                            + payment_id
-                            + "&bank=2" + "&useCustomRedirect=true"
-                            + "&user_id=" + user.Id
-                            + "&customRedirectUrl=" + redirectUrl);
+                        return Redirect(GeneralData.WebsiteUrl + "/Cart/PerformPay?paymentId=" + payment_id
+                            + "&redirectUrl=" + redirectUrl);
                     default:
                         return Redirect(redirectUrl);
                 }
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("PaymentApi.GuestPayReserve", exc);
                 return null;
             }
         }
@@ -121,7 +115,8 @@ namespace Amlakbashi.Host.Controllers.API
             catch (Exception exc)
             {
                 logger.Error("", exc);
-                return GenerateJsonResult(new {
+                return GenerateJsonResult(new
+                {
                     done = false,
                     result = 3
                 });
@@ -147,7 +142,7 @@ namespace Amlakbashi.Host.Controllers.API
                 }
                 string msg;
                 var done = reserveService.CashPay(reserve_id, out msg,
-                    user.Id, ActionLog.ActionSourceEnum.Application ,user.Id);
+                    user.Id, ActionLog.ActionSourceEnum.Application, user.Id);
                 return GenerateJsonResult(new
                 {
                     done = done,

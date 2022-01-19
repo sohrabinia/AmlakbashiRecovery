@@ -1,0 +1,34 @@
+﻿@model Payment
+
+@{
+    ViewBag.Title = "نتیجه پرداخت الکترونیک";
+    Layout = "~/Views/Shared/_Master.cshtml";
+}
+
+@section StyleLink
+{
+    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/cart.css">
+}
+
+<div class="container">
+    <div class="col-md-6 col-sm-6" style="padding: 10px; width:100%;">
+        <div style="font-family: Miransans;margin-top: 50px;padding: 20px;background-color: #f1f1f1;border-radius: 12px;">
+            <div style="font-family: Miransans;font-size: 23px;">اطلاعات پرداخت</div>
+            <div style="padding: 10px;">تاریخ پرداخت: @ViewBag.PayDate</div>
+            @if (Model.ProductType == "Credit_Inc_Then_Res")
+            {
+                <div style="padding: 5px;">مبلغ رزرو: @(string.Format("{0:n0}", Model.ReservePrice * 10)) ریال</div>
+                <div style="padding: 5px;">موجودی کیف پول: @(string.Format("{0:n0}", (Model.ReservePrice - (Model.TotalPrice / 10)) * 10)) ریال</div>
+            }
+            <div style="padding: 5px 0 15px 0;">مبلغ قابل پرداخت: @string.Format("{0:n0}", ViewBag.PayPrice) ریال</div>
+            <div style="padding: 5px 0 15px 0;">
+                پرداخت از درگاه:
+                @*<input type="radio" name="bank" id="saman" value="1" checked />
+                    <label for="saman">بانک سامان</label>*@
+                <input type="radio" name="bank" id="pasargad" value="2" checked />
+                <label for="pasargad">بانک پاسارگاد</label>
+            </div>
+            <button type="submit" style="font-family: Miransans; background-color: #fdd835;color: #242424;padding: 5px 10px; border-radius: 5px; cursor:pointer;">پرداخت</button>
+        </div>
+    </div>
+</div>

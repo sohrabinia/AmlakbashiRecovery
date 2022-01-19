@@ -36,7 +36,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses
         public string imageUrl { get; set; }
         public List<string> tags { get; set; }
         public int nightlyPrice { get; set; }
-        public int rating { get; set; }
+        public double rating { get; set; }
         public int commentsCount { get; set; }
     }
 
@@ -46,7 +46,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses
         public string imageUrl { get; set; }
         public List<string> tags { get; set; }
         public int nightlyPrice { get; set; }
-        public int rating { get; set; }
+        public double rating { get; set; }
         public int commentsCount { get; set; }
         public string badgeText { get; set; }
     }

@@ -274,7 +274,7 @@ function executeAddToShouldFollow(reserve_id, text) {
 }
 
 function executeAddInfo(reserve_id, text, notShowMessage) {
-    sendGetAjax("/reserve/addsupporterinfotoreserve", "reserve_id=" + reserve_id + "&text=" + text, function (ret) {
+    sendPostAjax("/reserve/addsupporterinfotoreserve", "reserve_id=" + reserve_id + "&text=" + text, function (ret) {
             if (ret.status == 0) {
                 errorAlert("عملیات با خطا مواجه شد");
             }

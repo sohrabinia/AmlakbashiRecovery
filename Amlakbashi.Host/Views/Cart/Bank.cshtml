@@ -1,47 +1,48 @@
-﻿@model System.Collections.Generic.Dictionary<string,object>
+﻿@using Amlakbashi.Core.Common.Enums
+
+@model System.Collections.Generic.Dictionary<string, object>
+
 @{
     ViewBag.Title = "انتقال به بانک";
-    Layout = "~/Views/Shared/_Master.cshtml";
+}
 
-}
-@section StyleLink
-{
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/cart.css">
-}
 <div class="container">
-    <div @*class="row"*@>
-
+    <div>
         <div class="col-md-12 col-sm-12 " style="padding: 6px;text-align: center;">
             <div style="font-family: Miransans;margin-top: 50px;padding: 20px;background-color: #f1f1f1;border-radius: 12px;">
                 <div style="font-family: Miransans;font-size: 23px;">در حال انتقال به بانک</div>
                 <div style="font-family: Miransans;font-size: 15px;color:red">کمی صبر کنید ....</div>
             </div>
-            <form action="@Model["url"]" method="post" id="bankform" style="display:none">
-                <input type="hidden" name="invoiceNumber" value="@Model["invoiceNumber"]" />
-                <input type="hidden" name="invoiceDate" value="@Model["invoiceDate"]" />
-                <input type="hidden" name="amount" value="@Model["amount"]" />
-                <input type="hidden" name="terminalCode" value="@Model["terminalCode"]" />
-                <input type="hidden" name="merchantCode" value="@Model["merchantCode"]" />
-                <input type="hidden" name="redirectAddress" value="@Model["redirectAddress"]" />
-                <input type="hidden" name="timeStamp" value="@Model["timeStamp"]" />
-                <input type="hidden" name="action" value="@Model["action"]" />
-                <input type="hidden" name="sign" value="@Model["sign"]" />
-                <input type="submit" id="bankformbtn" name="submit" value=""  />
-            </form>
+            @if ((BankEnum)Model["bank"] == BankEnum.Pasargad)
+            {
+                <form action="@Model["url"]" method="post" id="bankform" style="display:none">
+                    <input type="hidden" name="invoiceNumber" value="@Model["invoiceNumber"]" />
+                    <input type="hidden" name="invoiceDate" value="@Model["invoiceDate"]" />
+                    <input type="hidden" name="amount" value="@Model["amount"]" />
+                    <input type="hidden" name="terminalCode" value="@Model["terminalCode"]" />
+                    <input type="hidden" name="merchantCode" value="@Model["merchantCode"]" />
+                    <input type="hidden" name="redirectAddress" value="@Model["redirectAddress"]" />
+                    <input type="hidden" name="timeStamp" value="@Model["timeStamp"]" />
+                    <input type="hidden" name="action" value="@Model["action"]" />
+                    <input type="hidden" name="sign" value="@Model["sign"]" />
+                    <input type="submit" id="bankformbtn" name="submit" value="" />
+                </form>
+            }
+            else if ((BankEnum)Model["bank"] == BankEnum.Saman)
+            {
+                <form action="@Model["url"]" method="post" id="bankform" style="display:none">
+                    <input type="hidden" name="Token" value="@Model["token"]" />
+                    <input type="hidden" name="GetMethod" value="false" />
+                </form>
+            }
         </div>
-
-
     </div>
 </div>
 
-@section ScriptBlock
-{
-    <script>
-        $(document).ready(function () {
-            debugger;
-            $('#bankform').submit();
-            $('#bankformbtn').click();
-
-        });
-    </script>
-}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#bankform').submit();
+        $('#bankformbtn').click();
+    });
+</script>

@@ -7,6 +7,7 @@ namespace Amlakbashi.Core.Common.Enums
     public enum BankEnum
     {
         Unknown = 0,
+        Saman = 1,
         Pasargad = 2
     }
 }
