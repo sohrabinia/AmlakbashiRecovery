@@ -542,26 +542,6 @@ namespace Amlakbashi.Host.Controllers
                     TempData["msg"] = "شماره تلفن باید با کد کشوری باشد. مثال: +98 9102222222 .";
                     return Redirect(Request.Headers["referer"].ToString());
                 }
-                //if (user.Id == -1)
-                //{
-                //    if (string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.MainMobile)))
-                //    {
-                //        TempData["msg"] = "لطفا نام کاربری را وارد کنید .";
-                //        return RedirectToAction("Edit");
-                //    }
-                //    var userdb = userService.GetByMainMobile(user.MainMobile);
-                //    if (userdb != null)
-                //    {
-                //        TempData["msg"] = "این نام کاربری قبلا انتخاب شده است، لطفا نام کاربری دیگری انتخاب کنید .";
-                //        return RedirectToAction("Edit");
-                //    }
-                //    user.CreateDate = DateTime.Now;
-                //    user.State = (int)Entities.User.UserState.InActived;
-                //    userService.Insert(user, userAccessor.DoerUser.Id);
-
-                //}
-                //else
-                //{
                 List<string> errors;
                 var identityUser = userService.GetIdentityUser(user.MainMobile);
                 if (identityUser.State != (User.UserState)userState)
@@ -570,8 +550,7 @@ namespace Amlakbashi.Host.Controllers
                     userService.UpdateIdentityUser(identityUser);
                 }
                 userService.Update(UserDTO.Generate(user, identityUser), userAccessor.DoerUser.Id,
-                    false, ActionLog.ActionSourceEnum.AdminPanel, out errors, user.CancelInstantReserveLimit);
-                //}
+                    false, ActionLog.ActionSourceEnum.AdminPanel, out errors);
                 return RedirectToAction("Index");
             }
             catch (Exception exc)

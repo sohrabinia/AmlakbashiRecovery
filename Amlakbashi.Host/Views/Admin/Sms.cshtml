@@ -67,43 +67,6 @@
             </div>
         </div>
 
-        <div class="dynamic-filter__item">
-            <div class="dynamic-filter__label">نوع معامله :</div>
-            <div class="dynamic-filter__property">
-
-                <select name="tradeid">
-                    <option value="-1">همه </option>
-                    <option value="20">اجاره روزانه</option>
-                    <option value="1">خرید و فروش</option>
-                    <option value="2">رهن و اجاره</option>
-                </select>
-            </div>
-        </div>
-
-
-        <div class="dynamic-filter__item">
-            <div class="dynamic-filter__label">نوع ویژه :</div>
-            <div class="dynamic-filter__property">
-                <select name="special">
-                    <option value="-1">همه </option>
-                    <option value="0">آگهی عادی</option>
-                    <option value="1">آگهی ویژه</option>
-                    <option value="2">48 آگهی ویژه</option>
-                    <option value="3"> آگهی ویژه 24</option>
-                    <option value="4">آگهی ویژه 12</option>
-                    <option value="5">ویژه ی یک ستاره یک ماهه</option>
-                    <option value="6">ویژه ی یک ستاره سه ماهه</option>
-                    <option value="7">ویژه ی یک ستاره شش ماهه</option>
-                    <option value="8">ویژه ی دو ستاره یک ماهه</option>
-                    <option value="9">ویژه ی دو ستاره سه ماهه</option>
-                    <option value="10">ویژه ی دو ستاره شش ماهه</option>
-                    <option value="11">ویژه ی سه ستاره یک ماهه</option>
-                    <option value="12">ویژه ی سه ستاره سه ماهه</option>
-                    <option value="13">ویژه ی سه ستاره شش ماهه</option>
-                    <option value="999">ویژه ی سهرابی</option>
-                </select>
-            </div>
-        </div>
         @await Component.InvokeAsync("RegionSelector", new { province = ViewBag.province, city = ViewBag.city, area = ViewBag.area })
     </div>
     <table style="margin-top: 15px;border: solid lightgray; border-width: thin;">

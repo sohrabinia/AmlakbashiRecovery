@@ -23,5 +23,6 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public int City { get; set; } = -1;
         public int Area { get; set; } = -1;
         public int HygieneProtocolStatus { get; set; } = -1;
+        public Advertise.ParkingItems Parking { get; set; } = Advertise.ParkingItems.Unset;
     }
 }

@@ -28,7 +28,7 @@
     @foreach (var item in Model.GroupPaymentItems)
     {
         <div class="group-payment-list__item" style="background-color:@(item.BankResult == null ? "#ffffff" : (item.BankResult.success ? "#edf7ee" : "#f2e4e3"))">
-            <a target="_blank" href="/reserve/index?reserve_id=@item.ReserveId" class="group-payment-list__cell">کد رزرو: @item.ReserveId</a>
+            <a target="_blank" href="/reserve/newindex?reserve_id=@item.ReserveId" class="group-payment-list__cell">کد رزرو: @item.ReserveId</a>
             <div class="group-payment-list__cell">مبلغ: @(string.Format("{0:n0}", item.HostPayablePrice) + " ت")</div>
             @*<div class="group-payment-list__cell">
                     <div>نام میزبان:</div>

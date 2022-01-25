@@ -151,7 +151,7 @@ namespace Amlakbashi.Application.Services.UserServices
         }
 
         public bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
-            ActionLog.ActionSourceEnum source, out List<string> errors, int? cancelInstantReserveLimit = null)
+            ActionLog.ActionSourceEnum source, out List<string> errors)
         {
             if (dto.Validate(out errors) == false)
                 return false;
@@ -160,7 +160,6 @@ namespace Amlakbashi.Application.Services.UserServices
             user.FName = dto.fname;
             user.LName = dto.lname;
             user.OwnerShip = dto.OwnerShip;
-            user.CancelInstantReserveLimit = dto.CancelInstantReserveLimit;
             user.ContactPhone = dto.ContactPhone;
             user.AmlakbashiScore = dto.AmlakbashiScore;
             user.Address = dto.Address;
@@ -185,17 +184,6 @@ namespace Amlakbashi.Application.Services.UserServices
                     user.SetLocalPhoneNumber(User.PhoneType.OtherMobile2, dto.mobile2, 98);
                 }
             }
-            //if (string.IsNullOrEmpty(user.Email) || !string.IsNullOrEmpty(dto.email))
-            //{
-            //    user.Email = dto.email;
-            //    var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
-            //    if (dto.email != identityUser.Email)
-            //    {
-            //        identityUser.Email = dto.email;
-            //        identityUser.EmailConfirmed = false;
-            //        userManager.UpdateAsync(identityUser);
-            //    }
-            //}
             if (!string.IsNullOrEmpty(dto.tell))
             {
                 if (dto.tell.Substring(0, 2) == "00")
@@ -222,20 +210,13 @@ namespace Amlakbashi.Application.Services.UserServices
             }
             var bankCards = user.BankCards;
             var bankCardObj = bankCards == null || bankCards.Count == 0 ? null : bankCards.FirstOrDefault();
+
             var hasChange = ((bankCardObj == null && dto.shabaNumber == null &&
-                dto.bankCardNumber == null &&
-                dto.bankFname == null &&
-                dto.bankLname == null) ||
+                dto.bankCardNumber == null && dto.bankFname == null && dto.bankLname == null) ||
                 (bankCardObj != null && dto.shabaNumber == bankCardObj.ShabaNumber &&
                 dto.bankCardNumber == bankCardObj.BankCardNumber &&
-                dto.bankFname == bankCardObj.FName &&
-                dto.bankLname == bankCardObj.LName)) == false;
+                dto.bankFname == bankCardObj.FName && dto.bankLname == bankCardObj.LName)) == false;
 
-            //if (hasChange &&
-            //    (dto.userGeneralType > (int)User.UserGeneralTypeEnum.Guest ||
-            //    !string.IsNullOrEmpty(dto.bankCardNumber) ||
-            //    !string.IsNullOrEmpty(dto.shabaNumber) ||
-            //    userHasRefunedInProgress))
             if (hasChange)
             {
                 if (dto.shabaNumber != null)
@@ -283,14 +264,14 @@ namespace Amlakbashi.Application.Services.UserServices
                         source, currentUserId));
                 }
             }
-            if (cancelInstantReserveLimit != null &&
-                cancelInstantReserveLimit != user.CancelInstantReserveLimit)
+            if (dto.CancelInstantReserveLimit > 0 &&
+                dto.CancelInstantReserveLimit != user.CancelInstantReserveLimit)
             {
-                var hostAccs = user.Advertises;
-                if (hostAccs.Sum(x => x.InstantReserveCancels) > user.CancelInstantReserveLimit)
+                user.CancelInstantReserveLimit = dto.CancelInstantReserveLimit;
+                if (user.Advertises.Sum(x => x.InstantReserveCancels) > user.CancelInstantReserveLimit)
                 {
                     user.InstantReserveAccess = User.InstantReserveAccessEnum.Banned;
-                    foreach (var item in hostAccs)
+                    foreach (var item in user.Advertises)
                     {
                         item.InstantReserveStatus = Advertise.InstantReserveStatusEnum.None;
                     }
@@ -311,7 +292,6 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
             var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
-            //var shallowUser = user.ShallowCopy();
             if (state)
             {
                 identityUser.State = User.UserState.Acticved;

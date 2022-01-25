@@ -666,5 +666,26 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "";
             }
         }
+
+        public static string GetParkingText(ParkingItems item)
+        {
+            switch (item)
+            {
+                case ParkingItems.One:
+                    return "1 پارکینگ";
+                case ParkingItems.Two:
+                    return "2 پارکینگ";
+                case ParkingItems.Three:
+                    return "3 پارکینگ";
+                case ParkingItems.MoreThanThree:
+                    return "بیشتر از 3 پارکینگ";
+                case ParkingItems.Jointly:
+                    return "پارکینگ مشاع";
+                case ParkingItems.NoParking:
+                    return "بدون پارکینگ";
+                default:
+                    return "همه";
+            }
+        }
     }
 }

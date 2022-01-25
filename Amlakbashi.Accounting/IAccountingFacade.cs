@@ -112,9 +112,7 @@ namespace Amlakbashi.Accounting
         long PayAmlakbashiPortion(long reserveId, ReservePaymentType payType,
             out bool alreadyPaid, out long price, ReservePaymentMethod paymentMethod, int userId, int doerUserId);
 
-        bool RegisterPasargadEpay(BankEnum bank, int pid, int userId, DateTime date,
-            string tref, out string paymentResult, out string msg,
-            out bool invalidInput, ActionSourceEnum actionSource, int doerUserId);
+        bool RegisterPasargadEpay(PasargadEpayResponseDTO response, out string msg, out string referenceNumber);
 
         bool RegisterSamanEpay(SamanEpayResponseDTO response, out string msg);
 

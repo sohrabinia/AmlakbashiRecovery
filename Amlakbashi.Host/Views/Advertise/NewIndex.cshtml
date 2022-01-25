@@ -136,6 +136,18 @@ else
                             <label class="title-filter">حداقل رزرو نوروز از</label>
                             <input name="MinReserveNorouzFromDate" class="input-stlye js-filter-date-picker" type="text" id="minReserveNorouzFromDate" value="@(Model.MinReserveNorouzFromDate)" />
                         </div>
+                        <div class="item-filter-box">
+                            <label class="title-filter">پارکینگ</label>
+                            <select class="input-stlye" name="Parking">
+                                @{
+                                    var parkingOptions = (Advertise.ParkingItems[])Enum.GetValues(typeof(Advertise.ParkingItems));
+                                }
+                                @foreach (var st in parkingOptions)
+                                {
+                                    <option is-selected="@(st == Model.Parking)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetParkingText(st)</option>
+                                }
+                            </select>
+                        </div>
                     </div>
                     <div class="more-filter-row">
                         @await Component.InvokeAsync("RegionSelector", new { province = Model.Province, city = Model.City, area = Model.Area })

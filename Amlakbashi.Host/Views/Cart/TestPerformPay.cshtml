@@ -15,8 +15,7 @@
         <input type="hidden" name="id" value="@Model.Id" />
         @if (ViewBag.redirectUrl != null)
         {
-            <input type="hidden" name="useCustomRedirect" value="true" />
-            <input type="hidden" name="customRedirectUrl" value="@ViewBag.redirectUrl" />
+            <input type="hidden" name="redirectUrl" value="@ViewBag.redirectUrl" />
         }
         <div class="col-md-6 col-sm-6 " style="padding: 10px;width:100%;">
             <div style="font-family: Miransans;margin-top: 50px;padding: 20px;background-color: #f1f1f1;border-radius: 12px;">
@@ -32,7 +31,7 @@
                     پرداخت از درگاه:
                     <input type="radio" name="bank" id="saman" value="1" checked />
                     <label for="saman">بانک سامان</label>
-                    <input type="radio" name="bank" id="pasargad" value="2" checked />
+                    <input type="radio" name="bank" id="pasargad" value="2" />
                     <label for="pasargad">بانک پاسارگاد</label>
                 </div>
                 <button type="submit" style="font-family: Miransans; background-color: #fdd835;color: #242424;padding: 5px 10px; border-radius: 5px; cursor:pointer;">پرداخت</button>

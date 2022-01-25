@@ -438,9 +438,8 @@ namespace Amlakbashi.Host.Controllers
                 categoryItemDTO.AreaString = areaString;
                 categoryItemDTO.CountryDirectionString = countryDirectionString;
                 categoryItemDTO.CategoryH1Title = AdvertiseSeoLocalization
-                    .GetTitle(category.MostAccType,
-                    (int)category.Type, provinceString,
-                    cityString, areaString, countryDirectionString);
+                    .GetTitle(category.MostAccType, (int)category.Type, provinceString,
+                    cityString, areaString, countryDirectionString, norouz_special != null && norouz_special == "1" ? true : false);
                 categoryItemDTO.Phrase = phrase;
                 categoryItemDTO.FromPayPerNight = frompaypernight;
                 categoryItemDTO.ToPayPerNight = topaypernight;

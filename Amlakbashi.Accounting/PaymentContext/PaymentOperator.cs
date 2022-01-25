@@ -18,11 +18,11 @@ namespace Amlakbashi.Accounting.PaymentContext
             this.samanEngine = samanEngine;
         }
 
-        public EpayDTO GeneratePaymentData(BankEnum bank, int paymentId, long paymentTotalAmount,
-            string redirectAddress, out DateTime invoiceDate)
+        public EpayDTO GetPasargadPaymentData(BankEnum bank, int paymentId,
+            long paymentTotalAmount, string redirectAddress)
         {
-            return pasargadEngine.GeneratePaymentData(paymentId,
-                paymentTotalAmount, redirectAddress, out invoiceDate);
+            return pasargadEngine.GetPaymentData(paymentId,
+                paymentTotalAmount, redirectAddress);
         }
 
         public CheckPaymentDTO GetPasargadPaymentResult(BankEnum bank, string tref, out string result)

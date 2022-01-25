@@ -11,8 +11,8 @@ namespace Amlakbashi.Accounting.PaymentContext
 {
     internal interface IPaymentOperator
     {
-        EpayDTO GeneratePaymentData(BankEnum bank, int paymentId,
-            long paymentTotalAmount, string redirectAddress, out DateTime invoiceDate);
+        EpayDTO GetPasargadPaymentData(BankEnum bank, int paymentId,
+            long paymentTotalAmount, string redirectAddress);
         CheckPaymentDTO GetPasargadPaymentResult(BankEnum bank, string tref, out string result);
         CheckPaymentDTO GetPasargadPaymentResult(BankEnum bank, long paymentId, DateTime paymentDate);
         bool VerifyPasargadPayment(BankEnum bank, string paymentResult, int paymentId, long totalPayingPrice);

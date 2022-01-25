@@ -18,6 +18,7 @@ namespace Amlakbashi.Accounting.Services.Interfaces
         bool CheckTransactionId(string transactionId, BankEnum bank = BankEnum.Unknown);
         int Insert(Payment newPayment);
         void Update(Payment editedPayment);
+        void UpdateTransactionId(int paymentId, string transactionId);
         IQueryable<Payment> GetAllAsIQueryable();
     }
 }

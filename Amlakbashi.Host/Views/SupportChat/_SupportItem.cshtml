@@ -50,7 +50,7 @@
     @if (Model.reserveId > 0)
     {
         <a target="_blank" href="/reserve/newindex?reserveid=@(Model.reserveId)">کد رزرو: @Model.reserveId</a>
-        <a target="_blank" href="/advertise/index?id=@(Model.advertiseId)">کد آگهی: @Model.advertiseId</a>
+        <a target="_blank" href="/advertise/newindex?id=@(Model.advertiseId)">کد آگهی: @Model.advertiseId</a>
         if (Model.reserveSupporterId > 0)
         {
             <div style="display:flex;flex-flow:row; justify-content: center; align-items:center;">

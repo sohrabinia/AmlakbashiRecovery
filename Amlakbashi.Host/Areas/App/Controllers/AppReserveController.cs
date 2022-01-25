@@ -127,7 +127,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 {
                     case Reserve.GuestPayResult.ReadyToPay:
                         reserveAutoCancelService.UpdateScheduledTime(reserve_id);
-                        return Redirect($"/cart/performpay?payment_id={payment_id}&redirectUrl=amlakbashi://app");
+                        return Redirect($"/cart/performpay?paymentid={payment_id}&redirectUrl=amlakbashi://app");
                     default:
                         return Redirect(Request.Headers["referer"].ToString());
                 }

@@ -293,6 +293,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 model = model.Where(x => x.Photos.Count <= dto.ImageCountMax + 1);
             }
+            if (dto.Parking != ParkingItems.Unset)
+            {
+                model = model.Where(x => x.Parking == dto.Parking);
+            }
             if (dto.Sort == "contact")
                 model = model.OrderByDescending(a => a.ContactClick).ThenByDescending(a => a.WebVisit);
             else if (dto.Sort == "modify")

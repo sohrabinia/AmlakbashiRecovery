@@ -135,12 +135,11 @@ namespace Amlakbashi.Accounting.PaymentContext.BankEngines
             return dyn.actionResult.result == "True";
         }
 
-        public EpayDTO GeneratePaymentData(int paymentId,
-            long paymentTotalAmount, string redirectAddress,  out DateTime invoiceDate)
+        public EpayDTO GetPaymentData(int paymentId, long paymentTotalAmount, string redirectAddress)
         {
             var timeStamp = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             var invoiceNumber = paymentId;
-            invoiceDate = DateTime.Now;
+            var invoiceDate = DateTime.Now;
 
             var action = "1003";
             RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();

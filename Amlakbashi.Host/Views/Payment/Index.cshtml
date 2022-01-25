@@ -35,7 +35,7 @@
 </style>
 
 <form asp-controller="payment" asp-action="index" method="post">
-    <div>
+    <div style="overflow-x:auto;">
         <table>
             <tr>
                 <td class="label">وضعیت پرداخت:</td>
@@ -84,44 +84,48 @@
     </table>
 </div>
 
-<table>
-    <tr>
-        <th class="minw">
-            ردیف
-        </th>
-        <th>
-            شناسه
-        </th>
-        <th>
-            نوع
-        </th>
-        <th>
-            کاربر
-        </th>
-        <th>
-            شماره تراکنش
-        </th>
-        <th>
-            شماره ارجاع
-        </th>
-        <th>
-            شماره پیگیری
-        </th>
-        <th>
-            وضعیت
-        </th>
-        <th>
-            تاریخ ثبت
-        </th>
-        <th>
-            مبلغ
-        </th>
-        <th>
-            عملیات
-        </th>
-    </tr>
+<div style="overflow-x:auto;">
+    <table>
+        <tr>
+            <th class="minw">
+                ردیف
+            </th>
+            <th>
+                شناسه
+            </th>
+            <th>
+                نوع
+            </th>
+            <th>
+                بانک
+            </th>
+            <th>
+                کاربر
+            </th>
+            <th>
+                شماره تراکنش
+            </th>
+            <th>
+                شماره ارجاع
+            </th>
+            <th>
+                شماره پیگیری
+            </th>
+            <th>
+                وضعیت
+            </th>
+            <th>
+                تاریخ ثبت
+            </th>
+            <th>
+                مبلغ
+            </th>
+            <th>
+                عملیات
+            </th>
+        </tr>
 
-    @foreach (var item in data)
+        @foreach (var item in data)
     {
         Idx++;
         <tr class="table-content-row">
@@ -134,15 +138,25 @@
             <td>
                 @if (item.Payment.Type == Payment.PaymentType.Income)
                 {
-                    <i style="color: limegreen;" class="fa fa-arrow-circle-up"></i>
+                <i style="color: limegreen;" class="fa fa-arrow-circle-up"></i>
                 }
                 else
                 {
-                    <i style="color: red;" class="fa fa-arrow-circle-down"></i>
+                <i style="color: red;" class="fa fa-arrow-circle-down"></i>
                 }
             </td>
             <td>
-                <a style="text-decoration:none;" target="_blank" href="@string.Format("/user/index?code={0}" , item.Payment.UserID)">@item.UserPhoneNumber</a>
+                @if (item.Payment.BankId == Amlakbashi.Core.Common.Enums.BankEnum.Pasargad)
+                {
+                <span style="color: orangered; font-weight: bold;">P</span>
+                }
+                else if (item.Payment.BankId == Amlakbashi.Core.Common.Enums.BankEnum.Saman)
+                {
+                <span style="color: deepskyblue; font-weight: bold;">S</span>
+                }
+            </td>
+            <td>
+                <a style="text-decoration:none;" target="_blank" href="@string.Format("/user/index?code={0}" , item.Payment.UserID)">@item.Payment.UserID</a>
             </td>
             <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 <span style="overflow-y: hidden;">@item.Payment.Authority</span>
@@ -150,7 +164,7 @@
             <td>
                 @if (item.Payment.RefID > 0)
                 {
-                    @item.Payment.RefID
+                @item.Payment.RefID
                 }
             </td>
             <td>
@@ -159,11 +173,11 @@
             <td>
                 @if (item.Payment.Status == Payment.PaymentStatus.Paid)
                 {
-                    <i style="color: limegreen;" class="fa fa-check-circle"></i>
+                <i style="color: limegreen;" class="fa fa-check-circle"></i>
                 }
                 else
                 {
-                    <i style="color: red;" class="fa fa-times-circle"></i>
+                <i style="color: red;" class="fa fa-times-circle"></i>
                 }
             </td>
             <td>
@@ -173,18 +187,22 @@
                 @string.Format("{0:n0}", item.Payment.TotalPrice) ریال
             </td>
             <td>
-                @if (item.Payment.Type == Payment.PaymentType.Income)
+                @if (item.Payment.BankId == Amlakbashi.Core.Common.Enums.BankEnum.Pasargad)
                 {
-                    <button class="check-payment-btn" type="button" onclick="CheckIncomePayment(@item.Payment.Id)"><i class="fas fa-sync"></i></button>
-                }
-                else
-                {
-                    <button class="check-payment-btn" type="button" onclick="CheckExpenditurePayment(@item.Payment.Id)"><i class="fas fa-sync"></i></button>
+                    if (item.Payment.Type == Payment.PaymentType.Income)
+                    {
+                <button class="check-payment-btn" type="button" onclick="CheckIncomePayment(@item.Payment.Id)"><i class="fas fa-sync"></i></button>
+                    }
+                    else
+                    {
+                <button class="check-payment-btn" type="button" onclick="CheckExpenditurePayment(@item.Payment.Id)"><i class="fas fa-sync"></i></button>
+                    }
                 }
             </td>
         </tr>
     }
-</table>
+    </table>
+</div>
 
 <div class="mypagelist">
     @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Payment", new { page, status = (int)ViewBag.status, userId = (int)ViewBag.uid, fromDate = (string)ViewBag.from_str, toDate = (string)ViewBag.to_str }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5, DelimiterBetweenPageNumbers = "|" })

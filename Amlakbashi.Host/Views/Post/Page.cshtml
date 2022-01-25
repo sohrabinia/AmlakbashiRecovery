@@ -5,7 +5,6 @@
 @model IEnumerable<MostViewRegionsDTO>
 
 @{
-    //ViewBag.Title = "املاک باشی - اجاره روزانه خانه ، اجاره آنلاین ویلا و سوئیت در سراسر ایران";
     ViewBag.Title = "املاک باشی | اجاره روزانه، هفتگی و ماهانه خانه، ویلا، سوئیت و آپارتمان مبله";
     ViewBag.Description = "اجاره ویلا، اجاره سوئیت، اجاره روزانه خانه، اجاره آپارتمان مبله، اجاره منزل مبله در تهران، شمال، رامسر، ماسال، کرج، کردان، اصفهان، شیراز، یزد، مشهد و سایر شهر های توریسی ایران";
     ViewBag.HomePage = true;
@@ -29,8 +28,6 @@
         <link rel="stylesheet" type="text/css" href="/css/home-page.min.css" asp-append-version="true" />
     </environment>
 }
-
-
 
 <div style="clear:both;"></div>
 <div class="home-page__top-container">
@@ -109,12 +106,14 @@
             <p class="home-page__feature-label">نماد اعتماد الکترونیکی</p>
         </a>
     </div>
+
     @*<section class="home-page_style-box">
-            <a target="_blank" href="/ایران?norouz_special=1" class="home-page__link text-border-bottom_style"><h2><img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32">ویژه نوروز</h2>مشاهده همه</a>
-            <div class="home-page__category-container">
-                @Html.Partial("_AdvertiseList", norouzAdvertises, new ViewDataDictionary { { "all_images_lazy", true } })
-            </div>
-        </section>*@
+        <a target="_blank" href="/ایران?norouz_special=1" class="home-page__link text-border-bottom_style"><h2><img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32">ویژه نوروز</h2>مشاهده همه</a>
+        <div class="home-page__category-container">
+            @await Html.PartialAsync("_AdvertiseList", norouzAdvertises, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "all_images_lazy", true } })
+        </div>
+    </section>*@
+
     @if (norouzAdvertises.Count > 0)
     {
         <section class="home-page__boyd-banner">
@@ -133,7 +132,7 @@
                         <div class="bg"></div>
                         <div class="details">
                             <div class="img-norouz-style">
-                                <img src="~/resource/img/noroz-roban.png" />
+                                <img src="~/resource/img/noroz1401.png" />
                             </div>
                             <h3 class="js-animate-text"><a class="title-banner-overflow" target="_blank" href="@url">@item.Title</a></h3>
                             <h4 class="js-animate-text"><i class="fa fa-map-marker-alt"></i>@(item.RegionString)</h4>

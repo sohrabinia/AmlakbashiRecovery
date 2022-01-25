@@ -59,7 +59,6 @@
                 </div>
             </div>
             <!-- End-wrapper-right-banner -->
-
             <!-- Start-wrapper-left-banner d-->
             <div id="banner-status-@item.id" class="wrapper-left-banner div-unset">
                 <div class="flex-style">
@@ -92,7 +91,7 @@
                     <div class="icons-style quick-access-desktop" style="text-align:left;display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
                         @*<a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>*@
                         @*<a style="opacity:@(item.mainType == AccMainType.Single ?  "1" : "0" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>*@
-                        <!--<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item icons-desktop"--> @*onclick="showNorouzPopup(@item.id)"*@ <!--href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img class="noroz-style-icon" width="30" height="30" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>-->
+                        <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item icons-desktop" @*onclick="showNorouzPopup(@item.id)"*@ href="/app/advertise/updateextra?id=@(item.id)#norouz-price-input-section"><img class="noroz-style-icon" width="30" height="30" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
                         @*<a title="حذف" onclick="deleteButton(@item.id ,this)" class="icons-item trash-icon icons-desktop"><i class="fa fa-trash"></i></a>*@
                         <a href="/app/advertise/updatebasic?id=@item.id" class="icons-item edit-icon-banner icons-desktop"><i class="fas fa-pencil-alt"></i></a>
@@ -101,7 +100,6 @@
                 </div>
             </div>
             <!-- End-wrapper-left-banner -->
-
             <!-- Start-quick-access -->
             <div class="quick-access">
                 <a href="/app/advertise/updatebasic?id=@item.id" class="completed-advertise-button" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"flex":"none")">
@@ -116,8 +114,8 @@
                 </form>
                 <div class="icons div-unset" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
                     <div>
-                        @*<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-s" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="30" height="30" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>
-                            <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-xs" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="24" height="24" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_24x24" /></a>*@
+                        @*<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-s" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="30" height="30" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>*@
+                        <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-xs" href="/app/advertise/updateextra?id=@(item.id)#norouz-price-input-section"><img width="24" height="24" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_24x24" /></a>
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
                         @*<a title="حذف " class="icons-item trash-icon" onclick="deleteButton(@item.id , this)"><i class="fa fa-trash"></i></a>*@
                         <a href="/app/advertise/updatebasic?id=@item.id" class="icons-item edit-icon-banner"><i class="fas fa-pencil-alt"></i></a>
@@ -128,7 +126,6 @@
             <!-- End-quick-access -->
         </section>
         <!-- End-banner-single -->
-
         <!--start-banner-details- -->
         <section data-id="@item.id" id="banner-details-@item.id" class="banner-details">
             <!-- Start-edit-fast  -->

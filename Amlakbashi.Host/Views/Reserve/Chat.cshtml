@@ -4,14 +4,14 @@
     ViewBag.Title = "چت رزرو";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
-<a class="cancel" href="../Reserve/Index" style="float:left;">بازگشت</a>
+<a class="cancel" href="../Reserve/newindex" style="float:left;">بازگشت</a>
 <table style="margin-bottom:10px;table-layout:fixed;">
     <tr>
         <td class="label">
             کد رزرو :
         </td>
         <td style="width:300px;color:white;">
-            <a href="/Reserve/Index?reserve_id=@ViewBag.ReserveID">@ViewBag.ReserveID</a>
+            <a href="/Reserve/newindex?reserve_id=@ViewBag.ReserveID">@ViewBag.ReserveID</a>
         </td>
     </tr>
     <tr>

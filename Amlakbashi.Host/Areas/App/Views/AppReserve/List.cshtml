@@ -496,7 +496,7 @@
                                 "&reserveprice=" + (total_price)
                                 , function (ret) {
                                     if (ret.status == 1) {
-                                        window.location.href = "/cart/performpay?payment_id=" + ret.pid + "&redirectUrl=amlakbashi://app";
+                                        window.location.href = "/cart/performpay?paymentid=" + ret.pid + "&redirectUrl=amlakbashi://app";
                                     }
                                     else {
                                         showErrorMessage('خطا', 'متاسفانه عملیات با خطا مواجه شد');
@@ -521,7 +521,7 @@
                                 "&reserveprice=" + (deposite_price)
                                 , function (ret) {
                                     if (ret.status == 1) {
-                                        window.location.href = "/cart/performpay?payment_id=" + ret.pid + "&redirectUrl=amlakbashi://app";
+                                        window.location.href = "/cart/performpay?paymentid=" + ret.pid + "&redirectUrl=amlakbashi://app";
                                     }
                                     else {
                                         showErrorMessage('خطا', 'متاسفانه عملیات با خطا مواجه شد');
@@ -655,7 +655,9 @@
             if (mainChat == null)
                 return;
             var url = $("#host_root").is(":visible") ? "/Chat/GetHostChatPopup?reserve_id=" + reserve_id : "/Chat/GetGuestChatPopup?reserve_id=" + reserve_id;
-            mainChat.load(url)
+            mainChat.load(url, function () {
+                $(".reserve-main_chat-box")[0].scrollTop = $(".reserve-main_chat-box")[0].scrollHeight;
+            });
         }
 
         //function refreshCancelDiscussionBox(reserve_id) {
@@ -711,11 +713,11 @@
                         reserveDashboardHubConnection.invoke("reloadChat", reserve_id);
                         chatInput.val("");
                         chatInput.focus();
-                        $(".reserve-main_chat-box").stop().animate({ scrollTop: $(".reserve-main_chat-box")[0].scrollHeight}, 1000);
+                        //$(".reserve-main_chat-box").stop().animate({ scrollTop: $(".reserve-main_chat-box")[0].scrollHeight}, 1000);
                     }
                     else if (ret.status == 2) {
                         alertify.error("لطفا از ارسال شماره تلفن و یا آی دی و یا حروف انگلیسی خودداری کنید");
-                        reserveDashboardHubConnection.invoke("reloadChat", reserve_id);
+                        //reserveDashboardHubConnection.invoke("reloadChat", reserve_id);
                         chatInput.val("");
                         chatInput.focus();
                     }

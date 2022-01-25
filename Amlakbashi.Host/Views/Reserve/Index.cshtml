@@ -275,7 +275,7 @@
                     </td>
                     <td>
                         <div>زمان درخواست: @(item.createDateString)</div>
-                        <div>کد آگهی: <a href="/Advertise/Index?status=-1&id=@(item.parentAccomodationId > 0 ? item.parentAccomodationId : item.accommodationId)">@item.accommodationId @(item.parentAccomodationId > 0 ? " >> " + item.parentAccomodationId : "")</a></div>
+                        <div>کد آگهی: <a href="/Advertise/newindex?status=-1&id=@(item.parentAccomodationId > 0 ? item.parentAccomodationId : item.accommodationId)">@item.accommodationId @(item.parentAccomodationId > 0 ? " >> " + item.parentAccomodationId : "")</a></div>
                         <div>
                             @if (item.ContactWithHost)
                             {

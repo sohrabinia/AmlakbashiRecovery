@@ -44,10 +44,16 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
         }
 
         public static string GetTitle(int mostAccType, int advertiseType, string province, string city,
-            string area, string country_direction_string)
+            string area, string country_direction_string, bool isNorouzPage = false)
         {
             if (string.IsNullOrEmpty(province) && string.IsNullOrEmpty(city) && string.IsNullOrEmpty(area) && string.IsNullOrEmpty(country_direction_string))
+            {
+                if (isNorouzPage && advertiseType == 81)
+                {
+                    return "رزرو آنلاین ویلا و سوییت در نوروز 1401";
+                }
                 return GetTitle(advertiseType);
+            }
             var location_string = AdvertiseMainLocalization.GetLocationString(province, city, area, country_direction_string);
             string output;
             if (mostAccType > 0 && advertiseType == 81)
@@ -55,11 +61,9 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                 switch (mostAccType)
                 {
                     case 82:
-                        //output = " اجاره روزانه خانه ، سوئیت و آپارتمان مبله در " + location_string;
                         output = "اجاره روزانه، هفتگی و ماهانه خانه، آپارتمان مبله و سوئیت در " + location_string;
                         break;
                     case 83:
-                        //output = "اجاره روزانه ویلا و سوئیت در " + location_string;
                         output = "اجاره ویلا و سوئیت در " + location_string;
                         break;
                     default:

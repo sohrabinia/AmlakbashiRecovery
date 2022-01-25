@@ -700,7 +700,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.errors = TempData["prevErrors"];
                 var urlReferrer = HttpContext.Session.GetObjectFromJson<string>("urlReferrer");
                 if (string.IsNullOrEmpty(urlReferrer))
-                    urlReferrer = "/advertise/index";
+                    urlReferrer = "/advertise/newindex";
                 return Redirect(urlReferrer);
             }
             catch (Exception exc)

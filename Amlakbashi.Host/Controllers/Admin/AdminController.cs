@@ -214,12 +214,10 @@ namespace Portal.Controllers
                 IQueryable<User> recievers;
                 if (recieverUserID > 0)
                 {
-                    //recievers = _db.Users.Where(u => u.Id == recieverUserID);
                     recievers = userService.GetAllById(recieverUserID);
                 }
                 else
                 {
-
                     var users_query = userService.GetAllAsIQueryable();
                     if (ownership > 0)
                     {
@@ -228,8 +226,9 @@ namespace Portal.Controllers
                     if (province > 0 || city > 0 || area > 0 || adtype > 0 ||
                         adstatus > -1 || tradeid > 0 || special > 0)
                     {
-                        var advertises = advertiseService.FilterAdmin(province, city, area, adtype, true, adstatus);
-                        users_query = users_query.Where(user => advertises.Any(x => x.UserID == user.Id));
+                        var advertises = advertiseService.FilterAdmin(province, city, area, adtype, false, adstatus);
+                        var advertiseUserIds = advertises.Select(s => s.UserID);
+                        users_query = users_query.Where(w => advertiseUserIds.Contains(w.Id));
                     }
                     recievers = users_query;
                 }
@@ -237,7 +236,6 @@ namespace Portal.Controllers
                 {
                     recievers = recievers.Where(w => w.UserGeneralType > 0);
                 }
-
 
                 if (confirmRequired)
                 {
@@ -252,8 +250,7 @@ namespace Portal.Controllers
                     {
                         if (PhoneUtility.IsNumberForIran(mobile))
                         {
-                            iran_mobiles.Add(
-                                PhoneUtility.InternationalNumberToLocal(mobile));
+                            iran_mobiles.Add(PhoneUtility.InternationalNumberToLocal(mobile));
                         }
                     }
                     if (template == "SetNorouzPrice")
@@ -276,7 +273,6 @@ namespace Portal.Controllers
                         userService.SendCustomSms(delay, mobile, template);
                         delay++;
                     }
-
                     return GenerateJsonResult(new { status = 2, message = "" });
                 }
             }

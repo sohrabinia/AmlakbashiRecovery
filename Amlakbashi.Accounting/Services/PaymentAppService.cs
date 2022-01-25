@@ -130,6 +130,14 @@ namespace Amlakbashi.Accounting.Services
             Repository.Save();
         }
 
+        public void UpdateTransactionId(int paymentId, string transactionId)
+        {
+            var payment = Repository.Find(paymentId);
+            payment.Authority = transactionId;
+            Repository.Update(payment);
+            Repository.Save();
+        }
+
         public IQueryable<Payment> GetAllAsIQueryable()
         {
             return Repository.Query(q => q);

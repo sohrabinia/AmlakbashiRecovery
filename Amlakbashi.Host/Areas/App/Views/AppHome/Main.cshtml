@@ -117,11 +117,11 @@
         </div>*@
 
     @*<section class="home-page_style-box">
-            <a href="/ایران?norouz_special=1" class="home-page__link text-border-bottom_style"><h2><img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32">ویژه نوروز</h2>مشاهده همه</a>
-            <div class="home-page__category-container">
-                @Html.Partial("_AdvertiseList", norouzAdvertises, new ViewDataDictionary { { "all_images_lazy", true } })
-            </div>
-        </section>*@
+        <a href="/ایران?norouz_special=1" class="home-page__link text-border-bottom_style"><h2><img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32">ویژه نوروز</h2>مشاهده همه</a>
+        <div class="home-page__category-container">
+            @await Html.PartialAsync("_AdvertiseList", norouzAdvertises, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "all_images_lazy", true } })
+        </div>
+    </section>*@
 
     @if (norouzAdvertises.Count > 0)
     {
@@ -141,7 +141,7 @@
                         <div class="bg"></div>
                         <div class="details">
                             <div class="img-norouz-style">
-                                <img src="~/resource/img/noroz-roban.png" />
+                                <img src="~/resource/img/noroz1401.png" />
                             </div>
                             <h3 class="js-animate-text"><a class="title-banner-overflow" href="@url">@item.Title</a></h3>
                             <h4 class="js-animate-text"><i class="fa fa-map-marker-alt"></i>@(item.RegionString)</h4>

@@ -1167,7 +1167,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     case GuestPayResult.ReadyToPay:
                         reserveAutoCancelService.UpdateScheduledTime(reserve_id);
-                        return RedirectToAction("performpay", "cart", new { payment_id = payment_id });
+                        return RedirectToAction("performpay", "cart", new { paymentid = payment_id });
                     default:
                         return Redirect(Request.Headers["referer"].ToString());
                 }

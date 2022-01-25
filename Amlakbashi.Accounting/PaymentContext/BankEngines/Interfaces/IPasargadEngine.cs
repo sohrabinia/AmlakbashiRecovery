@@ -10,7 +10,6 @@ namespace Amlakbashi.Accounting.PaymentContext.BankEngines.Interfaces
         CheckPaymentDTO GetPaymentResult(string tref, out string result);
         CheckPaymentDTO GetPaymentResult(long paymentId, DateTime paymentDate);
         bool VerifyPayment(string paymentResult, int paymentId, long totalPayingPrice);
-        EpayDTO GeneratePaymentData(int paymentId,
-            long paymentTotalAmount, string redirectAddress, out DateTime invoiceDate);
+        EpayDTO GetPaymentData(int paymentId, long paymentTotalAmount, string redirectAddress);
     }
 }
