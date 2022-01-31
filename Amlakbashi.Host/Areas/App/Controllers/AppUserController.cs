@@ -153,7 +153,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 }
                 List<string> errors;
                 bool hasRefundInProgress = reserveService.UserHasRefundInProgress(user.id);
-                var done = userService.Update(user, userAccessor.CurrentUser.Id, hasRefundInProgress, ActionLog.ActionSourceEnum.WebsiteDashboard, out errors);
+                var done = userService.Update(user, userAccessor.CurrentUser.Id, hasRefundInProgress, ActionLog.ActionSourceEnum.Application, out errors);
                 if (done)
                 {
                     TempData["suc"] = "ویرایش پروفایل شما با موفقیت انجام شد";

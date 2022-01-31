@@ -1,6 +1,6 @@
 ﻿@using Entities = Amlakbashi.Core.Entities;
 
-@model User
+@model Amlakbashi.Core.DTOs.UserDTOs.UserEditDTO
 
 @{
     ViewBag.Title = "حساب کاربری";
@@ -9,26 +9,30 @@
 
 <div class="title">ثبت و ویرایش حساب کاربری</div>
 
-@using (Html.BeginForm("Edit", "User", FormMethod.Post, new { id = "userManageForm" }))
+@using (Html.BeginForm("Edit", "User", new { id = Model.Id }, FormMethod.Post, true, new { id = "userManageForm" }))
 {
-
-    @Html.HiddenFor(model => model.Id)
-    <input type="hidden" name="UserGroups" id="UserGroups" value="" />
-    <input type="hidden" name="ContactPhone" id="complete_profile_contact" value="" />
+    @*<input type="hidden" name="UserGroups" id="UserGroups" value="" />*@
+    @*<input type="hidden" name="ContactPhone" id="complete_profile_contact" value="" />*@
+    <input type="hidden" name="MainMobile" value="@Model.MainMobile" />
+    <input type="hidden" name="PhotoID" value="@Model.PhotoID" />
+    <input type="hidden" name="EmailAddress" value="@Model.EmailAddress" />
+    <input type="hidden" name="LastSendedEmailCode" value="@Model.LastSendedEmailCode" />
+    <input type="hidden" name="LastSendedSmsCode" value="@Model.LastSendedSmsCode" />
+    <input type="hidden" name="InstantReserveCancelCount" value="@Model.InstantReserveCancelCount" />
+    <input type="hidden" name="Credit" value="@Model.Credit" />
+    <input type="hidden" name="UserScore" value="@Model.UserScore" />
     <table>
-        @*@if (Model.UserID == -1)
-        {*@
         <tr>
             <td class="label">
-                نام کاربری :
+                نام کاربری (شماره موبایل اصلی):
             </td>
             <td style="direction:ltr">
-                @Html.EditorFor(model => model.MainMobile)
+                @Model.MainMobile
             </td>
             <td></td>
         </tr>
         <tr>
-            <td class="label">  عکس پروفایل :</td>
+            <td class="label">عکس پروفایل:</td>
             <td class="value">
                 @if (Model.PhotoID > 0)
                 {
@@ -44,7 +48,7 @@
         </tr>
         <tr>
             <td class="label">
-                امتیاز اصلی کاربر :
+                امتیاز اصلی کاربر:
             </td>
             <td style="width:300px;">
                 @Model.UserScore
@@ -53,7 +57,7 @@
         </tr>
         <tr>
             <td class="label">
-                نام :
+                نام:
             </td>
             <td style="width:300px;">
                 @Html.EditorFor(model => model.FName)
@@ -62,7 +66,7 @@
         </tr>
         <tr>
             <td class="label">
-                نام خانوادگی :
+                نام خانوادگی:
             </td>
             <td>
                 @Html.EditorFor(model => model.LName)
@@ -71,7 +75,7 @@
         </tr>
         <tr>
             <td class="label">
-                موبایل 1 :
+                موبایل 1:
             </td>
             <td style="direction:ltr">
                 @Html.EditorFor(model => model.Mobile)
@@ -132,7 +136,7 @@
                     <option is-selected="@((int)Entities.User.OwnerType.real_reservation == Model.OwnerShip)" value="0">واسطه‌ی حتمی</option>
                     <option is-selected="@((int)Entities.User.OwnerType.reservation == Model.OwnerShip)" value="1">واسطه‌ی احتمالی</option>
                     <option is-selected="@((int)Entities.User.OwnerType.owner == Model.OwnerShip)" value="3">مالک احتمالی</option>
-                    <option is-selected="@((int)Entities.User.OwnerType.real_owner == Model.OwnerShip)" value="10">مالک حتمی</option>
+                    <option is-selected="@((int)Entities.User.OwnerType.owner == Model.OwnerShip)" value="10">مالک حتمی</option>
                 </select>
             </td>
             <td></td>
@@ -142,18 +146,20 @@
                 وضعیت کاربر :
             </td>
             <td style="width:300px;">
-                @{ var states = Entities.User.GetAdminStateEnum(); }
-                @if (ViewBag.userState == Entities.User.UserState.InActived)
+                @{
+                    var states = Entities.User.GetAdminStateEnum();
+                }
+                @if (Model.UserState == Entities.User.UserState.InActived)
                 {
                     <input type="hidden" name="userState" value="2" />
                     <span>غیرفعال</span>
                 }
                 else
                 {
-                    <select name="userState">
+                    <select name="UserState">
                         @foreach (var item in states)
                         {
-                            <option is-selected="@(item == ViewBag.userState)" value="@((int)item)">@(Entities.User.GetStateTitle((int)item))</option>
+                            <option is-selected="@(item == Model.UserState)" value="@((int)item)">@(Entities.User.GetStateTitle((int)item))</option>
                         }
                     </select>
                 }
@@ -176,19 +182,19 @@
             <td style="direction:ltr">
                 @Html.EditorFor(model => model.CancelInstantReserveLimit)
             </td>
-            <td>تعداد کنسلی ها: @ViewBag.instantReserveCancelCount</td>
+            <td>تعداد کنسلی ها: @Model.InstantReserveCancelCount</td>
         </tr>
         <tr>
-            <td>آدرس ایمیل کاربر: @ViewBag.emailAddress</td>
-            <td>آخرین کد ارسال شده پیامک: @ViewBag.smsCode</td>
-            <td>آخرین کد ارسال شده ایمیل: @ViewBag.emailCode</td>
+            <td>آدرس ایمیل کاربر: @Model.EmailAddress</td>
+            <td>آخرین کد ارسال شده پیامک: @Model.LastSendedSmsCode</td>
+            <td>آخرین کد ارسال شده به ایمیل: @Model.LastSendedEmailCode</td>
         </tr>
         <tr><td colspan="3" class="tablesplit"></td></tr>
         <tr>
             <td>
                 <div style="text-align:right">
-                    <span>تماس جهت تکمیل پروفایل :</span>
-                    <input id="complete_profile_contact_checkbox" type="checkbox" value="1" is-checked="@(!string.IsNullOrEmpty(Model.ContactPhone) && Model.ContactPhone == "1")" />
+                    <span>تماس با کاربر:</span>
+                    <input id="complete_profile_contact_checkbox" name="ContactPhone" type="checkbox" value="true" is-checked="@Model.ContactPhone" />
                 </div>
             </td>
             <td></td>
@@ -201,22 +207,24 @@
     </div>
 }
 
-<div class="adminmsg">@ViewBag.msg</div>
-
 @section ScriptBlock
 {
     <script type="text/javascript">
-        $("form#userManageForm").submit(function () {
-            var $UserGroups = [];
-            $("#UserRoles input:checkbox:checked").each(function () {
-                $UserGroups.push($(this).val());
-            });
-            $("#UserGroups").val(JSON.stringify($UserGroups));
-            $("#complete_profile_contact").val($('input[id="complete_profile_contact_checkbox"]:checked').length);
-        });
-        @if (!String.IsNullOrEmpty(ViewBag.msg))
+        //$("form#userManageForm").submit(function () {
+        //    var $UserGroups = [];
+        //    $("#UserRoles input:checkbox:checked").each(function () {
+        //        $UserGroups.push($(this).val());
+        //    });
+        //    $("#UserGroups").val(JSON.stringify($UserGroups));
+        //    $("#complete_profile_contact").val($('input[id="complete_profile_contact_checkbox"]:checked').length);
+        //});
+
+        @if (Model.HasError)
         {
-            @: alert("@(ViewBag.msg)");
+            foreach (var item in Model.ErrorMessages)
+            {
+                @: alertify.error("@item");
+            }
         }
     </script>
 }

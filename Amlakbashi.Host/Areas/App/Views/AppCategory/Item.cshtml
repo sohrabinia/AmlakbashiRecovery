@@ -625,25 +625,22 @@
 
 @await Html.PartialAsync("_AdvertiseFilter", Model)
 
-@*@if (category != null && category.Province == 793)
-    {
-        <div style="font: 12px Miransans;
+@if (Model.Category != null && Model.Category.Province == 793)
+{
+    <div style="font: 12px Miransans;
             margin: 10px 5% 0 5%;
             padding: 5px;
-            /*border-top: 1px solid #242424;
-            border-bottom: 1px solid #242424;*/
-            /*background-image: url(/resource/img/corona-stay-home-pattern.png);*/
             background-color: #fffaed;
             background-repeat:repeat;
             box-shadow:0 2px 4px 0 rgba(0,0,0,.3), 0 2px 8px 0 rgba(0,0,0,.1);
             text-align: center;">
-            <div>کاربر گرامی رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است</div>
-            <div style="display:flex;justify-content:space-evenly;">
-                <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/794/اصفهان/رزرو-هتل">هتل</a>
-                <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/794/اصفهان/بومگردی">اقامتگاه بومگردی</a>
-            </div>
+        <div>کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.</div>
+        <div style="display:flex;justify-content:space-evenly;">
+            <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/app/category/item?type=87&regionid=793">هتل</a>
+            <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/app/category/item?type=4&regionid=793">اقامتگاه بومگردی</a>
         </div>
-    }*@
+    </div>
+}
 
 @*<div class="advertise-category__special-filter-container" style="width:90%;margin:auto;">*@
 @*<a class="advertise-category__norouz_button" href="/category/category?type=@(category.Type)&a_m_p_version=false&province=@(category.Province)&city=@(category.City)&area=@(Model.Area)&norouz_special=@(norouz_special ? "false" : "true")&today_empty_homes=@(today_empty_homes ? "true" : "false")&discount_homes=@(discount_homes ? "true" : "false")">

@@ -504,54 +504,34 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize(Policy = Policies.User_General_Edit)]
         [HttpGet]
-        public ActionResult Edit(int uid)
+        public ActionResult Edit(int id)
         {
             try
             {
-                ViewBag.msg = TempData["msg"];
-                var model = userService.Find(uid);
-                var identityUser = userService.GetIdentityUser(model.MainMobile);
-                ViewBag.userState = identityUser.State;
-                ViewBag.emailAddress = identityUser.Email;
-                ViewBag.smsCode = identityUser.Code;
-                ViewBag.emailCode = identityUser.EmailCode;
-                ViewBag.instantReserveCancelCount = model.Advertises.Sum(x => x.InstantReserveCancels);
+                var user = userService.Find(id);
+                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var model = UserEditDTO.Generate(user, identityUser);
                 return View(model);
             }
             catch (Exception exc)
             {
-                logger.Error("", exc);
+                logger.Error("User.Edit(get)", exc);
                 return Redirect(Request.Headers["referer"].ToString());
             }
         }
 
         [Authorize(Policy = Policies.User_General_Edit)]
         [HttpPost]
-        public ActionResult Edit(User user, int userState)
+        public ActionResult Edit(UserEditDTO editedUser)
         {
             try
             {
-                if (
-                    (!string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.MainMobile)) && !PhoneUtility.ValidateInternationalNumber(user.GetPhoneNumber(Entities.User.PhoneType.MainMobile))) ||
-                    (!string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile1)) && !PhoneUtility.ValidateInternationalNumber(user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile1))) ||
-                    (!string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile2)) && !PhoneUtility.ValidateInternationalNumber(user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile2))) ||
-                    (!string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.LandLine)) && !PhoneUtility.ValidateInternationalNumber(user.GetPhoneNumber(Entities.User.PhoneType.LandLine))) ||
-                    (!string.IsNullOrEmpty(user.GetPhoneNumber(Entities.User.PhoneType.ThirdPerson)) && !PhoneUtility.ValidateInternationalNumber(user.GetPhoneNumber(Entities.User.PhoneType.ThirdPerson)))
-                    )
+                if (editedUser.IsValid())
                 {
-                    TempData["msg"] = "شماره تلفن باید با کد کشوری باشد. مثال: +98 9102222222 .";
-                    return Redirect(Request.Headers["referer"].ToString());
+                    userService.Update(editedUser, userAccessor.DoerUser.Id);
+                    return RedirectToAction(nameof(Edit), new { id = editedUser.Id });
                 }
-                List<string> errors;
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
-                if (identityUser.State != (User.UserState)userState)
-                {
-                    identityUser.State = (User.UserState)userState;
-                    userService.UpdateIdentityUser(identityUser);
-                }
-                userService.Update(UserDTO.Generate(user, identityUser), userAccessor.DoerUser.Id,
-                    false, ActionLog.ActionSourceEnum.AdminPanel, out errors);
-                return RedirectToAction("Index");
+                return View(editedUser);
             }
             catch (Exception exc)
             {

@@ -25,6 +25,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         User GetActivatedUserByMainMobile(string mainMobile, bool includeFavorite = false);
         User GetActivatedUserByEmail(string email, bool includeFavorite = false);
         void Insert(User user, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
+        bool Update(UserEditDTO editedUser, int adminId);
         bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
             ActionLog.ActionSourceEnum source, out List<string> errors);
         void UpdateState(int userId, bool state, int currentUserId = 0,

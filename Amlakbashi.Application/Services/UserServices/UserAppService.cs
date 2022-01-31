@@ -150,6 +150,56 @@ namespace Amlakbashi.Application.Services.UserServices
             }
         }
 
+        public bool Update(UserEditDTO editedUser, int adminId)
+        {
+            var user = Repository.Find(editedUser.Id);
+            var shallowUser = user.ShallowCopy();
+
+            var identityUser = GetIdentityUser(user.MainMobile);
+            if (identityUser.State != editedUser.UserState)
+            {
+                identityUser.State = editedUser.UserState;
+                UpdateIdentityUser(identityUser);
+            }
+
+            user.FName = editedUser.FName;
+            user.LName = editedUser.LName;
+            user.OwnerShip = editedUser.OwnerShip;
+            user.ContactPhone = editedUser.ContactPhone ? "1" : null;
+            user.AmlakbashiScore = editedUser.AmlakbashiScore;
+            user.Address = editedUser.Address;
+
+            user.Mobile = editedUser.Mobile;
+            user.Mobile2 = editedUser.Mobile2;
+            user.Tell = editedUser.Tell;
+            user.ThirdPersonTell = editedUser.ThirdPersonTell;
+
+            if (editedUser.CancelInstantReserveLimit > 0 &&
+                editedUser.CancelInstantReserveLimit != user.CancelInstantReserveLimit)
+            {
+                user.CancelInstantReserveLimit = editedUser.CancelInstantReserveLimit;
+                if (user.Advertises.Sum(x => x.InstantReserveCancels) > user.CancelInstantReserveLimit)
+                {
+                    user.InstantReserveAccess = User.InstantReserveAccessEnum.Banned;
+                    foreach (var item in user.Advertises)
+                    {
+                        item.InstantReserveStatus = Advertise.InstantReserveStatusEnum.None;
+                    }
+                }
+                else
+                {
+                    if (user.InstantReserveAccess == User.InstantReserveAccessEnum.Banned)
+                    {
+                        user.InstantReserveAccess = User.InstantReserveAccessEnum.None;
+                    }
+                }
+            }
+            Repository.Update(user);
+            Repository.Save();
+            mediator.Publish(new UserUpdateEvent(shallowUser, user, ActionLog.ActionSourceEnum.AdminPanel, adminId));
+            return true;
+        }
+
         public bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
             ActionLog.ActionSourceEnum source, out List<string> errors)
         {
@@ -264,23 +314,6 @@ namespace Amlakbashi.Application.Services.UserServices
                         source, currentUserId));
                 }
             }
-            if (dto.CancelInstantReserveLimit > 0 &&
-                dto.CancelInstantReserveLimit != user.CancelInstantReserveLimit)
-            {
-                user.CancelInstantReserveLimit = dto.CancelInstantReserveLimit;
-                if (user.Advertises.Sum(x => x.InstantReserveCancels) > user.CancelInstantReserveLimit)
-                {
-                    user.InstantReserveAccess = User.InstantReserveAccessEnum.Banned;
-                    foreach (var item in user.Advertises)
-                    {
-                        item.InstantReserveStatus = Advertise.InstantReserveStatusEnum.None;
-                    }
-                }
-                else
-                {
-                    user.InstantReserveAccess = User.InstantReserveAccessEnum.Verified;
-                }
-            }
             Repository.Update(user);
             Repository.Save();
             mediator.Publish(new UserUpdateEvent(shallowUser, user, source, currentUserId));
@@ -318,7 +351,7 @@ namespace Amlakbashi.Application.Services.UserServices
             }
             else
             {
-                user.ContactPhone = "0";
+                user.ContactPhone = null;
             }
             Repository.Update(user);
             Repository.Save();

@@ -2003,14 +2003,21 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             string startDate, string endDate, out string msg)
         {
             var advertise = Repository.Find(advertiseId);
-            if (advertise.IsForbidden)
+            var user = Repository.Find<User, int>(currentUserId);
+            var haveReservedRequest = false;
+            if (user != null && user.Reserves != null)
             {
-                msg = "کاربر گرامی رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است";
+                haveReservedRequest = user.Reserves.Any(a => a.GetStateCategory() == ReserveCategory.Reserved ||
+                    a.GetStateCategory() == ReserveCategory.Finished);
+            }
+            if (advertise.IsForbidden && haveReservedRequest == false)
+            {
+                msg = "کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.";
                 return false;
             }
             if (advertise.Status != AdvertiseStatus.Published)
             {
-                msg = "متاسفانه این اقامتگاه در حال حاضر از دسترس خارج است. لطفا اقامتگاه دیگری انتخاب نمایید.";
+                msg = "متاسفانه این اقامتگاه در حال حاضر از دسترس خارج است. لطفا اقامتگاه دیگری انتخاب نمایید";
                 return false;
             }
             if (guestCount < 1)
@@ -2035,18 +2042,18 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             if (DateTimeUtility.PersianDateToGregorian(startDate) > DateTimeUtility.PersianDateToGregorian(endDate))
             {
-                msg = "تاریخ ورود نمیتواند از تاریخ خروج بیشتر باشد. لطفا اصلاح کنید.";
+                msg = "تاریخ ورود نمیتواند از تاریخ خروج بیشتر باشد. لطفا اصلاح کنید";
                 return false;
             }
             var days = DateTimeUtility.GetPersianDateRangeDays(startDate, endDate);
             if (advertise.MinReserveDays > 0 && days < advertise.MinReserveDays)
             {
-                msg = "برای رزرو این اقامتگاه باید حداقل " + advertise.MinReserveDays + "  شب اقامت کنید. برای اقامت " + days + " شبه میتوانید اقامتگاه های دیگر را رزرو کنید.";
+                msg = "برای رزرو این اقامتگاه باید حداقل " + advertise.MinReserveDays + "  شب اقامت کنید. برای اقامت " + days + " شبه میتوانید اقامتگاه های دیگر را رزرو کنید";
                 return false;
             }
             if (advertise.MaxReserveDays > 0 && days > advertise.MaxReserveDays)
             {
-                msg = "شما میتوانید حداکثر " + advertise.MaxReserveDays + "  شب در این اقامتگاه اقامت کنید. برای اقامت طولانی تر میتوانید اقامتگاه های دیگر را رزرو کنید.";
+                msg = "شما میتوانید حداکثر " + advertise.MaxReserveDays + "  شب در این اقامتگاه اقامت کنید. برای اقامت طولانی تر میتوانید اقامتگاه های دیگر را رزرو کنید";
                 return false;
             }
             var todayUnix = DateTimeUtility.DateValueOfJS(DateTime.Now.Date);
@@ -2054,7 +2061,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 DateTimeUtility.IsNorouz(DateTimeUtility.PersianDateRangeToList(startDate, endDate, true, false)))
             {
                 var minDateString = DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate));
-                msg = "برای رزرو نوروزی این اقامتگاه میتوانید از تاریخ " + minDateString + " اقدام کنید و یا اقامتگاه های دیگر را رزرو کنید.";
+                msg = "برای رزرو نوروزی این اقامتگاه میتوانید از تاریخ " + minDateString + " اقدام کنید و یا اقامتگاه های دیگر را رزرو کنید";
                 return false;
             }
             var startDateGregorian = DateTimeUtility.PersianDateToGregorian(startDate);
@@ -2062,7 +2069,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var minDate = DateTime.Now.TimeOfDay.Hours > 3 ? DateTime.Now.Date : DateTime.Now.Date.AddDays(-1);
             if (startDateGregorian < minDate || endDateGregorian <= minDate)
             {
-                msg = "تاریخ ورود و خروج گذشته است. لطفا زمان درست انتخاب کنید.";
+                msg = "تاریخ ورود و خروج گذشته است. لطفا زمان درست انتخاب کنید";
                 return false;
             }
             var occupiedDates = advertise.OccupiedDates().Select(s => DateTimeUtility.GregorianToPersianDate(s));
