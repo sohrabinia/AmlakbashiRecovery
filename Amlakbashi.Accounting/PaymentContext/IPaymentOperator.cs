@@ -13,8 +13,8 @@ namespace Amlakbashi.Accounting.PaymentContext
     {
         EpayDTO GetPasargadPaymentData(BankEnum bank, int paymentId,
             long paymentTotalAmount, string redirectAddress);
-        CheckPaymentDTO GetPasargadPaymentResult(BankEnum bank, string tref, out string result);
-        CheckPaymentDTO GetPasargadPaymentResult(BankEnum bank, long paymentId, DateTime paymentDate);
+        CheckPaymentDTO GetPasargadPaymentResult(string tref, out string result);
+        Task<CheckPaymentDTO> GetPasargadPaymentResult(long paymentId, DateTime paymentDate);
         bool VerifyPasargadPayment(BankEnum bank, string paymentResult, int paymentId, long totalPayingPrice);
 
         Task<EpayDTO> GetSamanPaymentToken(SamanRequestTokenDTO requestToken);

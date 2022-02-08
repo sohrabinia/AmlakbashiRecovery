@@ -49,25 +49,49 @@ else
     {
         <div>
             <span>کد رزرو:</span>
-            <a href="/reserve/newindex?reserve_id=@Model.ReserveId&mainFilter=1" target="_blank">@Model.ReserveId</a>
-            @if (Model.Result)
+            <a href="/reserve/newindex?reserveid=@Model.ReserveId&mainFilter=1" target="_blank">@Model.ReserveId</a>
+            @if (Model.ShowDoReserve)
             {
                 <span> | </span>
                 <button class="message-popup__message-button" type="button" onclick="doReserveByPaymentReinquiry(@Model.ReserveId, @Model.PaymentId)">تکمیل رزرو</button>
             }
         </div>
     }
+    if (Model.MustEdit)
+    {
+        <br />
+        <div style="text-align: center;">
+            <p style="color: red; font-size: 14px;">اطلاعات ثبت شده این پرداخت با استعلام دریافتی از بانک متفاوت است!</p>
+            <button class="message-popup__message-button" type="button" onclick="EditPaymentByReinquery(@Model.PaymentId)">ثبت تغییرات</button>
+        </div>
+    }
 }
 
 <script type="text/javascript">
     function doReserveByPaymentReinquiry(reserveId, paymentId) {
-        showNoYesMessage('تکمیل رزرو', 'وضعیت رزرو با کد ' + reserveId + ' به حالت «رزرو شده» تغییر می یابد. آیا از این مورد مطمئنید؟', function () {
+        showNoYesMessage('تکمیل رزرو', 'وضعیت رزرو با کد ' + reserveId + ' به حالت «رزرو شده» تغییر می یابد. آیا از این مورد مطمئن هستید؟', function () {
             myajax("reserve/ReserveByPaymentReinquiry", "reserveId=" + reserveId + "&paymentId=" + paymentId, function (ret) {
                 if (ret.status == 1) {
                     alertify.success(ret.msg);
                 }
                 else {
                     alertify.error(ret.msg);
+                }
+            });
+        });
+    }
+
+    function EditPaymentByReinquery(paymentId) {
+        showNoYesMessage('ثبت اطلاعات جدید پرداخت', 'آیا از ویرایش اطلاعات این پرداخت مطمئن هستید؟', function () {
+            myajax("payment/EditPaymentByReinquiry", "paymentId=" + paymentId, function (ret) {
+                if (ret.status == 1) {
+                    alertify.success('اطلاعات با موفقیت ویرایش شد');
+                    popupMsgList[0].btnClick(0, true);
+                    location.reload();
+                }
+                else {
+                    alertify.error('عملیات انجام نشد');
+                    popupMsgList[0].btnClick(0, true);
                 }
             });
         });

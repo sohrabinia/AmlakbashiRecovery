@@ -204,7 +204,7 @@ namespace Amlakbashi.Host.Controllers
                     }
                 }
                 advertiseService.Edit(ad);
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(NewIndex));
             }
             catch (Exception exc)
             {

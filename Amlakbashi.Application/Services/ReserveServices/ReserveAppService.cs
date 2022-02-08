@@ -1620,6 +1620,11 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 msg = "وضعیت پرداخت ناموفق می باشد";
                 return false;
             }
+            if (payment.ProductType == "Credit_Inc_Then_Res")
+            {
+                msg = "امکان تکمیل این رزرو وجود ندارد. مقدار پرداخت شده باید به کیف پول کاربر افزوده شود.";
+                return false;
+            }
             mediator.Send(new SetReserveStatusCommand(reserveId, ReserveStatus.Reserved, false,
                 ActionSourceEnum.AdminPanel, payment.UserID, true));
             if (payment.CouponID > 0)

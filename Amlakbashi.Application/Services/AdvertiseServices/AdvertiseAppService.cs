@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Identity;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Mediator.Commands.FileCommands;
 using Amlakbashi.Core.DTOs.AdvertiseDTOs;
+using Amlakbashi.Mediator.Commands.CategoryCommands;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
@@ -460,6 +461,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(advertise);
             Repository.Save();
             mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
+            mediator.Send(new RemoveCategoryItemCacheCommand(advertise.Id));
         }
 
         public void UpdateAccView(long accId)
@@ -1294,6 +1296,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.TodayIsEmpty = true;
             Repository.Update(acc);
             Repository.Save();
+            mediator.Send(new RemoveCategoryItemCacheCommand(acc.Id));
         }
 
         public void UnsetTodayEmpty(long id)
@@ -1302,6 +1305,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.TodayIsEmpty = false;
             Repository.Update(acc);
             Repository.Save();
+            mediator.Send(new RemoveCategoryItemCacheCommand(acc.Id));
         }
 
         public Dictionary<string, string> GetAdvertiseListPrices(List<long> ids)
@@ -2015,7 +2019,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 msg = "کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.";
                 return false;
             }
-            if (advertise.Status != AdvertiseStatus.Published)
+            if (advertise.Status != AdvertiseStatus.Published) 
             {
                 msg = "متاسفانه این اقامتگاه در حال حاضر از دسترس خارج است. لطفا اقامتگاه دیگری انتخاب نمایید";
                 return false;

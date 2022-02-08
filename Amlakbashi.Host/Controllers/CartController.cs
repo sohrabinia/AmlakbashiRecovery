@@ -254,29 +254,28 @@ namespace Amlakbashi.Host.Controllers
             return Redirect(string.Format("/{0}/{1}", redirect_controller, redirect_action));
         }
 
-        [Authorize(Policy = Policies.Payment_Actions)]
-        public IActionResult CheckPasargadPaymentResult(int paymentId)
-        {
-            try
-            {
-                var result = accounting.CheckPaymentResult(paymentId);
-                return PartialView("_CheckPaymentResult", result);
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Cart.CheckPasargadPaymentResult", exc);
-                return PartialView("_CheckPaymentResult");
-            }
-            
-        }
+        //[Authorize(Policy = Policies.Payment_Actions)]
+        //public IActionResult CheckPasargadPaymentResult(int paymentId)
+        //{
+        //    try
+        //    {
+        //        var result = accounting.CheckPaymentResult(paymentId);
+        //        return PartialView("_CheckPaymentResult", result);
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("Cart.CheckPasargadPaymentResult", exc);
+        //        return PartialView("_CheckPaymentResult");
+        //    }
+        //}
 
 #if DEBUG
-        public ActionResult LocalPay(int payment_id, string redirectUrl = null)
+        public ActionResult LocalPay(int paymentId, string redirectUrl = null)
         {
             try
             {
                 string msg;
-                if (accounting.TestFinalizePayment(payment_id, userAccessor.CurrentUser.Id, out msg))
+                if (accounting.TestFinalizePayment(paymentId, userAccessor.CurrentUser.Id, out msg))
                 {
                     TempData["payment_success_msg"] = msg;
                 }
@@ -289,7 +288,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 TempData["payment_error_msg"] = exc.Message;
             }
-            var objpay = accounting.FindPayment(payment_id);
+            var objpay = accounting.FindPayment(paymentId);
             if (string.IsNullOrEmpty(redirectUrl) == false)
             {
                 return Redirect(redirectUrl);

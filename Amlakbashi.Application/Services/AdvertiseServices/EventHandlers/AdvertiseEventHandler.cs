@@ -44,10 +44,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             this.advertiseRepository = advertiseRepository;
             this.setting = setting;
         }
+
         public Task Handle(ChangeAdvertiseStatusEvent notification, CancellationToken cancellationToken)
         {
-            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
-            if (acc.Childs != null)
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
+            if (acc.Mode == AdvertiseMode.Parent && acc.Childs != null)
             {
                 foreach (var item in acc.Childs)
                 {
@@ -61,8 +63,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertiseTypeEvent notification, CancellationToken cancellationToken)
         {
-            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
-            switch ((AdvertiseType)acc.TypeID)
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
+            switch (acc.TypeID)
             {
                 case AdvertiseType.Hotel:
                 case AdvertiseType.Camp:
@@ -86,7 +89,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertisePositionEvent notification, CancellationToken cancellationToken)
         {
-            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var item in acc.Childs)
             {
                 item.Position = acc.Position;
@@ -98,8 +102,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertiseAddressEvent notification, CancellationToken cancellationToken)
         {
-            var acc = advertiseRepository.Query(q =>
-            q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
             //update geographical properties
             acc.CountryDirection = (acc.Province == 1029 ||
                 acc.Province == 1393 || acc.Province == 1555) ? CountryDirection.North : CountryDirection.Unset;
@@ -123,7 +127,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertiseRulesEvent notification, CancellationToken cancellationToken)
         {
-            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var child in acc.Childs)
             {
                 child.AllowParty = acc.AllowParty;
@@ -139,7 +144,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertisePriceEvent notification, CancellationToken cancellationToken)
         {
-            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
             if (acc.Mode != AdvertiseMode.Parent && acc.BasePrice != acc.DailyPrice)
             {
                 acc.BasePrice = acc.DailyPrice;
@@ -169,7 +175,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeInstantReserveStatusEvent notification, CancellationToken cancellationToken)
         {
-            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var item in acc.Childs)
             {
                 item.InstantReserveStatus = acc.InstantReserveStatus;
@@ -182,7 +189,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeStayDurationEvent notification, CancellationToken cancellationToken)
         {
-            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var item in acc.Childs)
             {
                 item.MinReserveDays = acc.MinReserveDays;
@@ -195,7 +203,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeNorouzPriceEvent notification, CancellationToken cancellationToken)
         {
-            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var item in acc.Childs)
             {
                 item.NorouzPrice = acc.NorouzPrice;
@@ -208,7 +217,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeMaxInstantReserveStartEvent notification, CancellationToken cancellationToken)
         {
-            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var item in acc.Childs)
             {
                 item.MaxInstantReserveStart = acc.MaxInstantReserveStart;
@@ -220,11 +230,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(CreateAdvertiseBasicEvent notification, CancellationToken cancellationToken)
         {
-            //initialize amlakbashi score
-            var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
+            var acc = advertiseRepository.Find(notification.advertiseId);
             acc.AmlakbashiScore = 1000;
 
-            //initialize acc score
             var max_score = setting.MaxScore;
             long max_value = 10000;
             if (max_score > 0)
@@ -236,7 +245,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
                 acc.AdvertiseScore = 12000;
             }
 
-            //save changes
             advertiseRepository.Update(acc);
             advertiseRepository.Save();
             return Task.CompletedTask;
@@ -244,7 +252,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(CreateAdvertiseGeneralEvent notification, CancellationToken cancellationToken)
         {
-            //Initialize title and description
             var acc = advertiseRepository.Query(q => q.Include(i => i.RegionCity)
                 .Include(i => i.RegionProvince).FirstOrDefault(f => f.Id == notification.advertiseId));
             var cityTitle = acc.RegionCity.PersianName;
@@ -277,7 +284,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             //initialize acc type
             acc.ParentAccType = (AdvertiseType)AdvertiseTypeToHeadType((int)acc.TypeID);
 
-            //save changes
             advertiseRepository.Update(acc);
             advertiseRepository.Save();
             return Task.CompletedTask;
@@ -285,16 +291,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(AddHotelChildEvent notification, CancellationToken cancellationToken)
         {
-            var parent = advertiseRepository.Query(
-                q => q.FirstOrDefault(f => f.Id == notification.parentId));
-            var child = advertiseRepository.Query(
-                q => q.FirstOrDefault(f => f.Id == notification.childId));
+            //var parent = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.parentId));
+            var parent = advertiseRepository.Find(notification.parentId);
+            //var child = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.childId));
+            var child = advertiseRepository.Find(notification.childId);
 
-            //set amlakbashi score
             child.AmlakbashiScore = parent.AmlakbashiScore;
-            //set advertise score
             child.AdvertiseScore = parent.AdvertiseScore;
-            //set address part
             child.Address = parent.Address;
             child.CountryDirection = parent.CountryDirection;
             child.Province = parent.Province;
@@ -303,38 +306,28 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             child.LocationString = parent.LocationString;
             child.Latitude = parent.Latitude;
             child.Longitude = parent.Longitude;
-            //set acc type part
             child.TypeID = parent.TypeID;
             child.ParentAccType = parent.ParentAccType;
-            //set user id and ownership part
             child.UserID = parent.UserID;
             child.OwnerFullName = parent.OwnerFullName;
             child.OwnerMobile = parent.OwnerMobile;
             child.OwnerID = parent.OwnerID;
             child.OwnershipType = parent.OwnershipType;
-            //set status
             child.Status = parent.Status;
-            //set position part
             child.Position = parent.Position;
-            //set rules part
             child.AllowParty = parent.AllowParty;
             child.AllowPets = parent.AllowPets;
             child.AllowSmoking = parent.AllowSmoking;
             child.EvidenceRequired = parent.EvidenceRequired;
             child.OtherRules = parent.OtherRules;
-            //set as child mode
             child.Mode = AdvertiseMode.Child;
-            //set availablity as true by default
             child.Available = true;
-            //set base price
             child.BasePrice = child.DailyPrice;
-            //set parent's base price
             parent.BasePrice = parent.BasePrice < 1 ? child.BasePrice :
                 Math.Min(parent.BasePrice, child.BasePrice);
             parent.NorouzPrice = parent.NorouzPrice < 1 ? child.NorouzPrice :
                 Math.Min(parent.NorouzPrice, child.NorouzPrice);
 
-            //save changes
             advertiseRepository.Update(child);
             advertiseRepository.Save();
             return Task.CompletedTask;
@@ -345,11 +338,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             var parent = advertiseRepository.Find(notification.parentId);
             var child = advertiseRepository.Find(notification.childId);
 
-            //set amlakbashi score
             child.AmlakbashiScore = parent.AmlakbashiScore;
-            //set advertise score
             child.AdvertiseScore = parent.AdvertiseScore;
-            //set address part
             child.Address = parent.Address;
             child.CountryDirection = parent.CountryDirection;
             child.RegionProvince = parent.RegionProvince;
@@ -358,36 +348,26 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             child.LocationString = parent.LocationString;
             child.Latitude = parent.Latitude;
             child.Longitude = parent.Longitude;
-            //set acc type part
             child.ParentAccType = (AdvertiseType)Advertise.AdvertiseTypeToHeadType((int)child.TypeID);
-            //set user id and ownership part
             child.User = parent.User;
             child.OwnerFullName = parent.OwnerFullName;
             child.OwnerMobile = parent.OwnerMobile;
             child.OwnerID = parent.OwnerID;
             child.OwnershipType = parent.OwnershipType;
-            //set status
             child.Status = parent.Status;
-            //set position part
             child.Position = parent.Position;
-            //set rules part
             child.AllowParty = parent.AllowParty;
             child.AllowPets = parent.AllowPets;
             child.AllowSmoking = parent.AllowSmoking;
             child.EvidenceRequired = parent.EvidenceRequired;
             child.OtherRules = parent.OtherRules;
-            //set as child mode
             child.Mode = Advertise.AdvertiseMode.Child;
-            //set availablity as true by default
             child.Available = true;
-            //set base price
             child.BasePrice = child.DailyPrice;
-            //set parent's base price
             parent.BasePrice = parent.BasePrice < 1 ? child.BasePrice :
                 Math.Min(parent.BasePrice, child.BasePrice);
             parent.NorouzPrice = parent.NorouzPrice < 1 ? child.NorouzPrice :
                 Math.Min(parent.NorouzPrice, child.NorouzPrice);
-            //initialize slug, title and description
             var cityTitle = child.RegionCity.PersianName;
             var areaTitle = child.RegionArea != null ? child.RegionArea.PersianName : null;
             child.OldSlug = AdvertiseUrlLocalization.GetOldSlug(child.Title, (int)child.TypeID);
@@ -395,7 +375,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             child.MetaTitle = child.Title + " | املاک باشی";
             child.MetaDescription = AdvertiseSeoLocalization.GetMetaDescription(child, cityTitle, areaTitle);
 
-            //save changes
             advertiseRepository.Update(child);
             advertiseRepository.Save();
             return Task.CompletedTask;

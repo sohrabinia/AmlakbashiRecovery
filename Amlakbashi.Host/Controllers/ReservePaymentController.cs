@@ -295,16 +295,16 @@ namespace Amlakbashi.Host.Controllers
         //}
 
         [Authorize(Policy = Policies.Reserve_Payment_Edit)]
-        public JsonResult Delete(long reserve_payment_id)
+        public JsonResult Delete(long reservePaymentId)
         {
             try
             {
-                accounting.DeleteReservePayment(reserve_payment_id);
+                accounting.DeleteReservePayment(reservePaymentId);
                 return GenerateJsonResult(new { status = 1 });
             }
             catch (Exception exc)
             {
-                logger.Error("PaymentController.Delete", exc);
+                logger.Error("ReservePaymentController.Delete", exc);
                 return GenerateJsonResult(new { status = 0 });
             }
         }

@@ -10,6 +10,7 @@ using Amlakbashi.Core.Infrastructure.UserContact;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static Amlakbashi.Core.Entities.ActionLog;
 using static Amlakbashi.Core.Entities.PrizeCreditTransaction;
 using static Amlakbashi.Core.Entities.Reserve;
@@ -93,7 +94,8 @@ namespace Amlakbashi.Accounting
         Payment FindPayment(long id);
         void InsertPayment(Payment newPayment);
         void UpdatePayment(Payment editedPayment);
-        CheckPaymentDTO CheckPaymentResult(int paymentId);
+        Task<CheckPaymentDTO> CheckPaymentResult(int paymentId);
+        Task<bool> EditPaymentByReinquiry(int paymentId);
 
         // GroupPayment Functions
 

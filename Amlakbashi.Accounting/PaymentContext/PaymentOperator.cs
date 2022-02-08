@@ -25,14 +25,14 @@ namespace Amlakbashi.Accounting.PaymentContext
                 paymentTotalAmount, redirectAddress);
         }
 
-        public CheckPaymentDTO GetPasargadPaymentResult(BankEnum bank, string tref, out string result)
+        public CheckPaymentDTO GetPasargadPaymentResult(string tref, out string result)
         {
             return pasargadEngine.GetPaymentResult(tref, out result);
         }
 
-        public CheckPaymentDTO GetPasargadPaymentResult(BankEnum bank, long paymentId, DateTime paymentDate)
+        public async Task<CheckPaymentDTO> GetPasargadPaymentResult(long paymentId, DateTime paymentDate)
         {
-            return pasargadEngine.GetPaymentResult(paymentId, paymentDate);
+            return await pasargadEngine.GetPaymentResult(paymentId, paymentDate);
         }
 
         public bool VerifyPasargadPayment(BankEnum bank, string paymentResult,

@@ -34,6 +34,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs;
 using Amlakbashi.Core.Common.StaticData;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Accounting
 {
@@ -533,15 +534,37 @@ namespace Amlakbashi.Accounting
             paymentService.Update(editedPayment);
         }
 
-        public CheckPaymentDTO CheckPaymentResult(int paymentId)
+        public async Task<CheckPaymentDTO> CheckPaymentResult(int paymentId)
         {
             var payment = paymentService.Find(paymentId);
             if (payment.Type == Payment.PaymentType.Expenditure)
             {
                 return null;
             }
-            var result = paymentOperator.GetPasargadPaymentResult(BankEnum.Pasargad, payment.Id, payment.Date);
-            result.ReserveId = payment.ReserveID != null ? (long)payment.ReserveID : 0;
+            var response = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.Date);
+            response.PaymentId = payment.Id.ToString();
+            if ((response.Result && payment.Status == Payment.PaymentStatus.NotPaid) ||
+                (response.Result == false && payment.Status == Payment.PaymentStatus.Paid))
+            {
+                response.MustEdit = true;
+            }
+            if (payment.ReserveID != null)
+            {
+                response.ReserveId = payment.ReserveID.Value;
+                response.ShowDoReserve = response.Result && (payment.Reserve.Status == ReserveStatus.WaitForReserve ||
+                    payment.Reserve.Status == ReserveStatus.CanceledBySystem) ? true : false;
+            }
+            return response;
+        }
+
+        public async Task<bool> EditPaymentByReinquiry(int paymentId)
+        {
+            var payment = paymentService.Find(paymentId);
+            if (payment.Type == Payment.PaymentType.Expenditure)
+            {
+                return false;
+            }
+            var result = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.Date);
             if (result.Result == true && payment.Status == Payment.PaymentStatus.NotPaid)
             {
                 payment.Authority = result.TransactionReferenceId;
@@ -550,8 +573,19 @@ namespace Amlakbashi.Accounting
                 payment.PayDate = DateTime.Parse(result.TransactionDate);
                 payment.Status = Payment.PaymentStatus.Paid;
                 paymentService.Update(payment);
+                return true;
             }
-            return result;
+            else if (result.Result == false && payment.Status == Payment.PaymentStatus.Paid)
+            {
+                payment.Authority = null;
+                payment.RefID = 0;
+                payment.TraceNumber = null;
+                payment.PayDate = null;
+                payment.Status = Payment.PaymentStatus.NotPaid;
+                paymentService.Update(payment);
+                return true;
+            }
+            return false;
         }
 
         // GroupPayment Functions
@@ -1040,8 +1074,7 @@ namespace Amlakbashi.Accounting
             if (string.IsNullOrEmpty(response.tref) == false && response.iN > 0 && response.iD > DateTime.Now.Date)
             {
                 string paymentResult = string.Empty;
-                var checkPaymentResult = paymentOperator.GetPasargadPaymentResult(BankEnum.Pasargad,
-                    response.tref, out paymentResult);
+                var checkPaymentResult = paymentOperator.GetPasargadPaymentResult(response.tref, out paymentResult);
                 if (checkPaymentResult.Result)
                 {
                     referenceNumber = checkPaymentResult.ReferenceNumber;
