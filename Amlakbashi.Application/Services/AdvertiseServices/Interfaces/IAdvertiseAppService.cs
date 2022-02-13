@@ -22,6 +22,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         IList<Advertise> GetNotChildAdvertisesByUserId(int userId);
         IList<Advertise> GetInstantReserveAdvertisesByUserId(int userId, InstantReserveStatusEnum instantStatus);
         IList<Advertise> GetAdvertisesByStatus(AdvertiseStatus status, bool haveSlug = false);
+        IList<Advertise> GetMostLiked(int count, bool beInstantReserve = false);
+        List<string> GetAdvertiseTags(Advertise advertise);
         Advertise Find(long id, bool includeOccupiedTables = false);
         Advertise Find(long id, int statusLowerThan);
         Advertise FindIncludingDeleted(long id);

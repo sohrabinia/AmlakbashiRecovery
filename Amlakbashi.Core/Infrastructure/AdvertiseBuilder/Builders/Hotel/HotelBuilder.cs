@@ -20,7 +20,6 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Hotel
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<ReservePart>();
             BuildAdvertisePart<TitleDescPart>();
-            //BuildAdvertisePart<NorouzPart>();
             BuildAdvertisePart<PhotoPart>();
             BuildAdvertisePart<MetaTitleDescPart>();
             BuildAdvertisePart<AmenitiesPart>();

@@ -54,7 +54,7 @@
                 <div class="static-advertise advetise-form__part advetise-form__part1">
                     <div class="acc-hotel__title-box">
                         <h2 class="div-unset static-advertise__title"><i class="fas fa-bed"></i>@Model.titleAndDesc.Title</h2>
-                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccAvailableInput.cshtml", Model.Available, 
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccAvailableInput.cshtml", Model.Available,
                             new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", Model.Id } })
                     </div>
                     @if (Model.titleAndDesc != null)
@@ -87,6 +87,13 @@
                     <div class="static-advertise advetise-form__part static-advertie__price-box">
                         <p class="static-advertise__title"><i class="fa fa-dollar-sign"></i>اطلاعات قیمت اجاره روزانه اقامتگاه را ثبت کنید</p>
                         @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPriceInput.cshtml", Model.price)
+                    </div>
+                    <div class="static-advertise advetise-form__part static-advertie__price-box">
+                        <p class="static-advertise__title">
+                            <img class="noroz-style-icon" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" width="30" height="30" />
+                            اطلاعات قیمت نوروزی اقامتگاه را ثبت کنید
+                        </p>
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccNorouzPriceInput.cshtml", Model.price)
                     </div>
                 }
                 <div class="static-advertise advetise-form__part advertise-form_part-details">

@@ -100,6 +100,29 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return Repository.Query(q => q.Where(w => ids.Contains(w.Id) && w.Status == status).ToList());
         }
 
+        public IList<Advertise> GetMostLiked(int count, bool beInstantReserve = false)
+        {
+            if (beInstantReserve)
+            {
+                return Repository.Query(q => q.Where(w=>w.InstantReserveStatus == InstantReserveStatusEnum.Confirmed)
+                    .OrderByDescending(o => o.AverageUserRating).Take(count)).ToList();
+            }
+            return Repository.Query(q => q.OrderByDescending(o => o.AverageUserRating).Take(count)).ToList();
+        }
+
+        public List<string> GetAdvertiseTags(Advertise advertise)
+        {
+            var tags = new List<string>();
+            tags.Add(AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID));
+            if (advertise.Room > 0)
+            {
+                tags.Add($"{advertise.Room} خوابه");
+            }
+            tags.Add(advertise.RegionCity.PersianName);
+            tags.Add(advertise.RegionProvince.PersianName);
+            return tags;
+        }
+
         public void AddSupporterInfo(long id, string text, User supporter)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));

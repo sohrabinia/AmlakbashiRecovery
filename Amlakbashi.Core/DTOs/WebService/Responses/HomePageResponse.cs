@@ -28,6 +28,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses
         public List<string> tags { get; set; }
         public int nightlyPrice { get; set; }
         public int discountPercent { get; set; }
+        public double discountPrice { get; set; }
     }
 
     public class HomePageMostLikedResponse

@@ -302,6 +302,7 @@
     <Folder Include="wwwroot\Content\imgcache\" />
     <Folder Include="wwwroot\css\min\" />
     <Folder Include="wwwroot\font\" />
+    <Folder Include="wwwroot\image\regions\" />
     <Folder Include="wwwroot\js\min\" />
     <Folder Include="wwwroot\Resource\packages\jquery-mobile\images\" />
   </ItemGroup>

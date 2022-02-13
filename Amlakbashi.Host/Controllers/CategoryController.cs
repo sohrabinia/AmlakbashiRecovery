@@ -201,35 +201,6 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        // TODO: resolve cache for this
-        //public class LiveOutputCacheAttribute : ResponseCacheAttribute
-        //{
-        //    public LiveOutputCacheAttribute() : base()
-        //    {
-        //        var query = Request.Query;
-        //        if (query.ContainsKey("empty_range_from") ||
-        //            query.ContainsKey("empty_range_to") ||
-        //            query.ContainsKey("today_empty_homes") ||
-        //            query.ContainsKey("discount_homes") ||
-        //            query.ContainsKey(""norouz_special") ||
-        //            query.ContainsKey("frompaypernight") ||
-        //            query.ContainsKey("topaypernight") ||
-        //            query.ContainsKey("instant_reserve") ||
-        //            query.ContainsKey("hygieneProtocol") ||
-        //            query["ajax"] != false)
-        //        {
-        //            // clear cache
-        //            Location = ResponseCacheLocation.None;
-        //        }
-        //        else
-        //        {
-        //            Location = ResponseCacheLocation.Any;
-        //        }
-        //    }
-        //}
-
-        // TODO: uncomment this
-        //[LiveOutputCache(Duration = 60 * 60, VaryByQueryKeys = new string[] { "*" }, Location = ResponseCacheLocation.Any)]
         public ActionResult Item(int regionType,
             int regionId = 0, string name = "",
             string type = "", int countryDirection = 0,

@@ -152,6 +152,28 @@
                                         </span>
                                     </div>
                                 }
+                                @if (child.Price.NorouzPrice > 0)
+                                {
+                                    <div class="advertie-page__price-item js-NorouzPrice">
+                                        <p class="advertise-page__price-title">
+                                            <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" /> قیمت روزهای نوروز:
+                                        </p>
+                                        <p class="advertise-page__price-content">
+                                            @string.Format("{0:n0}", child.Price.NorouzPrice) تومان
+                                        </p>
+                                    </div>
+                                }
+                                @if (child.Price.NorouzOverCapacityPrice > 0)
+                                {
+                                    <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
+                                        <span class="advertise-page__price-title">
+                                            <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" /> قیمت هر مهمان اضافه نوروز:
+                                        </span>
+                                        <span class="advertise-page__price-content">
+                                            @string.Format("{0:n0}", child.Price.NorouzOverCapacityPrice) تومان
+                                        </span>
+                                    </div>
+                                }
                             </div>
                         </div>
                         <div class="reserve-complex__detail-button js-detail-button" data-state="0" data-change-text="1" data-text-expand="جزئیات بیشتر" data-text-collapse="جزئیات کمتر" data-target-id="@(child_advertise_type.ToString())_@(i)">

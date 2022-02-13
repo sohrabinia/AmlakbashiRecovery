@@ -187,8 +187,8 @@ namespace Amlakbashi.Host.Controllers
             {
                 string msg = string.Empty;
                 string referenceNumber = string.Empty;
-                bool payment_done = accounting.RegisterPasargadEpay(response, out msg, out referenceNumber);
-                return RedirectAfterEpay(payment_done, msg, response.iN, response.RedirectUrl, referenceNumber);
+                bool paymentResult = accounting.RegisterPasargadEpay(response, out msg, out referenceNumber);
+                return RedirectAfterEpay(paymentResult, msg, response.iN, response.RedirectUrl, referenceNumber);
             }
             catch (Exception exc)
             {
