@@ -46,6 +46,10 @@ namespace Amlakbashi.Core.Common.Utilities
 
         public static bool ValidateEmail(string email)
         {
+            if (string.IsNullOrEmpty(email))
+            {
+                return false;
+            }
             return EmailValidation.EmailValidator.Validate(email);
         }
     }

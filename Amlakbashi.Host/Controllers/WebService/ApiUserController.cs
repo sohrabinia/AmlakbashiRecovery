@@ -9,6 +9,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.DTOs.WebService.Responses.User;
+using System.Text;
+using Microsoft.Extensions.Configuration;
+using Amlakbashi.Core.DTOs.WebService.Requests.User;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.IdentityModel.Tokens.Jwt;
+using Amlakbashi.Host.Authentication;
+using Microsoft.AspNetCore.Http;
+using Amlakbashi.Core.Identity;
 
 namespace Amlakbashi.Host.Controllers.WebService
 {
@@ -17,113 +27,186 @@ namespace Amlakbashi.Host.Controllers.WebService
     public class ApiUserController : ApiBaseController
     {
         private readonly IUserAppService userService;
-        public ApiUserController(IUserAppService userService)
+        private readonly IUserAccessor userAccessor;
+        private readonly IConfiguration configuration;
+        public ApiUserController(IUserAppService userService,
+            IUserAccessor userAccessor,
+            IConfiguration configuration)
         {
             this.userService = userService;
+            this.userAccessor = userAccessor;
+            this.configuration = configuration;
         }
 
         [HttpPost]
-        public IActionResult LoginOrRegister(string phoneNumber)
+        public async Task<IActionResult> LoginOrRegister(LoginRequest request)
         {
-            var isCorrectNumber = string.IsNullOrEmpty(phoneNumber) == false && (PhoneUtility.ValidateLocalNumber(phoneNumber) ||
-                (phoneNumber.Length > 10 && (phoneNumber.Substring(0, 1) == "+" || phoneNumber.Substring(0, 2) == "00")));
+            var isCorrectNumber = string.IsNullOrEmpty(request.phoneNumber) == false && (PhoneUtility.ValidateLocalNumber(request.phoneNumber) ||
+                (request.phoneNumber.Length > 10 && (request.phoneNumber.Substring(0, 1) == "+" || request.phoneNumber.Substring(0, 2) == "00")));
             if (!isCorrectNumber)
             {
                 return BadRequest();
             }
 
-            var internationalMobileNumber = PhoneUtility.CorrectPhoneNumberIfPossible(phoneNumber);
-            var identityUser = userService.GetIdentityUser(internationalMobileNumber);
+            request.phoneNumber = PhoneUtility.CorrectPhoneNumberIfPossible(request.phoneNumber);
+            var identityUser = userService.GetIdentityUser(request.phoneNumber);
 
             if (identityUser == null)
             {
-                return Register(internationalMobileNumber);
+                return await Register(request);
             }
-            return Login(internationalMobileNumber);
+            return await Login(request);
         }
 
-        private CreatedResult Register(string internationalMobileNumber)
+        private async Task<IActionResult> Register(LoginRequest request)
         {
-            var isIranNumber = PhoneUtility.IsNumberForIran(internationalMobileNumber);
-            var verifyCode = new Random().Next(1111, 9999).ToString();
-            var user = new Entities.User()
-            {
-                Mobile = internationalMobileNumber,
-                MainMobile = internationalMobileNumber,
-                AmlakbashiScore = 1000
-            };
-            userService.Insert(user);
+            var isIranNumber = PhoneUtility.IsNumberForIran(request.phoneNumber);
 
-            var identityUser = new AppUser()
+            if (isIranNumber == false && EmailUtility.ValidateEmail(request.email) == false)
             {
-                UserName = internationalMobileNumber,
-                PhoneNumber = internationalMobileNumber,
-                CreateDate = DateTime.Now,
-                State = Entities.User.UserState.InActived,
-                Code = verifyCode,
-                SendVerification = DateTime.Now
-            };
-            userService.AddIdentityUser(identityUser);
-
-            if (isIranNumber)
-            {
-                var callableNumber = PhoneUtility.InternationalNumberToLocal(internationalMobileNumber);
-                userService.SendVerificationSms(callableNumber, verifyCode);
+                ModelState.AddModelError(nameof(request.email), "email address not valid");
+                return BadRequest(ModelState);
             }
 
+            if (string.IsNullOrEmpty(request.referralCode) == false)
+            {
+                var referralUser = userService.Find(int.Parse(request.referralCode));
+                if (referralUser == null)
+                {
+                    ModelState.AddModelError(nameof(request.referralCode), "referral code not valid");
+                    return BadRequest(ModelState);
+                }
+            }
+
+            var identityUser = await userService.RegisterAsync(request);
+            if (identityUser == null)
+            {
+                return BadRequest();
+            }
+
+            userService.SendVerifyCode(identityUser);
             var response = new LoginResponse()
             {
                 isNewUser = true,
-                mobileNumber = internationalMobileNumber,
+                guid = identityUser.Id,
+                username = identityUser.UserName,
                 state = Entities.User.UserState.InActived,
                 isIranNumber = isIranNumber
             };
-            return Created("", response);
+            return CreatedAtAction(nameof(Profile), response);
         }
 
-        private IActionResult Login(string internationalMobileNumber)
+        private async Task<IActionResult> Login(LoginRequest request)
         {
-            var identityUser = userService.GetIdentityUser(internationalMobileNumber);
+            var identityUser = userService.GetIdentityUser(request.phoneNumber);
 
-            // check blocked user
             if (identityUser != null && identityUser.State == Entities.User.UserState.Suspend)
             {
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
-            var isIranNumber = PhoneUtility.IsNumberForIran(internationalMobileNumber);
+            var isIranNumber = PhoneUtility.IsNumberForIran(request.phoneNumber);
+            if (isIranNumber == false)
+            {
+                if (EmailUtility.ValidateEmail(request.email) == false)
+                {
+                    ModelState.AddModelError(nameof(request.email), "email not valid");
+                    return BadRequest(ModelState);
+                }
+                await userService.UpdateEmailAsync(identityUser.Id, request.email, false);
+            }
+
+            await userService.UpdateVerifyCodeAsync(identityUser.Id);
+            userService.SendVerifyCode(identityUser);
+
             var response = new LoginResponse()
             {
-                mobileNumber = internationalMobileNumber,
+                guid = identityUser.Id,
+                username = identityUser.UserName,
                 state = identityUser.State,
                 isIranNumber = isIranNumber,
                 isNewUser = false
             };
-
-            // login with password
-            if (identityUser.PasswordHash != null)
-            {
-                response.hasPassword = true;
-                return Ok(response);
-            }
-
-            // login with verify code
-            var user = userService.GetByMainMobile(internationalMobileNumber);
-            var verifyCode = new Random().Next(1111, 9999).ToString();
-            if (isIranNumber)
-            {
-                var callableNumber = PhoneUtility.InternationalNumberToLocal(internationalMobileNumber);
-                userService.UpdateSendVerification(user.Id, DateTime.Now, verifyCode);
-                userService.SendVerificationSms(callableNumber, verifyCode);
-            }
-            else if (identityUser.EmailConfirmed)
-            {
-                string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد ورود شما در املاک باشی: {identityUser.EmailCode}</div></div>";
-#if !DEBUG
-                EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email }, "تایید ایمیل", strbody);
-#endif
-            }
             return Ok(response);
+        }
+
+        [HttpPost("verify")]
+        public async Task<IActionResult> LoginVerify(LoginVerifyRequest request)
+        {
+            if (string.IsNullOrEmpty(request.guid) || string.IsNullOrEmpty(request.verifyCode))
+            {
+                return BadRequest();
+            }
+
+            var identityUser = await userService.GetIdentityUserByIdAsync(request.guid);
+            if (identityUser == null)
+            {
+                return NotFound();
+            }
+            if (identityUser.Code != request.verifyCode)
+            {
+                return StatusCode(StatusCodes.Status406NotAcceptable, "verify code not correct");
+            }
+            if ((DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
+            {
+                return StatusCode(StatusCodes.Status406NotAcceptable, "verify code validity time ended");
+            }
+
+            var isIranNumber = PhoneUtility.IsNumberForIran(identityUser.UserName);
+            if (isIranNumber && identityUser.PhoneNumberConfirmed == false)
+            {
+                await userService.UpdatePhoneNumberConfirmedAsync(identityUser.Id, true);
+            }
+            if (isIranNumber == false && identityUser.EmailConfirmed == false)
+            {
+                await userService.UpdateEmailConfirmedAsync(identityUser.Id, true);
+            }
+            var jwtToken = await userService.GenerateJwtToken(identityUser.Id, configuration["JwtConfig:Secret"]);
+            return Ok(jwtToken);
+        }
+
+        [HttpPost("resendcode")]
+        public async Task<IActionResult> ResendVerifyCode(ResendVerifyCodeRequest request)
+        {
+            var identityUser = await userService.GetIdentityUserByIdAsync(request.guid);
+            if (identityUser == null)
+            {
+                return NotFound();
+            }
+            await userService.UpdateVerifyCodeAsync(identityUser.Id);
+            userService.SendVerifyCode(identityUser);
+            return NoContent();
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet]
+        public IActionResult Profile()
+        {
+            var user = userAccessor.CurrentUser;
+            if (user == null || user.Id == 0)
+            {
+                return NotFound();
+            }
+            var response = new UserProfileResponse()
+            {
+                id = user.Id,
+                mainMobile = user.MainMobile,
+                mobile1 = user.Mobile,
+                mobile2 = user.Mobile2,
+                tell = user.Tell,
+                thirdPersonTell = user.ThirdPersonTell,
+                fname = user.FName,
+                lname = user.LName,
+                email = user.Email
+            };
+            return Ok(response);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Policies.Payment_Actions)]
+        [HttpGet("test")]
+        public IActionResult test()
+        {
+            return Ok();
         }
     }
 }

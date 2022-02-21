@@ -592,7 +592,6 @@ namespace Amlakbashi.Host.Controllers
                 if (result.Succeeded)
                 {
                     var user = userService.GetIdentityUser(User.Identity.Name);
-                    //signInManager.SignOutAsync().Wait();
                     userService.SignOut();
                     signInManager.SignInAsync(user, true).Wait();
                     TempData["suc"] = "تغییر رمز عبور با موفقیت انجام شد";

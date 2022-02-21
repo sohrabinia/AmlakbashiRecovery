@@ -229,7 +229,8 @@ namespace Amlakbashi.Host.Controllers.API
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(auth);
             var tokenS = jsonToken as JwtSecurityToken;
-            var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+            //var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+            var mainMobile = User.Identity.Name;
             if (string.IsNullOrEmpty(mainMobile))
             {
                 return new User();
@@ -246,7 +247,8 @@ namespace Amlakbashi.Host.Controllers.API
                 var handler = new JwtSecurityTokenHandler();
                 var jsonToken = handler.ReadToken(auth);
                 var tokenS = jsonToken as JwtSecurityToken;
-                var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+                //var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+                var mainMobile = User.Identity.Name;
                 var securityStamp = tokenS.Claims.FirstOrDefault(claim => claim.Type == "AspNet.Identity.SecurityStamp").Value;
                 var identityUser = userService.GetIdentityUser(mainMobile);
                 var objDict = new RouteValueDictionary(obj);

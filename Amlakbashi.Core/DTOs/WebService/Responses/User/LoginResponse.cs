@@ -7,11 +7,17 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.User
 {
     public class LoginResponse
     {
-        public string mobileNumber { get; set; }
+        public string guid { get; set; }
+        public string username { get; set; }
         public Entities.User.UserState state { get; set; }
-        public bool hasPassword { get; set; } = false;
         public bool isNewUser { get; set; } = false;
         public bool isIranNumber { get; set; } = true;
-
+        public string stateDesc
+        {
+            get
+            {
+                return state.ToString();
+            }
+        }
     }
 }

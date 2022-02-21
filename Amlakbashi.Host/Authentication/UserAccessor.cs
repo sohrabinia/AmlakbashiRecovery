@@ -39,9 +39,7 @@ namespace Amlakbashi.Host.Authentication
             User user;
             if (PhoneUtility.ValidateInternationalNumber(context.User.Identity.Name))
             {
-                //var international_mobile = PhoneUtility.LocalNumberToInternational(
-                //        context.User.Identity.Name, 98);
-                user = userService.GetActivatedUserByMainMobile(context.User.Identity.Name);
+                user = userService.GetByMainMobile(context.User.Identity.Name);
             }
             else
             {

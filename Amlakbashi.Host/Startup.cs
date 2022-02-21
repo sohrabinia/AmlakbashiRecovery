@@ -88,8 +88,7 @@ namespace Amlakbashi.Host
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         RequireExpirationTime = false,
-                        ValidateLifetime = true,
-                        NameClaimType = "name",
+                        ValidateLifetime = true
                     };
                 });
 

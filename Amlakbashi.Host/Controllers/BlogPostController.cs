@@ -25,13 +25,16 @@ namespace Amlakbashi.Host.Controllers
         private readonly IUserAccessor userAccessor;
         private readonly IMapper mapper;
         private readonly ILog logger;
-        public BlogPostController(IBlogPostAppService blogPostService, IMapper mapper,
+        public BlogPostController(IBlogPostAppService blogPostService,
+            IMapper mapper,
             IUserAppService userService,
+            IUserAccessor userAccessor,
             IRegionAppService regionService,
             ILog logger)
         {
             this.blogPostService = blogPostService;
             this.userService = userService;
+            this.userAccessor = userAccessor;
             this.regionService = regionService;
             this.mapper = mapper;
             this.logger = logger;
@@ -119,7 +122,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize(Policy = Policies.Post_Add)]
-        [HttpPost]
+        //[HttpPost]
         public JsonResult AddEditBlogPost(BlogPost data)
         {
             try

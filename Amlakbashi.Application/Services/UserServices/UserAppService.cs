@@ -22,6 +22,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Amlakbashi.Core.Identity;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Amlakbashi.Core.DTOs.WebService.Requests.User;
+using Microsoft.Extensions.Configuration;
+using System.Text;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
@@ -91,11 +95,6 @@ namespace Amlakbashi.Application.Services.UserServices
             return null;
         }
 
-        public User GetByAdminLoginCode(string code)
-        {
-            return Repository.Query(q => q.FirstOrDefault(x => x.AdminLoginCode == code));
-        }
-
         public User GetByMainMobile(string mainMobile)
         {
             if (PhoneUtility.ValidateLocalNumber(mainMobile))
@@ -111,7 +110,8 @@ namespace Amlakbashi.Application.Services.UserServices
         public User GetActivatedUserByMainMobile(string mainMobile, bool includeFavorite = false)
         {
             var identityUser = userManager.FindByNameAsync(mainMobile).Result;
-            if (identityUser != null && identityUser.State == User.UserState.Acticved)
+            if (identityUser != null &&
+                (identityUser.State == User.UserState.Acticved || identityUser.State == User.UserState.ReserveBanned))
             {
                 if (includeFavorite)
                 {
@@ -147,6 +147,104 @@ namespace Amlakbashi.Application.Services.UserServices
             if (currentUserId > 0)
             {
                 mediator.Publish(new UserUpdateEvent(null, user, source, currentUserId));
+            }
+        }
+
+        public async Task<AppUser> RegisterAsync(LoginRequest request)
+        {
+            var identityUser = await userManager.FindByNameAsync(request.phoneNumber);
+            if (identityUser != null)
+            {
+                return null;
+            }
+
+            var verifyCode = new Random().Next(1111, 9999).ToString();
+            identityUser = new AppUser()
+            {
+                UserName = request.phoneNumber,
+                PhoneNumber = request.phoneNumber,
+                CreateDate = DateTime.Now,
+                State = User.UserState.InActived,
+                Code = verifyCode,
+                SendVerification = DateTime.Now,
+                Email = request.email
+            };
+            var result = await userManager.CreateAsync(identityUser);
+
+            if (result.Succeeded)
+            {
+                var user = new User()
+                {
+                    Mobile = request.phoneNumber,
+                    MainMobile = request.phoneNumber,
+                    AmlakbashiScore = 1000
+                };
+                Repository.Insert(user);
+                Repository.Save();
+                if (string.IsNullOrEmpty(request.referralCode) == false)
+                {
+                    SetReferralCode(user.Id, int.Parse(request.referralCode));
+                }
+                return identityUser;
+            }
+            return null;
+        }
+
+        public async Task UpdatePhoneNumberConfirmedAsync(string guid, bool confirm)
+        {
+            var identityUser = await userManager.FindByIdAsync(guid);
+            identityUser.PhoneNumberConfirmed = confirm;
+            await userManager.UpdateAsync(identityUser);
+        }
+
+        public async Task UpdateEmailConfirmedAsync(string guid, bool confirm)
+        {
+            var identityUser = await userManager.FindByIdAsync(guid);
+            identityUser.EmailConfirmed = confirm;
+            await userManager.UpdateAsync(identityUser);
+        }
+
+        public void SetReferralCode(int userId, int referralUserId)
+        {
+            var referralUser = Repository.Find(referralUserId);
+            if (referralUser != null)
+            {
+                var user = Repository.Find(userId);
+                user.PresentorUserID = referralUserId;
+                Repository.Update(user);
+                Repository.Save();
+                mediator.Send(new AddDiscountCouponCommand(user.Id, user.PresentorUserID,
+                    5, DiscountCoupon.DiscountCouponType.Present));
+                var contact = new UserContactDTO()
+                {
+                    UserMainMobile = user.MainMobile,
+                    UserAppNotificationToken = user.AppNotificationToken,
+                    UserEmail = "",
+                    EmailConfirmed = false,
+                    UserFcmAppNotificationToken = user.FcmAppNotificationToken,
+                    UserNotificationToken = user.NotificationToken,
+                    Type = UserContactType.CouponPresent,
+                    Extra1 = referralUser.FullName,
+                    Extra2 = "5%"
+                };
+                mediator.Enqueue(new SendMessageCommand(contact));
+            }
+        }
+
+        public void SendVerifyCode(AppUser identityUser)
+        {
+            var isIranNumber = PhoneUtility.IsNumberForIran(identityUser.PhoneNumber);
+            if (isIranNumber)
+            {
+                var callableNumber = PhoneUtility.InternationalNumberToLocal(identityUser.PhoneNumber);
+                SendVerificationSms(callableNumber, identityUser.Code);
+            }
+            else
+            {
+                string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد ورود شما در املاک باشی: {identityUser.Code}</div></div>";
+#if !DEBUG
+                EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email }, "تایید ایمیل", strbody);
+#endif
             }
         }
 
@@ -388,14 +486,6 @@ namespace Amlakbashi.Application.Services.UserServices
             userManager.UpdateAsync(identityUser).Wait();
         }
 
-        public void UpdateForgetCode(int userId, string code)
-        {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.ForgetCode = code;
-            Repository.Update(user);
-            Repository.Save();
-        }
-
         public void UpdateSendVerification(int userId, DateTime time, string code = null)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
@@ -408,26 +498,27 @@ namespace Amlakbashi.Application.Services.UserServices
             userManager.UpdateAsync(identityUser).Wait();
         }
 
+        public async Task<string> UpdateVerifyCodeAsync(string guid)
+        {
+            var identityUser = await userManager.FindByIdAsync(guid);
+            if (identityUser != null)
+            {
+                var newCode = new Random().Next(1111, 9999).ToString();
+                identityUser.Code = newCode;
+                identityUser.SendVerification = DateTime.Now;
+                var result = await userManager.UpdateAsync(identityUser);
+                if (result.Succeeded)
+                {
+                    return newCode;
+                }
+            }
+            return null;
+        }
+
         public void UpdatePresentorUser(int userId, int pid)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
             user.PresentorUserID = pid;
-            Repository.Update(user);
-            Repository.Save();
-        }
-
-        public void UpdateFName(int userId, string newFName)
-        {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.FName = newFName;
-            Repository.Update(user);
-            Repository.Save();
-        }
-
-        public void UpdateLName(int userId, string newLName)
-        {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.LName = newLName;
             Repository.Update(user);
             Repository.Save();
         }
@@ -439,6 +530,14 @@ namespace Amlakbashi.Application.Services.UserServices
             user.LName = newLName;
             Repository.Update(user);
             Repository.Save();
+        }
+
+        public async Task UpdateEmailAsync(string guid, string email, bool confirm)
+        {
+            var identityUser = await userManager.FindByIdAsync(guid);
+            identityUser.Email = email;
+            identityUser.EmailConfirmed = confirm;
+            await userManager.UpdateAsync(identityUser);
         }
 
         public void UpdateDesc(int userId, string desc)
@@ -667,24 +766,6 @@ namespace Amlakbashi.Application.Services.UserServices
             return userManager.Users.Where(w => w.State == state).Select(s => s.UserName).ToList();
         }
 
-        public AppUser GetActivatedIdentityUser(string phrase, bool isEmail = false)
-        {
-            AppUser user;
-            if (isEmail)
-            {
-                user = userManager.FindByEmailAsync(phrase).Result;
-            }
-            else
-            {
-                user = userManager.FindByNameAsync(phrase).Result;
-            }
-            if (user != null && user.State == User.UserState.Acticved)
-            {
-                return user;
-            }
-            return null;
-        }
-
         public AppUser GetIdentityUser(string phrase, bool isEmail = false)
         {
             AppUser user;
@@ -699,6 +780,11 @@ namespace Amlakbashi.Application.Services.UserServices
             return user;
         }
 
+        public async Task<AppUser> GetIdentityUserByIdAsync(string id)
+        {
+            return await userManager.FindByIdAsync(id);
+        }
+
         public void AddIdentityUser(AppUser user)
         {
             userManager.CreateAsync(user).Wait();
@@ -707,12 +793,6 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateIdentityUser(AppUser user)
         {
             userManager.UpdateAsync(user).Wait();
-        }
-
-        public IdentityResult AddIdentityUserPassword(string username, string password)
-        {
-            var user = userManager.FindByNameAsync(username).Result;
-            return userManager.AddPasswordAsync(user, password).Result;
         }
 
         public IdentityResult ChangeIdentityUserPassword(string username, string password)
@@ -741,16 +821,6 @@ namespace Amlakbashi.Application.Services.UserServices
                 return userManager.ChangePasswordAsync(user, currentPassword, newPassword).Result;
             }
             return userManager.AddPasswordAsync(user, newPassword).Result;
-        }
-
-        public bool VerifyLoginCode(string mobileInternational, string code)
-        {
-            var user = userManager.FindByNameAsync(mobileInternational).Result;
-            if (user.Code == code)
-            {
-                return true;
-            }
-            return false;
         }
 
         public IList<AppRole> GetAllRoles()
@@ -931,7 +1001,7 @@ namespace Amlakbashi.Application.Services.UserServices
             return errors.Any() == false;
         }
 
-        public JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key)
+        public JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key, int userGeneralType = 0)
         {
             var userRoles = userManager.GetRolesAsync(identityUser).Result;
             var authClaims = new List<Claim>();
@@ -939,11 +1009,10 @@ namespace Amlakbashi.Application.Services.UserServices
             {
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
             }
-            authClaims.Add(new Claim("name", identityUser.UserName));
             authClaims.Add(new Claim(ClaimTypes.NameIdentifier, identityUser.Id));
-            authClaims.Add(new Claim("AspNet.Identity.SecurityStamp",
-                userManager.GetSecurityStampAsync(identityUser).Result));
-            authClaims.Add(new Claim(JwtRegisteredClaimNames.Sub, identityUser.UserName));
+            authClaims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
+            authClaims.Add(new Claim("AspNet.Identity.SecurityStamp", userManager.GetSecurityStampAsync(identityUser).Result));
+            authClaims.Add(new Claim("type", userGeneralType == 0 ? "guest" : "host"));
 
             var authSigningKey = new SymmetricSecurityKey(key);
             var token = new JwtSecurityToken(
@@ -951,6 +1020,30 @@ namespace Amlakbashi.Application.Services.UserServices
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
             return token;
+        }
+
+        public async Task<string> GenerateJwtToken(string guid, string jwtSecret)
+        {
+            var identityUser = await userManager.FindByIdAsync(guid);
+            var user = GetByMainMobile(identityUser.UserName);
+            var claims = new List<Claim>();
+
+            var userRoles = await userManager.GetRolesAsync(identityUser);
+            foreach (var role in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, identityUser.Id));
+            claims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
+            //claims.Add(new Claim("AspNet.Identity.SecurityStamp", identityUser.SecurityStamp));
+            claims.Add(new Claim("type", user.UserGeneralType == 0 ? "guest" : "host"));
+
+            var symmetricKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret));
+            var token = new JwtSecurityToken(
+                    expires: DateTime.Now.AddDays(90),
+                    claims: claims,
+                    signingCredentials: new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256));
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         public IEnumerable<User> IdentityUsersToUsers(IEnumerable<AppUser> identityUsers)
@@ -970,6 +1063,7 @@ namespace Amlakbashi.Application.Services.UserServices
             result = result.Distinct();
             return result;
         }
+
         public IEnumerable<AppUser> GetAllEmployees()
         {
             var employeeRoles = Roles.AllEmployeeRoles;
