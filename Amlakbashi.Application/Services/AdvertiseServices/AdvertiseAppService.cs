@@ -104,7 +104,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             if (beInstantReserve)
             {
-                return Repository.Query(q => q.Where(w=>w.InstantReserveStatus == InstantReserveStatusEnum.Confirmed)
+                return Repository.Query(q => q.Where(w => w.InstantReserveStatus == InstantReserveStatusEnum.Confirmed)
                     .OrderByDescending(o => o.AverageUserRating).Take(count)).ToList();
             }
             return Repository.Query(q => q.OrderByDescending(o => o.AverageUserRating).Take(count)).ToList();
@@ -277,9 +277,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 model = model.Where(w => w.UserID == dto.UserId);
             }
-            if (dto.Type > 0)
+            if (dto.Type != Advertise.AdvertiseType.All)
             {
-                model = model.Where(a => a.TypeID == (AdvertiseType)dto.Type);
+                model = model.Where(a => a.TypeID == dto.Type);
             }
             if (dto.HygieneProtocolStatus > -1)
             {
@@ -319,7 +319,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             if (dto.Parking != ParkingItems.Unset)
             {
-                model = model.Where(x => x.Parking == dto.Parking);
+                model = model.Where(x => x.Parking == dto.Parking || x.Childs.Any(a => a.Parking == dto.Parking));
             }
             if (dto.Sort == "contact")
                 model = model.OrderByDescending(a => a.ContactClick).ThenByDescending(a => a.WebVisit);
@@ -2042,7 +2042,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 msg = "کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.";
                 return false;
             }
-            if (advertise.Status != AdvertiseStatus.Published) 
+            if (advertise.Status != AdvertiseStatus.Published)
             {
                 msg = "متاسفانه این اقامتگاه در حال حاضر از دسترس خارج است. لطفا اقامتگاه دیگری انتخاب نمایید";
                 return false;

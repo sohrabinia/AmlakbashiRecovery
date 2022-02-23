@@ -67,66 +67,66 @@ namespace Amlakbashi.Host.Controllers
             return View();
         }
 
-        [Authorize(Policy = Policies.Advertise_View)]
-        public ActionResult Index(int? page, int status = -1,
-            int adtype = -1, int userid = -1, string sort = "score",
-            long id = -1, int instantReserveStatus = -1, string minReserveNorouzFromDate = "",
-            int imageCountMin = 0, int imageCountMax = 0, int hygieneProtocolStatus = -1,
-            int province = -1, int city = -1, int area = -1)
-        {
-            try
-            {
-                long minReserveNorouzDateUnix = 0;
-                if (!string.IsNullOrEmpty(minReserveNorouzFromDate))
-                {
-                    var gregorianDate = DateTimeUtility.PersianDateToGregorian(
-                        StringUtility.PersianNumberToEnglish(minReserveNorouzFromDate).Replace('/', ','));
-                    minReserveNorouzDateUnix = DateTimeUtility.DateValueOfJS(gregorianDate);
-                }
+        //[Authorize(Policy = Policies.Advertise_View)]
+        //public ActionResult Index(int? page, int status = -1,
+        //    int adtype = -1, int userid = -1, string sort = "score",
+        //    long id = -1, int instantReserveStatus = -1, string minReserveNorouzFromDate = "",
+        //    int imageCountMin = 0, int imageCountMax = 0, int hygieneProtocolStatus = -1,
+        //    int province = -1, int city = -1, int area = -1)
+        //{
+        //    try
+        //    {
+        //        long minReserveNorouzDateUnix = 0;
+        //        if (!string.IsNullOrEmpty(minReserveNorouzFromDate))
+        //        {
+        //            var gregorianDate = DateTimeUtility.PersianDateToGregorian(
+        //                StringUtility.PersianNumberToEnglish(minReserveNorouzFromDate).Replace('/', ','));
+        //            minReserveNorouzDateUnix = DateTimeUtility.DateValueOfJS(gregorianDate);
+        //        }
 
-                var model = advertiseService.Filter((AdvertiseStatus)status, adtype, userid, sort, id, instantReserveStatus,
-                    minReserveNorouzDateUnix, imageCountMin, imageCountMax, province, city, area, hygieneProtocolStatus);
+        //        var model = advertiseService.Filter((AdvertiseStatus)status, adtype, userid, sort, id, instantReserveStatus,
+        //            minReserveNorouzDateUnix, imageCountMin, imageCountMax, province, city, area, hygieneProtocolStatus);
 
-                ViewBag.status = status;
-                ViewBag.adtype = adtype;
-                ViewBag.userid = userid;
-                ViewBag.province = province;
-                ViewBag.city = city;
-                ViewBag.area = area;
-                ViewBag.sort = sort;
-                ViewBag.id = id;
-                ViewBag.instantReserveStatus = instantReserveStatus;
-                ViewBag.hygieneProtocolStatus = hygieneProtocolStatus;
-                ViewBag.minReserveNorouzFromDate = minReserveNorouzFromDate;
-                ViewBag.imageCountMin = imageCountMin;
-                ViewBag.imageCountMax = imageCountMax;
+        //        ViewBag.status = status;
+        //        ViewBag.adtype = adtype;
+        //        ViewBag.userid = userid;
+        //        ViewBag.province = province;
+        //        ViewBag.city = city;
+        //        ViewBag.area = area;
+        //        ViewBag.sort = sort;
+        //        ViewBag.id = id;
+        //        ViewBag.instantReserveStatus = instantReserveStatus;
+        //        ViewBag.hygieneProtocolStatus = hygieneProtocolStatus;
+        //        ViewBag.minReserveNorouzFromDate = minReserveNorouzFromDate;
+        //        ViewBag.imageCountMin = imageCountMin;
+        //        ViewBag.imageCountMax = imageCountMax;
 
-                var PageNumber = page ?? 1;
-                var onePageOfModel = model.ToPagedList(PageNumber, 20);
-                ViewBag.RowIndexStart = (PageNumber * 20) - 20;
+        //        var PageNumber = page ?? 1;
+        //        var onePageOfModel = model.ToPagedList(PageNumber, 20);
+        //        ViewBag.RowIndexStart = (PageNumber * 20) - 20;
 
-                List<AdvertiseOldIndexDTO> advertiseDTOs = new List<AdvertiseOldIndexDTO>();
-                foreach (var item in onePageOfModel)
-                {
-                    var user = userService.Find(item.UserID);
-                    var dto = new AdvertiseOldIndexDTO()
-                    {
-                        Advertise = item,
-                        UserPhoneNumber = user != null ? user.GetPhoneNumber(Entities.User.PhoneType.MainMobile) : "کاربر حذف شده",
-                        UserScore = user != null ? user.UserScore : 0,
-                        CityPersianName = regionService.GetRegionName(item.City == null ? 0 : (int)item.City)
-                    };
-                    advertiseDTOs.Add(dto);
-                }
-                ViewBag.dto = advertiseDTOs;
-                return View(onePageOfModel);
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Advertise.Index", exc);
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
-        }
+        //        List<AdvertiseOldIndexDTO> advertiseDTOs = new List<AdvertiseOldIndexDTO>();
+        //        foreach (var item in onePageOfModel)
+        //        {
+        //            var user = userService.Find(item.UserID);
+        //            var dto = new AdvertiseOldIndexDTO()
+        //            {
+        //                Advertise = item,
+        //                UserPhoneNumber = user != null ? user.GetPhoneNumber(Entities.User.PhoneType.MainMobile) : "کاربر حذف شده",
+        //                UserScore = user != null ? user.UserScore : 0,
+        //                CityPersianName = regionService.GetRegionName(item.City == null ? 0 : (int)item.City)
+        //            };
+        //            advertiseDTOs.Add(dto);
+        //        }
+        //        ViewBag.dto = advertiseDTOs;
+        //        return View(onePageOfModel);
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("Advertise.Index", exc);
+        //        return Redirect(Request.Headers["Referer"].ToString());
+        //    }
+        //}
 
         [Authorize(Policy = Policies.Advertise_View)]
         public IActionResult NewIndex(AdvertiseIndexDTO dto)

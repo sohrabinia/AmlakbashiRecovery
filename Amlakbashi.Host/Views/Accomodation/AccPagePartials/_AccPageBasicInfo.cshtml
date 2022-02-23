@@ -31,7 +31,7 @@
             <i class="fa fa-chart-area"></i>زمین: @Model.LandArea.LandArea متر
         </p>
     }
-    @if (Model.Parking.Parking != Advertise.ParkingItems.Unset && Model.Parking.Parking != Advertise.ParkingItems.Unset)
+    @if (Model.Parking.Parking != Advertise.ParkingItems.Unset)
     {
         <p class="advertise-page__basic-property-item">
             @switch ((Advertise.ParkingItems)Model.Parking.Parking)
@@ -48,9 +48,9 @@
                 case Advertise.ParkingItems.MoreThanThree:
                     <i class="fa fa-warehouse"></i>@("بیشتر از 3 پارکینگ")
                     break;
-                case Advertise.ParkingItems.Jointly:
+                @*case Advertise.ParkingItems.Jointly:
                     <i class="fa fa-warehouse"></i>@("پارکینگ مشاع")
-                    break;
+                    break;*@
                 case Advertise.ParkingItems.NoParking:
                     <i class="fa fa-warehouse"></i>@("بدون پارکینگ")
                     break;

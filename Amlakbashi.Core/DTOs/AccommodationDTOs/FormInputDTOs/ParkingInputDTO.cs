@@ -17,6 +17,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
         public ParkingInputDTO()
         {
             parkingSelectItems = AccDTOHelper.GenerateAccSelectList<ParkingItems>();
+            parkingSelectItems.RemoveAt(5);
         }
 
         public static implicit operator ParkingInputDTO(ParkingPart part)
