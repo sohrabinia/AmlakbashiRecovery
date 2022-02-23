@@ -7,18 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.DTOs.WebService.Responses.User;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Amlakbashi.Core.DTOs.WebService.Requests.User;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.IdentityModel.Tokens.Jwt;
 using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Http;
 using Amlakbashi.Core.Identity;
+using Amlakbashi.Host.Extensions;
 
 namespace Amlakbashi.Host.Controllers.WebService
 {
@@ -64,7 +62,7 @@ namespace Amlakbashi.Host.Controllers.WebService
 
             if (isIranNumber == false && EmailUtility.ValidateEmail(request.email) == false)
             {
-                ModelState.AddModelError(nameof(request.email), "email address not valid");
+                ModelState.AddModelError(nameof(request.email), "email not valid");
                 return BadRequest(ModelState);
             }
 
@@ -133,11 +131,6 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost("verify")]
         public async Task<IActionResult> LoginVerify(LoginVerifyRequest request)
         {
-            if (string.IsNullOrEmpty(request.guid) || string.IsNullOrEmpty(request.verifyCode))
-            {
-                return BadRequest();
-            }
-
             var identityUser = await userService.GetIdentityUserByIdAsync(request.guid);
             if (identityUser == null)
             {
@@ -145,11 +138,11 @@ namespace Amlakbashi.Host.Controllers.WebService
             }
             if (identityUser.Code != request.verifyCode)
             {
-                return StatusCode(StatusCodes.Status406NotAcceptable, "verify code not correct");
+                return BadRequest("verify code not valid");
             }
             if ((DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
             {
-                return StatusCode(StatusCodes.Status406NotAcceptable, "verify code validity time ended");
+                return BadRequest("verify code lifetime ended");
             }
 
             var isIranNumber = PhoneUtility.IsNumberForIran(identityUser.UserName);
@@ -161,8 +154,10 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 await userService.UpdateEmailConfirmedAsync(identityUser.Id, true);
             }
-            var jwtToken = await userService.GenerateJwtToken(identityUser.Id, configuration["JwtConfig:Secret"]);
-            return Ok(jwtToken);
+            var jwtToken = await userService.GenerateJwtTokenAsync(identityUser.Id, configuration["JwtConfig:Secret"]);
+            return Ok(new {
+                token = jwtToken
+            });
         }
 
         [HttpPost("resendcode")]
@@ -176,6 +171,28 @@ namespace Amlakbashi.Host.Controllers.WebService
             await userService.UpdateVerifyCodeAsync(identityUser.Id);
             userService.SendVerifyCode(identityUser);
             return NoContent();
+        }
+
+        [HttpPost("refreshtoken")]
+        public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
+        {
+            var jwtSecret = configuration["JwtConfig:Secret"];
+            var principal = userService.GetPrincipalFromJwtToken(request.token, jwtSecret);
+            var refreshTokenClaim = principal.GetRefreshToken();
+            if (principal == null || string.IsNullOrEmpty(refreshTokenClaim))
+            {
+                return BadRequest();
+            }
+            var identityUser = await userService.GetIdentityUserByIdAsync(principal.GetGuid());
+            if (identityUser == null || identityUser.SecurityStamp != refreshTokenClaim)
+            {
+                return BadRequest();
+            }
+            var newToken = await userService.GenerateJwtTokenAsync(identityUser.Id, jwtSecret);
+            return new ObjectResult(new
+            {
+                token = newToken
+            });
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

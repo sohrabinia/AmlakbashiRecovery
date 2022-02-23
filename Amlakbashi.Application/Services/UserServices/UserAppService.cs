@@ -1016,13 +1016,13 @@ namespace Amlakbashi.Application.Services.UserServices
 
             var authSigningKey = new SymmetricSecurityKey(key);
             var token = new JwtSecurityToken(
-                    expires: DateTime.Now.AddHours(1440),
                     claims: authClaims,
+                    expires: DateTime.Now.AddHours(1440),
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
             return token;
         }
 
-        public async Task<string> GenerateJwtToken(string guid, string jwtSecret)
+        public async Task<string> GenerateJwtTokenAsync(string guid, string jwtSecret)
         {
             var identityUser = await userManager.FindByIdAsync(guid);
             var user = GetByMainMobile(identityUser.UserName);
@@ -1035,15 +1035,48 @@ namespace Amlakbashi.Application.Services.UserServices
             }
             claims.Add(new Claim(ClaimTypes.NameIdentifier, identityUser.Id));
             claims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
-            //claims.Add(new Claim("AspNet.Identity.SecurityStamp", identityUser.SecurityStamp));
             claims.Add(new Claim("type", user.UserGeneralType == 0 ? "guest" : "host"));
+            claims.Add(new Claim("refreshToken", identityUser.SecurityStamp));
 
             var symmetricKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret));
             var token = new JwtSecurityToken(
-                    expires: DateTime.Now.AddDays(90),
+                    issuer: "https://www.amlakbashi.com",
+                    audience: "https://www.amlakbashi.com",
                     claims: claims,
+                    expires: DateTime.Now.AddMinutes(5),
                     signingCredentials: new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256));
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public ClaimsPrincipal GetPrincipalFromJwtToken(string token, string jwtSecret)
+        {
+            try
+            {
+                var tokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = false,
+                    ValidateIssuerSigningKey = true,
+                    RequireSignedTokens = true,
+                    ValidIssuer = "https://www.amlakbashi.com",
+                    ValidAudience = "https://www.amlakbashi.com",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret))
+                };
+                var tokenHandler = new JwtSecurityTokenHandler();
+                SecurityToken securityToken;
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+                var jwtSecurityToken = securityToken as JwtSecurityToken;
+                if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return null;
+                }
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public IEnumerable<User> IdentityUsersToUsers(IEnumerable<AppUser> identityUsers)
