@@ -39,7 +39,7 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
             return prices.Sum(s => s.Value.price);
         }
 
-        public IDictionary<string,DatePriceDTO> CalculateJalaliDatePrices(
+        public IDictionary<string, DatePriceDTO> CalculateJalaliDatePrices(
             DateTime from, DateTime to, Advertise advertise,
             out long couponCalculationPrice, int moreThanCapacity = 0)
         {
@@ -56,25 +56,24 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                 int priceWithoutDiscount = 0;
                 var unixDate = DateTimeUtility.DateValueOfJS(gregorianDate);
                 var priceTable = priceTables.FirstOrDefault(x => x.UnixDate == unixDate);
+
+                bool is_holiday_or_between;
+                bool is_holiday_pike;
+                bool is_norouz;
+                localization.GetJalaliDateHolidayStatus(jalaliDate, out is_holiday_or_between, out is_holiday_pike, out is_norouz);
                 if (priceTable != null)
                 {
                     priceWithoutDiscount = priceTable.Price;
                 }
                 else
                 {
-                    bool is_holiday_or_between;
-                    bool is_holiday_pike;
-                    bool is_norouz;
-                    localization.GetJalaliDateHolidayStatus(jalaliDate, out is_holiday_or_between, out is_holiday_pike, out is_norouz);
                     // TODO: temp
-                    if (
-                        //advertise.TypeID == Advertise.AdvertiseType.Villa &&
-                        //(advertise.Province == 1 || advertise.Province == 352) &&
-                        gregorianDate.Month == 8 && (gregorianDate.Day == 16 || gregorianDate.Day == 17 || gregorianDate.Day == 20))
-                    {
-                        is_holiday_pike = true;
-                    }
+                    //if (gregorianDate.Month == 8 && (gregorianDate.Day == 16 || gregorianDate.Day == 17 || gregorianDate.Day == 20))
+                    //{
+                    //    is_holiday_pike = true;
+                    //}
                     // ##########
+
                     if (is_norouz && advertise.NorouzPrice > 0)
                     {
                         priceWithoutDiscount = advertise.NorouzPrice;
@@ -94,7 +93,14 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                 }
                 if (moreThanCapacity > 0)
                 {
-                    priceWithoutDiscount += (moreThanCapacity * advertise.MoreThanCapacityPrice);
+                    if (is_norouz && advertise.NorouzOverCapacityPrice > 0)
+                    {
+                        priceWithoutDiscount += (moreThanCapacity * advertise.NorouzOverCapacityPrice);
+                    }
+                    else
+                    {
+                        priceWithoutDiscount += (moreThanCapacity * advertise.MoreThanCapacityPrice);
+                    }
                 }
                 var discounts = discountTables.Where(f => gregorianDate >= f.From && gregorianDate < f.To);
                 DiscountTable discount = null;

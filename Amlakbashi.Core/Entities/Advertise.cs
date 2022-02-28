@@ -72,9 +72,7 @@ namespace Amlakbashi.Core.Entities
         public long RentPrice { get; set; }
         public int HolidayPrice { get; set; }
         public int HolidayPikePrice { get; set; }
-        public int PrepaymentPrice { get; set; }
         public int MoreThanCapacityPrice { get; set; }
-        public BuildingDirectionItems BuildingDirection { get; set; }
         public int LandArea { get; set; }
         public FloorItems Floor { get; set; }
         public int SingleBed { get; set; }
@@ -116,34 +114,40 @@ namespace Amlakbashi.Core.Entities
         public int MaxReserveDays { get; set; }
         public long unixNorouzMinRequestDate { get; set; }
         public int NorouzOverCapacityPrice { get; set; }
-        public ImageThumbStatusEnum ImageThumbGenerateStatus { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public HygieneProtocolStatus? HygieneProtocol { get; set; }
+        //public bool License { get; set; }
+        //public long? LicenseFileId { get; set; }
+        //public string LicenseNumber { get; set; }
 
         [JsonIgnore]
-        [ForeignKey("Province")]
+        [ForeignKey(nameof(Province))]
         public virtual Region RegionProvince { get; set; }
 
         [JsonIgnore]
-        [ForeignKey("City")]
+        [ForeignKey(nameof(City))]
         public virtual Region RegionCity { get; set; }
 
         [JsonIgnore]
-        [ForeignKey("Area")]
+        [ForeignKey(nameof(Area))]
         public virtual Region RegionArea { get; set; }
 
         [JsonIgnore]
-        [ForeignKey("PhotoID")]
+        [ForeignKey(nameof(PhotoID))]
         public virtual File MainPhoto { get; set; }
 
         [JsonIgnore]
-        [ForeignKey("UserID")]
+        [ForeignKey(nameof(UserID))]
         public virtual User User { get; set; }
 
         [JsonIgnore]
-        [ForeignKey("ParentId")]
+        [ForeignKey(nameof(ParentId))]
         public virtual Advertise Parent { get; set; }
+
+        //[JsonIgnore]
+        //[ForeignKey(nameof(LicenseFileId))]
+        //public virtual File LicenseFile { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<Advertise> Childs { get; set; }
@@ -189,6 +193,7 @@ namespace Amlakbashi.Core.Entities
         }
 
         #region Functions
+
         public Advertise ShallowCopy()
         {
             return (Advertise)this.MemberwiseClone();
@@ -223,11 +228,6 @@ namespace Amlakbashi.Core.Entities
             {
                 return TodayIsEmpty || (Childs != null && Childs.Any(x => x.TodayIsEmpty));
             }
-        }
-
-        public List<NotVerifyReasonsEnum> GetNotVerifyReasons()
-        {
-            return this.NotVerifyReasons.Split(',').Select(s => (NotVerifyReasonsEnum)Convert.ToInt32(s)).ToList();
         }
 
         public void SetNotVerifyReasons(IList<NotVerifyReasonsEnum> list)
@@ -334,34 +334,6 @@ namespace Amlakbashi.Core.Entities
                 w.type == Comment.CommentType.advertise).FirstOrDefault();
         }
 
-        public void GetRelatedCategories(
-            out DynamicCategory countryDirectionCat,
-            out DynamicCategory provinceCat, out DynamicCategory cityCat,
-            out DynamicCategory areaCat, out string countryDirectionName,
-            out string provinceName, out string cityName, out string areaName)
-        {
-            var categories = Categories.Where(x => x.Type == AdvertiseType.All);
-            if (CountryDirection > 0)
-            {
-                countryDirectionCat = categories.FirstOrDefault(x =>
-                    x.CountryDirection == CountryDirection && x.Province == null);
-                countryDirectionName = countryDirectionCat.RegionString;
-            }
-            else
-            {
-                countryDirectionCat = null;
-                countryDirectionName = "";
-            }
-            categories = categories.Where(x => x.Province != null);
-            provinceCat = categories.FirstOrDefault(x => x.Province == Province && x.City == null);
-            provinceName = provinceCat.RegionString.Replace("استان ", "").Trim();
-            categories = categories.Where(x => x.City != null);
-            cityCat = categories.FirstOrDefault(x => x.City == City && x.Area == null);
-            cityName = cityCat.RegionString;
-            areaCat = null;
-            areaName = Area != null ? RegionArea.PersianName : null;
-        }
-
         public object GetPropertyValue(Property property)
         {
             return GetType().GetProperty(property.ToString()).GetValue(this);
@@ -402,30 +374,6 @@ namespace Amlakbashi.Core.Entities
         public bool CanPublish()
         {
             return Status == AdvertiseStatus.Published && Available;
-        }
-
-        public bool Equals(Advertise obj, Property[] property_types = null)
-        {
-            if (property_types != null)
-            {
-                foreach (var property_type in property_types)
-                {
-                    var property = GetType().GetProperty(property_type.ToString());
-                    if (property.GetValue(this) != property.GetValue(obj))
-                        return false;
-                }
-                return true;
-            }
-            else
-            {
-                var properties = GetType().GetProperties();
-                foreach (var property in properties)
-                {
-                    if (property.GetValue(this) != property.GetValue(obj))
-                        return false;
-                }
-                return true;
-            }
         }
 
         public List<DateTime> OccupiedDates()
@@ -494,6 +442,7 @@ namespace Amlakbashi.Core.Entities
         #endregion
 
         #region Static Functions
+
         public static AdvertiseType[] GetAdvertiseTypes(
             AdvertisePageType page_type = AdvertisePageType.Undefined, AdvertiseType parent_type = AdvertiseType.None)
         {
@@ -612,105 +561,6 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        public static Property[] GetCommonProperties(AdvertiseType parent_type, AdvertiseType child_type = AdvertiseType.None)
-        {
-            switch (parent_type)
-            {
-                case AdvertiseType.Hotel:
-                case AdvertiseType.Inn:
-                case AdvertiseType.Pansion:
-                    return new Property[]{
-                        Property.TypeID,
-                        Property.Region,
-                        Property.Address,
-                        Property.Province,
-                        Property.City,
-                        Property.Area,
-                        Property.Description,
-                        Property.AllowParty,
-                        Property.AllowPets,
-                        Property.AllowSmoking,
-                        Property.EvidenceRequired,
-                        Property.OtherRules,
-                        Property.HeatingSystem,
-                        Property.CoolingSystem,
-                        Property.WC,
-                        Property.Bathroom,
-                        Property.Elevator,
-                        Property.TV,
-                        Property.Foosball,
-                        Property.Golf,
-                        Property.Hairdryer,
-                        Property.Jacuzzi,
-                        Property.Refrigerator,
-                        Property.Oven,
-                        Property.MicrowaveOven,
-                        Property.KitchenHood,
-                        Property.KitchenUtensils,
-                        Property.TeaMaker,
-                        Property.Pool,
-                        Property.PoolTable,
-                        Property.Sauna,
-                        Property.SoundSystem,
-                        Property.WashingMachine,
-                        Property.Wifi
-                    };
-                case AdvertiseType.Camp:
-                case AdvertiseType.TourismAccommodation:
-                    return new Property[] { };
-                case AdvertiseType.Complex:
-                case AdvertiseType.HotelApartment:
-                    return new Property[] {
-                        Property.Region,
-                        Property.Address,
-                        Property.Province,
-                        Property.City,
-                        Property.Area,
-                        Property.AllowParty,
-                        Property.AllowPets,
-                        Property.AllowSmoking,
-                        Property.EvidenceRequired,
-                        Property.OtherRules,
-                    };
-                default:
-                    return new Property[] { };
-            }
-        }
-
-        public static Property[] GetHotelUnitProperties(AdvertiseType hotel_type)
-        {
-            switch (hotel_type)
-            {
-                case AdvertiseType.Camp:
-                    return new Property[] {
-                        Property.Title,
-                        Property.Count,
-                        Property.Capacity,
-                        Property.MoreThanCapacity,
-                        Property.BlanketsAndMattresses,
-                        Property.DailyPrice,
-                        Property.HolidayPrice,
-                        Property.HolidayPikePrice,
-                        Property.NorouzPrice,
-                        Property.MoreThanCapacityPrice
-                    };
-                default:
-                    return new Property[] {
-                        Property.Title,
-                        Property.Count,
-                        Property.Capacity,
-                        Property.MoreThanCapacity,
-                        Property.SingleBed,
-                        Property.DoublesBed,
-                        Property.DailyPrice,
-                        Property.HolidayPrice,
-                        Property.HolidayPikePrice,
-                        Property.NorouzPrice,
-                        Property.MoreThanCapacityPrice
-                    };
-            }
-        }
-
         public static AdvertiseType[] GetComplexSupportedAdvertiseTypes(AdvertiseType complexType)
         {
             switch (complexType)
@@ -730,229 +580,6 @@ namespace Amlakbashi.Core.Entities
                         AdvertiseType.House,
                         AdvertiseType.Hut
                     };
-            }
-        }
-
-        public static PropertyType GetPropertyType(Property property)
-        {
-            switch (property)
-            {
-                case Property.Province:
-                case Property.City:
-                case Property.Area:
-                    return PropertyType.Location;
-                case Property.DailyPrice:
-                case Property.HolidayPrice:
-                case Property.HolidayPikePrice:
-                case Property.NorouzPrice:
-                case Property.RentPrice:
-                case Property.MoreThanCapacityPrice:
-                case Property.Metrazh:
-                case Property.LandArea:
-                case Property.Capacity:
-                case Property.MoreThanCapacity:
-                case Property.Room:
-                case Property.SingleBed:
-                case Property.DoublesBed:
-                case Property.BlanketsAndMattresses:
-                case Property.Count:
-                    return PropertyType.Number;
-                case Property.TypeID:
-                case Property.Region:
-                case Property.Parking:
-                case Property.BuildingDirection:
-                case Property.ExtraBlanketCount:
-                case Property.HeatingSystem:
-                case Property.CoolingSystem:
-                case Property.WC:
-                case Property.Floor:
-                    return PropertyType.SelectOption;
-                case Property.Elevator:
-                case Property.Pool:
-                case Property.Sauna:
-                case Property.Jacuzzi:
-                case Property.Bathroom:
-                case Property.Wifi:
-                case Property.WashingMachine:
-                case Property.MicrowaveOven:
-                case Property.SoundSystem:
-                case Property.Golf:
-                case Property.PoolTable:
-                case Property.Foosball:
-                case Property.Hairdryer:
-                case Property.AllowSmoking:
-                case Property.AllowPets:
-                case Property.AllowParty:
-                case Property.TV:
-                case Property.Oven:
-                case Property.Refrigerator:
-                case Property.KitchenHood:
-                case Property.KitchenUtensils:
-                case Property.TeaMaker:
-                    return PropertyType.Boolean;
-                case Property.Address:
-                case Property.EvidenceRequired:
-                case Property.OtherRules:
-                case Property.Title:
-                case Property.Description:
-                    return PropertyType.String;
-                default:
-                    return PropertyType.None;
-            }
-        }
-
-        public static PropertyCategory GetCategoryOfProperty(Property property)
-        {
-            switch (property)
-            {
-                case Property.TypeID:
-                case Property.Region:
-                case Property.Count:
-                case Property.Title:
-                case Property.Description:
-                    return PropertyCategory.Main;
-                case Property.Province:
-                case Property.City:
-                case Property.Area:
-                case Property.Address:
-                    return PropertyCategory.Address;
-                case Property.DailyPrice:
-                case Property.HolidayPrice:
-                case Property.HolidayPikePrice:
-                case Property.NorouzPrice:
-                case Property.RentPrice:
-                case Property.MoreThanCapacityPrice:
-                    return PropertyCategory.Price;
-                case Property.Metrazh:
-                case Property.LandArea:
-                case Property.Capacity:
-                case Property.MoreThanCapacity:
-                case Property.Room:
-                case Property.Parking:
-                case Property.SingleBed:
-                case Property.DoublesBed:
-                    return PropertyCategory.Basic;
-                case Property.Floor:
-                case Property.BuildingDirection:
-                    return PropertyCategory.Extra;
-                case Property.Elevator:
-                case Property.Pool:
-                case Property.Sauna:
-                case Property.Jacuzzi:
-                case Property.Bathroom:
-                case Property.Wifi:
-                case Property.WashingMachine:
-                case Property.MicrowaveOven:
-                case Property.SoundSystem:
-                case Property.Golf:
-                case Property.PoolTable:
-                case Property.Foosball:
-                case Property.Hairdryer:
-                case Property.TV:
-                case Property.Oven:
-                case Property.Refrigerator:
-                case Property.KitchenHood:
-                case Property.KitchenUtensils:
-                case Property.TeaMaker:
-                    return PropertyCategory.Aminities_Boolean;
-                case Property.ExtraBlanketCount:
-                case Property.HeatingSystem:
-                case Property.CoolingSystem:
-                case Property.WC:
-                    return PropertyCategory.Amenities_SelectOption;
-                case Property.AllowSmoking:
-                case Property.AllowPets:
-                case Property.AllowParty:
-                case Property.EvidenceRequired:
-                case Property.OtherRules:
-                case Property.BlanketsAndMattresses:
-                    return PropertyCategory.Rules;
-                default:
-                    return PropertyCategory.None;
-            }
-        }
-
-        public static Property[] GetPropertiesOfCategory(PropertyCategory category)
-        {
-            switch (category)
-            {
-                case PropertyCategory.Main:
-                    return new Property[] {
-                            Property.TypeID,
-                            Property.Region
-                        };
-                case PropertyCategory.Address:
-                    return new Property[] {
-                            Property.Province,
-                            Property.City,
-                            Property.Area,
-                            Property.Address
-                        };
-                case PropertyCategory.Price:
-                    return new Property[] {
-                            Property.DailyPrice,
-                            Property.HolidayPrice,
-                            Property.HolidayPikePrice,
-                            Property.MoreThanCapacityPrice,
-                            Property.RentPrice,
-                            Property.NorouzPrice,
-                        };
-                case PropertyCategory.Basic:
-                    return new Property[] {
-                            Property.Metrazh,
-                            Property.LandArea,
-                            Property.Capacity,
-                            Property.MoreThanCapacity,
-                            Property.Room,
-                            Property.Parking,
-                            Property.SingleBed,
-                            Property.DoublesBed
-                        };
-                case PropertyCategory.Extra:
-                    return new Property[] {
-                            Property.BuildingDirection,
-                            Property.Floor
-                        };
-                case PropertyCategory.Amenities_SelectOption:
-                    return new Property[] {
-                            Property.HeatingSystem,
-                            Property.CoolingSystem,
-                            Property.WC,
-                            Property.ExtraBlanketCount,
-                            Property.BlanketsAndMattresses
-                        };
-                case PropertyCategory.Aminities_Boolean:
-                    return new Property[] {
-                            Property.Bathroom,
-                            Property.Elevator,
-                            Property.Pool,
-                            Property.Sauna,
-                            Property.Jacuzzi,
-                            Property.TV,
-                            Property.Wifi,
-                            Property.WashingMachine,
-                            Property.Refrigerator,
-                            Property.Oven,
-                            Property.MicrowaveOven,
-                            Property.KitchenHood,
-                            Property.KitchenUtensils,
-                            Property.TeaMaker,
-                            Property.SoundSystem,
-                            Property.Hairdryer,
-                            Property.PoolTable,
-                            Property.Foosball,
-                            Property.Golf
-                        };
-                case PropertyCategory.Rules:
-                    return new Property[] {
-                            Property.AllowParty,
-                            Property.AllowPets,
-                            Property.AllowSmoking,
-                            Property.EvidenceRequired,
-                            Property.OtherRules
-                        };
-                default:
-                    return null;
             }
         }
 
@@ -1028,32 +655,6 @@ namespace Amlakbashi.Core.Entities
                 .Average(x => (float)x.Score) : 0;
         }
 
-        public string GetCommentNotVerifyReasonIfExists(int currentUserId)
-        {
-            var comments = Comments.AsQueryable();
-            var isHost = UserID == currentUserId;
-            comments = comments.Where(x => x.Status == Comment.CommentStatus.suspend);
-            if (isHost)
-            {
-                comments = comments.Where(x => x.type == Comment.CommentType.advertiseHostReply);
-            }
-            else
-            {
-                comments = comments.Where(x => x.type == (int)Comment.CommentType.advertise);
-                comments = comments.Where(x => x.SenderUserID == currentUserId);
-            }
-            if (comments.Any())
-            {
-                var comment = comments.First();
-                var reason = comment.SuspendReason;
-                if (!string.IsNullOrEmpty(reason))
-                {
-                    return reason;
-                }
-            }
-            return "";
-        }
-
         #endregion
 
         #region Enums
@@ -1081,6 +682,7 @@ namespace Amlakbashi.Core.Entities
             Parent = 1,
             Child = 2
         }
+
         public enum AdvertiseStatus
         {
             Unset = -1,
@@ -1092,7 +694,14 @@ namespace Amlakbashi.Core.Entities
             NotCompleted = 5,
             FirstReady = 6
         }
-        public enum AdvertisePageType { Undefined, Filter, Edit }
+
+        public enum AdvertisePageType 
+        {
+            Undefined,
+            Filter,
+            Edit 
+        }
+
         public enum PositionType
         {
             none = 0,
@@ -1107,6 +716,7 @@ namespace Amlakbashi.Core.Entities
             ashayeri = 9,
             SummerQuarter = 10
         }
+
         public enum Property
         {
             TypeID,
@@ -1190,6 +800,7 @@ namespace Amlakbashi.Core.Entities
             SelectOption = 3,
             Location = 4,
         }
+
         public enum PropertyCategory
         {
             None = -1,
@@ -1202,6 +813,7 @@ namespace Amlakbashi.Core.Entities
             Aminities_Boolean = 6,
             Rules = 7
         }
+
         public enum ParkingItems
         {
             Unset = 0,
@@ -1212,6 +824,7 @@ namespace Amlakbashi.Core.Entities
             Jointly = 80,
             NoParking = 2155
         }
+
         public enum BuildingDirectionItems
         {
             Unset = 0,
@@ -1221,6 +834,7 @@ namespace Amlakbashi.Core.Entities
             Southern = 37,
             TwoSided = 38
         }
+
         public enum ExtraBlanketCountItems
         {
             Unset = 0,
@@ -1231,6 +845,7 @@ namespace Amlakbashi.Core.Entities
             Five = 2210,
             MoreThanFive = 2211
         }
+
         public enum HeatingSystemItems
         {
             Unset = 0,
@@ -1242,6 +857,7 @@ namespace Amlakbashi.Core.Entities
             Other = 111,
             None = 2129
         }
+
         public enum CoolingSystemItems
         {
             Unset = 0,
@@ -1255,6 +871,7 @@ namespace Amlakbashi.Core.Entities
             Other = 118,
             None = 2052
         }
+
         public enum WCItems
         {
             Unset = 0,
@@ -1262,6 +879,7 @@ namespace Amlakbashi.Core.Entities
             Europian = 129,
             EuropianAndPersian = 128,
         }
+
         public enum FloorItems
         {
             Unset = -2,
@@ -1279,12 +897,7 @@ namespace Amlakbashi.Core.Entities
             Floor10th = 10,
             MoreThan10th = 1000
         }
-        public enum ImageThumbStatusEnum
-        {
-            None = 0,
-            Pending = 1,
-            Done = 2
-        }
+
         public enum InstantReserveStatusEnum
         {
             None = 0,
@@ -1330,13 +943,6 @@ namespace Amlakbashi.Core.Entities
             Reason_33 = 2459,
         }
 
-        public enum AdvertiseStatisticType
-        {
-            click = 0,
-            view = 1,
-            contact = 2
-        }
-
         public enum priceRangeTypes
         {
             Daily = 0,
@@ -1353,9 +959,14 @@ namespace Amlakbashi.Core.Entities
             UserRate = 3,
             Clean = 4
         }
-        public enum OccupiedSelectType { All, ForFrom, ForTo }
-        public enum OccupiedSource { All, Reserves, Tables }
-        public enum HygieneProtocolStatus { NotConsider = 0, Consider = 1, Verified = 2, NotVerified = 3 }
+
+        public enum HygieneProtocolStatus 
+        {
+            NotConsider = 0,
+            Consider = 1,
+            Verified = 2,
+            NotVerified = 3 
+        }
 
         [Flags]
         public enum PoolFeaturesEnum

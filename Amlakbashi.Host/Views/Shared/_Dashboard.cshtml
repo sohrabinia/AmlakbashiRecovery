@@ -152,7 +152,7 @@
                 <ul class="dashboard-main-navigation_list">
                     <li class="main-navigation_list-item list-item__account-style">
                         @if (User.Identity.IsAuthenticated &&
-                        userAccessor.CurrentUser.PhotoID > 0)
+                     userAccessor.CurrentUser.PhotoID > 0)
                         {
                             <img width="48" height="48" src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=200", userAccessor.CurrentUser.PhotoID)' alt="avatar" class="list-item__avatar">
                         }
@@ -221,11 +221,17 @@
             <main class="main">
                 @if (userAccessor.CurrentUser.UserGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Host)
                 {
-                    <div class="" style="width:100%; text-align: center; direction: rtl; font: 14px Miransans; padding: 10px 100px; margin-bottom: 20px; border: 1px solid darkgray; background-color: #eee; border-radius: 5px;">
+                    <div class="" style="width:100%; text-align: center; direction: rtl; font: 14px Miransans; padding: 10px 20px; margin-bottom: 10px; border: 1px solid darkgray; background-color: #eee; border-radius: 5px;">
                         <span style="color: red;">توجه: </span>
                         در صورتی که به دستور مقامات و سازمان های دولتی و به دلیل همه گیری ویروس کرونا، امکان سفر مهمان طی روز های نوروز میسر نباشد، کلیه مبلغ رزرو به مهمان عودت می گردد.
                     </div>
                 }
+
+                <div class="" style="width:100%; text-align: center; direction: rtl; font: 14px Miransans; padding: 10px 20px; margin-bottom: 20px; border: 1px solid darkgray; background-color: #eee; border-radius: 5px;">
+                    @*<span style="color: red;">توجه: </span>*@
+                    کاربر گرامی، شماره حساب پاسارگاد دارید؟ اگر شبا پاسارگاد را ثبت کنید حتی در ایام تعطیل و نوروز هم واریزی های سایت ما بلافاصله به حساب شما خواهد نشست.
+                </div>
+
                 @RenderBody()
             </main>
         </div>
@@ -323,7 +329,14 @@
         firebase.initializeApp(config);
     </script>
     @RenderSection("ScriptLink", required: false)
+    @await Component.InvokeAsync("MessagePopup")
     <script type="text/javascript">
+        // remove after handle jointly parking
+        @*var hasJointlyParking = @(userAccessor.CurrentUser.Advertises.Any(a => a.Parking == Advertise.ParkingItems.Jointly) ? "true" : "false");
+        if (hasJointlyParking) {
+            showInfoMessage('حذف گزینه پارکینگ مشاع', 'کاربر گرامی، با توجه به حذف گزینه پارکینگ مشاع از آگهی ها، لطفا نسبت به به روز رسانی امکانات آگهی های خود اقدام فرمایید.');
+        }*@
+
         function open_menu() {
             $(".menu").removeClass("menu--close");
             $(".open-menu-dashboard").hide();

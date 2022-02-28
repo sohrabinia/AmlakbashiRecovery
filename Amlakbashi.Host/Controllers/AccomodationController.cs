@@ -969,6 +969,15 @@ namespace Amlakbashi.Host.Controllers
                     data.PoolFeatures = PoolFeaturesEnum.None;
                 }
                 var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors, out level, isEdit);
+                //var uploadedLicenseFile = Request.Form.Files[0];
+                //var licenseContentType = uploadedLicenseFile?.ContentType.ToLower();
+                //if (string.IsNullOrEmpty(licenseContentType) == false &&
+                //    (licenseContentType == "image/png" ||
+                //    licenseContentType == "image/jpg" ||
+                //    licenseContentType == "image/jpeg") == false)
+                //{
+                //    errors.Add("LicenseFile", "فرمت فایل مجوز صحیح نمی باشد");
+                //}
                 if (errors.Any())
                 {
                     ModelState.Clear();
@@ -1020,7 +1029,7 @@ namespace Amlakbashi.Host.Controllers
                             }
                     }
                 }
-                switch ((AdvertiseMode)director.Mode)
+                switch (director.Mode)
                 {
                     case AdvertiseMode.Parent:
                         if (director.AdvertiseType == AdvertiseType.Complex || director.AdvertiseType == AdvertiseType.HotelApartment)
@@ -1038,21 +1047,15 @@ namespace Amlakbashi.Host.Controllers
                             });
                         }
                     default:
-                        var user = userAccessor.CurrentUser;
-                        if (string.IsNullOrEmpty(user.Mobile2) ||
-                            string.IsNullOrEmpty(user.Tell) ||
-                            string.IsNullOrEmpty(user.ThirdPersonTell))
+                        var advertiseState = userAccessor.CurrentUser.Advertises.FirstOrDefault(f => f.Id == data.Id).Status;
+                        var addOrEdit = isAdd ? "ثبت" : "ویرایش";
+                        var message = $"آگهی شما با موفقیت {addOrEdit} شد";
+                        if (advertiseState == AdvertiseStatus.ReadyToPublish)
                         {
-                            var success_str = "آگهی شما با موفقیت " + (isAdd ? "ثبت" : "ویرایش") + " و پس از تایید کارشناس " + (isAdd ? "" : "دوباره ") + "نمایش داده میشود، لطفا اطلاعات مورد نیاز را تکمیل کنید";
-                            TempData["alert_success"] = success_str;
-                            return RedirectToAction("ProfileManager", "User", new { UserID = user.Id });
+                            message += " و در انتظار تایید کارشناس است";
                         }
-                        else
-                        {
-                            var success_str = "آگهی شما با موفقیت " + (isAdd ? "ثبت" : "ویرایش") + " و پس از تایید کارشناس " + (isAdd ? "" : "دوباره ") + "نمایش داده میشود . \n";
-                            TempData["alert"] = success_str;
-                            return Redirect("/dashboard");
-                        }
+                        TempData["alert_success"] = message;
+                        return RedirectToAction("accomodationmanager", "post", new { type = "all" });
                 }
             }
             catch (Exception exc)
@@ -1164,7 +1167,7 @@ namespace Amlakbashi.Host.Controllers
                         parentId = data.ParentId
                     });
                 }
-                return Redirect("/dashboard");
+                return RedirectToAction("accomodationmanager", "post", new { type = "all" });
 
             }
             catch (Exception exc)
@@ -1293,7 +1296,7 @@ namespace Amlakbashi.Host.Controllers
                         parentId = data.ParentId
                     });
                 }
-                return Redirect("/dashboard");
+                return RedirectToAction("accomodationmanager", "post", new { type = "all" });
 
             }
             catch (Exception exc)
@@ -1324,7 +1327,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 model.floor.Floor = FloorItems.Unset;
             }
-            model.titleAndDesc = new Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs.TitleDescInputDTO(false);
+            model.titleAndDesc = new TitleDescInputDTO(false);
             return PartialView("_AccComplexTypeForm", model);
         }
         #endregion

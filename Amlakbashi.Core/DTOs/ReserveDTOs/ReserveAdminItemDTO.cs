@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public bool accVisitedByGuest { get; set; }
         public bool ContactWithHost { get; set; }
         public bool ContactWithGuest { get; set; }
+        public string hostResponseString { get; set; }
 
         public static ReserveAdminItemDTO Generate(Reserve reserve,
             SupporterStatus supportStatus, long guestPaidPrice,
@@ -196,7 +198,8 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                 disableAutoCancel = reserve.DisableAutoCancel,
                 accVisitedByGuest = reserve.AccVisitedByGuest,
                 ContactWithGuest = reserve.GuestUser.ContactPhone == "1" ? true : false,
-                ContactWithHost = reserve.HostUser.ContactPhone == "1" ? true : false
+                ContactWithHost = reserve.HostUser.ContactPhone == "1" ? true : false,
+                hostResponseString = ReserveLocalization.GetHostResponseString((int)reserve.HostResponse)
             };
             var basic = (ReserveAdminBasicItemDTO)reserve;
             PropertyCopier<ReserveAdminBasicItemDTO, ReserveAdminItemDTO>.Copy(basic, dto);

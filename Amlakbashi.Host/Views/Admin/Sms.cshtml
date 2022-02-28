@@ -78,6 +78,17 @@
             </div>
         </div>
 
+        <div class="dynamic-filter__item">
+            <div class="dynamic-filter__label">وضعیت قیمت نوروزی:</div>
+            <div class="dynamic-filter__property">
+                <select name="norouzPriceStatus">
+                    <option value="0">همه</option>
+                    <option value="1">ثبت شده</option>
+                    <option value="2">ثبت نشده</option>
+                </select>
+            </div>
+        </div>
+
         @await Component.InvokeAsync("RegionSelector", new { province = ViewBag.province, city = ViewBag.city, area = ViewBag.area })
     </div>
     <table style="margin-top: 15px;border: solid lightgray; border-width: thin;">

@@ -5,23 +5,6 @@
 <!DOCTYPE html>
 <html class="theme3">
 <head>
-    <!-- Global Site Tag (gtag.js) - Google Analytics -->
-    @*<script async src="https://www.googletagmanager.com/gtag/js"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
-          gtag('config', 'AW-706947688');
-        @RenderSection("GtagAddition", false)
-        </script>*@
-    <!-- Event snippet for Purchased (Tracking) conversion page -->
-    @*<script>
-        gtag('event', 'conversion', {
-            'send_to': 'AW-850965714/5NVbCJTHpZ0BENLp4pUD',
-            'transaction_id': ''
-        });
-        </script>*@
     <title>@ViewBag.Title</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -35,7 +18,6 @@
     <meta name="robots" content="index,follow,all" />
     <meta name="googlebot" content="index,follow" />
     <meta name="revisit-after" content="1 days" />
-    @*<meta name="alexaVerifyID" content="jz4RhWgXn7cMuI-LPQu9Xi3BmX4" />*@
     <meta name="msvalidate.01" content="0035A31DCA7DA125B1F904CB5DE15660" />
     @if (ViewBag.keywords != null)
     {
@@ -93,12 +75,13 @@
             background-color: rgba(0,0,0,0.6);
             text-align: center;
         }
-        .app-loader i.fa-spinner{
-            font-size: 100px; 
-            color: white; 
-            margin: 20% auto; 
-            animation: spin 1.5s linear infinite;
-        }
+
+            .app-loader i.fa-spinner {
+                font-size: 100px;
+                color: white;
+                margin: 20% auto;
+                animation: spin 1.5s linear infinite;
+            }
     </style>
 </head>
 <body>
@@ -134,7 +117,7 @@
                 <ul class="dashboard-main-navigation_list">
                     <li class="main-navigation_list-item list-item__account-style">
                         @if (User.Identity.IsAuthenticated &&
-                   userAccessor.CurrentUser.PhotoID > 0)
+                  userAccessor.CurrentUser.PhotoID > 0)
                         {
                             <img width="48" height="48" src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=200", userAccessor.CurrentUser.PhotoID)' alt="avatar" class="list-item__avatar">
                         }
@@ -142,7 +125,6 @@
                         {
                             <i class="fa fa-user-circle list-item__avatar"> </i>
                         }
-                        @*<i class="fa fa-plus-circle  add-profile" aria-hidden="true"></i>*@
                         <P>
                             @if (User.Identity.IsAuthenticated)
                             {
@@ -189,8 +171,19 @@
                 </ul>
             </nav>
             <main class="main">
-                <div class="main-top-space" style="height:10px; width:100% ;">
+                @if (userAccessor.CurrentUser.UserGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Host)
+                {
+                    <div class="" style="width:100%; text-align: center; direction: rtl; font: 14px Miransans; padding: 10px 20px; margin-bottom: 10px; border: 1px solid darkgray; background-color: #eee; border-radius: 5px;">
+                        <span style="color: red;">توجه: </span>
+                        در صورتی که به دستور مقامات و سازمان های دولتی و به دلیل همه گیری ویروس کرونا، امکان سفر مهمان طی روز های نوروز میسر نباشد، کلیه مبلغ رزرو به مهمان عودت می گردد.
+                    </div>
+                }
+
+                <div class="" style="width:100%; text-align: center; direction: rtl; font: 14px Miransans; padding: 10px 20px; margin-bottom: 20px; border: 1px solid darkgray; background-color: #eee; border-radius: 5px;">
+                    @*<span style="color: red;">توجه: </span>*@
+                    کاربر گرامی، شماره حساب پاسارگاد دارید؟ اگر شبا پاسارگاد را ثبت کنید حتی در ایام تعطیل و نوروز هم واریزی های سایت ما بلافاصله به حساب شما خواهد نشست.
                 </div>
+
                 @RenderBody()
             </main>
         </div>

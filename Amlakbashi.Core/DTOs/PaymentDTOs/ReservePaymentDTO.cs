@@ -1,4 +1,7 @@
-﻿using Amlakbashi.Core.Entities;
+﻿using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.Entities;
+using System;
+using System.Collections.Generic;
 using static Amlakbashi.Core.Entities.Reserve;
 
 namespace Amlakbashi.Core.DTOs.PaymentDTOs
@@ -18,6 +21,7 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs
         public long AvailableCouponPrice { get; set; }
         public bool AlreadyUsedDiscount { get; set; }
         public long PaidAmount { get; set; }
+        public bool hasDateInNorouzRange { get; set; } = false;
 
         public static ReservePaymentDTO Generate(Reserve reserve,
             long availablePrizeCredit, long availableCouponPrice,
@@ -38,6 +42,7 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs
             dto.AvailableCouponPrice = availableCouponPrice;
             dto.AlreadyUsedDiscount = reserve.CouponID > 0 || reserve.PrizeTransactionID > 0;
             dto.PaidAmount = paidAmount;
+            dto.hasDateInNorouzRange = DateTimeUtility.IsNorouz(reserve.StartDate, reserve.EndDate);
             return dto;
         }
     }

@@ -48,7 +48,13 @@ else
                 <p>مبلغ @string.Format("{0:n0}", item.totalPrice) @(item.depositePrice != item.totalPrice ? string.Format("(بیعانه: {0:n0})", item.depositePrice) : "")</p>
             </div>
 
-            <p class="status" style="color:@item.statusColor;">@item.statusString</p>
+            <div class="status">
+                <p style="color:@item.statusColor;">@item.statusString</p>
+                @if (item.instantReserve == false)
+                {
+                    <small style="border-top: 1px solid lightgray; margin-top: 5px; padding-top: 5px;">@item.hostResponseString</small>
+                }
+            </div>
 
             <div class="support-desc">
                 <button onclick="nextCallState(@(item.id), 'h', 'میزبان', this)" js-call-state="@(item.hostCallState)" style="color:@item.hostCallStateColor" class="support-call-btn call-state-h"><i class="fas fa-phone"></i> میزبان</button>

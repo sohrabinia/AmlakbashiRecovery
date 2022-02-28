@@ -32,11 +32,6 @@ namespace Portal.Controllers
         private readonly IWebHostEnvironment host;
         private readonly ILog logger;
         private static readonly object objlock = new object();
-        //private static List<int> AllowImageThumb = new List<int>(new int[] {
-        //    2000000, 200, 50003 , 2000150, 1000080, 6300330, 7500400, 9000400, 5000000, 500,
-        //    12000000, 1500000, 11000400, 1000040, 1500050, 1300000, 900090, 11400000, 3600000,
-        //    1000000, 12000450, 5000500, 5000300, 2000120, 2000200, 6000000, 1500100, 3700300,
-        //    3000200, 4000300, 4000080, 15000000});
         public FileController(IPostAppService postService,
             IBlogPostAppService blogPostService,
             IUserAppService userService,
@@ -285,59 +280,6 @@ namespace Portal.Controllers
             }
         }
 
-        //[ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
-        //public ActionResult ResourceImgThumbPng(string file_name, int w = 0, int h = 0)
-        //{
-        //    try
-        //    {
-        //        string path = "", strFormat = "image/jpeg";
-        //        var file_path = "resource/img/" + file_name + ".png";
-        //        try
-        //        {
-        //            using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, file_path)))
-        //            {
-        //                if (tmpImage.RawFormat.Equals(ImageFormat.Png))
-        //                {
-        //                    path = string.Format("content/imgcache/img{0}_{1}_{2}.png", file_name, w, h);
-        //                    strFormat = "image/png";
-        //                }
-        //                else
-        //                {
-        //                    path = string.Format("content/imgcache/img{0}_{1}_{2}.jpg", file_name, w, h);
-        //                }
-        //            }
-        //        }
-        //        catch (Exception exc)
-        //        {
-        //            logger.Error("File.ResourceImgThumbPng", exc);
-        //        }
-
-        //        if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
-        //        {
-        //            string OrginalPath = file_path;
-        //            using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, OrginalPath)))
-        //            {
-
-        //                lock (objlock)
-        //                {
-        //                    using (var result = (Bitmap)ImageUtility.ResizeImageKeepAspectRatio(OriginalImage, (int)w, (int)h))
-        //                    {
-        //                        result.Save(Path.Combine(host.WebRootPath, path), OriginalImage.RawFormat);
-        //                        //return File(path.Replace("~", ""), strFormat);
-        //                    }
-
-        //                }
-        //            }
-        //        }
-        //        return File("/" + path.Replace("~/", ""), strFormat);
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("File.ResourceImgThumbPng", exc);
-        //        return RedirectToAction("imgThumb", new { FileID = 202, w = w, h = h });
-        //    }
-        //}
-
         public ActionResult imgThumbOld(long FileID, int w = 0, int h = 0)
         {
             try
@@ -502,12 +444,6 @@ namespace Portal.Controllers
             return AdvertiseImageThumb(slug, 1000, 300);
         }
 
-        //[ResponseCache(Duration = 86400, VaryByQueryKeys = new string[] { "*" })]
-        //public ActionResult AdvertiseImageThumbSmall(string slug)
-        //{
-        //    return AdvertiseImageThumb(slug, 240, 144);
-        //}
-
         public ActionResult AdvertiseImageThumb(string slug, int w = 240, int h = 144)
         {
             try
@@ -662,73 +598,6 @@ namespace Portal.Controllers
             }
         }
 
-        //[Authorize(Roles = Roles.TechnicalManager)]
-        //public JsonResult RemoveExtraPhoto()
-        //{
-        //    try
-        //    {
-        //        var stopWatch = new Stopwatch();
-        //        stopWatch.Start();
-        //        IQueryable<User> all_users = userService.GetAllAsIQueryable();
-        //        var all_posts = postService.GetAll();
-        //        var all_blogposts = blogPostService.GetAll();
-        //        var exist_photos = advertiseService.GetAdvertisesPhotoIds();
-        //        exist_photos.AddRange(all_users.Where(x => x.PhotoID != null).Select(x => (long)x.PhotoID));
-        //        exist_photos.AddRange(all_posts.Where(x => x.PhotoID > 0).Select(x => x.PhotoID));
-        //        exist_photos.AddRange(all_blogposts.Where(x => x.PhotoID > 0).Select(x => x.PhotoID));
-        //        exist_photos = exist_photos.Distinct().ToList();
-        //        fileService.DeleteExtraFiles(exist_photos);
-
-        //        var all_paths = fileService.GetAllFilePath();
-        //        int count_remove_image = 0;
-        //        var random = new Random();
-
-        //        lock (objlock)
-        //        {
-        //            System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(Path.Combine(host.WebRootPath, "content/advertise"));
-        //            var IOFiles = IOdirectory.GetFiles();
-        //            var max = IOFiles.Length;
-        //            System.IO.FileInfo IOfile;
-        //            string path;
-        //            for (int i = 0; i < max; i++)
-        //            {
-        //                try
-        //                {
-        //                    IOfile = IOFiles[random.Next(0, IOFiles.Length)];
-        //                    path = "~/content/advertise/" + IOfile.Name;
-        //                    if (!all_paths.Contains(path))
-        //                    {
-        //                        IOfile.Delete();
-        //                        count_remove_image++;
-        //                    }
-        //                }
-        //                catch (Exception exc)
-        //                {
-        //                    logger.Error("File.RemoveExtraPhoto", exc);
-        //                }
-        //                if (stopWatch.ElapsedMilliseconds > 30000)
-        //                {
-        //                    break;
-        //                }
-        //            }
-        //        }
-        //        return GenerateJsonResult(new
-        //        {
-        //            status = 1,
-        //            val = count_remove_image + "با موفقیت پاک شد"
-        //        });
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("File.RemoveExtraPhoto", exc);
-        //        return GenerateJsonResult(new
-        //        {
-        //            status = 0,
-        //            val = "خطایی رخ داد"
-        //        });
-        //    }
-        //}
-
         [ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult AccThumbCard(long accid, long fileid)
         {
@@ -834,23 +703,11 @@ namespace Portal.Controllers
             return File("/resource/img/" + file_name + ".gif", "image/gif");
         }
 
-        //[ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "file_name" })]
-        //public ActionResult ResourceImageSVG(string file_name)
-        //{
-        //    return File("/resource/img/" + file_name + ".svg", "svg");
-        //}
-
         [ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "file_name" })]
         public ActionResult Loading()
         {
             return File("/resource/img/indicator.white.gif", "image/gif");
         }
-
-        //[ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
-        //public ActionResult GetFont(string file_name, string extension)
-        //{
-        //    return File("/fonts/" + file_name + "." + extension, "font/" + extension);
-        //}
 
         [ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetFile(string file_name, string type)
@@ -864,35 +721,17 @@ namespace Portal.Controllers
             return File(file_name, "image/png");
         }
 
-        //[ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
-        //public ActionResult GetWoffFile(string file_name)
-        //{
-        //    return File(file_name, "font/woff");
-        //}
-
         [ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetWoff2File(string file_name)
         {
             return File(file_name, "font/woff2");
         }
 
-        //[ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
-        //public ActionResult GetTtfFile(string file_name)
-        //{
-        //    return File(file_name, "font/ttf");
-        //}
-
         [ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetGifFile(string file_name)
         {
             return File(file_name, "image/gif");
         }
-
-        //[ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
-        //public ActionResult GetEotFile(string file_name)
-        //{
-        //    return File(file_name, "font/eot");
-        //}
 
         [ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult GetCss(string src, int v = 0)
@@ -986,36 +825,6 @@ namespace Portal.Controllers
         }
 
         private static System.Threading.Thread minifyThread;
-
-        //[Authorize(Roles = Roles.TechnicalManager)]
-        //public JsonResult MinifyAdvertiseImages()
-        //{
-        //    var fileList = fileService.GetAllAdvertiseFile();
-        //    minifyThread = new System.Threading.Thread(() =>
-        //    {
-        //        foreach (var file in fileList)
-        //        {
-        //            fileService.MinifyImage(file.Id, file.FilePath);
-        //        }
-        //    });
-        //    minifyThread.Start();
-        //    return GenerateJsonResult(new
-        //    {
-        //        status = 1,
-        //        count = fileList.Count
-        //    });
-        //}
-
-        //[Authorize(Roles = Roles.TechnicalManager)]
-        //public JsonResult StopQueue()
-        //{
-        //    fileService.StopQueuedJob();
-        //    return GenerateJsonResult(new
-        //    {
-        //        status = 1,
-        //        val = ""
-        //    });
-        //}
 
         public JsonResult GetUploadedPhoto(long id)
         {

@@ -207,7 +207,7 @@ namespace Portal.Controllers
         public JsonResult SendSms(string template, int recieverUserID = 0,
             int ownership = 0, int province = 0, int city = 0, int area = 0,
             int adtype = 0, int tradeid = 0, int special = 0, int adstatus = 0,
-            int userType = -1, bool confirmRequired = true)
+            int userType = -1, bool confirmRequired = true, int norouzPriceStatus = 0)
         {
             try
             {
@@ -233,6 +233,16 @@ namespace Portal.Controllers
                     if (userType > -1)
                     {
                         recievers = recievers.Where(w => w.UserGeneralType == userType);
+                    }
+                    if (norouzPriceStatus == 1)
+                    {
+                        recievers = recievers.Where(w => w.UserGeneralType == 1 &&
+                            w.Advertises.Any(a => a.NorouzPrice == 0) == false);
+                    }
+                    else if (norouzPriceStatus == 2)
+                    {
+                        recievers = recievers.Where(w => w.UserGeneralType == 1 &&
+                            w.Advertises.Any(a => a.NorouzPrice == 0));
                     }
                 }
 

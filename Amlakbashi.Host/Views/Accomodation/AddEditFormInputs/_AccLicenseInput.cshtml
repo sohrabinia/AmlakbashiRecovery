@@ -1,0 +1,35 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs.LicenseInputDTO
+
+<div class="static-advertise__item">
+    <P class="static-advertise__label">وضعیت مجوز اقامتگاه را مشخص کنید</P>
+    <input name="LicenseFileId" type="hidden" value="@Model.LicenseFileId" />
+    <select name="License" onchange="advertiseSelectLicense(this)" class="js-mandatory js-disable-error changed-input-target @(ViewData.ModelState.GetValidationState("License") == ModelValidationState.Invalid ? "input-validation-error" : "")">
+        <option is-selected="@(Model.License == false)" value="false">مجوز ندارد</option>
+        <option is-selected="@(Model.License == true)" value="true">مجوز دارد</option>
+    </select>
+</div>
+
+<div class="static-advertise__item @(Model.License == true ? "hide-aditem" : "") js-license">
+    <p class="static-advertise__label">شماره مجوز</p>
+    <div class="static-advertise__property">
+        <input class="changed-input-target" type="text" name="LicenseNumber" />
+    </div>
+</div>
+
+<div class="static-advertise__item @(Model.License == true ? "hide-aditem" : "") js-license">
+    <p class="static-advertise__label">فایل مجوز</p>
+    <div class="static-advertise__property">
+        <input class="changed-input-target" type="file" name="LicenseFile" />
+    </div>
+</div>
+
+<script type="text/javascript">
+    function advertiseSelectLicense($this) {
+        if ($($this).val() == "true") {
+            $(".js-license").removeClass("hide-aditem");
+        }
+        else {
+            $(".js-license").addClass("hide-aditem");
+        }
+    }
+</script>
