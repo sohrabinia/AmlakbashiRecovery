@@ -154,6 +154,9 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                             case priceRangeTypes.Monthly:
                                 relatedPrice = item.Childs.Min(x => x.RentPrice);
                                 break;
+                            case priceRangeTypes.Norouz:
+                                relatedPrice = item.Childs.Min(x => x.NorouzPrice);
+                                break;
                             default:
                                 relatedPrice = item.Childs.Min(x => x.DailyPrice);
                                 break;
@@ -171,6 +174,9 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                                 break;
                             case priceRangeTypes.Monthly:
                                 relatedPrice = item.RentPrice;
+                                break;
+                            case priceRangeTypes.Norouz:
+                                relatedPrice = item.NorouzPrice;
                                 break;
                             default:
                                 relatedPrice = item.DailyPrice;
@@ -203,6 +209,9 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                             case priceRangeTypes.Monthly:
                                 relatedPrice = item.Childs.Min(x => x.RentPrice);
                                 break;
+                            case priceRangeTypes.Norouz:
+                                relatedPrice = item.Childs.Min(x => x.NorouzPrice);
+                                break;
                             default:
                                 relatedPrice = item.Childs.Min(x => x.DailyPrice);
                                 break;
@@ -220,6 +229,9 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                                 break;
                             case priceRangeTypes.Monthly:
                                 relatedPrice = item.RentPrice;
+                                break;
+                            case priceRangeTypes.Norouz:
+                                relatedPrice = item.NorouzPrice;
                                 break;
                             default:
                                 relatedPrice = item.DailyPrice;

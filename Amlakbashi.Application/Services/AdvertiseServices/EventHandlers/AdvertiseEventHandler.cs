@@ -146,7 +146,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
         {
             //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
-            if (acc.Mode != AdvertiseMode.Parent && acc.BasePrice != acc.DailyPrice)
+            if (notification.changeNorouzPrice || (acc.Mode != AdvertiseMode.Parent && acc.BasePrice != acc.DailyPrice))
             {
                 acc.BasePrice = acc.DailyPrice;
                 advertiseRepository.Update(acc);

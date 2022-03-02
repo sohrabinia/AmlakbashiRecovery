@@ -546,7 +546,8 @@ namespace Amlakbashi.Host.Controllers
 
                 var priceTypeString = priceRangeType == 0 ? "" :
                     priceRangeType == 1 ? "قیمت تعطیلات " :
-                    priceRangeType == 2 ? "قیمت پیک تعطیلات " : "قیمت ماهانه ";
+                    priceRangeType == 2 ? "قیمت پیک تعطیلات " :
+                    priceRangeType == 3 ? "قیمت ماهانه " : "قیمت نوروز ";
                 var priceString = "";
                 if (frompaypernight != null)
                 {

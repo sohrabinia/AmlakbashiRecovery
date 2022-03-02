@@ -780,7 +780,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.LastModifyDate = DateTime.Now;
             Repository.Update(acc);
             Repository.Save();
-            mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id));
+            mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id, acc.NorouzPrice != oldAcc.NorouzPrice));
             if (acc.Mode == AdvertiseMode.Parent)
             {
                 mediator.Publish(new ChangeAdvertiseRulesEvent(acc.Id));
@@ -815,6 +815,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             data.TypeID = parent.TypeID;
             data.Mode = AdvertiseMode.Child;
             var director = new AdvertiseDirector(data, DirectorType.HotelUnit);
+            bool changeNorouzPrice = false;
             if (director.Validate(out errors, out groupErrors))
             {
                 if (data.Id > 0)
@@ -822,6 +823,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     var child = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
                     var oldChild = child.ShallowCopy();
                     director.Submit(ref child);
+                    changeNorouzPrice = child.NorouzPrice != oldChild.NorouzPrice;
                     child.LastModifyDate = DateTime.Now;
                     Repository.Update(child);
                     if (parent.Status == AdvertiseStatus.NotCompleted || parent.Status == AdvertiseStatus.FirstReady)
@@ -882,7 +884,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     }
                     mediator.Publish(new AddHotelChildEvent(data.Id, (long)data.ParentId));
                 }
-                mediator.Publish(new ChangeAdvertisePriceEvent(data.Id));
+                mediator.Publish(new ChangeAdvertisePriceEvent(data.Id, changeNorouzPrice));
                 mediator.Send(new RemoveAdvertiseCacheCommand(parent.Id));
             }
             return director;
@@ -918,6 +920,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             data.Mode = AdvertiseMode.Child;
             var director = new AdvertiseDirector(data, DirectorType.ComplexUnit);
+            bool changeNorouzPrice = false;
             if (director.Validate(out errors, out groupErrors))
             {
                 if (data.Id > 0)
@@ -925,6 +928,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     var child = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
                     var oldChild = child.ShallowCopy();
                     director.Submit(ref child);
+                    changeNorouzPrice = child.NorouzPrice != oldChild.NorouzPrice;
                     var removedPhotoIds = new List<long>();
                     var photoPart = director.GetAdvertisePart<PhotoPart>();
                     var photoIds = photoPart.AlbumPhotosArray;
@@ -1035,7 +1039,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     }
                     mediator.Publish(new AddComplexChildEvent(data.Id, (long)data.ParentId));
                 }
-                mediator.Publish(new ChangeAdvertisePriceEvent(data.Id));
+                mediator.Publish(new ChangeAdvertisePriceEvent(data.Id, changeNorouzPrice));
                 mediator.Send(new RemoveAdvertiseCacheCommand(data.Id));
             }
             return director;
@@ -1166,7 +1170,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (type == DirectorType.Extra || type == DirectorType.ComplexUnit ||
                 type == DirectorType.HotelUnit)
             {
-                mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id));
+                mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id, acc.NorouzPrice != shallowData.NorouzPrice));
             }
 
             Repository.Update(acc);

@@ -948,7 +948,8 @@ namespace Amlakbashi.Core.Entities
             Daily = 0,
             Holiday = 1,
             HolidayPeak = 2,
-            Monthly = 3
+            Monthly = 3,
+            Norouz = 4
         }
 
         public enum SortOrder
