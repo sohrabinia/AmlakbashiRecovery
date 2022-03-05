@@ -31,6 +31,7 @@ using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Mediator.Commands.FileCommands;
 using Amlakbashi.Core.DTOs.AdvertiseDTOs;
 using Amlakbashi.Mediator.Commands.CategoryCommands;
+using Microsoft.AspNetCore.Http;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
@@ -717,7 +718,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public AdvertiseDirector SubmitExtraForm(Advertise data, out Dictionary<string, string> errors,
-            out List<string> groupErrors, out int level, bool isEdit = false)
+            out List<string> groupErrors, out int level, IFormFile uploadedLicenseFile = null, bool isEdit = false)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
             var oldAcc = acc.ShallowCopy();
@@ -726,8 +727,22 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : (acc.OwnershipType < 1 ? 3 : 4));
             bool hasImportantChange = false;
             var director = new AdvertiseDirector(data, DirectorType.Extra);
+
             if (director.Validate(out errors, out groupErrors) == false)
+            {
                 return director;
+            }
+
+            var licenseContentType = uploadedLicenseFile?.ContentType.ToLower();
+            if (string.IsNullOrEmpty(licenseContentType) == false &&
+                (licenseContentType == "image/png" ||
+                licenseContentType == "image/jpg" ||
+                licenseContentType == "image/jpeg") == false)
+            {
+                errors.Add("LicenseFile", "فرمت فایل مجوز صحیح نمی باشد");
+                return director;
+            }
+
             if (data.Id < 1)
             {
                 return director;
@@ -736,6 +751,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 hasImportantChange = director.HasImpotantChange(acc);
             }
+            mediator.Send(new UpdateAdvertiseLicenseFileCommand(uploadedLicenseFile, data.Id, data.UserID, data.LicenseFileId));
             director.Submit(ref acc);
             var prevStatus = acc.Status;
             if (isEdit)
@@ -786,6 +802,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 mediator.Publish(new ChangeAdvertiseRulesEvent(acc.Id));
             }
             return director;
+        }
+
+        private void UpdateLicenseFile(IFormFile licenseFile, long advertiseId)
+        {
+
         }
 
         public AdvertiseDirector GetHotelForm(long id, long parentId, out bool isEdit)

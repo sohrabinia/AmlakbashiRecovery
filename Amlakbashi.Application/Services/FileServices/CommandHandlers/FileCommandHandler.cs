@@ -25,7 +25,8 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
         IRequestHandler<SetWatermarkCommand, string>,
         IRequestHandler<RemovePhotosByFileIdsCommand>,
         IRequestHandler<RemovePhotosByPathsCommnd>,
-        IRequestHandler<RenameAdvertisePhotosCommand>
+        IRequestHandler<RenameAdvertisePhotosCommand>,
+        IRequestHandler<UpdateAdvertiseLicenseFileCommand>
     {
         private static readonly object objlock = new object();
         private readonly IRepository<Entities.File, long> fileRepository;
@@ -479,6 +480,53 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
             {
                 logger.Error("FileCommandHandler.RenameAdvertisePhotosCommand", exc);
             }
+            return Task.FromResult(Unit.Value);
+        }
+
+        public Task<Unit> Handle(UpdateAdvertiseLicenseFileCommand request, CancellationToken cancellationToken)
+        {
+            var uploadfile = request.LicenseFile;
+            var contentType = uploadfile.ContentType.ToLower();
+            if ((contentType == "image/png" ||
+                contentType == "image/jpg" ||
+                contentType == "image/jpeg") == false)
+            {
+                return Task.FromResult(Unit.Value);
+            }
+
+            string filepath = host.WebRootPath + $"/content/licenses/license_{request.AdvertiseId}.jpg";
+            if (request.OldLicenseFileId != null && request.OldLicenseFileId > 0)
+            {
+                var oldFile = fileRepository.Find(request.OldLicenseFileId.Value);
+                oldFile.LastModifyDate = DateTime.Now;
+                fileRepository.Update(oldFile);
+                if (File.Exists(oldFile.FilePath))
+                {
+                    File.Delete(oldFile.FilePath);
+                }
+            }
+            else
+            {
+                var newLicenseFile = new Entities.File()
+                {
+                    PostDate = DateTime.Now,
+                    LastModifyDate = DateTime.Now,
+                    UserID = request.UserId,
+                    FilePath = filepath
+                };
+                fileRepository.Insert(newLicenseFile);
+            }
+
+            if (Directory.Exists(host.WebRootPath + "/content/licenses") == false)
+            {
+                Directory.CreateDirectory(host.WebRootPath + "/content/licenses");
+            }
+
+            using (var stream = File.Create(host.WebRootPath + filepath))
+            {
+                uploadfile.CopyTo(stream);
+            }
+            fileRepository.Save();
             return Task.FromResult(Unit.Value);
         }
     }

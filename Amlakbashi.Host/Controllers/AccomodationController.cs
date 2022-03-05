@@ -968,16 +968,8 @@ namespace Amlakbashi.Host.Controllers
                 {
                     data.PoolFeatures = PoolFeaturesEnum.None;
                 }
+                var uploadedLicenseFile = Request.Form.Files[0];
                 var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors, out level, isEdit);
-                //var uploadedLicenseFile = Request.Form.Files[0];
-                //var licenseContentType = uploadedLicenseFile?.ContentType.ToLower();
-                //if (string.IsNullOrEmpty(licenseContentType) == false &&
-                //    (licenseContentType == "image/png" ||
-                //    licenseContentType == "image/jpg" ||
-                //    licenseContentType == "image/jpeg") == false)
-                //{
-                //    errors.Add("LicenseFile", "فرمت فایل مجوز صحیح نمی باشد");
-                //}
                 if (errors.Any())
                 {
                     ModelState.Clear();

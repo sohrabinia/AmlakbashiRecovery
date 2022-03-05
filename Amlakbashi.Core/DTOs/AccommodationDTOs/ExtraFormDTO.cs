@@ -22,7 +22,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
         public ElevatorInputDTO elevator { get; set; }
         public RulesInputDTO rules { get; set; }
         public OwnershipInputDTO ownership { get; set; }
-        //public LicenseInputDTO license { get; set; }
+        public LicenseInputDTO license { get; set; }
         public AdvertiseMode advertiseMode { get; set; }
 
         public static ExtraFormDTO Generate(AdvertiseDirector director, long id)

@@ -117,9 +117,9 @@ namespace Amlakbashi.Core.Entities
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public HygieneProtocolStatus? HygieneProtocol { get; set; }
-        //public bool License { get; set; }
-        //public long? LicenseFileId { get; set; }
-        //public string LicenseNumber { get; set; }
+        public bool License { get; set; }
+        public long? LicenseFileId { get; set; }
+        public string LicenseNumber { get; set; }
 
         [JsonIgnore]
         [ForeignKey(nameof(Province))]
@@ -145,9 +145,9 @@ namespace Amlakbashi.Core.Entities
         [ForeignKey(nameof(ParentId))]
         public virtual Advertise Parent { get; set; }
 
-        //[JsonIgnore]
-        //[ForeignKey(nameof(LicenseFileId))]
-        //public virtual File LicenseFile { get; set; }
+        [JsonIgnore]
+        [ForeignKey(nameof(LicenseFileId))]
+        public virtual File LicenseFile { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<Advertise> Childs { get; set; }

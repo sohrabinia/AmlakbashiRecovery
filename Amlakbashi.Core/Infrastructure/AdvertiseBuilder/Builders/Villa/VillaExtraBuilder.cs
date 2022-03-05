@@ -26,7 +26,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Villa
             BuildAdvertisePart<AmenitiesPart>();
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<OwnershipPart>();
-            //BuildAdvertisePart<LicensePart>();
+            BuildAdvertisePart<LicensePart>();
         }
     }
 }
