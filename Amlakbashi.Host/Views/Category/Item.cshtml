@@ -292,6 +292,10 @@
                                         <input onchange="changePriceRangeType(3)" is-checked="@(Model.PriceRangeType == 3)" type="radio" id="js-price-range-type-3" name="js-price-range-type" value="3" />
                                         <label for="js-price-range-type-3">اجاره ماهانه</label>
                                     </div>
+                                    <div class="advertise-list__radio-item">
+                                        <input onchange="changePriceRangeType(4)" is-checked="@(Model.PriceRangeType == 4)" type="radio" id="js-price-range-type-4" name="js-price-range-type" value="4" />
+                                        <label for="js-price-range-type-4">نوروز</label>
+                                    </div>
                                 </div>
                                 <div style="display: flex;justify-content: space-around;margin-bottom:10px;">
                                     <div style="border-radius:5px;padding:5px;font:13px Liransans;display: flex;flex-flow: column;">
@@ -617,25 +621,22 @@
 
 @await Html.PartialAsync("_AdvertiseFilter", Model)
 
-@*@if (category != null && category.Province == 793)
-    {
-        <div style="font: 12px Miransans;
+@if (Model.Category != null && Model.Category.Province == 793)
+{
+    <div style="font: 12px Miransans;
             margin: 10px 5% 0 5%;
             padding: 5px;
-            /*border-top: 1px solid #242424;
-            border-bottom: 1px solid #242424;*/
-            /*background-image: url(/resource/img/corona-stay-home-pattern.png);*/
             background-color: #fffaed;
             background-repeat:repeat;
             box-shadow:0 2px 4px 0 rgba(0,0,0,.3), 0 2px 8px 0 rgba(0,0,0,.1);
             text-align: center;">
-            <div>کاربر گرامی رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است</div>
-            <div style="display:flex;justify-content:space-evenly;">
-                <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/794/اصفهان/رزرو-هتل">هتل</a>
-                <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/794/اصفهان/بومگردی">اقامتگاه بومگردی</a>
-            </div>
+        <div>کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.</div>
+        <div style="display:flex;justify-content:space-evenly;">
+            <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/793/استان-اصفهان/رزرو-هتل">هتل</a>
+            <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/793/استان-اصفهان/بومگردی">اقامتگاه بومگردی</a>
         </div>
-    }*@
+    </div>
+}
 
 @*<div class="advertise-category__special-filter-container" style="width:90%;margin:auto;">*@
 @*<a class="advertise-category__norouz_button" href="/category/category?type=@(category.Type)&a_m_p_version=false&province=@(category.Province)&city=@(category.City)&area=@(Model.Area)&norouz_special=@(norouz_special ? "false" : "true")&today_empty_homes=@(today_empty_homes ? "true" : "false")&discount_homes=@(discount_homes ? "true" : "false")">
@@ -703,25 +704,25 @@
 }
 
 @*<div class="share-post__container">
-    <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(Model.Title)" target="_blank" rel="noreferrer" title="اشتراک گذاری در تلگرام">
-        <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram" style="background-color: #259DCF;">
-    </a>
-    <a class="share-post__item" href="whatsapp://send?text=@(Model.Title) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(Model.Title) @(u_)')" title="اشتراک گذاری در واتس اپ">
-        <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp" style="background-color: #1BD741;">
-    </a>
-    <a class="share-post__item" href="http://twitter.com/share?text=@(Model.Title);url=@(u_)" target="_blank" rel="noreferrer" title="توئیت کردن اقامتگاه">
-        <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter" style="background-color: #55ACEE;">
-    </a>
-    <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(Model.Title)" target="_blank" rel="noreferrer" title="اشتراک گذاری در فیسبوک">
-        <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook" style="background-color: #3b5998;">
-    </a>
-    <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(Model.Title)" target="_blank" rel="noreferrer" title="پین کردن در پینترست">
-        <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest" style="background-color: #BD081C;">
-    </a>
-    <a class="share-post__item" href="mailto:?subject=@(Model.Title);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" title="اشتراک گذاری با ایمیل">
-        <i class="fa fa-envelope share-post__icon" style="font-size:24px;padding:8px;color:white;background-color:#3d3d3d;"></i>
-    </a>
-</div>*@
+        <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(Model.Title)" target="_blank" rel="noreferrer" title="اشتراک گذاری در تلگرام">
+            <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram" style="background-color: #259DCF;">
+        </a>
+        <a class="share-post__item" href="whatsapp://send?text=@(Model.Title) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(Model.Title) @(u_)')" title="اشتراک گذاری در واتس اپ">
+            <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp" style="background-color: #1BD741;">
+        </a>
+        <a class="share-post__item" href="http://twitter.com/share?text=@(Model.Title);url=@(u_)" target="_blank" rel="noreferrer" title="توئیت کردن اقامتگاه">
+            <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter" style="background-color: #55ACEE;">
+        </a>
+        <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(Model.Title)" target="_blank" rel="noreferrer" title="اشتراک گذاری در فیسبوک">
+            <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook" style="background-color: #3b5998;">
+        </a>
+        <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(Model.Title)" target="_blank" rel="noreferrer" title="پین کردن در پینترست">
+            <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest" style="background-color: #BD081C;">
+        </a>
+        <a class="share-post__item" href="mailto:?subject=@(Model.Title);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" title="اشتراک گذاری با ایمیل">
+            <i class="fa fa-envelope share-post__icon" style="font-size:24px;padding:8px;color:white;background-color:#3d3d3d;"></i>
+        </a>
+    </div>*@
 
 <div class="container" style="max-width:1100px">
     <div class="dynamic__header-container">
@@ -745,10 +746,10 @@
                 <i class="fa fa-percent"></i>
                 <span>تخفیف دار</span>
             </div>
-            @*<div id="norouz-special-filter-button" onclick="toggleNorouz()" style="background-color:@(norouz_special ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
-                    <img width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
-                    <span>ویژه نوروز</span>
-                </div>*@
+            <div id="norouz-special-filter-button" onclick="toggleNorouz()" style="background-color:@(Model.NorouzSpecial ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+                <img width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
+                <span>ویژه نوروز</span>
+            </div>
             <div id="corona-special-filter-button" onclick="toggleHygieneProtocol()" style="background-color:@(Model.HygieneProtocol ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
                 <img width="16" height="16" rel="ضدعفونی شده" title="ضدعفونی شده" src="/file/resourceimagepng?file_name=no-virus" />
                 <span>ضدعفونی شده</span>
@@ -814,8 +815,8 @@
         @await Html.PartialAsync("_AdvertiseListItems", Model)
     </div>
 </div>
-@if (Model.Category != null && !string.IsNullOrEmpty(Model.Category.CategoryPostTitle) && 
-    string.IsNullOrEmpty(Model.Category.CategoryPostText) == false)
+@if (Model.Category != null && !string.IsNullOrEmpty(Model.Category.CategoryPostTitle) &&
+   string.IsNullOrEmpty(Model.Category.CategoryPostText) == false)
 {
     <div class="advertise-category__description" style="white-space:unset;border-radius: 5px;">
         <header>
@@ -859,7 +860,7 @@
         <div style="text-align:center; margin: 20px;">
             <a href="https://www.aparat.com/v/vS7Oe" target="_blank" rel="noreferrer"><i class="fas fa-play-circle"></i> مشاهده در آپارات</a>
         </div>
-        
+
         @*<iframe class="style-video" src="https://www.aparat.com/video/video/embed/videohash/vS7Oe/vt/frame" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>*@
     </div>
     <p class="public__header-text">

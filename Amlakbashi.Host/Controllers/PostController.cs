@@ -350,8 +350,8 @@ namespace Amlakbashi.Host.Controllers
             }
             ViewBag.mostDiscountAdvertise = itemDTOs;
             var norouzItemDTOs = new List<AccommodationCardDTO>();
-            //var norouzAccs = advertiseService.GetNorouzAdvertises(5);
-            var norouzAccs = new List<Advertise>();
+            var norouzAccs = advertiseService.GetNorouzAdvertises(5);
+            //var norouzAccs = new List<Advertise>();
             foreach (var item in norouzAccs)
             {
                 var dto = (AccommodationCardDTO)item;

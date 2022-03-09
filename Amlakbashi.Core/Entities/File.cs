@@ -22,12 +22,16 @@ namespace Amlakbashi.Core.Entities
         public long MinifyQualityPercent { get; set; }
 
         [JsonIgnore]
-        [InverseProperty("Photos")]
+        [InverseProperty(nameof(Advertise.Photos))]
         public virtual ICollection<Advertise> Advertises { get; set; }
 
         [JsonIgnore]
         [InverseProperty(nameof(Advertise.MainPhoto))]
         public virtual ICollection<Advertise> MainPhotos { get; set; }
+
+        [JsonIgnore]
+        [InverseProperty(nameof(Advertise.LicenseFile))]
+        public virtual Advertise AdvertiseLicense { get; set; }
 
         public MinifyStatusEnum MinifyStatus
         {

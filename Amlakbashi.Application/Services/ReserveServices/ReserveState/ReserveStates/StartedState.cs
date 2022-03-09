@@ -6,6 +6,7 @@ using Amlakbashi.Core.Infrastructure.UserContact;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using System;
 using static Amlakbashi.Core.Entities.Reserve;
 
 namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveStates

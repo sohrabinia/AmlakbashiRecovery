@@ -677,7 +677,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             DateTime depositePayDate;
             long depositeTransactionId;
             var depositePaidPrice = reserve.GetReservePaymentPrice(ReservePayment.ReservePaymentType.GuestDeposite,
-                out depositePayDate, out depositeTransactionId,reserve.UserID);
+                out depositePayDate, out depositeTransactionId, reserve.UserID);
             var hostSitePortionPrice = reserve.TotalPrice / 10;
             DateTime totalPayDate;
             long totalTransactionId;
@@ -884,13 +884,45 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 return false;
             }
 
-            if (start_date != null)
+            if (string.IsNullOrEmpty(start_date) == false)
             {
-                objReserve.StartDate = DateTimeUtility.PersianDateToGregorian(start_date);
+                var startDate = DateTimeUtility.PersianDateToGregorian(start_date);
+                if (objReserve.StartDate != startDate)
+                {
+                    objReserve.StartDate = startDate;
+                    var beforeStart = new DateTime(
+                        objReserve.StartDate.Year,
+                        objReserve.StartDate.Month,
+                        objReserve.StartDate.Day,
+                        12, 0, 0) - DateTime.Now;
+                    if (beforeStart.TotalMilliseconds <= 0)
+                    {
+                        mediator.Send(new SetReserveStatusCommand(objReserve.Id, ReserveStatus.Started,
+                            true, actionSource, doerUserId));
+                    }
+                    else
+                    {
+                        var onStart = beforeStart.Add(new TimeSpan(2, 0, 0));
+                        mediator.Schedule(new SetReserveStatusCommand(objReserve.Id,
+                            ReserveStatus.Started, true, actionSource, doerUserId), onStart);
+                    }
+                }
             }
-            if (end_date != null)
+            if (string.IsNullOrEmpty(end_date) == false)
             {
-                objReserve.EndDate = DateTimeUtility.PersianDateToGregorian(end_date);
+                var endDate = DateTimeUtility.PersianDateToGregorian(end_date);
+                if (objReserve.EndDate != endDate)
+                {
+                    objReserve.EndDate = endDate;
+                    var finishDelay = new DateTime(
+                        objReserve.EndDate.Year,
+                        objReserve.EndDate.Month,
+                        objReserve.EndDate.Day,
+                        12, 0, 0) - DateTime.Now;
+                    mediator.Schedule(new SetReserveStatusCommand(objReserve.Id,
+                        ReserveStatus.Completed, false, actionSource, doerUserId), finishDelay);
+                    mediator.Schedule(new FinishStayMessageCommand(objReserve.Id), finishDelay);
+                }
             }
 
             if (objReserve.InstantReserve &&
@@ -962,9 +994,52 @@ namespace Amlakbashi.Application.Services.ReserveServices
             {
                 reserve.StartDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaStartDate);
             }
+
+            //if (string.IsNullOrEmpty(dto.PersinaEndDate) == false)
+            //{
+            //    reserve.EndDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaEndDate);
+            //}
+
+            //if (string.IsNullOrEmpty(dto.PersinaStartDate) == false)
+            //{
+            //    var startDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaStartDate);
+            //    if (reserve.StartDate != startDate)
+            //    {
+            //        reserve.StartDate = startDate;
+            //        var beforeStart = new DateTime(
+            //            reserve.StartDate.Year,
+            //            reserve.StartDate.Month,
+            //            reserve.StartDate.Day,
+            //            12, 0, 0) - DateTime.Now;
+            //        if (beforeStart.TotalMilliseconds <= 0)
+            //        {
+            //            mediator.Send(new SetReserveStatusCommand(reserve.Id, ReserveStatus.Started,
+            //                true, actionSource, doerUserId));
+            //        }
+            //        else
+            //        {
+            //            var onStart = beforeStart.Add(new TimeSpan(2, 0, 0));
+            //            mediator.Schedule(new SetReserveStatusCommand(reserve.Id,
+            //                ReserveStatus.Started, true, actionSource, doerUserId), onStart);
+            //        }
+            //    }
+            //}
+
             if (string.IsNullOrEmpty(dto.PersinaEndDate) == false)
             {
-                reserve.EndDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaEndDate);
+                var endDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaEndDate);
+                if (reserve.EndDate != endDate)
+                {
+                    reserve.EndDate = endDate;
+                    var finishDelay = new DateTime(
+                        reserve.EndDate.Year,
+                        reserve.EndDate.Month,
+                        reserve.EndDate.Day,
+                        12, 0, 0) - DateTime.Now;
+                    mediator.Schedule(new SetReserveStatusCommand(reserve.Id,
+                        ReserveStatus.Completed, false, actionSource, doerUserId), finishDelay);
+                    mediator.Schedule(new FinishStayMessageCommand(reserve.Id), finishDelay);
+                }
             }
 
             if (reserve.InstantReserve &&
@@ -1543,6 +1618,11 @@ namespace Amlakbashi.Application.Services.ReserveServices
             if (payment.Status == Payment.PaymentStatus.NotPaid)
             {
                 msg = "وضعیت پرداخت ناموفق می باشد";
+                return false;
+            }
+            if (payment.ProductType == "Credit_Inc_Then_Res")
+            {
+                msg = "امکان تکمیل این رزرو وجود ندارد. مقدار پرداخت شده باید به کیف پول کاربر افزوده شود.";
                 return false;
             }
             mediator.Send(new SetReserveStatusCommand(reserveId, ReserveStatus.Reserved, false,

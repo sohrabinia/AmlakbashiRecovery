@@ -19,6 +19,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.TourismAccomm
             BuildAdvertisePart<AmenitiesPart>();
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<OwnershipPart>();
+            BuildAdvertisePart<LicensePart>();
         }
     }
 }

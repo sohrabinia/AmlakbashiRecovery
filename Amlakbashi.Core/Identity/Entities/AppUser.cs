@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using static Amlakbashi.Core.Entities.User;
 
 namespace Amlakbashi.Core.Identity.Entities
@@ -11,10 +12,5 @@ namespace Amlakbashi.Core.Identity.Entities
         public DateTime? CreateDate { get; set; }
         public DateTime? SendVerification { get; set; }
         public UserState State { get; set; }
-
-        public AppUser ShallowCopy()
-        {
-            return (AppUser)this.MemberwiseClone();
-        }
     }
 }

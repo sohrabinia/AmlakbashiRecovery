@@ -55,7 +55,7 @@
             <span style="margin: 0 3px;font:12px Liransans;">@(Model.PaidAmount > 0 ? "الباقی مبلغ" : "تسویه"): <span id="js-final-total-price-label">@string.Format("{0:n0}", Model.TotalPrice - Model.PaidAmount)</span> ت</span>
             <input checked type="radio" id="js-payment-type-total" name="payType" value="total" />
         </label>
-        @if (Model.PaidAmount < 1 && Model.DepositePrice < Model.TotalPrice)
+        @if (Model.PaidAmount < 1 && Model.DepositePrice < Model.TotalPrice && Model.hasDateInNorouzRange == false)
         {
             <label for="js-payment-type-deposite" style="cursor:pointer;margin-right: 5px;display:flex;align-items:center;width:unset;cursor:pointer;color:#242424;border-radius:5px;">
                 <span style="margin: 0 3px;font:12px Liransans;">بیعانه: <span id="js-final-deposite-price-label">@string.Format("{0:n0}", Model.DepositePrice)</span> ت</span>

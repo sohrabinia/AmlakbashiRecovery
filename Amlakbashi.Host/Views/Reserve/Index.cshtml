@@ -199,7 +199,7 @@
         </table>
     </div>
 
-    <div class="reserve-top-filter-container">
+    @*<div class="reserve-top-filter-container">
         <div style="background-color:@(ViewBag.reserve_status == 1 ? "#fdd835" : "#ccc");" onclick="toggleStatus(1)"><i class="fa fa-book"></i><span>در انتظار پاسخ </span></div>
         <div style="background-color:@(ViewBag.reserve_status == 2 ? "#fdd835" : "#ccc");" onclick="toggleStatus(2)"><i class="fa fa-book"></i><span>در انتظار پرداخت </span></div>
         <div style="background-color:@(ViewBag.reserve_end_date == Amlakbashi.Core.Common.Utilities.DateTimeUtility.PersianTodayString && ViewBag.general_status == 0 ? "#fdd835" : "#ccc");" onclick="toggleTodayFinishStay()"><i class="fa fa-flag-checkered"></i><span>پایان سفر امروز </span></div>
@@ -207,9 +207,9 @@
         <div style="background-color:@(ViewBag.shouldFollow ? "#fdd835" : "#ccc");" onclick="toggleShouldFollowReserves()"><i class="fa fa-bullseye"></i><span>در حال پیگیری </span></div>
         <div style="background-color:@(ViewBag.disableAutoCancel ? "#fdd835" : "#ccc");" onclick="toggleDisableAutoCancelFilter()"><img src="/file/resourceimagepng?file_name=no-gear" width="18" height="18" /><span>عدم لغو خودکار</span></div>
         <div style="background-color:@(ViewBag.accVisited ? "#fdd835" : "#ccc");" onclick="toggleAccVisitFilter()"><img src="/file/resourceimagepng?file_name=acc-visit" width="18" height="18" /><span>بازدید اقامتگاه</span></div>
-    </div>
+    </div>*@
 
-    <div class="reserve-filters-container">
+    @*<div class="reserve-filters-container">
         <div class="reserve-main-filter-container" style="width: 450px;">
             <div onclick="toggleMyReserves(0)" style="background-color:@(ViewBag.reserve_support_status == 0 ? "#fdd835" : "#ffffff")">همه</div>
             <div onclick="toggleMyReserves(@((int)ReserveSupport.SupporterStatus.Free))" style="background-color:@(ViewBag.reserve_support_status == (int)ReserveSupport.SupporterStatus.Free ? "#fdd835" : "#ffffff")">بدون پشتیبان</div>
@@ -227,14 +227,14 @@
             <div onclick="toggleMainFilter(1)" style="background-color:@(ViewBag.mainFilter == 1 ? "#fdd835" : "#ffffff")">همه</div>
             <div onclick="toggleMainFilter(2)" style="background-color:@(ViewBag.mainFilter == 2 ? "#fdd835" : "#ffffff")">بایگانی</div>
         </div>
-    </div>
+    </div>*@
 
     <div style="overflow: auto">
         <table class="adminTable">
             <tr>
-                <th class="minw">
+                @*<th class="minw">
                     ردیف
-                </th>
+                </th>*@
                 <th>
                     کد رزرو
                 </th>
@@ -250,9 +250,9 @@
                 <th>
                     وضعیت
                 </th>
-                <th>
+                @*<th>
                     پاسخ میزبان
-                </th>
+                </th>*@
                 <th>توضیحات پشتیبان</th>
                 @*<th>وضعیت پشتیبانی</th>*@
                 <th>
@@ -266,16 +266,16 @@
             {
                 Idx++;
                 <tr id="js-@item.id">
-                    <td>
+                    @*<td>
                         @Idx
-                    </td>
+                    </td>*@
                     <td>
                         <div>@item.id</div>
-                        <div><i style="font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.id)', 'کد رزرو @(item.id)')"></i></div>
+                        @*<div><i style="font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.id)', 'کد رزرو @(item.id)')"></i></div>*@
                     </td>
                     <td>
                         <div>زمان درخواست: @(item.createDateString)</div>
-                        <div>کد آگهی: <a href="/Advertise/Index?status=-1&id=@(item.parentAccomodationId > 0 ? item.parentAccomodationId : item.accommodationId)">@item.accommodationId @(item.parentAccomodationId > 0 ? " >> " + item.parentAccomodationId : "")</a><i style="margin: 0 10px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.accommodationId)', 'کد آگهی @(item.accommodationId)')"></i></div>
+                        <div>کد آگهی: <a href="/Advertise/newindex?status=-1&id=@(item.parentAccomodationId > 0 ? item.parentAccomodationId : item.accommodationId)">@item.accommodationId @(item.parentAccomodationId > 0 ? " >> " + item.parentAccomodationId : "")</a></div>
                         <div>
                             @if (item.ContactWithHost)
                             {
@@ -283,7 +283,7 @@
                             }
                             کد میزبان:
                             <a href="/User/Index?code=@item.hostUserId">@item.hostUserId</a>
-                            <i style="margin: 0 5px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.hostUserId)', 'کد میزبان @(item.hostUserId)')"></i>
+                            @*<i style="margin: 0 5px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.hostUserId)', 'کد میزبان @(item.hostUserId)')"></i>*@
                             <i style="cursor:pointer;margin: 0 0px 0 0" class="fa fa-phone" onclick="showCallPopup(@(item.hostUserId),@(item.id),'میزبان')"></i>
                         </div>
                         <div>
@@ -293,14 +293,14 @@
                             }
                             کد مهمان:
                             <a href="/User/Index?code=@item.guestUserId">@item.guestUserId</a>
-                            <i style="margin: 0 5px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.guestUserId)', 'کد مهمان @(item.guestUserId)')"></i>
+                            @*<i style="margin: 0 5px;font-size:16px;cursor:pointer;" class="fas fa-copy" onclick="copyStringToClipboard('@(item.guestUserId)', 'کد مهمان @(item.guestUserId)')"></i>*@
                             <i style="cursor:pointer;margin: 0 0px 0 0" class="fa fa-phone" onclick="showCallPopup(@(item.guestUserId),@(item.id),'مهمان')"></i>
                         </div>
                     </td>
                     <td>
                         <span>از @item.startDateString تا @item.endDateString</span><br />
                         <span>@item.guestCount نفر به مدت @item.stayDays شب</span><br />
-                        <span style="color:@(item.totalPaidPrice > 0 ? "#34A853" : "#242424")">مبلغ: @string.Format("{0:n0}", item.totalPrice) ت</span><br />
+                        <span>مبلغ: @string.Format("{0:n0}", item.totalPrice) ت</span><br />
                         @if (item.depositePrice != item.totalPrice)
                         {
                             <span>بیعانه: @string.Format("{0:n0}", item.depositePrice) ت</span>
@@ -342,13 +342,10 @@
                                         <span style="color:#4285F4">کیف هدیه: @string.Format("{0:n0}", item.prizePrice) ت</span><br />
                                     }
                                 </a>
-                                <div style="margin-top: 5px;">
-                                    <a asp-controller="payment" asp-action="index" asp-route-reserveId="@item.id" style="border-top: 1px solid gray; text-decoration: none;" target="_blank">لیست پرداخت های آنلاین</a>
-                                </div>
                             }
                         }
                     </td>
-                    <td class="reserve-status-label" style="color:@item.statusColor; max-width: 70px;">
+                    <td class="reserve-status-label" style="max-width: 70px;">
                         <div style="display:flex;flex-flow:column">
                             <div>@item.statusString</div>
                             @if (item.status == (int)Reserve.ReserveStatus.Completed)
@@ -382,28 +379,28 @@
                             }
                         </div>
                     </td>
-                    <td style="max-width: 70px;">
+                    @*<td style="max-width: 70px;">
                         @if (item.instantReserve)
                         {
                             <div style="display:flex;flex-flow:row;padding:10px;justify-content:space-between;">
-                                @*<i style="font-size:20px;color:#DF7549" class="fas fa-bolt"></i>*@
+                                <i style="font-size:20px;color:#DF7549" class="fas fa-bolt"></i>
                                 <span>رزرو آنی</span>
                             </div>
                         }
                         else
                         {
                             <span>@item.hostResponseString</span>
-                            @*if ((Reserve.HostResponseEnum)item.hostResponse != Reserve.HostResponseEnum.None)
+                            if ((Reserve.HostResponseEnum)item.hostResponse != Reserve.HostResponseEnum.None)
                             {
                                 <br />
                                 <span>@(item.hostResponseDateString)</span><br />
                                 <span>@(item.hostResponseTimeString)</span>
-                            }*@
+                            }
                         }
-                    </td>
+                    </td>*@
                     <td style="width: 100px">
-                        <div class="call_state_h" js-call-state="@(item.hostCallState)" style="cursor:pointer;font:10px Miransans;color:@(item.hostCallStateColor);" onclick="nextCallState(@(item.id), 'h', 'میزبان', this)">✆ثبت تماس میزبان</div>
-                        <div class="call_state_g" js-call-state="@(item.guestCallState)" style="cursor:pointer;font:10px Miransans;color:@(item.guestCallStateColor);" onclick="nextCallState(@(item.id), 'g', 'مهمان', this)">✆ثبت تماس مهمان</div>
+                        <div class="call_state_h" js-call-state="@(item.hostCallState)" style="cursor:pointer;font:10px Miransans;" onclick="nextCallState(@(item.id), 'h', 'میزبان', this)">✆ثبت تماس میزبان</div>
+                        <div class="call_state_g" js-call-state="@(item.guestCallState)" style="cursor:pointer;font:10px Miransans;" onclick="nextCallState(@(item.id), 'g', 'مهمان', this)">✆ثبت تماس مهمان</div>
                         <i onclick="showAddInfoDialog(@(item.id))" class="fa fa-plus" style="color:#242424;cursor:pointer;" title="افزودن توضیحات"></i>
                         <i onclick="showInfo(@(item.id))" class="fa fa-eye" style="color:#242424;cursor:pointer;" title="نمایش توضیحات"></i>
                         @*<span class="js-info-count">(@(item.supportInfoCount) توضیح)</span>*@

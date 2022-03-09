@@ -57,6 +57,13 @@
                     <p class="static-advertise__title"><i class="fa fa-dollar-sign"></i>اطلاعات قیمت اجاره روزانه اقامتگاه را ثبت کنید</p>
                     @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPriceInput.cshtml", Model.price)
                 </div>
+                <div class="static-advertise advetise-form__part static-advertie__price-box">
+                    <p class="static-advertise__title">
+                        <img class="noroz-style-icon" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" width="30" height="30" />
+                        اطلاعات قیمت نوروزی اقامتگاه را ثبت کنید
+                    </p>
+                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccNorouzPriceInput.cshtml", Model.price)
+                </div>
             }
             @if (Model.hygieneProtocol != null)
             {
@@ -125,6 +132,14 @@
                 <div class="static-advertise advetise-form__part advertise-form__part-more">
                     <p class="static-advertise__title"><i class="fa fa-address-card"></i>سایر موارد </p>
                     @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccOwnershipInput.cshtml", Model.ownership)
+                    @if (Model.license != null)
+                    {
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccLicenseInput.cshtml", Model.license)
+                    }
+                    @if (Model.license.License && Model.license.LicenseFileId != null)
+                    {
+                        <a class="js-license" target="_blank" href="/file/getlicenseimage?id=@Model.license.LicenseFileId">مشاهده فایل مجوز</a>
+                    }
                 </div>
             }
         </div>

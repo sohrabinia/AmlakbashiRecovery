@@ -207,37 +207,49 @@ namespace Portal.Controllers
         public JsonResult SendSms(string template, int recieverUserID = 0,
             int ownership = 0, int province = 0, int city = 0, int area = 0,
             int adtype = 0, int tradeid = 0, int special = 0, int adstatus = 0,
-            bool confirmRequired = true)
+            int userType = -1, bool confirmRequired = true, int norouzPriceStatus = 0)
         {
             try
             {
                 IQueryable<User> recievers;
                 if (recieverUserID > 0)
                 {
-                    //recievers = _db.Users.Where(u => u.Id == recieverUserID);
                     recievers = userService.GetAllById(recieverUserID);
                 }
                 else
                 {
-
-                    var users_query = userService.GetAllAsIQueryable();
+                    recievers = userService.GetAllAsIQueryable();
                     if (ownership > 0)
                     {
-                        users_query = users_query.Where(x => x.OwnerShip == ownership);
+                        recievers = recievers.Where(x => x.OwnerShip == ownership);
                     }
                     if (province > 0 || city > 0 || area > 0 || adtype > 0 ||
                         adstatus > -1 || tradeid > 0 || special > 0)
                     {
-                        var advertises = advertiseService.FilterAdmin(province, city, area, adtype, true, adstatus);
-                        users_query = users_query.Where(user => advertises.Any(x => x.UserID == user.Id));
+                        var advertises = advertiseService.FilterAdmin(province, city, area, adtype, false, adstatus);
+                        var advertiseUserIds = advertises.Select(s => s.UserID);
+                        recievers = recievers.Where(w => advertiseUserIds.Contains(w.Id));
                     }
-                    recievers = users_query;
-                }
-                if (template == "SetNorouzPrice")
-                {
-                    recievers = recievers.Where(w => w.UserGeneralType > 0);
+                    if (userType > -1)
+                    {
+                        recievers = recievers.Where(w => w.UserGeneralType == userType);
+                    }
+                    if (norouzPriceStatus == 1)
+                    {
+                        recievers = recievers.Where(w => w.UserGeneralType == 1 &&
+                            w.Advertises.Any(a => a.NorouzPrice == 0) == false);
+                    }
+                    else if (norouzPriceStatus == 2)
+                    {
+                        recievers = recievers.Where(w => w.UserGeneralType == 1 &&
+                            w.Advertises.Any(a => a.NorouzPrice == 0));
+                    }
                 }
 
+                if (template == "SetNorouzPrice")
+                {
+                    recievers = recievers.Where(w => w.UserGeneralType == 1);
+                }
 
                 if (confirmRequired)
                 {
@@ -252,8 +264,7 @@ namespace Portal.Controllers
                     {
                         if (PhoneUtility.IsNumberForIran(mobile))
                         {
-                            iran_mobiles.Add(
-                                PhoneUtility.InternationalNumberToLocal(mobile));
+                            iran_mobiles.Add(PhoneUtility.InternationalNumberToLocal(mobile));
                         }
                     }
                     if (template == "SetNorouzPrice")
@@ -276,7 +287,6 @@ namespace Portal.Controllers
                         userService.SendCustomSms(delay, mobile, template);
                         delay++;
                     }
-
                     return GenerateJsonResult(new { status = 2, message = "" });
                 }
             }

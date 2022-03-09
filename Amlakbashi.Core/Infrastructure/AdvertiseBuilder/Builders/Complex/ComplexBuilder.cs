@@ -28,6 +28,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Complex
             //BuildAdvertisePart<NorouzPart>();
             BuildAdvertisePart<MetaTitleDescPart>();
             BuildAdvertisePart<PhotoPart>();
+            BuildAdvertisePart<LicensePart>();
         }
     }
 }

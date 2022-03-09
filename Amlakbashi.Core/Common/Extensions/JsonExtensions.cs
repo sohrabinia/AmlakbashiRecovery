@@ -5,22 +5,13 @@ namespace Amlakbashi.Core.Common.Extensions
 {
     public static class JsonExtensions
     {
-
-        static JsonExtensions()
-        {
-
-        }
-
         public static string ToJsonString(this object obj, bool camelCase = false, bool indented = false)
         {
             var settings = new JsonSerializerSettings();
-
-
             if (indented)
             {
                 settings.Formatting = Formatting.Indented;
             }
-
             return ToJsonString(obj, settings);
         }
 
@@ -43,14 +34,12 @@ namespace Amlakbashi.Core.Common.Extensions
                 : default(T);
         }
 
-
         public static object FromJsonString(this string value, Type type, JsonSerializerSettings settings)
         {
             if (type == null)
             {
                 throw new ArgumentNullException(nameof(type));
             }
-
             return value != null
                 ? JsonConvert.DeserializeObject(value, type, settings)
                 : null;

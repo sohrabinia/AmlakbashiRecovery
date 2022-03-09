@@ -1,50 +1,54 @@
-﻿using Amlakbashi.Accounting.PaymentContext.PaymentEngines.Interfaces;
+﻿using Amlakbashi.Accounting.PaymentContext.BankEngines.Interfaces;
 using Amlakbashi.Core.Common.Enums;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
+using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Accounting.PaymentContext
 {
     internal class PaymentOperator : IPaymentOperator
     {
-        private readonly IPasargadPaymentEngine pasargadEngine;
-        public PaymentOperator(IPasargadPaymentEngine pasargadEngine)
+        private readonly IPasargadEngine pasargadEngine;
+        private readonly ISamanEngine samanEngine;
+        public PaymentOperator(IPasargadEngine pasargadEngine, ISamanEngine samanEngine)
         {
             this.pasargadEngine = pasargadEngine;
+            this.samanEngine = samanEngine;
         }
 
-        public Dictionary<string, object> GeneratePaymentData(BankEnum bank, int paymentId, long paymentTotalAmount, string redirectAddress, out string sign, out DateTime invoiceDate)
+        public EpayDTO GetPasargadPaymentData(BankEnum bank, int paymentId,
+            long paymentTotalAmount, string redirectAddress)
         {
-            return GetEngine(bank).GeneratePaymentData(paymentId,
-                paymentTotalAmount, redirectAddress, out sign, out invoiceDate);
+            return pasargadEngine.GetPaymentData(paymentId,
+                paymentTotalAmount, redirectAddress);
         }
 
-        public CheckPaymentDTO ReadPaymentResult(BankEnum bank, string tref, out string result)
+        public CheckPaymentDTO GetPasargadPaymentResult(string tref, out string result)
         {
-            return GetEngine(bank).ReadPaymentResult(tref, out result);
+            return pasargadEngine.GetPaymentResult(tref, out result);
         }
 
-        public CheckPaymentDTO ReadPaymentResult(BankEnum bank, long paymentId, DateTime paymentDate)
+        public async Task<CheckPaymentDTO> GetPasargadPaymentResult(long paymentId, DateTime paymentDate)
         {
-            return GetEngine(bank).ReadPaymentResult(paymentId, paymentDate);
+            return await pasargadEngine.GetPaymentResult(paymentId, paymentDate);
         }
 
-        public bool VerifyPayment(BankEnum bank, string paymentResult,
+        public bool VerifyPasargadPayment(BankEnum bank, string paymentResult,
             int paymentId, long totalPayingPrice)
         {
-            return GetEngine(bank).VerifyPayment(paymentResult, paymentId, totalPayingPrice);
+            return pasargadEngine.VerifyPayment(paymentResult, paymentId, totalPayingPrice);
         }
 
-        private IPaymentEngine GetEngine(BankEnum bank)
+        public async Task<EpayDTO> GetSamanPaymentToken(SamanRequestTokenDTO requestToken)
         {
-            switch (bank)
-            {   
-                case BankEnum.Pasargad:
-                    return pasargadEngine;
-                default:
-                    return null;
-            }
+            return await samanEngine.GetPaymentToken(requestToken);
+        }
+
+        public Task<string> VerifySamanEpay(string RefNum)
+        {
+            return samanEngine.VerifyEpay(RefNum);
         }
     }
 }

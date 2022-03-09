@@ -102,9 +102,6 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<int>("BlanketsAndMattresses")
                         .HasColumnType("int");
 
-                    b.Property<int>("BuildingDirection")
-                        .HasColumnType("int");
-
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
@@ -171,9 +168,6 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<int?>("HygieneProtocol")
                         .HasColumnType("int");
 
-                    b.Property<int>("ImageThumbGenerateStatus")
-                        .HasColumnType("int");
-
                     b.Property<int>("InstantReserveCancels")
                         .HasColumnType("int");
 
@@ -200,6 +194,15 @@ namespace Amlakbashi.Data.Migrations
 
                     b.Property<double>("Latitude")
                         .HasColumnType("float");
+
+                    b.Property<bool>("License")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("LicenseFileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("LicenseNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LocationString")
                         .HasColumnType("nvarchar(max)");
@@ -297,9 +300,6 @@ namespace Amlakbashi.Data.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Region");
 
-                    b.Property<int>("PrepaymentPrice")
-                        .HasColumnType("int");
-
                     b.Property<int?>("Province")
                         .HasColumnType("int");
 
@@ -371,6 +371,10 @@ namespace Amlakbashi.Data.Migrations
                     b.HasIndex("Area");
 
                     b.HasIndex("City");
+
+                    b.HasIndex("LicenseFileId")
+                        .IsUnique()
+                        .HasFilter("[LicenseFileId] IS NOT NULL");
 
                     b.HasIndex("ParentId");
 
@@ -744,7 +748,9 @@ namespace Amlakbashi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ModifiedWalletTransactionId");
+                    b.HasIndex("ModifiedWalletTransactionId")
+                        .IsUnique()
+                        .HasFilter("[ModifiedWalletTransactionId] IS NOT NULL");
 
                     b.HasIndex("PaymentId");
 
@@ -2078,6 +2084,10 @@ namespace Amlakbashi.Data.Migrations
                         .WithMany()
                         .HasForeignKey("City");
 
+                    b.HasOne("Amlakbashi.Core.Entities.File", "LicenseFile")
+                        .WithOne("AdvertiseLicense")
+                        .HasForeignKey("Amlakbashi.Core.Entities.Advertise", "LicenseFileId");
+
                     b.HasOne("Amlakbashi.Core.Entities.Advertise", "Parent")
                         .WithMany("Childs")
                         .HasForeignKey("ParentId");
@@ -2095,6 +2105,8 @@ namespace Amlakbashi.Data.Migrations
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("LicenseFile");
 
                     b.Navigation("MainPhoto");
 
@@ -2236,8 +2248,8 @@ namespace Amlakbashi.Data.Migrations
             modelBuilder.Entity("Amlakbashi.Core.Entities.CreditTransaction", b =>
                 {
                     b.HasOne("Amlakbashi.Core.Entities.CreditTransaction", "ModifiedWalletTransaction")
-                        .WithMany()
-                        .HasForeignKey("ModifiedWalletTransactionId");
+                        .WithOne("CorrectiveWalletTransaction")
+                        .HasForeignKey("Amlakbashi.Core.Entities.CreditTransaction", "ModifiedWalletTransactionId");
 
                     b.HasOne("Amlakbashi.Core.Entities.Payment", "Payment")
                         .WithMany()
@@ -2623,8 +2635,15 @@ namespace Amlakbashi.Data.Migrations
                     b.Navigation("Childs");
                 });
 
+            modelBuilder.Entity("Amlakbashi.Core.Entities.CreditTransaction", b =>
+                {
+                    b.Navigation("CorrectiveWalletTransaction");
+                });
+
             modelBuilder.Entity("Amlakbashi.Core.Entities.File", b =>
                 {
+                    b.Navigation("AdvertiseLicense");
+
                     b.Navigation("MainPhotos");
                 });
 

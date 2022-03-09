@@ -14,16 +14,14 @@ namespace Amlakbashi.Core.DTOs.CategoryDTOs
         public int countAdvertise { get; set; }
         public string link { get; set; }
 
-        public static SearchTableDTO Generate(DynamicCategory category, string cityName)
+        public static SearchTableDTO GenerateForApp(Region region, string cityName)
         {
             var dto = new SearchTableDTO();
-            dto.categoryId = category.Id;
-            dto.regionString = category.RegionString;
-            dto.typeString = category.TypeString;
-            dto.areaString = category.AreaStr;
+            dto.regionString = region.PersianName;
+            dto.title = region.Type == 0 ? "استان " + region.PersianName : region.PersianName;
             dto.cityString = cityName;
-            dto.countAdvertise = category.CountAdvertise;
-            dto.link = CategoryUrlLocalization.CategoryToUrl(category);
+            dto.countAdvertise = region.CountAdvertise;
+            dto.link = $"/app/category/item?regionid={region.Id}";
             return dto;
         }
 

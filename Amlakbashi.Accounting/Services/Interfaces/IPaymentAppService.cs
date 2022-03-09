@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Core.Common.AppService;
+using Amlakbashi.Core.Common.Enums;
 using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,10 @@ namespace Amlakbashi.Accounting.Services.Interfaces
             bool byTotalPrice = false);
         int GetPaymentTriesCount(long reserveId, out string lastTryDateStr);
         Payment Find(int id);
+        bool CheckTransactionId(string transactionId, BankEnum bank = BankEnum.Unknown);
         int Insert(Payment newPayment);
         void Update(Payment editedPayment);
+        void UpdateTransactionId(int paymentId, string transactionId);
         IQueryable<Payment> GetAllAsIQueryable();
     }
 }

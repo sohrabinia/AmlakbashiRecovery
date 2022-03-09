@@ -2,7 +2,8 @@
 @model Amlakbashi.Core.DTOs.ReserveDTOs.ReserveDashboardItemDTO
 
 @{
-    string adv_link = string.Format("/{0}/{1}", "اجاره-روزانه", Model.advertiseSlug);
+    //string adv_link = string.Format("/{0}/{1}", "اجاره-روزانه", Model.advertiseSlug);
+    string adv_link = $"/app/advertise/item/{Model.advertiseId}";
     var img_src = Model.advertisePhotoId > 0 ? string.Format("/عکس-آگهی/{0}", Model.advertiseSlug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
 
     var panedingList = new List<int>()
@@ -76,13 +77,13 @@
             case Reserve.ReserveStatus.CashPay:
             case Reserve.ReserveStatus.Started:
             case Reserve.ReserveStatus.Completed:
-                <a class="billing_dashboard_reserve reserve-dashboard__item-container-button" target="_blank" href="/reserve/generateguestreceipt?reserve_id=@(Model.reserveId)">
+                <a class="billing_dashboard_reserve reserve-dashboard__item-container-button" href="/app/reserve/voucher?reserveId=@(Model.reserveId)">
                     @*<i class="fa fa-clipboard-list"></i>*@
                     صدور رسید رزرو
                 </a>
                 break;
             case Reserve.ReserveStatus.WaitForReserve:
-                <a class="dashboard_reserve__billing reserve-dashboard__item-container-button" target="_blank" href="/reserve/generateguestreceipt?reserve_id=@(Model.reserveId)">
+                <a class="dashboard_reserve__billing reserve-dashboard__item-container-button" href="/app/reserve/voucher?reserveId=@(Model.reserveId)">
                     @*<i class="fa fa-clipboard-list"></i>*@
                     صدور پیش فاکتور
                 </a>
@@ -213,10 +214,6 @@
                 @*<i class="fa fa-credit-card"></i>*@
                 پرداخت
             </div>
-            @*<div onclick="payAndReserveWithCredit(@Model.Id,@Model.TotalPrice, @Model.DepositPrice)" class="reserve-dashboard__item-container-button" style="background-color:#34A853">
-                    <i class="fa fa-money-bill-alt"></i>
-                    <span>پرداخت از کیف پول</span>
-                </div>*@
         }
         else if (Model.status == Reserve.ReserveStatus.Reserved ||
             Model.status == Reserve.ReserveStatus.CashPay)

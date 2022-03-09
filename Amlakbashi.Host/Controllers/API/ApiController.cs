@@ -131,7 +131,7 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 int AndroidApp_MinBuildNumber = 58;
-                int AndroidApp_LastBuildNumber = 58;
+                int AndroidApp_LastBuildNumber = 60;
 
                 //var newFeatures = new string[] {
                 //    "تسهیل ورود به حساب کاربری"
@@ -145,23 +145,28 @@ namespace Amlakbashi.Host.Controllers.API
                     done = true,
                     forceUpdate = forceUpdate,
                     updateSuggestion = updateSuggestion,
-                    newFeatures = newFeatures
-                    //,
-                    //customBlock = true,
-                    //customBlockTitle = "تست عنوان",
-                    //customBlockDesc = "تست متن",
-                    //customBlockUrls = new dynamic[] {
-                    //    new {
-                    //        id = 0,
-                    //        title = "دانلود از گوگل پلی",
-                    //        url = "https://cafebazaar.ir/app/com.amlakbashi.app"
-                    //    },
-                    //    new {
-                    //        id = 1,
-                    //        title = "دانلود از کافه بازار",
-                    //        url = "https://cafebazaar.ir/app/com.amlakbashi.app"
-                    //    }
-                    //}
+                    newFeatures = newFeatures,
+                    customBlock = true,
+                    customBlockTitle = "به روز رسانی اپلیکیشن املاک باشی",
+                    customBlockDesc = @"نسخه جدید اپلیکیشن املاک باشی با ویژگی ها و ظاهر جدید منتشر شد.
+لطفا از طریق یکی از روش های زیر، اقدام به آپدیت برنامه خود کنید:",
+                    customBlockUrls = new dynamic[] {
+                        new {
+                            id = 0,
+                            title = "دانلود از مایکت",
+                            url = "https://myket.ir/app/com.amlakbashi.app"
+                        },
+                        new {
+                            id = 1,
+                            title = "دانلود از کافه بازار",
+                            url = "http://cafebazaar.ir/app/?id=com.amlakbashi.app&ref=share"
+                        },
+                        new {
+                            id = 2,
+                            title = "دانلود مستقیم",
+                            url = "https://www.amlakbashi.com/amlakbashi-v4.0.0.apk"
+                        }
+                    }
                 });
             }
             catch (Exception exc)
@@ -196,7 +201,7 @@ namespace Amlakbashi.Host.Controllers.API
                 return GenerateJsonResult(new
                 {
                     done = true,
-                    forceUpdate = forceUpdate,
+                    forceUpdate = true,
                     updateSuggestion = updateSuggestion,
                     newFeatures = newFeatures
                 });
@@ -224,7 +229,8 @@ namespace Amlakbashi.Host.Controllers.API
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(auth);
             var tokenS = jsonToken as JwtSecurityToken;
-            var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+            //var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+            var mainMobile = User.Identity.Name;
             if (string.IsNullOrEmpty(mainMobile))
             {
                 return new User();
@@ -241,7 +247,8 @@ namespace Amlakbashi.Host.Controllers.API
                 var handler = new JwtSecurityTokenHandler();
                 var jsonToken = handler.ReadToken(auth);
                 var tokenS = jsonToken as JwtSecurityToken;
-                var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+                //var mainMobile = tokenS.Claims.First(claim => claim.Type == "name").Value;
+                var mainMobile = User.Identity.Name;
                 var securityStamp = tokenS.Claims.FirstOrDefault(claim => claim.Type == "AspNet.Identity.SecurityStamp").Value;
                 var identityUser = userService.GetIdentityUser(mainMobile);
                 var objDict = new RouteValueDictionary(obj);

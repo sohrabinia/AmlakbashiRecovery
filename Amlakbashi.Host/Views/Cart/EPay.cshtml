@@ -1,0 +1,40 @@
+﻿@using Amlakbashi.Core.Common.Enums
+@using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs
+
+@model EpayDTO
+
+@{
+    ViewBag.Title = "انتقال به بانک";
+}
+
+@if (Model.HasError)
+{
+    <p style="color: red; text-align: right;">خطا: @Model.ErrorMessage</p>
+}
+else
+{
+    <div class="container">
+        <div>
+            <div class="col-md-12 col-sm-12 " style="padding: 6px;text-align: center;">
+                <div style="font-family: Miransans;margin-top: 50px;padding: 20px;background-color: #f1f1f1;border-radius: 12px;">
+                    <div style="font-family: Miransans;font-size: 23px;">در حال انتقال به بانک</div>
+                    <div style="font-family: Miransans;font-size: 15px;color:red">کمی صبر کنید ....</div>
+                </div>
+                <form action="@Model.Url" method="post" id="bankform" style="display:none">
+                    @foreach (var item in Model.BankData)
+                    {
+                        <input type="hidden" name="@item.Key" value="@item.Value" />
+                    }
+                    <button type="submit" id="bankformbtn"></button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#bankform').submit();
+            $('#bankformbtn').click();
+        });
+    </script>
+}

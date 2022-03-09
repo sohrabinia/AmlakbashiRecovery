@@ -8,20 +8,13 @@ namespace Amlakbashi.Core.Common.Utilities
     public static class DateTimeUtility
     {
         public static List<string> norouz_dates = new List<string>() {
-                               "1399,12,28", "1399,12,29", "1399,12,30", "1400,1,1",
-                               "1400,1,2", "1400,1,3","1400,1,4",
-                               "1400,1,5", "1400,1,6", "1400,1,7",
-                               "1400,1,8","1400,1,9", "1400,1,10",
-                               "1400,1,11", "1400,1,12", "1400,1,13"};
+                               "1400,12,28", "1400,12,29", "1401,1,1",
+                               "1401,1,2", "1401,1,3","1401,1,4",
+                               "1401,1,5", "1401,1,6", "1401,1,7",
+                               "1401,1,8","1401,1,9", "1401,1,10",
+                               "1401,1,11", "1401,1,12", "1401,1,13"};
 
         public static List<string> persian_holidays = new List<string>() {
-                               "1400,1,1", "1400,1,2", "1400,1,3",
-                               "1400,1,4", "1400,1,9", "1400,1,12",
-                               "1400,2,14", "1400,2,23", "1400,3,15",
-                               "1400,3,16", "1400,4,30", "1400,5,7",
-                               "1400,5,27", "1400,5,28", "1400,7,5",
-                               "1400,7,13", "1400,7,15",
-                               "1400,8,2", "1400,10,16", "1400,11,26",
                                "1400,12,10", "1400,12,29",
                                "1401,1,1", "1401,1,2", "1401,1,3",
                                "1401,1,4", "1401,1,13", "1401,2,12",
@@ -200,6 +193,13 @@ namespace Amlakbashi.Core.Common.Utilities
         public static bool IsNorouz(List<string> persian_date_range)
         {
             return norouz_dates.Intersect(persian_date_range).Any();
+        }
+
+        public static bool IsNorouz(DateTime startDate, DateTime endDate)
+        {
+            var dateRange = GetDateRangeFromGregorianDate(startDate, endDate);
+            var persianDateRange = dateRange.Select(s => GregorianToPersianDate(s)).ToList();
+            return norouz_dates.Intersect(persianDateRange).Any();
         }
 
         public static string GetPersianDateDayOfWeek(string persian_date)

@@ -310,17 +310,9 @@
         /*margin: auto 5px;*/
     }
 
-    /*.master_header-account {
-        width: 25px;
-    }*/
-
     .master__header-menu {
         font: 13px Miransans;
         padding: 2px;
-        width: 25px;
-    }
-
-    .master_header-account {
         width: 25px;
     }
 

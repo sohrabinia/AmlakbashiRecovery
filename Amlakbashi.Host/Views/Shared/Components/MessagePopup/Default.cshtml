@@ -1,0 +1,13 @@
+﻿@model IList<string>
+
+@if (Model != null && Model.Count > 0)
+{
+    <script>
+        var message = '';
+        @foreach (var item in Model)
+        {
+            @:message = message + '* ' + '@item' + '\n';
+        }
+        showInfoMessage('توجه', message);
+    </script>
+}

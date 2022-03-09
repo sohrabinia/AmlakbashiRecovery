@@ -2,12 +2,12 @@
     loadCollapse(callerButton, $(callerButton).next()[0], '/advertise/GetAdvertiseIndexDetails?advertiseId=' + advertiseId);
 }
 
-$(".box-filter .submit-btn").click(function (event) {
+function quickFilterProcess() {
     $('#more_filter_form [name="Id"]').val($('.box-filter .bar-filter [name="AdvertiseId"').val());
     $('#more_filter_form [name="UserId"]').val($('.box-filter .bar-filter [name="HostUserId"').val());
     $('#more_filter_form [name="Status"]').val($('.box-filter .bar-filter [name="Status"').val());
     $('#more_filter_form').submit();
-});
+}
 
 function deleteAdvertise($id) {
     showConfirm('آیا از حذف این آگهی مطمئن هستید؟', function () {

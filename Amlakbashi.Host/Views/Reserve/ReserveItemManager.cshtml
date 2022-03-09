@@ -494,7 +494,7 @@
                                 "&reserveprice=" + (total_price)
                                 , function (ret) {
                                     if (ret.status == 1) {
-                                        window.location.href = "/cart/performpay?payment_id=" + ret.pid;
+                                        window.location.href = "/cart/performpay?paymentid=" + ret.pid;
                                     }
                                     else {
                                         showErrorMessage('خطا', 'متاسفانه عملیات با خطا مواجه شد');
@@ -519,7 +519,7 @@
                                 "&reserveprice=" + (deposite_price)
                                 , function (ret) {
                                     if (ret.status == 1) {
-                                        window.location.href = "/cart/performpay?payment_id=" + ret.pid;
+                                        window.location.href = "/cart/performpay?paymentid=" + ret.pid;
                                     }
                                     else {
                                         showErrorMessage('خطا', 'متاسفانه عملیات با خطا مواجه شد');
@@ -580,7 +580,8 @@
         var chatInput = null;
         var cancel_discussion_box = null;
         var chat_reserve_id = null;
-        var chatBox =  null;
+        var chatBox = null;
+
         function chat(reserve_id, element) {
             var width = $(window).width();
             if ( width < 960){
@@ -600,7 +601,8 @@
             $(".bg-chat-reserve").css("display", "block");
             var url = $("#host_root").is(":visible") ? "/Chat/GetHostChatPopup?reserve_id=" + reserve_id : "/Chat/GetGuestChatPopup?reserve_id=" + reserve_id;
             mainChat.load(url, function () {
-                $(".reserve-main_chat-box")[0].scrollTop = $(".reserve-main_chat-box")[0].scrollHeight;});
+                $(".reserve-main_chat-box")[0].scrollTop = $(".reserve-main_chat-box")[0].scrollHeight;
+            });
         }
 
         $(".close-chat-box").click(function(){
@@ -644,13 +646,14 @@
         //    });
         //}
 
-
-
         function refreshChatBox(reserve_id) {
             if (mainChat == null)
                 return;
             var url = $("#host_root").is(":visible") ? "/Chat/GetHostChatPopup?reserve_id=" + reserve_id : "/Chat/GetGuestChatPopup?reserve_id=" + reserve_id;
-            mainChat.load(url)
+            mainChat.load(url, function () {
+                $(".reserve-main_chat-box")[0].scrollTop = $(".reserve-main_chat-box")[0].scrollHeight;
+            });
+
         }
 
         //function refreshCancelDiscussionBox(reserve_id) {
@@ -706,11 +709,11 @@
                         reserveDashboardHubConnection.invoke("reloadChat", reserve_id);
                         chatInput.val("");
                         chatInput.focus();
-                        $(".reserve-main_chat-box").stop().animate({ scrollTop: $(".reserve-main_chat-box")[0].scrollHeight}, 1000);
+                        //$(".reserve-main_chat-box").stop().animate({ scrollTop: $(".reserve-main_chat-box")[0].scrollHeight}, 1000);
                     }
                     else if (ret.status == 2) {
-                        alertify.error("لطفا از ارسال شماره تلفن و یا آی دی و یا حروف انگلیسی خودداری کنید");
-                        reserveDashboardHubConnection.invoke("reloadChat", reserve_id);
+                        alertify.error("لطفا از ارسال شماره تلفن، شناسه و حروف انگلیسی خودداری کنید");
+                        //reserveDashboardHubConnection.invoke("reloadChat", reserve_id);
                         chatInput.val("");
                         chatInput.focus();
                     }

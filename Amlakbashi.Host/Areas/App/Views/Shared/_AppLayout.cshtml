@@ -9,23 +9,6 @@
 <!DOCTYPE html>
 <html class="theme3" lang="fa">
 <head>
-    <!-- Global Site Tag (gtag.js) - Google Analytics -->
-    @*<script async src="https://www.googletagmanager.com/gtag/js" defer></script>
-        <script async defer>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            gtag('js', new Date());
-            gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
-            gtag('config', 'AW-706947688');
-        </script>*@
-    <!-- Event snippet for Purchased (Tracking) conversion page -->
-    @*<script async defer>
-        gtag('event', 'conversion', {
-            'send_to': 'AW-850965714/5NVbCJTHpZ0BENLp4pUD',
-            'transaction_id': ''
-        });
-        </script>*@
-    @*<script> !function (e, t, a) { "use strict"; var s = t.head || t.getElementsByTagName("head")[0], p = t.createElement("script"); e.iwmfBadge = a, p.async = true, p.src = "https://cdn.iwmf.ir/js/people-votes/people-vote-2-2.js", s.appendChild(p) }(window, document, "o-bottom-left"); </script>*@
     @RenderSection("HeaderAddition", required: false)
     <title>@ViewBag.Title</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -36,9 +19,7 @@
     <meta name="theme-color" content="#fdd835" />
     <link rel='index' title='املاک باشی' href='@string.Format("{0}://{1}", Context.Request.Scheme, Context.Request.Host)' />
     <link rel='dns-prefetch' href='//googletagmanager.com' />
-    @*<link rel='dns-prefetch' href='//client.crisp.chat' />*@
     <link rel='dns-prefetch' href='//google-analytics.com' />
-    @*<link rel='dns-prefetch' href='//settings.crisp.chat' />*@
     <meta name="viewport" content="width=device-width, initial-scale= 1" />
     <meta name="coverage" content="Worldwide" />
     <meta name="robots" content="index,follow,all" />
@@ -93,9 +74,29 @@
     <style>
         @RenderSection("StyleBlock", required: false)
     </style>
+    <style>
+        .app-loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            background-color: rgba(0,0,0,0.6);
+            text-align: center;
+        }
+        .app-loader i.fa-spinner{
+            font-size: 100px; 
+            color: white; 
+            margin: 20% auto; 
+            animation: spin 1.5s linear infinite;
+        }
+    </style>
 </head>
 <body>
-    @await Html.PartialAsync("_ImpersonateContainer", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hidden", true } })
+    @*@await Html.PartialAsync("_ImpersonateContainer", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "hidden", true } })*@
+    <div class="app-loader"><i class="fa fa-spinner"></i></div>
     <div id="loading-icon" class="loading-contianer">
         <div class="ui active large loader loading-icon"></div>
     </div>
@@ -139,49 +140,37 @@
                     }
                 </div>
                 <div class="master_header-child">
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <a id="dashboard_button" asp-area="app" asp-controller="home" asp-action="dashboard" class="master_header-account app">
-                            <p><i class="fa fa-user"></i> حساب من </p>
-                        </a>
-                    }
-                    else
-                    {
-                        <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account">
-                            <p></p>
-                        </a>
-                    }
+                    <a id="dashboard_button" onclick="toggle_login()" href="#" class="master_header-account is-app">
+                        <p></p>
+                    </a>
                 </div>
-                <div class="master_header-child">
-                    <div onclick="toggleMenu()" class="master__header-menu">
-                        <i class="fa fa-bars"></i>
-                        <span>منو</span>
-                    </div>
-                </div>
+                @*<div class="master_header-child">
+                        <div onclick="toggleMenu()" class="master__header-menu">
+                            <i class="fa fa-bars"></i>
+                            <span>منو</span>
+                        </div>
+                    </div>*@
             </div>
             @RenderSection("TopPin", false)
             <div class="master__menu">
                 @if (ViewBag.home == null || !ViewBag.home)
                 {
-                    <a class="master__menu-item" href="/">صفحه اول</a>
+                    <a class="master__menu-item" href="/app/home/main">خانه</a>
                 }
                 @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
                 {
-                    <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=1"> رزرو های من </a>
-                    <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی </p>
-                    <a class="master__menu-item" href="/contact"> تماس با ما</a>
-                    <a class="master__menu-item js-present-prize-link" href="/post/presentandprize">هدیه سفر</a>
-                    <a class="master__menu-item" href="/accomodation/accbasicform"> ثبت آگهی</a>
+                    <a class="master__menu-item" href="/app/reserve/list?selectType=1">رزرو ها</a>
+                    <a class="master__menu-item" href="/app/advertise/updatebasic">ثبت آگهی</a>
+                    @*<p class="master__menu-item" onclick="searchAdvertiseId()">جستجو آگهی</p>*@
+                    @*<a class="master__menu-item" href="/contact"> تماس با ما</a>*@
                 }
                 else
                 {
-                    <a class="master__menu-item" href="/reserve/reserveitemmanager?selectType=2"> رزرو های من</a>
-                    <a class="master__menu-item" href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)"> آگهی های من</a>
-                    <p class="master__menu-item" onclick="searchAdvertiseId()"> جستجو با کد آگهی</p>
-                    <a class="master__menu-item" href="/contact"> تماس با ما </a>
-                    <a class="master__menu-item" href="/post/downloadapp">نصب اپلیکیشن </a>
-                    <a class="master__menu-item" href="/accomodation/accbasicform"> ثبت آگهی</a>
-                    <a class="master__menu-item js-present-prize-link" href="/post/presentandprize">هدیه سفر</a>
+                    <a class="master__menu-item" href="/app/reserve/list?selectType=2">رزرو ها</a>
+                    <a class="master__menu-item" href="/app/advertise/list">آگهی ها</a>
+                    <a class="master__menu-item" href="/app/advertise/updatebasic">ثبت آگهی</a>
+                    @*<p class="master__menu-item" onclick="searchAdvertiseId()">جستجو آگهی</p>*@
+                    @*<a class="master__menu-item" href="/contact"> تماس با ما </a>*@
                 }
             </div>
         }
@@ -196,6 +185,7 @@
             }*@
         <div style="display: none" id="chat_hidden_holder"></div>
         <input type="hidden" value="0" id="js-support-chat-id">
+
         <environment include="Development">
             <script src="/resource/scripts/general/message-popup.js" defer asp-append-version="true"></script>
             <script src="/resource/alertify.js-0.3.11/src/alertify.js" defer asp-append-version="true"></script>
@@ -231,6 +221,20 @@
         @RenderSection("ScriptBlock", required: false)
         <script type="text/javascript">
             $(document).ready(function () {
+
+                let showLoader = false;
+                $('a').click(function (event) {
+                    var target = $(this).attr("href");
+                    if (target && target.startsWith('/app/')) {
+                        showLoader = true;
+                    }
+                });
+                window.addEventListener('beforeunload', function () {
+                    if (showLoader) {
+                        $('.app-loader').show();
+                    }
+                });
+
                 var installBtnShown = false;
                 var userAgent = navigator.userAgent || navigator.vendor || window.opera;
                 var isAndroid = false;

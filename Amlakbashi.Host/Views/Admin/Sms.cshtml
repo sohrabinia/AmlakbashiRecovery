@@ -1,4 +1,5 @@
 ﻿@model Amlakbashi.Core.Entities.Comment
+
 @{
     ViewBag.Title = "ارسال اس ام اس";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
@@ -8,9 +9,6 @@
     string[] SmsTemplates = new string[] { "Template1", "Template2", "Template3", "SetNorouzPrice" };
 }
 
-@section ScriptLink
-{
-}
 <div class="title">ارسال  اس ام اس</div>
 <form data-ajax="true" asp-action="sendsms" asp-controller="admin" data-ajax-success="done" id="add-comment-form" method="post" enctype="multipart/form-data">
     <input type="hidden" id="confirmRequired" name="confirmRequired" value="true" />
@@ -21,6 +19,20 @@
                 <input name="recieverUserID" id="user_id_label" value="0" style="height:35px; border:1px solid #ccc;border-radius:7px;" />
             </div>
         </div>
+
+        <div class="dynamic-filter__item">
+            <div class="dynamic-filter__label">
+                نوع کاربر:
+            </div>
+            <div class="dynamic-filter__property">
+                <select name="userType">
+                    <option selected="selected" value="-1">همه</option>
+                    <option value="0">مهمان</option>
+                    <option value="1">میزبان</option>
+                </select>
+            </div>
+        </div>
+
         <div class="dynamic-filter__item">
             <div class="dynamic-filter__label">
                 وضعیت مالکیت گیرنده ها :
@@ -39,7 +51,6 @@
         <div class="dynamic-filter__item">
             <div class="dynamic-filter__label">نوع آگهی :</div>
             <div class="dynamic-filter__property">
-
                 <select name="adtype">
                     <option value="-1">همه </option>
                     @{ var types2 = Advertise.GetAdvertiseTypes(Advertise.AdvertisePageType.Filter);}
@@ -68,42 +79,16 @@
         </div>
 
         <div class="dynamic-filter__item">
-            <div class="dynamic-filter__label">نوع معامله :</div>
+            <div class="dynamic-filter__label">وضعیت قیمت نوروزی:</div>
             <div class="dynamic-filter__property">
-
-                <select name="tradeid">
-                    <option value="-1">همه </option>
-                    <option value="20">اجاره روزانه</option>
-                    <option value="1">خرید و فروش</option>
-                    <option value="2">رهن و اجاره</option>
+                <select name="norouzPriceStatus">
+                    <option value="0">همه</option>
+                    <option value="1">ثبت شده</option>
+                    <option value="2">ثبت نشده</option>
                 </select>
             </div>
         </div>
 
-
-        <div class="dynamic-filter__item">
-            <div class="dynamic-filter__label">نوع ویژه :</div>
-            <div class="dynamic-filter__property">
-                <select name="special">
-                    <option value="-1">همه </option>
-                    <option value="0">آگهی عادی</option>
-                    <option value="1">آگهی ویژه</option>
-                    <option value="2">48 آگهی ویژه</option>
-                    <option value="3"> آگهی ویژه 24</option>
-                    <option value="4">آگهی ویژه 12</option>
-                    <option value="5">ویژه ی یک ستاره یک ماهه</option>
-                    <option value="6">ویژه ی یک ستاره سه ماهه</option>
-                    <option value="7">ویژه ی یک ستاره شش ماهه</option>
-                    <option value="8">ویژه ی دو ستاره یک ماهه</option>
-                    <option value="9">ویژه ی دو ستاره سه ماهه</option>
-                    <option value="10">ویژه ی دو ستاره شش ماهه</option>
-                    <option value="11">ویژه ی سه ستاره یک ماهه</option>
-                    <option value="12">ویژه ی سه ستاره سه ماهه</option>
-                    <option value="13">ویژه ی سه ستاره شش ماهه</option>
-                    <option value="999">ویژه ی سهرابی</option>
-                </select>
-            </div>
-        </div>
         @await Component.InvokeAsync("RegionSelector", new { province = ViewBag.province, city = ViewBag.city, area = ViewBag.area })
     </div>
     <table style="margin-top: 15px;border: solid lightgray; border-width: thin;">

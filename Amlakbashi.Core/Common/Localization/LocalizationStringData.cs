@@ -30,10 +30,12 @@ namespace Amlakbashi.Core.Common.Localization
                         {"ACC_VALIDATION_ROOM", "تعداد اتاق خواب را وارد کنید" },
                         {"ACC_VALIDATION_FLOOR", "طبقه ملک را انتخاب کنید" },
                         {"ACC_VALIDATION_COUNT", "لطفا تعداد اتاق را وارد کنید" },
-                        { "ACC_VALIDATION_PRICE", "لطفا تمامی قیمت ها را به طور صحیح وارد کنید" },
-                        { "ACC_VALIDATION_PRICE_MIN", "حداقل قیمت {0} تومان" },
+                        {"ACC_VALIDATION_PRICE", "لطفا تمامی قیمت ها را به طور صحیح وارد کنید" },
+                        {"ACC_VALIDATION_PRICE_MIN", "حداقل قیمت {0} تومان" },
                         {"ACC_VALIDATION_AMENITIES", "لطفا تمامی امکانات را تعیین کنید" },
-                        {"ACC_VALIDATION_ELEVATOR", "لطفا آسانسور را تعیین کنید" }
+                        {"ACC_VALIDATION_ELEVATOR", "لطفا آسانسور را تعیین کنید" },
+                        {"ACC_VALIDATION_PARKING", "لطفا تعداد پارکینگ را مشخص کنید" },
+                        {"ACC_VALIDATION_LICENSENUMBER", "لطفا شماره مجوز را وارد کنید" },
                     }
                 }
         };

@@ -735,9 +735,16 @@ $("#edit_mail_button").click(function () {
 })
 function verification_success() {
     alertify.success("با موفقیت وارد حساب خود شدید");
-    $(".master_header-account").attr("href", "/dashboard");
-    $(".master_header-account").removeAttr("onclick");
-    $(".master_header-account").find("span").html("حساب من");
+    let dashboardLink = $(".master_header-account");
+    if (dashboardLink.hasClass('is-app')) {
+        dashboardLink.attr('href', '/app/home/dashboard');
+    }
+    else {
+        dashboardLink.attr("href", "/dashboard");
+    }
+    //$(".master_header-account").attr("href", "/dashboard");
+    dashboardLink.removeAttr("onclick");
+    dashboardLink.find("p").html("<i class='fa fa-user'></i> حساب من");
     $('.login__container').hide();
     $('.login__bg').hide();
     onLoginFinish();

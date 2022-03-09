@@ -1,4 +1,6 @@
 ﻿using Amlakbashi.Application;
+using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Data;
 using Amlakbashi.Data.Identity;
@@ -12,7 +14,6 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Hangfire;
 using Hangfire.SqlServer;
-using log4net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -78,19 +79,9 @@ namespace Amlakbashi.Host
             services.AddAuthentication()
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
-                    var key = Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"]);
                     options.SaveToken = true;
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        RequireSignedTokens = true,
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        RequireExpirationTime = false,
-                        ValidateLifetime = true,
-                        NameClaimType = "name",
-                    };
+                    options.TokenValidationParameters = 
+                        TokenUtility.GetTokenValidationParameters(Configuration["JwtConfig:Secret"]);
                 });
 
             services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
@@ -229,7 +220,7 @@ namespace Amlakbashi.Host
                 Credential = GoogleCredential.FromFile(env.ContentRootPath + "/amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json")
             });
 
-            //DatabaseInitializer.SeedData(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
+            //IdentityDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
             AmlakbashiDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
         }
     }

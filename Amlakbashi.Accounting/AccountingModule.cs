@@ -1,7 +1,7 @@
 ﻿
 using Amlakbashi.Accounting.PaymentContext;
-using Amlakbashi.Accounting.PaymentContext.PaymentEngines;
-using Amlakbashi.Accounting.PaymentContext.PaymentEngines.Interfaces;
+using Amlakbashi.Accounting.PaymentContext.BankEngines;
+using Amlakbashi.Accounting.PaymentContext.BankEngines.Interfaces;
 using Amlakbashi.Accounting.Services;
 using Amlakbashi.Accounting.Services.Interfaces;
 using Amlakbashi.Accounting.BankingContext.Extensions;

@@ -1,6 +1,7 @@
 ﻿using Amlakbashi.Accounting.PaymentContext;
 using Amlakbashi.Core.Common.Enums;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
+using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.PaymentStatisticsDTOs;
 using Amlakbashi.Core.DTOs.WalletDTOs;
@@ -9,6 +10,7 @@ using Amlakbashi.Core.Infrastructure.UserContact;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static Amlakbashi.Core.Entities.ActionLog;
 using static Amlakbashi.Core.Entities.PrizeCreditTransaction;
 using static Amlakbashi.Core.Entities.Reserve;
@@ -92,7 +94,8 @@ namespace Amlakbashi.Accounting
         Payment FindPayment(long id);
         void InsertPayment(Payment newPayment);
         void UpdatePayment(Payment editedPayment);
-        CheckPaymentDTO CheckPaymentResult(int paymentId);
+        Task<CheckPaymentDTO> CheckPaymentResult(int paymentId);
+        Task<bool> EditPaymentByReinquiry(int paymentId);
 
         // GroupPayment Functions
 
@@ -111,13 +114,14 @@ namespace Amlakbashi.Accounting
         long PayAmlakbashiPortion(long reserveId, ReservePaymentType payType,
             out bool alreadyPaid, out long price, ReservePaymentMethod paymentMethod, int userId, int doerUserId);
 
-        bool FinalizePayment(BankEnum bank, int pid, int userId, DateTime date,
-            string tref, out string paymentResult, out string msg,
-            out bool invalidInput, ActionSourceEnum actionSource, int doerUserId);
+        bool RegisterPasargadEpay(PasargadEpayResponseDTO response, out string msg, out string referenceNumber);
+
+        bool RegisterSamanEpay(SamanEpayResponseDTO response, out string msg);
 
         bool TestFinalizePayment(int pid, int userId, out string msg);
 
-        Dictionary<string, object> GeneratePaymentData(BankEnum bank, int pid, string redirectAddress);
+        EpayDTO GeneratePaymentData(BankEnum bank, int pid, string redirectAddress);
+
         GuestPayResult GuestPayReserve(int userId, long reserveId,
             int payReserveType, out long payment_id, int doerUserId,
             ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId);
@@ -125,10 +129,12 @@ namespace Amlakbashi.Accounting
         GuestPayResult GuestPayReserveWithCredit(int userId, long reserveId,
             int payReserveType, out long paymentId, int doerUserId,
             ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId);
+
         void GenerateReserveFinanceChart(int year, int month,
             out PaymentChartDTO TotalReservePriceChart,
             out PaymentChartDTO SitePortionChart,
             out PaymentChartDTO HostCreditorChart);
+
         PaymentChartDTO GeneratePaymentChart(int year, int month, bool extra_filter = false, List<int> user_list = null);
 
         // Podium Services

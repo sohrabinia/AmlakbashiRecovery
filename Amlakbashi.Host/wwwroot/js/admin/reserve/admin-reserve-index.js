@@ -14,13 +14,13 @@ function showSupportInfo(reserveId) {
     loadPopup("/reserve/getsupportinfo?reserveId=" + reserveId);
 }
 
-$(".box-filter .submit-btn").click(function (event) {
+function quickFilterProcess() {
     $('#more_filter_form [name="ReserveId"]').val($('.box-filter .bar-filter [name="ReserveId"').val());
     $('#more_filter_form [name="AdvertiseId"]').val($('.box-filter .bar-filter [name="AdvertiseId"').val());
     $('#more_filter_form [name="HostUserId"]').val($('.box-filter .bar-filter [name="HostUserId"').val());
     $('#more_filter_form [name="GuestUserId"]').val($('.box-filter .bar-filter [name="GuestUserId"').val());
     $('#more_filter_form').submit();
-});
+}
 
 function copyStringToClipboard(str, name) {
     // Create new element
@@ -274,7 +274,7 @@ function executeAddToShouldFollow(reserve_id, text) {
 }
 
 function executeAddInfo(reserve_id, text, notShowMessage) {
-    sendGetAjax("/reserve/addsupporterinfotoreserve", "reserve_id=" + reserve_id + "&text=" + text, function (ret) {
+    sendPostAjax("/reserve/addsupporterinfotoreserve", "reserve_id=" + reserve_id + "&text=" + text, function (ret) {
             if (ret.status == 0) {
                 errorAlert("عملیات با خطا مواجه شد");
             }

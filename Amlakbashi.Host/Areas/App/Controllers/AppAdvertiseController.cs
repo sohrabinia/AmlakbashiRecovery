@@ -13,6 +13,7 @@ using Amlakbashi.Host.Authentication;
 using log4net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -420,6 +421,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
                 int level;
+                IFormFile uploadedLicenseFile = null;
                 if (data.Pool == true)
                 {
                     data.PoolFeatures = poolDTO.ConvertToEnum();
@@ -428,7 +430,12 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 {
                     data.PoolFeatures = Advertise.PoolFeaturesEnum.None;
                 }
-                var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors, out level, isEdit);
+                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
+                {
+                    uploadedLicenseFile = Request.Form.Files[0];
+                }
+                var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors,
+                    out level, uploadedLicenseFile, isEdit);
                 if (errors.Any())
                 {
                     ModelState.Clear();
@@ -446,72 +453,61 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                     ViewBag.level = level;
                     return View(ExtraFormDTO.Generate(director, data.Id));
                 }
+
                 var isAdd = data.Status == Advertise.AdvertiseStatus.NotCompleted;
-                if (tab > 0)
+                switch (tab)
                 {
-                    switch (tab)
-                    {
-                        case 1:
-                            return RedirectToAction(nameof(UpdateBasic), new
-                            {
-                                id = data.Id
-                            });
-                        case 2:
-                            return RedirectToAction(nameof(UpdateGeneral), new
-                            {
-                                id = data.Id
-                            });
-                        case 4:
-                            if (director.AdvertiseType == Advertise.AdvertiseType.Complex || director.AdvertiseType == Advertise.AdvertiseType.HotelApartment)
-                            {
-                                return RedirectToAction(nameof(UpdateComplexUnit), new
-                                {
-                                    parentId = data.Id,
-                                    id = -1
-                                });
-                            }
-                            else
-                            {
-                                return RedirectToAction(nameof(UpdateHotelRoom), new
-                                {
-                                    parentId = data.Id,
-                                    id = -1
-                                });
-                            }
-                    }
-                }
-                switch (director.Mode)
-                {
-                    case Advertise.AdvertiseMode.Parent:
+                    case 1:
+                        return RedirectToAction(nameof(UpdateBasic), new
+                        {
+                            id = data.Id
+                        });
+                    case 2:
+                        return RedirectToAction(nameof(UpdateGeneral), new
+                        {
+                            id = data.Id
+                        });
+                    case 4:
                         if (director.AdvertiseType == Advertise.AdvertiseType.Complex || director.AdvertiseType == Advertise.AdvertiseType.HotelApartment)
                         {
                             return RedirectToAction(nameof(UpdateComplexUnit), new
                             {
-                                parentId = data.Id
+                                parentId = data.Id,
+                                id = -1
                             });
                         }
                         else
                         {
                             return RedirectToAction(nameof(UpdateHotelRoom), new
                             {
-                                parentId = data.Id
+                                parentId = data.Id,
+                                id = -1
                             });
                         }
                     default:
-                        var user = userAccessor.CurrentUser;
-                        if (string.IsNullOrEmpty(user.Mobile2) ||
-                            string.IsNullOrEmpty(user.Tell) ||
-                            string.IsNullOrEmpty(user.ThirdPersonTell))
+                        if (director.Mode == Advertise.AdvertiseMode.Parent)
                         {
-                            var success_str = "آگهی شما با موفقیت " + (isAdd ? "ثبت" : "ویرایش") + " و پس از تایید کارشناس " + (isAdd ? "" : "دوباره ") + "نمایش داده میشود، لطفا اطلاعات مورد نیاز را تکمیل کنید";
-                            TempData["alert_success"] = success_str;
-                            return RedirectToAction("ProfileManager", "User", new { UserID = user.Id });
+                            if (director.AdvertiseType == Advertise.AdvertiseType.Complex || director.AdvertiseType == Advertise.AdvertiseType.HotelApartment)
+                            {
+                                return RedirectToAction(nameof(UpdateComplexUnit), new
+                                {
+                                    parentId = data.Id
+                                });
+                            }
+                            else
+                            {
+                                return RedirectToAction(nameof(UpdateHotelRoom), new
+                                {
+                                    parentId = data.Id
+                                });
+                            }
                         }
                         else
                         {
+                            var user = userAccessor.CurrentUser;
                             var success_str = "آگهی شما با موفقیت " + (isAdd ? "ثبت" : "ویرایش") + " و پس از تایید کارشناس " + (isAdd ? "" : "دوباره ") + "نمایش داده میشود . \n";
                             TempData["alert"] = success_str;
-                            return Redirect("/dashboard");
+                            return Redirect("/app/advertise/list");
                         }
                 }
             }
@@ -624,7 +620,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                         parentId = data.ParentId
                     });
                 }
-                return Redirect("/dashboard");
+                return Redirect("/app/advertise/list");
 
             }
             catch (Exception exc)
@@ -753,7 +749,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                         parentId = data.ParentId
                     });
                 }
-                return Redirect("/dashboard");
+                return Redirect("/app/advertise/list");
             }
             catch (Exception exc)
             {
@@ -784,7 +780,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 model.floor.Floor = Advertise.FloorItems.Unset;
             }
             model.titleAndDesc = new TitleDescInputDTO(false);
-            return PartialView("_AccComplexTypeForm", model);
+            return PartialView("~/Views/Accomodation/_AccComplexTypeForm.cshtml", model);
         }
     }
 }

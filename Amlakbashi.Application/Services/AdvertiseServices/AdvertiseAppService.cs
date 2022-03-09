@@ -30,6 +30,8 @@ using Microsoft.AspNetCore.Identity;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Mediator.Commands.FileCommands;
 using Amlakbashi.Core.DTOs.AdvertiseDTOs;
+using Amlakbashi.Mediator.Commands.CategoryCommands;
+using Microsoft.AspNetCore.Http;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
@@ -99,6 +101,29 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return Repository.Query(q => q.Where(w => ids.Contains(w.Id) && w.Status == status).ToList());
         }
 
+        public IList<Advertise> GetMostLiked(int count, bool beInstantReserve = false)
+        {
+            if (beInstantReserve)
+            {
+                return Repository.Query(q => q.Where(w => w.InstantReserveStatus == InstantReserveStatusEnum.Confirmed)
+                    .OrderByDescending(o => o.AverageUserRating).Take(count)).ToList();
+            }
+            return Repository.Query(q => q.OrderByDescending(o => o.AverageUserRating).Take(count)).ToList();
+        }
+
+        public List<string> GetAdvertiseTags(Advertise advertise)
+        {
+            var tags = new List<string>();
+            tags.Add(AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID));
+            if (advertise.Room > 0)
+            {
+                tags.Add($"{advertise.Room} خوابه");
+            }
+            tags.Add(advertise.RegionCity.PersianName);
+            tags.Add(advertise.RegionProvince.PersianName);
+            return tags;
+        }
+
         public void AddSupporterInfo(long id, string text, User supporter)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
@@ -166,73 +191,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return false;
         }
 
-        public IList<Advertise> Filter(AdvertiseStatus status, int adtype, int userid, string sort, long id, int instantReserveStatus,
-            long minReserveNorouzDateUnix, int imageCountMin, int imageCountMax, int province, int city, int area, int hygieneProtocolStatus)
-        {
-            IQueryable<Advertise> model = Repository.Query(q => q);
-            model = model.Where(w => w.Mode != AdvertiseMode.Child);
-            if (status != AdvertiseStatus.Unset)
-                model = model.Where(a => a.Status == status);
-            else
-                model = model.Where(a => a.Status != AdvertiseStatus.Deleted);
-            if (id > 0)
-            {
-                model = model.Where(w => w.Id == id || w.Childs.Any(x => x.Id == id));
-            }
-            if (userid != -1)
-                model = model.Where(w => w.UserID == userid);
-            if (adtype > 0)
-            {
-                model = model.Where(a => a.TypeID == (AdvertiseType)adtype);
-            }
-            if (hygieneProtocolStatus > -1)
-            {
-                var st = (Advertise.HygieneProtocolStatus)hygieneProtocolStatus;
-                model = model.Where(w => w.HygieneProtocol == st);
-            }
-            if (instantReserveStatus > -1)
-            {
-                model = model.Where(x => x.InstantReserveStatus == (Advertise.InstantReserveStatusEnum)instantReserveStatus);
-            }
-            if (minReserveNorouzDateUnix != 0)
-            {
-                model = model.Where(x => x.unixNorouzMinRequestDate >= minReserveNorouzDateUnix);
-            }
-            if (area > -1)
-            {
-                model = model.Where(x => x.Area == area);
-            }
-            else if (city > -1)
-            {
-                model = model.Where(x => x.City == city);
-            }
-            else if (province > -1)
-            {
-                model = model.Where(x => x.Province == province);
-            }
-            if (imageCountMin > 0)
-            {
-                model = model.Where(x => x.Photos.Count > imageCountMin);
-            }
-            if (imageCountMax > 0)
-            {
-                model = model.Where(x => x.Photos.Count <= imageCountMax + 1);
-            }
-            if (sort == "contact")
-                model = model.OrderByDescending(a => a.ContactClick).ThenByDescending(a => a.WebVisit);
-            else if (sort == "modify")
-                model = model.OrderByDescending(a => a.LastModifyDate).ThenByDescending(a => a.CreateDate);
-            else if (sort == "click")
-                model = model.OrderByDescending(a => a.WebVisit).ThenByDescending(a => a.ContactClick);
-            else if (sort == "score")
-                model = model.OrderByDescending(a => a.AdvertiseScore);
-            else
-                model = model.OrderByDescending(a => a.CreateDate);
-
-            List<Advertise> advertises = model.ToList();
-            return advertises;
-        }
-
         public void FilterNew(AdvertiseIndexDTO dto)
         {
             IQueryable<Advertise> model = Repository.Query(q => q);
@@ -253,9 +211,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 model = model.Where(w => w.UserID == dto.UserId);
             }
-            if (dto.Type > 0)
+            if (dto.Type != Advertise.AdvertiseType.All)
             {
-                model = model.Where(a => a.TypeID == (AdvertiseType)dto.Type);
+                model = model.Where(a => a.TypeID == dto.Type);
             }
             if (dto.HygieneProtocolStatus > -1)
             {
@@ -292,6 +250,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (dto.ImageCountMax > 0)
             {
                 model = model.Where(x => x.Photos.Count <= dto.ImageCountMax + 1);
+            }
+            if (dto.Parking != ParkingItems.Unset)
+            {
+                model = model.Where(x => x.Parking == dto.Parking || x.Childs.Any(a => a.Parking == dto.Parking));
+            }
+            if (dto.License != null)
+            {
+                model = model.Where(x => x.License == dto.License);
             }
             if (dto.Sort == "contact")
                 model = model.OrderByDescending(a => a.ContactClick).ThenByDescending(a => a.WebVisit);
@@ -421,14 +387,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return query.ToList();
         }
 
-        public List<long> GetAdvertisesPhotoIds()
-        {
-            var data = Repository.Query(q => q);
-            List<long> photoIds = data.Where(w => w.PhotoID != null).Select(s => (long)s.PhotoID).ToList();
-            photoIds.AddRange(data.Where(w => w.Photos.Any()).SelectMany(m => m.Photos.Select(s => s.Id)));
-            return photoIds;
-        }
-
         public void Edit(Advertise editedAd)
         {
             var advertise = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedAd.Id));
@@ -456,6 +414,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(advertise);
             Repository.Save();
             mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
+            mediator.Send(new RemoveCategoryItemCacheCommand(advertise.Id));
         }
 
         public void UpdateAccView(long accId)
@@ -688,7 +647,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public AdvertiseDirector SubmitExtraForm(Advertise data, out Dictionary<string, string> errors,
-            out List<string> groupErrors, out int level, bool isEdit = false)
+            out List<string> groupErrors, out int level, IFormFile uploadedLicenseFile, bool isEdit = false)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
             var oldAcc = acc.ShallowCopy();
@@ -697,8 +656,30 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : (acc.OwnershipType < 1 ? 3 : 4));
             bool hasImportantChange = false;
             var director = new AdvertiseDirector(data, DirectorType.Extra);
+
             if (director.Validate(out errors, out groupErrors) == false)
+            {
                 return director;
+            }
+
+            var licenseContentType = uploadedLicenseFile?.ContentType.ToLower();
+            if (uploadedLicenseFile != null &&
+                (licenseContentType == "image/png" ||
+                licenseContentType == "image/jpg" ||
+                licenseContentType == "image/jpeg") == false)
+            {
+                errors.Add("LicenseFileId", "فرمت فایل مجوز صحیح نمی باشد");
+                groupErrors.Add("فرمت فایل مجوز صحیح نمی باشد");
+                return director;
+            }
+
+            if (data.License == true && (uploadedLicenseFile == null && data.LicenseFileId == null))
+            {
+                errors.Add("LicenseFileId", "لطفا فایل مجوز خود را انتخاب کنید");
+                groupErrors.Add("لطفا فایل مجوز خود را انتخاب کنید");
+                return director;
+            }
+
             if (data.Id < 1)
             {
                 return director;
@@ -707,7 +688,17 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 hasImportantChange = director.HasImpotantChange(acc);
             }
+            long? licenseFileId = null;
+            if (uploadedLicenseFile != null)
+            {
+                licenseFileId = mediator.Send(new UpdateAdvertiseLicenseFileCommand(uploadedLicenseFile, data.Id, acc.UserID, data.LicenseFileId)).Result;
+                hasImportantChange = true;
+            }
             director.Submit(ref acc);
+            if (licenseFileId != null)
+            {
+                acc.LicenseFileId = licenseFileId;
+            }
             var prevStatus = acc.Status;
             if (isEdit)
             {
@@ -751,12 +742,17 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.LastModifyDate = DateTime.Now;
             Repository.Update(acc);
             Repository.Save();
-            mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id));
+            mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id, acc.NorouzPrice != oldAcc.NorouzPrice));
             if (acc.Mode == AdvertiseMode.Parent)
             {
                 mediator.Publish(new ChangeAdvertiseRulesEvent(acc.Id));
             }
             return director;
+        }
+
+        private void UpdateLicenseFile(IFormFile licenseFile, long advertiseId)
+        {
+
         }
 
         public AdvertiseDirector GetHotelForm(long id, long parentId, out bool isEdit)
@@ -786,6 +782,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             data.TypeID = parent.TypeID;
             data.Mode = AdvertiseMode.Child;
             var director = new AdvertiseDirector(data, DirectorType.HotelUnit);
+            bool changeNorouzPrice = false;
             if (director.Validate(out errors, out groupErrors))
             {
                 if (data.Id > 0)
@@ -793,6 +790,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     var child = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
                     var oldChild = child.ShallowCopy();
                     director.Submit(ref child);
+                    changeNorouzPrice = child.NorouzPrice != oldChild.NorouzPrice;
                     child.LastModifyDate = DateTime.Now;
                     Repository.Update(child);
                     if (parent.Status == AdvertiseStatus.NotCompleted || parent.Status == AdvertiseStatus.FirstReady)
@@ -853,7 +851,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     }
                     mediator.Publish(new AddHotelChildEvent(data.Id, (long)data.ParentId));
                 }
-                mediator.Publish(new ChangeAdvertisePriceEvent(data.Id));
+                mediator.Publish(new ChangeAdvertisePriceEvent(data.Id, changeNorouzPrice));
                 mediator.Send(new RemoveAdvertiseCacheCommand(parent.Id));
             }
             return director;
@@ -889,6 +887,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             data.Mode = AdvertiseMode.Child;
             var director = new AdvertiseDirector(data, DirectorType.ComplexUnit);
+            bool changeNorouzPrice = false;
             if (director.Validate(out errors, out groupErrors))
             {
                 if (data.Id > 0)
@@ -896,6 +895,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     var child = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
                     var oldChild = child.ShallowCopy();
                     director.Submit(ref child);
+                    changeNorouzPrice = child.NorouzPrice != oldChild.NorouzPrice;
                     var removedPhotoIds = new List<long>();
                     var photoPart = director.GetAdvertisePart<PhotoPart>();
                     var photoIds = photoPart.AlbumPhotosArray;
@@ -1006,7 +1006,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     }
                     mediator.Publish(new AddComplexChildEvent(data.Id, (long)data.ParentId));
                 }
-                mediator.Publish(new ChangeAdvertisePriceEvent(data.Id));
+                mediator.Publish(new ChangeAdvertisePriceEvent(data.Id, changeNorouzPrice));
                 mediator.Send(new RemoveAdvertiseCacheCommand(data.Id));
             }
             return director;
@@ -1065,7 +1065,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
         public AdvertiseDirector SubmitAdminForm(Advertise data, out Dictionary<string, string> errors,
             out List<string> groupErrors, bool forceSave, DirectorType type, int currentUserId,
-            out AdvertiseType parentType, out AdvertiseStatus status, string rootPath = null)
+            out AdvertiseType parentType, out AdvertiseStatus status, IFormFile uploadedLicenseFile = null)
         {
             var acc = Repository.Find(data.Id);
             status = acc.Status;
@@ -1099,7 +1099,32 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (type == DirectorType.General && (errors.Keys.Contains("Province") || errors.Keys.Contains("City")))
                 return director;
 
+            var licenseContentType = uploadedLicenseFile?.ContentType.ToLower();
+            if (uploadedLicenseFile != null &&
+                (licenseContentType == "image/png" ||
+                licenseContentType == "image/jpg" ||
+                licenseContentType == "image/jpeg") == false)
+            {
+                groupErrors.Add("فرمت فایل مجوز صحیح نمی باشد");
+                return director;
+            }
+
+            if (data.License == true && (uploadedLicenseFile == null && data.LicenseFileId == null))
+            {
+                groupErrors.Add("لطفا فایل مجوز خود را انتخاب کنید");
+                return director;
+            }
+
+            long? licenseFileId = null;
+            if (uploadedLicenseFile != null)
+            {
+                licenseFileId = mediator.Send(new UpdateAdvertiseLicenseFileCommand(uploadedLicenseFile, data.Id, data.UserID, data.LicenseFileId)).Result;
+            }
             director.Submit(ref acc);
+            if (licenseFileId != null)
+            {
+                acc.LicenseFileId = licenseFileId;
+            }
 
             if (type == DirectorType.General || type == DirectorType.ComplexUnit)
             {
@@ -1137,7 +1162,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (type == DirectorType.Extra || type == DirectorType.ComplexUnit ||
                 type == DirectorType.HotelUnit)
             {
-                mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id));
+                mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id, acc.NorouzPrice != shallowData.NorouzPrice));
             }
 
             Repository.Update(acc);
@@ -1290,6 +1315,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.TodayIsEmpty = true;
             Repository.Update(acc);
             Repository.Save();
+            mediator.Send(new RemoveCategoryItemCacheCommand(acc.Id));
         }
 
         public void UnsetTodayEmpty(long id)
@@ -1298,6 +1324,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             acc.TodayIsEmpty = false;
             Repository.Update(acc);
             Repository.Save();
+            mediator.Send(new RemoveCategoryItemCacheCommand(acc.Id));
         }
 
         public Dictionary<string, string> GetAdvertiseListPrices(List<long> ids)
@@ -1999,14 +2026,23 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             string startDate, string endDate, out string msg)
         {
             var advertise = Repository.Find(advertiseId);
-            if (advertise.IsForbidden)
+            var user = Repository.Find<User, int>(currentUserId);
+            var haveReservedRequest = false;
+            if (user != null && user.Reserves != null)
             {
-                msg = "کاربر گرامی رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است";
+                haveReservedRequest = user.Reserves.Any(a => a.GetStateCategory() == ReserveCategory.Reserved ||
+                    a.GetStateCategory() == ReserveCategory.Finished);
+            }
+            if (((advertise.Mode == AdvertiseMode.Child && advertise.Parent.License == false) ||
+                (advertise.Mode != AdvertiseMode.Child && advertise.License == false)) &&
+                advertise.IsForbidden && haveReservedRequest == false)
+            {
+                msg = "کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.";
                 return false;
             }
             if (advertise.Status != AdvertiseStatus.Published)
             {
-                msg = "متاسفانه این اقامتگاه در حال حاضر از دسترس خارج است. لطفا اقامتگاه دیگری انتخاب نمایید.";
+                msg = "متاسفانه این اقامتگاه در حال حاضر از دسترس خارج است. لطفا اقامتگاه دیگری انتخاب نمایید";
                 return false;
             }
             if (guestCount < 1)
@@ -2031,18 +2067,18 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             if (DateTimeUtility.PersianDateToGregorian(startDate) > DateTimeUtility.PersianDateToGregorian(endDate))
             {
-                msg = "تاریخ ورود نمیتواند از تاریخ خروج بیشتر باشد. لطفا اصلاح کنید.";
+                msg = "تاریخ ورود نمیتواند از تاریخ خروج بیشتر باشد. لطفا اصلاح کنید";
                 return false;
             }
             var days = DateTimeUtility.GetPersianDateRangeDays(startDate, endDate);
             if (advertise.MinReserveDays > 0 && days < advertise.MinReserveDays)
             {
-                msg = "برای رزرو این اقامتگاه باید حداقل " + advertise.MinReserveDays + "  شب اقامت کنید. برای اقامت " + days + " شبه میتوانید اقامتگاه های دیگر را رزرو کنید.";
+                msg = "برای رزرو این اقامتگاه باید حداقل " + advertise.MinReserveDays + "  شب اقامت کنید. برای اقامت " + days + " شبه میتوانید اقامتگاه های دیگر را رزرو کنید";
                 return false;
             }
             if (advertise.MaxReserveDays > 0 && days > advertise.MaxReserveDays)
             {
-                msg = "شما میتوانید حداکثر " + advertise.MaxReserveDays + "  شب در این اقامتگاه اقامت کنید. برای اقامت طولانی تر میتوانید اقامتگاه های دیگر را رزرو کنید.";
+                msg = "شما میتوانید حداکثر " + advertise.MaxReserveDays + "  شب در این اقامتگاه اقامت کنید. برای اقامت طولانی تر میتوانید اقامتگاه های دیگر را رزرو کنید";
                 return false;
             }
             var todayUnix = DateTimeUtility.DateValueOfJS(DateTime.Now.Date);
@@ -2050,7 +2086,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 DateTimeUtility.IsNorouz(DateTimeUtility.PersianDateRangeToList(startDate, endDate, true, false)))
             {
                 var minDateString = DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate));
-                msg = "برای رزرو نوروزی این اقامتگاه میتوانید از تاریخ " + minDateString + " اقدام کنید و یا اقامتگاه های دیگر را رزرو کنید.";
+                msg = "برای رزرو نوروزی این اقامتگاه میتوانید از تاریخ " + minDateString + " اقدام کنید و یا اقامتگاه های دیگر را رزرو کنید";
                 return false;
             }
             var startDateGregorian = DateTimeUtility.PersianDateToGregorian(startDate);
@@ -2058,7 +2094,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var minDate = DateTime.Now.TimeOfDay.Hours > 3 ? DateTime.Now.Date : DateTime.Now.Date.AddDays(-1);
             if (startDateGregorian < minDate || endDateGregorian <= minDate)
             {
-                msg = "تاریخ ورود و خروج گذشته است. لطفا زمان درست انتخاب کنید.";
+                msg = "تاریخ ورود و خروج گذشته است. لطفا زمان درست انتخاب کنید";
                 return false;
             }
             var occupiedDates = advertise.OccupiedDates().Select(s => DateTimeUtility.GregorianToPersianDate(s));

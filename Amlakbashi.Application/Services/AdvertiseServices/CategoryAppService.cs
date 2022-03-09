@@ -384,6 +384,9 @@ namespace Amlakbashi.Application.Services.Category
                         case priceRangeTypes.Monthly:
                             model_output = model_output.ThenByDescending(a => a.RentPrice);
                             break;
+                        case priceRangeTypes.Norouz:
+                            model_output = model_output.ThenByDescending(a => a.NorouzPrice);
+                            break;
                         default:
                             model_output = model_output.ThenByDescending(a => a.BasePrice);
                             break;
@@ -400,6 +403,9 @@ namespace Amlakbashi.Application.Services.Category
                             break;
                         case priceRangeTypes.Monthly:
                             model_output = model_output.ThenBy(a => a.RentPrice);
+                            break;
+                        case priceRangeTypes.Norouz:
+                            model_output = model_output.ThenBy(a => a.NorouzPrice);
                             break;
                         default:
                             model_output = model_output.ThenBy(a => a.BasePrice);

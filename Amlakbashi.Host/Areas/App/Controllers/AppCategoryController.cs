@@ -39,7 +39,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             this.logger = logger;
         }
 
-        public ActionResult Item(int regionType,
+        public ActionResult Item(int regionType = 0,
             int regionId = 0,
             int type = 81, int countryDirection = 0,
             int page = 1, string discount_homes = null, string today_empty_homes = null,
@@ -823,6 +823,81 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             //var redirectUri = WebUtility.UrlDecode(HttpContext.Request.Host + path);
             //Uri redirectURI = new Uri(HttpContext.Request.Host + path);
             //return Redirect(redirectURI.AbsoluteUri);
+        }
+
+        [ResponseCache(Duration = 60 * 15, VaryByQueryKeys = new string[] { "*" })]
+        public ActionResult Search(string phrase = "",
+            string province = "-1", string city = "-1", string area = "-1")
+        {
+            ViewBag.Province = province;
+            ViewBag.City = city;
+            ViewBag.Area = area;
+            ViewBag.search_string = phrase;
+            try
+            {
+                var regions = regionService.GetBySearchRegion(phrase);
+                if (regions.Any() == false && string.IsNullOrEmpty(phrase) == false)
+                    ViewBag.showNotFound = true;
+                var model = new List<SearchTableDTO>();
+                foreach (var item in regions)
+                {
+                    model.Add(SearchTableDTO.GenerateForApp(item, regionService.GetRegionName(item.Type != 2 ? 0 : (int)item.ParentID)));
+                }
+                return PartialView("_SearchTable", model);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("App.Category.Search", exc);
+                ViewBag.showNotFound = true;
+                return PartialView("_SearchTable", null);
+            }
+        }
+
+        public JsonResult RegionSearchToUrl(int province, int city, int area)
+        {
+            try
+            {
+                string url = null;
+                Region region = null;
+                string title = null;
+                if (area > 0)
+                {
+                    region = regionService.Find(area);
+                }
+                else if (city > 0)
+                {
+                    region = regionService.Find(city);
+                }
+                else if (province > 0)
+                {
+                    region = regionService.Find(province);
+                }
+                if (region == null)
+                {
+                    title = "";
+                    url = "/app/category/item?regiontype=-2";
+                }
+                else
+                {
+                    url = $"/app/category/item?regiontype=0&regionid={region.Id}";
+                    title = region.PersianName;
+                }
+                return GenerateJsonResult(new
+                {
+                    status = 1,
+                    url = url,
+                    title = title
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("App.Category.RegionSearchToUrl", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "متاسفانه عملیات با خطا مواجه شد"
+                });
+            }
         }
     }
 }

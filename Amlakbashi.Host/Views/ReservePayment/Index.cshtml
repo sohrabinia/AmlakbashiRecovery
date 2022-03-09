@@ -157,6 +157,7 @@
                     {
                         <span class="fas fa-sync pay-status-btn" onclick="CheckPaymentStatus(@item.PaymentId)"></span>
                     }
+                    <span class="fa fa-trash" onclick="DeleteReservePayment(@item.Id)"></span>
                 </td>
             </tr>
         }
@@ -174,6 +175,20 @@
             showInfoMessage('وضعیت انتقال وجه', '',
                 { contentUrl: '/Payment/CheckPodiumPaymentStatus?paymentId=' + id, fullScreen: screen.width < 781 }
             );
+        }
+
+        function DeleteReservePayment(id) {
+            showNoYesMessage('حذف پرداخت رزرو', 'آیا از حذف این پرداخت رزرو مطمئن هستید؟', function () {
+                myajax("reservepayment/delete", "reservepaymentid=" + id, function (ret) {
+                    if (ret.status == 1) {
+                        alertify.success('پرداخت رزرو مورد نظر با موفقیت حذف شد');
+                        location.reload();
+                    }
+                    else {
+                        alertify.error('عملیات انجام نشد');
+                    }
+                });
+            });
         }
     </script>
 }

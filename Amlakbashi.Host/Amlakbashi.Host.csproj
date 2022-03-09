@@ -12,20 +12,25 @@
     <Compile Remove="wwwroot\Content\logocache\**" />
     <Compile Remove="wwwroot\Content\test\**" />
     <Compile Remove="wwwroot\Content\webp\**" />
+    <Compile Remove="wwwroot\image\regions\**" />
     <Content Remove="wwwroot\Content\advertisecache\**" />
     <Content Remove="wwwroot\Content\logocache\**" />
     <Content Remove="wwwroot\Content\test\**" />
     <Content Remove="wwwroot\Content\webp\**" />
+    <Content Remove="wwwroot\image\regions\**" />
     <EmbeddedResource Remove="wwwroot\Content\advertisecache\**" />
     <EmbeddedResource Remove="wwwroot\Content\logocache\**" />
     <EmbeddedResource Remove="wwwroot\Content\test\**" />
     <EmbeddedResource Remove="wwwroot\Content\webp\**" />
+    <EmbeddedResource Remove="wwwroot\image\regions\**" />
     <None Remove="wwwroot\Content\advertisecache\**" />
     <None Remove="wwwroot\Content\logocache\**" />
     <None Remove="wwwroot\Content\test\**" />
     <None Remove="wwwroot\Content\webp\**" />
+    <None Remove="wwwroot\image\regions\**" />
   </ItemGroup>
 
+  <!--
   <ItemGroup>
     <Content Remove="Areas\App\Views\AppAdvertise\Favorites.cshtml" />
     <Content Remove="Areas\App\Views\AppAdvertise\List.cshtml" />
@@ -39,11 +44,12 @@
     <Content Remove="Areas\App\Views\AppReserve\_InvoiceItem.cshtml" />
     <Content Remove="Areas\App\Views\AppReserve\_ReserveItem.cshtml" />
     <Content Remove="Areas\App\Views\AppReserve\_ReserveList.cshtml" />
-    <Content Remove="Areas\App\Views\AppUser\ProfileManager.cshtml" />
+    <Content Remove="Areas\App\Views\AppUser\Profile.cshtml" />
+    <Content Remove="Areas\App\Views\AppWallet\List.cshtml" />
     <Content Remove="Areas\App\Views\AppWallet\Prize.cshtml" />
-    <Content Remove="Areas\App\Views\AppWallet\UserWalletManager.cshtml" />
     <Content Remove="wwwroot\js\dashboard.min.js" />
   </ItemGroup>
+  -->
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\js\dashboard.min.js" />
@@ -63,9 +69,9 @@
     <None Include="Areas\App\Views\AppReserve\_InvoiceItem.cshtml" />
     <None Include="Areas\App\Views\AppReserve\_ReserveItem.cshtml" />
     <None Include="Areas\App\Views\AppReserve\_ReserveList.cshtml" />
-    <None Include="Areas\App\Views\AppUser\ProfileManager.cshtml" />
+    <None Include="Areas\App\Views\AppUser\Profile.cshtml" />
     <None Include="Areas\App\Views\AppWallet\Prize.cshtml" />
-    <None Include="Areas\App\Views\AppWallet\UserWalletManager.cshtml" />
+    <None Include="Areas\App\Views\AppWallet\List.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAddressInput.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAmenitiesInput.cshtml" />
     <None Include="Views\Accomodation\AddEditFormInputs\_AccAvailableInput.cshtml" />
@@ -121,7 +127,6 @@
     <None Include="Views\Admin\UserChart.cshtml" />
     <None Include="Views\Advertise\Admin.cshtml" />
     <None Include="Views\Advertise\Edit.cshtml" />
-    <None Include="Views\Advertise\Index.cshtml" />
     <None Include="Views\BankCard\Index.cshtml" />
     <None Include="Views\BlogPost\AddEdit.cshtml" />
     <None Include="Views\BlogPost\Index.cshtml" />

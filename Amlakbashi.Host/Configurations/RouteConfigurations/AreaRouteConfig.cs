@@ -14,7 +14,7 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations
             endpointRouteBuilder.MapAreaControllerRoute(
                 name: "ApplicationArea",
                 areaName: "App",
-                pattern: "app/{controller}/{action}/{id?}");
+                pattern: "app/{controller}/{action}");
         }
     }
 }

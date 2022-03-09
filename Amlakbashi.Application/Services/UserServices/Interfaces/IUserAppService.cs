@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.DTOs.UserDTOs;
+using Amlakbashi.Core.DTOs.WebService.Requests.User;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.UserServices.Interfaces
 {
@@ -20,26 +22,30 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         int CountNewUserInDates(DateTime fromDate, DateTime toDate, List<int> userList = null);
         User Find(int id, bool includeFavorite = false);
         User Find(int? id);
-        User GetByAdminLoginCode(string code);
         User GetByMainMobile(string mainMobile);
         User GetActivatedUserByMainMobile(string mainMobile, bool includeFavorite = false);
         User GetActivatedUserByEmail(string email, bool includeFavorite = false);
         void Insert(User user, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
+        Task<AppUser> RegisterAsync(LoginRequest request);
+        void SendVerifyCode(AppUser identityUser);
+        bool Update(UserEditDTO editedUser, int adminId);
         bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
-            ActionLog.ActionSourceEnum source, out List<string> errors, int? cancelInstantReserveLimit = null);
+            ActionLog.ActionSourceEnum source, out List<string> errors);
         void UpdateState(int userId, bool state, int currentUserId = 0,
             ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
+        Task UpdatePhoneNumberConfirmedAsync(string guid, bool confirm);
+        Task UpdateEmailConfirmedAsync(string guid, bool confirm);
         void UpdateContactPhone(int userId, bool state);
         void UpdateProfilePhoto(int userId, long photoId, User.UserPhotoState state);
         void UpdatePhotoStatus(int userId, User.UserPhotoState state, int currentUserId = 0,
             ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         void UpdateCreateDate(int userId, DateTime time);
         void UpdateSendVerification(int userId, DateTime time, string code = null);
+        Task<string> UpdateVerifyCodeAsync(string guid);
         void UpdatePresentorUser(int userId, int pid);
-        void UpdateFName(int userId, string newFName);
-        void UpdateLName(int userId, string newLName);
         void UpdateFNameLName(int userId, string newFName, string newLName);
         void UpdateDesc(int userId, string desc);
+        Task UpdateEmailAsync(string guid, string email, bool confirm);
         void UpdateLoginCode(int userId, string token);
         void UpdateLastNotifPermetionTicks(int userId, long ticks);
         void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
@@ -48,7 +54,6 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void UpdateFcmNotificationToken(int userId, string token);
         void UpdateAppNotificationToken(int userId, string token);
         void UpdateUserGeneralType(int userId, User.UserGeneralTypeEnum userGeneralType);
-        void UpdateForgetCode(int userId, string code);
         void Delete(int userId, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         void AddFavorite(int userId, long advertiseId);
         void DeleteFavorite(int userId, long advertiseId);
@@ -60,17 +65,15 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void SendMessage(UserContactDTO userContact);
         void SendSms(UserContactDTO userContact);
         IList<string> GetAllIdentityUsernamesByState(User.UserState state = User.UserState.Acticved);
-        AppUser GetActivatedIdentityUser(string phrase, bool isEmail = false);
         AppUser GetIdentityUser(string phrase, bool isEmail = false);
+        Task<AppUser> GetIdentityUserByIdAsync(string id);
         void AddIdentityUser(AppUser user);
         bool AddClaimsToUser(string username, IList<Claim> claims);
         void RemoveClaimsFromUser(string username, IList<Claim> claims);
-        IdentityResult AddIdentityUserPassword(string username, string password);
         IdentityResult ChangeIdentityUserPassword(string username, string password);
         IdentityResult ChangeIdentityUserPassword(string username, string currentPassword, string newPassword);
         IdentityResult ChangePassword(string username, string currentPassword, string newPassword);
         void UpdateIdentityUser(AppUser user);
-        bool VerifyLoginCode(string mobileInternational, string code);
         IList<AppRole> GetAllRoles();
         IList<string> GetAllRoleNames();
         IList<string> GetUserRoles(string username);
@@ -80,7 +83,9 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
             out Dictionary<string, string> errors);
         bool SignInRegisterOld(int user_id, string fname, string lname,
             string password, string confirmPassword, out Dictionary<string, string> errors);
-        JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key);
+        JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key, int userGeneralType = 0);
+        Task<string> GenerateJwtTokenAsync(string guid, string jwtSecret);
+        ClaimsPrincipal GetPrincipalFromJwtToken(string token, string jwtSecret);
         IEnumerable<User> IdentityUsersToUsers(IEnumerable<AppUser> identityUsers);
         IEnumerable<AppUser> GetAllSupportEmployees();
         IEnumerable<AppUser> GetAllEmployees();

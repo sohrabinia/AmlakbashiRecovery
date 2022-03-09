@@ -32,6 +32,7 @@ using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs;
 using Amlakbashi.Core.Common.Caching;
+using Microsoft.AspNetCore.Http;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -218,8 +219,7 @@ namespace Amlakbashi.Host.Controllers
                 AdvertiseType parentType;
                 AdvertiseStatus status;
                 var director = advertiseService.SubmitAdminForm(data, out errors, out groupErrors,
-                    forceSave, DirectorType.General, userAccessor.CurrentUser.Id, out parentType, out status,
-                    webHostEnvironment.WebRootPath);
+                    forceSave, DirectorType.General, userAccessor.CurrentUser.Id, out parentType, out status);
                 var hasImportantError = errors.ContainsKey("Province") || errors.ContainsKey("City");
                 if (hasImportantError || (forceSave == false && groupErrors.Any()))
                 {
@@ -311,6 +311,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 Dictionary<string, string> errors;
                 List<string> groupErrors = new List<string>();
+                IFormFile uploadedLicenseFile = null;
                 AdvertiseType parentType;
                 AdvertiseStatus status;
                 if (data.Pool == true)
@@ -321,8 +322,12 @@ namespace Amlakbashi.Host.Controllers
                 {
                     data.PoolFeatures = PoolFeaturesEnum.None;
                 }
+                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
+                {
+                    uploadedLicenseFile = Request.Form.Files[0];
+                }
                 var director = advertiseService.SubmitAdminForm(data, out errors, out groupErrors, forceSave,
-                    DirectorType.Extra, userAccessor.CurrentUser.Id, out parentType, out status);
+                    DirectorType.Extra, userAccessor.CurrentUser.Id, out parentType, out status, uploadedLicenseFile);
                 if (forceSave == false && groupErrors.Any())
                 {
                     ModelState.Clear();
@@ -463,7 +468,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var childs = advertiseService.GetAccChilds((long)data.ParentId);
                 var director = advertiseService.SubmitAdminForm(data, out errors, out groupErrors, forceSave,
-                    DirectorType.ComplexUnit, userAccessor.CurrentUser.Id, out parentType, out status, webHostEnvironment.WebRootPath);
+                    DirectorType.ComplexUnit, userAccessor.CurrentUser.Id, out parentType, out status);
                 if (forceSave == false && groupErrors.Any())
                 {
                     ModelState.Clear();
@@ -700,7 +705,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.errors = TempData["prevErrors"];
                 var urlReferrer = HttpContext.Session.GetObjectFromJson<string>("urlReferrer");
                 if (string.IsNullOrEmpty(urlReferrer))
-                    urlReferrer = "/advertise/index";
+                    urlReferrer = "/advertise/newindex";
                 return Redirect(urlReferrer);
             }
             catch (Exception exc)
@@ -960,6 +965,7 @@ namespace Amlakbashi.Host.Controllers
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
                 int level;
+                IFormFile uploadedLicenseFile = null;
                 if (data.Pool == true)
                 {
                     data.PoolFeatures = poolDTO.ConvertToEnum();
@@ -968,7 +974,12 @@ namespace Amlakbashi.Host.Controllers
                 {
                     data.PoolFeatures = PoolFeaturesEnum.None;
                 }
-                var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors, out level, isEdit);
+                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
+                {
+                    uploadedLicenseFile = Request.Form.Files[0];
+                }
+                var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors,
+                    out level, uploadedLicenseFile, isEdit);
                 if (errors.Any())
                 {
                     ModelState.Clear();
@@ -1020,7 +1031,7 @@ namespace Amlakbashi.Host.Controllers
                             }
                     }
                 }
-                switch ((AdvertiseMode)director.Mode)
+                switch (director.Mode)
                 {
                     case AdvertiseMode.Parent:
                         if (director.AdvertiseType == AdvertiseType.Complex || director.AdvertiseType == AdvertiseType.HotelApartment)
@@ -1038,21 +1049,15 @@ namespace Amlakbashi.Host.Controllers
                             });
                         }
                     default:
-                        var user = userAccessor.CurrentUser;
-                        if (string.IsNullOrEmpty(user.Mobile2) ||
-                            string.IsNullOrEmpty(user.Tell) ||
-                            string.IsNullOrEmpty(user.ThirdPersonTell))
+                        var advertiseState = userAccessor.CurrentUser.Advertises.FirstOrDefault(f => f.Id == data.Id).Status;
+                        var addOrEdit = isAdd ? "ثبت" : "ویرایش";
+                        var message = $"آگهی شما با موفقیت {addOrEdit} شد";
+                        if (advertiseState == AdvertiseStatus.ReadyToPublish)
                         {
-                            var success_str = "آگهی شما با موفقیت " + (isAdd ? "ثبت" : "ویرایش") + " و پس از تایید کارشناس " + (isAdd ? "" : "دوباره ") + "نمایش داده میشود، لطفا اطلاعات مورد نیاز را تکمیل کنید";
-                            TempData["alert_success"] = success_str;
-                            return RedirectToAction("ProfileManager", "User", new { UserID = user.Id });
+                            message += " و در انتظار تایید کارشناس است";
                         }
-                        else
-                        {
-                            var success_str = "آگهی شما با موفقیت " + (isAdd ? "ثبت" : "ویرایش") + " و پس از تایید کارشناس " + (isAdd ? "" : "دوباره ") + "نمایش داده میشود . \n";
-                            TempData["alert"] = success_str;
-                            return Redirect("/dashboard");
-                        }
+                        TempData["alert_success"] = message;
+                        return RedirectToAction("accomodationmanager", "post", new { type = "all" });
                 }
             }
             catch (Exception exc)
@@ -1164,7 +1169,7 @@ namespace Amlakbashi.Host.Controllers
                         parentId = data.ParentId
                     });
                 }
-                return Redirect("/dashboard");
+                return RedirectToAction("accomodationmanager", "post", new { type = "all" });
 
             }
             catch (Exception exc)
@@ -1293,7 +1298,7 @@ namespace Amlakbashi.Host.Controllers
                         parentId = data.ParentId
                     });
                 }
-                return Redirect("/dashboard");
+                return RedirectToAction("accomodationmanager", "post", new { type = "all" });
 
             }
             catch (Exception exc)
@@ -1324,7 +1329,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 model.floor.Floor = FloorItems.Unset;
             }
-            model.titleAndDesc = new Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs.TitleDescInputDTO(false);
+            model.titleAndDesc = new TitleDescInputDTO(false);
             return PartialView("_AccComplexTypeForm", model);
         }
         #endregion

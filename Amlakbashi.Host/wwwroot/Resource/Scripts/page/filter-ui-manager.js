@@ -306,6 +306,9 @@ function updateMoreFilterBarUI(newData) {
             else if (newData.priceType == '2') {
                 payString = "قیمت پیک تعطیلات ";
             }
+            else if (newData.priceType == '4') {
+                payString = "قیمت نوروز ";
+            }
             else {
                 payString = "قیمت ماهانه ";
             }

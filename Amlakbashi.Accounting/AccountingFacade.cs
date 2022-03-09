@@ -32,6 +32,9 @@ using Amlakbashi.Core.DTOs.WalletDTOs;
 using Amlakbashi.Core.Common.Enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs;
+using Amlakbashi.Core.Common.StaticData;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Accounting
 {
@@ -531,15 +534,37 @@ namespace Amlakbashi.Accounting
             paymentService.Update(editedPayment);
         }
 
-        public CheckPaymentDTO CheckPaymentResult(int paymentId)
+        public async Task<CheckPaymentDTO> CheckPaymentResult(int paymentId)
         {
             var payment = paymentService.Find(paymentId);
             if (payment.Type == Payment.PaymentType.Expenditure)
             {
                 return null;
             }
-            var result = paymentOperator.ReadPaymentResult(BankEnum.Pasargad, payment.Id, payment.Date);
-            result.ReserveId = payment.ReserveID != null ? (long)payment.ReserveID : 0;
+            var response = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.Date);
+            response.PaymentId = payment.Id.ToString();
+            if ((response.Result && payment.Status == Payment.PaymentStatus.NotPaid) ||
+                (response.Result == false && payment.Status == Payment.PaymentStatus.Paid))
+            {
+                response.MustEdit = true;
+            }
+            if (payment.ReserveID != null)
+            {
+                response.ReserveId = payment.ReserveID.Value;
+                response.ShowDoReserve = response.Result && (payment.Reserve.Status == ReserveStatus.WaitForReserve ||
+                    payment.Reserve.Status == ReserveStatus.CanceledBySystem) ? true : false;
+            }
+            return response;
+        }
+
+        public async Task<bool> EditPaymentByReinquiry(int paymentId)
+        {
+            var payment = paymentService.Find(paymentId);
+            if (payment.Type == Payment.PaymentType.Expenditure)
+            {
+                return false;
+            }
+            var result = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.Date);
             if (result.Result == true && payment.Status == Payment.PaymentStatus.NotPaid)
             {
                 payment.Authority = result.TransactionReferenceId;
@@ -548,8 +573,19 @@ namespace Amlakbashi.Accounting
                 payment.PayDate = DateTime.Parse(result.TransactionDate);
                 payment.Status = Payment.PaymentStatus.Paid;
                 paymentService.Update(payment);
+                return true;
             }
-            return result;
+            else if (result.Result == false && payment.Status == Payment.PaymentStatus.Paid)
+            {
+                payment.Authority = null;
+                payment.RefID = 0;
+                payment.TraceNumber = null;
+                payment.PayDate = null;
+                payment.Status = Payment.PaymentStatus.NotPaid;
+                paymentService.Update(payment);
+                return true;
+            }
+            return false;
         }
 
         // GroupPayment Functions
@@ -800,81 +836,6 @@ namespace Amlakbashi.Accounting
 
         }
 
-        public bool FinalizePayment(BankEnum bank, int paymentId, int userId, DateTime date,
-            string tref, out string paymentResult, out string msg,
-            out bool invalidInput, ActionSourceEnum actionSource, int doerUserId)
-        {
-            try
-            {
-                msg = "";
-                if (string.IsNullOrEmpty(tref) == false && paymentId > 0 && date > DateTime.Now.Date)
-                {
-                    var checkPaymentResult = paymentOperator.ReadPaymentResult(bank, tref, out paymentResult);
-                    if (checkPaymentResult.Result)
-                    {
-                        var payment = paymentService.Find(paymentId);
-                        var verifyPaymentResult = paymentOperator.VerifyPayment(bank, paymentResult, payment.Id, payment.TotalPrice);
-                        if (verifyPaymentResult)
-                        {
-                            long transactionReferenceID = long.Parse(checkPaymentResult.TransactionReferenceId);
-                            DateTime transactionDate = DateTime.Parse(checkPaymentResult.TransactionDate);
-                            if (GiveProduct(paymentId, userId, checkPaymentResult.ReferenceNumber,
-                                transactionReferenceID, checkPaymentResult.TraceNumber, transactionDate,
-                                out msg, actionSource, doerUserId))
-                            {
-                                invalidInput = false;
-                                return true;
-                            }
-                        }
-                        else
-                        {
-                            msg = "خطایی در هنگام پرداخت رخ داده . لطفا دوباره امتحان کنید .";
-                        }
-                    }
-                }
-                else
-                {
-                    msg = "خطایی در هنگام پرداخت رخ داده . لطفا دوباره امتحان کنید .";
-                    invalidInput = true;
-                }
-                invalidInput = false;
-                paymentResult = null;
-                return false;
-            }
-            catch (Exception exc)
-            {
-                logger.Error("AccountingFacade.FinalizePayment", exc);
-                msg = "خطایی در هنگام پرداخت رخ داده . لطفا دوباره امتحان کنید .";
-                invalidInput = false;
-                paymentResult = null;
-                return false;
-            }
-        }
-
-        public bool TestFinalizePayment(int pid, int userId, out string msg)
-        {
-            Random random = new Random();
-            var randomRefId = random.Next(100000000, 999999999);
-            var randomTransactionId = random.Next(100000000, 999999999);
-            var randomTraceNumber = random.Next(100000000, 999999999);
-            var transactionDate = DateTime.Now;
-            return GiveProduct(pid, userId, randomRefId.ToString(), randomTransactionId, randomTraceNumber.ToString(), transactionDate, out msg, ActionSourceEnum.Background, userId);
-        }
-
-        public Dictionary<string, object> GeneratePaymentData(BankEnum bank, int pid, string redirectAddress)
-        {
-            var payment = paymentService.Find(pid);
-            string sign;
-            DateTime invoiceDate;
-            var result = paymentOperator.GeneratePaymentData(bank, pid,
-                payment.TotalPrice, redirectAddress, out sign, out invoiceDate);
-            //payment.Authority = sign;
-            payment.BankId = bank;
-            payment.Date = invoiceDate;
-            UpdatePayment(payment);
-            return result;
-        }
-
         public void GenerateReserveFinanceChart(int year, int month,
             out PaymentChartDTO TotalReservePriceChart,
             out PaymentChartDTO SitePortionChart,
@@ -978,96 +939,6 @@ namespace Amlakbashi.Accounting
             return chart;
         }
 
-        private bool GiveProduct(int paymentId, int userId, string referenceNumber,
-            long transactionReferenceId, string traceNumber, DateTime transactionDate, out string msg,
-            ActionSourceEnum actionSource, int doerUserId)
-        {
-            try
-            {
-                var payment = paymentService.Find(paymentId);
-                if (payment.Status == Payment.PaymentStatus.Paid)
-                {
-                    msg = "این تراکنش تکراری میباشد";
-                    return false;
-                }
-                payment.RefID = long.Parse(referenceNumber);
-                payment.Authority = transactionReferenceId.ToString();
-                payment.TraceNumber = traceNumber;
-                payment.Status = Payment.PaymentStatus.Paid;
-                payment.PayDate = transactionDate;
-                //paymentService.Update(objpay);
-                var user = repository.FindUser(userId);
-                var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
-                var contact = new UserContactDTO()
-                {
-                    UserMainMobile = user.MainMobile,
-                    UserAppNotificationToken = user.AppNotificationToken,
-                    UserEmail = identityUser.Email,
-                    EmailConfirmed = identityUser.EmailConfirmed,
-                    UserFcmAppNotificationToken = user.FcmAppNotificationToken,
-                    UserNotificationToken = user.NotificationToken,
-                    Type = UserContactType.payment,
-                    TransactionId = payment.RefID.ToString()
-                };
-                mediator.Enqueue(new SendMessageCommand(contact));
-                var price = payment.TotalPrice / 10;
-                msg = $"پرداخت شما با موفقیت انجام شد. شماره تراکنش پرداخت شما {payment.RefID} می باشد.";
-                long currentCredit;
-                if (payment.ProductType.Contains("Reserve"))
-                {
-                    mediator.Send(new FinalizeReserveCommand(payment.ReserveID == null ? 0 : (long)payment.ReserveID,
-                        payment.RefID, price, ReservePaymentMethod.EPay, actionSource, doerUserId, -1, payment.CouponID,
-                        payment.PrizePrice, true));
-                    if (payment.ReserveID != null)
-                    {
-                        var hostPhoneNumber = payment.Reserve.HostUser.Mobile;
-                        msg = $"{msg} شماره تماس میزبان: {PhoneUtility.InternationalNumberToLocal(hostPhoneNumber)}";
-                    }
-                    //try
-                    //{
-                    //    var reserve = repository.FindReserve(objpay.ReserveID == null ? 0 : (long)objpay.ReserveID);
-                    //    var hostUser = repository.FindUser(reserve.Advertise.UserID);
-                    //    msg = " پرداخت شما با موفقیت انجام شد . شماره تراکنش پرداخت شما " + objpay.RefID.ToString() + "می باشد . شماره تماس میزبان: " + PhoneUtility.InternationalNumberToLocal(hostUser.Mobile);
-                    //}
-                    //catch { }
-                }
-                else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString())
-                {
-                    payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.RefID, 0, out currentCredit, CreditTransaction.WalletTransactionReason.Charge, null, paymentId, doerUserId, actionSource);
-                }
-                else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Inc_Then_Res.ToString())
-                {
-                    payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.RefID, 0, out currentCredit, CreditTransaction.WalletTransactionReason.Charge, null, paymentId, doerUserId, actionSource);
-                    var creditTransactionId = DecreaseCredit(payment.UserID, payment.ReservePrice, 0, payment.ReserveID == null ? 0 : (long)payment.ReserveID, out currentCredit, CreditTransaction.WalletTransactionReason.Reserve, null, null, doerUserId, actionSource);
-                    if (creditTransactionId > 0)
-                    {
-                        mediator.Send(new FinalizeReserveCommand(payment.ReserveID == null ? 0 : (long)payment.ReserveID,
-                            creditTransactionId, payment.ReservePrice, ReservePaymentMethod.AmlakbashiCredit,
-                            actionSource, doerUserId, -1, payment.CouponID, payment.PrizePrice, true));
-                    }
-                    if (payment.ReserveID != null)
-                    {
-                        var hostPhoneNumber = payment.Reserve.HostUser.Mobile;
-                        msg = $"{msg} شماره تماس میزبان: {PhoneUtility.InternationalNumberToLocal(hostPhoneNumber)}";
-                    }
-                    //try
-                    //{
-                    //    var reserve = repository.FindReserve(objpay.ReserveID == null ? 0 : (long)objpay.ReserveID);
-                    //    var hostUser = repository.FindUser(reserve.Advertise.UserID);
-                    //    msg = " پرداخت شما با موفقیت انجام شد . شماره تراکنش پرداخت شما " + objpay.RefID.ToString() + "می باشد . شماره تماس میزبان: " + PhoneUtility.InternationalNumberToLocal(hostUser.Mobile);
-                    //}
-                    //catch { }
-                }
-                paymentService.Update(payment);
-                return true;
-            }
-            catch (Exception exc)
-            {
-                msg = exc.Message;
-                return false;
-            }
-        }
-
         private long PayGuest(int userId, long reserveId, ReservePaymentType payType,
             out bool alreadyPaid, out long price, ReservePaymentMethod paymentMethod,
             int doerUseId, ActionSourceEnum actionSource, bool useCoupon, bool usePrize, long couponId)
@@ -1144,6 +1015,185 @@ namespace Amlakbashi.Accounting
                 default:
                     return 0;
             }
+        }
+
+        // Epay
+
+        public EpayDTO GeneratePaymentData(BankEnum bank, int paymentId, string redirectUrl = null)
+        {
+            var payment = paymentService.Find(paymentId);
+            EpayDTO epay = new EpayDTO();
+            if (payment == null || payment.Status == Payment.PaymentStatus.Paid)
+            {
+                epay.HasError = true;
+                epay.ErrorMessage = "اطلاعات پرداخت صحیح نمی باشد";
+                return epay;
+            }
+
+            switch (bank)
+            {
+                case BankEnum.Saman:
+                    var samanRedirectUrl = GeneralData.WebsiteUrl + "/Cart/RegisterSamanEpay";
+                    if (string.IsNullOrEmpty(redirectUrl) == false)
+                    {
+                        samanRedirectUrl += "?RedirectUrl=" + redirectUrl;
+                    }
+                    var request = new SamanRequestTokenDTO()
+                    {
+                        ResNum = payment.Id.ToString(),
+                        Amount = payment.TotalPrice,
+                        RedirectUrl = samanRedirectUrl,
+                        CellNumber = payment.User.MainMobile
+                    };
+                    epay = paymentOperator.GetSamanPaymentToken(request).Result;
+                    break;
+                case BankEnum.Pasargad:
+                    var pasargadRedirectUrl = GeneralData.WebsiteUrl + "/Cart/RegisterPasargadEpay";
+                    if (string.IsNullOrEmpty(redirectUrl) == false)
+                    {
+                        pasargadRedirectUrl += "?RedirectUrl=" + redirectUrl;
+                    }
+                    epay = paymentOperator.GetPasargadPaymentData(bank, paymentId,
+                        payment.TotalPrice, pasargadRedirectUrl);
+                    break;
+                default:
+                    epay.HasError = true;
+                    epay.ErrorMessage = "درگاه بانکی صحیح نمی باشد";
+                    break;
+            }
+
+            payment.BankId = bank;
+            payment.Date = epay.Date;
+            UpdatePayment(payment);
+
+            return epay;
+        }
+
+        public bool RegisterPasargadEpay(PasargadEpayResponseDTO response, out string msg, out string referenceNumber)
+        {
+            if (string.IsNullOrEmpty(response.tref) == false && response.iN > 0 && response.iD > DateTime.Now.Date)
+            {
+                string paymentResult = string.Empty;
+                var checkPaymentResult = paymentOperator.GetPasargadPaymentResult(response.tref, out paymentResult);
+                if (checkPaymentResult.Result)
+                {
+                    referenceNumber = checkPaymentResult.ReferenceNumber;
+                    var payment = paymentService.Find(response.iN);
+                    var verifyPaymentResult = paymentOperator.VerifyPasargadPayment(BankEnum.Pasargad,
+                        paymentResult, payment.Id, payment.TotalPrice);
+                    if (verifyPaymentResult)
+                    {
+                        DateTime transactionDate = DateTime.Parse(checkPaymentResult.TransactionDate);
+                        return GiveProduct(payment.Id, payment.UserID, checkPaymentResult.ReferenceNumber,
+                            checkPaymentResult.TransactionReferenceId, checkPaymentResult.TraceNumber, transactionDate,
+                            out msg, response.ActionSource);
+                    }
+                }
+            }
+            msg = "عملیات پرداخت با خطا مواجه شد";
+            referenceNumber = null;
+            return false;
+        }
+
+        public bool RegisterSamanEpay(SamanEpayResponseDTO response, out string msg)
+        {
+            var payment = paymentService.Find(response.ResNum);
+            if (payment != null && payment.Status == Payment.PaymentStatus.NotPaid
+                && response.Status == SamanEpayResponseDTO.StatusEnum.OK
+                && string.IsNullOrEmpty(response.RefNum) == false
+                && paymentService.CheckTransactionId(response.RefNum, BankEnum.Saman) == false)
+            {
+                var verifyEpayResult = paymentOperator.VerifySamanEpay(response.RefNum).Result;
+                double verfiyEpayAmout = double.Parse(verifyEpayResult);
+                if (verfiyEpayAmout == payment.TotalPrice)
+                {
+                    return GiveProduct(response.ResNum, payment.UserID, response.RRN,
+                            response.RefNum, response.TraceNo, DateTime.Now,
+                            out msg, response.ActionSource);
+                }
+            }
+            msg = "عملیات پرداخت با خطا مواجه شد";
+            return false;
+        }
+
+        public bool TestFinalizePayment(int pid, int userId, out string msg)
+        {
+            Random random = new Random();
+            var randomRefId = random.Next(100000000, 999999999);
+            var randomTransactionId = random.Next(100000000, 999999999).ToString();
+            var randomTraceNumber = random.Next(100000000, 999999999);
+            var transactionDate = DateTime.Now;
+            return GiveProduct(pid, userId, randomRefId.ToString(), randomTransactionId, randomTraceNumber.ToString(), transactionDate, out msg, ActionSourceEnum.Background);
+        }
+
+        private bool GiveProduct(int paymentId, int userId, string referenceNumber,
+            string transactionReferenceId, string traceNumber, DateTime transactionDate, out string msg,
+            ActionSourceEnum actionSource)
+        {
+            var payment = paymentService.Find(paymentId);
+            if (payment.Status == Payment.PaymentStatus.Paid)
+            {
+                msg = "این تراکنش تکراری میباشد";
+                return false;
+            }
+            payment.RefID = long.Parse(referenceNumber);
+            payment.Authority = transactionReferenceId;
+            payment.TraceNumber = traceNumber;
+            payment.Status = Payment.PaymentStatus.Paid;
+            payment.PayDate = transactionDate;
+            var user = repository.FindUser(userId);
+            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            var contact = new UserContactDTO()
+            {
+                UserMainMobile = user.MainMobile,
+                UserAppNotificationToken = user.AppNotificationToken,
+                UserEmail = identityUser.Email,
+                EmailConfirmed = identityUser.EmailConfirmed,
+                UserFcmAppNotificationToken = user.FcmAppNotificationToken,
+                UserNotificationToken = user.NotificationToken,
+                Type = UserContactType.payment,
+                TransactionId = payment.RefID.ToString()
+            };
+            mediator.Enqueue(new SendMessageCommand(contact));
+            var price = payment.TotalPrice / 10;
+            msg = $"پرداخت شما با موفقیت انجام شد. شماره تراکنش پرداخت شما {payment.RefID} می باشد.";
+            long currentCredit;
+            if (payment.ProductType.Contains("Reserve"))
+            {
+                mediator.Send(new FinalizeReserveCommand(payment.ReserveID == null ? 0 : (long)payment.ReserveID,
+                    payment.RefID, price, ReservePaymentMethod.EPay, actionSource, payment.UserID, -1, payment.CouponID,
+                    payment.PrizePrice, true));
+                if (payment.ReserveID != null)
+                {
+                    var hostPhoneNumber = payment.Reserve.HostUser.Mobile;
+                    msg = $"{msg} شماره تماس میزبان: {PhoneUtility.InternationalNumberToLocal(hostPhoneNumber)}";
+                }
+            }
+            else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString())
+            {
+                payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.RefID, 0, out currentCredit,
+                    CreditTransaction.WalletTransactionReason.Charge, null, paymentId, payment.UserID, actionSource);
+            }
+            else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Inc_Then_Res.ToString())
+            {
+                payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.RefID, 0, out currentCredit,
+                    CreditTransaction.WalletTransactionReason.Charge, null, paymentId, payment.UserID, actionSource);
+                var creditTransactionId = DecreaseCredit(payment.UserID, payment.ReservePrice, 0, payment.ReserveID == null ? 0 : (long)payment.ReserveID,
+                    out currentCredit, CreditTransaction.WalletTransactionReason.Reserve, null, null, payment.UserID, actionSource);
+                if (creditTransactionId > 0)
+                {
+                    mediator.Send(new FinalizeReserveCommand(payment.ReserveID == null ? 0 : (long)payment.ReserveID,
+                        creditTransactionId, payment.ReservePrice, ReservePaymentMethod.AmlakbashiCredit,
+                        actionSource, payment.UserID, -1, payment.CouponID, payment.PrizePrice, true));
+                }
+                if (payment.ReserveID != null)
+                {
+                    var hostPhoneNumber = payment.Reserve.HostUser.Mobile;
+                    msg = $"{msg} شماره تماس میزبان: {PhoneUtility.InternationalNumberToLocal(hostPhoneNumber)}";
+                }
+            }
+            paymentService.Update(payment);
+            return true;
         }
 
         // Podium Services

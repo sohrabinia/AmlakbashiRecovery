@@ -24,12 +24,14 @@ namespace Amlakbashi.Host.Areas.App.Controllers
     {
         private readonly IUserAccessor userAccessor;
         private readonly IReserveAppService reserveService;
+        private readonly IReserveAutoCancelAppService reserveAutoCancelService;
         private readonly IAdvertiseAppService advertiseService;
         private readonly IChatAppService chatService;
         private readonly IAccountingFacade accounting;
         private readonly ILog logger;
         public AppReserveController(IUserAccessor userAccessor,
             IReserveAppService reserveService,
+            IReserveAutoCancelAppService reserveAutoCancelService,
             IAdvertiseAppService advertiseService,
             IChatAppService chatService,
             IAccountingFacade accounting,
@@ -37,13 +39,13 @@ namespace Amlakbashi.Host.Areas.App.Controllers
         {
             this.userAccessor = userAccessor;
             this.reserveService = reserveService;
+            this.reserveAutoCancelService = reserveAutoCancelService;
             this.advertiseService = advertiseService;
             this.chatService = chatService;
             this.accounting = accounting;
             this.logger = logger;
         }
 
-        [HttpGet]
         [Authorize]
         public ActionResult List(string reserve_id = "", int status = -1, int category = -1,
             long initialPayId = 0, Reserve.ReserveManagerSelectType selectType = Reserve.ReserveManagerSelectType.All,
@@ -111,7 +113,74 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             }
         }
 
-        [HttpGet]
+        [Authorize]
+        public ActionResult BankPay(long reserve_id,
+            int pay_reserve_type, bool useCoupon = false, bool usePrize = false, long couponId = 0)
+        {
+            try
+            {
+                long payment_id;
+                var result = accounting.GuestPayReserve(userAccessor.CurrentUser.Id, reserve_id,
+                    pay_reserve_type, out payment_id, userAccessor.DoerUser.Id,
+                    ActionLog.ActionSourceEnum.WebsiteDashboard, useCoupon, usePrize, couponId);
+                switch (result)
+                {
+                    case Reserve.GuestPayResult.ReadyToPay:
+                        reserveAutoCancelService.UpdateScheduledTime(reserve_id);
+                        return Redirect($"/cart/performpay?paymentid={payment_id}&redirectUrl=amlakbashi://app");
+                    default:
+                        return Redirect(Request.Headers["referer"].ToString());
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("App.Reserve.BankPay", exc);
+                TempData["msg"] = "خطایی رخ داده است، لطفا دوباره امتحان کنید";
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        public ActionResult WalletPay(long reserve_id,
+            int pay_reserve_type, bool useCoupon = false, bool usePrize = false, long couponId = 0)
+        {
+            try
+            {
+                long payment_id;
+                var reserve = reserveService.Find(reserve_id);
+                var result = accounting.GuestPayReserveWithCredit(reserve.UserID,
+                    reserve_id, pay_reserve_type, out payment_id, userAccessor.DoerUser.Id,
+                    ActionLog.ActionSourceEnum.WebsiteDashboard, useCoupon, usePrize, couponId);
+                switch (result)
+                {
+                    case Reserve.GuestPayResult.NotEnoughCredit:
+                        TempData["msg"] = "متاسفانه موجودی حساب شما کم است";
+                        return Redirect(Request.Headers["referer"].ToString());
+                    case Reserve.GuestPayResult.Paid:
+                        var msg = " پرداخت شما با موفقیت انجام شد . شماره تراکنش پرداخت شما " + payment_id + "می باشد .";
+                        TempData["payment_success_msg"] = msg;
+                        TempData.SetObjectAsJson("payment_transaction_id", payment_id);
+                        TempData.SetObjectAsJson("payment_reserve_id", reserve_id);
+                        return Redirect("/app/reserve/list?category=2&selecttype=1");
+                    default:
+                        return Redirect(Request.Headers["referer"].ToString());
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.Error("App.Reserve.WalletPay", exc);
+                TempData["msg"] = "خطایی رخ داده است، لطفا دوباره امتحان کنید";
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        public ActionResult Voucher(long reserveId)
+        {
+            var model = reserveService.GenerateVoucher(reserveId, userAccessor.CurrentUser.Id);
+            return View(model);
+        }
+
         [Authorize]
         public ActionResult Invoice(int? page)
         {

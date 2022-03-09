@@ -56,3 +56,25 @@
         </span>
     </div>
 }
+@if (Model.NorouzPrice > 0)
+{
+    <div class="advertie-page__price-item js-NorouzPrice">
+        <p class="advertise-page__price-title">
+            <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" /> قیمت روزهای نوروز:
+        </p>
+        <p class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.NorouzPrice) تومان
+        </p>
+    </div>
+}
+@if (Model.NorouzOverCapacityPrice > 0)
+{
+    <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
+        <span class="advertise-page__price-title">
+            <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" /> قیمت هر مهمان اضافه نوروز:
+        </span>
+        <span class="advertise-page__price-content">
+            @string.Format("{0:n0}", Model.NorouzOverCapacityPrice) تومان
+        </span>
+    </div>
+}

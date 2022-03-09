@@ -134,24 +134,19 @@
                     url += ("empty_range_to=" + Model.EmptyRangeTo);
                 }
                 <a target="_blank" href="@url" class="home-page__category-item-container-large@(Model.ForAdvertisePage ? " advertise-category__advertise-item-container" : "")" id="advertise_@(item.AdvertiseID)">
-                    @*<div class="advertise-item__icon-list" style="position: absolute;width: unset;display: inline;flex-flow: column;">*@
                     @{
                         int discount = item.DiscountPercent;
                         string date_string = item.DiscountDateString;
-                        if (discount > 0)
+
+                        if (item.NorouzPrice > 0)
+                        {
+                            <p class="advertise-item__norouz-label home-page_discount-style"><img width="21" height="21" rel="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" /> @(string.Format("{0:n0}", item.NorouzPrice)) تومان</p>
+                        }
+                        else if (discount > 0)
                         {
                             <p class="advertise-item__discount-label home-page_discount-style"><i class="fa fa-percent"></i>@(discount) تخفیف @date_string</p>
                         }
                     }
-                    @*@if (AdvertiseDepend.IsNorouzSpecial(item))
-                        {
-                            <img width="32" height="32" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_32x32" />
-                        }*@
-                    @*@if (item.TodayIsEmpty)
-                        {
-                            <i class="fa fa-home" style="color: white;font-size: 24px;margin: 3px;text-shadow: 0px 2px 5px #333;"></i>
-                        }*@
-                    @*</div>*@
                     <img class="home-page__advertise-image @(initial_loaded_img ? "" : "lazy")" src="@img_src_to_show" @img_data_source width="240" height="144" alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")' />
                     @if (!initial_loaded_img)
                     {
@@ -278,7 +273,7 @@
 }
 
 @if (Model.CurrentPageNumber == 1 && Model.AdvertiseItems.Count() < 5 &&
-       (Model.DiscountHomes || Model.TodayEmptyHomes || Model.InstantReserve || Model.NorouzSpecial || Model.HygieneProtocol))
+    (Model.DiscountHomes || Model.TodayEmptyHomes || Model.InstantReserve || Model.NorouzSpecial || Model.HygieneProtocol))
 {
     <div class="advertise-category-link__container">
         @await Html.PartialAsync("_AdvertiseCategoryLink", Model.Category,

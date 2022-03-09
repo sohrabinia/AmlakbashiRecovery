@@ -151,14 +151,13 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             bool done = false;
             try
             {
-                if (request.status == ReserveStatus.Started ||
-                    request.status == ReserveStatus.Completed)
-                {
-                    if (request.force == false && accounting.IsReservePaidCompletely(request.reserveId) == false)
-                    {
-                        return Task.FromResult(false);
-                    }
-                }
+                //if (request.status == ReserveStatus.Started)
+                //{
+                //    if (request.force == false && accounting.IsReservePaidCompletely(request.reserveId) == false)
+                //    {
+                //        return Task.FromResult(false);
+                //    }
+                //}
                 done = reserveState.UseReserve(request.reserveId).SetStatus(request.status,
                     request.sendSms, request.actionSource, request.doerUserId, request.force);
             }

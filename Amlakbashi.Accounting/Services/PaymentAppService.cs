@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Accounting.Services.Interfaces;
 using Amlakbashi.Core.Common.AppService;
+using Amlakbashi.Core.Common.Enums;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
@@ -101,6 +102,18 @@ namespace Amlakbashi.Accounting.Services
             return newPayment.Id;
         }
 
+        public bool CheckTransactionId(string transactionId, BankEnum bank = BankEnum.Unknown)
+        {
+            if (bank == BankEnum.Unknown)
+            {
+                return Repository.Query(q => q.Any(w => w.Authority == transactionId));
+            }
+            else
+            {
+                return Repository.Query(q => q.Any(w => w.BankId == bank && w.Authority == transactionId));
+            }
+        }
+
         public void Update(Payment editedPayment)
         {
             var payment = Repository.Find(editedPayment.Id);
@@ -113,6 +126,14 @@ namespace Amlakbashi.Accounting.Services
             payment.WalletTransactionId = editedPayment.WalletTransactionId;
             payment.ReservePaymentId = editedPayment.ReservePaymentId;
             payment.TraceNumber = editedPayment.TraceNumber;
+            Repository.Update(payment);
+            Repository.Save();
+        }
+
+        public void UpdateTransactionId(int paymentId, string transactionId)
+        {
+            var payment = Repository.Find(paymentId);
+            payment.Authority = transactionId;
             Repository.Update(payment);
             Repository.Save();
         }

@@ -34,36 +34,36 @@
 }
 
 <form asp-area="app" asp-controller="reserve" asp-action="list" method="get">
-        <input type="hidden" name="selectType" value="@ViewBag.selectType" />
-        <div class="personal-filter">
-            <span class="personal-filter__item" style="width:168px;">
-                <span>کد رزرو:</span>
-                <input style="width:80px;" placeholder="مثال:6032" type="tel" name="reserve_id" value="@(!string.IsNullOrEmpty(ViewBag.reserve_id) ? ViewBag.reserve_id : "")" />
-            </span>
-            <input style="font:13px Miransans;padding:10px;" class="personal-filter-button bg-yellow" type="submit" value="جستجو" />
-        </div>
+    <input type="hidden" name="selectType" value="@ViewBag.selectType" />
+    <div class="personal-filter">
+        <span class="personal-filter__item" style="width:168px;">
+            <span>کد رزرو:</span>
+            <input style="width:80px;" placeholder="مثال:6032" type="tel" name="reserve_id" value="@(!string.IsNullOrEmpty(ViewBag.reserve_id) ? ViewBag.reserve_id : "")" />
+        </span>
+        <input style="font:13px Miransans;padding:10px;" class="personal-filter-button bg-yellow" type="submit" value="جستجو" />
+    </div>
 </form>
 
 <div class="reserve-dashboard__stepBars">
     @foreach (var category in categories)
     {
-        <div class="reserve_stepbars @((int)category == ViewBag.category ? "isActive" : "")">
-            <span class="text-style-banner__reserve_stepbars">
-                @if (ViewBag.countDict[category] > 0)
+    <div class="reserve_stepbars @((int)category == ViewBag.category ? "isActive" : "")">
+        <span class="text-style-banner__reserve_stepbars">
+            @if (ViewBag.countDict[category] > 0)
                 {
-                    <span class="reserve-setbars_box-number @((int)category == ViewBag.category ? "is_Active" : "")"> @ViewBag.countDict[category]</span>
+            <span class="reserve-setbars_box-number @((int)category == ViewBag.category ? "is_Active" : "")"> @ViewBag.countDict[category]</span>
                 }
-                <a href="/app/reserve/list?category=@((int)category)&selectType=@((int)ViewBag.selectType)" style="color:@((int)category == ViewBag.category ?"#242424" : "#6d7179");">
-                    <span>
-                        @if ((int)ViewBag.selectType == 1)
+            <a href="/app/reserve/list?category=@((int)category)&selectType=@((int)ViewBag.selectType)" style="color:@((int)category == ViewBag.category ?"#242424" : "#6d7179");">
+                <span>
+                    @if ((int)ViewBag.selectType == 1)
                         {@ReserveLocalization.GetReserveCategoryTitle(category, ViewBag.selectType)}
-                        @if ((int)ViewBag.selectType == 2)
+                    @if ((int)ViewBag.selectType == 2)
                         {@ReserveLocalization.GetReserveCategoryTitle(category, ViewBag.selectType)}
-                        @ReserveLocalization.GetReserveCategoryTitle(category)
-                    </span>
-                </a>
-            </span>
-        </div>
+                    @ReserveLocalization.GetReserveCategoryTitle(category)
+                </span>
+            </a>
+        </span>
+    </div>
     }
 </div>
 
@@ -263,16 +263,19 @@
                 }
             });
         }
+
         function ReserveAccept(reserve_id, response,advertise_id, guest_user_id){
             showNoYesMessage('  قبول درخواست ', ' آیا از قبول درخواست رزرو مطمئنید؟', function () {
                 selectRespons(reserve_id, response,advertise_id, guest_user_id);
             });
         }
+
         var reasonsReserveCancle;
         function cancleReserve(reserve_id,advertise_id){
             reasonsReserveCancle = `<strong class="title_cancle_reserve">لطفا علت لغو در خواست رزرو خود را مشخص کنید</strong><div onclick="sendReserveResponse(${reserve_id},@((int)Reserve.HostResponseEnum.RejectedHomeFull),${advertise_id},null)" class="button_cancle_reserve"><span>اقامتگاه پر است</span></div><div onclick="sendReserveResponse(${reserve_id},@((int)Reserve.HostResponseEnum.RejectedPrice),${advertise_id},null)" class="button_cancle_reserve"><span>قیمت کم است</span></div><div onclick="sendReserveResponse(${reserve_id},@((int)Reserve.HostResponseEnum.Rejected),${advertise_id},null)" class="button_cancle_reserve"><span>  سایر موارد ...</span></div>`;
             reserveCancle = showInfoMessage("لغو رزرو" , reasonsReserveCancle);
         };
+
         function selectRespons(reserve_id, response,advertise_id, guest_user_id){
             switch (response) {
                 case @((int)Reserve.HostResponseEnum.Accepted):
@@ -283,6 +286,7 @@
                     break;
             }
         }
+
         function sendReserveResponse(reserve_id, response,advertise_id, guest_user_id){
             myajax("Reserve/ReserveResponse", "reserve_id=" + reserve_id + "&host_response=" + response, function(ret){
                 if (ret.val == 1 && ret.rejectReason == 'home_full')
@@ -396,7 +400,7 @@
                             );
                         break;
                     default:
-                        var url = '/reserve/guestpayreserve?reserve_id=' + reserve_id +
+                        var url = '/app/reserve/bankpay?reserve_id=' + reserve_id +
                             '&pay_reserve_type=' + reservePaymentData.payType +
                             '&useCoupon=' + reservePaymentData.useCoupon +
                             '&usePrize=' + reservePaymentData.usePrize +
@@ -421,7 +425,7 @@
                 });
         }
 
-        function payAndReserveWithCredit(reserve_id, total_price, deposite_price)
+        @*function payAndReserveWithCredit(reserve_id, total_price, deposite_price)
         {
             if (deposite_price >= total_price)
             {
@@ -461,7 +465,7 @@
                     }
                 }
             });
-        }
+        }*@
 
         function payWithCredit(pay_type, reserve_id, total_price, deposite_price, user_id, payed_price, useCoupon, usePrize, couponId, prizePrice, couponPrice, discountCouponId) {
             if (useCoupon == undefined){
@@ -492,7 +496,7 @@
                                 "&reserveprice=" + (total_price)
                                 , function (ret) {
                                     if (ret.status == 1) {
-                                        window.location.href = "/cart/performpay?payment_id=" + ret.pid;
+                                        window.location.href = "/cart/performpay?paymentid=" + ret.pid + "&redirectUrl=amlakbashi://app";
                                     }
                                     else {
                                         showErrorMessage('خطا', 'متاسفانه عملیات با خطا مواجه شد');
@@ -500,7 +504,7 @@
                                 });
                         }
                         else {
-                            var url = '/Reserve/GuestPayReserveWithCredit?reserve_id=' + reserve_id +
+                            var url = '/app/reserve/walletpay?reserve_id=' + reserve_id +
                                 '&pay_reserve_type=' + pay_type +
                                 '&useCoupon=' + useCoupon +
                                 '&usePrize=' + usePrize +
@@ -517,7 +521,7 @@
                                 "&reserveprice=" + (deposite_price)
                                 , function (ret) {
                                     if (ret.status == 1) {
-                                        window.location.href = "/cart/performpay?payment_id=" + ret.pid;
+                                        window.location.href = "/cart/performpay?paymentid=" + ret.pid + "&redirectUrl=amlakbashi://app";
                                     }
                                     else {
                                         showErrorMessage('خطا', 'متاسفانه عملیات با خطا مواجه شد');
@@ -525,7 +529,7 @@
                                 });
                         }
                         else {
-                            var url = '/Reserve/GuestPayReserveWithCredit?reserve_id=' + reserve_id +
+                            var url = '/app/reserve/walletpay?reserve_id=' + reserve_id +
                                 '&pay_reserve_type=' + pay_type +
                                 '&useCoupon=' + useCoupon +
                                 '&usePrize=' + usePrize +
@@ -550,11 +554,12 @@
             });
         }
 
-        function payAndStart(reserve_id)
-        {
-            var url = '/Reserve/GuestPayReserve?reserve_id=' + reserve_id + '&pay_reserve_type=1';
-            window.location.href = url;
-        }
+        //function payAndStart(reserve_id)
+        //{
+        //    var url = '/Reserve/GuestPayReserve?reserve_id=' + reserve_id + '&pay_reserve_type=1';
+        //    window.location.href = url;
+        //}
+
         function finish(reserve_id) {
             //var advertise = guestAdvertiseRatingArray[index];
             myajax("Reserve/Finish", "reserve_id=" + reserve_id,
@@ -569,11 +574,13 @@
                     }
                 });
         }
+
         function rating(reserve_id) {
             ratingDialog(reserve_id, function(){
                 reserveDashboardHubConnection.invoke('reloadReserveItem', reserve_id);
             });
         }
+
         var mainChat = null;
         var chatInput = null;
         var cancel_discussion_box = null;
@@ -608,9 +615,11 @@
             $(".header_container").css("display", "block");
             $(".bg-chat-reserve").css("display","none");
         });
+
         $(".bg-chat-reserve").click(function(){
             chatBox.toggleClass("animation-shake");
         })
+
         //function showCancelDiscussion(reserve_id, element) {
         //    chat_reserve_id = reserve_id;
         //    cancel_discussion_box = $.confirm({
@@ -642,13 +651,13 @@
         //    });
         //}
 
-
-
         function refreshChatBox(reserve_id) {
             if (mainChat == null)
                 return;
             var url = $("#host_root").is(":visible") ? "/Chat/GetHostChatPopup?reserve_id=" + reserve_id : "/Chat/GetGuestChatPopup?reserve_id=" + reserve_id;
-            mainChat.load(url)
+            mainChat.load(url, function () {
+                $(".reserve-main_chat-box")[0].scrollTop = $(".reserve-main_chat-box")[0].scrollHeight;
+            });
         }
 
         //function refreshCancelDiscussionBox(reserve_id) {
@@ -704,11 +713,11 @@
                         reserveDashboardHubConnection.invoke("reloadChat", reserve_id);
                         chatInput.val("");
                         chatInput.focus();
-                        $(".reserve-main_chat-box").stop().animate({ scrollTop: $(".reserve-main_chat-box")[0].scrollHeight}, 1000);
+                        //$(".reserve-main_chat-box").stop().animate({ scrollTop: $(".reserve-main_chat-box")[0].scrollHeight}, 1000);
                     }
                     else if (ret.status == 2) {
                         alertify.error("لطفا از ارسال شماره تلفن و یا آی دی و یا حروف انگلیسی خودداری کنید");
-                        reserveDashboardHubConnection.invoke("reloadChat", reserve_id);
+                        //reserveDashboardHubConnection.invoke("reloadChat", reserve_id);
                         chatInput.val("");
                         chatInput.focus();
                     }
@@ -777,6 +786,7 @@
                 },
             });
         }
+
         function contactUser(user_id, onClose, extra_msg, reserve_id, is_guest) {
             if (extra_msg !== ""){
                 confirmAndContactUser(user_id, onClose, extra_msg, reserve_id, is_guest);
@@ -790,6 +800,7 @@
             }
             showInfoMessage('  شماره تماس  ' ,'', {contentUrl:'/User/ContactUserPopup?user_id=' + user_id});
         }
+
         function showRules( adcertise_rules , id_reserve ){
             if ($(id_reserve)){
                 var rules_string;
@@ -810,25 +821,6 @@
 
         function showPayDialog(id, totalPrice, depositePrice) {
             payAndReserve(id);
-            //payDialogMsg = showInfoMessage('پرداخت رزرو',
-            //    '<div>' +
-            //    '<div>' +
-            //    '</div>' +
-            //    'لطفا نوع پرداخت را انتخاب کنید:' +
-            //    '<div style="display:flex;flex-flow:row;">' +
-            //    '<div onclick="payDialogMsg.close();payAndReserve(' + id + ',' + totalPrice + ',' + depositePrice +')" ' +
-            //    'style="width:unset;margin:10px;padding:10px;cursor:pointer;background-color:#fdd835;color:#242424;border-radius:5px;">' +
-            //    '<i class="fa fa-credit-card"></i>' +
-            //    ' پرداخت آنلاین' +
-            //    '</div>' +
-            //    '<div onclick="payDialogMsg.close();payAndReserveWithCredit(' + id + ',' + totalPrice + ',' + depositePrice +')" ' +
-            //    'style="width:unset;margin:10px;padding:10px;cursor:pointer;background-color:#fdd835;color:#242424;border-radius:5px;">' +
-            //    '<i class="fa fa-money-bill-alt"></i>' +
-            //    ' پرداخت از کیف پول' +
-            //    '</div>' +
-            //    '</div>' +
-            //    '</div>'
-            //    );
         }
 
         function showInvoicePopup(id) {
@@ -836,7 +828,7 @@
                 '', {contentUrl: '/reserve/invoiceitempopup?id=' + id});
         }
 
-           var payment_success_msg = '@TempData["payment_success_msg"]';
+        var payment_success_msg = '@TempData["payment_success_msg"]';
         var payment_error_msg = '@TempData["payment_error_msg"]';
         var payment_transaction_id = @paymentTransactionId;
         if (payment_transaction_id > 0) {
@@ -966,6 +958,5 @@
                 }
             }
         });
-
     </script>
 }

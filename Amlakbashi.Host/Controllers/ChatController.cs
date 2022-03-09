@@ -176,7 +176,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 chatService.UpdateChatListReadStatus(notReadChats);
                 reserveDashboardHubServer.ReloadChatFromServer(reserve_id);
-                reserveDashboardHubServer.ReloadReserveItemsFromServer(reserve_id);
+                //reserveDashboardHubServer.ReloadReserveItemsFromServer(reserve_id);
             }
             var model = ReserveChatPopupDTO.Generate(chats.ToList(),
                 userAccessor.CurrentUser.Id, reserve.UserID, advertiseService.GetAllAsIQueriable());

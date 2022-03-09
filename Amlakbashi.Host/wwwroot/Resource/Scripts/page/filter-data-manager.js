@@ -278,6 +278,7 @@ function removeMoreFilter() {
     filterInputData.poolTable = '-1';
     filterInputData.foosball = '-1';
     filterInputData.teaMaker = '-1';
+    filterInputData.priceType = '0';
     sendNewFilterData();
 }
 

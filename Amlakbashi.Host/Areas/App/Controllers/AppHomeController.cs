@@ -22,17 +22,20 @@ namespace Amlakbashi.Host.Areas.App.Controllers
     {
         private readonly IUserAccessor userAccessor;
         private readonly ICategoryAppService categoryService;
+        private readonly IAdvertiseAppService advertiseService;
         private readonly IDiscountTableAppService discountTableService;
         private readonly IRegionAppService regionService;
         private readonly IBlogPostAppService blogPostService;
         public AppHomeController(IUserAccessor userAccessor,
             ICategoryAppService categoryService,
+            IAdvertiseAppService advertiseService,
             IDiscountTableAppService discountTableService,
             IRegionAppService regionService,
             IBlogPostAppService blogPostService)
         {
             this.userAccessor = userAccessor;
             this.categoryService = categoryService;
+            this.advertiseService = advertiseService;
             this.discountTableService = discountTableService;
             this.regionService = regionService;
             this.blogPostService = blogPostService;
@@ -134,8 +137,8 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             }
             ViewBag.mostDiscountAdvertise = itemDTOs;
             var norouzItemDTOs = new List<AccommodationCardDTO>();
-            //var norouzAccs = advertiseService.GetNorouzAdvertises(5);
-            var norouzAccs = new List<Advertise>();
+            var norouzAccs = advertiseService.GetNorouzAdvertises(5);
+            //var norouzAccs = new List<Advertise>();
             foreach (var item in norouzAccs)
             {
                 var dto = (AccommodationCardDTO)item;

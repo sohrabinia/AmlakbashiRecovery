@@ -1,0 +1,90 @@
+﻿@using Amlakbashi.Core.DTOs.CategoryDTOs;
+
+<div class="home-page__search-container">
+    @*<div class="home-page__search-empty-space"></div>*@
+    @*<h1 class="home-page__search-title">اجاره روزانه خانه ، اجاره آنلاین ویلا و سوئیت در سراسر ایران</h1>*@
+    <h1 class="home-page__search-title">اجاره روزانه، هفتگی و ماهانه خانه، ویلا، سوئیت و آپارتمان مبله</h1>
+    <div class="home-page__search-box">
+        @*<i onclick="openFirstSearchResult()" class="home-page__search-icon fa fa-search"></i>*@
+        <input autocomplete="off" id="js-search-input-main" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="مقصد سفر شما کجاست؟" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)"  class="home-page__search-input" type="search" />
+        <i onclick="clearSearch()" class="home-page__clear-icon fa fa-times"></i>
+    </div>
+    <div class="home-page__search-list-box">
+        <div class="home-page__search-list-result-container">
+            @await Html.PartialAsync("_SearchTable", new List<SearchTableDTO>())
+        </div>
+        <div class="home-page__search-list-most-view-parent">
+            <div class="home-page__search-list-most-view-label">مناطق پر بازدید:</div>
+            <div class="home-page__search-list-most-view-container">
+                <div onclick="selectMostViewRegion('/app/category/item?regiontype=0&regionid=2', 'تهران')" class="home-page__search-list-most-view-item">تهران</div>
+                <div onclick="selectMostViewRegion('/app/category/item?regiontype=-1&countrydirection=1', 'شمال')" class="home-page__search-list-most-view-item">شمال</div>
+                <div onclick="selectMostViewRegion('/app/category/item?regiontype=0&regionid=1583', 'رامسر')" class="home-page__search-list-most-view-item">رامسر</div>
+                <div onclick="showSearchByRegion()" class="home-page__search-list-most-view-item home-page__search-list-region-btn">لیست شهرها</div>
+            </div>
+        </div>
+    </div>
+    <div id="js-search-region-popup" style="position: fixed;
+    z-index: 1000;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: 0;
+    display:none;
+    background-color: white;">
+        <div style="display:flex;width:100%;justify-content:space-between;align-items:center;border-bottom:1px solid #e0e0e0;padding: 10px;background-color:#fdd835;">
+            <div style="font:13px Miransans;">انتخاب مقصد سفر</div>
+            <i onclick="toggleRegionSearchPopup(false)" style="cursor:pointer;font-size:20px;color:#494949;" class="fa fa-times"></i>
+        </div>
+        <div style="padding: 0 5.7%">
+            <div id="js-search-box-mobile" class="home-page__search-box" style="margin-bottom: 0;">
+                @*<i onclick="openFirstSearchResult()" class="home-page__search-icon fa fa-search"></i>*@
+                <input autocomplete="off" id="js-mobile-region-input" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="مقصد سفر شما کجاست؟" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)" class="home-page__search-input" type="search" />
+                <i onclick="clearSearch()" class="home-page__clear-icon fa fa-times"></i>
+            </div>
+            <div class="home-page__search-list-box js-dont-close" style="height: 70%;overflow-y: scroll;padding: 15px 0;display:flex;flex-flow:column;">
+                <div class="home-page__search-list-result-container">
+                    @await Html.PartialAsync("_SearchTable", new List<SearchTableDTO>()))
+                </div>
+                <div class="home-page__search-list-most-view-parent">
+                    <div class="home-page__search-list-most-view-label">مناطق پر بازدید:</div>
+                    <div class="home-page__search-list-most-view-container">
+                        <div onclick="selectMostViewRegion('/app/category/item?regiontype=0&regionid=2', 'تهران')" class="home-page__search-list-most-view-item">تهران</div>
+                        <div onclick="selectMostViewRegion('/app/category/item?regiontype=-1&countrydirection=1', 'شمال')" class="home-page__search-list-most-view-item">شمال</div>
+                        <div onclick="selectMostViewRegion('/app/category/item?regiontype=0&regionid=1583', 'رامسر')" class="home-page__search-list-most-view-item">رامسر</div>
+                        <div onclick="showSearchByRegion()" class="home-page__search-list-most-view-item home-page__search-list-region-btn">لیست شهرها</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="home-page__date-container">
+        @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker-from" }, { "class", "main-date-picker" } })
+        <div onclick="showFromDatePicker()" class="home-page__date-input-container">
+            <input id="from_date_date_picker" readonly placeholder="تاریخ ورود" class="home-page__date-input" type="text" />
+            <i onclick="clearSearch()" class="home-page__input-icon fa fa-angle-down"></i>
+        </div>
+        @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker-to" }, { "class", "main-date-picker" } })
+        <div onclick="showToDatePicker()" class="home-page__date-input-container">
+            <input id="to_date_date_picker" readonly placeholder="تاریخ خروج" class="home-page__date-input" type="text" />
+            <i onclick="clearSearch()" class="home-page__input-icon fa fa-angle-down"></i>
+        </div>
+    </div>
+    <div onclick="toggleGuestSelect()" class="home-page__guest-input-container">
+        <input readonly placeholder="تعداد مهمان" class="home-page__guest-input" type="text" />
+        <i class="home-page__input-icon fa fa-angle-down"></i>
+    </div>
+    <div class="home-page__guest-select-box" style="width: unset;min-height: 0px;">
+        <div class="home-page__guest-select-item">
+            <i class="fa fa-plus input-plus-button" onclick="onClickIncDecButton(this)" data-action="plus"></i>
+            <input style="text-align:center;" onpaste="onChangeGuestCount(this)" onkeyup="onChangeGuestCount(this)" onchange="onChangeGuestCount(this)" class="inc_dec_number" type="number" name="Metrazh" min="0" value="0">
+            <i class="fa fa-minus input-minus-button" onclick="onClickIncDecButton(this)" data-action="minus"></i>
+        </div>
+        <div style="margin: 10px;">مهمان</div>
+        @*<div onclick="hideGuestSelect()" class="home-page__guest-select-close">ثبت</div>*@
+    </div>
+    <div onclick="doHomePageSearch()" class="home-page__search-button">
+        @*<i class="home-page__search-icon fa fa-search"></i>*@
+        <span>جستجو</span>
+    </div>
+</div>

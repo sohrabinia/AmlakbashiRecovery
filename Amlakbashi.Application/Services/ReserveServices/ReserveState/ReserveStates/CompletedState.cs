@@ -1,6 +1,7 @@
 ﻿using Amlakbashi.Accounting;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
+using System;
 using static Amlakbashi.Core.Entities.Reserve;
 
 namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveStates
@@ -24,11 +25,14 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             ActionLog.ActionSourceEnum actionSource, int doerUserId)
         {
             var reserve = Repository.Find(ReserveId);
-            reserve.Status = ReserveStatus.Completed;
-            Repository.Update(reserve);
-            Repository.Save();
-            accounting.GivePresentorPrizeIfAny(reserve.Id, actionSource, doerUserId);
-            accounting.GiveAppreciateDiscountIfDeserve(reserve.Id, actionSource, doerUserId);
+            if (reserve.EndDate.Date == DateTime.Now.Date)
+            {
+                reserve.Status = ReserveStatus.Completed;
+                Repository.Update(reserve);
+                Repository.Save();
+                accounting.GivePresentorPrizeIfAny(reserve.Id, actionSource, doerUserId);
+                accounting.GiveAppreciateDiscountIfDeserve(reserve.Id, actionSource, doerUserId);
+            }
         }
     }
 }

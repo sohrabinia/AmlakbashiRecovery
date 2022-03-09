@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using X.PagedList;
 using Entities = Amlakbashi.Core.Entities;
 
@@ -109,6 +110,42 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Payment.RegisterNotPaidPayment", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0
+                });
+            }
+        }
+
+        [Authorize(Policy = Policies.Payment_Actions)]
+        public async Task<IActionResult> CheckPasargadPaymentResult(int paymentId)
+        {
+            try
+            {
+                var result = await accounting.CheckPaymentResult(paymentId);
+                return PartialView("_CheckPasargadPaymentResult", result);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Payment.CheckPasargadPaymentResult", exc);
+                return PartialView("_CheckPasargadPaymentResult");
+            }
+        }
+
+        [Authorize(Policy = Policies.Payment_Actions)]
+        public async Task<IActionResult> EditPaymentByReinquiry(int paymentId)
+        {
+            try
+            {
+                var result = await accounting.EditPaymentByReinquiry(paymentId);
+                return GenerateJsonResult(new
+                {
+                    status = result ? 1 : 0
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Payment.EditPaymentByReinquiry", exc);
                 return GenerateJsonResult(new
                 {
                     status = 0

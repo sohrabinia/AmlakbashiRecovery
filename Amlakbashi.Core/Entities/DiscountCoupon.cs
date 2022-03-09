@@ -34,7 +34,8 @@ namespace Amlakbashi.Core.Entities
             Appreciate = 2,
             Moupon = 3,
             Instagram = 4,
-            Yalda1400 = 5
+            Yalda1400 = 5,
+            Pedar1400 = 6
         }
         public enum StatusEnum
         {

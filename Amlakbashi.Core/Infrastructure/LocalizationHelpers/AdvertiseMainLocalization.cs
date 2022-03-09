@@ -69,6 +69,41 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             }
         }
 
+        public static string GetAdvertiseTypePersianNameForAdminPanel(AdvertiseType advertiseType)
+        {
+            switch (advertiseType)
+            {
+                case AdvertiseType.All:
+                    return "همه";
+                case AdvertiseType.Apartment:
+                    return "آپارتمان مبله";
+                case AdvertiseType.Villa:
+                    return "ویلا";
+                case AdvertiseType.Hotel:
+                    return "هتل";
+                case AdvertiseType.HotelApartment:
+                    return "هتل آپارتمان";
+                case AdvertiseType.Camp:
+                    return "کمپ";
+                case AdvertiseType.TourismAccommodation:
+                    return "اقامتگاه بومگردی";
+                case AdvertiseType.House:
+                    return "خانه ویلایی مبله";
+                case AdvertiseType.SuitAndRoom:
+                    return "اتاق و سوئیت مبله";
+                case AdvertiseType.Inn:
+                    return "مسافرخانه";
+                case AdvertiseType.Pansion:
+                    return "پانسیون";
+                case AdvertiseType.Complex:
+                    return "مجتمع";
+                case AdvertiseType.Hut:
+                    return "کلبه";
+                default:
+                    return "هیچ کدام";
+            }
+        }
+
         public static string GetAdvertiseStatusString(int status, bool shortened = false)
         {
             switch ((AdvertiseStatus)status)
@@ -664,6 +699,27 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "عدم تایید";
                 default:
                     return "";
+            }
+        }
+
+        public static string GetParkingText(ParkingItems item)
+        {
+            switch (item)
+            {
+                case ParkingItems.One:
+                    return "1 پارکینگ";
+                case ParkingItems.Two:
+                    return "2 پارکینگ";
+                case ParkingItems.Three:
+                    return "3 پارکینگ";
+                case ParkingItems.MoreThanThree:
+                    return "بیشتر از 3 پارکینگ";
+                case ParkingItems.Jointly:
+                    return "پارکینگ مشاع";
+                case ParkingItems.NoParking:
+                    return "بدون پارکینگ";
+                default:
+                    return "همه";
             }
         }
     }

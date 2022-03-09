@@ -77,7 +77,7 @@
                 queryStringIndex++;
                 url += ("empty_range_to=" + vBag.empty_range_to);
             }
-            <a target="_blank" href="/app/advertise/item/@item.AdvertiseID" class="home-page__category-item-container-large@(for_advertise_page ? " advertise-category__advertise-item-container" : "")" id="advertise_@(item.AdvertiseID)">
+            <a href="/app/advertise/item/@item.AdvertiseID" class="home-page__category-item-container-large@(for_advertise_page ? " advertise-category__advertise-item-container" : "")" id="advertise_@(item.AdvertiseID)">
                 @*<div class="advertise-item__icon-list" style="position: absolute;width: unset;display: inline;flex-flow: column;">*@
                 @{
                     int discount = item.DiscountPercent;

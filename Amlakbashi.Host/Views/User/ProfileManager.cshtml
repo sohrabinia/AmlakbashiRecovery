@@ -116,7 +116,6 @@
             <div class="profile__title">ارتباط ضروری ما با شما</div>
             <div class="profile__item no-column">
                 <span class="profile__tip">این اطلاعات فقط جهت ارتباط ما با شما در مواقع ضروری است و در سایت نمایش داده نمی شود</span>
-                @*<span class="profile__text"></span>*@
             </div>
             <div class="profile__item ">
                 <span class="profile__label">
@@ -151,11 +150,6 @@
                 <button type="button" onclick="showRegisterEmailForm()" style="border:0; margin-right: 20px;" class="btn-photo">@(string.IsNullOrEmpty(Model.email) ? "ثبت ایمیل" : "تغییر ایمیل")</button>
             </span>
         </div>
-        //if (Model.userGeneralType > (int)Entities.User.UserGeneralTypeEnum.Guest ||
-        //    string.IsNullOrEmpty(Model.bankCardNumber) == false ||
-        //    string.IsNullOrEmpty(Model.shabaNumber) == false ||
-        //    (ViewBag.hasCanselReserve != null ? ViewBag.hasCanselReserve : false))
-        //{
         <div class="profile__title">اطلاعات حساب بانکی</div>
         <div class="profile__item no-column">
             <span class="profile__tip">اطلاعات حساب بانکی جهت انتقال وجه به حساب شما</span>
@@ -209,14 +203,6 @@
                        style="text-align:left;"><span style="margin:auto 5px">IR</span>
             </span>
         </div>
-        @*}
-            else
-            {
-                <input type="hidden" name="bankFname" value="@Model.bankFname">
-                <input type="hidden" name="bankLname" value="@Model.bankLname">
-                <input type="hidden" name="bankCardNumber" value="@Model.bankCardNumber">
-                <input type="hidden" name="shabaNumber" value="@Model.shabaNumber">
-            }*@
         <input type="submit" value="ثبت ویرایش" class="profile__submit" />
     }
 </div>

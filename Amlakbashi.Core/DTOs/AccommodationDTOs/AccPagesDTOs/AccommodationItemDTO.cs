@@ -41,6 +41,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             this.TitleDesc = this.TitleDesc == null ? new TitleDescDTO() : this.TitleDesc;
             this.MetaTitleDesc = this.MetaTitleDesc == null ? new MetaTitleDescDTO() : this.MetaTitleDesc;
             this.Pool = this.Pool == null ? new PoolDTO() : this.Pool;
+            this.License = this.License == null ? new LicenseDTO() : this.License;
         }
 
         public static implicit operator AccommodationItemDTO(AdvertiseDirector director)
@@ -102,6 +103,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             PropertyCopier<RulesPart, RulesDTO>.Copy(director.GetAdvertisePart<RulesPart>(), dto.Rules);
             PropertyCopier<TitleDescPart, TitleDescDTO>.Copy(director.GetAdvertisePart<TitleDescPart>(), dto.TitleDesc);
             PropertyCopier<MetaTitleDescPart, MetaTitleDescDTO>.Copy(director.GetAdvertisePart<MetaTitleDescPart>(), dto.MetaTitleDesc);
+            PropertyCopier<LicensePart, LicenseDTO>.Copy(director.GetAdvertisePart<LicensePart>(), dto.License);
             return dto;
         }
 
@@ -312,6 +314,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
         public RulesDTO Rules { get; set; }
         public TitleDescDTO TitleDesc { get; set; }
         public MetaTitleDescDTO MetaTitleDesc { get; set; }
+        public LicenseDTO License { get; set; }
         public List<AccommodationHotelItemDTO> HotelChildren { get; set; }
         public List<AccommodationApartmentItemDTO> ApartmentChildren { get; set; }
         public List<AccommodationSuitItemDTO> SuitChildren { get; set; }

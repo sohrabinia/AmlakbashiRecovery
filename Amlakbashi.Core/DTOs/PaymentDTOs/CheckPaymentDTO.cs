@@ -14,6 +14,10 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs
         public string ReferenceNumber { get; set; }
         public string TransactionDate { get; set; }
         public string Amount { get; set; }
+
         public long ReserveId { get; set; }
+        public bool ShowDoReserve { get; set; }
+        public bool MustEdit { get; set; }
+
     }
 }

@@ -92,26 +92,26 @@
           crossorigin="" />
 }
 
-<div class="share-post__container" style="flex-flow: row;left: 0;bottom: 0;right: 0;overflow: auto;background-color: white;width: fit-content;height: 70px;align-items: center;position: fixed;max-width: 100%;">
-    <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(t_)" target="_blank" rel="noreferrer" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;width: 40px;height: 40px;">
-        <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram">
-    </a>
-    <a class="share-post__item" href="whatsapp://send?text=@(t_) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(t_) @(u_)')" title="اشتراک گذاری در واتس اپ" style="background-color: #1BD741;width: 40px;height: 40px;">
-        <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp">
-    </a>
-    <a class="share-post__item" href="http://twitter.com/share?text=@(t_);url=@(u_)" target="_blank" rel="noreferrer" title="توئیت کردن اقامتگاه" style="background-color: #55ACEE;width: 40px;height: 40px;">
-        <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter">
-    </a>
-    <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(t_)" target="_blank" rel="noreferrer" title="اشتراک گذاری در فیسبوک" style="background-color: #3b5998;width: 40px;height: 40px;">
-        <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook">
-    </a>
-    <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(t_)" target="_blank" rel="noreferrer" title="پین کردن در پینترست" style="background-color: #BD081C;width: 40px;height: 40px;">
-        <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest">
-    </a>
-    <a class="share-post__item" href="mailto:?subject=@(t_);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" rel="noreferrer" title="اشتراک گذاری با ایمیل" style="width: 40px;height: 40px;">
-        <i class="fa fa-envelope share-post__icon style-custom-email"></i>
-    </a>
-</div>
+@*<div class="share-post__container" style="flex-flow: row;left: 0;bottom: 0;right: 0;overflow: auto;background-color: white;width: fit-content;height: 70px;align-items: center;position: fixed;max-width: 100%;">
+        <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(t_)" target="_blank" rel="noreferrer" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;width: 40px;height: 40px;">
+            <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram">
+        </a>
+        <a class="share-post__item" href="whatsapp://send?text=@(t_) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(t_) @(u_)')" title="اشتراک گذاری در واتس اپ" style="background-color: #1BD741;width: 40px;height: 40px;">
+            <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp">
+        </a>
+        <a class="share-post__item" href="http://twitter.com/share?text=@(t_);url=@(u_)" target="_blank" rel="noreferrer" title="توئیت کردن اقامتگاه" style="background-color: #55ACEE;width: 40px;height: 40px;">
+            <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter">
+        </a>
+        <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(t_)" target="_blank" rel="noreferrer" title="اشتراک گذاری در فیسبوک" style="background-color: #3b5998;width: 40px;height: 40px;">
+            <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook">
+        </a>
+        <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(t_)" target="_blank" rel="noreferrer" title="پین کردن در پینترست" style="background-color: #BD081C;width: 40px;height: 40px;">
+            <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest">
+        </a>
+        <a class="share-post__item" href="mailto:?subject=@(t_);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" rel="noreferrer" title="اشتراک گذاری با ایمیل" style="width: 40px;height: 40px;">
+            <i class="fa fa-envelope share-post__icon style-custom-email"></i>
+        </a>
+    </div>*@
 <div class="advertise-page__bottom-pin" style="@(Model.AdvertiseMode == Advertise.AdvertiseMode.Parent || !Model.CanPublish ? "background-color:transparent;border:none;" : "")">
     @if (Model.AdvertiseMode != Advertise.AdvertiseMode.Parent && Model.CanPublish)
     {
@@ -142,34 +142,6 @@
                             img_xxxlarge = photo_id > 0 ? string.Format("/file/accthumbxxxlarge?accid={0}&fileid={1}", Model.Id, photo_id) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394);
 
                             <a href="@string.Format("/file/getimage?fileid={0}", photo_id)" data-lightbox="advertise-gallery-set" class="advertise-page__slider-image-container" data-alt="@(Model.TitleDesc.Title)-@(i+1)" data-title="@(Model.TitleDesc.Title)-@(i+1)">
-                                @*<img data-srcset="@img_small 213w,
-                                    @img_medium 249w,
-                                    @img_large 331w,
-                                    @img_xlarge 450w,
-                                    @img_xxlarge 600w,
-                                    @img_xxxlarge 700w"
-
-                                     srcset='@(i == 0 ? img_small + " 213w," +
-                                        img_medium + " 249w," +
-                                        img_large + " 331w," +
-                                        img_xlarge + " 450w," +
-                                        img_xxlarge + " 600w," +
-                                        img_xxxlarge + " 700w" : "")'
-
-                                     sizes="(max-width: 312px) 213px,
-                                     (max-width: 320px) 249px,
-                                     (max-width: 400px) 249px,
-                                     (max-width: 550px) 331px,
-                                     (max-width: 680px) 450px,
-                                     (max-width: 780px) 600px,
-                                     (max-width: 900px) 450px,
-                                     (max-width: 1100px) 450px,
-                                     (max-width: 1200px) 700px,
-                                     700px"
-                                     @(i == 0 ? "" : "data-lazy=/file/resourceimagepng?file_name=lazy-16_9")
-                                     data-src="@img_small" @(i > 0 ? "data-" : "") alt="@(Model.TitleDesc.Title)-@(i+1)" @(i > 0 ? "data-" : "") title="@(Model.TitleDesc.Title)-@(i+1)"
-                                     class="advertise-page__slider-image lazy" style="@(i > 0 ? "display:none;" : "")">*@
-
                                 <img width="213" height="120" src="@img_small"
                                      srcset='@(img_small + " 213w," +
                                         img_medium + " 249w," +
@@ -223,6 +195,26 @@
                     <div class="share-post__button master__share-button">
                         <p>اشتراک گذاری</p>
                         <i class="fa fa-share-alt"></i>
+                        <div class="share-popup" id="share_popup">
+                            <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(t_)" rel="noreferrer" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;">
+                                <i class="fab fa-telegram-plane"></i>
+                            </a>
+                            <a class="share-post__item" href="whatsapp://send?text=@(t_) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(t_) @(u_)')" title="اشتراک گذاری در واتس اپ" style="background-color: #1BD741;">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <a class="share-post__item" href="http://twitter.com/share?text=@(t_);url=@(u_)" rel="noreferrer" title="توئیت کردن اقامتگاه" style="background-color: #55ACEE;">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(t_)" rel="noreferrer" title="اشتراک گذاری در فیسبوک" style="background-color: #3b5998;">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(t_)" rel="noreferrer" title="پین کردن در پینترست" style="background-color: #BD081C;">
+                                <i class="fab fa-pinterest-p"></i>
+                            </a>
+                            <a class="share-post__item" href="mailto:?subject=@(t_);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" rel="noreferrer" title="اشتراک گذاری با ایمیل" style="background-color: #ddd;">
+                                <i class="fa fa-envelope"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -245,18 +237,6 @@
                 {
                     <div class="advertise-page__price-container">
                         @await Html.PartialAsync("AccPagePartials/_AccPagePrice", Model.Price)
-
-                        @*@if (Model.Price.NorouzOverCapacityPrice > 0)
-                            {
-                                <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
-                                    <span class="advertise-page__price-title">
-                                        قیمت هر مهمان اضافه نوروز <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
-                                    </span>
-                                    <span class="advertise-page__price-content">
-                                        @string.Format("{0:n0}", Model.Price.NorouzOverCapacityPrice) تومان
-                                    </span>
-                                </div>
-                            }*@
                     </div>
                 }
 
@@ -294,6 +274,12 @@
                 <p class="advertise-page__description" data-max-height="200">
                     @Model.TitleDesc.Description
                     <br /><br />
+                    @if (Model.License.License)
+                    {
+                        <span class="fa fa-certificate"></span>
+                        @:دارای مجوز از سازمان گردشگری با شماره ثبت @Model.License.LicenseNumber
+                        <br /><br />
+                    }
                     <span class="fa fa-calendar-check"></span>
                     تاریخ آخرین ویرایش آگهی: @StringUtility.EnglishNumberToPersian(Model.LastModifyDate)
                 </p>

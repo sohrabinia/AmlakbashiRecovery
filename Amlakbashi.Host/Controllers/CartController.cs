@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
 using System.Text;
 using Amlakbashi.Core.Common.Enums;
+using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -108,51 +109,9 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        public ActionResult ConfirmAndPayment(long id, int bank, bool useCustomRedirect = false, int user_id = 0, string customRedirectUrl = null, long price = 0)
+        public ActionResult PerformPay(int paymentId, string redirectUrl = null)
         {
-            try
-            {
-                Payment payment = accounting.FindPayment(id);
-                if (payment == null || payment.Status == Payment.PaymentStatus.Paid)
-                {
-                    return RedirectToRoute(new
-                    {
-                        controller = "errors",
-                        action = "http404"
-                    });
-                }
-
-                string redirectAddress;
-                if (useCustomRedirect)
-                {
-                    redirectAddress = GeneralData.WebsiteUrl + "/Cart/VerifyPasargadPayment"
-                        + "?user_id=" + user_id
-                        + "&useCustomRedirect=" + "true"
-                        + "&customRedirectUrl=" + customRedirectUrl
-                        + "&price=" + payment.TotalPrice;
-                }
-                else
-                {
-                    redirectAddress = GeneralData.WebsiteUrl + "/Cart/VerifyPasargadPayment";
-                    //var redirectAddress = "http://localhost:53552/Cart/VerifyPasargadPayment";
-                    //var redirectAddress = "http://test.amlakbashi.com/Cart/VerifyPasargadPayment";
-                }
-                var result = accounting.GeneratePaymentData(BankEnum.Pasargad, (int)id, redirectAddress);
-                return View("Bank", result);
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Cart.ConfirmAndPayment", exc);
-                TempData["payment_error_msg"] = "خطایی در هنگام پرداخت رخ داده . لطفا دوباره امتحان کنید .";
-                return RedirectToAction("cart", "transactionresult");
-            }
-        }
-
-
-        [Authorize]
-        public ActionResult PerformPay(int payment_id)
-        {
-            var payment = accounting.FindPayment(payment_id);
+            var payment = accounting.FindPayment(paymentId);
             if (payment == null || payment.Status == Payment.PaymentStatus.Paid)
             {
                 return RedirectToRoute(new
@@ -162,34 +121,100 @@ namespace Amlakbashi.Host.Controllers
                 });
             }
             payment.Date = DateTime.Now;
-            payment.Authority = "";
             payment.BankId = 0;
             accounting.UpdatePayment(payment);
             ViewBag.PayPrice = payment.TotalPrice;
             ViewBag.PayDate = DateTimeUtility.ConvertDate(payment.Date);
+            ViewBag.redirectUrl = redirectUrl;
             return View(payment);
         }
 
-        public ActionResult VerifyPasargadPayment(int user_id = 0, bool useCustomRedirect = false,
-            string customRedirectUrl = null, long price = 0)
+        public ActionResult TestPerformPay(int paymentId, string redirectUrl = null)
         {
-            if (user_id < 1)
+            var payment = accounting.FindPayment(paymentId);
+            if (payment == null || payment.Status == Payment.PaymentStatus.Paid)
             {
-                user_id = userAccessor.DoerUser.Id;
+                return RedirectToRoute(new
+                {
+                    controller = "errors",
+                    action = "http404"
+                });
             }
-            string tref = Request.Query["tref"];
-            var pid = int.Parse(Request.Query["iN"]);
-            var date = DateTime.Parse(Request.Query["iD"]);
-            string msg = "";
-            string paymentResult;
-            bool invalidInput;
-            bool payment_done = accounting.FinalizePayment(
-                BankEnum.Pasargad, pid, user_id,
-                date, tref, out paymentResult, out msg, out invalidInput,
-                useCustomRedirect ? ActionLog.ActionSourceEnum.Application :
-                ActionLog.ActionSourceEnum.WebsiteDashboard, user_id);
-            HttpContext.Session.SetObjectAsJson("resp", paymentResult);
-            if (payment_done)
+            payment.Date = DateTime.Now;
+            payment.BankId = 0;
+            accounting.UpdatePayment(payment);
+            ViewBag.PayPrice = payment.TotalPrice;
+            ViewBag.PayDate = DateTimeUtility.ConvertDate(payment.Date);
+            ViewBag.redirectUrl = redirectUrl;
+            return View(payment);
+        }
+
+        public IActionResult Epay(BankEnum bank, int id, string RedirectUrl = null)
+        {
+            try
+            {
+                var result = accounting.GeneratePaymentData(bank, id, RedirectUrl);
+                return View("EPay", result);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Cart.Epay", exc);
+                TempData["payment_error_msg"] = "عملیات پرداخت با خطا مواجه شد";
+                return RedirectToAction("cart", "transactionresult");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult RegisterSamanEpay(SamanEpayResponseDTO response)
+        {
+            try
+            {
+                string msg = string.Empty;
+                bool paymentResult = accounting.RegisterSamanEpay(response, out msg);
+                return RedirectAfterEpay(paymentResult, msg, response.ResNum, response.RedirectUrl, response.RRN);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Cart.RegisterSamanEpay", exc);
+                TempData["payment_error_msg"] = "عملیات پرداخت با خطا مواجه شد";
+                return RedirectToAction("cart", "transactionresult");
+            }
+        }
+
+        public IActionResult RegisterPasargadEpay(PasargadEpayResponseDTO response)
+        {
+            try
+            {
+                string msg = string.Empty;
+                string referenceNumber = string.Empty;
+                bool paymentResult = accounting.RegisterPasargadEpay(response, out msg, out referenceNumber);
+                return RedirectAfterEpay(paymentResult, msg, response.iN, response.RedirectUrl, referenceNumber);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Cart.RegisterPasargadEpay", exc);
+                TempData["payment_error_msg"] = "عملیات پرداخت با خطا مواجه شد";
+                return RedirectToAction("cart", "transactionresult");
+            }
+        }
+
+        private IActionResult RedirectAfterEpay(bool epayResult, string msg, int paymentId,
+            string redirectUrl, string referenceNumber = null)
+        {
+            var payment = accounting.FindPayment(paymentId);
+            if (string.IsNullOrEmpty(redirectUrl) == false)
+            {
+                if (epayResult)
+                {
+                    return Redirect(redirectUrl + "?done=true&price=" + payment.TotalPrice);
+                }
+                else
+                {
+                    return Redirect(redirectUrl + "?done=false");
+                }
+            }
+
+            if (epayResult)
             {
                 TempData["payment_success_msg"] = msg;
             }
@@ -197,37 +222,21 @@ namespace Amlakbashi.Host.Controllers
             {
                 TempData["payment_error_msg"] = msg;
             }
-            if (invalidInput)
-            {
-                var bytes = Encoding.UTF8.GetBytes("Invalid Input");
-                HttpContext.Response.Body.WriteAsync(bytes, 0, bytes.Length);
-            }
-            if (useCustomRedirect)
-            {
-                if (payment_done)
-                {
-                    return Redirect(customRedirectUrl + "?done=true&price=" + price);
-                }
-                else
-                {
-                    return Redirect(customRedirectUrl + "?done=false");
-                }
-            }
-            var objpay = accounting.FindPayment(pid);
+            
             string redirect_controller;
             string redirect_action;
-            if (objpay.ProductType.Contains("Reserve"))
+            if (payment.ProductType.Contains("Reserve"))
             {
                 redirect_controller = "reserve";
                 redirect_action = "reserveitemmanager?selecttype=1&category=2";
 
             }
-            else if (objpay.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString())
+            else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString())
             {
                 redirect_controller = "user";
                 redirect_action = "usercreditmanager";
             }
-            else if (objpay.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Inc_Then_Res.ToString())
+            else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Inc_Then_Res.ToString())
             {
                 redirect_controller = "reserve";
                 redirect_action = "reserveitemmanager?selecttype=1&category=2";
@@ -239,39 +248,34 @@ namespace Amlakbashi.Host.Controllers
             }
             if (redirect_action == "reserveitemmanager")
             {
-                XDocument doc = XDocument.Parse(HttpContext.Session.GetObjectFromJson<string>("resp")); //or XDocument.Load(path)
-                string jsonText = JsonConvert.SerializeXNode(doc);
-                dynamic resp = ((dynamic)JsonConvert.DeserializeObject<ExpandoObject>(jsonText)).resultObj;
-                TempData["payment_transaction_id"] = (string)resp.referenceNumber;
-                TempData.SetObjectAsJson("payment_reserve_id", accounting.FindPayment(pid).ReserveID);
+                TempData["payment_transaction_id"] = referenceNumber;
+                TempData.SetObjectAsJson("payment_reserve_id", payment.ReserveID);
             }
             return Redirect(string.Format("/{0}/{1}", redirect_controller, redirect_action));
         }
 
-        [Authorize(Policy = Policies.Payment_Actions)]
-        public IActionResult CheckPasargadPaymentResult(int paymentId)
-        {
-            try
-            {
-                var result = accounting.CheckPaymentResult(paymentId);
-                return PartialView("_CheckPaymentResult", result);
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Cart.CheckPasargadPaymentResult", exc);
-                return PartialView("_CheckPaymentResult");
-            }
-            
-        }
+        //[Authorize(Policy = Policies.Payment_Actions)]
+        //public IActionResult CheckPasargadPaymentResult(int paymentId)
+        //{
+        //    try
+        //    {
+        //        var result = accounting.CheckPaymentResult(paymentId);
+        //        return PartialView("_CheckPaymentResult", result);
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("Cart.CheckPasargadPaymentResult", exc);
+        //        return PartialView("_CheckPaymentResult");
+        //    }
+        //}
 
 #if DEBUG
-        //[Authorize(Roles = Roles.TechnicalManager + "," + Roles.TechnicalEmployee)]
-        public ActionResult LocalPay(int payment_id)
+        public ActionResult LocalPay(int paymentId, string redirectUrl = null)
         {
             try
             {
                 string msg;
-                if (accounting.TestFinalizePayment(payment_id, userAccessor.CurrentUser.Id, out msg))
+                if (accounting.TestFinalizePayment(paymentId, userAccessor.CurrentUser.Id, out msg))
                 {
                     TempData["payment_success_msg"] = msg;
                 }
@@ -284,7 +288,11 @@ namespace Amlakbashi.Host.Controllers
             {
                 TempData["payment_error_msg"] = exc.Message;
             }
-            var objpay = accounting.FindPayment(payment_id);
+            var objpay = accounting.FindPayment(paymentId);
+            if (string.IsNullOrEmpty(redirectUrl) == false)
+            {
+                return Redirect(redirectUrl);
+            }
             string redirect_controller;
             string redirect_action;
             if (objpay.ProductType.Contains("Reserve"))

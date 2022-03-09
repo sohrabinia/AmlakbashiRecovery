@@ -25,7 +25,7 @@ else
         <div class="admin-filter-container">
             <div class="box-filter">
                 <button class="more-filter">فیلتر بیشتر</button>
-                <div class="bar-filter">
+                <div class="bar-filter quick-filter">
                     <span><i class="fas fa-filter"></i>فیلتر :</span>
                     <input class="input-stlye" type="text" value="@(Model.Id > 0 ? Model.Id : "")" name="AdvertiseId" placeholder="کد آگهی">
                     <input class="input-stlye" type="text" value="@(Model.UserId > 0 ? Model.UserId : "")" name="HostUserId" placeholder="کد کاربر">
@@ -72,6 +72,22 @@ else
                             <input class="input-stlye" type="text" value="@(Model.UserId > 0 ? Model.UserId : "")" name="UserId">
                         </div>
                         <div class="item-filter-box">
+                            <label class="title-filter">نوع آگهی</label>
+                            <select name="Type" class="input-stlye">
+                                @{
+                                    var advertiseTypes = (Advertise.AdvertiseType[])Enum.GetValues(typeof(Advertise.AdvertiseType));
+                                    var advertiseTypesList = advertiseTypes.AsEnumerable().ToList();
+                                    advertiseTypesList.Remove(Advertise.AdvertiseType.None);
+                                    advertiseTypesList.Remove(Advertise.AdvertiseType.All);
+                                }
+                                <option is-selected="Model.Type == Advertise.AdvertiseType.All" value="@Advertise.AdvertiseType.All">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(Advertise.AdvertiseType.All)</option>
+                                @foreach (var item in advertiseTypesList)
+                                {
+                                    <option is-selected="@(item == Model.Type)" value="@((int)item)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(item)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="item-filter-box">
                             <label class="title-filter">وضعیت آگهی</label>
                             <select class="input-stlye" id="js-status-filter-select" name="Status">
                                 <option value="-1">همه وضعیت ها</option>
@@ -84,6 +100,9 @@ else
                                 <option is-selected="@(3 == (int)Model.Status)" value="3">حذف شده ها</option>
                             </select>
                         </div>
+
+                    </div>
+                    <div class="more-filter-row">
                         <div class="item-filter-box">
                             <label class="title-filter">وضعیت رزرو آنی</label>
                             <select name="InstatntReserveStatus" class="input-stlye">
@@ -97,8 +116,16 @@ else
                                 }
                             </select>
                         </div>
-                    </div>
-                    <div class="more-filter-row">
+                        <div class="item-filter-box">
+                            <label for="respons" class="title-filter">ترتیب</label>
+                            <select id="js-sort-filter-select" name="Sort" class="input-stlye">
+                                <option value="score" is-selected="@("score" == Model.Sort)">امتیاز آگهی</option>
+                                <option value="date" is-selected="@("date" == Model.Sort)">تاریخ ثبت </option>
+                                <option value="modify" is-selected="@("modify" == Model.Sort)">تاریخ ویرایش </option>
+                                <option value="click" is-selected="@("click" == Model.Sort)">کلیک </option>
+                                <option value="contact" is-selected="@("contact" == Model.Sort)">نمایش تماس </option>
+                            </select>
+                        </div>
                         <div class="item-filter-box">
                             <label for="status" class="title-filter">حداقل عکس</label>
                             <input class="input-stlye" type="number" name="ImageCountMin" value="@Model.ImageCountMin" />
@@ -106,6 +133,24 @@ else
                         <div class="item-filter-box">
                             <label for="status-travel" class="title-filter">حداکثر عکس</label>
                             <input class="input-stlye" type="number" name="ImageCountMax" value="@Model.ImageCountMax" />
+                        </div>
+                    </div>
+                    <div class="more-filter-row">
+                        <div class="item-filter-box">
+                            <label class="title-filter">حداقل رزرو نوروز از</label>
+                            <input name="MinReserveNorouzFromDate" class="input-stlye js-filter-date-picker" type="text" id="minReserveNorouzFromDate" value="@(Model.MinReserveNorouzFromDate)" />
+                        </div>
+                        <div class="item-filter-box">
+                            <label class="title-filter">پارکینگ</label>
+                            <select class="input-stlye" name="Parking">
+                                @{
+                                    var parkingOptions = (Advertise.ParkingItems[])Enum.GetValues(typeof(Advertise.ParkingItems));
+                                }
+                                @foreach (var st in parkingOptions)
+                                {
+                                    <option is-selected="@(st == Model.Parking)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetParkingText(st)</option>
+                                }
+                            </select>
                         </div>
                         <div class="item-filter-box">
                             <label class="title-filter">وضعیت پروتکل بهداشتی</label>
@@ -121,20 +166,12 @@ else
                             </select>
                         </div>
                         <div class="item-filter-box">
-                            <label for="respons" class="title-filter">ترتیب</label>
-                            <select id="js-sort-filter-select" name="Sort" class="input-stlye">
-                                <option value="score" is-selected="@("score" == Model.Sort)">امتیاز آگهی</option>
-                                <option value="date" is-selected="@("date" == Model.Sort)">تاریخ ثبت </option>
-                                <option value="modify" is-selected="@("modify" == Model.Sort)">تاریخ ویرایش </option>
-                                <option value="click" is-selected="@("click" == Model.Sort)">کلیک </option>
-                                <option value="contact" is-selected="@("contact" == Model.Sort)">نمایش تماس </option>
+                            <label class="title-filter">وضعیت مجوز</label>
+                            <select class="input-stlye" name="License">
+                                <option is-selected="@(Model.License == null)" value="">همه</option>
+                                <option is-selected="@(Model.License == true)" value="true">با مجوز</option>
+                                <option is-selected="@(Model.License == false)" value="false">بدون مجوز</option>
                             </select>
-                        </div>
-                    </div>
-                    <div class="more-filter-row">
-                        <div class="item-filter-box">
-                            <label class="title-filter">حداقل رزرو نوروز از</label>
-                            <input name="MinReserveNorouzFromDate" class="input-stlye js-filter-date-picker" type="text" id="minReserveNorouzFromDate" value="@(Model.MinReserveNorouzFromDate)" />
                         </div>
                     </div>
                     <div class="more-filter-row">

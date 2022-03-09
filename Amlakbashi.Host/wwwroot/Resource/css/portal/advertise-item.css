@@ -185,7 +185,7 @@ pre.advertise-page__rule-content{
     display: flex;
     justify-content: space-around !important;
     flex-flow: row;
-    position: unset;
+    /*position: unset;*/
     background-color: white;
     border-radius: 5px;
     width: 140px !important;
@@ -1675,9 +1675,9 @@ input[type=number] {
     .advertise-page__description{
         margin:0;
     }
-    .master__favourite-button i, .share-post__button.master__share-button i {
+    /*.master__favourite-button i, .share-post__button.master__share-button i {
         font-size: 18px !important;
-    }
+    }*/
     p.advertise-page__amenities-header {
         margin: 14px 0 0 0;
     }
