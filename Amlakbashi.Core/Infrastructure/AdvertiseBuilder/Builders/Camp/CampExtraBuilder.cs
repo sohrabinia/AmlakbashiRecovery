@@ -16,6 +16,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Camp
             BuildAdvertisePart<AmenitiesPart>();
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<OwnershipPart>();
+            BuildAdvertisePart<LicensePart>();
         }
     }
 }

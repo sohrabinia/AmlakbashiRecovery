@@ -132,7 +132,14 @@
                 <div class="static-advertise advetise-form__part advertise-form__part-more">
                     <p class="static-advertise__title"><i class="fa fa-address-card"></i>سایر موارد </p>
                     @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccOwnershipInput.cshtml", Model.ownership)
-                    @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccLicenseInput.cshtml", Model.license)
+                    @if (Model.license != null)
+                    {
+                        @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccLicenseInput.cshtml", Model.license)
+                    }
+                    @if (Model.license.License && Model.license.LicenseFileId != null)
+                    {
+                        <a class="js-license" target="_blank" href="/file/getlicenseimage?id=@Model.license.LicenseFileId">مشاهده فایل مجوز</a>
+                    }
                 </div>
             }
         </div>

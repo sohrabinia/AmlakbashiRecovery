@@ -127,7 +127,6 @@
     <None Include="Views\Admin\UserChart.cshtml" />
     <None Include="Views\Advertise\Admin.cshtml" />
     <None Include="Views\Advertise\Edit.cshtml" />
-    <None Include="Views\Advertise\Index.cshtml" />
     <None Include="Views\BankCard\Index.cshtml" />
     <None Include="Views\BlogPost\AddEdit.cshtml" />
     <None Include="Views\BlogPost\Index.cshtml" />

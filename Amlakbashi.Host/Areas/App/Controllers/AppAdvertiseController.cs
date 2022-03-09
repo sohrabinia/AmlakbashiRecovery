@@ -13,6 +13,7 @@ using Amlakbashi.Host.Authentication;
 using log4net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -420,6 +421,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
                 int level;
+                IFormFile uploadedLicenseFile = null;
                 if (data.Pool == true)
                 {
                     data.PoolFeatures = poolDTO.ConvertToEnum();
@@ -428,7 +430,12 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 {
                     data.PoolFeatures = Advertise.PoolFeaturesEnum.None;
                 }
-                var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors, out level, isEdit);
+                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
+                {
+                    uploadedLicenseFile = Request.Form.Files[0];
+                }
+                var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors,
+                    out level, uploadedLicenseFile, isEdit);
                 if (errors.Any())
                 {
                     ModelState.Clear();

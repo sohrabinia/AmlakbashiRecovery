@@ -6,22 +6,25 @@
 <html class="theme3">
 <head>
     <!-- Global Site Tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
-      gtag('config', 'AW-706947688');
-    @RenderSection("GtagAddition", false)
-    </script>
-    <!-- Event snippet for Purchased (Tracking) conversion page -->
-    @*<script>
-        gtag('event', 'conversion', {
-            'send_to': 'AW-850965714/5NVbCJTHpZ0BENLp4pUD',
-            'transaction_id': ''
-        });
+    @*<script async src="https://www.googletagmanager.com/gtag/js"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
+          gtag('config', 'AW-706947688');
+        @RenderSection("GtagAddition", false)
         </script>*@
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-112037224-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-112037224-1');
+    </script>
+
     <title>@ViewBag.Title</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />

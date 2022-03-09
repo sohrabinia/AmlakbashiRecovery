@@ -32,6 +32,7 @@ using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs;
 using Amlakbashi.Core.Common.Caching;
+using Microsoft.AspNetCore.Http;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -218,8 +219,7 @@ namespace Amlakbashi.Host.Controllers
                 AdvertiseType parentType;
                 AdvertiseStatus status;
                 var director = advertiseService.SubmitAdminForm(data, out errors, out groupErrors,
-                    forceSave, DirectorType.General, userAccessor.CurrentUser.Id, out parentType, out status,
-                    webHostEnvironment.WebRootPath);
+                    forceSave, DirectorType.General, userAccessor.CurrentUser.Id, out parentType, out status);
                 var hasImportantError = errors.ContainsKey("Province") || errors.ContainsKey("City");
                 if (hasImportantError || (forceSave == false && groupErrors.Any()))
                 {
@@ -311,6 +311,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 Dictionary<string, string> errors;
                 List<string> groupErrors = new List<string>();
+                IFormFile uploadedLicenseFile = null;
                 AdvertiseType parentType;
                 AdvertiseStatus status;
                 if (data.Pool == true)
@@ -321,8 +322,12 @@ namespace Amlakbashi.Host.Controllers
                 {
                     data.PoolFeatures = PoolFeaturesEnum.None;
                 }
+                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
+                {
+                    uploadedLicenseFile = Request.Form.Files[0];
+                }
                 var director = advertiseService.SubmitAdminForm(data, out errors, out groupErrors, forceSave,
-                    DirectorType.Extra, userAccessor.CurrentUser.Id, out parentType, out status);
+                    DirectorType.Extra, userAccessor.CurrentUser.Id, out parentType, out status, uploadedLicenseFile);
                 if (forceSave == false && groupErrors.Any())
                 {
                     ModelState.Clear();
@@ -463,7 +468,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var childs = advertiseService.GetAccChilds((long)data.ParentId);
                 var director = advertiseService.SubmitAdminForm(data, out errors, out groupErrors, forceSave,
-                    DirectorType.ComplexUnit, userAccessor.CurrentUser.Id, out parentType, out status, webHostEnvironment.WebRootPath);
+                    DirectorType.ComplexUnit, userAccessor.CurrentUser.Id, out parentType, out status);
                 if (forceSave == false && groupErrors.Any())
                 {
                     ModelState.Clear();
@@ -960,6 +965,7 @@ namespace Amlakbashi.Host.Controllers
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
                 int level;
+                IFormFile uploadedLicenseFile = null;
                 if (data.Pool == true)
                 {
                     data.PoolFeatures = poolDTO.ConvertToEnum();
@@ -968,8 +974,12 @@ namespace Amlakbashi.Host.Controllers
                 {
                     data.PoolFeatures = PoolFeaturesEnum.None;
                 }
-                var uploadedLicenseFile = Request.Form.Files[0];
-                var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors, out level, isEdit);
+                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
+                {
+                    uploadedLicenseFile = Request.Form.Files[0];
+                }
+                var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors,
+                    out level, uploadedLicenseFile, isEdit);
                 if (errors.Any())
                 {
                     ModelState.Clear();

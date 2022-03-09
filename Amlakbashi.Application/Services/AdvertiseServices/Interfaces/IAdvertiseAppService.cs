@@ -11,6 +11,7 @@ using Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs;
 using System;
 using static Amlakbashi.Core.Entities.ActionLog;
 using Amlakbashi.Core.DTOs.AdvertiseDTOs;
+using Microsoft.AspNetCore.Http;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
 {
@@ -28,10 +29,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         Advertise Find(long id, int statusLowerThan);
         Advertise FindIncludingDeleted(long id);
         bool Delete(long id);
-        List<long> GetAdvertisesPhotoIds();
         void AddSupporterInfo(long id, string text, User supporter);
-        IList<Advertise> Filter(AdvertiseStatus status, int adtype, int userid, string sort, long id, int instantReserveStatus,
-            long minReserveNorouzDateUnix, int imageCountMin, int imageCountMax, int province, int city, int area, int hygieneProtocolStatus);
         void FilterNew(AdvertiseIndexDTO dto);
         IList<Advertise> Filter(string statusString, int userid, long id);
         IList<Advertise> FilterAdmin(int province = 0, int city = 0, int area = 0, int adtype = 0,
@@ -45,7 +43,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         AdvertiseDirector GetGeneralForm(long id, out bool isEdit, out int level);
         AdvertiseDirector SubmitGeneralForm(Advertise data, out Dictionary<string, string> errors, out List<string> groupErrors, out int level, string rootPath, bool isEdit = false);
         AdvertiseDirector GetExtraForm(long id, out bool isEdit, out int level);
-        AdvertiseDirector SubmitExtraForm(Advertise data, out Dictionary<string, string> errors, out List<string> groupErrors, out int level, bool isEdit = false);
+        AdvertiseDirector SubmitExtraForm(Advertise data, out Dictionary<string, string> errors, out List<string> groupErrors, out int level, IFormFile uploadedLicenseFile, bool isEdit = false);
         AdvertiseDirector GetHotelForm(long id, long parentId, out bool isEdit);
         AdvertiseDirector SubmitHotelForm(Advertise data, int userId, out Dictionary<string, string> errors, out List<string> groupErrors, bool save);
         AdvertiseDirector GetComplexForm(long id, long parentId, out AdvertiseType parentType, out bool isEdit);
@@ -56,7 +54,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
             out List<string> groupErrors, int currentUserId);
         AdvertiseDirector SubmitAdminForm(Advertise data, out Dictionary<string, string> errors,
             out List<string> groupErrors, bool forceSave, DirectorType type, int currentUserId,
-            out AdvertiseType parentType, out AdvertiseStatus status, string rootPath = null);
+            out AdvertiseType parentType, out AdvertiseStatus status, IFormFile uploadedLicenseFile = null);
         Dictionary<AdvertiseType, Dictionary<long, string>> GetAccChilds(long parentId);
         PriceInputDTO GetPrices(long id);
         IDictionary<string, DatePriceDTO> GetAccPriceDatesInfo(long id);

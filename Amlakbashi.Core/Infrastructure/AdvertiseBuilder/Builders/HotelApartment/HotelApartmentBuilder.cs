@@ -25,6 +25,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.HotelApartmen
             BuildAdvertisePart<MetaTitleDescPart>();
             BuildAdvertisePart<AmenitiesPart>();
             BuildAdvertisePart<ElevatorPart>();
+            BuildAdvertisePart<LicensePart>();
         }
     }
 }

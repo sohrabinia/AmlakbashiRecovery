@@ -15,6 +15,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Complex
             BuildAdvertisePart<HygieneProtocolPart>();
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<OwnershipPart>();
+            BuildAdvertisePart<LicensePart>();
         }
     }
 }

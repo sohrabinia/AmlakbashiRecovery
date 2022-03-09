@@ -220,7 +220,7 @@ namespace Amlakbashi.Host
                 Credential = GoogleCredential.FromFile(env.ContentRootPath + "/amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json")
             });
 
-            //DatabaseInitializer.SeedData(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
+            //IdentityDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
             AmlakbashiDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
         }
     }

@@ -93,25 +93,25 @@
 }
 
 @*<div class="share-post__container" style="flex-flow: row;left: 0;bottom: 0;right: 0;overflow: auto;background-color: white;width: fit-content;height: 70px;align-items: center;position: fixed;max-width: 100%;">
-    <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(t_)" target="_blank" rel="noreferrer" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;width: 40px;height: 40px;">
-        <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram">
-    </a>
-    <a class="share-post__item" href="whatsapp://send?text=@(t_) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(t_) @(u_)')" title="اشتراک گذاری در واتس اپ" style="background-color: #1BD741;width: 40px;height: 40px;">
-        <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp">
-    </a>
-    <a class="share-post__item" href="http://twitter.com/share?text=@(t_);url=@(u_)" target="_blank" rel="noreferrer" title="توئیت کردن اقامتگاه" style="background-color: #55ACEE;width: 40px;height: 40px;">
-        <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter">
-    </a>
-    <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(t_)" target="_blank" rel="noreferrer" title="اشتراک گذاری در فیسبوک" style="background-color: #3b5998;width: 40px;height: 40px;">
-        <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook">
-    </a>
-    <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(t_)" target="_blank" rel="noreferrer" title="پین کردن در پینترست" style="background-color: #BD081C;width: 40px;height: 40px;">
-        <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest">
-    </a>
-    <a class="share-post__item" href="mailto:?subject=@(t_);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" rel="noreferrer" title="اشتراک گذاری با ایمیل" style="width: 40px;height: 40px;">
-        <i class="fa fa-envelope share-post__icon style-custom-email"></i>
-    </a>
-</div>*@
+        <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(t_)" target="_blank" rel="noreferrer" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;width: 40px;height: 40px;">
+            <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram">
+        </a>
+        <a class="share-post__item" href="whatsapp://send?text=@(t_) @(u_)" data-action="share/whatsapp/share" onclick="shareOnWathsapp('@(t_) @(u_)')" title="اشتراک گذاری در واتس اپ" style="background-color: #1BD741;width: 40px;height: 40px;">
+            <img class="share-post__icon" width="40" height="40" alt="whatsapp" src="/file/resourceimagepng?file_name=socialnetwork/whatsapp">
+        </a>
+        <a class="share-post__item" href="http://twitter.com/share?text=@(t_);url=@(u_)" target="_blank" rel="noreferrer" title="توئیت کردن اقامتگاه" style="background-color: #55ACEE;width: 40px;height: 40px;">
+            <img class="share-post__icon" width="40" height="40" alt="twitter" src="/file/resourceimagepng?file_name=socialnetwork/twitter">
+        </a>
+        <a class="share-post__item" href="http://www.facebook.com/sharer.php?u=@(u_);t=@(t_)" target="_blank" rel="noreferrer" title="اشتراک گذاری در فیسبوک" style="background-color: #3b5998;width: 40px;height: 40px;">
+            <img class="share-post__icon" width="40" height="40" alt="facebook" src="/file/resourceimagepng?file_name=socialnetwork/facebook">
+        </a>
+        <a class="share-post__item" href="http://pinterest.com/pin/create/button/?url=@(u_)&media=@(img_)&description=@(t_)" target="_blank" rel="noreferrer" title="پین کردن در پینترست" style="background-color: #BD081C;width: 40px;height: 40px;">
+            <img class="share-post__icon" width="40" height="40" alt="pinterest" src="/file/resourceimagepng?file_name=socialnetwork/pinterest">
+        </a>
+        <a class="share-post__item" href="mailto:?subject=@(t_);BODY=@("این اقامتگاه را در سایت املاک باشی مشاهده کنید:"): @(u_)" rel="noreferrer" title="اشتراک گذاری با ایمیل" style="width: 40px;height: 40px;">
+            <i class="fa fa-envelope share-post__icon style-custom-email"></i>
+        </a>
+    </div>*@
 <div class="advertise-page__bottom-pin" style="@(Model.AdvertiseMode == Advertise.AdvertiseMode.Parent || !Model.CanPublish ? "background-color:transparent;border:none;" : "")">
     @if (Model.AdvertiseMode != Advertise.AdvertiseMode.Parent && Model.CanPublish)
     {
@@ -274,6 +274,12 @@
                 <p class="advertise-page__description" data-max-height="200">
                     @Model.TitleDesc.Description
                     <br /><br />
+                    @if (Model.License.License)
+                    {
+                        <span class="fa fa-certificate"></span>
+                        @:دارای مجوز از سازمان گردشگری با شماره ثبت @Model.License.LicenseNumber
+                        <br /><br />
+                    }
                     <span class="fa fa-calendar-check"></span>
                     تاریخ آخرین ویرایش آگهی: @StringUtility.EnglishNumberToPersian(Model.LastModifyDate)
                 </p>

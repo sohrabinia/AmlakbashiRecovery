@@ -35,6 +35,7 @@ namespace Amlakbashi.Core.Common.Localization
                         {"ACC_VALIDATION_AMENITIES", "لطفا تمامی امکانات را تعیین کنید" },
                         {"ACC_VALIDATION_ELEVATOR", "لطفا آسانسور را تعیین کنید" },
                         {"ACC_VALIDATION_PARKING", "لطفا تعداد پارکینگ را مشخص کنید" },
+                        {"ACC_VALIDATION_LICENSENUMBER", "لطفا شماره مجوز را وارد کنید" },
                     }
                 }
         };

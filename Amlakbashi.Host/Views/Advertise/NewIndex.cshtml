@@ -100,7 +100,7 @@ else
                                 <option is-selected="@(3 == (int)Model.Status)" value="3">حذف شده ها</option>
                             </select>
                         </div>
-                        
+
                     </div>
                     <div class="more-filter-row">
                         <div class="item-filter-box">
@@ -163,6 +163,14 @@ else
                                 {
                                     <option is-selected="@((int)st == Model.HygieneProtocolStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetHygieneProtocolStatusText(st)</option>
                                 }
+                            </select>
+                        </div>
+                        <div class="item-filter-box">
+                            <label class="title-filter">وضعیت مجوز</label>
+                            <select class="input-stlye" name="License">
+                                <option is-selected="@(Model.License == null)" value="">همه</option>
+                                <option is-selected="@(Model.License == true)" value="true">با مجوز</option>
+                                <option is-selected="@(Model.License == false)" value="false">بدون مجوز</option>
                             </select>
                         </div>
                     </div>

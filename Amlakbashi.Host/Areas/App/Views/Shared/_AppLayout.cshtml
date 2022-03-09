@@ -9,23 +9,6 @@
 <!DOCTYPE html>
 <html class="theme3" lang="fa">
 <head>
-    <!-- Global Site Tag (gtag.js) - Google Analytics -->
-    @*<script async src="https://www.googletagmanager.com/gtag/js" defer></script>
-        <script async defer>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            gtag('js', new Date());
-            gtag('config', 'UA-112037224-1', { 'currency': 'IRR' });
-            gtag('config', 'AW-706947688');
-        </script>*@
-    <!-- Event snippet for Purchased (Tracking) conversion page -->
-    @*<script async defer>
-        gtag('event', 'conversion', {
-            'send_to': 'AW-850965714/5NVbCJTHpZ0BENLp4pUD',
-            'transaction_id': ''
-        });
-        </script>*@
-    @*<script> !function (e, t, a) { "use strict"; var s = t.head || t.getElementsByTagName("head")[0], p = t.createElement("script"); e.iwmfBadge = a, p.async = true, p.src = "https://cdn.iwmf.ir/js/people-votes/people-vote-2-2.js", s.appendChild(p) }(window, document, "o-bottom-left"); </script>*@
     @RenderSection("HeaderAddition", required: false)
     <title>@ViewBag.Title</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -36,9 +19,7 @@
     <meta name="theme-color" content="#fdd835" />
     <link rel='index' title='املاک باشی' href='@string.Format("{0}://{1}", Context.Request.Scheme, Context.Request.Host)' />
     <link rel='dns-prefetch' href='//googletagmanager.com' />
-    @*<link rel='dns-prefetch' href='//client.crisp.chat' />*@
     <link rel='dns-prefetch' href='//google-analytics.com' />
-    @*<link rel='dns-prefetch' href='//settings.crisp.chat' />*@
     <meta name="viewport" content="width=device-width, initial-scale= 1" />
     <meta name="coverage" content="Worldwide" />
     <meta name="robots" content="index,follow,all" />

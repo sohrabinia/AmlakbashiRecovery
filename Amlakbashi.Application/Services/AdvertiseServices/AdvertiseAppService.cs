@@ -191,73 +191,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return false;
         }
 
-        public IList<Advertise> Filter(AdvertiseStatus status, int adtype, int userid, string sort, long id, int instantReserveStatus,
-            long minReserveNorouzDateUnix, int imageCountMin, int imageCountMax, int province, int city, int area, int hygieneProtocolStatus)
-        {
-            IQueryable<Advertise> model = Repository.Query(q => q);
-            model = model.Where(w => w.Mode != AdvertiseMode.Child);
-            if (status != AdvertiseStatus.Unset)
-                model = model.Where(a => a.Status == status);
-            else
-                model = model.Where(a => a.Status != AdvertiseStatus.Deleted);
-            if (id > 0)
-            {
-                model = model.Where(w => w.Id == id || w.Childs.Any(x => x.Id == id));
-            }
-            if (userid != -1)
-                model = model.Where(w => w.UserID == userid);
-            if (adtype > 0)
-            {
-                model = model.Where(a => a.TypeID == (AdvertiseType)adtype);
-            }
-            if (hygieneProtocolStatus > -1)
-            {
-                var st = (Advertise.HygieneProtocolStatus)hygieneProtocolStatus;
-                model = model.Where(w => w.HygieneProtocol == st);
-            }
-            if (instantReserveStatus > -1)
-            {
-                model = model.Where(x => x.InstantReserveStatus == (Advertise.InstantReserveStatusEnum)instantReserveStatus);
-            }
-            if (minReserveNorouzDateUnix != 0)
-            {
-                model = model.Where(x => x.unixNorouzMinRequestDate >= minReserveNorouzDateUnix);
-            }
-            if (area > -1)
-            {
-                model = model.Where(x => x.Area == area);
-            }
-            else if (city > -1)
-            {
-                model = model.Where(x => x.City == city);
-            }
-            else if (province > -1)
-            {
-                model = model.Where(x => x.Province == province);
-            }
-            if (imageCountMin > 0)
-            {
-                model = model.Where(x => x.Photos.Count > imageCountMin);
-            }
-            if (imageCountMax > 0)
-            {
-                model = model.Where(x => x.Photos.Count <= imageCountMax + 1);
-            }
-            if (sort == "contact")
-                model = model.OrderByDescending(a => a.ContactClick).ThenByDescending(a => a.WebVisit);
-            else if (sort == "modify")
-                model = model.OrderByDescending(a => a.LastModifyDate).ThenByDescending(a => a.CreateDate);
-            else if (sort == "click")
-                model = model.OrderByDescending(a => a.WebVisit).ThenByDescending(a => a.ContactClick);
-            else if (sort == "score")
-                model = model.OrderByDescending(a => a.AdvertiseScore);
-            else
-                model = model.OrderByDescending(a => a.CreateDate);
-
-            List<Advertise> advertises = model.ToList();
-            return advertises;
-        }
-
         public void FilterNew(AdvertiseIndexDTO dto)
         {
             IQueryable<Advertise> model = Repository.Query(q => q);
@@ -321,6 +254,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (dto.Parking != ParkingItems.Unset)
             {
                 model = model.Where(x => x.Parking == dto.Parking || x.Childs.Any(a => a.Parking == dto.Parking));
+            }
+            if (dto.License != null)
+            {
+                model = model.Where(x => x.License == dto.License);
             }
             if (dto.Sort == "contact")
                 model = model.OrderByDescending(a => a.ContactClick).ThenByDescending(a => a.WebVisit);
@@ -448,14 +385,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 query = query.Where(x => x.UserID == userId);
 
             return query.ToList();
-        }
-
-        public List<long> GetAdvertisesPhotoIds()
-        {
-            var data = Repository.Query(q => q);
-            List<long> photoIds = data.Where(w => w.PhotoID != null).Select(s => (long)s.PhotoID).ToList();
-            photoIds.AddRange(data.Where(w => w.Photos.Any()).SelectMany(m => m.Photos.Select(s => s.Id)));
-            return photoIds;
         }
 
         public void Edit(Advertise editedAd)
@@ -718,7 +647,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public AdvertiseDirector SubmitExtraForm(Advertise data, out Dictionary<string, string> errors,
-            out List<string> groupErrors, out int level, IFormFile uploadedLicenseFile = null, bool isEdit = false)
+            out List<string> groupErrors, out int level, IFormFile uploadedLicenseFile, bool isEdit = false)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
             var oldAcc = acc.ShallowCopy();
@@ -734,12 +663,20 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
 
             var licenseContentType = uploadedLicenseFile?.ContentType.ToLower();
-            if (string.IsNullOrEmpty(licenseContentType) == false &&
+            if (uploadedLicenseFile != null &&
                 (licenseContentType == "image/png" ||
                 licenseContentType == "image/jpg" ||
                 licenseContentType == "image/jpeg") == false)
             {
-                errors.Add("LicenseFile", "فرمت فایل مجوز صحیح نمی باشد");
+                errors.Add("LicenseFileId", "فرمت فایل مجوز صحیح نمی باشد");
+                groupErrors.Add("فرمت فایل مجوز صحیح نمی باشد");
+                return director;
+            }
+
+            if (data.License == true && (uploadedLicenseFile == null && data.LicenseFileId == null))
+            {
+                errors.Add("LicenseFileId", "لطفا فایل مجوز خود را انتخاب کنید");
+                groupErrors.Add("لطفا فایل مجوز خود را انتخاب کنید");
                 return director;
             }
 
@@ -751,8 +688,17 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 hasImportantChange = director.HasImpotantChange(acc);
             }
-            mediator.Send(new UpdateAdvertiseLicenseFileCommand(uploadedLicenseFile, data.Id, data.UserID, data.LicenseFileId));
+            long? licenseFileId = null;
+            if (uploadedLicenseFile != null)
+            {
+                licenseFileId = mediator.Send(new UpdateAdvertiseLicenseFileCommand(uploadedLicenseFile, data.Id, acc.UserID, data.LicenseFileId)).Result;
+                hasImportantChange = true;
+            }
             director.Submit(ref acc);
+            if (licenseFileId != null)
+            {
+                acc.LicenseFileId = licenseFileId;
+            }
             var prevStatus = acc.Status;
             if (isEdit)
             {
@@ -1119,7 +1065,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
         public AdvertiseDirector SubmitAdminForm(Advertise data, out Dictionary<string, string> errors,
             out List<string> groupErrors, bool forceSave, DirectorType type, int currentUserId,
-            out AdvertiseType parentType, out AdvertiseStatus status, string rootPath = null)
+            out AdvertiseType parentType, out AdvertiseStatus status, IFormFile uploadedLicenseFile = null)
         {
             var acc = Repository.Find(data.Id);
             status = acc.Status;
@@ -1153,7 +1099,32 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (type == DirectorType.General && (errors.Keys.Contains("Province") || errors.Keys.Contains("City")))
                 return director;
 
+            var licenseContentType = uploadedLicenseFile?.ContentType.ToLower();
+            if (uploadedLicenseFile != null &&
+                (licenseContentType == "image/png" ||
+                licenseContentType == "image/jpg" ||
+                licenseContentType == "image/jpeg") == false)
+            {
+                groupErrors.Add("فرمت فایل مجوز صحیح نمی باشد");
+                return director;
+            }
+
+            if (data.License == true && (uploadedLicenseFile == null && data.LicenseFileId == null))
+            {
+                groupErrors.Add("لطفا فایل مجوز خود را انتخاب کنید");
+                return director;
+            }
+
+            long? licenseFileId = null;
+            if (uploadedLicenseFile != null)
+            {
+                licenseFileId = mediator.Send(new UpdateAdvertiseLicenseFileCommand(uploadedLicenseFile, data.Id, data.UserID, data.LicenseFileId)).Result;
+            }
             director.Submit(ref acc);
+            if (licenseFileId != null)
+            {
+                acc.LicenseFileId = licenseFileId;
+            }
 
             if (type == DirectorType.General || type == DirectorType.ComplexUnit)
             {
@@ -2062,7 +2033,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 haveReservedRequest = user.Reserves.Any(a => a.GetStateCategory() == ReserveCategory.Reserved ||
                     a.GetStateCategory() == ReserveCategory.Finished);
             }
-            if (advertise.IsForbidden && haveReservedRequest == false)
+            if (((advertise.Mode == AdvertiseMode.Child && advertise.Parent.License == false) ||
+                (advertise.Mode != AdvertiseMode.Child && advertise.License == false)) &&
+                advertise.IsForbidden && haveReservedRequest == false)
             {
                 msg = "کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.";
                 return false;

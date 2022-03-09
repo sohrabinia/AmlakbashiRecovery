@@ -6,18 +6,18 @@ using System.Text;
 
 namespace Amlakbashi.Mediator.Commands.FileCommands
 {
-    public class UpdateAdvertiseLicenseFileCommand : IRequest
+    public class UpdateAdvertiseLicenseFileCommand : IRequest<long>
     {
-        public IFormFile LicenseFile { get; set; }
         public long AdvertiseId { get; set; }
         public int UserId { get; set; }
-        public long? OldLicenseFileId { get; set; }
-        public UpdateAdvertiseLicenseFileCommand(IFormFile licenseFile, long advertiseId, int userId, long? oldLicenseFileId)
+        public IFormFile NewLicenseFile { get; set; }
+        public long? LicenseFileId { get; set; }
+        public UpdateAdvertiseLicenseFileCommand(IFormFile newLicenseFile, long advertiseId, int userId, long? licenseFileId)
         {
-            this.LicenseFile = licenseFile;
+            this.NewLicenseFile = newLicenseFile;
             this.AdvertiseId = advertiseId;
             this.UserId = userId;
-            this.OldLicenseFileId = oldLicenseFileId;
+            this.LicenseFileId = licenseFileId;
         }
     }
 }

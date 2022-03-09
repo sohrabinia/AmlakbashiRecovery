@@ -663,6 +663,12 @@ namespace Portal.Controllers
             return File("/resource/img/logo.gif", "image/gif");
         }
 
+        public ActionResult GetLicenseImage(long id)
+        {
+            var file = fileService.Find(id);
+            return File(file.FilePath, "image/jpg");
+        }
+
         [ResponseCache(Duration = 60 * 60 * 24 * 365, Location = ResponseCacheLocation.Client, VaryByQueryKeys = new string[] { "*" })]
         public ActionResult HomePageSlider(int number, string format = "webp")
         {
