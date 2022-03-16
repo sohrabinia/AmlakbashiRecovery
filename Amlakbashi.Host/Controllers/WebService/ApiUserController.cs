@@ -214,7 +214,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 thirdPersonTell = user.ThirdPersonTell,
                 fname = user.FName,
                 lname = user.LName,
-                email = user.Email
+                email = ""
             };
             return Ok(response);
         }

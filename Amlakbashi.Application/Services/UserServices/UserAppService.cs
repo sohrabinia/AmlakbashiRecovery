@@ -266,7 +266,7 @@ namespace Amlakbashi.Application.Services.UserServices
             user.ContactPhone = editedUser.ContactPhone ? "1" : null;
             user.AmlakbashiScore = editedUser.AmlakbashiScore;
             user.Address = editedUser.Address;
-
+            user.ForbiddenRegionsAccess = editedUser.ForbiddenRegionsAccess;
             user.Mobile = editedUser.Mobile;
             user.Mobile2 = editedUser.Mobile2;
             user.Tell = editedUser.Tell;
@@ -432,12 +432,6 @@ namespace Amlakbashi.Application.Services.UserServices
                 identityUser.State = User.UserState.InActived;
             }
             userManager.UpdateAsync(identityUser).Wait();
-            //Repository.Update(user);
-            //Repository.Save();
-            //if (currentUserId > 0)
-            //{
-            //    mediator.Publish(new UserUpdateEvent(shallowUser, user, source, currentUserId));
-            //}
         }
 
         public void UpdateContactPhone(int userId, bool state)
@@ -552,14 +546,6 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
             user.LastNotifPermitionTicks = ticks;
-            Repository.Update(user);
-            Repository.Save();
-        }
-
-        public void UpdateLoginCode(int userId, string token)
-        {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.AdminLoginCode = token;
             Repository.Update(user);
             Repository.Save();
         }
@@ -756,6 +742,7 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             mediator.Enqueue(new SendMessageCommand(userContact));
         }
+
         public void SendSms(UserContactDTO userContact)
         {
             mediator.Enqueue(new SendSmsCommand(userContact));

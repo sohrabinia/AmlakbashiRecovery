@@ -397,17 +397,6 @@
 @section ScriptBlock
 {
     <script type="text/javascript">
-        function loginUserDirectly(id) {
-            myajax('user/loginuserdirectly', 'id=' + id, function (ret) {
-                if (ret.status == 0) {
-                    showErrorMessage('خطا', ret.msg);
-                    return;
-                }
-                var url = '/admin/loginuserdirectly?token=' + ret.token;
-                copyStringToClipboard('https://www.amlakbashi.com' + url, 'لینک ورود');
-            });
-        }
-
         $('.impersonateDenied').on('click', function () {
             showErrorMessage("", "وضعیت دسترسی کاربر در حالت «عدم دسترسی به وب سایت» قرار دارد");
         });

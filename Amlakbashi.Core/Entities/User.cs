@@ -10,26 +10,32 @@ namespace Amlakbashi.Core.Entities
 {
     public class User : Entity<int>, ISoftDelete
     {
-        [Column("UserID")]
+        [Column("Id")]
         public override int Id { get; set; }
+
+        [Column("FirstName")]
         public string FName { get; set; }
+
+        [Column("LastName")]
         public string LName { get; set; }
+
+        [Column("PhoneNumber")]
         public string MainMobile { get; set; }
-        public string Email { get; set; }
-        public int State { get; set; }
-        public int LoginPriority { get; set; }
-        public int UserGeneralType { get; set; }
-        public string ForgetCode { get; set; }
-        public string Code { get; set; }
-        public DateTime? CreateDate { get; set; }
-        public DateTime? SendVerification { get; set; }
-        public int AccessType { get; set; }
+
+        [Column("PhoneNumber2")]
         public string Mobile { get; set; }
+
+        [Column("PhoneNumber3")]
         public string Mobile2 { get; set; }
+
+        [Column("LandlinePhoneNumber")]
         public string Tell { get; set; }
+
+        [Column("ThirdPersonPhoneNumber")]
         public string ThirdPersonTell { get; set; }
-        public int ResponseFrom { get; set; }
-        public int ResponseTo { get; set; }
+
+        [Column("Type")]
+        public int UserGeneralType { get; set; }
         public string NotificationToken { get; set; }
         public string AppNotificationToken { get; set; }
         public string FcmAppNotificationToken { get; set; }
@@ -41,15 +47,33 @@ namespace Amlakbashi.Core.Entities
         public InstantReserveAccessEnum InstantReserveAccess { get; set; }
         public long? PhotoID { get; set; }
         public int PhotoStatus { get; set; }
-        public string Address { get; set; }//Description
+
+        [Column("Description")]
+        public string Address { get; set; } //Description
+
+        [Column("WalletAmount")]
         public long Credit { get; set; }
+
+        [Column("GiftWalletAmount")]
         public long PrizeCredit { get; set; }
         public int PresentorUserID { get; set; }
         public bool PresentorPrizeGiven { get; set; }
         public bool RecieveAppreciateDiscount { get; set; }
-        public string AdminLoginCode { get; set; }
         public string ContactPhone { get; set; }
+        public bool ForbiddenRegionsAccess { get; set; }
         public bool IsDeleted { get; set; }
+
+        //public string Email { get; set; }
+        //public int State { get; set; }
+        //public int LoginPriority { get; set; }
+        //public string ForgetCode { get; set; }
+        //public string Code { get; set; }
+        //public DateTime? CreateDate { get; set; }
+        //public DateTime? SendVerification { get; set; }
+        //public int AccessType { get; set; }
+        //public int ResponseFrom { get; set; }
+        //public int ResponseTo { get; set; }
+        //public string AdminLoginCode { get; set; }
 
         [JsonIgnore]
         [InverseProperty("HostUser")]
@@ -276,13 +300,6 @@ namespace Amlakbashi.Core.Entities
             Deleted = 4
         }
 
-        public enum AccessTypeEnum
-        {
-            Full = 0,
-            ReserveBanned = 1,
-            LoginBanned = 2,
-        }
-
         public enum UserPhotoState
         {
             not_set = 0,
@@ -312,12 +329,6 @@ namespace Amlakbashi.Core.Entities
             OtherMobile1, 
             OtherMobile2, 
             ThirdPerson 
-        }
-
-        public enum LoginPriorites 
-        { 
-            Mobile = 0, 
-            Email = 1 
         }
 
         public enum InstantReserveAccessEnum

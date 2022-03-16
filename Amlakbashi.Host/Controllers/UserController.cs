@@ -1912,35 +1912,6 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        [Authorize(Roles = Roles.TechnicalManager)]
-        public JsonResult LoginUserDirectly(int id)
-        {
-            try
-            {
-                var targetUser = userService.Find(id);
-                if (userService.GetAllEmployees().Select(s => s.PhoneNumber).Contains(targetUser.MainMobile))
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = 0,
-                        msg = "کاربر مورد نظر جزو کارکنان است و امکان ورود از طرف کارکنان وجود ندارد"
-                    });
-                }
-                var token = HashUtility.GetMd5Hash(id + "#li#$%S0hR@b!@ml@kb@$h!");
-                userService.UpdateLoginCode(id, token);
-                return GenerateJsonResult(new { status = 1, token = token });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("", exc);
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "عملیات با خطای فنی مواجه شد"
-                });
-            }
-        }
-
         [HttpGet]
         public IActionResult ChangeDesc(int userId)
         {
