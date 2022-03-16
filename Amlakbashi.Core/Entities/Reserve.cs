@@ -10,7 +10,7 @@ using static Amlakbashi.Core.Entities.ReservePayment;
 
 namespace Amlakbashi.Core.Entities
 {
-    public class Reserve : Entity<long>, IReserve,ISoftDelete
+    public class Reserve : Entity<long>, IReserve, ISoftDelete
     {
         #region Properties
         [Column("ReserveID")]
@@ -372,42 +372,6 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        //public static bool IsActiveReserve(int status)
-        //{
-        //    switch ((ReserveStatus)status)
-        //    {
-        //        case ReserveStatus.WaitForReserve:
-        //        case ReserveStatus.WaitForResponse:
-        //        case ReserveStatus.Reserved:
-        //        case ReserveStatus.CashPay:
-        //        case ReserveStatus.Started:
-        //        case ReserveStatus.CancelRequestByGuest:
-        //        case ReserveStatus.CancelRequestByHost:
-        //            return true;
-        //        default:
-        //            return false;
-        //    }
-        //}
-
-        [NotMapped]
-        public bool IsActiveReserve {
-            get {
-                switch (this.Status)
-                {
-                    case ReserveStatus.WaitForReserve:
-                    case ReserveStatus.WaitForResponse:
-                    case ReserveStatus.Reserved:
-                    case ReserveStatus.CashPay:
-                    case ReserveStatus.Started:
-                    case ReserveStatus.CancelRequestByGuest:
-                    case ReserveStatus.CancelRequestByHost:
-                        return true;
-                    default:
-                        return false;
-                }
-            } 
-        }
-
         public bool CanReserveStarted(out DateTime canStartTime)
         {
             canStartTime = new DateTime(StartDate.Year, StartDate.Month,
@@ -488,18 +452,6 @@ namespace Amlakbashi.Core.Entities
             return Array.ConvertAll(SupporterIds.Split(','), x => int.Parse(x));
         }
 
-        public void AddSupporterId(int id)
-        {
-            if (string.IsNullOrEmpty(SupporterIds))
-            {
-                SupporterIds = id.ToString();
-                return;
-            }
-            if (!GetSupporterIds().Contains(id))
-            {
-                SupporterIds += ("," + id.ToString());
-            }
-        }
         public ReserveCategory? GetStateCategory()
         {
             switch (Status)
@@ -525,6 +477,7 @@ namespace Amlakbashi.Core.Entities
                     return null;
             }
         }
+
         public static int[] GetReserveCategoryStates(Reserve.ReserveCategory category)
         {
             switch (category)
@@ -621,13 +574,6 @@ namespace Amlakbashi.Core.Entities
             {
                 return Chats == null ? 0 : Chats.Count();
             }
-        }
-
-        public int GetNotReadChatCount(int userId)
-        {
-            return Chats.Count(c =>
-                    c.UserID != userId &&
-                    c.ReadStatus == (int)Chat.ReadStatusEnum.NotRead);
         }
 
         public int ChatCountUnreadBySupport

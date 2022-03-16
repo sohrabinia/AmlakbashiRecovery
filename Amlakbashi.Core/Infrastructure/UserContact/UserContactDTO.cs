@@ -62,7 +62,8 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
         HostUpdatePrice = 28,
         PrizeCharge = 29,
         CouponPresent = 30,
-        CouponAppreciate = 31
+        CouponAppreciate = 31,
+        GuestNorouzRules = 32
     }
 
     public enum ContactMethod

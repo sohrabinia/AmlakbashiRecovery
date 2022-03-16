@@ -181,12 +181,12 @@ namespace Amlakbashi.Host.Controllers.WebService
             var refreshTokenClaim = principal.GetRefreshToken();
             if (principal == null || string.IsNullOrEmpty(refreshTokenClaim))
             {
-                return BadRequest();
+                return Unauthorized();
             }
             var identityUser = await userService.GetIdentityUserByIdAsync(principal.GetGuid());
             if (identityUser == null || identityUser.SecurityStamp != refreshTokenClaim)
             {
-                return BadRequest();
+                return Unauthorized();
             }
             var newToken = await userService.GenerateJwtTokenAsync(identityUser.Id, jwtSecret);
             return new ObjectResult(new

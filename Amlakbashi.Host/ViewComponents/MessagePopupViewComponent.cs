@@ -31,7 +31,8 @@ namespace Amlakbashi.Host.ViewComponents
 
         private string CheckJointlyParking()
         {
-            var advertisesWithJoinlyParking = userAccessor.CurrentUser.Advertises.Where(w => w.Parking == Advertise.ParkingItems.Jointly);
+            var advertisesWithJoinlyParking = userAccessor.CurrentUser.Advertises.Where(w => w.Parking == Advertise.ParkingItems.Jointly &&
+                w.Status != Advertise.AdvertiseStatus.Deleted);
             if (advertisesWithJoinlyParking.Count() > 0)
             {
                 var message = "کاربر گرامی، با توجه به حذف گزینه پارکینگ مشاع از آگهی ها، لطفا نسبت به آپدیت گزینه پارکینگ آگهی های مقابل اقدام فرمایید:";

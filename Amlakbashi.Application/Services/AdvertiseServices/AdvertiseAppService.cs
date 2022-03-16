@@ -2037,7 +2037,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 (advertise.Mode != AdvertiseMode.Child && advertise.License == false)) &&
                 advertise.IsForbidden && haveReservedRequest == false)
             {
-                msg = "کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.";
+                msg = "کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.";
                 return false;
             }
             if (advertise.Status != AdvertiseStatus.Published)

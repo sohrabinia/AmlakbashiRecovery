@@ -222,13 +222,6 @@
                             else
                             {
                                 @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", rating } })
-                                @*<select class="average-rating">
-                                        <option @IsSelected(rating == 1) value="1">خیلی ضعیف</option>
-                                        <option @IsSelected(rating == 2) value="2">ضعیف</option>
-                                        <option @IsSelected(rating == 3) value="3">متوسط</option>
-                                        <option @IsSelected(rating == 4) value="4">خوب</option>
-                                        <option @IsSelected(rating == 5) value="5">خیلی خوب</option>
-                                    </select>*@
                             }
                             <div class="home-page__favourite-button" advertise_id="@item.AdvertiseID">
                                 <i class="fa fa-heart"></i>
@@ -244,11 +237,6 @@
                 <div class="advertise-category__not-found">با فیلتر های انتخاب شده موردی یافت نشد</div>
             </div>
         }
-
-        @*if (!for_advertise_page)
-            {
-            @:</div>
-            }*@
     }
 </div>
 
@@ -277,28 +265,3 @@
         }
     </div>
 }
-
-@if (Model.CurrentPageNumber == 1 && Model.AdvertiseItems.Count() < 5 &&
-       (Model.DiscountHomes || Model.TodayEmptyHomes || Model.InstantReserve || Model.NorouzSpecial || Model.HygieneProtocol))
-{
-    <div class="advertise-category-link__container">
-        @await Html.PartialAsync("_AdvertiseCategoryLink", Model.Category,
-            new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "queryString", queryString } })
-    </div>
-}
-
-@*@if (related_categories.Count() > 0)
-{
-    <div class="advertise-category-link__title">موارد مشابه</div>
-    <div class="advertise-category-link__container">
-        @foreach (var related_category in related_categories)
-        {
-            @await Html.PartialAsync("_AdvertiseCategoryLink", related_category,
-                new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "queryString", queryString } })
-        }
-    </div>
-}*@
-
-@*<script>
-    nowUrl = "@Model.UrlWithParameters".replaceAll("&amp;", "&");
-</script>*@
