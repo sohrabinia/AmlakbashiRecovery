@@ -11,8 +11,6 @@
 
 @using (Html.BeginForm("Edit", "User", new { id = Model.Id }, FormMethod.Post, true, new { id = "userManageForm" }))
 {
-    @*<input type="hidden" name="UserGroups" id="UserGroups" value="" />*@
-    @*<input type="hidden" name="ContactPhone" id="complete_profile_contact" value="" />*@
     <input type="hidden" name="MainMobile" value="@Model.MainMobile" />
     <input type="hidden" name="PhotoID" value="@Model.PhotoID" />
     <input type="hidden" name="EmailAddress" value="@Model.EmailAddress" />
@@ -197,7 +195,12 @@
                     <input id="complete_profile_contact_checkbox" name="ContactPhone" type="checkbox" value="true" is-checked="@Model.ContactPhone" />
                 </div>
             </td>
-            <td></td>
+            <td>
+                <div style="text-align:right">
+                    <span>امکان دسترسی به مناطق ممنوعه:</span>
+                    <input name="ForbiddenRegionsAccess" type="checkbox" value="true" is-checked="@Model.ForbiddenRegionsAccess" />
+                </div>
+            </td>
         </tr>
     </table>
 
@@ -210,15 +213,6 @@
 @section ScriptBlock
 {
     <script type="text/javascript">
-        //$("form#userManageForm").submit(function () {
-        //    var $UserGroups = [];
-        //    $("#UserRoles input:checkbox:checked").each(function () {
-        //        $UserGroups.push($(this).val());
-        //    });
-        //    $("#UserGroups").val(JSON.stringify($UserGroups));
-        //    $("#complete_profile_contact").val($('input[id="complete_profile_contact_checkbox"]:checked').length);
-        //});
-
         @if (Model.HasError)
         {
             foreach (var item in Model.ErrorMessages)

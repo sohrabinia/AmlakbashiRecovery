@@ -6,7 +6,7 @@
     <h1 class="home-page__search-title">اجاره روزانه، هفتگی و ماهانه خانه، ویلا، سوئیت و آپارتمان مبله</h1>
     <div class="home-page__search-box">
         @*<i onclick="openFirstSearchResult()" class="home-page__search-icon fa fa-search"></i>*@
-        <input autocomplete="off" id="js-search-input-main" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="مقصد سفر شما کجاست؟" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)"  class="home-page__search-input" type="search" />
+        <input autocomplete="off" id="js-search-input-main" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="نام استان، شهر یا کد آگهی" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)"  class="home-page__search-input" type="search" />
         <i onclick="clearSearch()" class="home-page__clear-icon fa fa-times"></i>
     </div>
     <div class="home-page__search-list-box">
@@ -39,12 +39,12 @@
         <div style="padding: 0 5.7%">
             <div id="js-search-box-mobile" class="home-page__search-box" style="margin-bottom: 0;">
                 @*<i onclick="openFirstSearchResult()" class="home-page__search-icon fa fa-search"></i>*@
-                <input autocomplete="off" id="js-mobile-region-input" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="مقصد سفر شما کجاست؟" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)" class="home-page__search-input" type="search" />
+                <input autocomplete="off" id="js-mobile-region-input" @(ViewData["autofocus"] != null && (bool)ViewData["autofocus"] ? "autofocus" : "") placeholder="نام استان، شهر یا کد آگهی" onpaste="search_catrgories(event)" onkeyup="search_catrgories(event)" onchange="search_catrgories(event)" class="home-page__search-input" type="search" />
                 <i onclick="clearSearch()" class="home-page__clear-icon fa fa-times"></i>
             </div>
             <div class="home-page__search-list-box js-dont-close" style="height: 70%;overflow-y: scroll;padding: 15px 0;display:flex;flex-flow:column;">
                 <div class="home-page__search-list-result-container">
-                    @await Html.PartialAsync("_SearchTable", new List<SearchTableDTO>()))
+                    @await Html.PartialAsync("_SearchTable", new List<SearchTableDTO>())
                 </div>
                 <div class="home-page__search-list-most-view-parent">
                     <div class="home-page__search-list-most-view-label">مناطق پر بازدید:</div>

@@ -159,6 +159,7 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
 
         public void SendTemplateSms(string mobile, string template)
         {
+            mobile = PhoneUtility.InternationalNumberToLocal(mobile);
 #if DEBUG
             if (AdminMobiles.Contains(mobile) == false)
                 return;

@@ -23,14 +23,15 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
         {
             var days = DateTimeUtility.GetPersianDateRangeDays(startDate, endDate);
             couponCalculationPrice = 0;
+            var moreThanCapacity = Math.Max(0, guestCount - advertise.Capacity);
             if (advertise.RentPrice > 0 && days >= 30)
             {
                 var price = (long)Math.Round(((double)days * (double)((double)advertise.RentPrice / 30f) / 10000f), 0) * 10000;
+                price += (moreThanCapacity * advertise.MoreThanCapacityPrice) * days;
                 priceWithoutDiscount = price;
-                couponCalculationPrice = (long)Math.Round((double)advertise.RentPrice / 30f);
+                //couponCalculationPrice = (long)Math.Round((double)advertise.RentPrice / 30f);
                 return price;
             }
-            var moreThanCapacity = Math.Max(0, guestCount - advertise.Capacity);
             var from = DateTimeUtility.PersianDateToGregorian(startDate);
             var to = DateTimeUtility.PersianDateToGregorian(endDate).AddDays(-1);
             var prices = CalculateJalaliDatePrices(from, to, advertise,

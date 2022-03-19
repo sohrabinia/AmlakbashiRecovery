@@ -33,8 +33,6 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
                     break;
                 case UserContactType.NewReserveChatGuest:
                 case UserContactType.NewReserveChatHost:
-                    //SmsEngine.VerifyLookup(mobile_to_send_sms,
-                    //    user_id, contactDTO.AdvertiseId, contactDTO.ReserveId, type.ToString());
                     break;
                 case UserContactType.GuestPayReserve:
                 case UserContactType.HostReserveCashPay:
@@ -103,6 +101,10 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
                 case UserContactType.HostUpdatePrice:
                     SmsEngine.VerifyLookup(mobile_to_send_sms,
                         ".", "", "", contactDTO.Extra1, "SetNorouzPrice");
+                    break;
+                case UserContactType.GuestNorouzRules:
+                    SmsEngine.VerifyLookup(mobile_to_send_sms,
+                        ".", "", "", contactDTO.Extra1, "GuestNorouzRules");
                     break;
             }
         }

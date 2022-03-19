@@ -2699,7 +2699,11 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 id = StringUtility.PersianNumberToEnglish(id);
-                var idLong = long.Parse(id);
+                //var idLong = long.Parse(id);
+
+                long idLong;
+                var test = long.TryParse(id, out idLong);
+
                 string slug = "";
                 var acc = advertiseService.Find(idLong);
                 if (acc == null || acc.Status != AdvertiseStatus.Published || !acc.Available)

@@ -1,5 +1,9 @@
 ﻿setTimeout(function(){ clearSearch(true) }, 500);
 function doHomePageSearch() {
+    if (currentSearchAdvertiseId !== undefined && isNaN(currentSearchAdvertiseId) === false) {
+        searchByAdvertiseId(currentSearchAdvertiseId);
+        return;
+    }
     if (currentSelectedRegion != undefined &&
         currentSelectedRegion.href == undefined) {
         currentSelectedRegion = undefined;
@@ -13,37 +17,17 @@ function doHomePageSearch() {
         guestCount = 11;
     }
 
-    var have = false;
-
     if (fromDate != null) {
-        //if (firstQueryAdded) {
-        //    regionHref += "&";
-        //}
-        //else {
-        //    regionHref += "?";
-        //}
         regionHref += "&";
         regionHref += "empty_range_from=" + fromDate;
         firstQueryAdded = true;
     }
     if (toDate != null) {
-        //if (firstQueryAdded) {
-        //    regionHref += "?";
-        //}
-        //else {
-        //    regionHref += "&";
-        //}
         regionHref += "&";
         regionHref += "empty_range_to=" + toDate;
         firstQueryAdded = true;
     }
     if (guestCount != null) {
-        //if (firstQueryAdded) {
-        //    regionHref += "?";
-        //}
-        //else {
-        //    regionHref += "&";
-        //}
         regionHref += "&";
         regionHref += "capacity=" + guestCount;
         firstQueryAdded = true;
@@ -52,6 +36,18 @@ function doHomePageSearch() {
     window.location.href = regionHref;
 }
 
+function searchByAdvertiseId(id) {
+    if (isNaN(id)) {
+        return;
+    }
+    myajax('accomodation/getaccurlbyid', 'id=' + id, function (ret) {
+        if (ret.status == 0) {
+            showErrorMessage('خطا', 'کد آگهی یافت نشد. لطفا کد وارد شده را بررسی کنید.');
+            return;
+        }
+        window.open('/app/advertise/item/' + id, '_self');
+    });
+}
 
 $(".home-page__search-box").click(function () {
     //clearSearch();
@@ -104,6 +100,7 @@ function openFirstSearchResult() {
 }
 
 var currentSelectedRegion = undefined;
+var currentSearchAdvertiseId = undefined;
 var currentGuestCount = 0;
 
 function toggleGuestSelect() {
@@ -144,9 +141,6 @@ function selectSearchRegion(elem) {
     if (isMobileDevice) {
         toggleRegionSearchPopup(false);
     }
-    //if (firstSelectedDay == undefined) {
-    //    showFromDatePicker();
-    //}
 }
 
 function onChangeGuestCount(elem) {
@@ -182,22 +176,29 @@ function search_catrgories(e) {
     }
     var search_string = $input.val();
 
-    //if (search_string == '') {
-    //    toggleSearchHolder(true);
-    //    $(".home-page__search-list-result-container").empty();
-    //    selectSearchRegion(null);
-    //    return;
-    //}
     toggleSearchHolder(false);
     if (typeof search_string == 'undefined' || search_string == null || search_string == '') {
         return;
     }
-    if (search_string != '' && /^[A-Za-z]*$/.test(search_string)) {
-        //$(".home-page__search-list-result-container").empty();
+
+    if (isNaN(search_string) === false) {
+        let searchContent = '<div onclick="searchByAdvertiseId(' + search_string +
+            ')" style="color:#242424;font:13px Miransans;padding:5px 10px;display: flex;align-items: center;"><i class="fa fa-search"></i><span>کد آگهی '
+            + search_string + '</span></div>';
+        $(".home-page__search-list-result-container").html(searchContent);
+        currentSearchAdvertiseId = search_string;
+        return;
+    }
+    else {
+        currentSearchAdvertiseId = undefined;
+    }
+
+    if (/^[A-Za-z]*$/.test(search_string)) {
         $(".home-page__search-input").val(search_string.replace(/[A-Za-z]/g, ""));
         alertify.error("لطفا فارسی تایپ کنید");
         return;
     }
+
     var url = "/app/Category/search?phrase=" + search_string;
     console.log("searching phrase: " + url);
     $.get(url, function (data) {

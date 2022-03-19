@@ -2033,13 +2033,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 haveReservedRequest = user.Reserves.Any(a => a.GetStateCategory() == ReserveCategory.Reserved ||
                     a.GetStateCategory() == ReserveCategory.Finished);
             }
-            if (((advertise.Mode == AdvertiseMode.Child && advertise.Parent.License == false) ||
-                (advertise.Mode != AdvertiseMode.Child && advertise.License == false)) &&
-                advertise.IsForbidden && haveReservedRequest == false)
-            {
-                msg = "کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در استان اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.";
-                return false;
-            }
+            //if (((advertise.Mode == AdvertiseMode.Child && advertise.Parent.License == false) ||
+            //    (advertise.Mode != AdvertiseMode.Child && advertise.License == false)) &&
+            //    advertise.IsForbidden && haveReservedRequest == false)
+            //{
+            //    msg = "کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.";
+            //    return false;
+            //}
             if (advertise.Status != AdvertiseStatus.Published)
             {
                 msg = "متاسفانه این اقامتگاه در حال حاضر از دسترس خارج است. لطفا اقامتگاه دیگری انتخاب نمایید";

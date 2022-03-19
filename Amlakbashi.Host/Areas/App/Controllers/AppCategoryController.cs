@@ -843,13 +843,13 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 {
                     model.Add(SearchTableDTO.GenerateForApp(item, regionService.GetRegionName(item.Type != 2 ? 0 : (int)item.ParentID)));
                 }
-                return PartialView("_SearchTable", model);
+                return PartialView("_Search", model);
             }
             catch (Exception exc)
             {
                 logger.Error("App.Category.Search", exc);
                 ViewBag.showNotFound = true;
-                return PartialView("_SearchTable", null);
+                return PartialView("_Search", null);
             }
         }
 

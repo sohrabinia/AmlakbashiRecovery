@@ -2636,22 +2636,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(id);
-                if ((ReservePayment.ReservePaymentMethod)method == ReservePayment.ReservePaymentMethod.AmlakbashiCredit)
-                {
-                    long newCredit;
-                    var creditTransactionId = accounting.DecreaseCredit(reserve.UserID, price, 0, reserve.Id, out newCredit,
-                        CreditTransaction.WalletTransactionReason.Reserve, null,
-                        null, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
-                    if (creditTransactionId < 1)
-                    {
-                        return GenerateJsonResult(new
-                        {
-                            status = 0,
-                            msg = "موجودی کیف پول مهمان کافی نیست"
-                        });
-                    }
-                    transactionId = creditTransactionId;
-                }
+                
                 var reservePayment = new ReservePayment()
                 {
                     CreateDate = DateTime.Now,
@@ -2665,20 +2650,28 @@ namespace Amlakbashi.Host.Controllers
                 };
                 var invalidData = false;
                 var errorMessage = "";
+                
                 if (reservePayment.Price <= 0)
                 {
                     invalidData = true;
-                    errorMessage = "لطفا قیمت را وارد کنید.";
+                    errorMessage = "لطفا قیمت را وارد کنید";
                 }
-                else if (reservePayment.TransactionID <= 0)
+                else if ((ReservePayment.ReservePaymentMethod)method == ReservePayment.ReservePaymentMethod.BankCard &&
+                    reservePayment.TransactionID <= 0)
                 {
                     invalidData = true;
-                    errorMessage = "لطفا شماره تراکنش را وارد کنید.";
+                    errorMessage = "لطفا شماره تراکنش را وارد کنید";
                 }
                 else if (accounting.ReservePaymentExists(reservePayment.TransactionID, reservePayment.PaymentMethod))
                 {
                     invalidData = true;
-                    errorMessage = "شماره تراکنش تکراری میباشد.";
+                    errorMessage = "شماره تراکنش تکراری می باشد";
+                }
+                else if ((ReservePayment.ReservePaymentMethod)method == ReservePayment.ReservePaymentMethod.AmlakbashiCredit &&
+                    reserve.GuestUser.Credit < price)
+                {
+                    invalidData = true;
+                    errorMessage = "موجودی کیف پول کافی نمی باشد";
                 }
                 if (invalidData)
                 {
@@ -2687,6 +2680,14 @@ namespace Amlakbashi.Host.Controllers
                         status = 0,
                         msg = errorMessage
                     });
+                }
+                if ((ReservePayment.ReservePaymentMethod)method == ReservePayment.ReservePaymentMethod.AmlakbashiCredit)
+                {
+                    long newCredit;
+                    var creditTransactionId = accounting.DecreaseCredit(reserve.UserID, price, 0, reserve.Id, out newCredit,
+                        CreditTransaction.WalletTransactionReason.Reserve, null,
+                        null, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
+                    reservePayment.TransactionID = creditTransactionId;
                 }
                 accounting.InsertReservePayment(reservePayment);
                 if (reservePayment.PaymentType == (int)ReservePayment.ReservePaymentType.GuestDeposite

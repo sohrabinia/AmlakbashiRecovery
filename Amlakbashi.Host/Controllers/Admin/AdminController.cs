@@ -258,15 +258,8 @@ namespace Portal.Controllers
                 }
                 else
                 {
-                    var user_mobiles = recievers.Select(x => x.MainMobile).ToList();
-                    var iran_mobiles = new List<string>();
-                    foreach (var mobile in user_mobiles)
-                    {
-                        if (PhoneUtility.IsNumberForIran(mobile))
-                        {
-                            iran_mobiles.Add(PhoneUtility.InternationalNumberToLocal(mobile));
-                        }
-                    }
+                    var phoneNumbers = recievers.Select(x => x.MainMobile).ToList();
+                    phoneNumbers = phoneNumbers.Where(w => PhoneUtility.IsNumberForIran(w)).ToList();
                     if (template == "SetNorouzPrice")
                     {
                         var receiverUsers = recievers.ToList();
@@ -281,8 +274,22 @@ namespace Portal.Controllers
                         }
                         return GenerateJsonResult(new { status = 2, message = "" });
                     }
+                    if (template == "GuestNorouzRules")
+                    {
+                        var receiverUsers = recievers.ToList();
+                        foreach (var number in phoneNumbers)
+                        {
+                            userService.SendSms(new Amlakbashi.Core.Infrastructure.UserContact.UserContactDTO()
+                            {
+                                UserMainMobile = number,
+                                Type = Amlakbashi.Core.Infrastructure.UserContact.UserContactType.GuestNorouzRules,
+                                Extra1 = ""
+                            });
+                        }
+                        return GenerateJsonResult(new { status = 2, message = "" });
+                    }
                     var delay = 1;
-                    foreach (var mobile in iran_mobiles)
+                    foreach (var mobile in phoneNumbers)
                     {
                         userService.SendCustomSms(delay, mobile, template);
                         delay++;

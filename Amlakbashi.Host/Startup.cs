@@ -146,6 +146,19 @@ namespace Amlakbashi.Host
                 options.Configuration = redisConfigString;
             });
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConfigString));
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowCrossOrigins", policy =>
+                {
+                    var crossOrigins = new List<string>();
+                    crossOrigins.Add("http://localhost:3000");
+                    crossOrigins.Add("https://localhost:3000");
+                    crossOrigins.Add("http://next.amlakbashi.com");
+                    crossOrigins.Add("https://next.amlakbashi.com");
+                    policy.WithOrigins(crossOrigins.ToArray()).AllowAnyHeader().AllowAnyMethod();
+                });
+            });
         }
 
         // ConfigureContainer is where you can register things directly
@@ -174,6 +187,7 @@ namespace Amlakbashi.Host
             }
 
             app.UseAntiXssMiddleware();
+            app.UseCors("AllowCrossOrigins");
             app.UseResponseCaching();
             app.UseStaticFiles(new StaticFileOptions
             {

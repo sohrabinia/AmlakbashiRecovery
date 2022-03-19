@@ -866,6 +866,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             ActionSourceEnum actionSource)
         {
             var objReserve = Repository.Query(q => q.Include("Advertise.User.Advertises").FirstOrDefault(f => f.Id == reserve.Id));
+
             var isPaidDeposit = accounting.GetReservePaidAmount(objReserve.Id, StatusStringType.Guest) >=
                 objReserve.DepositPrice - objReserve.CouponPrice - objReserve.PrizePrice;
 
@@ -972,14 +973,17 @@ namespace Amlakbashi.Application.Services.ReserveServices
         public bool UpdateNew(ReserveIndexEditDTO dto, out string msg, int doerUserId, ActionSourceEnum actionSource)
         {
             var reserve = Repository.Query(q => q.Include("Advertise.User.Advertises").FirstOrDefault(f => f.Id == dto.Id));
-            var isPaidDeposit = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest) >=
-                reserve.DepositPrice - reserve.CouponPrice - reserve.PrizePrice;
+            var isPaidDeposit = reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePayment.ReservePaymentType.GuestDeposite ||
+                a.PaymentType == (int)ReservePayment.ReservePaymentType.GuestClearing);
+
+            //var isPaidDeposit = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest) >=
+            //    reserve.DepositPrice - reserve.CouponPrice - reserve.PrizePrice;
 
             if (isPaidDeposit == false && (dto.Status == ReserveStatus.Reserved || dto.Status == ReserveStatus.CashPay ||
                 dto.Status == ReserveStatus.Started || dto.Status == ReserveStatus.Completed ||
                 dto.Status == ReserveStatus.CancelRequestByGuest || dto.Status == ReserveStatus.CancelRequestByHost))
             {
-                msg = "مبلغ بیعانه هنوز پرداخت نشده، تغییر به وضعیت " + ReserveLocalization.GetStatusString((int)dto.Status, Reserve.StatusStringType.Site) + " امکان پذیر نیست";
+                msg = "مبلغ بیعانه این رزرو تسویه نشده است";
                 return false;
             }
 
@@ -994,36 +998,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             {
                 reserve.StartDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaStartDate);
             }
-
-            //if (string.IsNullOrEmpty(dto.PersinaEndDate) == false)
-            //{
-            //    reserve.EndDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaEndDate);
-            //}
-
-            //if (string.IsNullOrEmpty(dto.PersinaStartDate) == false)
-            //{
-            //    var startDate = DateTimeUtility.PersianDateToGregorian(dto.PersinaStartDate);
-            //    if (reserve.StartDate != startDate)
-            //    {
-            //        reserve.StartDate = startDate;
-            //        var beforeStart = new DateTime(
-            //            reserve.StartDate.Year,
-            //            reserve.StartDate.Month,
-            //            reserve.StartDate.Day,
-            //            12, 0, 0) - DateTime.Now;
-            //        if (beforeStart.TotalMilliseconds <= 0)
-            //        {
-            //            mediator.Send(new SetReserveStatusCommand(reserve.Id, ReserveStatus.Started,
-            //                true, actionSource, doerUserId));
-            //        }
-            //        else
-            //        {
-            //            var onStart = beforeStart.Add(new TimeSpan(2, 0, 0));
-            //            mediator.Schedule(new SetReserveStatusCommand(reserve.Id,
-            //                ReserveStatus.Started, true, actionSource, doerUserId), onStart);
-            //        }
-            //    }
-            //}
 
             if (string.IsNullOrEmpty(dto.PersinaEndDate) == false)
             {

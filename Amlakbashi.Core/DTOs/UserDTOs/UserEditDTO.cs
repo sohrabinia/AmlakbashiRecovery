@@ -27,6 +27,7 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
         public User.UserState UserState { get; set; }
         public long Credit { get; set; }
         public int CancelInstantReserveLimit { get; set; }
+        public bool ForbiddenRegionsAccess { get; set; }
 
         public int InstantReserveCancelCount { get; set; }
         public string EmailAddress { get; set; }
@@ -60,22 +61,13 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                 LastSendedSmsCode = identityUser.Code,
                 UserState = identityUser.State,
                 OwnerShip = user.OwnerShip,
-                ContactPhone = string.IsNullOrEmpty(user.ContactPhone) == false && user.ContactPhone == "1"
+                ContactPhone = string.IsNullOrEmpty(user.ContactPhone) == false && user.ContactPhone == "1",
+                ForbiddenRegionsAccess = user.ForbiddenRegionsAccess
             };
         }
 
         public bool IsValid()
         {
-            //if ((!string.IsNullOrEmpty(MainMobile) && !PhoneUtility.ValidateInternationalNumber(MainMobile)) ||
-            //    (!string.IsNullOrEmpty(Mobile) && !PhoneUtility.ValidateInternationalNumber(Mobile)) ||
-            //    (!string.IsNullOrEmpty(Mobile2) && !PhoneUtility.ValidateInternationalNumber(Mobile2)) ||
-            //    (!string.IsNullOrEmpty(Tell) && !PhoneUtility.ValidateInternationalNumber(Tell)) ||
-            //    (!string.IsNullOrEmpty(ThirdPersonTell) && !PhoneUtility.ValidateInternationalNumber(ThirdPersonTell)))
-            //{
-            //    errors.Add("شماره تلفن باید با کد کشوری باشد. مثال: +98 9102222222");
-            //    hasError = true;
-            //}
-
             if (string.IsNullOrEmpty(Mobile) == false && PhoneUtility.ValidateInternationalNumber(Mobile) == false)
             {
                 ErrorMessages.Add("شماره موبایل اشتباه است");

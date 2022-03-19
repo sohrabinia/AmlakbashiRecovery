@@ -46,7 +46,6 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void UpdateFNameLName(int userId, string newFName, string newLName);
         void UpdateDesc(int userId, string desc);
         Task UpdateEmailAsync(string guid, string email, bool confirm);
-        void UpdateLoginCode(int userId, string token);
         void UpdateLastNotifPermetionTicks(int userId, long ticks);
         void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
             int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
