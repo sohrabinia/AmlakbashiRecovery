@@ -7,14 +7,7 @@ jalaliWeekDays = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه شنبه', '
 jalaliMonthNames = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
 jalaliWeekDaysShort = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
-var jalaliHolidays = ["1400/1/1", "1400/1/2", "1400/1/3",
-                       "1400/1/4", "1400/1/9", "1400/1/12",
-                       "1400/2/14", "1400/2/23", "1400/3/15",
-                       "1400/3/16", "1400/4/30", "1400/5/7",
-                       "1400/5/27", "1400/5/28", "1400/7/5",
-                       "1400/7/13", "1400/7/15",
-                       "1400/8/2", "1400/10/16", "1400/11/26",
-                        "1400/12/10", "1400/12/29",
+var jalaliHolidays = [  "1400/12/10", "1400/12/29",
                         "1401/1/1", "1401/1/2", "1401/1/3",
                         "1401/1/4", "1401/1/13", "1401/2/12",
                         "1401/2/13", "1401/3/5", "1401/3/14",
@@ -54,9 +47,9 @@ function gregorianToJalaliDate(gDate) {
     pastDayOffset = pastDayOffset == undefined ? 0 : pastDayOffset;
     var gToday = new Date();
     var pastDayBoundary = new Date();
-    if (pastDayOffset != 0) {
-        pastDayBoundary.setDate(pastDayBoundary.getDate() + pastDayOffset);
-    }
+    //if (pastDayOffset != 0) {
+    //    pastDayBoundary.setDate(pastDayBoundary.getDate() + pastDayOffset);
+    //}
     gToday.setHours(0, 0, 0, 0);
 
     pastDayBoundary.setHours(0, 0, 0, 0);
@@ -89,7 +82,8 @@ function gregorianToJalaliDate(gDate) {
         isToday: gDate.toDateString() === gToday.toDateString(),
         isPastDay: gDate < pastDayBoundary,
         isHoliday: jalaliDayOfWeek == 6 || jalaliHolidays.includes(dateStringEnglishDigit),
-        value: jYear == 1400 && jMonth == 1 && jDay == 2 ? 1616358600000 : gDateClone.valueOf()
+        value: jYear == 1401 && jMonth == 1 && jDay == 2 ? 1647894600000 : gDateClone.valueOf()
+        //value: gDateClone.valueOf()
     };
 }
 
@@ -114,11 +108,12 @@ function getJalaliMonthDays(jDate) {
     var dayList = [];
     var gPrevDay = new Date(gDate.getTime());
     var gNextDay = new Date(gDate.getTime());
-    if (getJalaliToday().month > 6) {
-        gNextDay.addHours(1);
-    }
+    //if (getJalaliToday().month > 6) {
+    //    gNextDay.addHours(1);
+    //}
     if (jDate.day > 1) {
         while (true) {
+            debugger;
             gPrevDay.setDate(gPrevDay.getDate() - 1);
             var jPrevDay = gregorianToJalaliDate(gPrevDay);
             dayList.unshift(jPrevDay);
