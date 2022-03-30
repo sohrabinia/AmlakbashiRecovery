@@ -239,8 +239,8 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
                 NewValue = (((rnd.NextDouble() - 0) * NewRange) / OldRange) + advertise.Longitude - 0.0017;
                 lng = NewValue;
             }
-            string[] _rulesParagraphs;
-            var _rulesHeaderText = AdvertiseMainLocalization.GetRulesText(out _rulesParagraphs);
+            string[] _rulesParagraphs = new string[5];
+            var _rulesHeaderText = "";
             return new ApiAdvertiseDetailDTO()
             {
                 id = advertise.Id,

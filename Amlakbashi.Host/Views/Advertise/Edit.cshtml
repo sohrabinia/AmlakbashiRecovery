@@ -136,7 +136,15 @@
                 کد کاربر :
             </td>
             <td style="width:300px;">
-                @Html.EditorFor(model => model.UserID)
+                @if (Model.Reserves.Any())
+                {
+                    <input type="hidden" name="UserID" value="@Model.UserID" />
+                    @Model.UserID
+                }
+                else
+                {
+                    @Html.EditorFor(model => model.UserID)
+                }
             </td>
             <td></td>
         </tr>

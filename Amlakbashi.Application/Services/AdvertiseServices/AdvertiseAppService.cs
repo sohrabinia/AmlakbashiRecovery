@@ -32,25 +32,235 @@ using Amlakbashi.Mediator.Commands.FileCommands;
 using Amlakbashi.Core.DTOs.AdvertiseDTOs;
 using Amlakbashi.Mediator.Commands.CategoryCommands;
 using Microsoft.AspNetCore.Http;
+using Amlakbashi.Core.DTOs.WebService.Requests.Advertises;
+using Amlakbashi.Core.Infrastructure.FilterHelpers.Interfaces;
+using Amlakbashi.Core.DTOs.WebService.Responses.Advertises;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
     internal class AdvertiseAppService : AppServiceBase<Advertise, long>, IAdvertiseAppService
     {
         private readonly IPriceCalculator priceCalculator;
+        private readonly IAdvertiseFilterHelper advertiseFilter;
         private readonly UserManager<AppUser> userManager;
         private readonly IMediator mediator;
         public AdvertiseAppService(IRepository<Advertise, long> repository,
-            IMediator mediator, IPriceCalculator priceCalculator, UserManager<AppUser> userManager) : base(repository)
+            IMediator mediator, IPriceCalculator priceCalculator,
+            UserManager<AppUser> userManager, IAdvertiseFilterHelper advertiseFilter) : base(repository)
         {
             this.mediator = mediator;
             this.priceCalculator = priceCalculator;
             this.userManager = userManager;
+            this.advertiseFilter = advertiseFilter;
         }
 
         public IQueryable<Advertise> GetAllAsIQueriable()
         {
             return Repository.Query(q => q);
+        }
+
+        public AdvertiseListResponse Filter(AdvertisesRequest request)
+        {
+            var category = Repository.Find<DynamicCategory, int>(request.categoryId);
+            var advertises = category.Advertises.AsQueryable();
+            
+            advertises = advertiseFilter.FilterPhrase(advertises, request.phrase);
+            if (request.area > 0)
+            {
+                advertises = advertises.Where(x => x.Area == request.area);
+            }
+            if (request.positions != null && request.positions.Any())
+            {
+                advertises = advertises.Where(a => request.positions.Contains(a.Position));
+            }
+            if (request.parking)
+            {
+                advertises = advertises.Where(a => a.Parking != ParkingItems.NoParking);
+            }
+            if (request.capacity > 0)
+            {
+                advertises = advertises.Where(a => a.Capacity >= request.capacity ||
+                    a.Capacity + a.MoreThanCapacity >= request.capacity);
+            }
+            if (request.roomCount > 0)
+            {
+                advertises = advertises.Where(w => w.Room == request.roomCount);
+            }
+            if (request.bedCount > 0)
+            {
+                advertises = advertises.Where(x => x.SingleBed + (x.DoublesBed * 2) == request.bedCount);
+            }
+            if (request.elevator)
+            {
+                advertises = advertises.Where(a => a.Elevator == true);
+            }
+            if (request.pool)
+            {
+                advertises = advertises.Where(x => x.Pool == true);
+            }
+            if (request.wifi)
+            {
+                advertises = advertises.Where(x => x.Wifi == true);
+            }
+            if (request.washingMachine)
+            {
+                advertises = advertises.Where(a => a.WashingMachine == true);
+            }
+            if (request.jacuzzi)
+            {
+                advertises = advertises.Where(a => a.Jacuzzi == true);
+            }
+            if (request.poolTable)
+            {
+                advertises = advertises.Where(a => a.PoolTable == true);
+            }
+            if (request.foosball)
+            {
+                advertises = advertises.Where(a => a.Foosball == true);
+            }
+            if (request.teaMaker)
+            {
+                advertises = advertises.Where(a => a.TeaMaker == true);
+            }
+            if (request.pets)
+            {
+                advertises = advertises.Where(a => a.AllowPets == true);
+            }
+            if (request.party)
+            {
+                advertises = advertises.Where(a => a.AllowParty == true);
+            }
+            if (request.smoking)
+            {
+                advertises = advertises.Where(a => a.AllowSmoking == true);
+            }
+            if (request.wcType != WCItems.Unset)
+            {
+                if (request.wcType == WCItems.EuropianAndPersian)
+                {
+                    advertises = advertises.Where(a => a.WC == WCItems.EuropianAndPersian);
+                }
+                else if (request.wcType == WCItems.Europian)
+                {
+                    advertises = advertises.Where(a => a.WC == WCItems.Europian || a.WC == WCItems.EuropianAndPersian);
+                }
+                else
+                {
+                    advertises = advertises.Where(a => a.WC == WCItems.Persian || a.WC == WCItems.EuropianAndPersian);
+                }
+            }
+            if (request.norouz)
+            {
+                advertises = advertises.Where(a => a.NorouzPrice > 0);
+            }
+            if (request.instantReserve)
+            {
+                advertises = advertises.Where(a => a.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed);
+            }
+            if (request.minPrice > 0 || request.maxPrice > 0)
+            {
+                advertises = advertiseFilter.FilterPrice(advertises, request.priceType,
+                    request.minPrice, request.maxPrice);
+            }
+            if ((!string.IsNullOrEmpty(request.fromDate) &&
+                !string.IsNullOrEmpty(request.toDate)) || request.emptyTonight)
+            {
+                if (request.emptyTonight)
+                {
+                    request.fromDate = DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date);
+                    request.toDate = DateTimeUtility.GregorianToPersianDate(DateTime.Now.AddDays(1).Date);
+                }
+                var from = StringUtility.PersianNumberToEnglish(request.fromDate).Replace("/", ",");
+                var to = StringUtility.PersianNumberToEnglish(request.toDate).Replace("/", ",");
+                var range = DateTimeUtility.PersianDateRangeToList(from, to, true, false)
+                    .Select(s => DateTimeUtility.PersianDateToGregorian(s)).ToList();
+                advertises = advertises.Where(w => w.OccupiedTables.Any(a => range.Select(s => s).Contains(a.Date)) == false);
+            }
+
+            IOrderedQueryable<Advertise> orderedAdvertiseList = advertises.OrderBy(x => true);
+            if (request.emptyTonight)
+            {
+                orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(x => x.TodayIsEmpty);
+            }
+            if (request.advertiseType != AdvertiseType.None && request.advertiseType != AdvertiseType.All)
+            {
+                orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(x => x.TypeID == request.advertiseType);
+            }
+            if (request.capacity > 0)
+            {
+                orderedAdvertiseList = orderedAdvertiseList.ThenBy(x => x.Capacity);
+            }
+            switch (request.sort)
+            {
+                case SortOrder.MoreExpensive:
+                    switch (request.priceType)
+                    {
+                        case priceRangeTypes.Holiday:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.HolidayPrice);
+                            break;
+                        case priceRangeTypes.HolidayPeak:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.HolidayPikePrice);
+                            break;
+                        case priceRangeTypes.Monthly:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.RentPrice);
+                            break;
+                        case priceRangeTypes.Norouz:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.NorouzPrice);
+                            break;
+                        default:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.BasePrice);
+                            break;
+                    }
+                    break;
+                case SortOrder.Cheaper:
+                    switch (request.priceType)
+                    {
+                        case priceRangeTypes.Holiday:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenBy(a => a.HolidayPrice);
+                            break;
+                        case priceRangeTypes.HolidayPeak:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenBy(a => a.HolidayPikePrice);
+                            break;
+                        case priceRangeTypes.Monthly:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenBy(a => a.RentPrice);
+                            break;
+                        case priceRangeTypes.Norouz:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenBy(a => a.NorouzPrice);
+                            break;
+                        default:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenBy(a => a.BasePrice);
+                            break;
+                    }
+                    break;
+                case SortOrder.UserRate:
+                    orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.AverageUserRating);
+                    break;
+                case SortOrder.Clean:
+                    orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.TidinessUserRating);
+                    break;
+                default:
+                    orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.AdvertiseScore);
+                    break;
+            }
+
+            AdvertiseListResponse response = new AdvertiseListResponse();
+            response.advertiseCount = orderedAdvertiseList.Count();
+            response.page = request.page;
+            response.categoryTitle = AdvertiseSeoLocalization.GetTitle(category.MostAccType, (int)category.Type,
+                category.Province == null ? "" : category.RegionProvince.PersianName,
+                category.City == null ? "" : category.RegionCity.PersianName,
+                category.Area == null ? "" : category.RegionArea.PersianName,
+                Region.GetCountryDirectionString(category.CountryDirection));
+
+            var model = orderedAdvertiseList.Skip(request.pageItemCount * (request.page - 1))
+                .Take(request.pageItemCount).ToList();
+            foreach (var item in model)
+            {
+                var itemResponse = (AdvertiseListItemResponse)item;
+                itemResponse.favourited = request.UserFavorites.Any(x => x.AdvertiseID == item.Id);
+                response.advertiseList.Add(itemResponse);
+            }
+            return response;
         }
 
         public IList<Advertise> GetAdvertisesByUserId(int userId, bool includeCommentsAndReports = false)

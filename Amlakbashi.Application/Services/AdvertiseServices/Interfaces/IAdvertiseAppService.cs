@@ -12,12 +12,15 @@ using System;
 using static Amlakbashi.Core.Entities.ActionLog;
 using Amlakbashi.Core.DTOs.AdvertiseDTOs;
 using Microsoft.AspNetCore.Http;
+using Amlakbashi.Core.DTOs.WebService.Requests.Advertises;
+using Amlakbashi.Core.DTOs.WebService.Responses.Advertises;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
 {
     public interface IAdvertiseAppService : IAppService<Advertise, long>
     {
         IQueryable<Advertise> GetAllAsIQueriable();
+        AdvertiseListResponse Filter(AdvertisesRequest request);
         IList<Advertise> GetAdvertisesByUserId(int userId, bool includeCommentsAndReports = false);
         IList<long> GetAdvertiseIdsByUserId(int userId);
         IList<Advertise> GetNotChildAdvertisesByUserId(int userId);

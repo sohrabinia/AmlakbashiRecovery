@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Core.Entities;
+using System.Collections.Generic;
 using static Amlakbashi.Core.Entities.Advertise;
 
 namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
@@ -676,15 +677,24 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             }
         }
 
-        public static string GetRulesText(out string[] paragraphs)
+        public static IList<string> GetReserveCancelationRules()
         {
-            paragraphs = new string[4];
-            paragraphs[0] = "کنسل نمودن رزرو توسط مهمان تا ۷۲ ساعت مانده به شروع اقامت: کسر ۱۰٪ از مبلغ کل رزرو و بازگشت باقی‌مانده مبلغ.";
-            paragraphs[1] = "کنسل نمودن رزرو توسط مهمان کمتر از ۷۲ ساعت مانده به شروع اقامت: کسر مبلغ اولین شب رزرو و بازگشت باقی‌مانده مبلغ.";
-            paragraphs[2] = "کنسل نمودن رزرو توسط مهمان در روز شروع اقامت: کسر مبلغ ۲ شب اول رزرو و بازگشت باقی‌مانده مبلغ";
-            paragraphs[3] = "در ایام پیک تعطیلات، بازه‌ی ۷۲ ساعت، ۱ هفته محاسبه می‌شود و امکان کنسلی وجود ندارد";
-            return "قوانین کنسلی توسط مهمان:";
+            var rules = new List<string>();
+            rules.Add("کنسل نمودن رزرو توسط مهمان تا ۷۲ ساعت مانده به شروع اقامت: کسر ۱۰٪ از مبلغ کل رزرو و بازگشت باقی‌مانده مبلغ");
+            rules.Add("کنسل نمودن رزرو توسط مهمان کمتر از ۷۲ ساعت مانده به شروع اقامت: کسر ۱۰٪ از مبلغ کل و مبلغ اولین شب رزرو و بازگشت باقی‌مانده مبلغ");
+            rules.Add("کنسل نمودن رزرو توسط مهمان در روز شروع اقامت: کسر ۱۰٪ از مبلغ کل و مبلغ ۲ شب اول رزرو و بازگشت باقی‌مانده مبلغ");
+            rules.Add("در ایام پیک تعطیلات، بازه‌ی ۷۲ ساعت، ۱ هفته محاسبه شده و امکان کنسلی وجود ندارد");
+            return rules;
         }
+
+        public static IList<string> GetNowruzReserveCancelationRules()
+        {
+            var rules = new List<string>();
+            rules.Add("رزروهای مربوط به ایام نوروز فقط با رضایت میزبان قابل لغو می باشند");
+            rules.Add("همچنین در صورتی که به دستور مقامات و سازمان های دولتی و به دلیل همه گیری ویروس کرونا، امکان سفر به مقصد مورد نظر طی روز های نوروز میسر نباشد، کلیه مبلغ رزرو به مهمان عودت می گردد");
+            return rules;
+        }
+
         public static string GetHygieneProtocolStatusText(HygieneProtocolStatus hygieneProtocolStatus)
         {
             switch (hygieneProtocolStatus)

@@ -1,0 +1,69 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+
+namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
+{
+    public class AdvertiseListResponse
+    {
+        public AdvertiseListResponse()
+        {
+            advertiseList = new List<AdvertiseListItemResponse>();
+        }
+
+        public List<AdvertiseListItemResponse> advertiseList { get; set; }
+        public string categoryTitle { get; set; }
+        public int advertiseCount { get; set; }
+        public int page { get; set; }
+        public int pageCount => advertiseCount % 20 == 0 ? advertiseCount / 20 : (advertiseCount / 20) + 1;
+    }
+
+    public class AdvertiseListItemResponse
+    {
+        public long id { get; set; }
+        public string title { get; set; }
+        public long price { get; set; }
+        public int discountPercent { get; set; }
+        public bool favourited { get; set; }
+        public int roomCount { get; set; }
+        public string typeTitle { get; set; }
+        public float rate { get; set; }
+        public int rateCount { get; set; }
+        public bool instantReserve { get; set; }
+        public string provinceName { get; set; }
+        public string cityName { get; set; }
+        public string areaName { get; set; }
+        public List<string> imagesUrls { get; set; }
+
+
+        public static implicit operator AdvertiseListItemResponse(Entities.Advertise advertise)
+        {
+            var response = new AdvertiseListItemResponse();
+            int discountPercent = 0;
+            var discount = advertise.GetFirstDiscountData(true, true);
+            if (discount.Percent > 0)
+            {
+                discountPercent = discount.Percent;
+            }
+            response.id = advertise.Id;
+            response.title = advertise.Title;
+            response.price = advertise.BasePrice;
+            response.typeTitle = AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID);
+            response.roomCount = advertise.Room;
+            response.rate = advertise.AverageUserRating;
+            response.rateCount = advertise.UserRatingDict().Count;
+            response.instantReserve = advertise.InstantReserveStatus == Entities.Advertise.InstantReserveStatusEnum.Confirmed;
+            response.discountPercent = discountPercent;
+            response.provinceName = advertise.RegionProvince.PersianName;
+            response.cityName = advertise.RegionCity.PersianName;
+            response.areaName = advertise.Area != null ? advertise.RegionArea.PersianName : null;
+            response.imagesUrls = new List<string>();
+            foreach (var item in advertise.Photos)
+            {
+                response.imagesUrls.Add($"/file/accthumbxxxlarge?accid={advertise.Id}&fileid={item.Id}");
+            }
+            return response;
+        }
+    }
+}

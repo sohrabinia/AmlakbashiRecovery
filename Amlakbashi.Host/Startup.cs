@@ -154,8 +154,8 @@ namespace Amlakbashi.Host
                     var crossOrigins = new List<string>();
                     crossOrigins.Add("http://localhost:3000");
                     crossOrigins.Add("https://localhost:3000");
-                    crossOrigins.Add("http://next.amlakbashi.com");
-                    crossOrigins.Add("https://next.amlakbashi.com");
+                    crossOrigins.Add("http://next.amlakbashi.com:3000");
+                    crossOrigins.Add("https://next.amlakbashi.com:3000");
                     policy.WithOrigins(crossOrigins.ToArray()).AllowAnyHeader().AllowAnyMethod();
                 });
             });

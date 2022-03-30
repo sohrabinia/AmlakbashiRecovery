@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Reflection;
 using static Amlakbashi.Core.Entities.Region;
 
 namespace Amlakbashi.Core.Entities
@@ -262,14 +263,14 @@ namespace Amlakbashi.Core.Entities
         {
             return Comments.Where(w => w.Status == Comment.CommentStatus.publish &&
                     w.type == Comment.CommentType.advertise)
-                    .OrderByDescending(o => o.Id);
+                    .OrderByDescending(o => o.CreateDate);
         }
 
         public Dictionary<int, List<ReportItem>> UserRatingDict()
         {
             var dict = new Dictionary<int, List<ReportItem>>();
-            var userRatingItems = ReportItems;
-            foreach (var rp in userRatingItems)
+            //var userRatingItems = ReportItems;
+            foreach (var rp in ReportItems)
             {
                 if (dict.ContainsKey(rp.UserID))
                 {
@@ -423,6 +424,85 @@ namespace Amlakbashi.Core.Entities
             if (list == null || !list.Any())
                 return new List<DateTime>();
             return list.Select(s => s.Date).Distinct().ToList();
+        }
+
+        public List<Property> GetActiveAmeneties()
+        {
+            List<Property> activeAmenities = new List<Property>();
+
+            if (Pool == true)
+            {
+                activeAmenities.Add(Property.Pool);
+            }
+            if (Oven == true)
+            {
+                activeAmenities.Add(Property.Oven);
+            }
+            if (Refrigerator == true)
+            {
+                activeAmenities.Add(Property.Refrigerator);
+            }
+            if (KitchenHood == true)
+            {
+                activeAmenities.Add(Property.KitchenHood);
+            }
+            if (KitchenUtensils == true)
+            {
+                activeAmenities.Add(Property.KitchenUtensils);
+            }
+            if (TeaMaker == true)
+            {
+                activeAmenities.Add(Property.TeaMaker);
+            }
+            if (MicrowaveOven == true)
+            {
+                activeAmenities.Add(Property.MicrowaveOven);
+            }
+            if (Wifi == true)
+            {
+                activeAmenities.Add(Property.Wifi);
+            }
+            if (TV == true)
+            {
+                activeAmenities.Add(Property.TV);
+            }
+            if (SoundSystem == true)
+            {
+                activeAmenities.Add(Property.SoundSystem);
+            }
+            if (Golf == true)
+            {
+                activeAmenities.Add(Property.Golf);
+            }
+            if (Bathroom == true)
+            {
+                activeAmenities.Add(Property.Bathroom);
+            }
+            if (WashingMachine == true)
+            {
+                activeAmenities.Add(Property.WashingMachine);
+            }
+            if (Hairdryer == true)
+            {
+                activeAmenities.Add(Property.Hairdryer);
+            }
+            if (PoolTable == true)
+            {
+                activeAmenities.Add(Property.PoolTable);
+            }
+            if (Foosball == true)
+            {
+                activeAmenities.Add(Property.Foosball);
+            }
+            if (Sauna == true)
+            {
+                activeAmenities.Add(Property.Sauna);
+            }
+            if (Jacuzzi == true)
+            {
+                activeAmenities.Add(Property.Jacuzzi);
+            }
+            return activeAmenities;
         }
 
         private static List<AdvertiseType> IsfahanForbiddenTypes =
@@ -789,29 +869,6 @@ namespace Amlakbashi.Core.Entities
 
             OwnershipType,
             OwnerID
-        }
-
-        public enum PropertyType
-        {
-            None = -1,
-            Number = 0,
-            Boolean = 1,
-            String = 2,
-            SelectOption = 3,
-            Location = 4,
-        }
-
-        public enum PropertyCategory
-        {
-            None = -1,
-            Main = 0,
-            Address = 1,
-            Price = 2,
-            Basic = 3,
-            Extra = 4,
-            Amenities_SelectOption = 5,
-            Aminities_Boolean = 6,
-            Rules = 7
         }
 
         public enum ParkingItems

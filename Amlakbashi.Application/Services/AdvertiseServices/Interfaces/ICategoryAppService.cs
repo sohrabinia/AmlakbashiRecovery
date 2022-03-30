@@ -55,6 +55,7 @@ namespace Amlakbashi.Application.Services.Category.Interfaces
         DynamicCategory GetForItemAction(int regionType, AdvertiseType type,
             CountryDirection countryDirection = CountryDirection.Unset,
             int province = 0, int city = 0, int area = 0);
+        DynamicCategory GetByRegion(int regionId, AdvertiseType type, out bool isArea);
         DynamicCategory GetCategoryByCountryDirectionOrRegion(AdvertiseType type, CountryDirection countryDirection,
             int regionId, Region.AdvertiseRegion regionType);
         List<DynamicCategory> GetAccItemLinks(int? province,

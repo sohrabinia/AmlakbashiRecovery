@@ -113,7 +113,6 @@ function getJalaliMonthDays(jDate) {
     //}
     if (jDate.day > 1) {
         while (true) {
-            debugger;
             gPrevDay.setDate(gPrevDay.getDate() - 1);
             var jPrevDay = gregorianToJalaliDate(gPrevDay);
             dayList.unshift(jPrevDay);
