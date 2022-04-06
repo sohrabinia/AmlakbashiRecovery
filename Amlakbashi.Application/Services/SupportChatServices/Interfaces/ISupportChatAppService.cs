@@ -14,6 +14,7 @@ namespace Amlakbashi.Application.Services.SupportChatServices.Interfaces
         SupportChat Find(long id);
         SupportChat GetByUserId(int userId);
         SupportChat Insert(int userId);
+        IList<long> UpdateMessagesReadStatus(long id, SupportChatMessage.TypeEnum type = SupportChatMessage.TypeEnum.Supporter);
         void ScheduleSendSupporterNewMsgNotif(int delay, long messageId, long supportChatId, string[] supportersNotifToken);
     }
 }

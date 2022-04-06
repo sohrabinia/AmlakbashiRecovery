@@ -11,22 +11,21 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
 {
     public class AdvertiseResponse
     {
-        public AdvertiseResponse()
-        {
-            imagesUrls = new List<string>();
-            amenities = new List<string>();
-        }
-
         public long id { get; set; }
         public string title { get; set; }
         public bool active { get; set; }
         public bool favorite { get; set; }
         public string typeTitle { get; set; }
+        public int hostId { get; set; }
         public string hostName { get; set; }
         public string hostCreateDate { get; set; }
         public float hostReponseRate { get; set; }
         public int capacity { get; set; }
         public int extraCapacity { get; set; }
+        public int roomCount { get; set; }
+        public int singleBedCount { get; set; }
+        public int doubleBedCount { get; set; }
+        public int wcCount { get; set; }
         public string description { get; set; }
         public int buildingArea { get; set; }
         public int landArea { get; set; }
@@ -36,8 +35,9 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
         public AdvertiseRulesResponse rules { get; set; }
         public AdvertiseAddressResponse location { get; set; }
         public AdvertiseCommentResponse comments { get; set; }
-        public List<string> amenities { get; set; }
-        public List<string> imagesUrls { get; set; }
+        public List<string> amenities { get; set; } = new List<string>();
+        public List<AdvertiseChildsResponse> units { get; set; } = new List<AdvertiseChildsResponse>();
+        public List<string> imagesUrls { get; set; } = new List<string>();
 
         public static implicit operator AdvertiseResponse(Advertise advertise)
         {
@@ -46,8 +46,8 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             response.active = advertise.CanPublish();
             response.title = advertise.Title;
             response.typeTitle = AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID);
+            response.hostId = advertise.UserID;
             response.hostName = advertise.User.FullName;
-            response.hostCreateDate = "";
             if (advertise.User.HostReserves.Any())
             {
                 response.hostReponseRate = ((float)advertise.User.HostReserves.Where(x => x.HostResponse != Reserve.HostResponseEnum.None).Count()
@@ -55,6 +55,9 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             }
             response.capacity = advertise.Capacity;
             response.extraCapacity = advertise.MoreThanCapacity;
+            response.roomCount = advertise.Room;
+            response.singleBedCount = advertise.SingleBed;
+            response.doubleBedCount = advertise.DoublesBed;
             response.description = advertise.Description;
             response.buildingArea = advertise.Metrazh;
             response.landArea = advertise.LandArea;
@@ -107,6 +110,23 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             foreach (var item in advertise.GetActiveAmeneties())
             {
                 response.amenities.Add(AdvertiseMainLocalization.GetPropertyTitle(item));
+            }
+            if (advertise.Mode == Advertise.AdvertiseMode.Parent)
+            {
+                response.units.AddRange(advertise.Childs.Select(x => new AdvertiseChildsResponse()
+                {
+                    id = x.Id,
+                    roomCount = x.Room,
+                    singleBedCount = x.SingleBed,
+                    doubleBedCount = x.DoublesBed,
+                    capacity = x.Capacity,
+                    extraCapacity = x.MoreThanCapacity,
+                    price = x.DailyPrice,
+                    holidyPrice = x.HolidayPrice,
+                    peakHolidayPrice = x.HolidayPikePrice,
+                    extraCapacityPrice = x.MoreThanCapacityPrice,
+                    //imagesUrls = x.Photos.Select(s => $"/file/accthumbxxxlarge?accid={x.Id}&fileid={s.Id}").ToList()
+                }));
             }
             foreach (var item in advertise.Photos)
             {

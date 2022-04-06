@@ -40,13 +40,13 @@
             <p class="static-advertise__title"><i class="fa fa-dollar-sign"></i>اطلاعات قیمت اجاره روزانه اقامتگاه را ثبت کنید</p>
             @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPriceInput.cshtml", Model.price)
         </div>
-        <div id="norouz-price-input-section" class="static-advertise advetise-form__part static-advertie__price-box">
+        @*<div id="norouz-price-input-section" class="static-advertise advetise-form__part static-advertie__price-box">
             <p class="static-advertise__title">
                 <img class="noroz-style-icon" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" width="30" height="30" />
                 اطلاعات قیمت نوروزی اقامتگاه را ثبت کنید
             </p>
             @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccNorouzPriceInput.cshtml", Model.price)
-        </div>
+        </div>*@
     }
     @if (Model.floor != null)
     {

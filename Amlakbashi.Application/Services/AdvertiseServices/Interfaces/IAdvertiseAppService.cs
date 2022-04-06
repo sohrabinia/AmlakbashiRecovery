@@ -21,6 +21,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
     {
         IQueryable<Advertise> GetAllAsIQueriable();
         AdvertiseListResponse Filter(AdvertisesRequest request);
+        IList<Advertise> Filter(string id);
+        void FilterNew(AdvertiseIndexDTO dto);
+        IList<Advertise> Filter(string statusString, int userid, long id);
+        IList<Advertise> FilterAdmin(int province = 0, int city = 0, int area = 0, int adtype = 0,
+            bool defaultProvince = false, int adStatus = -1);
+        IList<Advertise> FilterAdmin(int province, int city, int area, int adtype, DateTime fromDate, DateTime toDate, int userId);
         IList<Advertise> GetAdvertisesByUserId(int userId, bool includeCommentsAndReports = false);
         IList<long> GetAdvertiseIdsByUserId(int userId);
         IList<Advertise> GetNotChildAdvertisesByUserId(int userId);
@@ -33,11 +39,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         Advertise FindIncludingDeleted(long id);
         bool Delete(long id);
         void AddSupporterInfo(long id, string text, User supporter);
-        void FilterNew(AdvertiseIndexDTO dto);
-        IList<Advertise> Filter(string statusString, int userid, long id);
-        IList<Advertise> FilterAdmin(int province = 0, int city = 0, int area = 0, int adtype = 0,
-            bool defaultProvince = false, int adStatus = -1);
-        IList<Advertise> FilterAdmin(int province, int city, int area, int adtype, DateTime fromDate, DateTime toDate, int userId);
         void UpdateAccView(long accId);
         AdvertiseDirector GetAdvertisePageData(long id, out Dictionary<AdvertiseType, IList<AdvertiseDirector>> childrenDirectors);
         void Edit(Advertise editedAd);

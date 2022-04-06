@@ -38,17 +38,17 @@
             <div style="min-height: 90px" class="@(is_self ? "chat-popup__msg-right" : "chat-popup__msg-left")">
                 @if (item.UserID >= 0)
                 {
-                <div class="chat-popup__sender-name">
-                    @if (item.UserID > 0)
-                    {
-                        <img width="40" height="40" style="border-radius:60px" src="@(is_from_user ? "/عکس-پروفایل_کوچک-" + item.UserID : "/file/resourceimagewebp?file_name=siteicons/icon-40x40_round")" />
-                    }
-                    else
-                    {
-                        <i style="font-size:40px" class="fa fa-user-circle"></i>
-                    }
-                    <span>@(is_self ? "شما" : (is_user ? "پشتیبان" : user_id == 0 ? "ناشناس" : Model.UserFullName))</span>
-                </div>
+                    <div class="chat-popup__sender-name">
+                        @if (item.UserID > 0)
+                        {
+                            <img width="40" height="40" style="border-radius:60px" src="@(is_from_user ? "/عکس-پروفایل_کوچک-" + item.UserID : "/file/resourceimagewebp?file_name=siteicons/icon-40x40_round")" />
+                        }
+                        else
+                        {
+                            <i style="font-size:40px" class="fa fa-user-circle"></i>
+                        }
+                        <span>@(is_self ? "شما" : (is_user ? "پشتیبان" : user_id == 0 ? "ناشناس" : Model.UserFullName))</span>
+                    </div>
                 }
                 <div @(item.UserID >= 0 ? "" : "style='width:100%;margin:0;'") class="@(is_self ? "speech-bubble-right" : "speech-bubble-left")">
                     @for (int i = 0; i < chatSentences.Count; i++)

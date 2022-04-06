@@ -16,10 +16,10 @@ namespace Amlakbashi.Core.Common.StaticData
             }
         }
 
-        public static bool IsSupportOnline()
+        public static bool IsSupportersOnline()
         {
             TimeSpan start = new TimeSpan(09, 00, 0);
-            TimeSpan end = new TimeSpan(23, 30, 0);
+            TimeSpan end = new TimeSpan(21, 00, 0);
             TimeSpan now = DateTime.Now.TimeOfDay;
             var onlineSupport = (now > start) && (now < end);
             return onlineSupport;

@@ -93,5 +93,10 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "";
             }
         }
+
+        public static string GetClosedCompanyMessage()
+        {
+            return "کاربر گرامی، ساعت کاری شرکت از 9 صبح تا 9 شب می باشد.";
+        }
     }
 }

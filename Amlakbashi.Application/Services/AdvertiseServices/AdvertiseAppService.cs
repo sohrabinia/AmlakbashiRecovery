@@ -69,9 +69,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 advertises = advertises.Where(x => x.Area == request.area);
             }
-            if (request.positions != null && request.positions.Any())
+            if (request.locationTypes != null && request.locationTypes.Any())
             {
-                advertises = advertises.Where(a => request.positions.Contains(a.Position));
+                advertises = advertises.Where(a => request.locationTypes.Contains(a.Position));
             }
             if (request.parking)
             {
@@ -182,9 +182,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(x => x.TodayIsEmpty);
             }
-            if (request.advertiseType != AdvertiseType.None && request.advertiseType != AdvertiseType.All)
+            if (request.residencyType != AdvertiseType.None && request.residencyType != AdvertiseType.All)
             {
-                orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(x => x.TypeID == request.advertiseType);
+                orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(x => x.TypeID == request.residencyType);
             }
             if (request.capacity > 0)
             {
@@ -261,6 +261,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 response.advertiseList.Add(itemResponse);
             }
             return response;
+        }
+
+        public IList<Advertise> Filter(string id)
+        {
+            return Repository.Query(q => q.Where(x => x.Id.ToString().Contains(id) &&
+                x.Status == AdvertiseStatus.Published && x.Available)).OrderByDescending(x=>x.AmlakbashiScore).Take(5).ToList();
         }
 
         public IList<Advertise> GetAdvertisesByUserId(int userId, bool includeCommentsAndReports = false)

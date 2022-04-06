@@ -19,7 +19,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         public Advertise.priceRangeTypes priceType { get; set; }
         public int minPrice { get; set; }
         public int maxPrice { get; set; }
-        public Advertise.AdvertiseType advertiseType { get; set; } = Advertise.AdvertiseType.All;
+        public Advertise.AdvertiseType residencyType { get; set; } = Advertise.AdvertiseType.All;
         public bool instantReserve { get; set; }
         public bool emptyTonight { get; set; }
         public Advertise.SortOrder sort { get; set; }
@@ -29,7 +29,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         public bool party { get; set; }
         public bool pets { get; set; }
         public bool smoking { get; set; }
-        public List<Advertise.PositionType> positions { get; set; }
+        public List<Advertise.PositionType> locationTypes { get; set; }
 
         public bool parking { get; set; }
         public bool elevator { get; set; }

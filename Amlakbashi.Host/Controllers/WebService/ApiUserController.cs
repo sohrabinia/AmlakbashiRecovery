@@ -219,6 +219,20 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
+        [HttpGet("host/{id:int}")]
+        public IActionResult HostProfile(int id)
+        {
+            var user = userService.Find(id);
+            if (user == null || user.UserGeneralType == 0)
+            {
+                return NotFound();
+            }
+            var identityUser = userService.GetIdentityUser(user.MainMobile);
+            HostProfileResponse response = user;
+            response.hostCreateDate = StringUtility.EnglishNumberToPersian(DateTimeUtility.ConvertDate(identityUser.CreateDate.Value));
+            return Ok(response);
+        }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Policies.Payment_Actions)]
         [HttpGet("test")]
         public IActionResult test()

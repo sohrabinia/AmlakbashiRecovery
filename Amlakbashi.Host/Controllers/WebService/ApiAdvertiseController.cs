@@ -6,6 +6,7 @@ using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.WebService.Requests.Advertises;
 using Amlakbashi.Core.DTOs.WebService.Responses.Advertises;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
@@ -39,10 +40,10 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpGet]
-        public AdvertiseListResponse Get(AdvertisesRequest request)
+        public AdvertiseListResponse Get([FromQuery] AdvertisesRequest request)
         {
             bool isArea = false;
-            DynamicCategory category = categoryService.GetByRegion(request.regionId, request.advertiseType, out isArea);
+            DynamicCategory category = categoryService.GetByRegion(request.regionId, request.residencyType, out isArea);
 
             // read from redis cache
             //bool canUseCache = string.IsNullOrEmpty(request.phrase) && area < 1;
@@ -97,5 +98,61 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
+        [HttpGet("searchid")]
+        public IActionResult SearchId(string id)
+        {
+            var advertises = advertiseService.Filter(id);
+            if (advertises.Any() == false)
+            {
+                return NotFound();
+            }
+            var response = new List<AdvertiseSearchIdResponse>();
+            response.AddRange(advertises.Select(x => new AdvertiseSearchIdResponse()
+            {
+                id = x.Id,
+                title = x.Title,
+                roomCount = x.Room,
+                typeTitle = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(x.TypeID),
+                provinceName = x.RegionProvince.PersianName,
+                cityName = x.RegionCity.PersianName,
+                imageUrl = $"/file/accthumbxxxlarge?accid={x.Id}&fileid={x.MainPhoto.Id}"
+            }));
+            return Ok(response);
+        }
+
+        [HttpGet("types")]
+        public IList<AdvertiseTypesResponse> GetAdvertiseTypes()
+        {
+            var response = new List<AdvertiseTypesResponse>();
+            var advertiseTypesList = Enum.GetValues<Advertise.AdvertiseType>().ToList();
+            advertiseTypesList.Remove(Advertise.AdvertiseType.None);
+            response.AddRange(advertiseTypesList.Select(x => new AdvertiseTypesResponse()
+            {
+                name = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(x),
+                value = (int)x
+            }));
+            return response;
+        }
+
+        [HttpGet("calendar/{id:long}")]
+        public IActionResult GetCalendarData(long id)
+        {
+            var advertise = advertiseService.Find(id);
+            if (advertise == null)
+            {
+                return NotFound();
+            }
+            var response = new AdvertiseCalendarResponse()
+            {
+                occupiedDates = advertise.OccupiedDates().Select(x => DateTimeUtility.DateValueOfJS(x)).ToList(),
+                prices = advertiseService.GetAccPriceDatesInfo(id).Select(x => new AdvertiseCalendarPriceItemResponse()
+                {
+                    date = x.Key,
+                    price = x.Value.price,
+                    discount = x.Value.off
+                }).ToList()
+            };
+            return Ok(response);
+        }
     }
 }

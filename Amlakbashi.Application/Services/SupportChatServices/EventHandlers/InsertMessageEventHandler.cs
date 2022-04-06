@@ -19,8 +19,7 @@ namespace Amlakbashi.Application.Services.SupportChatServices.EventHandlers
         public Task Handle(InsertMessageEvent notification, CancellationToken cancellationToken)
         {
 
-            var supportChat = repository.Query(q => q.FirstOrDefault(f =>
-                f.Id == notification.SupportChatId));
+            var supportChat = repository.Find(notification.SupportChatId);
             supportChat.LastMessageTime = DateTime.Now;
             repository.Update(supportChat);
             repository.Save();

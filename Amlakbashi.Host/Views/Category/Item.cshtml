@@ -292,10 +292,10 @@
                                         <input onchange="changePriceRangeType(3)" is-checked="@(Model.PriceRangeType == 3)" type="radio" id="js-price-range-type-3" name="js-price-range-type" value="3" />
                                         <label for="js-price-range-type-3">اجاره ماهانه</label>
                                     </div>
-                                    <div class="advertise-list__radio-item">
+                                    @*<div class="advertise-list__radio-item">
                                         <input onchange="changePriceRangeType(4)" is-checked="@(Model.PriceRangeType == 4)" type="radio" id="js-price-range-type-4" name="js-price-range-type" value="4" />
                                         <label for="js-price-range-type-4">نوروز</label>
-                                    </div>
+                                    </div>*@
                                 </div>
                                 <div style="display: flex;justify-content: space-around;margin-bottom:10px;">
                                     <div style="border-radius:5px;padding:5px;font:13px Liransans;display: flex;flex-flow: column;">
@@ -746,10 +746,10 @@
                 <i class="fa fa-percent"></i>
                 <span>تخفیف دار</span>
             </div>
-            <div id="norouz-special-filter-button" onclick="toggleNorouz()" style="background-color:@(Model.NorouzSpecial ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
+            @*<div id="norouz-special-filter-button" onclick="toggleNorouz()" style="background-color:@(Model.NorouzSpecial ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
                 <img width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
                 <span>ویژه نوروز</span>
-            </div>
+            </div>*@
             <div id="corona-special-filter-button" onclick="toggleHygieneProtocol()" style="background-color:@(Model.HygieneProtocol ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
                 <img width="16" height="16" rel="ضدعفونی شده" title="ضدعفونی شده" src="/file/resourceimagepng?file_name=no-virus" />
                 <span>ضدعفونی شده</span>

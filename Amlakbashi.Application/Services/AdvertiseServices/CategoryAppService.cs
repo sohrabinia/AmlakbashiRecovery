@@ -587,6 +587,24 @@ namespace Amlakbashi.Application.Services.Category
             }
         }
 
+        public int GetAdvertiseCount(int regionId, Region.AdvertiseRegion type)
+        {
+            var region = Repository.Find<Region, int>(regionId);
+            switch (type)
+            {
+                case AdvertiseRegion.Province:
+                    return Repository.Query(q => q.FirstOrDefault(f => f.Province == regionId &&
+                        f.City == null)).CountAdvertise;
+                case AdvertiseRegion.City:
+                    return Repository.Query(q => q.FirstOrDefault(f => f.City == regionId &&
+                        f.Area == null)).CountAdvertise;
+                case AdvertiseRegion.Area:
+                    return Repository.Query(q => q.FirstOrDefault(f => f.Area == regionId)).CountAdvertise;
+                default:
+                    return 0;
+            }
+        }
+
         public List<DynamicCategory> GetAccItemLinks(int? province,
             int? city, int? area, AdvertiseType Type = AdvertiseType.None)
         {
