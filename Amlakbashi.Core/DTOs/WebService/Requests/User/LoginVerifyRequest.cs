@@ -7,9 +7,10 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.User
 {
     public class LoginVerifyRequest
     {
-        [Required(ErrorMessage = "guid needed")]
+        [Required(ErrorMessage = "guid is required")]
         public string guid { get; set; }
-        [Required(ErrorMessage = "verifyCode needed")]
+
+        [Required(ErrorMessage = "verifyCode is required")]
         public string verifyCode { get; set; }
     }
 }

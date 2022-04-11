@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,19 @@ namespace Amlakbashi.Host.Extensions
         public static string GetRefreshToken(this ClaimsPrincipal userPrincipal)
         {
             return userPrincipal?.FindFirst("refreshToken")?.Value;
+        }
+
+        public static User.UserGeneralTypeEnum GetUserType(this ClaimsPrincipal userPrincipal)
+        {
+            var type = userPrincipal?.FindFirst("type")?.Value;
+            if (type == "host")
+            {
+                return User.UserGeneralTypeEnum.Host;
+            }
+            else
+            {
+                return User.UserGeneralTypeEnum.Guest;
+            }
         }
     }
 }

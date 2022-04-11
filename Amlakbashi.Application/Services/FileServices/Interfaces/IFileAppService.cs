@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Entities;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +12,13 @@ namespace Amlakbashi.Application.Services.FileServices.Interfaces
     public interface IFileAppService : IAppService<File, long>
     {
         IList<File> GetAllDescendingByLastModifyDate(int count = 0);
-        IList<File> GetAllAdvertiseFile();
-        List<string> GetAllFilePath();
         File Find(long id);
         long Insert(File newFile);
         void Update(File editedFile, string wwwrootPath);
         void UpdateFilePath(long fileId, string filePath);
+        Task<long> UpdateUserProfileImageAsync(int userId, IFormFile newImage);
         void Delete(int fileId, string serverPath);
-        void DeleteExtraFiles(List<long> existFile);
-        void MinifyImage(long fileId, string filePath);
-        void StopQueuedJob();
-        //void SetWatermarkForAdvertisePhotos(long fileId, string serverPath);
+        void ClearImagesCache();
         void GenerateThumbImage(long accId, long fileId);
     }
 }

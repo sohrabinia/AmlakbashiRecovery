@@ -35,6 +35,7 @@ using Microsoft.Extensions.Hosting;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs;
 using Amlakbashi.Core.Common.StaticData;
 using System.Threading.Tasks;
+using Amlakbashi.Core.DTOs;
 
 namespace Amlakbashi.Accounting
 {
@@ -282,6 +283,11 @@ namespace Amlakbashi.Accounting
         public IList<CreditTransaction> GetCreditListByUserId(int userId)
         {
             return creditTransactionService.GetListByUserId(userId);
+        }
+
+        public PagedList<CreditTransaction> GetUserWalletTransactions(int userId, int page, int pageItemCount)
+        {
+            return creditTransactionService.GetListByUserId(userId).ToPagedList(page, pageItemCount);
         }
 
         public CreditTransaction GetCanselInstantReserveCreditTransaction(int userId, int tranCause, long id)

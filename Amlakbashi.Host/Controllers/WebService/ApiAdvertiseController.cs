@@ -9,6 +9,8 @@ using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -153,6 +155,38 @@ namespace Amlakbashi.Host.Controllers.WebService
                 }).ToList()
             };
             return Ok(response);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("favorite")]
+        public AdvertiseListResponse GetFavorites(int page = 1)
+        {
+            var favoriteAdvertises = advertiseService.GetUserFavoriteAdvertises(userAccessor.CurrentUser.Id, page);
+            return favoriteAdvertises;
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("favorite/{id:long}")]
+        public IActionResult AddFavorite(long id)
+        {
+            var advertise = advertiseService.Find(id);
+            if (advertise == null)
+            {
+                return NotFound();
+            }
+            userService.AddFavorite(userAccessor.CurrentUser.Id, id);
+            return CreatedAtAction(nameof(GetFavorites), null);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpDelete("favorite/{id:long}")]
+        public IActionResult DeleteFavorite(long id)
+        {
+            if (userService.DeleteFavorite(userAccessor.CurrentUser.Id, id))
+            {
+                return NoContent();
+            }
+            return BadRequest("advertise id is incorrect");
         }
     }
 }

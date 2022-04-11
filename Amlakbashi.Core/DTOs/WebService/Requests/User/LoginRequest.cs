@@ -7,7 +7,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.User
 {
     public class LoginRequest
     {
-        [Required]
+        [Required(ErrorMessage = "phoneNumber is required")]
         public string phoneNumber { get; set; }
         public string email { get; set; }
         public string referralCode { get; set; }

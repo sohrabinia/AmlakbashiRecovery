@@ -31,6 +31,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         bool Update(UserEditDTO editedUser, int adminId);
         bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
             ActionLog.ActionSourceEnum source, out List<string> errors);
+        Task<bool> UpdateAsync(UserPutProfileRequest request);
         void UpdateState(int userId, bool state, int currentUserId = 0,
             ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         Task UpdatePhoneNumberConfirmedAsync(string guid, bool confirm);
@@ -55,7 +56,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void UpdateUserGeneralType(int userId, User.UserGeneralTypeEnum userGeneralType);
         void Delete(int userId, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         void AddFavorite(int userId, long advertiseId);
-        void DeleteFavorite(int userId, long advertiseId);
+        bool DeleteFavorite(int userId, long advertiseId);
         void SendCustomSms(int delay, string mobile, string template);
         void SendNotificationApplication(string token, string title, string body, string targetAction, string targetId);
         void SendGroupNotification(List<string> tokens, string title, string body, string clickAction);

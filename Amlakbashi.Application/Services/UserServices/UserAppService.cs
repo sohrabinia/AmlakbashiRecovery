@@ -24,7 +24,6 @@ using Amlakbashi.Core.Identity;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Amlakbashi.Core.DTOs.WebService.Requests.User;
-using Microsoft.Extensions.Configuration;
 using System.Text;
 
 namespace Amlakbashi.Application.Services.UserServices
@@ -307,10 +306,6 @@ namespace Amlakbashi.Application.Services.UserServices
             var shallowUser = user.ShallowCopy();
             user.FName = dto.fname;
             user.LName = dto.lname;
-            user.OwnerShip = dto.OwnerShip;
-            user.ContactPhone = dto.ContactPhone;
-            user.AmlakbashiScore = dto.AmlakbashiScore;
-            user.Address = dto.Address;
             if (dto.mobile1.Substring(0, 2) == "00")
             {
                 var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile1);
@@ -356,8 +351,8 @@ namespace Amlakbashi.Application.Services.UserServices
                     user.SetLocalPhoneNumber(User.PhoneType.ThirdPerson, dto.thirdPersonTell, 98);
                 }
             }
-            var bankCards = user.BankCards;
-            var bankCardObj = bankCards == null || bankCards.Count == 0 ? null : bankCards.FirstOrDefault();
+
+            var bankCardObj = user.BankCards == null || user.BankCards.Any() == false ? null : user.BankCards.FirstOrDefault();
 
             var hasChange = ((bankCardObj == null && dto.shabaNumber == null &&
                 dto.bankCardNumber == null && dto.bankFname == null && dto.bankLname == null) ||
@@ -415,6 +410,77 @@ namespace Amlakbashi.Application.Services.UserServices
             Repository.Update(user);
             Repository.Save();
             mediator.Publish(new UserUpdateEvent(shallowUser, user, source, currentUserId));
+            return true;
+        }
+
+        public async Task<bool> UpdateAsync(UserPutProfileRequest request)
+        {
+            var user = Repository.Find(request.id);
+            var shallowUser = user.ShallowCopy();
+            user.FName = request.firstName;
+            user.LName = request.lastName;
+            user.Mobile = PhoneUtility.CorrectPhoneNumberIfPossible(request.phoneNumber2);
+            user.Mobile2 = PhoneUtility.CorrectPhoneNumberIfPossible(request.phoneNumber3);
+            user.Tell = PhoneUtility.CorrectPhoneNumberIfPossible(request.landLinePhoneNumber);
+            user.ThirdPersonTell = PhoneUtility.CorrectPhoneNumberIfPossible(request.thirdPersonPhoneNumber);
+
+            var identityUser = GetIdentityUser(user.MainMobile);
+            identityUser.Email = request.email;
+            await UpdateIdentityUserAsync(identityUser);
+
+            var bankCard = user.BankCards == null || user.BankCards.Any() == false ? null : user.BankCards.FirstOrDefault();
+            var hasBankCardChanged = ((bankCard == null && request.shebaNumber == null &&
+                request.bankCardNumber == null && request.bankCardOwnerFirstName == null && request.bankCardOwnerLastName == null) ||
+                (bankCard != null && request.shebaNumber == bankCard.ShabaNumber &&
+                request.bankCardNumber == bankCard.BankCardNumber &&
+                request.bankCardOwnerFirstName == bankCard.FName && request.bankCardOwnerLastName == bankCard.LName)) == false;
+
+            if (hasBankCardChanged)
+            {
+                if (request.shebaNumber != null)
+                {
+                    request.shebaNumber = StringUtility.PersianNumberToEnglish(request.shebaNumber);
+                }
+                if (request.bankCardNumber != null)
+                {
+                    request.bankCardNumber = StringUtility.PersianNumberToEnglish(request.bankCardNumber);
+                }
+
+                if (bankCard != null)
+                {
+                    var shallowBankCard = bankCard.ShallowCopy();
+                    bankCard.BankCardStatus = (int)BankCard.BankCardStatusEnum.NotVerified;
+                    bankCard.ShabaStatus = (int)BankCard.BankCardStatusEnum.NotVerified;
+                    bankCard.FName = request.bankCardOwnerFirstName;
+                    bankCard.LName = request.bankCardOwnerLastName;
+                    bankCard.BankCardNumber = request.bankCardNumber;
+                    bankCard.ShabaNumber = request.shebaNumber;
+                    bankCard.LastModifyDate = DateTime.Now;
+                    await mediator.Publish(new BankCardUpdateEvent(shallowBankCard, bankCard,
+                        ActionLog.ActionSourceEnum.WebsiteDashboard, user.Id));
+                }
+                else
+                {
+                    var newBankCard = new BankCard()
+                    {
+                        UserID = request.id,
+                        BankCardNumber = request.bankCardNumber,
+                        ShabaNumber = request.shebaNumber,
+                        FName = request.bankCardOwnerFirstName,
+                        LName = request.bankCardOwnerLastName,
+                        CreateDate = DateTime.Now,
+                        LastModifyDate = DateTime.Now,
+                        BankCardStatus = (int)BankCard.BankCardStatusEnum.NotVerified,
+                        ShabaStatus = (int)BankCard.BankCardStatusEnum.NotVerified
+                    };
+                    user.BankCards.Add(newBankCard);
+                    await mediator.Publish(new BankCardUpdateEvent(null, newBankCard,
+                        ActionLog.ActionSourceEnum.WebsiteDashboard, user.Id));
+                }
+            }
+            Repository.Update(user);
+            Repository.Save();
+            await mediator.Publish(new UserUpdateEvent(shallowUser, user, ActionLog.ActionSourceEnum.WebsiteDashboard, user.Id));
             return true;
         }
 
@@ -648,7 +714,11 @@ namespace Amlakbashi.Application.Services.UserServices
 
         public void AddFavorite(int userId, long advertiseId)
         {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
+            var user = Repository.Find(userId);
+            if (user.Favorite.Any(x => x.AdvertiseID == advertiseId))
+            {
+                return;
+            }
             var favorite = new UserFavorite();
             favorite.AdvertiseID = advertiseId;
             favorite.SetDate = DateTime.Now;
@@ -657,16 +727,18 @@ namespace Amlakbashi.Application.Services.UserServices
             Repository.Save();
         }
 
-        public void DeleteFavorite(int userId, long advertiseId)
+        public bool DeleteFavorite(int userId, long advertiseId)
         {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
+            var user = Repository.Find(userId);
             var favorite = user.Favorite.FirstOrDefault(f => f.AdvertiseID == advertiseId);
-            if (favorite != null)
+            if (favorite == null)
             {
-                user.Favorite.Remove(favorite);
-                Repository.Update(user);
-                Repository.Save();
+                return false;
             }
+            user.Favorite.Remove(favorite);
+            Repository.Update(user);
+            Repository.Save();
+            return true;
         }
 
         public void SendVerificationSms(string localNumber, string code)
@@ -780,6 +852,12 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateIdentityUser(AppUser user)
         {
             userManager.UpdateAsync(user).Wait();
+        }
+
+        public async Task<bool> UpdateIdentityUserAsync(AppUser user)
+        {
+            var result = await userManager.UpdateAsync(user);
+            return result.Succeeded;
         }
 
         public IdentityResult ChangeIdentityUserPassword(string username, string password)
@@ -1030,7 +1108,7 @@ namespace Amlakbashi.Application.Services.UserServices
                     issuer: "https://www.amlakbashi.com",
                     audience: "https://www.amlakbashi.com",
                     claims: claims,
-                    expires: DateTime.Now.AddMinutes(5),
+                    expires: DateTime.Now.AddDays(30),
                     signingCredentials: new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256));
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

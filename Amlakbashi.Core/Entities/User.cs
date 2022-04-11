@@ -49,7 +49,7 @@ namespace Amlakbashi.Core.Entities
         public int PhotoStatus { get; set; }
 
         [Column("Description")]
-        public string Address { get; set; } //Description
+        public string Address { get; set; }
 
         [Column("WalletAmount")]
         public long Credit { get; set; }
@@ -62,18 +62,6 @@ namespace Amlakbashi.Core.Entities
         public string ContactPhone { get; set; }
         public bool ForbiddenRegionsAccess { get; set; }
         public bool IsDeleted { get; set; }
-
-        //public string Email { get; set; }
-        //public int State { get; set; }
-        //public int LoginPriority { get; set; }
-        //public string ForgetCode { get; set; }
-        //public string Code { get; set; }
-        //public DateTime? CreateDate { get; set; }
-        //public DateTime? SendVerification { get; set; }
-        //public int AccessType { get; set; }
-        //public int ResponseFrom { get; set; }
-        //public int ResponseTo { get; set; }
-        //public string AdminLoginCode { get; set; }
 
         [JsonIgnore]
         [InverseProperty("HostUser")]

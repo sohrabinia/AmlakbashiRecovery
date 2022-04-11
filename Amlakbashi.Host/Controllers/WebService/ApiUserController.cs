@@ -17,6 +17,9 @@ using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Http;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Extensions;
+using Microsoft.AspNetCore.Hosting;
+using Amlakbashi.Core.Entities;
+using Amlakbashi.Application.Services.FileServices.Interfaces;
 
 namespace Amlakbashi.Host.Controllers.WebService
 {
@@ -25,15 +28,24 @@ namespace Amlakbashi.Host.Controllers.WebService
     public class ApiUserController : ApiBaseController
     {
         private readonly IUserAppService userService;
+        private readonly IBankCardAppService bankCardService;
+        private readonly IFileAppService fileService;
         private readonly IUserAccessor userAccessor;
         private readonly IConfiguration configuration;
+        private readonly IWebHostEnvironment webHostEnvironment;
         public ApiUserController(IUserAppService userService,
+            IBankCardAppService bankCardService,
+            IFileAppService fileService,
             IUserAccessor userAccessor,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IWebHostEnvironment webHostEnvironment)
         {
             this.userService = userService;
+            this.bankCardService = bankCardService;
+            this.fileService = fileService;
             this.userAccessor = userAccessor;
             this.configuration = configuration;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         [HttpPost]
@@ -195,30 +207,6 @@ namespace Amlakbashi.Host.Controllers.WebService
             });
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet]
-        public IActionResult Profile()
-        {
-            var user = userAccessor.CurrentUser;
-            if (user == null || user.Id == 0)
-            {
-                return NotFound();
-            }
-            var response = new UserProfileResponse()
-            {
-                id = user.Id,
-                mainMobile = user.MainMobile,
-                mobile1 = user.Mobile,
-                mobile2 = user.Mobile2,
-                tell = user.Tell,
-                thirdPersonTell = user.ThirdPersonTell,
-                fname = user.FName,
-                lname = user.LName,
-                email = ""
-            };
-            return Ok(response);
-        }
-
         [HttpGet("host/{id:int}")]
         public IActionResult HostProfile(int id)
         {
@@ -233,10 +221,64 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var user = userAccessor.CurrentUser;
+            if (user == null || user.Id == 0)
+            {
+                return NotFound();
+            }
+            var identityUser = await userService.GetIdentityUserByIdAsync(User.GetGuid());
+            var bankCard = bankCardService.GetByUserId(user.Id);
+            var response = new UserGetProfileResponse()
+            {
+                phoneNumber = user.MainMobile,
+                phoneNumber2 = user.Mobile,
+                phoneNumber3 = user.Mobile2,
+                landLinePhoneNumber = user.Tell,
+                thirdPersonPhoneNumber = user.ThirdPersonTell,
+                firstName = user.FName,
+                lastName = user.LName,
+                email = identityUser.Email,
+                bankCardNumber = bankCard.BankCardNumber,
+                bankCardOwnerName = bankCard.FullName,
+                shebaNumber = bankCard.ShabaNumber,
+                imageUrl = $"/عکس-پروفایل_کوچک-{user.PhotoID}"
+            };
+            return Ok(response);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPut]
+        public async Task<IActionResult> Profile(UserPutProfileRequest request)
+        {
+            if (request.IsValid(ModelState) == false)
+            {
+                return BadRequest(ModelState);
+            }
+            request.id = userAccessor.CurrentUser.Id;
+            if (request.image != null)
+            {
+                await fileService.UpdateUserProfileImageAsync(request.id, request.image);
+            }
+            await userService.UpdateAsync(request);
+            return Ok();
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("referralCode")]
+        public IActionResult GetReferralCode()
+        {
+            return Ok(userAccessor.CurrentUser.Id);
+        }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Policies.Payment_Actions)]
         [HttpGet("test")]
         public IActionResult test()
         {
+            User.GetUserType();
             return Ok();
         }
     }

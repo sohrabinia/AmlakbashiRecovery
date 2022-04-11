@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Accounting.PaymentContext;
 using Amlakbashi.Core.Common.Enums;
+using Amlakbashi.Core.DTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
@@ -58,6 +59,7 @@ namespace Amlakbashi.Accounting
 
         void FilterCreditTransactions(CreditTransactionIndexDTO dto);
         IList<CreditTransaction> GetCreditListByUserId(int userId);
+        PagedList<CreditTransaction> GetUserWalletTransactions(int userId, int page, int pageItemCount);
         CreditTransaction GetCanselInstantReserveCreditTransaction(int userId, int tranCause, long id);
         CreditTransaction FindCreditTransaction(long id);
         long IncreaseCredit(int userId, long amount, long transactionId, long reserveId,

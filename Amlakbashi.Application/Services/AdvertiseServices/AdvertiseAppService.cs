@@ -63,7 +63,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var category = Repository.Find<DynamicCategory, int>(request.categoryId);
             var advertises = category.Advertises.AsQueryable();
-            
+
             advertises = advertiseFilter.FilterPhrase(advertises, request.phrase);
             if (request.area > 0)
             {
@@ -162,8 +162,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 advertises = advertiseFilter.FilterPrice(advertises, request.priceType,
                     request.minPrice, request.maxPrice);
             }
-            if ((!string.IsNullOrEmpty(request.fromDate) &&
-                !string.IsNullOrEmpty(request.toDate)) || request.emptyTonight)
+            if ((string.IsNullOrEmpty(request.fromDate) == false &&
+                string.IsNullOrEmpty(request.toDate) == false) || request.emptyTonight)
             {
                 if (request.emptyTonight)
                 {
@@ -243,18 +243,17 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     break;
             }
 
-            AdvertiseListResponse response = new AdvertiseListResponse();
-            response.advertiseCount = orderedAdvertiseList.Count();
-            response.page = request.page;
-            response.categoryTitle = AdvertiseSeoLocalization.GetTitle(category.MostAccType, (int)category.Type,
-                category.Province == null ? "" : category.RegionProvince.PersianName,
-                category.City == null ? "" : category.RegionCity.PersianName,
-                category.Area == null ? "" : category.RegionArea.PersianName,
-                Region.GetCountryDirectionString(category.CountryDirection));
-
-            var model = orderedAdvertiseList.Skip(request.pageItemCount * (request.page - 1))
-                .Take(request.pageItemCount).ToList();
-            foreach (var item in model)
+            var pagedList = orderedAdvertiseList.ToPagedList(request.page, request.pageItemCount);
+            AdvertiseListResponse response = new AdvertiseListResponse()
+            {
+                pagingInfo = pagedList.PagingInfo,
+                categoryTitle = AdvertiseSeoLocalization.GetTitle(category.MostAccType, (int)category.Type,
+                    category.Province == null ? "" : category.RegionProvince.PersianName,
+                    category.City == null ? "" : category.RegionCity.PersianName,
+                    category.Area == null ? "" : category.RegionArea.PersianName,
+                    Region.GetCountryDirectionString(category.CountryDirection))
+            };
+            foreach (var item in pagedList.List)
             {
                 var itemResponse = (AdvertiseListItemResponse)item;
                 itemResponse.favourited = request.UserFavorites.Any(x => x.AdvertiseID == item.Id);
@@ -266,7 +265,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public IList<Advertise> Filter(string id)
         {
             return Repository.Query(q => q.Where(x => x.Id.ToString().Contains(id) &&
-                x.Status == AdvertiseStatus.Published && x.Available)).OrderByDescending(x=>x.AmlakbashiScore).Take(5).ToList();
+                x.Status == AdvertiseStatus.Published && x.Available)).OrderByDescending(x => x.AmlakbashiScore).Take(5).ToList();
         }
 
         public IList<Advertise> GetAdvertisesByUserId(int userId, bool includeCommentsAndReports = false)
@@ -338,6 +337,26 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             tags.Add(advertise.RegionCity.PersianName);
             tags.Add(advertise.RegionProvince.PersianName);
             return tags;
+        }
+
+        public AdvertiseListResponse GetUserFavoriteAdvertises(int userId, int page = 1, int pageItemCount = 20)
+        {
+            var user = Repository.Find<User, int>(userId);
+            var pagedIdList = user.Favorite.OrderByDescending(x => x.SetDate)
+                .Select(x => x.AdvertiseID).ToPagedList(page, pageItemCount);
+            var advertises = GetAccListByIds(pagedIdList.List);
+            var response = new AdvertiseListResponse()
+            {
+                pagingInfo = pagedIdList.PagingInfo,
+                categoryTitle = "علاقه مندی ها"
+            };
+            foreach (var item in advertises)
+            {
+                var itemResponse = (AdvertiseListItemResponse)item;
+                itemResponse.favourited = true;
+                response.advertiseList.Add(itemResponse);
+            }
+            return response;
         }
 
         public void AddSupporterInfo(long id, string text, User supporter)

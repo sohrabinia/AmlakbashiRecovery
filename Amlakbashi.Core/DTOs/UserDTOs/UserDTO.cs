@@ -26,16 +26,8 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
         public string shabaNumber { get; set; }
         public string bankFname { get; set; }
         public string bankLname { get; set; }
-        public int loginPriority { get; set; }
         public int userGeneralType { get; set; }
-        public int responseFrom { get; set; }
-        public int responseTo { get; set; }
-        public int accessType { get; set; }
-        public int OwnerShip { get; set; }
         public int CancelInstantReserveLimit { get; set; }
-        public string ContactPhone { get; set; }
-        public int AmlakbashiScore { get; set; }
-        public string Address { get; set; }
         public bool hasPassword { get; set; }
 
         public static UserDTO Generate(User user, AppUser identityUser)
@@ -72,11 +64,7 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                 user.GetCallablePhoneNumber(User.PhoneType.ThirdPerson);
 
             dto.userGeneralType = user.UserGeneralType;
-            dto.OwnerShip = user.OwnerShip;
             dto.CancelInstantReserveLimit = user.CancelInstantReserveLimit;
-            dto.ContactPhone = user.ContactPhone;
-            dto.AmlakbashiScore = user.AmlakbashiScore;
-            dto.Address = user.Address;
             dto.hasPassword = identityUser.PasswordHash != null;
             return dto;
         }
@@ -92,31 +80,6 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                     errors.Add("شماره کارت وارد شده صحیح نمی باشد");
                     has_error = true;
                 }
-                //if (!string.IsNullOrEmpty(this.bankCardNumber) &&
-                //    Regex.IsMatch(@"[a-zA-Zآ-ی]", this.bankCardNumber))
-                //{
-
-                //    errors.Add("شماره کارت بانکی نمی تواند شامل حروف باشد");
-                //    has_error = true;
-                //}
-                //if (!string.IsNullOrEmpty(this.bankCardNumber) &&
-                //    this.bankCardNumber.Length != 16)
-                //{
-                //    errors.Add("شماره کارت بانکی باید 16 رقم باشد ");
-                //    has_error = true;
-                //}
-                
-                //TODO: handle this in app and then uncomment it
-                //if (string.IsNullOrEmpty(this.bankFname))
-                //{
-                //    errors.Add("لطفا نام صاحب حساب را وارد کنید");
-                //    has_error = true;
-                //}
-                //if (string.IsNullOrEmpty(this.bankLname))
-                //{
-                //    errors.Add("لطفا نام خانوادگی صاحب حساب را وارد کنید");
-                //    has_error = true;
-                //}
             }
             else
             {

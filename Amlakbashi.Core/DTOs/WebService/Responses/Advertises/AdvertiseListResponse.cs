@@ -7,16 +7,9 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
 {
     public class AdvertiseListResponse
     {
-        public AdvertiseListResponse()
-        {
-            advertiseList = new List<AdvertiseListItemResponse>();
-        }
-
-        public List<AdvertiseListItemResponse> advertiseList { get; set; }
+        public List<AdvertiseListItemResponse> advertiseList { get; set; } = new List<AdvertiseListItemResponse>();
+        public PagingInfo pagingInfo { get; set; }
         public string categoryTitle { get; set; }
-        public int advertiseCount { get; set; }
-        public int page { get; set; }
-        public int pageCount => advertiseCount % 20 == 0 ? advertiseCount / 20 : (advertiseCount / 20) + 1;
     }
 
     public class AdvertiseListItemResponse

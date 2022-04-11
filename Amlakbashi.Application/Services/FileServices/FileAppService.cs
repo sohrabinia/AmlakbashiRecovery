@@ -6,20 +6,25 @@ using System.Collections.Generic;
 using System.Linq;
 using ServiceStack;
 using MediatR;
-using Amlakbashi.Core.Common.Extensions;
-using Amlakbashi.Mediator.Commands.FileCommands;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using System;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.FileServices
 {
     internal class FileAppService : AppServiceBase<File, long>, IFileAppService
     {
-        private static readonly object objlock = new object();
         private readonly IMediator mediator;
-        public FileAppService(IRepository<File, long> repository, IMediator mediator) : base(repository)
+        private readonly IWebHostEnvironment webHostEnvironment;
+        private static readonly object objlock = new object();
+        public FileAppService(IRepository<File, long> repository,
+            IMediator mediator,
+            IWebHostEnvironment webHostEnvironment) : base(repository)
         {
             this.mediator = mediator;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         public IList<File> GetAllDescendingByLastModifyDate(int count = 0)
@@ -29,16 +34,6 @@ namespace Amlakbashi.Application.Services.FileServices
                 return Repository.Query(q => q.OrderByDescending(o => o.LastModifyDate).ToList());
             }
             return Repository.Query(q => q.OrderByDescending(o => o.LastModifyDate).Take(count).ToList());
-        }
-
-        public IList<File> GetAllAdvertiseFile()
-        {
-            return Repository.Query(q => q.Where(w => w.FilePath.Contains("/content/advertise/") && w.MinifyStatusInt < 1).ToList());
-        }
-
-        public List<string> GetAllFilePath()
-        {
-            return Repository.Query(q => q.Select(s => s.FilePath).ToList());
         }
 
         public File Find(long id)
@@ -55,23 +50,25 @@ namespace Amlakbashi.Application.Services.FileServices
 
         public void Update(File editedFile, string wwwrootPath)
         {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedFile.Id));
-            if (!editedFile.FilePath.IsNullOrEmpty() && editedFile.FilePath != data.FilePath)
+            var file = Repository.Find(editedFile.Id);
+            if (editedFile.FilePath.IsNullOrEmpty() == false && editedFile.FilePath != file.FilePath)
             {
-                if (System.IO.File.Exists(wwwrootPath + data.FilePath.Replace("~/", "")))
+                if (System.IO.File.Exists(wwwrootPath + file.FilePath.Replace("~/", "")))
+                {
                     lock (objlock)
                     {
-                        System.IO.File.Delete(wwwrootPath + data.FilePath.Replace("~/", ""));
+                        System.IO.File.Delete(wwwrootPath + file.FilePath.Replace("~/", ""));
                     }
-                data.FilePath = editedFile.FilePath;
+                }
+                file.FilePath = editedFile.FilePath;
             }
-            data.LastModifyDate = editedFile.LastModifyDate;
-            data.PostDate = editedFile.PostDate;
-            data.UserID = editedFile.UserID;
-            data.MinifyStatusInt = editedFile.MinifyStatusInt;
-            data.MinifyMaxWidth = editedFile.MinifyMaxWidth;
-            data.MinifyQualityPercent = editedFile.MinifyQualityPercent;
-            Repository.Update(data);
+            file.LastModifyDate = editedFile.LastModifyDate;
+            file.PostDate = editedFile.PostDate;
+            file.UserID = editedFile.UserID;
+            file.MinifyStatusInt = editedFile.MinifyStatusInt;
+            file.MinifyMaxWidth = editedFile.MinifyMaxWidth;
+            file.MinifyQualityPercent = editedFile.MinifyQualityPercent;
+            Repository.Update(file);
             Repository.Save();
         }
 
@@ -82,6 +79,42 @@ namespace Amlakbashi.Application.Services.FileServices
             data.LastModifyDate = DateTime.Now;
             Repository.Update(data);
             Repository.Save();
+        }
+
+        public async Task<long> UpdateUserProfileImageAsync(int userId, IFormFile newImage)
+        {
+            if (HasImageCorrectContentType(newImage.ContentType) == false)
+            {
+                return 0;
+            }
+
+            var user = Repository.Find<User, int>(userId);
+            string filepath = $"~/content/users/user_{user.Id}.jpg";
+            long PhotoID = 0;
+            if (user.PhotoID != null)
+            {
+                PhotoID = user.Photo.Id;
+                var file = Repository.Find(user.PhotoID.Value);
+                file.FilePath = filepath;
+                file.LastModifyDate = DateTime.Now;
+                Update(file, webHostEnvironment.WebRootPath);
+            }
+            else
+            {
+                PhotoID = Insert(new File()
+                {
+                    PostDate = DateTime.Now,
+                    LastModifyDate = DateTime.Now,
+                    UserID = user.Id,
+                    FilePath = filepath
+                });
+            }
+            using (var stream = System.IO.File.Create(webHostEnvironment.WebRootPath + filepath.Replace("~", "")))
+            {
+                await newImage.CopyToAsync(stream);
+            }
+            ClearImagesCache();
+            return PhotoID;
         }
 
         public void Delete(int fileId, string serverPath)
@@ -96,64 +129,25 @@ namespace Amlakbashi.Application.Services.FileServices
             Repository.Save();
         }
 
-        public void DeleteExtraFiles(List<long> existFile)
+        public void ClearImagesCache()
         {
-            var files = Repository.Query(q => q);
-            foreach (var file in files)
+            System.IO.DirectoryInfo imageCacheDir = new System.IO.DirectoryInfo(
+                System.IO.Path.Combine(webHostEnvironment.WebRootPath, "content/imgcache"));
+            foreach (System.IO.FileInfo item in imageCacheDir.GetFiles())
             {
-                if (!existFile.Contains(file.Id))
-                {
-                    Repository.Delete(file.Id);
-                }
+                item.Delete();
             }
-            Repository.Save();
         }
 
-        public void MinifyImage(long fileId, string filePath)
+        public bool HasImageCorrectContentType(string contentType)
         {
-            mediator.Enqueue(new MinifyImageCommand(filePath, 1024, 80, fileId));
+            contentType = contentType.ToLower();
+            return contentType == "image/png" ||
+                contentType == "image/gif" ||
+                contentType == "image/jpg" ||
+                contentType == "image/jpeg" 
+                ? true : false;
         }
-
-        public void StopQueuedJob()
-        {
-            mediator.Send(new StopQueuedJobCommand());
-        }
-
-        //public void SetWatermarkForAdvertisePhotos(long advertiseId, string serverPath)
-        //{
-        //    var advertise = Repository.Find<Advertise, long>(advertiseId);
-        //    var advertisesToWatermark = new List<Advertise>();
-        //    advertisesToWatermark.Add(advertise);
-        //    if ((advertise.TypeID == Advertise.AdvertiseType.Complex ||
-        //        advertise.TypeID == Advertise.AdvertiseType.HotelApartment) &&
-        //        advertise.Childs != null)
-        //    {
-        //        advertisesToWatermark.AddRange(advertise.Childs);
-        //    }
-        //    foreach (var adv in advertisesToWatermark)
-        //    {
-        //        if (adv.Photos.Any())
-        //        {
-        //            foreach (var photo in adv.Photos)
-        //            {
-        //                if (!photo.FilePath.Contains("watermark_advertise"))
-        //                {
-        //                    mediator.Send(new SetWatermarkCommand(photo.Id, serverPath));
-        //                }
-        //            }
-        //            mediator.Send(new GenerateThumbImageCommand(adv.Id, adv.PhotoID,
-        //            adv.Photos.Select(s => s.Id).ToList(), serverPath));
-        //        }
-        //    }
-        //    lock (objlock)
-        //    {
-        //        System.IO.DirectoryInfo IOdirectory = new System.IO.DirectoryInfo(System.IO.Path.Combine(serverPath, "content/imgcache"));
-        //        foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
-        //        {
-        //            IOfile.Delete();
-        //        }
-        //    }
-        //}
 
         public void GenerateThumbImage(long accId, long fileId)
         {
