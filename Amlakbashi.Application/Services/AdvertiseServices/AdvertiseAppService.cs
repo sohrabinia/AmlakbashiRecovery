@@ -59,7 +59,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return Repository.Query(q => q);
         }
 
-        public AdvertiseListResponse Filter(AdvertisesRequest request)
+        public AdvertiseListResponse Filter(AdvertiseListRequest request)
         {
             var category = Repository.Find<DynamicCategory, int>(request.categoryId);
             var advertises = category.Advertises.AsQueryable();

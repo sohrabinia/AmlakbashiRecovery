@@ -19,6 +19,8 @@ using Amlakbashi.Mediator.Events.UserEvents;
 using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.DTOs.ReserveDTOs;
 using Amlakbashi.Core.Infrastructure.StyleHelpers;
+using Amlakbashi.Core.DTOs.WebService.Responses.Reserves;
+using Amlakbashi.Core.DTOs.WebService.Requests.Reserves;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
@@ -37,232 +39,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             this.reserveSupportService = reserveSupportService;
         }
 
-        public IList<Reserve> Filter(long reserve_id = -1, long advertise_id = -1,
-            int host_user_id = -1, int guest_user_id = -1, int reserve_status = -1,
-            int host_response_status = -1, int general_status = -1,
-            string site_clearing_date = "", int site_cleared_status = -1,
-            string reserve_from_date = "", string reserve_to_date = "",
-            string reserve_end_date = "", int stay_duration_from = -1, int stay_duration_to = -1,
-            int reserve_support_status = 0, bool shouldFollow = false,
-            int supporter_id = -1, int host_card_status = -1,
-            int mainFilter = 0, int instantReserveFilter = 2,
-            bool disableAutoCancel = false, bool accVisited = false)
-        {
-            IQueryable<Reserve> allReserves;
-            if (reserve_support_status > 0 && reserve_support_status != 3)
-            {
-                allReserves = Repository.Query(q => q.Include("GuestUser.ReserveSupportsAsGuest"));
-            }
-            else
-            {
-                allReserves = Repository.Query(q => q);
-            }
-            if (mainFilter == 0)
-            {
-                allReserves = allReserves.Where(x => !x.Archive);
-            }
-            else if (mainFilter == 2)
-            {
-                allReserves = allReserves.Where(x => x.Archive);
-            }
-            if (instantReserveFilter == 0)
-            {
-                allReserves = allReserves.Where(x => !x.InstantReserve);
-            }
-            else if (instantReserveFilter == 1)
-            {
-                allReserves = allReserves.Where(x => x.InstantReserve);
-            }
-            IQueryable<Reserve> model = allReserves.Where(u => u.Status != Reserve.ReserveStatus.Deleted);
-            if (shouldFollow)
-            {
-                model = model.Where(x => x.shouldFollow);
-            }
-            if (disableAutoCancel)
-            {
-                model = model.Where(x => x.DisableAutoCancel);
-            }
-            if (accVisited)
-            {
-                model = model.Where(x => x.AccVisitedByGuest);
-            }
-            if (reserve_id > 0)
-            {
-                model = model.Where(x => x.Id == reserve_id);
-            }
-            if (advertise_id > 0)
-            {
-                model = model.Where(x => x.AdvertiseID == advertise_id);
-            }
-            if (guest_user_id > 0)
-            {
-                model = model.Where(x => x.UserID == guest_user_id);
-            }
-            if (reserve_status > -1)
-            {
-                model = model.Where(x => (int)x.Status == reserve_status);
-            }
-            if (host_response_status > -1)
-            {
-                var hostResp = (HostResponseEnum)host_response_status;
-                model = model.Where(x => x.HostResponse == hostResp);
-            }
-            if (general_status > -1)
-            {
-                if (general_status == 0)
-                {
-                    model = model.Where(x => x.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.GuestClearing
-                        || a.PaymentType == (int)ReservePaymentType.GuestDeposite));
-                }
-            }
-            if (host_user_id > 0)
-            {
-                model = model.Where(x => x.Advertise.UserID == host_user_id);
-            }
-            if (!string.IsNullOrEmpty(site_clearing_date))
-            {
-                model = model.Where(x => x.Status == Reserve.ReserveStatus.Reserved ||
-                    x.Status == Reserve.ReserveStatus.Started ||
-                    x.Status == Reserve.ReserveStatus.Completed ||
-                    x.Status == Reserve.ReserveStatus.CashPay);
-                var gregorian_clearing_date = DateTimeUtility.PersianDateToGregorian(
-                    StringUtility.PersianNumberToEnglish(site_clearing_date).Replace('/', ','));
-                model = model.Where(w => (EF.Functions.DateDiffDay(w.StartDate, w.EndDate) > 1 ?
-                    w.StartDate.AddDays(2) : w.EndDate) <= gregorian_clearing_date);
-            }
-            if (stay_duration_from > 0)
-            {
-                model = model.Where(w => EF.Functions.DateDiffDay(w.StartDate, w.EndDate) >= stay_duration_from);
-            }
-            if (stay_duration_to > 0)
-            {
-                model = model.Where(w => EF.Functions.DateDiffDay(w.StartDate, w.EndDate) <= stay_duration_to);
-            }
-            if (!string.IsNullOrEmpty(reserve_from_date))
-            {
-                var gregorian_date = DateTimeUtility.PersianDateToGregorian(
-                    StringUtility.PersianNumberToEnglish(reserve_from_date).Replace('/', ','));
-                model = model.Where(x => x.StartDate >= gregorian_date);
-            }
-            if (!string.IsNullOrEmpty(reserve_to_date))
-            {
-                var gregorian_date = DateTimeUtility.PersianDateToGregorian(
-                    StringUtility.PersianNumberToEnglish(reserve_to_date).Replace('/', ','));
-                model = model.Where(x => x.EndDate <= gregorian_date);
-            }
-            if (!string.IsNullOrEmpty(reserve_end_date))
-            {
-                var gregorian_date = DateTimeUtility.PersianDateToGregorian(
-                    StringUtility.PersianNumberToEnglish(reserve_end_date).Replace('/', ','));
-                model = model.Where(x => x.EndDate == gregorian_date);
-            }
-            if (site_cleared_status == 0)//payed
-            {
-                model = model.Where(w => w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteClearingToHost) ||
-                    (w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost) &&
-                    w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.GuestClearing) == false));
-            }
-            else if (site_cleared_status == 1)//not payed
-            {
-                model = model.Where(w => (w.Status == Reserve.ReserveStatus.Reserved ||
-                    w.Status == Reserve.ReserveStatus.Started ||
-                    w.Status == Reserve.ReserveStatus.Completed ||
-                    w.Status == Reserve.ReserveStatus.CashPay) &&
-                    w.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteClearingToHost) == false);
-
-                var matchedIds = new List<long>();
-                foreach (var item in model)
-                {
-                    var guestPaidAmount = accounting.GetReservePaidAmount(item.Id, StatusStringType.Guest);
-                    var payablePrice = PriceUtility.CalculateHostPayablePrice(item.TotalPrice, guestPaidAmount, item.CouponPrice, item.PrizePrice);
-                    if (item.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.SiteDepositeToHost))
-                    {
-                        payablePrice -= item.ReservePayments.FirstOrDefault(f => f.PaymentType == (int)ReservePaymentType.SiteDepositeToHost).Price;
-                    }
-                    if (payablePrice > 0)
-                    {
-                        matchedIds.Add(item.Id);
-                    }
-                }
-                model = model.Where(x => matchedIds.Contains(x.Id));
-            }
-            else if (site_cleared_status == 2)//refund done
-            {
-                var matchedIds = new List<long>();
-                foreach (var item in model)
-                {
-                    bool refundDone;
-                    bool result;
-                    if (item.ReservePayments.Any(x => x.PaymentType == (int)ReservePaymentType.SiteRefundToGuest))
-                    {
-                        refundDone = true;
-                        result = true;
-                    }
-                    else
-                    {
-                        refundDone = false;
-                        result =
-                            item.Status == Reserve.ReserveStatus.WaitForResponse ||
-                            item.Status == Reserve.ReserveStatus.WaitForReserve ||
-                            item.Status == Reserve.ReserveStatus.Rejected ||
-                            item.Status == Reserve.ReserveStatus.Reserved ||
-                            item.Status == Reserve.ReserveStatus.CashPay ||
-                            item.Status == Reserve.ReserveStatus.Started ||
-                            item.Status == Reserve.ReserveStatus.Completed ||
-                            item.Status == Reserve.ReserveStatus.CancelRequestByHost ||
-                            item.Status == Reserve.ReserveStatus.CancelRequestByGuest ? false :
-                            item.ReservePayments.Any(x => x.PaymentType == (int)ReservePaymentType.GuestClearing ||
-                            x.PaymentType == (int)ReservePaymentType.GuestDeposite);
-                    }
-                    if (result && refundDone)
-                    {
-                        matchedIds.Add(item.Id);
-                    }
-                }
-                model = model.Where(x => matchedIds.Contains(x.Id));
-            }
-            else if (site_cleared_status == 3)//should refund
-            {
-                var matchedIds = new List<long>();
-                var tempModel = model.Where(w => w.ReservePayments.Any(x =>
-                    x.PaymentType == (int)ReservePaymentType.GuestClearing ||
-                    x.PaymentType == (int)ReservePaymentType.GuestDeposite));
-                foreach (var item in tempModel)
-                {
-                    bool refundDone;
-                    bool result;
-                    if (item.ReservePayments.Any(x => x.PaymentType == (int)ReservePaymentType.SiteRefundToGuest))
-                    {
-                        refundDone = true;
-                        result = true;
-                    }
-                    else
-                    {
-                        refundDone = false;
-                        result =
-                            item.Status == Reserve.ReserveStatus.WaitForResponse ||
-                            item.Status == Reserve.ReserveStatus.WaitForReserve ||
-                            item.Status == Reserve.ReserveStatus.Rejected ||
-                            item.Status == Reserve.ReserveStatus.Reserved ||
-                            item.Status == Reserve.ReserveStatus.CashPay ||
-                            item.Status == Reserve.ReserveStatus.Started ||
-                            item.Status == Reserve.ReserveStatus.Completed ||
-                            item.Status == Reserve.ReserveStatus.CancelRequestByHost ||
-                            item.Status == Reserve.ReserveStatus.CancelRequestByGuest ? false :
-                            item.ReservePayments.Any(x => x.PaymentType == (int)ReservePaymentType.GuestClearing ||
-                            x.PaymentType == (int)ReservePaymentType.GuestDeposite);
-                    }
-                    if (result && !refundDone)
-                    {
-                        matchedIds.Add(item.Id);
-                    }
-                }
-                model = model.Where(x => matchedIds.Contains(x.Id));
-            }
-            return model.ToList();
-        }
-
-        public IList<Reserve> NewFilter(ReserveIndexDTO dto, int currentUserId)
+        public IList<Reserve> Filter(ReserveIndexDTO dto, int currentUserId)
         {
             var reserves = Repository.Query(q => q.Where(w => w.Status != Reserve.ReserveStatus.Deleted));
 
@@ -557,6 +334,32 @@ namespace Amlakbashi.Application.Services.ReserveServices
             dto.PagingInfo = new Core.DTOs.PagingDTO(dto.Page, reserves.Count());
 
             return reserves.OrderByDescending(x => x.Id).Skip((dto.Page - 1) * dto.PagingInfo.PageItemCount).Take(dto.PagingInfo.PageItemCount).ToList();
+        }
+
+        public ReserveListResponse Filter(ReserveListRequest request)
+        {
+            var reserves = Repository.Query(q => q);
+            if (request.userId > 0)
+            {
+                reserves = request.userType == User.UserGeneralTypeEnum.Guest ?
+                    reserves.Where(x => x.UserID == request.userId) :
+                    reserves.Where(x => x.HostUserID == request.userId);
+            }
+
+            var categoryStatus = request.userType == User.UserGeneralTypeEnum.Guest ?
+                Reserve.GetGuestCategoryStates(request.category) :
+                Reserve.GetHostCategoryStates(request.category);
+            reserves = reserves.Where(x => categoryStatus.Contains(x.Status));
+
+            reserves = reserves.OrderByDescending(x => x.CreateDate);
+
+            var pagedList = reserves.ToPagedList(request.page, request.pageItemCount);
+            var response = new ReserveListResponse()
+            {
+                pagingInfo = pagedList.PagingInfo,
+                reserveList = pagedList.List.Select(x => (ReserveListItemResponse)x).ToList()
+            };
+            return response;
         }
 
         public IList<Reserve> GetListByUserId(int userId,
@@ -1491,14 +1294,14 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var categoryEnumList = Enum.GetValues(typeof(ReserveCategory)) as ReserveCategory[];
             foreach (var ReserveCategory in categoryEnumList)
             {
-                var states = GetReserveCategoryStates(ReserveCategory);
-                countDict[ReserveCategory] = reserves.Count(c => states.ToList().Contains((int)c.Status));
+                var states = GetHostCategoryStates(ReserveCategory);
+                countDict[ReserveCategory] = reserves.Count(c => states.ToList().Contains(c.Status));
             }
             if (category > -1)
             {
-                var states = GetReserveCategoryStates(
+                var states = GetHostCategoryStates(
                     (ReserveCategory)category).ToList();
-                reserves = reserves.Where(x => states.Contains((int)x.Status));
+                reserves = reserves.Where(x => states.Contains(x.Status));
             }
             reserves = reserves.ToList();
             if (selectType == ReserveManagerSelectType.Host)
@@ -1555,6 +1358,23 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var paidAmount = notReserved == false ? accounting.GetReserveGuestPaidAmount(reserve.ReservePayments)
                 + reserve.CouponPrice + reserve.PrizePrice : 0;
             return VoucherDTO.Generate(reserve, paidAmount, notReserved == true);
+        }
+
+        public ReserveInvoiceResponse GetInvoice(long reserveId, int currentUserId)
+        {
+            var reserve = Repository.Find(reserveId);
+            if ((reserve.UserID != currentUserId && reserve.HostUserID != currentUserId) ||
+                (reserve.GetStateCategory() != ReserveCategory.WaitForGuestPayment &&
+                reserve.GetStateCategory() != ReserveCategory.Reserved &&
+                reserve.GetStateCategory() != ReserveCategory.Finished))
+            {
+                return null;
+            }
+
+            //var paidAmount = accounting.GetReserveGuestPaidAmount(reserve.ReservePayments)
+            //    + reserve.CouponPrice + reserve.PrizePrice;
+
+            return (ReserveInvoiceResponse)reserve;
         }
 
         public void SendReserveRequestCall(long reserveId)

@@ -68,33 +68,12 @@ namespace Amlakbashi.Core.Entities
 
         public enum UserRatingType
         {
-            Tidiness = 1,
+            Cleaning = 1,
             HostBehaviour = 2,
-            Position = 3,
+            Location = 3,
             InfoCorrectness = 4,
             Safety = 5,
             PriceWorth = 6
-        }
-
-        public static string GetUserRatingTypeString(UserRatingType ratingType)
-        {
-            switch (ratingType)
-            {
-                case UserRatingType.Tidiness:
-                    return "پاکیزگی اقامتگاه";
-                case UserRatingType.HostBehaviour:
-                    return "برخورد میزبان";
-                case UserRatingType.Position:
-                    return "موقعیت اقامتگاه";
-                case UserRatingType.InfoCorrectness:
-                    return "صحت مطالب";
-                case UserRatingType.Safety:
-                    return "امنیت اقامتگاه";
-                case UserRatingType.PriceWorth:
-                    return "ارزش نسبت به قیمت";
-                default:
-                    return "";
-            }
         }
     }
 }

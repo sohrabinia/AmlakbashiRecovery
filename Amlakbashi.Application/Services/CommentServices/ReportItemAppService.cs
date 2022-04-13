@@ -9,6 +9,7 @@ using System;
 using MediatR;
 using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
+using Amlakbashi.Core.DTOs.WebService.Requests.Comments;
 
 namespace Amlakbashi.Application.Services.CommentServices
 {
@@ -59,6 +60,40 @@ namespace Amlakbashi.Application.Services.CommentServices
                   x.AdvertiseID == advertiseId &&
                   x.ReportID == reportId));
             return report_item != null ? report_item.Score : 0;
+        }
+
+
+        public void Submit(int userId, long advertiseId, IList<CommentPostScoresRequest> scores)
+        {
+            var advertise = Repository.Find<Advertise, long>(advertiseId);
+            foreach (var item in scores)
+            {
+                var report = advertise.ReportItems.FirstOrDefault(s => s.UserID == userId && s.ReportID == (int)item.type);
+                if (report == null)
+                {
+                    report = new ReportItem()
+                    {
+                        AdvertiseID = advertiseId,
+                        CreateDate = DateTime.Now,
+                        LastModifyDate = DateTime.Now,
+                        LastModifyDatetick = DateTime.Now.Ticks,
+                        ReportID = (int)item.type,
+                        Score = item.score,
+                        UserID = userId
+                    };
+                    Repository.Insert(report);
+                }
+                else
+                {
+                    report.Score = item.score;
+                    report.LastModifyDate = DateTime.Now;
+                    report.LastModifyDatetick = DateTime.Now.Ticks;
+                    Repository.Update(report);
+                }
+            }
+            Repository.Save();
+            mediator.Enqueue(new UpdateAccUserRatingCommand(advertise.Id));
+            mediator.Enqueue(new UpdateAccTidinessRatingCommand(advertise.Id));
         }
 
         public void SubmitAdvertiseScore(int userId, long advertiseId, int reportId,

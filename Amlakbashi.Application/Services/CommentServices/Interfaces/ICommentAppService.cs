@@ -20,6 +20,7 @@ namespace Amlakbashi.Application.Services.CommentServices.Interfaces
         Comment GetByAccSenderUser(long advertiseId, long senderUserId);
         Comment GetHostReply(long accId, long senderUserId);
         void Insert(Comment newComment);
+        void Submit(int userId, long advertiseId, string text);
         void Update(Comment editedComment);
         void UpdateStatus(long id, Comment.CommentStatus status, string suspendReason = "");
         void SetAsSeenByHost(int accId);

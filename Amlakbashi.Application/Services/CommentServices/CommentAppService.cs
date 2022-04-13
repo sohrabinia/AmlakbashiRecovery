@@ -4,6 +4,7 @@ using Amlakbashi.Application.Services.CommentServices.Interfaces;
 using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Amlakbashi.Application.Services.CommentServices
 {
@@ -171,6 +172,36 @@ namespace Amlakbashi.Application.Services.CommentServices
         public void Insert(Comment newComment)
         {
             Repository.Insert(newComment);
+            Repository.Save();
+        }
+
+        public void Submit(int userId, long advertiseId, string text)
+        {
+            var advertise = Repository.Find<Advertise, long>(advertiseId);
+            var comment = advertise.Comments.FirstOrDefault(f => f.SenderUserID == userId);
+            if (comment == null)
+            {
+                comment = new Comment()
+                {
+                    SenderUserID = userId,
+                    Status = Comment.CommentStatus.ready,
+                    type = Comment.CommentType.advertise,
+                    Text = text,
+                    CreateDate = DateTime.Now,
+                    LastModifyDate = DateTime.Now,
+                    LastModifyDatetick = DateTime.Now.Ticks,
+                    AdvertiseID = advertiseId
+                };
+                Repository.Insert(comment);
+            }
+            else
+            {
+                comment.Text = text;
+                comment.Status = (int)Comment.CommentStatus.ready;
+                comment.LastModifyDate = DateTime.Now;
+                comment.LastModifyDatetick = DateTime.Now.Ticks;
+                Repository.Update(comment);
+            }
             Repository.Save();
         }
 

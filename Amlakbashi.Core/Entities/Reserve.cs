@@ -137,13 +137,6 @@ namespace Amlakbashi.Core.Entities
             Unsuccessful = 4
         }
 
-        public enum SupportStateEnum
-        {
-            WaitForSupport = 0,
-            Supporting = 1,
-            SupportDone = 2
-        }
-
         public enum CallState
         {
             NotCalled = 0,
@@ -443,15 +436,6 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        public int[] GetSupporterIds()
-        {
-            if (string.IsNullOrEmpty(SupporterIds))
-            {
-                return new int[0];
-            }
-            return Array.ConvertAll(SupporterIds.Split(','), x => int.Parse(x));
-        }
-
         public ReserveCategory? GetStateCategory()
         {
             switch (Status)
@@ -478,29 +462,71 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        public static int[] GetReserveCategoryStates(Reserve.ReserveCategory category)
+        public static IList<ReserveStatus> GetHostCategoryStates(Reserve.ReserveCategory category)
         {
             switch (category)
             {
                 case Reserve.ReserveCategory.WaitForHostResponse:
-                    return new int[] { (int)ReserveStatus.WaitForResponse };
+                    return new List<ReserveStatus>() { 
+                        ReserveStatus.WaitForResponse
+                    };
                 case Reserve.ReserveCategory.WaitForGuestPayment:
-                    return new int[] { (int)ReserveStatus.WaitForReserve };
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.WaitForReserve
+                    };
                 case Reserve.ReserveCategory.Reserved:
-                    return new int[] { (int)ReserveStatus.Reserved,
-                        (int)ReserveStatus.Started,
-                        (int)ReserveStatus.CashPay,
-                        (int)ReserveStatus.CancelRequestByGuest,
-                        (int)ReserveStatus.CancelRequestByHost};
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.Reserved,
+                        ReserveStatus.Started,
+                        ReserveStatus.CashPay,
+                        ReserveStatus.CancelRequestByGuest,
+                        ReserveStatus.CancelRequestByHost
+                    };
                 case Reserve.ReserveCategory.Finished:
-                    return new int[] { (int)ReserveStatus.Completed };
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.Completed
+                    };
                 case Reserve.ReserveCategory.Unsuccessful:
-                    return new int[] { (int)ReserveStatus.Rejected,
-                        (int)ReserveStatus.CanceledByGuest,
-                        (int)ReserveStatus.CanceledByHost,
-                        (int)ReserveStatus.CanceledBySystem};
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.Rejected,
+                        ReserveStatus.CanceledBySystem,
+                        ReserveStatus.CanceledByHost,
+                        ReserveStatus.CanceledByGuest
+                    };
                 default:
-                    return new int[] { };
+                    return null;
+            }
+        }
+
+        public static IList<ReserveStatus> GetGuestCategoryStates(Reserve.ReserveCategory category)
+        {
+            var statusList = new List<ReserveStatus>();
+            switch (category)
+            {
+                case Reserve.ReserveCategory.WaitForHostResponse:
+                case Reserve.ReserveCategory.WaitForGuestPayment:
+                case Reserve.ReserveCategory.Reserved:
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.WaitForResponse,
+                        ReserveStatus.WaitForReserve,
+                        ReserveStatus.Reserved,
+                        ReserveStatus.Started,
+                        ReserveStatus.CashPay,
+                        ReserveStatus.CancelRequestByGuest,
+                        ReserveStatus.CancelRequestByHost};
+                case Reserve.ReserveCategory.Finished:
+                    return new List<ReserveStatus>() { 
+                        ReserveStatus.Completed 
+                    };
+                case Reserve.ReserveCategory.Unsuccessful:
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.Rejected,
+                        ReserveStatus.CanceledByHost,
+                        ReserveStatus.CanceledByGuest,
+                        ReserveStatus.CanceledBySystem
+                    };
+                default:
+                    return null;
             }
         }
 
@@ -580,8 +606,8 @@ namespace Amlakbashi.Core.Entities
         {
             get
             {
-                return Chats ==  null ? 0 : Chats.Count(c =>
-                    c.SupportReadStatus == (int)Chat.ReadStatusEnum.NotRead);
+                return Chats == null ? 0 : Chats.Count(c =>
+                   c.SupportReadStatus == (int)Chat.ReadStatusEnum.NotRead);
             }
         }
         #endregion

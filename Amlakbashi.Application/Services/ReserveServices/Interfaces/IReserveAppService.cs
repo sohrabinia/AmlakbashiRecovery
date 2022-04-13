@@ -7,22 +7,15 @@ using Amlakbashi.Core.DTOs.ReserveDTOs;
 using static Amlakbashi.Core.Entities.ActionLog;
 using static Amlakbashi.Core.Entities.Reserve;
 using static Amlakbashi.Core.Entities.ReservePayment;
+using Amlakbashi.Core.DTOs.WebService.Responses.Reserves;
+using Amlakbashi.Core.DTOs.WebService.Requests.Reserves;
 
 namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
 {
     public interface IReserveAppService : IAppService<Reserve, long>
     {
-        IList<Reserve> Filter(long reserve_id = -1, long advertise_id = -1,
-            int host_user_id = -1, int guest_user_id = -1, int reserve_status = -1,
-            int host_response_status = -1, int general_status = -1,
-            string site_clearing_date = "", int site_cleared_status = -1,
-            string reserve_from_date = "", string reserve_to_date = "",
-            string reserve_end_date = "", int stay_duration_from = -1, int stay_duration_to = -1,
-            int reserve_support_status = 0, bool shouldFollow = false,
-            int supporter_id = -1, int host_card_status = -1,
-            int mainFilter = 0, int instantReserveFilter = 2,
-            bool disableAutoCancel = false, bool accVisited = false);
-        IList<Reserve> NewFilter(ReserveIndexDTO dto, int currentUserId);
+        IList<Reserve> Filter(ReserveIndexDTO dto, int currentUserId);
+        ReserveListResponse Filter(ReserveListRequest request);
         IList<Reserve> GetListByUserId(int userId, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, int category, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, Reserve.ReserveStatus status, bool RatingShownToGuest,
@@ -87,6 +80,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
             int category, string reserve_id, int status,
             out Dictionary<ReserveCategory, int> countDict);
         VoucherDTO GenerateVoucher(long reserveId, int currentUserId);
+        ReserveInvoiceResponse GetInvoice(long reserveId, int currentUserId);
         void SendReserveRequestCall(long reserveId);
         void SendPayReserveCall(long reserveId);
         bool ReserveByPaymentReinquiry(long reserveId, long paymentId, out string msg);

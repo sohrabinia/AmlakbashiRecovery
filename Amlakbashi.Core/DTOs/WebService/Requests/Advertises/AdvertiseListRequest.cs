@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Core.Entities;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
 {
-    public class AdvertisesRequest
+    public class AdvertiseListRequest
     {
         public int regionId { get; set; }
         public int area { get; set; }
@@ -46,10 +47,10 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         public int page { get; set; } = 1;
         public int pageItemCount { get; set; } = 20;
 
-        [JsonIgnore]
+        [BindNever]
         public int categoryId { get; set; }
 
-        [JsonIgnore]
+        [BindNever]
         public ICollection<UserFavorite> UserFavorites { get; set; }
     }
 }

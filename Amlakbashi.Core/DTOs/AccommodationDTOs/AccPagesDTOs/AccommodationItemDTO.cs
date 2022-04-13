@@ -226,7 +226,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             {
                 var typeReportItems = advertise.ReportItems.Where(w => w.ReportID == (int)item);
                 dto.Statistics.OverallRatingDecimal.Add(item, typeReportItems.Any() == false ? 0 : (float)typeReportItems.Average(x => x.Score));
-                dto.Statistics.UserRatingTypeString.Add(item, Comment.GetUserRatingTypeString(item));
+                dto.Statistics.UserRatingTypeString.Add(item, ReportItem.GetUserRatingTypeString(item));
             }
 
             //Dictionary<User, List<ReportItem>> reports = new Dictionary<User, List<ReportItem>>();

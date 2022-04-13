@@ -20,7 +20,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
     public interface IAdvertiseAppService : IAppService<Advertise, long>
     {
         IQueryable<Advertise> GetAllAsIQueriable();
-        AdvertiseListResponse Filter(AdvertisesRequest request);
+        AdvertiseListResponse Filter(AdvertiseListRequest request);
         IList<Advertise> Filter(string id);
         void FilterNew(AdvertiseIndexDTO dto);
         IList<Advertise> Filter(string statusString, int userid, long id);

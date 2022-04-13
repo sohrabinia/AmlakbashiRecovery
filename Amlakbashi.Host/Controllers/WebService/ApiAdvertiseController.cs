@@ -42,7 +42,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpGet]
-        public AdvertiseListResponse Get([FromQuery] AdvertisesRequest request)
+        public AdvertiseListResponse Get([FromQuery] AdvertiseListRequest request)
         {
             bool isArea = false;
             DynamicCategory category = categoryService.GetByRegion(request.regionId, request.residencyType, out isArea);

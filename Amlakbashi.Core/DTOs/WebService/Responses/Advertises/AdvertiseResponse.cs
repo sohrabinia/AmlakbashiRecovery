@@ -96,7 +96,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             foreach (var item in detailedRatesTypes)
             {
                 var itemRates = advertise.ReportItems.Where(w => w.ReportID == (int)item);
-                response.comments.detailedRates.Add(new AdvertiseRateItemResponse(Comment.GetUserRatingTypeString(item),
+                response.comments.detailedRates.Add(new AdvertiseRateItemResponse(ReportItem.GetUserRatingTypeString(item),
                     itemRates.Any() == false ? 0 : (float)itemRates.Average(x => x.Score)));
             }
             var comments = advertise.PublishedComments();
