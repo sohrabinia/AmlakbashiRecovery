@@ -9,6 +9,8 @@ using static Amlakbashi.Core.Entities.Reserve;
 using static Amlakbashi.Core.Entities.ReservePayment;
 using Amlakbashi.Core.DTOs.WebService.Responses.Reserves;
 using Amlakbashi.Core.DTOs.WebService.Requests.Reserves;
+using System.Threading.Tasks;
+using Amlakbashi.Application.DTOs;
 
 namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
 {
@@ -53,6 +55,8 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         void UpdatePaymentGTAGRegistered(long id, bool value);
         int UpdateCallState(long id, string hostOrGuest);
         bool StartStay(long reserveId, int user_id, out string msg,
+            ActionSourceEnum actionSource, int doerUserId);
+        Task<ServiceResult<bool>> ConfirmResidenceAsync(long reserveId, int userId,
             ActionSourceEnum actionSource, int doerUserId);
         void UpdateAccVisitedByGuest(long id, bool value);
         void UpdateDisableAutoCancel(long id, bool value);

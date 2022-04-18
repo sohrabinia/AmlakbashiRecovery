@@ -188,5 +188,19 @@ namespace Amlakbashi.Host.Controllers.WebService
             }
             return BadRequest("advertise id is incorrect");
         }
+
+        [HttpGet("rules/{id:long}")]
+        public IActionResult GetRules(long id)
+        {
+            var advertise = advertiseService.Find(id);
+            return Ok(new
+            {
+                party = advertise.AllowParty,
+                pets = advertise.AllowPets,
+                smoking = advertise.AllowSmoking,
+                otherRules = advertise.OtherRules,
+                requiredEvidences = advertise.EvidenceRequired,
+            });
+        }
     }
 }

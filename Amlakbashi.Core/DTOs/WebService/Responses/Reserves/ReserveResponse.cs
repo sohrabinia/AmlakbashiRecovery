@@ -7,34 +7,29 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Responses.Reserves
 {
-    public class ReserveListResponse
+    public class ReserveResponse
     {
-        public List<ReserveListItemResponse> reserveList { get; set; } = new List<ReserveListItemResponse>();
-        public PagingInfo pagingInfo { get; set; }
-    }
+        public long reserveId { get; set; }
+        public ReserveAdvertiseResponse residencyInfo { get; set; }
+        public string fromDate { get; set; }
+        public string toDate { get; set; }
+        public int guestCount { get; set; }
+        public string hostName { get; set; }
+        public string hostPhoneNumber { get; set; }
+        public string hostImageUrl { get; set; }
 
-    public class ReserveListItemResponse : ReserveResponse
-    {
-        public Reserve.ReserveStatus status { get; set; }
-        public string statusTitle { get; set; }
-        public long price { get; set; }
-        public string remainedTime { get; set; }
-
-        public static implicit operator ReserveListItemResponse(Reserve reserve)
+        public static implicit operator ReserveResponse(Reserve reserve)
         {
-            var response = new ReserveListItemResponse()
+            var response = new ReserveResponse()
             {
                 reserveId = reserve.Id,
                 fromDate = DateTimeUtility.GregorianToPersianDate(reserve.StartDate),
                 toDate = DateTimeUtility.GregorianToPersianDate(reserve.EndDate),
                 guestCount = reserve.NumberOfGuests,
-                status = reserve.Status,
-                statusTitle = ReserveLocalization.GetStatusString((int)reserve.Status,
-                    Reserve.StatusStringType.Guest, reserve.Id, reserve.HostResponse),
-                price = reserve.TotalPayablePrice,
                 hostName = reserve.HostUser.FullName,
                 hostImageUrl = reserve.HostUser.PhotoID == null ? "" : $"/عکس-پروفایل_کوچک-{reserve.HostUser.PhotoID}",
-                remainedTime = "",
+                hostPhoneNumber = reserve.Status == Reserve.ReserveStatus.Reserved ||
+                        reserve.Status == Reserve.ReserveStatus.Started ? reserve.HostUser.MainMobile : null,
                 residencyInfo = new ReserveAdvertiseResponse()
                 {
                     id = reserve.AdvertiseID,
@@ -43,10 +38,24 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Reserves
                     roomCount = reserve.Advertise.Room,
                     provinceName = reserve.Advertise.RegionProvince?.PersianName,
                     cityName = reserve.Advertise.RegionCity?.PersianName,
+                    address = reserve.Status == Reserve.ReserveStatus.Reserved ||
+                        reserve.Status == Reserve.ReserveStatus.Started ? reserve.Advertise.Address : null,
                     imageUrl = $"/file/accthumbxxxlarge?accid={reserve.AdvertiseID}&fileid={reserve.Advertise.PhotoID}"
                 }
             };
             return response;
         }
+    }
+
+    public class ReserveAdvertiseResponse
+    {
+        public long id { get; set; }
+        public string title { get; set; }
+        public string type { get; set; }
+        public int roomCount { get; set; }
+        public string provinceName { get; set; }
+        public string cityName { get; set; }
+        public string address { get; set; }
+        public string imageUrl { get; set; }
     }
 }

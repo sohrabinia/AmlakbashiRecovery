@@ -14,23 +14,12 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Reserves
         public long totalServicePrice { get; set; }
         public long finalPrice { get; set; }
         public long payablePrice { get; set; }
-        public ReserveAdvertiseResponse residencyInfo { get; set; }
-        public string fromDate { get; set; }
-        public string toDate { get; set; }
-        public int guestCount { get; set; }
-        public string hostName { get; set; }
-        public string hostImageUrl { get; set; }
 
         public static implicit operator ReserveInvoiceResponse(Reserve reserve)
         {
             var response = new ReserveInvoiceResponse()
             {
                 reserveId = reserve.Id,
-                fromDate = DateTimeUtility.GregorianToPersianDate(reserve.StartDate),
-                toDate = DateTimeUtility.GregorianToPersianDate(reserve.EndDate),
-                guestCount = reserve.NumberOfGuests,
-                hostName = reserve.HostUser.FullName,
-                hostImageUrl = reserve.HostUser.PhotoID == null ? "" : $"/عکس-پروفایل_کوچک-{reserve.HostUser.PhotoID}",
                 totalServicePrice = reserve.TotalPrice,
                 finalPrice = reserve.TotalPayablePrice,
                 payablePrice = reserve.TotalPayablePrice,
@@ -43,16 +32,6 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Reserves
                         unitPrice = 0,
                         totalPrice = reserve.TotalPrice
                     }
-                },
-                residencyInfo = new ReserveAdvertiseResponse()
-                {
-                    id = reserve.AdvertiseID,
-                    title = reserve.Advertise.Title,
-                    type = AdvertiseMainLocalization.GetAdvertiseTypeUserString(reserve.Advertise.TypeID),
-                    roomCount = reserve.Advertise.Room,
-                    provinceName = reserve.Advertise.RegionProvince?.PersianName,
-                    cityName = reserve.Advertise.RegionCity?.PersianName,
-                    imageUrl = $"/file/accthumbxxxlarge?accid={reserve.AdvertiseID}&fileid={reserve.Advertise.PhotoID}"
                 }
             };
             return response;

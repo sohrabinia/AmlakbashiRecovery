@@ -56,6 +56,11 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 var currentUser = userAccessor.CurrentUser;
                 if (reserve_id != null)
                     reserve_id = StringUtility.PersianNumberToEnglish(reserve_id);
+                if (selectType == Reserve.ReserveManagerSelectType.All)
+                {
+                    selectType = currentUser.UserGeneralType > 0 ?
+                        Reserve.ReserveManagerSelectType.Host : Reserve.ReserveManagerSelectType.Guest;
+                }
                 Dictionary<Reserve.ReserveCategory, int> countDict;
                 var reserves = reserveService.GetReserveDashboardItems(currentUser,
                     selectType, category, reserve_id, status, out countDict);

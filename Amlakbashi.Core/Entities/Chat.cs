@@ -26,6 +26,19 @@ namespace Amlakbashi.Core.Entities
         [ForeignKey("ReserveID")]
         public virtual Reserve Reserve { get; set; }
 
+        [NotMapped]
+        public ReadStatusEnum IsViewed
+        {
+            get
+            {
+                return (ReadStatusEnum)ReadStatus;
+            }
+            set
+            {
+                ReadStatus = (int)value;
+            }
+        }
+
         public enum ChatStatusEnum
         {
             Sent = 0,

@@ -21,6 +21,8 @@ using Amlakbashi.Core.DTOs.ReserveDTOs;
 using Amlakbashi.Core.Infrastructure.StyleHelpers;
 using Amlakbashi.Core.DTOs.WebService.Responses.Reserves;
 using Amlakbashi.Core.DTOs.WebService.Requests.Reserves;
+using Amlakbashi.Application.DTOs;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
@@ -992,6 +994,41 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return true;
         }
 
+        public async Task<ServiceResult<bool>> ConfirmResidenceAsync(long reserveId, int userId,
+            ActionSourceEnum actionSource, int doerUserId)
+        {
+            var serviceResult = new ServiceResult<bool>();
+            var reserve = Repository.Find(reserveId);
+            if (reserve.UserID != userId)
+            {
+                serviceResult.IsValid = false;
+                serviceResult.ErrorMessages.Add(ReserveErrorMessages.ConfirmResidence_UserInvalid);
+            }
+            if (accounting.IsReservePaidCompletely(reserveId) == false)
+            {
+                serviceResult.IsValid = false;
+                serviceResult.ErrorMessages.Add(ReserveErrorMessages.ConfirmResidence_NotPaid);
+            }
+            DateTime canStartTime;
+            if (reserve.CanReserveStarted(out canStartTime) == false)
+            {
+                serviceResult.IsValid = false;
+                serviceResult.ErrorMessages.Add(ReserveErrorMessages.ConfirmResidence_DateInvalid);
+            }
+            if (reserve.Status != ReserveStatus.Reserved)
+            {
+                serviceResult.IsValid = false;
+                serviceResult.ErrorMessages.Add(ReserveErrorMessages.ConfirmResidence_StateInvalid);
+            }
+            if (serviceResult.IsValid == false)
+            {
+                return serviceResult;
+            }
+
+            serviceResult.Result = await mediator.Send(new SetReserveStatusCommand(reserveId, ReserveStatus.Started, true, actionSource, doerUserId));
+            return serviceResult;
+        }
+
         public void UpdateExcludeGroup(long id, bool value)
         {
             var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
@@ -1294,13 +1331,12 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var categoryEnumList = Enum.GetValues(typeof(ReserveCategory)) as ReserveCategory[];
             foreach (var ReserveCategory in categoryEnumList)
             {
-                var states = GetHostCategoryStates(ReserveCategory);
+                var states = Reserve.GetHostCategoryStates(ReserveCategory);
                 countDict[ReserveCategory] = reserves.Count(c => states.ToList().Contains(c.Status));
             }
             if (category > -1)
             {
-                var states = GetHostCategoryStates(
-                    (ReserveCategory)category).ToList();
+                var states = GetHostCategoryStates((ReserveCategory)category).ToList();
                 reserves = reserves.Where(x => states.Contains(x.Status));
             }
             reserves = reserves.ToList();

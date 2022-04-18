@@ -45,9 +45,10 @@ namespace Amlakbashi.Host.Controllers.WebService
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{id:long}")]
-        public IActionResult Get(long id)
+        public ReserveResponse Get(long id)
         {
-
+            ReserveResponse response = reserveService.Find(id);
+            return response;
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -106,6 +107,19 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(new { 
                 discountPrice = discountPrice
             });
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPut("confirmstart/{id:long}")]
+        public async Task<IActionResult> ConfirmReserveStart(long id)
+        {
+            var result = await reserveService.ConfirmResidenceAsync(id, userAccessor.CurrentUser.Id,
+                ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
+            if (result.IsValid && result.Result)
+            {
+                return Ok();
+            }
+            return BadRequest(result.ErrorMessages);
         }
     }
 }
