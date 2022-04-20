@@ -18,6 +18,7 @@ namespace Amlakbashi.Host.Controllers.WebService
 {
     [ApiController]
     [Route("api/chat")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ApiChatController : ApiBaseController
     {
         private readonly IChatAppService chatService;
@@ -27,20 +28,21 @@ namespace Amlakbashi.Host.Controllers.WebService
         private readonly IReserveDashboardHubServer reserveDashboardHubServer;
         private readonly IReserveAdminHubServer reserveAdminHubServer;
         public ApiChatController(IChatAppService chatService,
+            IReserveAppService reserveService,
             IReserveAutoCancelAppService reserveAutoCancelService,
             IUserAccessor userAccessor,
             IReserveDashboardHubServer reserveDashboardHubServer,
             IReserveAdminHubServer reserveAdminHubServer)
         {
             this.chatService = chatService;
+            this.reserveService = reserveService;
             this.reserveAutoCancelService = reserveAutoCancelService;
             this.userAccessor = userAccessor;
             this.reserveDashboardHubServer = reserveDashboardHubServer;
             this.reserveAdminHubServer = reserveAdminHubServer;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet("{reserveId:{long}")]
+        [HttpGet("{reserveId:long}")]
         public IList<ChatResponse> Get(long reserveId)
         {
             var chats = chatService.GetReserveChats(reserveId);
@@ -61,14 +63,13 @@ namespace Amlakbashi.Host.Controllers.WebService
             return response;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
         public IActionResult Post(ChatPostMessageRequest request)
         {
             var result = chatService.Insert(request.reserveId, userAccessor.CurrentUser.Id, request.message);
-            if (result.IsValid == false)
+            if (result.HasError())
             {
-                return BadRequest(result.ErrorMessages);
+                return BadRequest(result.GetErrors());
             }
             var reserve = reserveService.Find(request.reserveId);
             if (reserve.InstantReserve == false)

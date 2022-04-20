@@ -186,7 +186,10 @@ namespace Amlakbashi.Host
                 app.UseStatusCodePagesWithReExecute("/errors/http404");
             }
 
+#if !DEBUG
             app.UseAntiXssMiddleware();
+#endif
+
             app.UseCors("AllowCrossOrigins");
             app.UseResponseCaching();
             app.UseStaticFiles(new StaticFileOptions

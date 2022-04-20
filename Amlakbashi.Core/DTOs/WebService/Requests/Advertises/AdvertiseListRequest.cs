@@ -51,6 +51,6 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         public int categoryId { get; set; }
 
         [BindNever]
-        public ICollection<UserFavorite> UserFavorites { get; set; }
+        public int userId { get; set; }
     }
 }

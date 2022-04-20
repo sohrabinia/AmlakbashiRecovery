@@ -17,6 +17,12 @@ namespace Amlakbashi.Application.Services.ReserveServices
         {
         }
 
+        public DateTime? GetReserveExpireTime(long reserveId)
+        {
+            var reserveAutoCancel = Repository.Query(q => q.FirstOrDefault(w => w.ReserveId == reserveId));
+            return reserveAutoCancel?.ScheduledTime;
+        }
+
         public void UpdateScheduledTime(long reserveId, int delayInMinute = 30)
         {
             var data = Repository.Query(q => q.FirstOrDefault(w => w.ReserveId == reserveId));

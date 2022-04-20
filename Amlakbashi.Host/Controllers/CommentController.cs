@@ -197,12 +197,15 @@ namespace Amlakbashi.Host.Controllers
                 advertises = advertises.Where(x => x.UserID == userid);
                 advertises = advertises.Where(x => x.Status != AdvertiseStatus.Deleted);
                 var advertise_ids = advertises.Select(x => x.Id).ToList();
+
                 IQueryable<Comment> comments = commentService.GetAllAsIQueryable();
                 comments = comments.Where(x => x.Status == Comment.CommentStatus.publish);
                 comments = comments.Where(x => x.type == (int)Comment.CommentType.advertise);
                 comments = comments.Where(x => advertise_ids.Contains(x.AdvertiseID));
+
                 IQueryable<ReportItem> reportItems = reportItemService.GetAllAsIQueriable();
                 reportItems = reportItems.Where(x => advertise_ids.Contains(x.AdvertiseID));
+
                 var ids = new List<long>();
                 foreach (var item in advertises)
                 {
@@ -303,7 +306,7 @@ namespace Amlakbashi.Host.Controllers
             }
             if (adv.UserID == userAccessor.CurrentUser.Id)
             {
-                commentService.SetAsSeenByHost(id);
+                commentService.SetAsSeenByHost(adv.Id);
             }
             ViewBag.user_id = adv.UserID;
             ViewBag.UrlReferrer = string.IsNullOrEmpty(Request.Headers["Referer"]) ? "/" : Request.Headers["Referer"].ToString();

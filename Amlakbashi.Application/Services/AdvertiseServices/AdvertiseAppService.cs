@@ -244,6 +244,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
 
             var pagedList = orderedAdvertiseList.ToPagedList(request.page, request.pageItemCount);
+            var user = Repository.Find<User, int>(request.userId);
+
             AdvertiseListResponse response = new AdvertiseListResponse()
             {
                 pagingInfo = pagedList.PagingInfo,
@@ -256,7 +258,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             foreach (var item in pagedList.List)
             {
                 var itemResponse = (AdvertiseListItemResponse)item;
-                itemResponse.favourited = request.UserFavorites.Any(x => x.AdvertiseID == item.Id);
+                itemResponse.favourited = user?.Favorite.Any(x => x.AdvertiseID == item.Id) ?? false;
                 response.advertiseList.Add(itemResponse);
             }
             return response;

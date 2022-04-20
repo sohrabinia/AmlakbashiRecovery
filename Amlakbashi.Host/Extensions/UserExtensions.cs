@@ -1,12 +1,7 @@
 ﻿using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Core.Entities;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Extensions
 {
@@ -52,9 +47,9 @@ namespace Amlakbashi.Host.Extensions
             return userPrincipal?.FindFirst("refreshToken")?.Value;
         }
 
-        public static User.UserGeneralTypeEnum GetUserType(this ClaimsPrincipal userPrincipal)
+        public static User.UserGeneralTypeEnum GetUserPanelType(this ClaimsPrincipal userPrincipal)
         {
-            var type = userPrincipal?.FindFirst("type")?.Value;
+            var type = userPrincipal?.FindFirst("panel")?.Value;
             if (type == "host")
             {
                 return User.UserGeneralTypeEnum.Host;

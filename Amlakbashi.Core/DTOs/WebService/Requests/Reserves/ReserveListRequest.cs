@@ -17,6 +17,6 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Reserves
         public int userId { get; set; } = 0;
 
         [BindNever]
-        public Entities.User.UserGeneralTypeEnum userType { get; set; }
+        public Entities.User.UserGeneralTypeEnum panel { get; set; }
     }
 }

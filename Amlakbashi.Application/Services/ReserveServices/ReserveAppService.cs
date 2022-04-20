@@ -343,12 +343,12 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var reserves = Repository.Query(q => q);
             if (request.userId > 0)
             {
-                reserves = request.userType == User.UserGeneralTypeEnum.Guest ?
+                reserves = request.panel == User.UserGeneralTypeEnum.Guest ?
                     reserves.Where(x => x.UserID == request.userId) :
                     reserves.Where(x => x.HostUserID == request.userId);
             }
 
-            var categoryStatus = request.userType == User.UserGeneralTypeEnum.Guest ?
+            var categoryStatus = request.panel == User.UserGeneralTypeEnum.Guest ?
                 Reserve.GetGuestCategoryStates(request.category) :
                 Reserve.GetHostCategoryStates(request.category);
             reserves = reserves.Where(x => categoryStatus.Contains(x.Status));
@@ -359,7 +359,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var response = new ReserveListResponse()
             {
                 pagingInfo = pagedList.PagingInfo,
-                reserveList = pagedList.List.Select(x => (ReserveListItemResponse)x).ToList()
+                reserveList = pagedList.List.Select(x => (ReserveResponse)x).ToList()
             };
             return response;
         }
@@ -1001,26 +1001,22 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var reserve = Repository.Find(reserveId);
             if (reserve.UserID != userId)
             {
-                serviceResult.IsValid = false;
-                serviceResult.ErrorMessages.Add(ReserveErrorMessages.ConfirmResidence_UserInvalid);
+                serviceResult.AddError(ReserveErrorMessages.ConfirmResidence_UserInvalid);
             }
             if (accounting.IsReservePaidCompletely(reserveId) == false)
             {
-                serviceResult.IsValid = false;
-                serviceResult.ErrorMessages.Add(ReserveErrorMessages.ConfirmResidence_NotPaid);
+                serviceResult.AddError(ReserveErrorMessages.ConfirmResidence_NotPaid);
             }
             DateTime canStartTime;
             if (reserve.CanReserveStarted(out canStartTime) == false)
             {
-                serviceResult.IsValid = false;
-                serviceResult.ErrorMessages.Add(ReserveErrorMessages.ConfirmResidence_DateInvalid);
+                serviceResult.AddError(ReserveErrorMessages.ConfirmResidence_DateInvalid);
             }
             if (reserve.Status != ReserveStatus.Reserved)
             {
-                serviceResult.IsValid = false;
-                serviceResult.ErrorMessages.Add(ReserveErrorMessages.ConfirmResidence_StateInvalid);
+                serviceResult.AddError(ReserveErrorMessages.ConfirmResidence_StateInvalid);
             }
-            if (serviceResult.IsValid == false)
+            if (serviceResult.HasError())
             {
                 return serviceResult;
             }
@@ -1399,10 +1395,8 @@ namespace Amlakbashi.Application.Services.ReserveServices
         public ReserveInvoiceResponse GetInvoice(long reserveId, int currentUserId)
         {
             var reserve = Repository.Find(reserveId);
-            if ((reserve.UserID != currentUserId && reserve.HostUserID != currentUserId) ||
-                (reserve.GetStateCategory() != ReserveCategory.WaitForGuestPayment &&
-                reserve.GetStateCategory() != ReserveCategory.Reserved &&
-                reserve.GetStateCategory() != ReserveCategory.Finished))
+            if (reserve == null || (reserve.UserID != currentUserId && reserve.HostUserID != currentUserId) ||
+                reserve.GetStateCategory() == ReserveCategory.Unsuccessful)
             {
                 return null;
             }

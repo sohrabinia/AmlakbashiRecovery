@@ -64,8 +64,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 request.area = request.regionId;
             }
             request.categoryId = category.Id;
-            request.UserFavorites = userAccessor.CurrentUser.Id > 0 ?
-                userAccessor.CurrentUser.Favorite : new List<UserFavorite>();
+            request.userId = userAccessor.CurrentUser.Id;
 
             var response = advertiseService.Filter(request);
 
@@ -77,7 +76,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             return response;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:long}")]
         public IActionResult Get(long id)
         {
             var advertise = advertiseService.Find(id);
@@ -98,6 +97,18 @@ namespace Amlakbashi.Host.Controllers.WebService
                 response.favorite = true;
             }
             return Ok(response);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("list")]
+        public List<AdvertiseBasicInfoReponse> GetUserAdvertises(Advertise.AdvertiseStatus status = Advertise.AdvertiseStatus.Published,
+            int page = 1, int pageItemCount = 20)
+        {
+            var advertises = advertiseService.GetAdvertisesByUserId(userAccessor.CurrentUser.Id);
+            advertises = advertises.Where(x => x.Status == status).ToList();
+            List<AdvertiseBasicInfoReponse> response = new List<AdvertiseBasicInfoReponse>();
+            response.AddRange(advertises.Select(x => (AdvertiseBasicInfoReponse)x));
+            return response;
         }
 
         [HttpGet("searchid")]

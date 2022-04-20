@@ -1,7 +1,4 @@
-﻿using Amlakbashi.Core.Common.Utilities;
-using Amlakbashi.Core.Entities;
-using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,44 +6,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Reserves
 {
     public class ReserveListResponse
     {
-        public List<ReserveListItemResponse> reserveList { get; set; } = new List<ReserveListItemResponse>();
+        public List<ReserveResponse> reserveList { get; set; } = new List<ReserveResponse>();
         public PagingInfo pagingInfo { get; set; }
-    }
-
-    public class ReserveListItemResponse : ReserveResponse
-    {
-        public Reserve.ReserveStatus status { get; set; }
-        public string statusTitle { get; set; }
-        public long price { get; set; }
-        public string remainedTime { get; set; }
-
-        public static implicit operator ReserveListItemResponse(Reserve reserve)
-        {
-            var response = new ReserveListItemResponse()
-            {
-                reserveId = reserve.Id,
-                fromDate = DateTimeUtility.GregorianToPersianDate(reserve.StartDate),
-                toDate = DateTimeUtility.GregorianToPersianDate(reserve.EndDate),
-                guestCount = reserve.NumberOfGuests,
-                status = reserve.Status,
-                statusTitle = ReserveLocalization.GetStatusString((int)reserve.Status,
-                    Reserve.StatusStringType.Guest, reserve.Id, reserve.HostResponse),
-                price = reserve.TotalPayablePrice,
-                hostName = reserve.HostUser.FullName,
-                hostImageUrl = reserve.HostUser.PhotoID == null ? "" : $"/عکس-پروفایل_کوچک-{reserve.HostUser.PhotoID}",
-                remainedTime = "",
-                residencyInfo = new ReserveAdvertiseResponse()
-                {
-                    id = reserve.AdvertiseID,
-                    title = reserve.Advertise.Title,
-                    type = AdvertiseMainLocalization.GetAdvertiseTypeUserString(reserve.Advertise.TypeID),
-                    roomCount = reserve.Advertise.Room,
-                    provinceName = reserve.Advertise.RegionProvince?.PersianName,
-                    cityName = reserve.Advertise.RegionCity?.PersianName,
-                    imageUrl = $"/file/accthumbxxxlarge?accid={reserve.AdvertiseID}&fileid={reserve.Advertise.PhotoID}"
-                }
-            };
-            return response;
-        }
     }
 }

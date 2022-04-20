@@ -1100,7 +1100,7 @@ namespace Amlakbashi.Application.Services.UserServices
             }
             claims.Add(new Claim(ClaimTypes.NameIdentifier, identityUser.Id));
             claims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
-            claims.Add(new Claim("type", user.UserGeneralType == 0 ? "guest" : "host"));
+            claims.Add(new Claim("panel", user.UserGeneralType == 0 ? "guest" : "host"));
             claims.Add(new Claim("refreshToken", identityUser.SecurityStamp));
 
             var symmetricKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret));

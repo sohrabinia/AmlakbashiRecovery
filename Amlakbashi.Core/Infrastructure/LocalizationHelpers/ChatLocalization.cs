@@ -137,7 +137,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             return has_forbidden_characters;
         }
 
-        private static List<string> ForbiddenWords = new List<string>()
+        private static List<string> ForbiddenContainWords = new List<string>()
         {
             "6037",
             "5892",
@@ -164,12 +164,6 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             "09",
             "۰۹",
             "صفر",
-            "ص",
-            "ف",
-            "ر",
-            "ن",
-            "ه",
-            "د",
             "صفرنه",
             "نهصد",
             "نهصدو",
@@ -177,9 +171,15 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             "شیپور",
             "شيبور",
             "جاکو",
-            "",
-            "",
-            "",
+        };
+        private static List<string> ForbiddenEqualWords = new List<string>()
+        {
+            "ص",
+            "ف",
+            "ر",
+            "ن",
+            "ه",
+            "د",
         };
         private static List<string> ForbiddenStartedCharacters = new List<string>()
         {
@@ -187,6 +187,8 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             "۰",
             "9",
             "۹",
+            "+9",
+            "+۹",
         };
         public static bool HasForbiddenWord(string text)
         {
@@ -194,8 +196,9 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             foreach (var word in words)
             {
                 if (BankUtility.ValidateBankCardNumber(word) ||
-                    ForbiddenWords.Any(x => word.Contains(x)) ||
+                    ForbiddenContainWords.Any(x => word.Contains(x)) ||
                     ForbiddenStartedCharacters.Any(x => word.StartsWith(x)) ||
+                    ForbiddenEqualWords.Any(x => x == word) ||
                     Regex.IsMatch(word, @"[a-zA-Z]"))
                 {
                     return true;

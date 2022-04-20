@@ -94,13 +94,20 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
             if (userId != reserve.UserID && userId != reserve.HostUserID)
             {
-                serviceResult.IsValid = false;
-                serviceResult.ErrorMessages.Add("user is incorrect");
+                serviceResult.AddError("user is incorrect");
             }
             if (ChatLocalization.HasForbiddenWord(message))
             {
-                serviceResult.IsValid = false;
-                serviceResult.ErrorMessages.Add("has forbidden word");
+                serviceResult.AddError("has forbidden word");
+            }
+            if (reserve.GetStateCategory() == Reserve.ReserveCategory.Finished ||
+                reserve.GetStateCategory() == Reserve.ReserveCategory.Unsuccessful)
+            {
+                serviceResult.AddError("chat is closed for this reserve");
+            }
+            if (serviceResult.HasError())
+            {
+                return serviceResult;
             }
 
             serviceResult.Result = Insert(new Chat()

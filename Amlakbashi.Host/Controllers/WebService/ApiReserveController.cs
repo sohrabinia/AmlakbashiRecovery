@@ -6,6 +6,7 @@ using Amlakbashi.Core.Entities;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using Amlakbashi.Host.Extensions;
+using Amlakbashi.Host.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -19,31 +20,37 @@ namespace Amlakbashi.Host.Controllers.WebService
 {
     [ApiController]
     [Route("api/reserve")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ApiReserveController : ApiBaseController
     {
         private readonly IReserveAppService reserveService;
+        private readonly IReserveAutoCancelAppService reserveAutoCancelService;
         private readonly IAccountingFacade accounting;
         private readonly IUserAccessor userAccessor;
         public ApiReserveController(IReserveAppService reserveService,
+            IReserveAutoCancelAppService reserveAutoCancelService,
             IAccountingFacade accounting,
             IUserAccessor userAccessor)
         {
             this.reserveService = reserveService;
+            this.reserveAutoCancelService = reserveAutoCancelService;
             this.accounting = accounting;
             this.userAccessor = userAccessor;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public ReserveListResponse Get([FromQuery] ReserveListRequest request)
         {
             request.userId = userAccessor.CurrentUser.Id;
-            request.userType = User.GetUserType();
+            request.panel = User.GetUserPanelType();
             var response = reserveService.Filter(request);
+            foreach (var item in response.reserveList)
+            {
+                item.expireTime = reserveAutoCancelService.GetReserveExpireTime(item.reserveId);
+            }
             return response;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{id:long}")]
         public ReserveResponse Get(long id)
         {
@@ -51,27 +58,19 @@ namespace Amlakbashi.Host.Controllers.WebService
             return response;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("invoice/{reserveId:long}")]
         public IActionResult Invoice(long reserveId)
         {
             var response = reserveService.GetInvoice(reserveId, userAccessor.CurrentUser.Id);
             if (response == null)
             {
-                return Unauthorized();
+                return BadRequest();
             }
             return Ok(response);
         }
 
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        //[HttpPut("cancel/{id:long}")]
-        //public IActionResult Cancel(long id)
-        //{
-
-        //}
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("discount")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Guest)]
         public IActionResult AddDiscountCode(ReserveAddDiscountCodeRequest request)
         {
             var discountCodeType = DiscountCoupon.GetDiscountCouponType(request.discountCode);
@@ -109,17 +108,33 @@ namespace Amlakbashi.Host.Controllers.WebService
             });
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPut("confirmstart/{id:long}")]
+        [HttpPost("confirmstart/{id:long}")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Guest)]
         public async Task<IActionResult> ConfirmReserveStart(long id)
         {
             var result = await reserveService.ConfirmResidenceAsync(id, userAccessor.CurrentUser.Id,
                 ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
-            if (result.IsValid && result.Result)
+            if (result.HasError() == false && result.Result)
             {
                 return Ok();
             }
-            return BadRequest(result.ErrorMessages);
+            return BadRequest(result.GetErrors());
+        }
+
+        [HttpPost("hostresponse")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
+        public IActionResult SubmitHostResponse(ReserveHostResponseRequest request)
+        {
+            var reserve = reserveService.Find(request.reserveId);
+            if (reserve == null || reserve.HostUserID != userAccessor.CurrentUser.Id ||
+                (reserve.Status != Reserve.ReserveStatus.WaitForResponse &&
+                reserve.Status != Reserve.ReserveStatus.WaitForReserve))
+            {
+                return Forbid();
+            }
+            reserveService.SetHostResponse(request.reserveId, request.hostResponse, true,
+                ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
+            return Ok();
         }
     }
 }

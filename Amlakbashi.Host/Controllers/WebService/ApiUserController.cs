@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Http;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Hosting;
-using Amlakbashi.Core.Entities;
 using Amlakbashi.Application.Services.FileServices.Interfaces;
 
 namespace Amlakbashi.Host.Controllers.WebService
@@ -278,7 +277,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpGet("test")]
         public IActionResult test()
         {
-            User.GetUserType();
+            User.GetUserPanelType();
             return Ok();
         }
     }

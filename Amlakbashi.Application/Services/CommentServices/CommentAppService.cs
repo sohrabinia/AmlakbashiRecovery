@@ -5,6 +5,11 @@ using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Amlakbashi.Core.DTOs.WebService.Responses.Comments;
+using Amlakbashi.Core.DTOs.WebService.Requests.Comments;
+using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.Common.Extensions;
+using Amlakbashi.Core.DTOs;
 
 namespace Amlakbashi.Application.Services.CommentServices
 {
@@ -79,6 +84,46 @@ namespace Amlakbashi.Application.Services.CommentServices
             return model.OrderByDescending(x => x.Id).ToList();
         }
 
+        public CommentListResponse GetForHost(int userId, bool seenByHost = true, int page = 1, int pageItemCount = 20)
+        {
+            var user = Repository.Find<User, int>(userId);
+            if (user == null || user.UserGeneralType != 1)
+            {
+                return null;
+            }
+            var pagedList = user.Advertises.SelectMany(x =>
+                x.Comments.Where(y => y.Status == Comment.CommentStatus.publish &&
+                y.type == Comment.CommentType.advertise && y.SeenByHost == seenByHost)).ToPagedList(page, pageItemCount);
+            if (pagedList.List.Any() && seenByHost == false)
+            {
+                UpdateHostCommentsToSeened(userId);
+            }
+            var response = new CommentListResponse()
+            {
+                pagingInfo = pagedList.PagingInfo,
+                comments = pagedList.List.Select(x => (CommentResponse)x).ToList()
+            };
+            return response;
+        }
+
+        private void UpdateHostCommentsToSeened(int userId)
+        {
+            var user = Repository.Find<User, int>(userId);
+            if (user == null || user.UserGeneralType != 1)
+            {
+                return;
+            }
+            var unseenComments = user.Advertises.SelectMany(x =>
+                x.Comments.Where(y => y.Status == Comment.CommentStatus.publish &&
+                y.type == Comment.CommentType.advertise && y.SeenByHost == false));
+            foreach (var item in unseenComments)
+            {
+                item.SeenByHost = true;
+                Repository.Update(item);
+            }
+            Repository.Save();
+        }
+
         public Comment Find(long id)
         {
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
@@ -133,19 +178,6 @@ namespace Amlakbashi.Application.Services.CommentServices
             Repository.Save();
         }
 
-        public void SetAsSeenByHost(int accId)
-        {
-            var data = Repository.Query(q => q.Where(w => w.AdvertiseID == accId &&
-                w.type == (int)Comment.CommentType.advertise &&
-                w.Status == Comment.CommentStatus.publish)).ToList();
-            foreach (var item in data)
-            {
-                item.SeenByHost = true;
-                Repository.Update(item);
-            }
-            Repository.Save();
-        }
-
         public void SetAsSeenByHost(long accId)
         {
             var data = Repository.Query(q => q.Where(w => w.AdvertiseID == accId &&
@@ -175,7 +207,7 @@ namespace Amlakbashi.Application.Services.CommentServices
             Repository.Save();
         }
 
-        public void Submit(int userId, long advertiseId, string text)
+        public void SubmitGuestComment(int userId, long advertiseId, string text)
         {
             var advertise = Repository.Find<Advertise, long>(advertiseId);
             var comment = advertise.Comments.FirstOrDefault(f => f.SenderUserID == userId);
@@ -203,6 +235,36 @@ namespace Amlakbashi.Application.Services.CommentServices
                 Repository.Update(comment);
             }
             Repository.Save();
+        }
+
+        public ServiceResult<bool> SubmitHostReply(CommentHostSubmitRequest requst)
+        {
+            var serviceResult = new ServiceResult<bool>();
+            var comment = Repository.Find(requst.commentId);
+            if (comment == null || comment.HostReplyId != null)
+            {
+                serviceResult.AddError("comment id is invalid");
+                return serviceResult;
+            }
+            if (comment.Advertise.UserID != requst.userId)
+            {
+                serviceResult.AddError("invalid user");
+                return serviceResult;
+            }
+            comment.HostReply = new Comment()
+            {
+                AdvertiseID = comment.AdvertiseID,
+                SeenByHost = true,
+                CreateDate = DateTime.Now,
+                LastModifyDate = DateTime.Now,
+                Status = Comment.CommentStatus.ready,
+                type = Comment.CommentType.advertiseHostReply,
+                Text = requst.text
+            };
+            Repository.Update(comment);
+            Repository.Save();
+            serviceResult.Result = true;
+            return serviceResult;
         }
 
         public bool AnyComment(long advertiseId)
