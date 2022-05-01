@@ -14,13 +14,15 @@ using Amlakbashi.Core.DTOs.AdvertiseDTOs;
 using Microsoft.AspNetCore.Http;
 using Amlakbashi.Core.DTOs.WebService.Requests.Advertises;
 using Amlakbashi.Core.DTOs.WebService.Responses.Advertises;
+using Amlakbashi.Application.DTOs;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
 {
     public interface IAdvertiseAppService : IAppService<Advertise, long>
     {
         IQueryable<Advertise> GetAllAsIQueriable();
-        AdvertiseListResponse Filter(AdvertiseListRequest request);
+        AdvertiseListResponse Filter(AdvertiseGetListRequest request);
         IList<Advertise> Filter(string id);
         void FilterNew(AdvertiseIndexDTO dto);
         IList<Advertise> Filter(string statusString, int userid, long id);
@@ -43,6 +45,17 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void UpdateAccView(long accId);
         AdvertiseDirector GetAdvertisePageData(long id, out Dictionary<AdvertiseType, IList<AdvertiseDirector>> childrenDirectors);
         void Edit(Advertise editedAd);
+
+        //##############
+        Task<ServiceResult<long>> CreateAsync(AdvertisePostCreateRequest request);
+        Task<ServiceResult<long>> UpdateBasicInfoAsync(AdvertisePutBasicInfoRequest request);
+        Task<ServiceResult> UpdateGeneralInfoAsync(AdvertisePutGeneralInfoRequest request);
+        Task<ServiceResult> UpdateSupplementaryInfoAsync(AdvertisePutSupplementaryInfoRequest request);
+        Task<ServiceResult> UpdateFinalInfoAsync(AdvertisePutFinalInfoRequest request);
+        Task<ServiceResult> CreateHotelRoomAsync(AdvertisePutHotelRoomInfoRequest request);
+        Task<ServiceResult> UpdateHotelRoomInfoAsync(AdvertisePutHotelRoomInfoRequest request);
+        //##############
+
         AdvertiseDirector GetBasicForm(long id, out bool isEdit, out int level);
         AdvertiseDirector SubmitBasicForm(Advertise data, int userId, out Dictionary<string, string> errors, out List<string> groupErrors, out int level);
         AdvertiseDirector GetGeneralForm(long id, out bool isEdit, out int level);

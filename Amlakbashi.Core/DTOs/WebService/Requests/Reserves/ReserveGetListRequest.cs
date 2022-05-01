@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.Reserves
 {
-    public class ReserveListRequest
+    public class ReserveGetListRequest
     {
         public Reserve.ReserveCategory category { get; set; }
         public int sort { get; set; }

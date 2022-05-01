@@ -25,7 +25,7 @@ namespace Amlakbashi.Application.Services.CommentServices.Interfaces
         CommentListResponse GetForHost(int userId, bool seenByHost = true, int page = 1, int pageItemCount = 20);
         void Insert(Comment newComment);
         void SubmitGuestComment(int userId, long advertiseId, string text);
-        ServiceResult<bool> SubmitHostReply(CommentHostSubmitRequest requst);
+        ServiceResult<bool> SubmitHostReply(CommentPostHostRequest requst);
         void Update(Comment editedComment);
         void UpdateStatus(long id, Comment.CommentStatus status, string suspendReason = "");
         void SetAsSeenByHost(long accId);

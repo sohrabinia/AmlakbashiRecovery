@@ -237,7 +237,7 @@ namespace Amlakbashi.Application.Services.CommentServices
             Repository.Save();
         }
 
-        public ServiceResult<bool> SubmitHostReply(CommentHostSubmitRequest requst)
+        public ServiceResult<bool> SubmitHostReply(CommentPostHostRequest requst)
         {
             var serviceResult = new ServiceResult<bool>();
             var comment = Repository.Find(requst.commentId);

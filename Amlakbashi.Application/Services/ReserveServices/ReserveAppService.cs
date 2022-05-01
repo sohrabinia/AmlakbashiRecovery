@@ -23,6 +23,10 @@ using Amlakbashi.Core.DTOs.WebService.Responses.Reserves;
 using Amlakbashi.Core.DTOs.WebService.Requests.Reserves;
 using Amlakbashi.Application.DTOs;
 using System.Threading.Tasks;
+using Amlakbashi.Core.Infrastructure.PriceHelpers.Interfaces;
+using Amlakbashi.Mediator.Commands.UserCommands;
+using Amlakbashi.Mediator.Events.ReserveEvents;
+using Amlakbashi.Core.Infrastructure.UserContact;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
@@ -31,14 +35,17 @@ namespace Amlakbashi.Application.Services.ReserveServices
         private readonly IMediator mediator;
         private readonly IAccountingFacade accounting;
         private readonly IReserveSupportAppService reserveSupportService;
+        private readonly IPriceCalculator priceCalculator;
         public ReserveAppService(IRepository<Reserve, long> repository,
             IMediator mediator,
             IAccountingFacade accounting,
-            IReserveSupportAppService reserveSupportService) : base(repository)
+            IReserveSupportAppService reserveSupportService,
+            IPriceCalculator priceCalculator) : base(repository)
         {
             this.mediator = mediator;
             this.accounting = accounting;
             this.reserveSupportService = reserveSupportService;
+            this.priceCalculator = priceCalculator;
         }
 
         public IList<Reserve> Filter(ReserveIndexDTO dto, int currentUserId)
@@ -338,7 +345,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return reserves.OrderByDescending(x => x.Id).Skip((dto.Page - 1) * dto.PagingInfo.PageItemCount).Take(dto.PagingInfo.PageItemCount).ToList();
         }
 
-        public ReserveListResponse Filter(ReserveListRequest request)
+        public ReserveListResponse Filter(ReserveGetListRequest request)
         {
             var reserves = Repository.Query(q => q);
             if (request.userId > 0)
@@ -666,113 +673,196 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return relatedReserve;
         }
 
-        public bool Update(Reserve reserve, string start_date,
-            string end_date, out string msg, int doerUserId,
-            ActionSourceEnum actionSource)
+        public ServiceResult<bool> Validate(ReservePostRequest request)
         {
-            var objReserve = Repository.Query(q => q.Include("Advertise.User.Advertises").FirstOrDefault(f => f.Id == reserve.Id));
+            var serviceResult = new ServiceResult<bool>();
+            var advertise = Repository.Find<Advertise, long>(request.advertiseId);
+            var user = Repository.Find<User, int>(request.userId);
 
-            var isPaidDeposit = accounting.GetReservePaidAmount(objReserve.Id, StatusStringType.Guest) >=
-                objReserve.DepositPrice - objReserve.CouponPrice - objReserve.PrizePrice;
-
-            if (isPaidDeposit == false && (reserve.Status == ReserveStatus.Reserved || reserve.Status == ReserveStatus.CashPay ||
-                reserve.Status == ReserveStatus.Started || reserve.Status == ReserveStatus.Completed ||
-                reserve.Status == ReserveStatus.CancelRequestByGuest || reserve.Status == ReserveStatus.CancelRequestByHost))
+            if (advertise == null)
             {
-                msg = "مبلغ بیعانه هنوز پرداخت نشده، تغییر به وضعیت " + ReserveLocalization.GetStatusString((int)reserve.Status, Reserve.StatusStringType.Site) + " امکان پذیر نیست";
-                return false;
+                serviceResult.AddError("کد آگهی اشتباه است");
+                return serviceResult;
             }
-
-            if (isPaidDeposit && (reserve.Status == ReserveStatus.WaitForReserve || reserve.Status == ReserveStatus.WaitForResponse ||
-                reserve.Status == ReserveStatus.Rejected || reserve.Status == ReserveStatus.CanceledBySystem))
+            if (request.numberOfGuest < 1)
             {
-                msg = "وضعیت رزرو پرداخت شده نمی تواند به حالت " + ReserveLocalization.GetStatusString((int)reserve.Status, Reserve.StatusStringType.Site) + " تغییر کند";
-                return false;
+                serviceResult.AddError("لطفا تعداد مهمان را وارد کنید");
             }
-
-            if (string.IsNullOrEmpty(start_date) == false)
+            if (user.Reserves.Count(c => c.Status == ReserveStatus.WaitForResponse) >= 3)
             {
-                var startDate = DateTimeUtility.PersianDateToGregorian(start_date);
-                if (objReserve.StartDate != startDate)
-                {
-                    objReserve.StartDate = startDate;
-                    var beforeStart = new DateTime(
-                        objReserve.StartDate.Year,
-                        objReserve.StartDate.Month,
-                        objReserve.StartDate.Day,
-                        12, 0, 0) - DateTime.Now;
-                    if (beforeStart.TotalMilliseconds <= 0)
-                    {
-                        mediator.Send(new SetReserveStatusCommand(objReserve.Id, ReserveStatus.Started,
-                            true, actionSource, doerUserId));
-                    }
-                    else
-                    {
-                        var onStart = beforeStart.Add(new TimeSpan(2, 0, 0));
-                        mediator.Schedule(new SetReserveStatusCommand(objReserve.Id,
-                            ReserveStatus.Started, true, actionSource, doerUserId), onStart);
-                    }
-                }
+                serviceResult.AddError("شما نمی توانید همزمان بیشتر از 3 درخواست رزرو بدهید");
             }
-            if (string.IsNullOrEmpty(end_date) == false)
+            //var haveReservedRequest = false;
+            //if (user != null && user.Reserves != null)
+            //{
+            //    haveReservedRequest = user.Reserves.Any(a => a.GetStateCategory() == ReserveCategory.Reserved ||
+            //        a.GetStateCategory() == ReserveCategory.Finished);
+            //}
+            //if (((advertise.Mode == AdvertiseMode.Child && advertise.Parent.License == false) ||
+            //    (advertise.Mode != AdvertiseMode.Child && advertise.License == false)) &&
+            //    advertise.IsForbidden && haveReservedRequest == false)
+            //{
+            //    serviceResult.AddError("کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است");
+            //}
+            if (advertise.Status != Advertise.AdvertiseStatus.Published)
             {
-                var endDate = DateTimeUtility.PersianDateToGregorian(end_date);
-                if (objReserve.EndDate != endDate)
-                {
-                    objReserve.EndDate = endDate;
-                    var finishDelay = new DateTime(
-                        objReserve.EndDate.Year,
-                        objReserve.EndDate.Month,
-                        objReserve.EndDate.Day,
-                        12, 0, 0) - DateTime.Now;
-                    mediator.Schedule(new SetReserveStatusCommand(objReserve.Id,
-                        ReserveStatus.Completed, false, actionSource, doerUserId), finishDelay);
-                    mediator.Schedule(new FinishStayMessageCommand(objReserve.Id), finishDelay);
-                }
+                serviceResult.AddError("اقامتگاه مورد نظر در حال حاضر از دسترس خارج است");
             }
-
-            if (objReserve.InstantReserve &&
-                !objReserve.InstantReserveCancelHost &&
-                reserve.Status == Reserve.ReserveStatus.CanceledByHost &&
-                accounting.GetReservePaidAmount(objReserve.ReservePayments.ToList(), Reserve.StatusStringType.Guest) > 0)
+            if (request.numberOfGuest < 1)
             {
-                var acc = objReserve.Advertise;
-                var hostUser = objReserve.HostUser;
-                var hostAccs = hostUser.Advertises;
-                var hostCancelCount = hostAccs.Sum(x => x.InstantReserveCancels);
-                int penaltyPrice = 0;
-                if (hostCancelCount == 0)
-                {
-                    penaltyPrice = (int)Math.Floor(objReserve.TotalPrice * 0.1f);
-                }
-                else if (hostCancelCount > 0)
-                {
-                    penaltyPrice = (int)Math.Floor(objReserve.TotalPrice * 0.15f);
-                }
-                if (penaltyPrice > 0)
-                {
-                    long newCredit;
-                    accounting.DecreaseCredit(hostUser.Id, penaltyPrice, 0, 0, out newCredit, CreditTransaction.WalletTransactionReason.Other, "جریمه لغو رزرو آنی کد " + reserve.Id, null, doerUserId, ActionLog.ActionSourceEnum.AdminPanel);
-                }
-                objReserve.InstantReserveCancelHost = true;
-
-                mediator.Send(new IncreaseInstantReserveCancelCommand(acc.Id));
-                if (hostCancelCount > hostUser.CancelInstantReserveLimit - 1)
-                {
-                    mediator.Send(new ChangeInstantReserveAccessCommand(hostUser.Id,
-                        User.InstantReserveAccessEnum.Banned, doerUserId, actionSource));
-                    mediator.Send(new UpdateInstantReserveStatusCommand(acc.Id, Advertise.InstantReserveStatusEnum.None, doerUserId, actionSource));
-                }
+                serviceResult.AddError("لطفا تعداد نفرات را وارد کنید");
             }
-            objReserve.NumberOfGuests = reserve.NumberOfGuests;
-            objReserve.TotalPrice = reserve.TotalPrice;
-            objReserve.DepositPrice = reserve.DepositPrice;
-            objReserve.CancelReason = reserve.CancelReason;
-            objReserve.InstantReserveCancelHost = reserve.InstantReserveCancelHost;
-            Repository.Update(objReserve);
+            if (string.IsNullOrEmpty(request.fromDate) || string.IsNullOrEmpty(request.toDate))
+            {
+                serviceResult.AddError("لطفا تاریخ شروع و پایان سفر را انتخاب کنید");
+            }
+            if (request.fromDate == request.toDate)
+            {
+                serviceResult.AddError("تاریخ شروع و پایان سفر نمی توانند یکی باشند");
+            }
+            var startDateGregorian = DateTimeUtility.PersianDateToGregorian(request.fromDate);
+            var endDateGregorian = DateTimeUtility.PersianDateToGregorian(request.toDate);
+            if (startDateGregorian > endDateGregorian)
+            {
+                serviceResult.AddError("تاریخ ورود نمی تواند از تاریخ خروج بیشتر باشد");
+            }
+            var days = DateTimeUtility.GetPersianDateRangeDays(request.fromDate, request.toDate);
+            if (advertise.MinReserveDays > 0 && days < advertise.MinReserveDays)
+            {
+                serviceResult.AddError($"برای رزرو این اقامتگاه باید حداقل {advertise.MinReserveDays} شب اقامت کنید");
+            }
+            if (advertise.MaxReserveDays > 0 && days > advertise.MaxReserveDays)
+            {
+                serviceResult.AddError($"شما می توانید حداکثر {advertise.MaxReserveDays} شب در این اقامتگاه اقامت کنید");
+            }
+            var todayUnix = DateTimeUtility.DateValueOfJS(DateTime.Now.Date);
+            if (advertise.unixNorouzMinRequestDate > todayUnix &&
+                DateTimeUtility.IsNorouz(DateTimeUtility.PersianDateRangeToList(request.fromDate, request.toDate, true, false)))
+            {
+                var minDateString = DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate));
+                serviceResult.AddError($"برای رزرو نوروزی این اقامتگاه میتوانید از تاریخ {minDateString} اقدام کنید");
+            }
+            var minDate = DateTime.Now.TimeOfDay.Hours > 3 ? DateTime.Now.Date : DateTime.Now.Date.AddDays(-1);
+            if (startDateGregorian < minDate || endDateGregorian <= minDate)
+            {
+                serviceResult.AddError("تاریخ ورود و خروج گذشته است. لطفا زمان درست انتخاب کنید");
+            }
+            var occupiedDates = advertise.OccupiedDates().Select(s => DateTimeUtility.GregorianToPersianDate(s));
+            var intersects = DateTimeUtility.PersianDateRangeToList(request.fromDate, request.toDate, true, false)
+                .Intersect(occupiedDates);
+            if (intersects.Any())
+            {
+                serviceResult.AddError("متاسفانه بعضی از روز های انتخاب شده پر هستند");
+            }
+            long priceWithoutDiscount, couponCalPrice;
+            var total_price = priceCalculator.CalculateReservePrice(advertise, request.fromDate, request.toDate,
+                request.numberOfGuest, out priceWithoutDiscount, out couponCalPrice);
+            long depositePrice;
+            if (days > 3)
+            {
+                depositePrice = (long)Math.Round(total_price * 0.3f);
+            }
+            else
+            {
+                var deposite = (long)Math.Round((double)total_price / (double)days);
+                depositePrice = (long)(Math.Max(Math.Round(deposite / 1000f, 0), 1) * 1000);
+            }
+            if (request.userId > 0 && advertise.Count < 1 &&
+                user.UserHasSimilarReserve(request.advertiseId, startDateGregorian, endDateGregorian))
+            {
+                serviceResult.AddError("شما یک درخواست مشابه برای این آگهی دارید");
+            }
+            if (serviceResult.HasError())
+            {
+                serviceResult.Result = false;
+            }
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult<long>> SubmitAsync(ReservePostRequest request)
+        {
+            var serviceResult = new ServiceResult<long>();
+            var advertise = Repository.Find<Advertise, long>(request.advertiseId);
+            var user = Repository.Find<User, int>(request.userId);
+
+            bool isInstantReserve = false;
+            var startGaregorianDate = DateTimeUtility.PersianDateToGregorian(request.fromDate);
+            var endGaregorianDate = DateTimeUtility.PersianDateToGregorian(request.toDate);
+            if (advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed)
+            {
+                isInstantReserve = startGaregorianDate <= DateTime.Now.AddDays(advertise.MaxInstantReserveStart).Date;
+            }
+            long withoutDiscountPrice, couponCalculationPrice;
+            var days = DateTimeUtility.GetPersianDateRangeDays(request.fromDate, request.toDate);
+            var totalPrice = priceCalculator.CalculateReservePrice(advertise, request.fromDate, request.toDate, request.numberOfGuest,
+                out withoutDiscountPrice, out couponCalculationPrice);
+            long depositePrice;
+            if (days == 1)
+            {
+                depositePrice = totalPrice;
+            }
+            else if (days > 3)
+            {
+                depositePrice = (long)Math.Round(totalPrice * 0.3f);
+            }
+            else
+            {
+                var deposite = (long)Math.Round((double)totalPrice / (double)days);
+                depositePrice = (long)(Math.Max(Math.Round(deposite / 1000f, 0), 1) * 1000);
+            }
+            Reserve reserve = new Reserve()
+            {
+                Advertise = advertise,
+                GuestUser = user,
+                HostUser = advertise.User,
+                StartDate = startGaregorianDate,
+                EndDate = endGaregorianDate,
+                CreateDate = DateTime.Now,
+                HostResponseDate = DateTime.Now,
+                NumberOfGuests = request.numberOfGuest,
+                TotalPrice = totalPrice,
+                DepositPrice = depositePrice,
+                InstantReserve = isInstantReserve,
+                CouponCalculationPrice = couponCalculationPrice,
+                Status = isInstantReserve ? Reserve.ReserveStatus.WaitForReserve : 
+                    Reserve.ReserveStatus.WaitForResponse
+            };
+            Insert(reserve);
+            serviceResult.Result = reserve.Id;
+
+            await mediator.Publish(new ReserveRequestEvent(reserve.Id));
+            mediator.Enqueue(new UpdateAdvertiseScoreCommand(request.advertiseId));
+            SendReserveRequestSmsToHost(reserve, request.fromDate, request.toDate);
+            return serviceResult;
+        }
+
+        public Reserve Insert(Reserve reserve)
+        {
+            Repository.Insert(reserve);
             Repository.Save();
-            msg = "";
-            return true;
+            return reserve;
+        }
+
+        public void SendReserveRequestSmsToHost(Reserve reserve, string fromDate, string toDate)
+        {
+            var contact = new UserContactDTO()
+            {
+                UserMainMobile = reserve.HostUser.MainMobile,
+                UserAppNotificationToken = reserve.HostUser.AppNotificationToken,
+                UserEmail = "",
+                EmailConfirmed = false,
+                UserFcmAppNotificationToken = reserve.HostUser.FcmAppNotificationToken,
+                UserNotificationToken = reserve.HostUser.NotificationToken,
+                Type = UserContactType.ReserveRequest,
+                AdvertiseId = reserve.AdvertiseID.ToString(),
+                UserId = string.Format("{0:n0}", reserve.TotalPrice - (reserve.TotalPrice * 0.1f)), // به جای کد مهمان، در این فیلد سهم میزبان فرستاده می شود
+                ReserveId = reserve.Id.ToString(),
+                Extra1 = fromDate,
+                Extra2 = toDate + Environment.NewLine + "به مدت " + (reserve.EndDate - reserve.StartDate).TotalDays + " شب" +
+                            Environment.NewLine + "مبلغ: " + string.Format("{0:n0}", reserve.TotalPrice) + " تومان",
+                Extra3 = reserve.NumberOfGuests.ToString() + " نفر" + Environment.NewLine + "کد رزرو: " + reserve.Id
+            };
+            mediator.Enqueue(new SendMessageCommand(contact));
         }
 
         public bool UpdateNew(ReserveIndexEditDTO dto, out string msg, int doerUserId, ActionSourceEnum actionSource)

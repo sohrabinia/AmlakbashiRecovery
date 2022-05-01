@@ -1,4 +1,5 @@
-﻿using Amlakbashi.Core.Common.AppService;
+﻿using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs;
 using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
@@ -20,5 +21,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         Dictionary<DynamicCategory, string[]> GetRegionPersianNamesByCategoryList(IList<DynamicCategory> categoryList);
         ApiRegionTotalDTO GetRegionHierarchy();
         IList<Region> GetBySearchRegion(string search_string);
+        ServiceResult IsValidRegions(int provinceId, int cityId, int areaId);
     }
 }

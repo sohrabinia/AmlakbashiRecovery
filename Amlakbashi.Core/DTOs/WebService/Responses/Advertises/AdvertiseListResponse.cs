@@ -51,11 +51,12 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             response.provinceName = advertise.RegionProvince.PersianName;
             response.cityName = advertise.RegionCity.PersianName;
             response.areaName = advertise.Area != null ? advertise.RegionArea.PersianName : null;
-            response.imagesUrls = new List<string>();
-            foreach (var item in advertise.Photos)
-            {
-                response.imagesUrls.Add($"/file/accthumbxxxlarge?accid={advertise.Id}&fileid={item.Id}");
-            }
+            //response.imagesUrls = new List<string>();
+            response.imagesUrls = advertise.GetImagesApiUrls();
+            //foreach (var item in advertise.Photos)
+            //{
+            //    response.imagesUrls.Add($"/file/accthumbxxxlarge?accid={advertise.Id}&fileid={item.Id}");
+            //}
             return response;
         }
     }

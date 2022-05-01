@@ -47,7 +47,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertiseStatusEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             if (acc.Mode == AdvertiseMode.Parent && acc.Childs != null)
             {
@@ -63,7 +62,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertiseTypeEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             switch (acc.TypeID)
             {
@@ -89,7 +87,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertisePositionEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var item in acc.Childs)
             {
@@ -102,7 +99,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertiseAddressEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             //update geographical properties
             acc.CountryDirection = (acc.Province == 1029 ||
@@ -127,7 +123,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertiseRulesEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var child in acc.Childs)
             {
@@ -144,7 +139,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeAdvertisePriceEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             if (notification.changeNorouzPrice || (acc.Mode != AdvertiseMode.Parent && acc.BasePrice != acc.DailyPrice))
             {
@@ -175,7 +169,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeInstantReserveStatusEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var item in acc.Childs)
             {
@@ -189,7 +182,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeStayDurationEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var item in acc.Childs)
             {
@@ -203,7 +195,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeNorouzPriceEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var item in acc.Childs)
             {
@@ -217,7 +208,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(ChangeMaxInstantReserveStartEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             foreach (var item in acc.Childs)
             {
@@ -230,7 +220,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(CreateAdvertiseBasicEvent notification, CancellationToken cancellationToken)
         {
-            //var acc = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.advertiseId));
             var acc = advertiseRepository.Find(notification.advertiseId);
             acc.AmlakbashiScore = 1000;
 
@@ -291,9 +280,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 
         public Task Handle(AddHotelChildEvent notification, CancellationToken cancellationToken)
         {
-            //var parent = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.parentId));
             var parent = advertiseRepository.Find(notification.parentId);
-            //var child = advertiseRepository.Query(q => q.FirstOrDefault(f => f.Id == notification.childId));
             var child = advertiseRepository.Find(notification.childId);
 
             child.AmlakbashiScore = parent.AmlakbashiScore;

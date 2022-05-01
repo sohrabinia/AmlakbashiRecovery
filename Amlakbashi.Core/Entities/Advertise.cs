@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Reflection;
-using static Amlakbashi.Core.Entities.Region;
 
 namespace Amlakbashi.Core.Entities
 {
@@ -29,7 +27,7 @@ namespace Amlakbashi.Core.Entities
         public int? Province { get; set; }
         public int? City { get; set; }
         public int? Area { get; set; }
-        public CountryDirection CountryDirection { get; set; }
+        public Region.CountryDirection CountryDirection { get; set; }
         public int WebVisit { get; set; }
         public int Overview { get; set; }
         public int ContactClick { get; set; }
@@ -110,7 +108,7 @@ namespace Amlakbashi.Core.Entities
         public string SupportInfo { get; set; }
         public int InstantReserveCancels { get; set; }
         public InstantReserveStatusEnum InstantReserveStatus { get; set; }
-        public int MaxInstantReserveStart { get; set; }
+        public int MaxInstantReserveStart { get; set; } = 30;
         public int MinReserveDays { get; set; }
         public int MaxReserveDays { get; set; }
         public long unixNorouzMinRequestDate { get; set; }
@@ -188,10 +186,6 @@ namespace Amlakbashi.Core.Entities
         #endregion
 
         public bool HasDiscount;
-        public Advertise()
-        {
-            MaxInstantReserveStart = 30;
-        }
 
         #region Functions
 
@@ -379,17 +373,6 @@ namespace Amlakbashi.Core.Entities
 
         public List<DateTime> OccupiedDates()
         {
-            //if (IsForbidden)
-            //{
-            //    var result = new List<DateTime>();
-            //    var d = DateTime.Now.Date;
-            //    for (int i = 0; i < 100; i++)
-            //    {
-            //        result.Add(d);
-            //        d = d.AddDays(1);
-            //    }
-            //    return result;
-            //}
             var yesterday = DateTime.Now.Date.AddDays(-1);
             if (Count > 1)
             {
@@ -517,6 +500,69 @@ namespace Amlakbashi.Core.Entities
                 return City == 794 && IsfahanForbiddenTypes.Contains(ParentOrSelf.TypeID);
                 //return false;
             }
+        }
+
+        public void UpdateStatusAfterChangeInfo(bool hasImportantChange = false)
+        {
+            switch (Status)
+            {
+                case AdvertiseStatus.FirstReady:
+                case AdvertiseStatus.NotCompleted:
+                case AdvertiseStatus.ReadyToPublish:
+                case AdvertiseStatus.Deleted:
+                case AdvertiseStatus.Unset:
+                    break;
+                case AdvertiseStatus.NotVerified:
+                case AdvertiseStatus.Archived:
+                    Status = AdvertiseStatus.ReadyToPublish;
+                    break;
+                case AdvertiseStatus.Published:
+                    if (hasImportantChange)
+                    {
+                        Status = AdvertiseStatus.ReadyToPublish;
+                    }
+                    break;
+            }
+        }
+
+        public Comment GetCommentBySenderUser(long senderUserId, Comment.CommentType type, bool onlyPublished)
+        {
+            var comments = Comments.Where(f =>
+                f.SenderUserID == senderUserId && f.type == type);
+            if (onlyPublished)
+            {
+                comments = comments.Where(x => x.Status == Comment.CommentStatus.publish);
+            }
+            return comments.FirstOrDefault();
+        }
+
+        public float GetAverageUserRating(int user_id = 0)
+        {
+            var reportItems = ReportItems.AsQueryable();
+            if (user_id > 0)
+            {
+                reportItems = reportItems
+                    .Where(x => x.UserID == user_id);
+                return reportItems.Any() ? reportItems
+                    .Average(a => (float)a.Score) : 0;
+            }
+            return reportItems.Any() ? reportItems
+                .Average(x => (float)x.Score) : 0;
+        }
+
+        public string GetMainImageApiUrl()
+        {
+            return PhotoID == null ? null : $"/api/file/advertise/{Id}/{PhotoID}";
+        }
+
+        public List<string> GetImagesApiUrls()
+        {
+            var urls = new List<string>();
+            foreach (var item in Photos)
+            {
+                urls.Add($"/api/file/advertise/{Id}/{item.Id}");
+            }
+            return urls;
         }
 
         #endregion
@@ -675,6 +721,25 @@ namespace Amlakbashi.Core.Entities
             };
         }
 
+        public static AdvertiseMode GetModeByType(AdvertiseType type)
+        {
+            switch (type)
+            {
+                case AdvertiseType.Hotel:
+                case AdvertiseType.Camp:
+                case AdvertiseType.TourismAccommodation:
+                case AdvertiseType.Inn:
+                case AdvertiseType.Pansion:
+                case AdvertiseType.HotelApartment:
+                case AdvertiseType.Complex:
+                    return AdvertiseMode.Parent;
+                    break;
+                default:
+                    return AdvertiseMode.Single;
+                    break;
+            }
+        }
+
         public static Array GetPropertyItems(Property property, AdvertiseType parent_type = AdvertiseType.None)
         {
             switch (property)
@@ -710,29 +775,60 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        public Comment GetCommentBySenderUser(long senderUserId, Comment.CommentType type, bool onlyPublished)
+        public static PoolFeaturesEnum GetPoolFeatureFlag(bool hotWater, bool filteration, bool open, bool covered)
         {
-            var comments = Comments.Where(f =>
-                f.SenderUserID == senderUserId && f.type == type);
-            if (onlyPublished)
+            PoolFeaturesEnum feature = new PoolFeaturesEnum();
+            if (hotWater == false && filteration == false && open == false && covered == false)
             {
-                comments = comments.Where(x => x.Status == Comment.CommentStatus.publish);
+                feature = PoolFeaturesEnum.None;
             }
-            return comments.FirstOrDefault();
+            else
+            {
+                if (hotWater)
+                {
+                    feature = PoolFeaturesEnum.HotWater;
+                }
+                if (filteration)
+                {
+                    feature = feature | PoolFeaturesEnum.Filtration;
+                }
+                if (open)
+                {
+                    feature = feature | PoolFeaturesEnum.Open;
+                }
+                if (covered)
+                {
+                    feature = feature | PoolFeaturesEnum.Covered;
+                }
+            }
+            return feature;
         }
 
-        public float GetAverageUserRating(int user_id = 0)
+        public static string GetImageFileAddress(long advertiseId, long fileId, ImageType type = ImageType.Orginal)
         {
-            var reportItems = ReportItems.AsQueryable();
-            if (user_id > 0)
+            switch (type)
             {
-                reportItems = reportItems
-                    .Where(x => x.UserID == user_id);
-                return reportItems.Any() ? reportItems
-                    .Average(a => (float)a.Score) : 0;
+                case ImageType.Orginal:
+                    return $"content/advertise/advertise_{advertiseId}_{fileId}.jpg";
+                case ImageType.Card:
+                    return $"content/accthumb/{advertiseId}/{fileId}/card.jpg";
+                case ImageType.Xsmall:
+                    return $"content/accthumb/{advertiseId}/{fileId}/xsmall.jpg";
+                case ImageType.Small:
+                    return $"content/accthumb/{advertiseId}/{fileId}/small.jpg";
+                case ImageType.Medium:
+                    return $"content/accthumb/{advertiseId}/{fileId}/medium.jpg";
+                case ImageType.Large:
+                    return $"content/accthumb/{advertiseId}/{fileId}/large.jpg";
+                case ImageType.Xlarge:
+                    return $"content/accthumb/{advertiseId}/{fileId}/xlarge.jpg";
+                case ImageType.Xxlarge:
+                    return $"content/accthumb/{advertiseId}/{fileId}/xxlarge.jpg";
+                case ImageType.Xxxlarge:
+                    return $"content/accthumb/{advertiseId}/{fileId}/xxxlarge.jpg";
+                default:
+                    return "";
             }
-            return reportItems.Any() ? reportItems
-                .Average(x => (float)x.Score) : 0;
         }
 
         #endregion
@@ -775,11 +871,11 @@ namespace Amlakbashi.Core.Entities
             FirstReady = 6
         }
 
-        public enum AdvertisePageType 
+        public enum AdvertisePageType
         {
             Undefined,
             Filter,
-            Edit 
+            Edit
         }
 
         public enum PositionType
@@ -1018,12 +1114,12 @@ namespace Amlakbashi.Core.Entities
             Clean = 4
         }
 
-        public enum HygieneProtocolStatus 
+        public enum HygieneProtocolStatus
         {
             NotConsider = 0,
             Consider = 1,
             Verified = 2,
-            NotVerified = 3 
+            NotVerified = 3
         }
 
         [Flags]
@@ -1034,6 +1130,19 @@ namespace Amlakbashi.Core.Entities
             Filtration = 2,
             Open = 4,
             Covered = 8
+        }
+
+        public enum ImageType
+        {
+            Orginal = 0,
+            Card = 1,
+            Xsmall = 2,
+            Small = 3,
+            Medium = 4,
+            Large = 5,
+            Xlarge = 6,
+            Xxlarge = 7,
+            Xxxlarge = 8
         }
 
         #endregion

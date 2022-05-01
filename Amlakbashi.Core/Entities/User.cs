@@ -113,6 +113,8 @@ namespace Amlakbashi.Core.Entities
         [InverseProperty("GuestUser")]
         public virtual ICollection<Reserve> Reserves { get; set; }
 
+        #region Functions
+
         [NotMapped]
         public string FullName
         {
@@ -186,6 +188,35 @@ namespace Amlakbashi.Core.Entities
             return (User)this.MemberwiseClone();
         }
 
+        public bool UserHasSimilarReserve(long advertiseId, DateTime startDate, DateTime endDate)
+        {
+            var reserves = Reserves.Where(x =>
+                x.AdvertiseID == advertiseId &&
+                x.Status != Reserve.ReserveStatus.Deleted &&
+                x.Status != Reserve.ReserveStatus.Rejected &&
+                x.Status != Reserve.ReserveStatus.CanceledBySystem &&
+                x.Status != Reserve.ReserveStatus.CanceledByGuest &&
+                x.Status != Reserve.ReserveStatus.CanceledByHost);
+            foreach (var item in reserves)
+            {
+                if (DateTimeUtility.DateRangesHaveOverlap(item.StartDate, item.EndDate,
+                    startDate, endDate))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public string GetUserImageApiUrl()
+        {
+            return PhotoID == null ? null : $"/api/file/user/{Id}";
+        }
+
+        #endregion
+
+        #region Static Functions
+
         public static string GetUserGeneralTypeString(int type)
         {
             switch ((UserGeneralTypeEnum)type)
@@ -240,25 +271,7 @@ namespace Amlakbashi.Core.Entities
             return list;
         }
 
-        public bool UserHasSimilarReserve(long advertiseId, DateTime startDate, DateTime endDate)
-        {
-            var reserves = Reserves.Where(x =>
-                x.AdvertiseID == advertiseId &&
-                x.Status != Reserve.ReserveStatus.Deleted &&
-                x.Status != Reserve.ReserveStatus.Rejected &&
-                x.Status != Reserve.ReserveStatus.CanceledBySystem &&
-                x.Status != Reserve.ReserveStatus.CanceledByGuest &&
-                x.Status != Reserve.ReserveStatus.CanceledByHost);
-            foreach (var item in reserves)
-            {
-                if (DateTimeUtility.DateRangesHaveOverlap(item.StartDate, item.EndDate,
-                    startDate, endDate))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        #endregion
 
         public enum SignInFirstStepResult
         {

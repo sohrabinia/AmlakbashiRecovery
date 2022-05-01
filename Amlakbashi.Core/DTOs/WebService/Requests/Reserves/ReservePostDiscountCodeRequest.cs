@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.Reserves
 {
-    public class ReserveAddDiscountCodeRequest
+    public class ReservePostDiscountCodeRequest
     {
         [Required]
         public long reserveId { get; set; }

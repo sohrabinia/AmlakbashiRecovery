@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
 {
-    public class AdvertiseListRequest
+    public class AdvertiseGetListRequest
     {
         public int regionId { get; set; }
         public int area { get; set; }

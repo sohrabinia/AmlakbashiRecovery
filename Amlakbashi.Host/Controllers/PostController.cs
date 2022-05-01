@@ -349,15 +349,15 @@ namespace Amlakbashi.Host.Controllers
                 itemDTOs.Add(dto);
             }
             ViewBag.mostDiscountAdvertise = itemDTOs;
+
             var norouzItemDTOs = new List<AccommodationCardDTO>();
-            var norouzAccs = advertiseService.GetNorouzAdvertises(5);
-            //var norouzAccs = new List<Advertise>();
-            foreach (var item in norouzAccs)
-            {
-                var dto = (AccommodationCardDTO)item;
-                dto.Favourited = user.Id > 0 && userFavorites.Any(x => x.AdvertiseID == item.Id);
-                norouzItemDTOs.Add(dto);
-            }
+            //var norouzAccs = advertiseService.GetNorouzAdvertises(5);
+            //foreach (var item in norouzAccs)
+            //{
+            //    var dto = (AccommodationCardDTO)item;
+            //    dto.Favourited = user.Id > 0 && userFavorites.Any(x => x.AdvertiseID == item.Id);
+            //    norouzItemDTOs.Add(dto);
+            //}
             ViewBag.norouzAdvertises = norouzItemDTOs;
 
             ViewBag.advertiseItemCount = advertiseItemCount;

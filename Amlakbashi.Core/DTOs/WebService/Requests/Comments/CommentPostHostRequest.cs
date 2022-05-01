@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.Comments
 {
-    public class CommentHostSubmitRequest
+    public class CommentPostHostRequest
     {
         public long commentId { get; set; }
         public string text { get; set; }

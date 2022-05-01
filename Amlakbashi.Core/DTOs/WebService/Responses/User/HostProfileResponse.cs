@@ -29,7 +29,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.User
                 hostName = user.FullName,
                 hostReponseRate = ((float)user.HostReserves.Where(x => x.HostResponse != Reserve.HostResponseEnum.None).Count()
                 / (float)user.HostReserves.Count) * 100,
-                imageUrl = user.PhotoID == null ? "" : $"/عکس-پروفایل_کوچک-{user.PhotoID}"
+                imageUrl = user.GetUserImageApiUrl()
             };
             var publishedAdvertises = user.Advertises.Where(x => x.Status == Advertise.AdvertiseStatus.Published);
             response.residencies = publishedAdvertises.Select(s => (AdvertiseListItemResponse)s).ToList();
@@ -39,10 +39,10 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.User
                 comment = c.Text,
                 date = StringUtility.EnglishNumberToPersian(DateTimeUtility.ConvertDate(c.CreateDate)),
                 name = c.SenderUser.FullName,
-                imageUrl = c.SenderUser.PhotoID == null ? "" : $"/عکس-پروفایل_کوچک-{c.SenderUser.PhotoID}",
+                imageUrl = c.SenderUser.GetUserImageApiUrl(),
                 residencyId = s.Id,
                 residencyTitle = s.Title,
-                residencyImageUrl = s.PhotoID == null ? "" : $"/file/accthumbxxxlarge?accid={s.Id}&fileid={s.PhotoID}"
+                residencyImageUrl = s.GetMainImageApiUrl()
             })).ToList();
             response.commentCount = response.comments.Count;
             return response;

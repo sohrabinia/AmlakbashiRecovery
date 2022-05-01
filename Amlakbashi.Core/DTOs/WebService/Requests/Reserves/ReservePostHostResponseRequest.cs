@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.Reserves
 {
-    public class ReserveHostResponseRequest
+    public class ReservePostHostResponseRequest
     {
         public Reserve.HostResponseEnum hostResponse { get; set; }
         public long reserveId { get; set; }

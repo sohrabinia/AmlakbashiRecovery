@@ -1,4 +1,5 @@
-﻿using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
+﻿using Amlakbashi.Application.DTOs;
+using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
 using Amlakbashi.Application.Services.Category.Interfaces;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.Common.Caching;
@@ -21,28 +22,33 @@ namespace Amlakbashi.Host.Controllers.WebService
 {
     [ApiController]
     [Route("api/advertise")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ApiAdvertiseController : ApiBaseController
     {
         private readonly IAdvertiseAppService advertiseService;
         private readonly ICategoryAppService categoryService;
+        private readonly IRegionAppService regionService;
         private readonly IUserAppService userService;
         private readonly ICacheManager cacheManager;
         private readonly IUserAccessor userAccessor;
         public ApiAdvertiseController(IAdvertiseAppService advertiseService,
             ICategoryAppService categoryService,
+            IRegionAppService regionService,
             IUserAppService userService,
             IUserAccessor userAccessor,
             ICacheManager cacheManager)
         {
             this.advertiseService = advertiseService;
             this.categoryService = categoryService;
+            this.regionService = regionService;
             this.userService = userService;
             this.cacheManager = cacheManager;
             this.userAccessor = userAccessor;
         }
 
+        [AllowAnonymous]
         [HttpGet]
-        public AdvertiseListResponse Get([FromQuery] AdvertiseListRequest request)
+        public AdvertiseListResponse Get([FromQuery] AdvertiseGetListRequest request)
         {
             bool isArea = false;
             DynamicCategory category = categoryService.GetByRegion(request.regionId, request.residencyType, out isArea);
@@ -76,6 +82,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             return response;
         }
 
+        [AllowAnonymous]
         [HttpGet("{id:long}")]
         public IActionResult Get(long id)
         {
@@ -99,7 +106,6 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("list")]
         public List<AdvertiseBasicInfoReponse> GetUserAdvertises(Advertise.AdvertiseStatus status = Advertise.AdvertiseStatus.Published,
             int page = 1, int pageItemCount = 20)
@@ -111,6 +117,173 @@ namespace Amlakbashi.Host.Controllers.WebService
             return response;
         }
 
+        [HttpPost("create")]
+        public async Task<IActionResult> Create(AdvertisePostCreateRequest request)
+        {
+            if (request.IsValid(ModelState) == false)
+            {
+                return BadRequest(ModelState);
+            }
+            request.userId = userAccessor.CurrentUser.Id;
+            var result = await advertiseService.CreateAsync(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return CreatedAtAction(nameof(Get), new { id = result.Result });
+        }
+
+        [HttpGet("update/basic/{id:long}")]
+        public IActionResult GetBasicInfoForUpdate(long id)
+        {
+            var advertise = advertiseService.Find(id);
+            if (advertise == null)
+            {
+                return NotFound();
+            }
+            AdvertiseGetBasicInfoForUpdateResponse response = advertise;
+            return Ok(response);
+        }
+
+        [HttpPut("update/basic")]
+        public async Task<IActionResult> UpdateBasicInfo(AdvertisePutBasicInfoRequest request)
+        {
+            if (request.IsValid(ModelState) == false)
+            {
+                return BadRequest(ModelState);
+            }
+            request.userId = userAccessor.CurrentUser.Id;
+            var result = await advertiseService.UpdateBasicInfoAsync(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok();
+        }
+
+        [HttpGet("update/general/{id:long}")]
+        public IActionResult GetGeneralInfoForUpdate(long id)
+        {
+            var advertise = advertiseService.Find(id);
+            if (advertise == null)
+            {
+                return NotFound();
+            }
+            AdvertiseGetGeneralInfoForUpdateResponse response = advertise;
+            return Ok(response);
+        }
+
+        [HttpPut("update/general")]
+        public async Task<IActionResult> UpdateGeneralInfo(AdvertisePutGeneralInfoRequest request)
+        {
+            if (request.IsValid(ModelState) == false)
+            {
+                return BadRequest(ModelState);
+            }
+            var checkRegionResult = regionService.IsValidRegions(request.province, request.city, request.area);
+            if (checkRegionResult.HasError())
+            {
+                return BadRequest(checkRegionResult.GetErrors());
+            }
+            request.userId = userAccessor.CurrentUser.Id;
+            var result = await advertiseService.UpdateGeneralInfoAsync(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok();
+        }
+
+        [HttpGet("update/supplementary/{id:long}")]
+        public IActionResult GetSupplementaryInfoForUpdate(long id)
+        {
+            var advertise = advertiseService.Find(id);
+            if (advertise == null)
+            {
+                return NotFound();
+            }
+            return Ok((AdvertiseGetSupplementaryInfoForUpdateResponse)advertise);
+        }
+
+        [HttpPut("update/supplementary")]
+        public async Task<IActionResult> UpdateSupplementaryInfo(AdvertisePutSupplementaryInfoRequest request)
+        {
+            if (request.IsValid(ModelState) == false)
+            {
+                return BadRequest(ModelState);
+            }
+            request.userId = userAccessor.CurrentUser.Id;
+            var result = await advertiseService.UpdateSupplementaryInfoAsync(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok();
+        }
+
+        [HttpGet("update/final/{id:long}")]
+        public IActionResult GetFinalInfoForUpdate(long id)
+        {
+            var advertise = advertiseService.Find(id);
+            if (advertise == null)
+            {
+                return NotFound();
+            }
+            return Ok((AdvertiseGetFinalInfoForUpdateResponse)advertise);
+        }
+
+        [HttpPut("update/final")]
+        public async Task<IActionResult> UpdateFinalInfo(AdvertisePutFinalInfoRequest request)
+        {
+            if (request.IsValid(ModelState) == false)
+            {
+                return BadRequest(ModelState);
+            }
+            request.userId = userAccessor.CurrentUser.Id;
+            var result = await advertiseService.UpdateFinalInfoAsync(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok();
+        }
+
+        [HttpGet("update/hotelroom/{id:long}")]
+        public IActionResult GetHotelRoomInfoForUpdate(long id)
+        {
+            var advertise = advertiseService.Find(id);
+            if (advertise == null || advertise.Mode != Advertise.AdvertiseMode.Child)
+            {
+                return NotFound();
+            }
+            return Ok((AdvertiseGetHotelRoomInfoForUpdateResponse)advertise);
+        }
+
+        [HttpPut("update/hotelroom")]
+        public async Task<IActionResult> CreateOrUpdateHotelRoomInfo(AdvertisePutHotelRoomInfoRequest request)
+        {
+            if (request.IsValid(ModelState) == false)
+            {
+                return BadRequest(ModelState);
+            }
+            request.userId = userAccessor.CurrentUser.Id;
+            ServiceResult result = null;
+            if (request.unitId > 0)
+            {
+                result = await advertiseService.UpdateHotelRoomInfoAsync(request);
+            }
+            else
+            {
+                result = await advertiseService.CreateHotelRoomAsync(request);
+            }
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok();
+        }
+
+        [AllowAnonymous]
         [HttpGet("searchid")]
         public IActionResult SearchId(string id)
         {
@@ -133,6 +306,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpGet("types")]
         public IList<AdvertiseTypesResponse> GetAdvertiseTypes()
         {
@@ -147,6 +321,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             return response;
         }
 
+        [AllowAnonymous]
         [HttpGet("calendar/{id:long}")]
         public IActionResult GetCalendarData(long id)
         {
@@ -168,7 +343,6 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("favorite")]
         public AdvertiseListResponse GetFavorites(int page = 1)
         {
@@ -176,7 +350,6 @@ namespace Amlakbashi.Host.Controllers.WebService
             return favoriteAdvertises;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("favorite/{id:long}")]
         public IActionResult AddFavorite(long id)
         {
@@ -189,7 +362,6 @@ namespace Amlakbashi.Host.Controllers.WebService
             return CreatedAtAction(nameof(GetFavorites), null);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("favorite/{id:long}")]
         public IActionResult DeleteFavorite(long id)
         {
@@ -200,6 +372,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             return BadRequest("advertise id is incorrect");
         }
 
+        [AllowAnonymous]
         [HttpGet("rules/{id:long}")]
         public IActionResult GetRules(long id)
         {

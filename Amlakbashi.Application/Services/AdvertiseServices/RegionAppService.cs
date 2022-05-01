@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static Amlakbashi.Core.Entities.Region;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs;
+using Amlakbashi.Application.DTOs;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
@@ -203,6 +204,29 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
             return result.OrderByDescending(x => x.PersianName == search_string)
                 .ThenByDescending(x => x.CountAdvertise).Take(5).ToList();
+        }
+
+        public ServiceResult IsValidRegions(int provinceId, int cityId, int areaId)
+        {
+            var serviceResult = new ServiceResult();
+            var province = Repository.Find(provinceId);
+            if (province == null || province.Type != 0)
+            {
+                serviceResult.AddError("province is incorrect");
+            }
+            else if (province.Childs.Any(x => x.Id == cityId) == false)
+            {
+                serviceResult.AddError("city is incorrect");
+            }
+            else if (areaId > 0)
+            {
+                var city = province.Childs.FirstOrDefault(x => x.Id == cityId);
+                if (city.Childs.Any(x => x.Id == areaId) == false)
+                {
+                    serviceResult.AddError("area is incorrect");
+                }
+            }
+            return serviceResult;
         }
     }
 }

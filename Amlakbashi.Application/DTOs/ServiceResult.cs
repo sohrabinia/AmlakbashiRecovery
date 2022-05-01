@@ -5,9 +5,8 @@ using System.Text;
 
 namespace Amlakbashi.Application.DTOs
 {
-    public class ServiceResult<T>
+    public class ServiceResult
     {
-        public T Result { get; set; }
         private IList<string> ErrorMessages { get; set; } = new List<string>();
 
         public void AddError(string error)
@@ -24,5 +23,10 @@ namespace Amlakbashi.Application.DTOs
         {
             return ErrorMessages.Any();
         }
+    }
+
+    public class ServiceResult<T> : ServiceResult
+    {
+        public T Result { get; set; }
     }
 }

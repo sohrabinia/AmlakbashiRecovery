@@ -35,6 +35,8 @@ using Microsoft.AspNetCore.Http;
 using Amlakbashi.Core.DTOs.WebService.Requests.Advertises;
 using Amlakbashi.Core.Infrastructure.FilterHelpers.Interfaces;
 using Amlakbashi.Core.DTOs.WebService.Responses.Advertises;
+using Amlakbashi.Application.DTOs;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
@@ -59,7 +61,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return Repository.Query(q => q);
         }
 
-        public AdvertiseListResponse Filter(AdvertiseListRequest request)
+        public AdvertiseListResponse Filter(AdvertiseGetListRequest request)
         {
             var category = Repository.Find<DynamicCategory, int>(request.categoryId);
             var advertises = category.Advertises.AsQueryable();
@@ -686,6 +688,281 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return director;
         }
 
+        public async Task<ServiceResult<long>> CreateAsync(AdvertisePostCreateRequest request)
+        {
+            var serviceResult = new ServiceResult<long>();
+            Advertise advertise = new Advertise()
+            {
+                CreateDate = DateTime.Now,
+                LastModifyDate = DateTime.Now,
+                Status = AdvertiseStatus.NotCompleted,
+                UserID = request.userId,
+                Available = true,
+                TypeID = request.type,
+                Position = request.locationType,
+                Mode = Advertise.GetModeByType(request.type),
+                Floor = FloorItems.Unset,
+            };
+            Insert(advertise);
+            await mediator.Publish(new CreateAdvertiseBasicEvent(advertise.Id, request.userId));
+            serviceResult.Result = advertise.Id;
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult<long>> UpdateBasicInfoAsync(AdvertisePutBasicInfoRequest request)
+        {
+            var serviceResult = new ServiceResult<long>();
+            var advertise = Repository.Find(request.advertiseId);
+            if (advertise == null)
+            {
+                serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            advertise.Position = request.locationType;
+            Repository.Update(advertise);
+            Repository.Save();
+            await mediator.Publish(new ChangeAdvertisePositionEvent(advertise.Id));
+            serviceResult.Result = advertise.Id;
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> UpdateGeneralInfoAsync(AdvertisePutGeneralInfoRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var advertise = Repository.Find(request.advertiseId);
+            if (advertise == null)
+            {
+                serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            var shallowAdvertise = advertise.ShallowCopy();
+            advertise.Province = request.province;
+            advertise.City = request.city;
+            if (request.area > 0)
+            {
+                advertise.Area = request.area;
+            }
+            else
+            {
+                advertise.Area = null;
+            }
+            advertise.Address = request.address;
+            advertise.Title = request.title;
+            advertise.Description = request.description;
+            advertise.Longitude = request.longitude;
+            advertise.Latitude = request.latitude;
+            advertise.LastModifyDate = DateTime.Now;
+            advertise.UpdateStatusAfterChangeInfo(HasImportantChangeOnUpdate(shallowAdvertise, advertise));
+            Repository.Update(advertise);
+            Repository.Save();
+
+            if (advertise.Status != shallowAdvertise.Status)
+            {
+                await mediator.Publish(new ChangeAdvertiseStatusEvent(advertise.Id, shallowAdvertise.Status));
+                await mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAdvertise, advertise));
+            }
+            await mediator.Publish(new CreateAdvertiseGeneralEvent(advertise.Id));
+            await mediator.Publish(new ChangeAdvertiseAddressEvent(shallowAdvertise, advertise));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> UpdateSupplementaryInfoAsync(AdvertisePutSupplementaryInfoRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var advertise = Repository.Find(request.advertiseId);
+            if (advertise == null)
+            {
+                serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            if (request.license && advertise.LicenseFileId is null)
+            {
+                serviceResult.AddError("license file not exist");
+                return serviceResult;
+            }
+            var shallowAdvertise = advertise.ShallowCopy();
+            PropertyCopier<AdvertisePutSupplementaryInfoRequest, Advertise>.CopyInsensetive(request, advertise);
+            advertise.LastModifyDate = DateTime.Now;
+            advertise.PoolFeatures = Advertise.GetPoolFeatureFlag(request.poolHotWater,
+                request.poolFiltration, request.poolOpen, request.poolCovered);
+            advertise.UpdateStatusAfterChangeInfo(HasImportantChangeOnUpdate(shallowAdvertise, advertise));
+            Repository.Update(advertise);
+            Repository.Save();
+
+            if (shallowAdvertise.Status != advertise.Status)
+            {
+                await mediator.Publish(new ChangeAdvertiseStatusEvent(advertise.Id, shallowAdvertise.Status));
+                await mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAdvertise, advertise));
+            }
+            if (advertise.Mode == AdvertiseMode.Parent)
+            {
+                await mediator.Publish(new ChangeAdvertiseRulesEvent(advertise.Id));
+            }
+            await mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> UpdateFinalInfoAsync(AdvertisePutFinalInfoRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var advertise = Repository.Find(request.advertiseId);
+            if (advertise == null)
+            {
+                serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            var shallowAdvertise = advertise.ShallowCopy();
+            PropertyCopier<AdvertisePutFinalInfoRequest, Advertise>.CopyInsensetive(request, advertise);
+            advertise.MoreThanCapacity = request.extraCapacity;
+            advertise.MoreThanCapacityPrice = request.extraCapacityPrice;
+            advertise.RentPrice = request.monthlyPrice;
+            advertise.NorouzOverCapacityPrice = request.norouzExtraCapacityPrice;
+            advertise.Room = request.roomCount;
+            advertise.SingleBed = request.singleBedCount;
+            advertise.DoublesBed = request.doublesBedCount;
+            advertise.BlanketsAndMattresses = request.blanketsAndMattressesCount;
+            if (advertise.Status == AdvertiseStatus.NotCompleted)
+            {
+                advertise.Status = AdvertiseStatus.FirstReady;
+            }
+            else
+            {
+                advertise.UpdateStatusAfterChangeInfo(HasImportantChangeOnUpdate(shallowAdvertise, advertise));
+            }
+            Repository.Update(advertise);
+            Repository.Save();
+
+            if (shallowAdvertise.Status != advertise.Status)
+            {
+                await mediator.Publish(new ChangeAdvertiseStatusEvent(advertise.Id, shallowAdvertise.Status));
+                await mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAdvertise, advertise));
+            }
+            await mediator.Publish(new ChangeAdvertisePriceEvent(advertise.Id, advertise.NorouzPrice != shallowAdvertise.NorouzPrice));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> CreateHotelRoomAsync(AdvertisePutHotelRoomInfoRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var parentAdvertise = Repository.Find(request.parentId);
+            if (parentAdvertise == null)
+            {
+                serviceResult.AddError("parent not found");
+                return serviceResult;
+            }
+            if (parentAdvertise.Mode != AdvertiseMode.Parent)
+            {
+                serviceResult.AddError("parent is incorrect");
+                return serviceResult;
+            }
+            var shallowParentAdvertise = parentAdvertise.ShallowCopy();
+            var unit = new Advertise()
+            {
+                UserID = parentAdvertise.UserID,
+                TypeID = parentAdvertise.TypeID,
+                Mode = AdvertiseMode.Child,
+                CreateDate = DateTime.Now,
+                LastModifyDate = DateTime.Now,
+                Status = parentAdvertise.Status,
+                Capacity = request.capacity,
+                MoreThanCapacity = request.extraCapacity,
+                Title = request.title,
+                Description = request.description,
+                DailyPrice = request.dailyPrice,
+                HolidayPikePrice = request.holidayPikePrice,
+                HolidayPrice = request.holidayPrice,
+                RentPrice = request.monthlyPrice,
+                NorouzPrice = request.norouzPrice,
+                MoreThanCapacityPrice = request.extraCapacityPrice,
+                NorouzOverCapacityPrice = request.norouzExtraCapacityPrice,
+                Metrazh = request.metrazh,
+                Room = request.count,
+                SingleBed = request.singleBedCount,
+                DoublesBed = request.doublesBedCount,
+                BlanketsAndMattresses = request.blanketsAndMattressesCount,
+                ExtraBlanketCount = request.extraBlanketCount
+            };
+            parentAdvertise.Childs.Add(unit);
+            if (parentAdvertise.Status == AdvertiseStatus.NotCompleted)
+            {
+                parentAdvertise.Status = AdvertiseStatus.FirstReady;
+            }
+            else
+            {
+                parentAdvertise.UpdateStatusAfterChangeInfo(true);
+            }
+            Repository.Update(parentAdvertise);
+            Repository.Save();
+
+            if (parentAdvertise.Status != shallowParentAdvertise.Status)
+            {
+                await mediator.Publish(new ChangeAdvertiseStatusEvent(parentAdvertise.Id, shallowParentAdvertise.Status));
+                await mediator.Publish(new ChangeAdvertiseActiveEvent(shallowParentAdvertise, parentAdvertise));
+            }
+            await mediator.Publish(new AddHotelChildEvent(unit.Id, (long)unit.ParentId));
+            await mediator.Publish(new ChangeAdvertisePriceEvent(unit.Id, false));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(parentAdvertise.Id));
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> UpdateHotelRoomInfoAsync(AdvertisePutHotelRoomInfoRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var advertise = Repository.Find(request.unitId);
+            if (advertise == null || advertise.Mode != AdvertiseMode.Child)
+            {
+                serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            var shallowAdvertise = advertise.ShallowCopy();
+            var shallowParentAdvertise = advertise.Parent.ShallowCopy();
+            PropertyCopier<AdvertisePutHotelRoomInfoRequest, Advertise>.CopyInsensetive(request, advertise);
+            advertise.MoreThanCapacity = request.extraCapacity;
+            advertise.MoreThanCapacityPrice = request.extraCapacityPrice;
+            advertise.RentPrice = request.monthlyPrice;
+            advertise.NorouzOverCapacityPrice = request.norouzExtraCapacityPrice;
+            advertise.Room = request.count;
+            advertise.SingleBed = request.singleBedCount;
+            advertise.DoublesBed = request.doublesBedCount;
+            advertise.BlanketsAndMattresses = request.blanketsAndMattressesCount;
+            advertise.Parent.UpdateStatusAfterChangeInfo(true);
+            Repository.Update(advertise);
+            Repository.Save();
+
+            if (shallowAdvertise.Status != advertise.Status)
+            {
+                await mediator.Publish(new ChangeAdvertiseStatusEvent(advertise.ParentId.Value, shallowParentAdvertise.Status));
+                await mediator.Publish(new ChangeAdvertiseActiveEvent(shallowParentAdvertise, advertise.Parent));
+            }
+            await mediator.Publish(new ChangeAdvertisePriceEvent(advertise.Id, advertise.NorouzPrice != shallowAdvertise.NorouzPrice));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(advertise.ParentId.Value));
+            return serviceResult;
+        }
+
+        private bool HasImportantChangeOnUpdate(Advertise advertise, Advertise updatedAdvertise)
+        {
+            if (advertise.Title != updatedAdvertise.Title ||
+                advertise.Description != updatedAdvertise.Description ||
+                advertise.Province != updatedAdvertise.Province ||
+                advertise.City != updatedAdvertise.City ||
+                advertise.Area != updatedAdvertise.Area ||
+                advertise.Address != updatedAdvertise.Address ||
+                advertise.TypeID != updatedAdvertise.TypeID ||
+                advertise.License != updatedAdvertise.License ||
+                advertise.LicenseNumber != updatedAdvertise.LicenseNumber ||
+                advertise.OwnershipType != updatedAdvertise.OwnershipType ||
+                advertise.AlbumPhoto != updatedAdvertise.AlbumPhoto ||
+                advertise.Position != updatedAdvertise.Position ||
+                advertise.EvidenceRequired != updatedAdvertise.EvidenceRequired ||
+                advertise.OtherRules != updatedAdvertise.OtherRules)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public AdvertiseDirector GetBasicForm(long id, out bool isEdit, out int level)
         {
             Advertise acc = null;
@@ -985,11 +1262,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 mediator.Publish(new ChangeAdvertiseRulesEvent(acc.Id));
             }
             return director;
-        }
-
-        private void UpdateLicenseFile(IFormFile licenseFile, long advertiseId)
-        {
-
         }
 
         public AdvertiseDirector GetHotelForm(long id, long parentId, out bool isEdit)
@@ -1426,6 +1698,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 childsDic.Add(type, dic);
             }
             return childsDic;
+        }
+
+        public Advertise Insert(Advertise advertise)
+        {
+            Repository.Insert(advertise);
+            Repository.Save();
+            return advertise;
         }
 
         public IDictionary<string, DatePriceDTO> GetAccPriceDatesInfo(long id)

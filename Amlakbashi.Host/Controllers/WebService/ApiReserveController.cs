@@ -9,7 +9,6 @@ using Amlakbashi.Host.Extensions;
 using Amlakbashi.Host.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -39,7 +38,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpGet]
-        public ReserveListResponse Get([FromQuery] ReserveListRequest request)
+        public ReserveListResponse Get([FromQuery] ReserveGetListRequest request)
         {
             request.userId = userAccessor.CurrentUser.Id;
             request.panel = User.GetUserPanelType();
@@ -58,6 +57,24 @@ namespace Amlakbashi.Host.Controllers.WebService
             return response;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Submit(ReservePostRequest request)
+        {
+            request.userId = userAccessor.CurrentUser.Id;
+
+            var validateResult = reserveService.Validate(request);
+            if (validateResult.HasError())
+            {
+                return BadRequest(validateResult.GetErrors());
+            }
+
+            var submitResult = await reserveService.SubmitAsync(request);
+            return Ok(new
+            {
+                reserveId = submitResult.Result
+            });
+        }
+
         [HttpGet("invoice/{reserveId:long}")]
         public IActionResult Invoice(long reserveId)
         {
@@ -71,7 +88,7 @@ namespace Amlakbashi.Host.Controllers.WebService
 
         [HttpPost("discount")]
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Guest)]
-        public IActionResult AddDiscountCode(ReserveAddDiscountCodeRequest request)
+        public IActionResult AddDiscountCode(ReservePostDiscountCodeRequest request)
         {
             var discountCodeType = DiscountCoupon.GetDiscountCouponType(request.discountCode);
             if (discountCodeType == DiscountCoupon.DiscountCouponType.Unset)
@@ -108,22 +125,9 @@ namespace Amlakbashi.Host.Controllers.WebService
             });
         }
 
-        [HttpPost("confirmstart/{id:long}")]
-        [Panel(Core.Entities.User.UserGeneralTypeEnum.Guest)]
-        public async Task<IActionResult> ConfirmReserveStart(long id)
-        {
-            var result = await reserveService.ConfirmResidenceAsync(id, userAccessor.CurrentUser.Id,
-                ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
-            if (result.HasError() == false && result.Result)
-            {
-                return Ok();
-            }
-            return BadRequest(result.GetErrors());
-        }
-
         [HttpPost("hostresponse")]
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
-        public IActionResult SubmitHostResponse(ReserveHostResponseRequest request)
+        public IActionResult SubmitHostResponse(ReservePostHostResponseRequest request)
         {
             var reserve = reserveService.Find(request.reserveId);
             if (reserve == null || reserve.HostUserID != userAccessor.CurrentUser.Id ||
@@ -135,6 +139,19 @@ namespace Amlakbashi.Host.Controllers.WebService
             reserveService.SetHostResponse(request.reserveId, request.hostResponse, true,
                 ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
             return Ok();
+        }
+
+        [HttpPost("confirmstart/{id:long}")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Guest)]
+        public async Task<IActionResult> ConfirmReserveStart(long id)
+        {
+            var result = await reserveService.ConfirmResidenceAsync(id, userAccessor.CurrentUser.Id,
+                ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
+            if (result.HasError() == false && result.Result)
+            {
+                return Ok();
+            }
+            return BadRequest(result.GetErrors());
         }
     }
 }

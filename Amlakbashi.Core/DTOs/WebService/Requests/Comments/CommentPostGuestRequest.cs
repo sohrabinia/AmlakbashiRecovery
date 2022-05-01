@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.Comments
 {
-    public class CommentGuestSubmitRequest
+    public class CommentPostGuestRequest
     {
         [Required]
         public long advertiseId { get; set; }

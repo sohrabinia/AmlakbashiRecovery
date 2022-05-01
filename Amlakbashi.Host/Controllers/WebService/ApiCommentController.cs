@@ -50,7 +50,7 @@ namespace Amlakbashi.Host.Controllers.WebService
 
         [HttpPost("guest")]
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Guest)]
-        public IActionResult SubmitGuestComment(CommentGuestSubmitRequest request)
+        public IActionResult SubmitGuestComment(CommentPostGuestRequest request)
         {
             var advertise = advertiseService.Find(request.advertiseId);
             var canUserSetComment = advertise?.Reserves.Any(x => x.UserID == userAccessor.CurrentUser.Id &&
@@ -67,7 +67,7 @@ namespace Amlakbashi.Host.Controllers.WebService
 
         [HttpPost("host")]
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
-        public IActionResult SubmitHostReply(CommentHostSubmitRequest request)
+        public IActionResult SubmitHostReply(CommentPostHostRequest request)
         {
             request.userId = userAccessor.CurrentUser.Id;
             var result = commentService.SubmitHostReply(request);

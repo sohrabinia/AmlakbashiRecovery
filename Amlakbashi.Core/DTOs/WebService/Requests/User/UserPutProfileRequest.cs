@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -27,68 +26,56 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.User
 
         public bool IsValid(ModelStateDictionary modelState)
         {
-            bool hasError = false;
             if (string.IsNullOrEmpty(bankCardNumber) == false &&
                 BankUtility.ValidateBankCardNumber(bankCardNumber) == false)
             {
                 modelState.AddModelError(nameof(bankCardNumber), "bankCardNumber is incorrect");
-                hasError = true;
             }
             if (string.IsNullOrEmpty(shebaNumber) == false &&
                 (Regex.IsMatch(@"[a-zA-Zآ-ی]", shebaNumber) || shebaNumber.Length != 24))
             {
                 modelState.AddModelError(nameof(shebaNumber), "shebaNumber is incorrect");
-                hasError = true;
             }
             if (PhoneUtility.ValidateCallableNumber(phoneNumber2) == false)
             {
                 modelState.AddModelError(nameof(phoneNumber2), "phoneNumber2 is incorrect");
-                hasError = true;
             }
             if (string.IsNullOrEmpty(phoneNumber3) == false &&
                 PhoneUtility.ValidateCallableNumber(phoneNumber3) == false)
             {
                 modelState.AddModelError(nameof(phoneNumber3), "phoneNumber3 is incorrect");
-                hasError = true;
             }
             if (string.IsNullOrEmpty(landLinePhoneNumber) == false &&
                 PhoneUtility.ValidateCallableNumber(landLinePhoneNumber) == false)
             {
                 modelState.AddModelError(nameof(landLinePhoneNumber), "landLinePhoneNumber is incorrect");
-                hasError = true;
             }
             if (string.IsNullOrEmpty(this.thirdPersonPhoneNumber) == false &&
                 PhoneUtility.ValidateCallableNumber(thirdPersonPhoneNumber) == false)
             {
                 modelState.AddModelError(nameof(thirdPersonPhoneNumber), "thirdPersonPhoneNumber is incorrect");
-                hasError = true;
             }
             if (string.IsNullOrEmpty(firstName) || StringUtility.ContainsNumber(firstName))
             {
                 modelState.AddModelError(nameof(firstName), "firstName is incorrect");
-                hasError = true;
             }
             if (string.IsNullOrEmpty(lastName) || StringUtility.ContainsNumber(lastName))
             {
                 modelState.AddModelError(nameof(lastName), "lastName is incorrect");
-                hasError = true;
             }
             if (string.IsNullOrEmpty(bankCardOwnerFirstName) || StringUtility.ContainsNumber(bankCardOwnerFirstName))
             {
                 modelState.AddModelError(nameof(bankCardOwnerFirstName), "bankCardOwnerFirstName is incorrect");
-                hasError = true;
             }
             if (string.IsNullOrEmpty(bankCardOwnerLastName) || StringUtility.ContainsNumber(bankCardOwnerLastName))
             {
                 modelState.AddModelError(nameof(bankCardOwnerLastName), "bankCardOwnerLastName is incorrect");
-                hasError = true;
             }
             if (string.IsNullOrEmpty(email) == false && EmailUtility.ValidateEmail(email) == false)
             {
                 modelState.AddModelError(nameof(email), "email is incorrect");
-                hasError = true;
             }
-            return hasError == false;
+            return modelState.IsValid;
         }
     }
 }

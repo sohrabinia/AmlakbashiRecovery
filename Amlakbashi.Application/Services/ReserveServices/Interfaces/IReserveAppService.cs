@@ -17,7 +17,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
     public interface IReserveAppService : IAppService<Reserve, long>
     {
         IList<Reserve> Filter(ReserveIndexDTO dto, int currentUserId);
-        ReserveListResponse Filter(ReserveListRequest request);
+        ReserveListResponse Filter(ReserveGetListRequest request);
         IList<Reserve> GetListByUserId(int userId, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, int category, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, Reserve.ReserveStatus status, bool RatingShownToGuest,
@@ -33,8 +33,8 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         IList<Reserve> GetByUserId(int userId);
         Reserve FirstHavingUserId(int userId, Reserve.ReserveStatus status);
         Reserve GetRelatedReserveByUser(int userId, out bool isHost);
-        bool Update(Reserve reserve, string start_date, string end_date, out string msg, int doerUserId,
-            ActionSourceEnum actionSource);
+        ServiceResult<bool> Validate(ReservePostRequest request);
+        Task<ServiceResult<long>> SubmitAsync(ReservePostRequest request);
         bool UpdateNew(ReserveIndexEditDTO dto, out string msg, int doerUserId, ActionSourceEnum actionSource);
         void SetStatus(long reserveId, ReserveStatus status, bool sendSms,
             ActionLog.ActionSourceEnum actionSource, int doerUserId, bool force = false);

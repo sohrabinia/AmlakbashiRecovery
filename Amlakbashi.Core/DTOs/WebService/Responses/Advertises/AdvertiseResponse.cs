@@ -38,6 +38,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
         public List<string> amenities { get; set; } = new List<string>();
         public List<AdvertiseChildsResponse> units { get; set; } = new List<AdvertiseChildsResponse>();
         public List<string> imagesUrls { get; set; } = new List<string>();
+        public string hostImageUrl { get; set; }
 
         public static implicit operator AdvertiseResponse(Advertise advertise)
         {
@@ -48,6 +49,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             response.typeTitle = AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID);
             response.hostId = advertise.UserID;
             response.hostName = advertise.User.FullName;
+            response.hostImageUrl = advertise.User.GetUserImageApiUrl();
             if (advertise.User.HostReserves.Any())
             {
                 response.hostReponseRate = ((float)advertise.User.HostReserves.Where(x => x.HostResponse != Reserve.HostResponseEnum.None).Count()
@@ -105,7 +107,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
                 comment = s.Text,
                 date = StringUtility.EnglishNumberToPersian(DateTimeUtility.ConvertDate(s.CreateDate)),
                 name = s.SenderUser.FullName,
-                imageUrl = s.SenderUser.PhotoID == null ? "" : $"/عکس-پروفایل_کوچک-{s.SenderUser.PhotoID}"
+                imageUrl = s.SenderUser.GetUserImageApiUrl()
             }).ToList());
             foreach (var item in advertise.GetActiveAmeneties())
             {
@@ -124,14 +126,10 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
                     price = x.DailyPrice,
                     holidyPrice = x.HolidayPrice,
                     peakHolidayPrice = x.HolidayPikePrice,
-                    extraCapacityPrice = x.MoreThanCapacityPrice,
-                    //imagesUrls = x.Photos.Select(s => $"/file/accthumbxxxlarge?accid={x.Id}&fileid={s.Id}").ToList()
+                    extraCapacityPrice = x.MoreThanCapacityPrice
                 }));
             }
-            foreach (var item in advertise.Photos)
-            {
-                response.imagesUrls.Add($"/file/accthumbxxxlarge?accid={advertise.Id}&fileid={item.Id}");
-            }
+            response.imagesUrls = advertise.GetImagesApiUrls();
             return response;
         }
     }
