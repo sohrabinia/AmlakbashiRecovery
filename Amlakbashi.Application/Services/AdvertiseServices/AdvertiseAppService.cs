@@ -2932,5 +2932,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Save();
             mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
+
+        public void UpdateAlbumPhoto(long advertiseId)
+        {
+            var advertise = Repository.Find(advertiseId);
+            var photoIds = advertise.Photos.Select(x => x.Id).ToList();
+            advertise.AlbumPhoto = advertise.Photos.Count == 0 ? "," : ("," + string.Join(",", photoIds) + ",");
+            Repository.Update(advertise);
+            Repository.Save();
+        }
     }
 }

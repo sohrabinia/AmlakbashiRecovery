@@ -20,6 +20,18 @@ namespace Amlakbashi.Core.Entities
         public int MinifyStatusInt { get; set; }
         public int MinifyMaxWidth { get; set; }
         public long MinifyQualityPercent { get; set; }
+        public bool IsDeleted { get; set; }
+        public MinifyStatusEnum MinifyStatus
+        {
+            get
+            {
+                return (MinifyStatusEnum)MinifyStatusInt;
+            }
+            set
+            {
+                this.MinifyStatusInt = (int)value;
+            }
+        }
 
         [JsonIgnore]
         [InverseProperty(nameof(Advertise.Photos))]
@@ -33,38 +45,36 @@ namespace Amlakbashi.Core.Entities
         [InverseProperty(nameof(Advertise.LicenseFile))]
         public virtual Advertise AdvertiseLicense { get; set; }
 
-        public MinifyStatusEnum MinifyStatus
-        {
-            get
-            {
-                return (MinifyStatusEnum)MinifyStatusInt;
-            }
-            set
-            {
-                this.MinifyStatusInt = (int)value;
-            }
-        }
+        // ---------------------------------------------------- 
 
-        public bool IsDeleted { get; set; }
+        public const string AdvertiseImageDirectory = "content/advertise";
+        public const string UserImagesDirectory = "content/user";
+        public const string AdvertiseLicenseImagesDirectory = "content/license";
+        public const string ImageChacheDerectory = "content/imgcache";
 
         public string FilePathWithoutTildeAndSlash { get { return FilePath.Replace("~/", ""); } }
         public string FilePathWithoutTilde { get { return FilePath.Replace("~", ""); } }
-
-        public enum MinifyStatusEnum
-        {
-            None = 0,
-            Done = 1,
-            Failed = 2
-        }
 
         public File Clone()
         {
             return (File)this.MemberwiseClone();
         }
 
-        public static List<File> GetListClone(List<File> source)
+        public static bool IsValidImageContentType(string contentType)
         {
-            return source.Select(item => item.Clone()).ToList();
+            contentType = contentType.ToLower();
+            return contentType == "image/png" ||
+                contentType == "image/gif" ||
+                contentType == "image/jpg" ||
+                contentType == "image/jpeg"
+                ? true : false;
+        }
+
+        public enum MinifyStatusEnum
+        {
+            None = 0,
+            Done = 1,
+            Failed = 2
         }
 
         public enum FileTypes
@@ -74,12 +84,6 @@ namespace Amlakbashi.Core.Entities
             Voice = 2,
             File = 3,
             zip = 4
-        }
-
-        public enum FileGroup
-        {
-            Post = 0,
-            Advertise = 1
         }
     }
 }

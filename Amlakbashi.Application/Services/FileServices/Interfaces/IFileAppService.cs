@@ -1,4 +1,6 @@
-﻿using Amlakbashi.Core.Common.AppService;
+﻿using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.Common.AppService;
+using Amlakbashi.Core.DTOs.WebService.Requests.Files;
 using Amlakbashi.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -14,6 +16,7 @@ namespace Amlakbashi.Application.Services.FileServices.Interfaces
         IList<File> GetAllDescendingByLastModifyDate(int count = 0);
         File Find(long id);
         long Insert(File newFile);
+        ServiceResult AddAdvertiseImages(FilePostAdvertiseImagesRequest request);
         void Update(File editedFile, string wwwrootPath);
         void UpdateFilePath(long fileId, string filePath);
         Task<long> UpdateUserProfileImageAsync(int userId, IFormFile newImage);

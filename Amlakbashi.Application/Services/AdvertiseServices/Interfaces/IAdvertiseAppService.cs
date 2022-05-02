@@ -141,5 +141,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
             string endDate, int guestCount, bool instantReserve, out string msg, out long reserveId);
         IList<Advertise> GetNorouzAdvertises(int count);
         void SetHygieneProtocol(long id, HygieneProtocolStatus value);
+        void UpdateAlbumPhoto(long advertiseId);
     }
 }

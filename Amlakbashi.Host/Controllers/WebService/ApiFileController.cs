@@ -1,5 +1,7 @@
-﻿using Amlakbashi.Application.Services.FileServices.Interfaces;
+﻿using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
+using Amlakbashi.Application.Services.FileServices.Interfaces;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
+using Amlakbashi.Core.DTOs.WebService.Requests.Files;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
@@ -36,17 +38,8 @@ namespace Amlakbashi.Host.Controllers.WebService
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        private IActionResult File(string fileAddress)
-        {
-            if (System.IO.File.Exists(Path.Combine(webHostEnvironment.WebRootPath, fileAddress)) == false)
-            {
-                return NotFound();
-            }
-            return File(fileAddress, "image/jpeg");
-        }
-
         [HttpGet("user")]
-        public IActionResult GetCurrentUserProfileImage(int userId)
+        public IActionResult GetCurrentUserProfileImage()
         {
             if (userAccessor.CurrentUser.PhotoID == null)
             {
@@ -75,11 +68,23 @@ namespace Amlakbashi.Host.Controllers.WebService
             return File(path);
         }
 
-        //[HttpPost("advertise")]
-        //public IActionResult AddAdvertiseImage()
-        //{
-
-        //}
+        [HttpPost("advertise")]
+        public IActionResult AddAdvertiseImage([FromForm] FilePostAdvertiseImagesRequest request,
+            [FromServices] IAdvertiseAppService advertiseService)
+        {
+            if (request.IsValid(ModelState) == false)
+            {
+                return BadRequest(ModelState);
+            }
+            request.userId = userAccessor.CurrentUser.Id;
+            var result = fileService.AddAdvertiseImages(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            advertiseService.UpdateAlbumPhoto(request.advertiseId);
+            return Created("", "");
+        }
 
         //[HttpDelete("advertise")]
         //public IActionResult RemoveAdvertiseImage()
@@ -92,5 +97,14 @@ namespace Amlakbashi.Host.Controllers.WebService
         //{
 
         //}
+
+        private IActionResult File(string fileAddress)
+        {
+            if (System.IO.File.Exists(Path.Combine(webHostEnvironment.WebRootPath, fileAddress)) == false)
+            {
+                return NotFound();
+            }
+            return File(fileAddress, "image/jpeg");
+        }
     }
 }
