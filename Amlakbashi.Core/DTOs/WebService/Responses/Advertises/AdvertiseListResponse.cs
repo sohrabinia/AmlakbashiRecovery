@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 
 namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
@@ -27,7 +28,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
         public string provinceName { get; set; }
         public string cityName { get; set; }
         public string areaName { get; set; }
-        public List<string> imagesUrls { get; set; }
+        public List<string> imagesUrls { get; set; } = new List<string>();
 
 
         public static implicit operator AdvertiseListItemResponse(Entities.Advertise advertise)
@@ -51,12 +52,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             response.provinceName = advertise.RegionProvince.PersianName;
             response.cityName = advertise.RegionCity.PersianName;
             response.areaName = advertise.Area != null ? advertise.RegionArea.PersianName : null;
-            //response.imagesUrls = new List<string>();
             response.imagesUrls = advertise.GetImagesApiUrls();
-            //foreach (var item in advertise.Photos)
-            //{
-            //    response.imagesUrls.Add($"/file/accthumbxxxlarge?accid={advertise.Id}&fileid={item.Id}");
-            //}
             return response;
         }
     }

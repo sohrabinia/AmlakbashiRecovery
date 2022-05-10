@@ -301,7 +301,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 typeTitle = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(x.TypeID),
                 provinceName = x.RegionProvince.PersianName,
                 cityName = x.RegionCity.PersianName,
-                imageUrl = $"/file/accthumbxxxlarge?accid={x.Id}&fileid={x.MainPhoto.Id}"
+                imageUrl = x.GetMainImageApiUrl()
             }));
             return Ok(response);
         }

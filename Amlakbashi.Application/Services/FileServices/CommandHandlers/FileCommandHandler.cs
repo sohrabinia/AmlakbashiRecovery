@@ -172,14 +172,14 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                     foreach (var file in files)
                     {
                         var fileThumbPath = $"{accThumbPath}/{file.Id}";
-                        if (File.Exists(host.WebRootPath + file.FilePathWithoutTilde) == false ||
+                        if (File.Exists(Path.Combine(host.WebRootPath, file.CorrectedFilePath)) == false ||
                             (request.IsEdit == false && Directory.Exists(fileThumbPath)))
                         {
                             continue;
                         }
                         var waterPath = mediator.Send(new SetWatermarkCommand(file.Id)).Result;
                         var watermarkedImagePath = string.IsNullOrEmpty(waterPath) ?
-                            host.WebRootPath + file.FilePathWithoutTilde :
+                            Path.Combine(host.WebRootPath, file.CorrectedFilePath) :
                             host.WebRootPath + waterPath;
                         watermarkedImageList.Add(watermarkedImagePath);
 
@@ -303,11 +303,8 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
             try
             {
                 var file = fileRepository.Find(request.FileId);
-                var filePath = host.WebRootPath + file.FilePathWithoutTilde;
+                var filePath = Path.Combine(host.WebRootPath, file.CorrectedFilePath);
                 string waterPath = string.Empty;
-
-                //if (file == null || File.Exists(filePath) == false)
-                //    return Task.FromResult(waterPath);
 
                 double ratio = 4.5;
                 using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -396,9 +393,9 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                         if (item.Advertises.Count == 0)
                         {
                             fileRepository.Delete(item.Id);
-                            if (File.Exists(Path.Combine(host.WebRootPath, item.FilePathWithoutTildeAndSlash)))
+                            if (File.Exists(Path.Combine(host.WebRootPath, item.CorrectedFilePath)))
                             {
-                                File.Delete(Path.Combine(host.WebRootPath, item.FilePathWithoutTildeAndSlash));
+                                File.Delete(Path.Combine(host.WebRootPath, item.CorrectedFilePath));
                             }
                             hasChange = true;
                         }
@@ -461,7 +458,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                             item.FilePath.Contains($"/advertise_") == false)
                         {
                             var fileName = $"advertise_{acc.Id}_{item.Id}";
-                            var oldFilePath = host.WebRootPath + item.FilePathWithoutTilde;
+                            var oldFilePath = Path.Combine(host.WebRootPath, item.CorrectedFilePath);
                             var newDbFilePath = $"~/content/advertise/{fileName}.jpg";
                             var newFilePath = $"{host.WebRootPath}/content/advertise/{fileName}.jpg";
                             if (File.Exists(oldFilePath))
@@ -493,7 +490,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 return Task.FromResult((long)0);
             }
 
-            string filepath = $"/content/licenses/license_{request.AdvertiseId}.jpg";
+            string filepath = $"{Entities.File.AdvertiseLicenseImagesDirectory}/license_{request.AdvertiseId}.jpg";
             if (request.LicenseFileId != null && request.LicenseFileId > 0)
             {
                 var oldFile = fileRepository.Find(request.LicenseFileId.Value);

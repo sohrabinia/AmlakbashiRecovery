@@ -1,4 +1,5 @@
-﻿using Amlakbashi.Core.Common.Utilities;
+﻿using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
 using Newtonsoft.Json;
 using System;
@@ -552,7 +553,7 @@ namespace Amlakbashi.Core.Entities
 
         public string GetMainImageApiUrl()
         {
-            return PhotoID == null ? null : $"/api/file/advertise/{Id}/{PhotoID}";
+            return PhotoID == null ? null : $"{GeneralData.WebsiteUrl}/api/file/advertise/{Id}/{PhotoID}";
         }
 
         public List<string> GetImagesApiUrls()
@@ -560,7 +561,7 @@ namespace Amlakbashi.Core.Entities
             var urls = new List<string>();
             foreach (var item in Photos)
             {
-                urls.Add($"/api/file/advertise/{Id}/{item.Id}");
+                urls.Add($"{GeneralData.WebsiteUrl}/api/file/advertise/{Id}/{item.Id}");
             }
             return urls;
         }

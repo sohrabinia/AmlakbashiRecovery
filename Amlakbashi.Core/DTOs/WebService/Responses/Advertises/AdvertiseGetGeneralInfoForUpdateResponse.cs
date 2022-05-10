@@ -30,7 +30,8 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
                 longitude = advertise.Longitude,
                 latitude = advertise.Latitude,
                 title = advertise.Title,
-                description = advertise.Description
+                description = advertise.Description,
+                imagesUrls = advertise.GetImagesApiUrls()
             };
         }
     }

@@ -48,12 +48,17 @@ namespace Amlakbashi.Core.Entities
         // ---------------------------------------------------- 
 
         public const string AdvertiseImageDirectory = "content/advertise";
-        public const string UserImagesDirectory = "content/user";
-        public const string AdvertiseLicenseImagesDirectory = "content/license";
+        public const string UserImagesDirectory = "content/users";
+        public const string AdvertiseLicenseImagesDirectory = "content/licenses";
         public const string ImageChacheDerectory = "content/imgcache";
 
-        public string FilePathWithoutTildeAndSlash { get { return FilePath.Replace("~/", ""); } }
-        public string FilePathWithoutTilde { get { return FilePath.Replace("~", ""); } }
+        //public string FilePathWithoutTildeAndSlash { get { return FilePath.Replace("~/", ""); } }
+        public string CorrectedFilePath {
+            get {
+                return FilePath.StartsWith('~') ? FilePath.Replace("~/", "") : 
+                    FilePath.StartsWith('/') ? FilePath.Substring(1) : FilePath;
+            }
+        }
 
         public File Clone()
         {

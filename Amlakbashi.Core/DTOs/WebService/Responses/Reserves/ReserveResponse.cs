@@ -39,11 +39,11 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Reserves
                 statusTitle = ReserveLocalization.GetStatusString((int)reserve.Status, Reserve.StatusStringType.Site),
                 price = reserve.TotalPrice,
                 hostName = reserve.HostUser.FullName,
-                hostImageUrl = reserve.HostUser.PhotoID == null ? "" : $"/عکس-پروفایل_کوچک-{reserve.HostUser.PhotoID}",
+                hostImageUrl = reserve.HostUser.GetUserImageApiUrl(),
                 hostPhoneNumber = reserve.Status == Reserve.ReserveStatus.Reserved ||
                         reserve.Status == Reserve.ReserveStatus.Started ? reserve.HostUser.MainMobile : null,
                 guestName = reserve.GuestUser.FullName,
-                guestImageUrl = reserve.GuestUser.PhotoID == null ? "" : $"/عکس-پروفایل_کوچک-{reserve.GuestUser.PhotoID}",
+                guestImageUrl = reserve.GuestUser.GetUserImageApiUrl(),
                 guestPhoneNumber = reserve.Status == Reserve.ReserveStatus.Reserved ||
                         reserve.Status == Reserve.ReserveStatus.Started ? reserve.GuestUser.MainMobile : null,
                 residencyInfo = reserve.Advertise

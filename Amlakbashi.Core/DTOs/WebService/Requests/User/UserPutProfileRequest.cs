@@ -1,5 +1,4 @@
 ﻿using Amlakbashi.Core.Common.Utilities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,6 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.User
         public string bankCardOwnerFirstName { get; set; }
         public string bankCardOwnerLastName { get; set; }
         public string shebaNumber { get; set; }
-        public IFormFile image { get; set; }
 
         public bool IsValid(ModelStateDictionary modelState)
         {

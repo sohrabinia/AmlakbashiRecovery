@@ -19,6 +19,7 @@ using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Amlakbashi.Application.Services.FileServices.Interfaces;
+using Amlakbashi.Core.Common.StaticData;
 
 namespace Amlakbashi.Host.Controllers.WebService
 {
@@ -244,7 +245,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 bankCardNumber = bankCard.BankCardNumber,
                 bankCardOwnerName = bankCard.FullName,
                 shebaNumber = bankCard.ShabaNumber,
-                imageUrl = $"/عکس-پروفایل_کوچک-{user.PhotoID}"
+                imageUrl = user.GetCurrentUserImageApiUrl()
             };
             return Ok(response);
         }
@@ -258,10 +259,6 @@ namespace Amlakbashi.Host.Controllers.WebService
                 return BadRequest(ModelState);
             }
             request.id = userAccessor.CurrentUser.Id;
-            if (request.image != null)
-            {
-                await fileService.UpdateUserProfileImageAsync(request.id, request.image);
-            }
             await userService.UpdateAsync(request);
             return Ok();
         }

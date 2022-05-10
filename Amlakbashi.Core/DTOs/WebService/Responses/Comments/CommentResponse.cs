@@ -25,9 +25,9 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Comments
                 userName = comment.SenderUser.FullName,
                 date = DateTimeUtility.GregorianToPersianDate(comment.CreateDate),
                 comment = comment.Text,
-                userImageUrl = "",
+                userImageUrl = comment.SenderUser.GetUserImageApiUrl(),
                 residencyTitle = comment.Advertise.Title,
-                residencyImageUrl = "",
+                residencyImageUrl = comment.Advertise.GetMainImageApiUrl(),
                 hostReplyComment = comment.HostReply?.Text
             };
         }

@@ -18,6 +18,8 @@ using X.PagedList;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace Portal.Controllers
 {
@@ -70,22 +72,16 @@ namespace Portal.Controllers
         }
 
         [Authorize(Policy = Policies.Advertise_Edit)]
-        public ActionResult Edit(int fid = -1)
+        public ActionResult Edit(int fileId)
         {
             try
             {
-                ViewBag.msg = TempData["msg"];
-                if (fid == -1)
+                var file = fileService.Find(fileId);
+                if (file == null)
                 {
-                    Entities.File model = new Entities.File();
-                    model.Id = -1;
-                    return View(model);
+                    return NotFound();
                 }
-                else
-                {
-                    Entities.File model = fileService.Find(fid);
-                    return View(model);
-                }
+                return View(fileId);
             }
             catch (Exception exc)
             {
@@ -96,76 +92,49 @@ namespace Portal.Controllers
 
         [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
-        public ActionResult Edit(Entities.File nfile)
+        public ActionResult Edit(int fileId, IFormFile image)
         {
             try
             {
-                string ext = "", filepath = "";
-                int FileType = -1;
-                if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
+                if (image == null || image.Length == 0)
                 {
-                    var uploadfile = Request.Form.Files[0];
-                    ext = Path.GetExtension(uploadfile.FileName).ToLower();
-                    if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif")
-                        FileType = (int)Entities.File.FileTypes.Image;
-                    else if (ext == ".flv" || ext == ".mp4")
-                        FileType = (int)Entities.File.FileTypes.Video;
-                    else if (ext == ".mp3")
-                        FileType = (int)Entities.File.FileTypes.Voice;
-                    else if (ext == ".txt" || ext == ".pdf" || ext == ".doc" || ext == ".docx")
-                        FileType = (int)Entities.File.FileTypes.File;
-                    else if (ext == ".zip")
-                        FileType = (int)Entities.File.FileTypes.zip;
-                    else
-                    {
-                        TempData["msg"] = "فرمت فایل مورد قبول نمی باشد .";
-                        return RedirectToAction("Edit", "File");
-                    }
-
-                    filepath = string.Format("~/content/files/file{0}{1}", Guid.NewGuid(), ext);
-                    if (!Directory.Exists(Path.Combine(host.WebRootPath, "content/files")))
-                        Directory.CreateDirectory(Path.Combine(host.WebRootPath, "content/files"));
-
-                    using (Stream writer = new FileStream(Path.Combine(host.WebRootPath, filepath.Replace("~/", "")), FileMode.Create))
-                    {
-                        uploadfile.CopyTo(writer);
-                    }
-
-                    lock (objlock)
-                    {
-                        DirectoryInfo IOdirectory = new DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
-                        foreach (System.IO.FileInfo IOfile in IOdirectory.GetFiles())
-                        {
-                            IOfile.Delete();
-                        }
-                    }
+                    ViewBag.msg = "لطفا یک فایل انتخاب کنید";
+                    return View(fileId);
                 }
-                else if (nfile.Id == -1)
+                if (Entities.File.IsValidImageContentType(image.ContentType) == false)
                 {
-                    TempData["msg"] = "لطفا یک فایل انتخاب کنید .";
-                    return RedirectToAction("Edit", "File");
+                    ViewBag.msg = "فرمت فایل مورد قبول نمی باشد";
+                    return View(fileId);
                 }
 
-                if (nfile.Id == -1)
+                var file = fileService.Find(fileId);
+                if (file == null)
                 {
-                    nfile.FilePath = filepath;
-                    nfile.PostDate = DateTime.Now;
-                    nfile.LastModifyDate = DateTime.Now;
-                    nfile.UserID = userAccessor.CurrentUser.Id;
-                    fileService.Insert(nfile);
+                    return NotFound();
                 }
-                else
+
+                file.LastModifyDate = DateTime.Now;
+                fileService.Update(file, host.WebRootPath);
+                using (Stream writer = new FileStream(Path.Combine(host.WebRootPath, file.CorrectedFilePath), FileMode.Create))
                 {
-                    var file = fileService.Find(nfile.Id);
-                    nfile.PostDate = file.PostDate;
-                    nfile.LastModifyDate = DateTime.Now;
-                    if (!string.IsNullOrEmpty(filepath))
+                    image.CopyTo(writer);
+                }
+                if (file.Advertises != null && file.Advertises.Any())
+                {
+                    foreach (var item in file.Advertises)
                     {
-                        nfile.FilePath = filepath;
+                        fileService.GenerateThumbImage(item.Id, fileId);
                     }
-                    fileService.Update(nfile, host.WebRootPath);
                 }
-                return RedirectToAction("Index");
+                lock (objlock)
+                {
+                    DirectoryInfo IOdirectory = new DirectoryInfo(Path.Combine(host.WebRootPath, "content/imgcache"));
+                    foreach (FileInfo IOfile in IOdirectory.GetFiles())
+                    {
+                        IOfile.Delete();
+                    }
+                }
+                return View(fileId);
             }
             catch (Exception exc)
             {
@@ -210,7 +179,7 @@ namespace Portal.Controllers
 
                 var extension = Path.GetExtension(objFile.FilePath).Replace(".", "");
                 var strFormat = "image/" + (extension == "jpg" ? "jpeg" : extension);
-                if (System.IO.File.Exists(host.WebRootPath + "/" + objFile.FilePathWithoutTildeAndSlash))
+                if (System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)))
                 {
                     return File(objFile.FilePath, strFormat);
                 }
@@ -230,13 +199,13 @@ namespace Portal.Controllers
             {
                 var objFile = fileService.Find(FileID);
                 if (objFile == null ||
-                    System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)) == false)
+                    System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)) == false)
                 {
                     return File("/resource/img/img202_500_300.png", "image/png");
                 }
 
                 string path = "", strFormat = "";
-                using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)))
                 {
                     if (tmpImage.RawFormat.Equals(ImageFormat.Png))
                     {
@@ -252,8 +221,8 @@ namespace Portal.Controllers
 
                 if (System.IO.File.Exists(Path.Combine(host.WebRootPath, path)) == false)
                 {
-                    string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
-                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, OrginalPath)))
+                    //string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
+                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)))
                     {
                         lock (objlock)
                         {
@@ -286,13 +255,13 @@ namespace Portal.Controllers
             {
                 var objFile = fileService.Find(FileID);
                 if (objFile == null ||
-                    System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)) == false)
+                    System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)) == false)
                 {
                     return File("/resource/img/img202_500_300.png", "image/png");
                 }
 
                 string path = "", strFormat = "";
-                using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)))
                 {
                     if (tmpImage.RawFormat.Equals(ImageFormat.Png))
                     {
@@ -308,8 +277,8 @@ namespace Portal.Controllers
 
                 if (System.IO.File.Exists(Path.Combine(host.WebRootPath, path)) == false)
                 {
-                    string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
-                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, OrginalPath)))
+                    //string OrginalPath = objFile.FilePathWithoutTildeAndSlash;
+                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)))
                     {
                         double nw, nh, zz;
                         if (w == 0)
@@ -370,13 +339,13 @@ namespace Portal.Controllers
             {
                 var objFile = fileService.Find(FileID);
                 if (objFile == null ||
-                    System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)) == false)
+                    System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)) == false)
                 {
                     return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 }
 
                 string path = "", strFormat = "";
-                using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                using (Image tmpImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)))
                 {
                     if (tmpImage.RawFormat.Equals(ImageFormat.Png))
                     {
@@ -392,7 +361,7 @@ namespace Portal.Controllers
 
                 if (System.IO.File.Exists(Path.Combine(host.WebRootPath, path)) == false)
                 {
-                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)))
                     {
                         double nw, nh, zz;
                         if (w == 0)
@@ -459,7 +428,7 @@ namespace Portal.Controllers
                     return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 }
                 var objFile = fileService.Find(advertise.PhotoID == null ? 0 : (long)advertise.PhotoID);
-                if (objFile == null || !System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                if (objFile == null || !System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)))
                 {
                     return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 }
@@ -469,7 +438,7 @@ namespace Portal.Controllers
 
                 if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))
                 {
-                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.FilePathWithoutTildeAndSlash)))
+                    using (Image OriginalImage = Image.FromFile(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)))
                     {
                         lock (objlock)
                         {
@@ -532,7 +501,7 @@ namespace Portal.Controllers
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
 
-                using (Image image = Image.FromFile(Path.Combine(host.WebRootPath, file.FilePathWithoutTildeAndSlash)))
+                using (Image image = Image.FromFile(Path.Combine(host.WebRootPath, file.CorrectedFilePath)))
                 {
                     if (image.Width > 1500)
                         ViewBag.BigImage = true;
@@ -558,9 +527,9 @@ namespace Portal.Controllers
                         Entities.File ObjFile = fileService.Find(id).Clone();
                         var uploadfile = Request.Form.Files[0];
 
-                        string directoryPath = ObjFile.FilePathWithoutTildeAndSlash.Substring(0,
-                            ObjFile.FilePathWithoutTildeAndSlash.LastIndexOf('/') + 1);
-                        var filepath = Path.Combine(host.WebRootPath, ObjFile.FilePathWithoutTildeAndSlash);
+                        string directoryPath = ObjFile.CorrectedFilePath.Substring(0,
+                            ObjFile.CorrectedFilePath.LastIndexOf('/') + 1);
+                        var filepath = Path.Combine(host.WebRootPath, ObjFile.CorrectedFilePath);
 
                         if (Directory.Exists(Path.Combine(host.WebRootPath, directoryPath)) == false)
                             Directory.CreateDirectory(Path.Combine(host.WebRootPath, directoryPath));
@@ -884,13 +853,13 @@ namespace Portal.Controllers
                     if (Directory.Exists(host.WebRootPath + "/content/advertise") == false)
                         Directory.CreateDirectory(host.WebRootPath + "/content/advertise");
 
-                    var filepath = $"~/content/advertise/advertise_{accId}_{photoID}.jpg";
+                    var filepath = $"{Entities.File.AdvertiseImageDirectory}/advertise_{accId}_{photoID}.jpg";
                     ImageCodecInfo format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
                     EncoderParameters encoderParameters = new EncoderParameters(1);
                     encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, quality);
                     var image = Image.FromStream(uploadfile.OpenReadStream(), true, true);
                     image = ImageUtility.MinifyImage(image, maxWidth);
-                    image.Save(host.WebRootPath + filepath.Replace("~", ""), format, encoderParameters);
+                    image.Save(Path.Combine(host.WebRootPath, filepath), format, encoderParameters);
 
                     fileService.UpdateFilePath(photoID, filepath);
                     return GenerateJsonResult(new { Status = 1, id = photoID });

@@ -1,4 +1,5 @@
-﻿using Amlakbashi.Core.Common.Utilities;
+﻿using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.WebService.Responses.Advertises;
 using Amlakbashi.Core.DTOs.WebService.Responses.Advertises.AdvertiseParts;
 using Amlakbashi.Core.Entities;

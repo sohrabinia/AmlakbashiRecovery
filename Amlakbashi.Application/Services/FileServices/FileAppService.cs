@@ -15,6 +15,7 @@ using Amlakbashi.Core.Common.Utilities;
 using System.Drawing.Imaging;
 using System.Drawing;
 using Amlakbashi.Application.DTOs;
+using Amlakbashi.Mediator.Commands.FileCommands;
 
 namespace Amlakbashi.Application.Services.FileServices
 {
@@ -22,7 +23,6 @@ namespace Amlakbashi.Application.Services.FileServices
     {
         private readonly IMediator mediator;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private static readonly object objlock = new object();
         public FileAppService(IRepository<File, long> repository,
             IMediator mediator,
             IWebHostEnvironment webHostEnvironment) : base(repository)
@@ -52,7 +52,7 @@ namespace Amlakbashi.Application.Services.FileServices
             return newFile.Id;
         }
 
-        public ServiceResult AddAdvertiseImages(FilePostAdvertiseImagesRequest request)
+        public async Task<ServiceResult> AddAdvertiseImagesAsync(FilePostAdvertiseImagesRequest request)
         {
             var serviceResult = new ServiceResult();
             var advertise = Repository.Find<Advertise, long>(request.advertiseId);
@@ -65,6 +65,7 @@ namespace Amlakbashi.Application.Services.FileServices
             CheckExistDirectory(File.AdvertiseImageDirectory);
             var quality = 80;
             var maxWidth = 1024;
+            var newFileIds = new List<long>();
             foreach (var item in request.images.Files)
             {
                 var file = new File()
@@ -88,45 +89,11 @@ namespace Amlakbashi.Application.Services.FileServices
                 image = ImageUtility.MinifyImage(image, maxWidth);
                 image.Save(System.IO.Path.Combine(webHostEnvironment.WebRootPath,
                     File.AdvertiseImageDirectory, fileName), format, encoderParameters);
-                UpdateFilePath(file.Id, $"~/{File.AdvertiseImageDirectory}/{fileName}");
+                UpdateFilePath(file.Id, $"{File.AdvertiseImageDirectory}/{fileName}");
+                newFileIds.Add(file.Id);
             }
+            await mediator.Send(new GenerateThumbImageCommand(advertise.Id, null, newFileIds));
             return serviceResult;
-        }
-
-        public async Task<long> UpdateUserProfileImageAsync(int userId, IFormFile newImage)
-        {
-            if (File.IsValidImageContentType(newImage.ContentType) == false)
-            {
-                return 0;
-            }
-
-            var user = Repository.Find<User, int>(userId);
-            string filepath = $"~/content/users/user_{user.Id}.jpg";
-            long PhotoID = 0;
-            if (user.PhotoID != null)
-            {
-                PhotoID = user.Photo.Id;
-                var file = Repository.Find(user.PhotoID.Value);
-                file.FilePath = filepath;
-                file.LastModifyDate = DateTime.Now;
-                Update(file, webHostEnvironment.WebRootPath);
-            }
-            else
-            {
-                PhotoID = Insert(new File()
-                {
-                    PostDate = DateTime.Now,
-                    LastModifyDate = DateTime.Now,
-                    UserID = user.Id,
-                    FilePath = filepath
-                });
-            }
-            using (var stream = System.IO.File.Create(webHostEnvironment.WebRootPath + filepath.Replace("~", "")))
-            {
-                await newImage.CopyToAsync(stream);
-            }
-            ClearImagesCache();
-            return PhotoID;
         }
 
         public void Update(File editedFile, string wwwrootPath)
@@ -134,13 +101,7 @@ namespace Amlakbashi.Application.Services.FileServices
             var file = Repository.Find(editedFile.Id);
             if (string.IsNullOrEmpty(editedFile.FilePath) == false && editedFile.FilePath != file.FilePath)
             {
-                if (System.IO.File.Exists(wwwrootPath + file.FilePath.Replace("~/", "")))
-                {
-                    lock (objlock)
-                    {
-                        System.IO.File.Delete(wwwrootPath + file.FilePath.Replace("~/", ""));
-                    }
-                }
+                DeleteFile(file.CorrectedFilePath);
                 file.FilePath = editedFile.FilePath;
             }
             file.LastModifyDate = editedFile.LastModifyDate;
@@ -162,19 +123,129 @@ namespace Amlakbashi.Application.Services.FileServices
             Repository.Save();
         }
 
+        public async Task<ServiceResult<long>> UpdateUserProfileImageAsync(int userId, IFormFile newImage)
+        {
+            var serviceResult = new ServiceResult<long>();
+            if (File.IsValidImageContentType(newImage.ContentType) == false)
+            {
+                serviceResult.AddError("incorrect image format");
+                return serviceResult;
+            }
+
+            var user = Repository.Find<User, int>(userId);
+            string filepath = $"{File.UserImagesDirectory}/user_{user.Id}.jpg";
+            if (user.PhotoID != null)
+            {
+                serviceResult.Result = user.PhotoID.Value;
+                var file = Repository.Find(user.PhotoID.Value);
+                file.FilePath = filepath;
+                file.LastModifyDate = DateTime.Now;
+                Update(file, webHostEnvironment.WebRootPath);
+            }
+            else
+            {
+                serviceResult.Result = Insert(new File()
+                {
+                    PostDate = DateTime.Now,
+                    LastModifyDate = DateTime.Now,
+                    UserID = user.Id,
+                    FilePath = filepath
+                });
+            }
+            CheckExistDirectory(File.UserImagesDirectory);
+            await SaveFile(newImage, filepath);
+            ClearImagesCache();
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> UpdateAdvertiseLicenseImageAsync(FilePostAdvertiseLicenseImageRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var advertise = Repository.Find<Advertise, long>(request.advertiseId);
+            if (File.IsValidImageContentType(request.image.ContentType) == false)
+            {
+                serviceResult.AddError("image content type is incorrect");
+            }
+            if (advertise == null)
+            {
+                serviceResult.AddError("advertise id is incorrect");
+            }
+            if (advertise != null && advertise.UserID != request.userId)
+            {
+                serviceResult.AddError("user is incorrect");
+            }
+            if (serviceResult.HasError())
+            {
+                return serviceResult;
+            }
+
+            string filepath = $"{File.AdvertiseLicenseImagesDirectory}/license_{request.advertiseId}.jpg";
+            if (advertise.LicenseFileId != null)
+            {
+                advertise.LicenseFile.FilePath = filepath;
+                advertise.LicenseFile.LastModifyDate = DateTime.Now;
+                Repository.Update(advertise.LicenseFile);
+                Repository.Save();
+            }
+            else
+            {
+                var newLicenseFile = new File()
+                {
+                    PostDate = DateTime.Now,
+                    LastModifyDate = DateTime.Now,
+                    UserID = request.userId,
+                    FilePath = filepath,
+                    AdvertiseLicense = advertise
+                };
+                Insert(newLicenseFile);
+            }
+            CheckExistDirectory(File.AdvertiseLicenseImagesDirectory);
+            await SaveFile(request.image, filepath);
+            return serviceResult;
+        }
+
         public void Delete(int fileId, string serverPath)
         {
             var file = Repository.Query(q => q.FirstOrDefault(f => f.Id == fileId));
-            if (System.IO.File.Exists(serverPath + file.FilePath.Replace("~/", "")))
-                lock (objlock)
-                {
-                    System.IO.File.Delete(serverPath + file.FilePath.Replace("~/", ""));
-                }
+            DeleteFile(file.CorrectedFilePath);
             Repository.Delete(fileId);
             Repository.Save();
         }
 
-        public void ClearImagesCache()
+        public async Task<ServiceResult> DeleteAdvertiseImage(long advertiseId, long fileId, int userId)
+        {
+            var serviceResult = new ServiceResult();
+            var advertise = Repository.Find<Advertise, long>(advertiseId);
+            if (advertise == null)
+            {
+                serviceResult.AddError("advertise Id is incorrect");
+            }
+            if (advertise.UserID != userId)
+            {
+                serviceResult.AddError("user is incorrect");
+            }
+            if (advertise.Photos.Any(x => x.Id == fileId) == false)
+            {
+                serviceResult.AddError("file Id is incorrect");
+            }
+            if (serviceResult.HasError())
+            {
+                return serviceResult;
+            }
+            var file = Repository.Find(fileId);
+            file.Advertises.Remove(advertise);
+            Repository.Update(file);
+            Repository.Save();
+            await mediator.Send(new RemovePhotosByFileIdsCommand(advertiseId, new List<long>() { fileId }));
+            return serviceResult;
+        }
+
+        public void GenerateThumbImage(long accId, long fileId)
+        {
+            mediator.Send(new GenerateThumbImageCommand(accId, null, new List<long>() { fileId }, true));
+        }
+
+        private void ClearImagesCache()
         {
             System.IO.DirectoryInfo imageCacheDir = new System.IO.DirectoryInfo(
                 System.IO.Path.Combine(webHostEnvironment.WebRootPath, File.ImageChacheDerectory));
@@ -184,15 +255,33 @@ namespace Amlakbashi.Application.Services.FileServices
             }
         }
 
-        public void GenerateThumbImage(long accId, long fileId)
+        private async Task SaveFile(IFormFile file, string path)
         {
-            mediator.Send(new GenerateThumbImageCommand(accId, null, new List<long>() { fileId }, true));
+            path = System.IO.Path.Combine(webHostEnvironment.WebRootPath, path);
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
+            using (var stream = System.IO.File.Create(path))
+            {
+                await file.CopyToAsync(stream);
+            }
         }
 
-        private void CheckExistDirectory(string directoryPath)
+        private void DeleteFile(string path)
         {
-            if (System.IO.Directory.Exists(System.IO.Path.Combine(webHostEnvironment.WebRootPath, directoryPath)) == false)
-                System.IO.Directory.CreateDirectory(System.IO.Path.Combine(webHostEnvironment.WebRootPath, directoryPath));
+            path = System.IO.Path.Combine(webHostEnvironment.WebRootPath, path);
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
+        }
+
+        private void CheckExistDirectory(string path)
+        {
+            path = System.IO.Path.Combine(webHostEnvironment.WebRootPath, path);
+            if (System.IO.Directory.Exists(path) == false)
+                System.IO.Directory.CreateDirectory(path);
         }
     }
 }

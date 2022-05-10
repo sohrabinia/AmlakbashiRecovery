@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Core.Common.Entity;
+using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Core.Common.Utilities;
 using Newtonsoft.Json;
 using System;
@@ -208,9 +209,14 @@ namespace Amlakbashi.Core.Entities
             return false;
         }
 
+        public string GetCurrentUserImageApiUrl()
+        {
+            return PhotoID == null ? null : $"{GeneralData.WebsiteUrl}/api/file/user";
+        }
+
         public string GetUserImageApiUrl()
         {
-            return PhotoID == null ? null : $"/api/file/user/{Id}";
+            return PhotoID == null ? null : $"{GeneralData.WebsiteUrl}/api/file/user/{Id}";
         }
 
         #endregion
