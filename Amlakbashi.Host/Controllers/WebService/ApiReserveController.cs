@@ -134,24 +134,39 @@ namespace Amlakbashi.Host.Controllers.WebService
                 (reserve.Status != Reserve.ReserveStatus.WaitForResponse &&
                 reserve.Status != Reserve.ReserveStatus.WaitForReserve))
             {
-                return Forbid();
+                return BadRequest();
             }
             reserveService.SetHostResponse(request.reserveId, request.hostResponse, true,
                 ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
             return Ok();
         }
 
-        [HttpPost("confirmstart/{id:long}")]
+        [HttpPost("start")]
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Guest)]
-        public async Task<IActionResult> ConfirmReserveStart(long id)
+        public async Task<IActionResult> Start(ReservePostStartRequest request)
         {
-            var result = await reserveService.ConfirmResidenceAsync(id, userAccessor.CurrentUser.Id,
-                ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
-            if (result.HasError() == false && result.Result)
+            request.userId = userAccessor.CurrentUser.Id;
+            request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
+            var result = await reserveService.StartAsync(request);
+            if (result.HasError())
             {
-                return Ok();
+                return BadRequest(result.GetErrors());
             }
-            return BadRequest(result.GetErrors());
+            return Ok();
+        }
+
+        [HttpPost("cancel")]
+        public async Task<IActionResult> Cancel(ReservePostCancelRequest request)
+        {
+            request.userId = userAccessor.CurrentUser.Id;
+            request.panel = User.GetUserPanelType();
+            request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
+            var result = await reserveService.CancelAsync(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok();
         }
     }
 }

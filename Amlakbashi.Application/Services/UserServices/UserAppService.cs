@@ -25,6 +25,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Amlakbashi.Core.DTOs.WebService.Requests.User;
 using System.Text;
+using Amlakbashi.Core.Common.StaticData;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
@@ -1087,26 +1088,28 @@ namespace Amlakbashi.Application.Services.UserServices
             return token;
         }
 
-        public async Task<string> GenerateJwtTokenAsync(string guid, string jwtSecret)
+        public async Task<string> GenerateJwtTokenAsync(string guid, string jwtSecret,
+            User.UserGeneralTypeEnum? panel = null)
         {
             var identityUser = await userManager.FindByIdAsync(guid);
             var user = GetByMainMobile(identityUser.UserName);
+            var userRoles = await userManager.GetRolesAsync(identityUser);
+            panel = panel != null ? panel.Value : (User.UserGeneralTypeEnum)user.UserGeneralType;
             var claims = new List<Claim>();
 
-            var userRoles = await userManager.GetRolesAsync(identityUser);
             foreach (var role in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
             claims.Add(new Claim(ClaimTypes.NameIdentifier, identityUser.Id));
             claims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
-            claims.Add(new Claim("panel", user.UserGeneralType == 0 ? "guest" : "host"));
             claims.Add(new Claim("refreshToken", identityUser.SecurityStamp));
+            claims.Add(new Claim("panel", panel == User.UserGeneralTypeEnum.Guest ? "guest" : "host"));
 
             var symmetricKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret));
             var token = new JwtSecurityToken(
-                    issuer: "https://www.amlakbashi.com",
-                    audience: "https://www.amlakbashi.com",
+                    issuer: GeneralData.WebsiteUrl,
+                    audience: GeneralData.WebsiteUrl,
                     claims: claims,
                     expires: DateTime.Now.AddDays(30),
                     signingCredentials: new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256));
@@ -1124,15 +1127,16 @@ namespace Amlakbashi.Application.Services.UserServices
                     ValidateLifetime = false,
                     ValidateIssuerSigningKey = true,
                     RequireSignedTokens = true,
-                    ValidIssuer = "https://www.amlakbashi.com",
-                    ValidAudience = "https://www.amlakbashi.com",
+                    ValidIssuer = GeneralData.WebsiteUrl,
+                    ValidAudience = GeneralData.WebsiteUrl,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret))
                 };
                 var tokenHandler = new JwtSecurityTokenHandler();
                 SecurityToken securityToken;
                 var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
                 var jwtSecurityToken = securityToken as JwtSecurityToken;
-                if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                if (jwtSecurityToken == null ||
+                    jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase) == false)
                 {
                     return null;
                 }

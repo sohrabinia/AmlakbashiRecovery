@@ -14,8 +14,10 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Hangfire;
 using Hangfire.SqlServer;
+using log4net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -50,8 +52,8 @@ namespace Amlakbashi.Host
         }
 
         public IConfigurationRoot Configuration { get; private set; }
-
         public ILifetimeScope AutofacContainer { get; private set; }
+        private const string crossOriginPolicyName = "AllowCrossOrigins";
 
         // ConfigureServices is where you register dependencies. This gets
         // called by the runtime before the ConfigureContainer method, below.
@@ -80,7 +82,7 @@ namespace Amlakbashi.Host
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
                     options.SaveToken = true;
-                    options.TokenValidationParameters = 
+                    options.TokenValidationParameters =
                         TokenUtility.GetTokenValidationParameters(Configuration["JwtConfig:Secret"]);
                 });
 
@@ -149,7 +151,7 @@ namespace Amlakbashi.Host
 
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowCrossOrigins", policy =>
+                options.AddPolicy(crossOriginPolicyName, policy =>
                 {
                     var crossOrigins = new List<string>();
                     crossOrigins.Add("http://localhost:3000");
@@ -182,15 +184,36 @@ namespace Amlakbashi.Host
             }
             else
             {
-                app.UseExceptionHandler("/errors/http500");
-                app.UseStatusCodePagesWithReExecute("/errors/http404");
+                app.UseExceptionHandler(errorApp =>
+                {
+                    errorApp.Run(context =>
+                    {
+                        if (context.Request.Path.Value.StartsWith("/api/") == false)
+                        {
+                            context.Response.Redirect("/errors/http500");
+                        }
+                        return Task.CompletedTask;
+                    });
+                });
+                app.UseStatusCodePages(new StatusCodePagesOptions()
+                {
+                    HandleAsync = context =>
+                    {
+                        if (context.HttpContext.Request.Path.Value.StartsWith("/api/") == false &&
+                            context.HttpContext.Response.StatusCode == StatusCodes.Status404NotFound)
+                        {
+                            context.HttpContext.Response.Redirect("/errors/http404");
+                        }
+                        return Task.CompletedTask;
+                    }
+                });
             }
 
 #if !DEBUG
             app.UseAntiXssMiddleware();
 #endif
 
-            app.UseCors("AllowCrossOrigins");
+            app.UseCors(crossOriginPolicyName);
             app.UseResponseCaching();
             app.UseStaticFiles(new StaticFileOptions
             {

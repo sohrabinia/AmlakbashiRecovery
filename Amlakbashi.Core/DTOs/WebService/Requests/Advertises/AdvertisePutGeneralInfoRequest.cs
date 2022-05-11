@@ -31,36 +31,9 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         [Required]
         public string description { get; set; }
 
+        public long mainImageId { get; set; }
+
         [BindNever]
         public int userId { get; set; }
-
-        public bool IsValid(ModelStateDictionary modelState)
-        {
-            //if (province < 1)
-            //{
-            //    modelState.AddModelError(nameof(province), "value is incorrect");
-            //}
-            //if (city < 1)
-            //{
-            //    modelState.AddModelError(nameof(city), "value is incorrect");
-            //}
-            //if (area < 1)
-            //{
-            //    modelState.AddModelError(nameof(area), "value is incorrect");
-            //}
-            //if (string.IsNullOrEmpty(address))
-            //{
-            //    modelState.AddModelError(nameof(address), "value is incorrect");
-            //}
-            //if (string.IsNullOrEmpty(title))
-            //{
-            //    modelState.AddModelError(nameof(title), "value is incorrect");
-            //}
-            //if (string.IsNullOrEmpty(description))
-            //{
-            //    modelState.AddModelError(nameof(description), "value is incorrect");
-            //}
-            return modelState.IsValid;
-        }
     }
 }

@@ -551,12 +551,12 @@ namespace Amlakbashi.Core.Entities
                 .Average(x => (float)x.Score) : 0;
         }
 
-        public string GetMainImageApiUrl()
+        public string GetMainImageUrl()
         {
             return PhotoID == null ? null : $"{GeneralData.WebsiteUrl}/api/file/advertise/{Id}/{PhotoID}";
         }
 
-        public List<string> GetImagesApiUrls()
+        public List<string> GetImagesUrls()
         {
             var urls = new List<string>();
             foreach (var item in Photos)
@@ -564,6 +564,16 @@ namespace Amlakbashi.Core.Entities
                 urls.Add($"{GeneralData.WebsiteUrl}/api/file/advertise/{Id}/{item.Id}");
             }
             return urls;
+        }
+
+        public Dictionary<long, string> GetImagesIdAndUrls()
+        {
+            var dic = new Dictionary<long, string>();
+            foreach (var item in Photos)
+            {
+                dic.Add(item.Id, $"{GeneralData.WebsiteUrl}/api/file/advertise/{Id}/{item.Id}");
+            }
+            return dic;
         }
 
         #endregion

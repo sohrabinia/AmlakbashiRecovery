@@ -52,7 +52,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             response.provinceName = advertise.RegionProvince.PersianName;
             response.cityName = advertise.RegionCity.PersianName;
             response.areaName = advertise.Area != null ? advertise.RegionArea.PersianName : null;
-            response.imagesUrls = advertise.GetImagesApiUrls();
+            response.imagesUrls = advertise.GetImagesUrls();
             return response;
         }
     }

@@ -16,7 +16,8 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
         public double latitude { get; set; }
         public string title { get; set; }
         public string description { get; set; }
-        public List<string> imagesUrls { get; set; }
+        public long? mainImageId { get; set; }
+        public Dictionary<long, string> images { get; set; }
 
         public static implicit operator AdvertiseGetGeneralInfoForUpdateResponse(Advertise advertise)
         {
@@ -31,7 +32,8 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
                 latitude = advertise.Latitude,
                 title = advertise.Title,
                 description = advertise.Description,
-                imagesUrls = advertise.GetImagesApiUrls()
+                mainImageId = advertise.PhotoID,
+                images = advertise.GetImagesIdAndUrls()
             };
         }
     }

@@ -176,10 +176,6 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPut("update/general")]
         public async Task<IActionResult> UpdateGeneralInfo(AdvertisePutGeneralInfoRequest request)
         {
-            if (request.IsValid(ModelState) == false)
-            {
-                return BadRequest(ModelState);
-            }
             var checkRegionResult = regionService.IsValidRegions(request.province, request.city, request.area);
             if (checkRegionResult.HasError())
             {
@@ -301,7 +297,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 typeTitle = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(x.TypeID),
                 provinceName = x.RegionProvince.PersianName,
                 cityName = x.RegionCity.PersianName,
-                imageUrl = x.GetMainImageApiUrl()
+                imageUrl = x.GetMainImageUrl()
             }));
             return Ok(response);
         }

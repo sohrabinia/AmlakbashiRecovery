@@ -200,7 +200,8 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 return Unauthorized();
             }
-            var newToken = await userService.GenerateJwtTokenAsync(identityUser.Id, jwtSecret);
+            var newToken = await userService.GenerateJwtTokenAsync(identityUser.Id, jwtSecret,
+                request.panel != null ? request.panel : principal.GetUserPanelType());
             return new ObjectResult(new
             {
                 token = newToken

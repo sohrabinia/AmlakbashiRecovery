@@ -84,7 +84,8 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         bool SignInRegisterOld(int user_id, string fname, string lname,
             string password, string confirmPassword, out Dictionary<string, string> errors);
         JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key, int userGeneralType = 0);
-        Task<string> GenerateJwtTokenAsync(string guid, string jwtSecret);
+        Task<string> GenerateJwtTokenAsync(string guid, string jwtSecret,
+            User.UserGeneralTypeEnum? panel = null);
         ClaimsPrincipal GetPrincipalFromJwtToken(string token, string jwtSecret);
         IEnumerable<User> IdentityUsersToUsers(IEnumerable<AppUser> identityUsers);
         IEnumerable<AppUser> GetAllSupportEmployees();

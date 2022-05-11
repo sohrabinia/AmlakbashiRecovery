@@ -47,6 +47,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         void CancelReserve(User user, long reserve_id, int cancel_reason_code,
             string cancel_reason_string, bool is_host, out string msg,
             out bool isPending, ActionSourceEnum actionSource, int doerUserId);
+        Task<ServiceResult> CancelAsync(ReservePostCancelRequest request);
         void RefuseCancelReserve(User user, long reserve_id, bool is_host, out string msg,
             ActionSourceEnum actionLog, int doerUserId);
         void UpdateShouldFollow(long id, string text, User user);
@@ -56,8 +57,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         int UpdateCallState(long id, string hostOrGuest);
         bool StartStay(long reserveId, int user_id, out string msg,
             ActionSourceEnum actionSource, int doerUserId);
-        Task<ServiceResult<bool>> ConfirmResidenceAsync(long reserveId, int userId,
-            ActionSourceEnum actionSource, int doerUserId);
+        Task<ServiceResult> StartAsync(ReservePostStartRequest request);
         void UpdateAccVisitedByGuest(long id, bool value);
         void UpdateDisableAutoCancel(long id, bool value);
         void UpdateExcludeGroup(long id, bool value);

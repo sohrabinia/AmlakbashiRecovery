@@ -27,7 +27,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Comments
                 comment = comment.Text,
                 userImageUrl = comment.SenderUser.GetUserImageApiUrl(),
                 residencyTitle = comment.Advertise.Title,
-                residencyImageUrl = comment.Advertise.GetMainImageApiUrl(),
+                residencyImageUrl = comment.Advertise.GetMainImageUrl(),
                 hostReplyComment = comment.HostReply?.Text
             };
         }

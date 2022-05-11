@@ -1084,34 +1084,34 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return true;
         }
 
-        public async Task<ServiceResult<bool>> ConfirmResidenceAsync(long reserveId, int userId,
-            ActionSourceEnum actionSource, int doerUserId)
+        public async Task<ServiceResult> StartAsync(ReservePostStartRequest request)
         {
-            var serviceResult = new ServiceResult<bool>();
-            var reserve = Repository.Find(reserveId);
-            if (reserve.UserID != userId)
+            var serviceResult = new ServiceResult();
+            var reserve = Repository.Find(request.reserveId);
+            if (reserve.UserID != request.userId)
             {
-                serviceResult.AddError(ReserveErrorMessages.ConfirmResidence_UserInvalid);
+                serviceResult.AddError(ReserveErrorMessages.StartAsync_UserInvalid);
             }
-            if (accounting.IsReservePaidCompletely(reserveId) == false)
+            if (accounting.IsReservePaidCompletely(request.reserveId) == false)
             {
-                serviceResult.AddError(ReserveErrorMessages.ConfirmResidence_NotPaid);
+                serviceResult.AddError(ReserveErrorMessages.StartAsync_NotPaid);
             }
             DateTime canStartTime;
             if (reserve.CanReserveStarted(out canStartTime) == false)
             {
-                serviceResult.AddError(ReserveErrorMessages.ConfirmResidence_DateInvalid);
+                serviceResult.AddError(ReserveErrorMessages.StartAsync_DateInvalid);
             }
             if (reserve.Status != ReserveStatus.Reserved)
             {
-                serviceResult.AddError(ReserveErrorMessages.ConfirmResidence_StateInvalid);
+                serviceResult.AddError(ReserveErrorMessages.StartAsync_StateInvalid);
             }
             if (serviceResult.HasError())
             {
                 return serviceResult;
             }
 
-            serviceResult.Result = await mediator.Send(new SetReserveStatusCommand(reserveId, ReserveStatus.Started, true, actionSource, doerUserId));
+            await mediator.Send(new SetReserveStatusCommand(request.reserveId, ReserveStatus.Started, true,
+                request.actionSource, request.userId));
             return serviceResult;
         }
 
@@ -1304,6 +1304,47 @@ namespace Amlakbashi.Application.Services.ReserveServices
                     ReserveStatus.CanceledByGuest, true, actionSource, doerUserId));
                 msg = "درخواست رزرو شما با موفقیت لغو شد";
             }
+        }
+
+        public async Task<ServiceResult> CancelAsync(ReservePostCancelRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var reserve = Repository.Find(request.reserveId);
+            if ((request.panel == User.UserGeneralTypeEnum.Guest && reserve.UserID != request.userId) ||
+                (request.panel == User.UserGeneralTypeEnum.Host && reserve.HostUserID != request.userId))
+            {
+                serviceResult.AddError("user is incorrect");
+            }
+            if (reserve.Status > ReserveStatus.Started)
+            {
+                serviceResult.AddError("cannot cancel this reserve");
+            }
+            if (serviceResult.HasError())
+            {
+                return serviceResult;
+            }
+
+            var targetStatus = ReserveStatus.Default;
+            if (accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest) > 0)
+            {
+                targetStatus = request.panel == User.UserGeneralTypeEnum.Host ?
+                    ReserveStatus.CancelRequestByHost : ReserveStatus.CancelRequestByGuest;
+            }
+            else
+            {
+                targetStatus = request.panel == User.UserGeneralTypeEnum.Host ?
+                    ReserveStatus.CanceledByHost : ReserveStatus.CanceledByGuest;
+            }
+            var changeStatusResult = await mediator.Send(new SetReserveStatusCommand(reserve.Id, targetStatus, true,
+                request.actionSource, request.userId));
+
+            if (changeStatusResult)
+            {
+                reserve.CancelReason = request.reason;
+                Repository.Update(reserve);
+                Repository.Save();
+            }
+            return serviceResult;
         }
 
         public void RefuseCancelReserve(User user, long reserve_id,

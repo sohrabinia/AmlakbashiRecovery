@@ -713,7 +713,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var serviceResult = new ServiceResult<long>();
             var advertise = Repository.Find(request.advertiseId);
-            if (advertise == null)
+            if (advertise == null || request.userId != advertise.UserID)
             {
                 serviceResult.AddError("advertise not found");
                 return serviceResult;
@@ -730,9 +730,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var serviceResult = new ServiceResult();
             var advertise = Repository.Find(request.advertiseId);
-            if (advertise == null)
+            if (advertise == null || advertise.UserID != request.userId)
             {
                 serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            if (request.mainImageId > 0 && advertise.Photos.Any(x=>x.Id == request.mainImageId) == false)
+            {
+                serviceResult.AddError("main image id is incorrect");
                 return serviceResult;
             }
             var shallowAdvertise = advertise.ShallowCopy();
@@ -752,6 +757,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             advertise.Longitude = request.longitude;
             advertise.Latitude = request.latitude;
             advertise.LastModifyDate = DateTime.Now;
+            advertise.PhotoID = request.mainImageId > 0 ? request.mainImageId : advertise.PhotoID;
             advertise.UpdateStatusAfterChangeInfo(HasImportantChangeOnUpdate(shallowAdvertise, advertise));
             Repository.Update(advertise);
             Repository.Save();
@@ -771,7 +777,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var serviceResult = new ServiceResult();
             var advertise = Repository.Find(request.advertiseId);
-            if (advertise == null)
+            if (advertise == null || advertise.UserID != request.userId)
             {
                 serviceResult.AddError("advertise not found");
                 return serviceResult;
@@ -807,7 +813,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var serviceResult = new ServiceResult();
             var advertise = Repository.Find(request.advertiseId);
-            if (advertise == null)
+            if (advertise == null || advertise.UserID != request.userId)
             {
                 serviceResult.AddError("advertise not found");
                 return serviceResult;
@@ -847,9 +853,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var serviceResult = new ServiceResult();
             var parentAdvertise = Repository.Find(request.parentId);
-            if (parentAdvertise == null)
+            if (parentAdvertise == null || parentAdvertise.UserID != request.userId)
             {
-                serviceResult.AddError("parent not found");
+                serviceResult.AddError("parent advertise not found");
                 return serviceResult;
             }
             if (parentAdvertise.Mode != AdvertiseMode.Parent)

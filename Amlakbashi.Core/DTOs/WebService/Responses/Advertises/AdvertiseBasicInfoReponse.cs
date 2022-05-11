@@ -32,7 +32,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
                 cityName = advertise.RegionCity?.PersianName,
                 provinceName = advertise.RegionProvince?.PersianName,
                 address = advertise.Address,
-                imageUrl = advertise.GetMainImageApiUrl()
+                imageUrl = advertise.GetMainImageUrl()
             };
         }
     }

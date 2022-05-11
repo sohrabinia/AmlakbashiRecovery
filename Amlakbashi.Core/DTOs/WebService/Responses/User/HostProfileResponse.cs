@@ -43,7 +43,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.User
                 imageUrl = c.SenderUser.GetUserImageApiUrl(),
                 residencyId = s.Id,
                 residencyTitle = s.Title,
-                residencyImageUrl = s.GetMainImageApiUrl()
+                residencyImageUrl = s.GetMainImageUrl()
             })).ToList();
             response.commentCount = response.comments.Count;
             return response;

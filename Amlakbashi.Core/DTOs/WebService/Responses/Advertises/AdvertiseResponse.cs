@@ -130,7 +130,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
                     extraCapacityPrice = x.MoreThanCapacityPrice
                 }));
             }
-            response.imagesUrls = advertise.GetImagesApiUrls();
+            response.imagesUrls = advertise.GetImagesUrls();
             return response;
         }
     }
