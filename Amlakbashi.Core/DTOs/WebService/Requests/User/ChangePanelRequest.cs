@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.User
 {
-    public class RefreshTokenRequest
+    public class ChangePanelRequest
     {
-        [Required(ErrorMessage = "token is required")]
-        public string token { get; set; }
+        [Range(0, 1)]
+        public Entities.User.UserGeneralTypeEnum panel { get; set; }
     }
 }

@@ -1120,17 +1120,7 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             try
             {
-                var tokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = false,
-                    ValidateIssuerSigningKey = true,
-                    RequireSignedTokens = true,
-                    ValidIssuer = GeneralData.WebsiteUrl,
-                    ValidAudience = GeneralData.WebsiteUrl,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret))
-                };
+                var tokenValidationParameters = TokenUtility.GetTokenValidationParameters(jwtSecret, false);
                 var tokenHandler = new JwtSecurityTokenHandler();
                 SecurityToken securityToken;
                 var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);

@@ -15,16 +15,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Http;
-using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Amlakbashi.Application.Services.FileServices.Interfaces;
-using Amlakbashi.Core.Common.StaticData;
 
 namespace Amlakbashi.Host.Controllers.WebService
 {
     [ApiController]
     [Route("api/user")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ApiUserController : ApiBaseController
     {
         private readonly IUserAppService userService;
@@ -48,6 +47,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             this.webHostEnvironment = webHostEnvironment;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> LoginOrRegister(LoginRequest request)
         {
@@ -140,6 +140,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpPost("verify")]
         public async Task<IActionResult> LoginVerify(LoginVerifyRequest request)
         {
@@ -172,6 +173,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             });
         }
 
+        [AllowAnonymous]
         [HttpPost("resendcode")]
         public async Task<IActionResult> ResendVerifyCode(ResendVerifyCodeRequest request)
         {
@@ -185,6 +187,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             return NoContent();
         }
 
+        [AllowAnonymous]
         [HttpPost("refreshtoken")]
         public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
         {
@@ -200,14 +203,31 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 return Unauthorized();
             }
-            var newToken = await userService.GenerateJwtTokenAsync(identityUser.Id, jwtSecret,
-                request.panel != null ? request.panel : principal.GetUserPanelType());
-            return new ObjectResult(new
+            var newToken = await userService.GenerateJwtTokenAsync(identityUser.Id,
+                jwtSecret, principal.GetUserPanelType());
+            return Ok(new
             {
                 token = newToken
             });
         }
 
+        [HttpPost("panel")]
+        public async Task<IActionResult> ChangePanel(ChangePanelRequest request)
+        {
+            var currentPanel = User.GetUserPanelType();
+            if (currentPanel == request.panel)
+            {
+                return NoContent();
+            }
+            var newToken = await userService.GenerateJwtTokenAsync(User.GetGuid(),
+                configuration["JwtConfig:Secret"], request.panel);
+            return Ok(new
+            {
+                token = newToken
+            });
+        }
+
+        [AllowAnonymous]
         [HttpGet("host/{id:int}")]
         public IActionResult HostProfile(int id)
         {
@@ -222,7 +242,6 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
@@ -251,7 +270,6 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut]
         public async Task<IActionResult> Profile(UserPutProfileRequest request)
         {
@@ -264,19 +282,18 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok();
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("referralCode")]
         public IActionResult GetReferralCode()
         {
             return Ok(userAccessor.CurrentUser.Id);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Policies.Payment_Actions)]
-        [HttpGet("test")]
-        public IActionResult test()
-        {
-            User.GetUserPanelType();
-            return Ok();
-        }
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Policies.Payment_Actions)]
+        //[HttpGet("test")]
+        //public IActionResult test()
+        //{
+        //    User.GetUserPanelType();
+        //    return Ok();
+        //}
     }
 }
