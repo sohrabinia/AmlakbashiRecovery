@@ -1287,7 +1287,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 else
                 {
                     var hostUser = Repository.Find<User, int>(advertise.UserID);
-                    var host_contact_str = "شماره تماس: " + hostUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) +
+                    var host_contact_str = "شماره تماس: " + (string.IsNullOrEmpty(hostUser.Mobile) ? hostUser.GetLocalPhoneNumber(User.PhoneType.MainMobile) : hostUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1)) +
                         (!string.IsNullOrEmpty(hostUser.Mobile2) ? " و " + hostUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile2) : "");
                     msg = string.Format("لطفا با میزبان خود آقا/خانم {0} تماس بگیرید {1} و خسارت کنسلی را تایید کنید و نتیجه را به ما اعلام فرمایید. شماره تماس املاک باشی: 02632565304", hostUser.FullName, host_contact_str);
                 }

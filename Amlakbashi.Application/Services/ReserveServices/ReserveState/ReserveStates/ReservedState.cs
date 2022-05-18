@@ -64,7 +64,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             var remainedAmount = accounting.GetReserveRemainedAmount(ReserveId);
             var advertise = reserve.Advertise;
             var hostlerUser = Repository.Find<User, int>(advertise.UserID);
+            var hostPhoneNumber = hostlerUser.Mobile ?? hostlerUser.MainMobile;
             var guestUser = reserve.GuestUser;
+            var guestPhoneNumber = guestUser.Mobile ?? guestUser.MainMobile;
             if (isPaidCompletely)
             {
                 if (sendSms)
@@ -80,9 +82,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.GuestReservedTotalPayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(hostlerUser.GetPhoneNumber(User.PhoneType.OtherMobile1)) ?
-                            hostlerUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
-                            hostlerUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1)
+                        AudienceMobile = PhoneUtility.IsNumberForIran(hostPhoneNumber) ?
+                            PhoneUtility.InternationalNumberToLocal(hostPhoneNumber) :
+                            PhoneUtility.InternationalNumberToCallable(hostPhoneNumber)
                     };
                     mediator.Enqueue(new SendMessageCommand(guestContact));
 
@@ -98,13 +100,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.HostReservedTotalPayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(guestUser.GetPhoneNumber(User.PhoneType.OtherMobile1)) ?
-                            guestUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
-                            guestUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1)
+                        AudienceMobile = PhoneUtility.IsNumberForIran(guestPhoneNumber) ?
+                            PhoneUtility.InternationalNumberToLocal(guestPhoneNumber) :
+                            PhoneUtility.InternationalNumberToCallable(guestPhoneNumber)
                     };
                     mediator.Enqueue(new SendMessageCommand(hostContact));
                 }
-
             }
             else
             {
@@ -121,10 +122,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.GuestReservedDepositePayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(hostlerUser.GetPhoneNumber(
-                            User.PhoneType.MainMobile)) ?
-                            hostlerUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
-                            hostlerUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1),
+                        AudienceMobile = PhoneUtility.IsNumberForIran(hostPhoneNumber) ?
+                            PhoneUtility.InternationalNumberToLocal(hostPhoneNumber) :
+                            PhoneUtility.InternationalNumberToCallable(hostPhoneNumber),
                         Price = paidPrice.ToString(),
                         RemainPrice = remainedAmount.ToString()
                     };
@@ -142,10 +142,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.HostReservedDepositePayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(guestUser.GetPhoneNumber(
-                            User.PhoneType.MainMobile)) ?
-                            guestUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
-                            guestUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1),
+                        AudienceMobile = PhoneUtility.IsNumberForIran(guestPhoneNumber) ?
+                            PhoneUtility.InternationalNumberToLocal(guestPhoneNumber) :
+                            PhoneUtility.InternationalNumberToCallable(guestPhoneNumber),
                         Price = paidPrice.ToString(),
                         RemainPrice = remainedAmount.ToString()
                     };

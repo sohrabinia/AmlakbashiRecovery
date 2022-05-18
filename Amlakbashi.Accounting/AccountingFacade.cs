@@ -1171,7 +1171,7 @@ namespace Amlakbashi.Accounting
                     payment.PrizePrice, true));
                 if (payment.ReserveID != null)
                 {
-                    var hostPhoneNumber = payment.Reserve.HostUser.Mobile;
+                    var hostPhoneNumber = payment.Reserve.HostUser.Mobile ?? payment.Reserve.HostUser.MainMobile;
                     msg = $"{msg} شماره تماس میزبان: {PhoneUtility.InternationalNumberToLocal(hostPhoneNumber)}";
                 }
             }
@@ -1194,7 +1194,7 @@ namespace Amlakbashi.Accounting
                 }
                 if (payment.ReserveID != null)
                 {
-                    var hostPhoneNumber = payment.Reserve.HostUser.Mobile;
+                    var hostPhoneNumber = payment.Reserve.HostUser.Mobile ?? payment.Reserve.HostUser.MainMobile;
                     msg = $"{msg} شماره تماس میزبان: {PhoneUtility.InternationalNumberToLocal(hostPhoneNumber)}";
                 }
             }

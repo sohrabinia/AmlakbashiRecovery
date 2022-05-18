@@ -24,7 +24,8 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
             "09196218216",
             "09052932348",
             "09199075074",
-            "09365966647"
+            "09365966647",
+            "09107447535"
         };
 #endif
 

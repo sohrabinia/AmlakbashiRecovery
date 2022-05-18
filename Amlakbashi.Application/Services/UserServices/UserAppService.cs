@@ -177,7 +177,6 @@ namespace Amlakbashi.Application.Services.UserServices
             {
                 var user = new User()
                 {
-                    Mobile = request.phoneNumber,
                     MainMobile = request.phoneNumber,
                     AmlakbashiScore = 1000
                 };
