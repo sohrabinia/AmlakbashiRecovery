@@ -26,6 +26,8 @@ using System.Threading.Tasks;
 using Amlakbashi.Core.DTOs.WebService.Requests.User;
 using System.Text;
 using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.DTOs.WebService.Responses.User;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
@@ -307,51 +309,57 @@ namespace Amlakbashi.Application.Services.UserServices
             var shallowUser = user.ShallowCopy();
             user.FName = dto.fname;
             user.LName = dto.lname;
-            if (dto.mobile1.Substring(0, 2) == "00")
-            {
-                var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile1);
-                user.SetPhoneNumber(User.PhoneType.OtherMobile1, corrected);
-            }
-            else
-            {
-                user.SetLocalPhoneNumber(User.PhoneType.OtherMobile1, dto.mobile1, 98);
-            }
-            if (!string.IsNullOrEmpty(dto.mobile2))
-            {
-                if (dto.mobile2.Substring(0, 2) == "00")
-                {
-                    var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile2);
-                    user.SetPhoneNumber(User.PhoneType.OtherMobile2, corrected);
-                }
-                else
-                {
-                    user.SetLocalPhoneNumber(User.PhoneType.OtherMobile2, dto.mobile2, 98);
-                }
-            }
-            if (!string.IsNullOrEmpty(dto.tell))
-            {
-                if (dto.tell.Substring(0, 2) == "00")
-                {
-                    var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.tell);
-                    user.SetPhoneNumber(User.PhoneType.LandLine, corrected);
-                }
-                else
-                {
-                    user.SetLocalPhoneNumber(User.PhoneType.LandLine, dto.tell, 98);
-                }
-            }
-            if (!string.IsNullOrEmpty(dto.thirdPersonTell))
-            {
-                if (dto.thirdPersonTell.Substring(0, 2) == "00")
-                {
-                    var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.thirdPersonTell);
-                    user.SetPhoneNumber(User.PhoneType.ThirdPerson, corrected);
-                }
-                else
-                {
-                    user.SetLocalPhoneNumber(User.PhoneType.ThirdPerson, dto.thirdPersonTell, 98);
-                }
-            }
+
+            user.Mobile = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile2);
+            user.Mobile2 = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile3);
+            user.Tell = PhoneUtility.CorrectPhoneNumberIfPossible(dto.tell);
+            user.ThirdPersonTell = PhoneUtility.CorrectPhoneNumberIfPossible(dto.thirdPersonTell);
+
+            //if (dto.mobile2.Substring(0, 2) == "00")
+            //{
+            //    var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile2);
+            //    user.SetPhoneNumber(User.PhoneType.OtherMobile1, corrected);
+            //}
+            //else
+            //{
+            //    user.SetLocalPhoneNumber(User.PhoneType.OtherMobile1, dto.mobile2, 98);
+            //}
+            //if (!string.IsNullOrEmpty(dto.mobile3))
+            //{
+            //    if (dto.mobile3.Substring(0, 2) == "00")
+            //    {
+            //        var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile3);
+            //        user.SetPhoneNumber(User.PhoneType.OtherMobile2, corrected);
+            //    }
+            //    else
+            //    {
+            //        user.SetLocalPhoneNumber(User.PhoneType.OtherMobile2, dto.mobile3, 98);
+            //    }
+            //}
+            //if (!string.IsNullOrEmpty(dto.tell))
+            //{
+            //    if (dto.tell.Substring(0, 2) == "00")
+            //    {
+            //        var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.tell);
+            //        user.SetPhoneNumber(User.PhoneType.LandLine, corrected);
+            //    }
+            //    else
+            //    {
+            //        user.SetLocalPhoneNumber(User.PhoneType.LandLine, dto.tell, 98);
+            //    }
+            //}
+            //if (!string.IsNullOrEmpty(dto.thirdPersonTell))
+            //{
+            //    if (dto.thirdPersonTell.Substring(0, 2) == "00")
+            //    {
+            //        var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.thirdPersonTell);
+            //        user.SetPhoneNumber(User.PhoneType.ThirdPerson, corrected);
+            //    }
+            //    else
+            //    {
+            //        user.SetLocalPhoneNumber(User.PhoneType.ThirdPerson, dto.thirdPersonTell, 98);
+            //    }
+            //}
 
             var bankCardObj = user.BankCards == null || user.BankCards.Any() == false ? null : user.BankCards.FirstOrDefault();
 
@@ -427,7 +435,7 @@ namespace Amlakbashi.Application.Services.UserServices
 
             var identityUser = GetIdentityUser(user.MainMobile);
             identityUser.Email = request.email;
-            await UpdateIdentityUserAsync(identityUser);
+            await UpdateIdentityAsync(identityUser);
 
             var bankCard = user.BankCards == null || user.BankCards.Any() == false ? null : user.BankCards.FirstOrDefault();
             var hasBankCardChanged = ((bankCard == null && request.shebaNumber == null &&
@@ -483,6 +491,98 @@ namespace Amlakbashi.Application.Services.UserServices
             Repository.Save();
             await mediator.Publish(new UserUpdateEvent(shallowUser, user, ActionLog.ActionSourceEnum.WebsiteDashboard, user.Id));
             return true;
+        }
+
+        public async Task<ServiceResult<bool>> UpdateMainPhoneNumberAsync(int userId, string newMainPhoneNumber)
+        {
+            var serviceResult = new ServiceResult<bool>();
+            var user = Repository.Find(userId);
+            if (user == null)
+            {
+                serviceResult.AddError("کاربر یافت نشد");
+                return serviceResult;
+            }
+            if (PhoneUtility.ValidatePhoneNumber(newMainPhoneNumber) == false)
+            {
+                serviceResult.AddError("شماره موبایل وارد شده اشتباه است");
+                return serviceResult;
+            }
+            var internationalMobile = PhoneUtility.CorrectPhoneNumberIfPossible(newMainPhoneNumber);
+            var userPhoneNumbersList = user.GetPhoneNumbersList();
+            userPhoneNumbersList.Add(internationalMobile);
+            if (PhoneUtility.HasSamePhoneNumber(userPhoneNumbersList))
+            {
+                serviceResult.AddError("شماره موبایل وارد شده با دیگر شماره های ثبت شده شما یکسان است");
+                return serviceResult;
+            }
+            if (await FindIdentityByUsernameAsync(internationalMobile) != null)
+            {
+                serviceResult.AddError("با شماره وارد شده حساب کاربری ایجاد شده است");
+                return serviceResult;
+            }
+            var isNumberForIran = PhoneUtility.IsNumberForIran(internationalMobile);
+            if (isNumberForIran == false && PhoneUtility.IsNumberForIran(user.MainMobile))
+            {
+                serviceResult.AddError("امکان تغییر شماره ایرانی به خارجی وجود ندارد");
+                return serviceResult;
+            }
+
+            var identityUser = await FindIdentityByUsernameAsync(user.MainMobile);
+            if (isNumberForIran)
+            {
+                var callableNumber = PhoneUtility.InternationalNumberToLocal(internationalMobile);
+                var code = new Random().Next(1111, 9999).ToString();
+                identityUser.Temp = internationalMobile;
+                identityUser.SendVerification = DateTime.Now;
+                identityUser.Code = code;
+                await UpdateIdentityAsync(identityUser);
+                SendVerificationSms(callableNumber, code);
+                serviceResult.Result = false;
+            }
+            else
+            {
+                identityUser.PhoneNumber = internationalMobile;
+                identityUser.UserName = internationalMobile;
+                identityUser.IsForeigner = true;
+                await UpdateIdentityAsync(identityUser);
+                await UpdatePhoneNumberAsync(user.Id, internationalMobile);
+                await userManager.UpdateSecurityStampAsync(identityUser);
+                await signInManager.SignInAsync(identityUser, true);
+                serviceResult.Result = true;
+            }
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> VerifyNewMainPhoneNumber(int userId, string verifyCode)
+        {
+            var serviceResult = new ServiceResult();
+            var user = Repository.Find(userId);
+            if (user == null)
+            {
+                serviceResult.AddError("کاربر یافت نشد");
+                return serviceResult;
+            }
+            var identityUser = await FindIdentityByUsernameAsync(user.MainMobile);
+            var internationalMobile = PhoneUtility.CorrectPhoneNumberIfPossible(identityUser.Temp);
+            if (PhoneUtility.ValidateInternationalNumber(internationalMobile) == false)
+            {
+                serviceResult.AddError("شماره موبایل وارد شده اشتباه است");
+                return serviceResult;
+            }
+            if (identityUser.IsVerifyCodeValid(verifyCode) == false)
+            {
+                serviceResult.AddError("کد وارد شده نامعتبر است");
+                return serviceResult;
+            }
+
+            identityUser.PhoneNumber = internationalMobile;
+            identityUser.UserName = internationalMobile;
+            identityUser.IsForeigner = false;
+            await UpdateIdentityAsync(identityUser);
+            await UpdatePhoneNumberAsync(user.Id, internationalMobile);
+            await userManager.UpdateSecurityStampAsync(identityUser);
+            await signInManager.SignInAsync(identityUser, true);
+            return serviceResult;
         }
 
         public void UpdateState(int userId, bool state, int currentUserId = 0,
@@ -840,9 +940,14 @@ namespace Amlakbashi.Application.Services.UserServices
             return user;
         }
 
-        public async Task<AppUser> GetIdentityUserByIdAsync(string id)
+        public async Task<AppUser> FindIdentityByIdAsync(string id)
         {
             return await userManager.FindByIdAsync(id);
+        }
+
+        public async Task<AppUser> FindIdentityByUsernameAsync(string username)
+        {
+            return await userManager.FindByNameAsync(username);
         }
 
         public void AddIdentityUser(AppUser user)
@@ -855,7 +960,7 @@ namespace Amlakbashi.Application.Services.UserServices
             userManager.UpdateAsync(user).Wait();
         }
 
-        public async Task<bool> UpdateIdentityUserAsync(AppUser user)
+        public async Task<bool> UpdateIdentityAsync(AppUser user)
         {
             var result = await userManager.UpdateAsync(user);
             return result.Succeeded;
@@ -1179,6 +1284,21 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             signInManager.SignOutAsync().Wait();
             mediator.Send(new DeleteImpersonationCookiesCommand());
+        }
+
+        private async Task<bool> UpdatePhoneNumberAsync(int userId, string newPhoneNumber)
+        {
+            var user = Repository.Find(userId);
+            if (user == null)
+            {
+                return false;
+            }
+            var shallowUser = user.ShallowCopy();
+            user.MainMobile = newPhoneNumber;
+            Repository.Update(user);
+            Repository.Save();
+            await mediator.Publish(new UserUpdateEvent(shallowUser, user, ActionLog.ActionSourceEnum.WebsiteDashboard, user.Id));
+            return true;
         }
     }
 }

@@ -4,14 +4,16 @@ using Amlakbashi.Data.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
 {
     [DbContext(typeof(IdentityDB))]
-    partial class IdentityDBModelSnapshot : ModelSnapshot
+    [Migration("20220516103421_improve-columns-name-and-add-temp-and-isforeigner")]
+    partial class improvecolumnsnameandaddtempandisforeigner
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

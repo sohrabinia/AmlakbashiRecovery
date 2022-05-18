@@ -32,6 +32,7 @@ using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Application.Services.ReserveServices.Interfaces;
 using Amlakbashi.Application.Services.FileServices.Interfaces;
 using Microsoft.AspNetCore.Hosting;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -73,7 +74,6 @@ namespace Amlakbashi.Host.Controllers
             this.host = host;
         }
 
-        #region Impersonate
         [Authorize(Policy = Policies.User_Impersonate)]
         public IActionResult Impersonate(int userId, string url)
         {
@@ -178,7 +178,6 @@ namespace Amlakbashi.Host.Controllers
                 return Redirect("/errors/http500");
             }
         }
-        #endregion
 
         #region [ admin ]
 
@@ -191,7 +190,7 @@ namespace Amlakbashi.Host.Controllers
         [Authorize(Policy = Policies.Admin_General)]
         public ActionResult Index(int? page, string uname = "", int photo = -1,
             string username = "", string mobile = "", int code = -1, int ownership = -1, int sort_order = -1,
-            int mobile_status = -1, int status = -1, int advertise_count = -1,
+            int status = -1, int advertise_count = -1,
             int complete_profile_status = -1, int complete_profile_contact_status = -1,
             int user_general_type = -1,
             int userFilterType = -1, int card_status = -1, string minReserveNorouzFromDate = "",
@@ -233,24 +232,9 @@ namespace Amlakbashi.Host.Controllers
                     model = model.Where(u => u.MainMobile.Contains(username));
 
                 if (!string.IsNullOrEmpty(mobile))
-                    model = model.Where(u => u.Mobile != null && u.Mobile.Contains(mobile));
-                if (mobile_status == 0)
                 {
-                    var regex = new Regex(@"\d{10}");
-                    var filtered_user_ids = new List<int>();
-                    foreach (var item in model)
-                    {
-                        //if (String.IsNullOrEmpty(item.Mobile) || item.Mobile.Length != 11 ||
-                        //    !regex.IsMatch(item.Mobile) || !item.Mobile.StartsWith("09"))
-                        if (!PhoneUtility.ValidateInternationalNumber(item.GetPhoneNumber(Amlakbashi.Core.Entities.User.PhoneType.MainMobile))
-                            || !PhoneUtility.ValidateInternationalNumber(item.GetPhoneNumber(Amlakbashi.Core.Entities.User.PhoneType.OtherMobile1)))
-                        {
-                            filtered_user_ids.Add(item.Id);
-                        }
-                    }
-
-                    model = model.Where(u => filtered_user_ids.Contains(u.Id));
-
+                    model = model.Where(u => u.MainMobile.Contains(mobile) || u.Mobile.Contains(mobile) ||
+                        u.Mobile2.Contains(mobile));
                 }
                 if (status != -1)
                 {
@@ -439,19 +423,6 @@ namespace Amlakbashi.Host.Controllers
                         (int)r.Status >= 10 && (int)r.Status <= 12));
                 }
 
-                if (mobile_status == 1)
-                {
-                    var user_list = userService.GetAll();
-                    List<int> filtered_user_ids = new List<int>();
-                    foreach (var item in model)
-                    {
-                        if (user_list.Any(u => u.Mobile == item.Mobile && u.Id != item.Id))
-                            filtered_user_ids.Add(item.Id);
-                    }
-                    model = model.Where(x => filtered_user_ids.Contains(x.Id)).
-                        OrderBy(u => u.Mobile);
-                }
-
                 var PageNumber = page ?? 1;
                 var onePageOfModel = model.ToPagedList(PageNumber, 20);
 
@@ -464,7 +435,6 @@ namespace Amlakbashi.Host.Controllers
                     Username = username,
                     Ownership = ownership,
                     SortOrder = sort_order,
-                    MobileStatus = mobile_status,
                     Status = status,
                     AdvertiseCount = advertise_count,
                     CompleteProfileStatus = complete_profile_status,
@@ -729,7 +699,6 @@ namespace Amlakbashi.Host.Controllers
                 if (identityUser == null)
                 {
                     user = new User();
-                    user.Mobile = international_mobile;
                     user.MainMobile = international_mobile;
                     user.FName = null;
                     user.LName = null;
@@ -743,7 +712,8 @@ namespace Amlakbashi.Host.Controllers
                         PhoneNumber = international_mobile,
                         CreateDate = DateTime.Now,
                         PhoneNumberConfirmed = false,
-                        State = Entities.User.UserState.InActived
+                        State = Entities.User.UserState.InActived,
+                        IsForeigner = isNumberForIran == false
                     };
                     userService.AddIdentityUser(identityUser);
 
@@ -918,7 +888,7 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(mobileInternational);
                 if (identityUser != null)
                 {
-                    if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null || 
+                    if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null ||
                         (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 10, 0, 0))
                     {
                         identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
@@ -1447,7 +1417,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_UserContact", userService.Find(user_id));
         }
 
-#endregion
+        #endregion
 
         [Authorize]
         public JsonResult IncreaseCredit(long price, long? reserveId = null,
@@ -1621,9 +1591,9 @@ namespace Amlakbashi.Host.Controllers
             var user = userService.Find(user_id);
             var main_mobile = PhoneUtility.NormalizePhoneNumber(
                 user.GetPhoneNumber(Entities.User.PhoneType.MainMobile));
-            var mobile_1 = PhoneUtility.NormalizePhoneNumber(
-                user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile1));
             var mobile_2 = PhoneUtility.NormalizePhoneNumber(
+                user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile1));
+            var mobile_3 = PhoneUtility.NormalizePhoneNumber(
                 user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile2));
             var land_line = PhoneUtility.NormalizePhoneNumber(
                 user.GetPhoneNumber(Entities.User.PhoneType.LandLine));
@@ -1638,8 +1608,8 @@ namespace Amlakbashi.Host.Controllers
             {
                 status = 1,
                 main_mobile = main_mobile,
-                mobile_1 = mobile_1,
                 mobile_2 = mobile_2,
+                mobile_3 = mobile_3,
                 land_line = land_line,
                 third_person = third_person,
                 full_name = full_name
@@ -2014,7 +1984,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 if (user.id != userAccessor.CurrentUser.Id)
                     return Redirect("/errors/http404");
-                
+
                 if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
                 {
                     var uploadfile = Request.Form.Files[0];
@@ -2086,6 +2056,69 @@ namespace Amlakbashi.Host.Controllers
             {
                 logger.Error("User.ProfileManager", exc);
                 return RedirectToAction("profilemanager");
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult ChangeMainPhoneNumber()
+        {
+            try
+            {
+                return View("_ChangeMainPhoneNumber");
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.ChangeMainPhoneNumber(get)", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangeMainPhoneNumber(string newMainPhoneNumber)
+        {
+            try
+            {
+                var result = await userService.UpdateMainPhoneNumberAsync(userAccessor.CurrentUser.Id, newMainPhoneNumber);
+                return GenerateJsonResult(new
+                {
+                    status = result.HasError() ? 0 : result.Result ? 2 : 1,
+                    msg = result.HasError() ? result.GetErrors().First() : null
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.ChangeMainPhoneNumber(post)", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطا مواجه شد"
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> VerifyChangeMainPhoneNumber(string verifyCode)
+        {
+            try
+            {
+                var result = await userService.VerifyNewMainPhoneNumber(userAccessor.CurrentUser.Id, verifyCode);
+                return GenerateJsonResult(new
+                {
+                    status = result.HasError() ? 0 : 1,
+                    msg = result.HasError() ? result.GetErrors().First() : null
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.VerifyChangeMainPhoneNumber(post)", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطا مواجه شد"
+                });
             }
         }
     }

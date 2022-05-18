@@ -333,11 +333,11 @@ function showCallPopup(user_id, reserve_id, guestOrHostStr) {
             if (ret.main_mobile != null) {
                 elements_str += ('<div style="display:flex;flex-flow:row;"><div>موبایل اصلی: </div><div style="direction:ltr;margin:5px;color:#2200ff;">' + ret.main_mobile.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3') + '</div></div>');
             }
-            if (ret.mobile_1 != null && ret.main_mobile != ret.mobile_1) {
-                elements_str += ('<div style="display:flex;flex-flow:row;"><div>موبایل ۱: </div><div style="direction:ltr;margin:5px;color:#2200ff;">' + ret.mobile_1.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3') + '</div></div>');
+            if (ret.mobile_2 != null && ret.main_mobile != ret.mobile_1) {
+                elements_str += ('<div style="display:flex;flex-flow:row;"><div>موبایل 2: </div><div style="direction:ltr;margin:5px;color:#2200ff;">' + ret.mobile_2.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3') + '</div></div>');
             }
-            if (ret.mobile_2 != null) {
-                elements_str += ('<div style="display:flex;flex-flow:row;"><div>موبایل ۲: </div><div style="direction:ltr;margin:5px;color:#2200ff;">' + ret.mobile_2.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3') + '</div></div>');
+            if (ret.mobile_3 != null) {
+                elements_str += ('<div style="display:flex;flex-flow:row;"><div>موبایل 3: </div><div style="direction:ltr;margin:5px;color:#2200ff;">' + ret.mobile_3.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3') + '</div></div>');
             }
             if (ret.land_line != null) {
                 elements_str += ('<div style="display:flex;flex-flow:row;"><div>تلفن ثابت:‌ </div><div style="direction:ltr;margin:5px;color:#2200ff;">' + ret.land_line.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3') + '</div></div>');

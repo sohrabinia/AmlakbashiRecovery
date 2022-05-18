@@ -17,7 +17,6 @@ namespace Amlakbashi.Data
             {
                 return;
             }
-
             context.Database.Migrate();
         }
     }

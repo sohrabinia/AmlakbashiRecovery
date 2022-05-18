@@ -109,7 +109,7 @@ namespace Amlakbashi.Core.Entities
         [JsonIgnore]
         [InverseProperty("Supporter")]
         public virtual ICollection<ReserveSupport> ReserveSupportsAsSupporter { get; set; }
-        
+
         [JsonIgnore]
         [InverseProperty("GuestUser")]
         public virtual ICollection<Reserve> Reserves { get; set; }
@@ -124,6 +124,19 @@ namespace Amlakbashi.Core.Entities
                 return (!string.IsNullOrEmpty(FName) ? FName + " " : "") +
                     (!string.IsNullOrEmpty(LName) ? LName : "");
             }
+        }
+
+        public IList<string> GetPhoneNumbersList(bool withMainPhoneNumber = false)
+        {
+            var list = new List<string>()
+            {
+                Mobile, Mobile2, Tell, ThirdPersonTell
+            };
+            if (withMainPhoneNumber)
+            {
+                list.Add(MainMobile);
+            }
+            return list;
         }
 
         public string GetPhoneNumber(PhoneType type)
@@ -329,13 +342,13 @@ namespace Amlakbashi.Core.Entities
             Host = 1
         }
 
-        public enum PhoneType 
-        { 
-            MainMobile, 
-            LandLine, 
-            OtherMobile1, 
-            OtherMobile2, 
-            ThirdPerson 
+        public enum PhoneType
+        {
+            MainMobile,
+            LandLine,
+            OtherMobile1,
+            OtherMobile2,
+            ThirdPerson
         }
 
         public enum InstantReserveAccessEnum

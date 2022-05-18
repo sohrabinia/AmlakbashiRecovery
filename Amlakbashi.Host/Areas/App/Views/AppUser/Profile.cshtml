@@ -20,7 +20,7 @@
 
     <form asp-area="app" asp-controller="user" asp-action="profile" method="post" id="ManageForm" enctype="multipart/form-data">
         <input type="hidden" name="id" value="@Model.id" />
-        <input type="hidden" name="mainMobile" value="@Model.mainMobile" />
+        <input type="hidden" name="mainMobile" id="mainMobile" value="@Model.mainMobile" />
         <input type="hidden" name="userGeneralType" value="@Model.userGeneralType" />
 
         <div class="profile__photo">
@@ -62,11 +62,6 @@
             <span class="profile__label">کد کاربری :</span>
             <span class="profile__text">@Model.id</span>
         </div>
-        <div class="profile__item no-column">
-            <span class="profile__label">شماره موبایل اصلی :</span>
-            <span class="profile__text" style="direction:ltr">@(Model.mainMobile)</span>
-        </div>
-
         <div class="profile__item ">
             <span class="profile__label">نام :<span style="color:red">*</span></span>
             <span class="profile__text">
@@ -83,65 +78,73 @@
                        } }>
             </span>
         </div>
-        <div class="profile__item ">
-            <a asp-area="app" asp-controller="user" asp-action="password" style="margin-top:20px;" class="btn-photo">@(Model.hasPassword ? "تغییر" : "تعیین") رمز عبور</a>
+        <div class="profile__item">
+            <a asp-controller="user" asp-action="changepassword" class="btn-photo">@(Model.hasPassword ? "تغییر" : "تعیین") رمز عبور</a>
         </div>
         <div class="profile__title">اطلاعات تماس</div>
+        <div class="profile__item no-column">
+            <span class="profile__label">شماره موبایل اصلی:</span>
+            <span class="profile__text" style="direction:ltr">@(Model.mainMobile)</span>
+        </div>
+        @if (Context.User.IsImpersonatedUser() == false)
+        {
+            <div class="profile__item">
+                <button type="button" onclick="showChangeMainMobileForm()" style="border:0; margin-left: 20px;" class="btn-photo">تغییر شماره موبایل اصلی</button>
+            </div>
+            <br />
+        }
         <div class="profile__item ">
             <span class="profile__label">
-                شماره موبایل :
-                <span style="color:red">*</span>
+                شماره موبایل 2:
             </span>
             <span class="profile__text">
-                <input id="profile_mobile" type="text" style="direction:ltr"
-                       placeholder="شماره موبایل" name="mobile1" title="شماره موبایل"
+                <input id="mobile2" type="text" style="direction:ltr"
+                       placeholder="شماره موبایل 2" name="mobile2" title="شماره موبایل 2"
                        onkeyup="validateNumber(this);" onchange="validateNumber(this)"
-                       value="@(Model.mobile1)" class="mandatory">
+                       value="@(Model.mobile2)" class="mandatory">
             </span>
         </div>
         @if (Model.userGeneralType > (int)Entities.User.UserGeneralTypeEnum.Guest)
         {
-        <div class="profile__item ">
-            <span class="profile__label">
-                شماره موبایل ۲ :
-            </span>
-            <span class="profile__text">
-                <input id="mobile2" type="text" style="direction:ltr"
-                       placeholder="شماره موبایل ۲" name="mobile2" title="شماره موبایل ۲"
-                       onkeyup="validateNumber(this);" onchange="validateNumber(this)"
-                       value="@(Model.mobile2)">
-            </span>
-        </div>
-        <div class="profile__title">ارتباط ضروری ما با شما</div>
-        <div class="profile__item no-column">
-            <span class="profile__tip">این اطلاعات فقط جهت ارتباط ما با شما در مواقع ضروری است و در سایت نمایش داده نمی شود</span>
-            @*<span class="profile__text"></span>*@
-        </div>
-        <div class="profile__item ">
-            <span class="profile__label">
-                تلفن ثابت :
-            </span>
-            <span class="profile__text">
-                <input id="Tell" type="text" style="direction:ltr"
-                       placeholder="تلفن ثابت" name="tell" title="تلفن ثابت"
-                       onkeyup="validateNumber(this);" onchange="validateNumber(this)"
-                       value="@(Model.tell)">
-            </span>
-        </div>
+            <div class="profile__item ">
+                <span class="profile__label">
+                    شماره موبایل 3 :
+                </span>
+                <span class="profile__text">
+                    <input id="mobile3" type="text" style="direction:ltr"
+                           placeholder="شماره موبایل 3" name="mobile3" title="شماره موبایل 3"
+                           onkeyup="validateNumber(this);" onchange="validateNumber(this)"
+                           value="@(Model.mobile3)">
+                </span>
+            </div>
+            @*<div class="profile__title">ارتباط ضروری ما با شما</div>*@
+            @*<div class="profile__item no-column">
+                    <span class="profile__tip">این اطلاعات فقط جهت ارتباط ما با شما در مواقع ضروری است و در سایت نمایش داده نمی شود</span>
+                </div>*@
+            <div class="profile__item ">
+                <span class="profile__label">
+                    تلفن ثابت :
+                </span>
+                <span class="profile__text">
+                    <input id="tell" type="text" style="direction:ltr"
+                           placeholder="تلفن ثابت" name="tell" title="تلفن ثابت"
+                           onkeyup="validateNumber(this);" onchange="validateNumber(this)"
+                           value="@(Model.tell)">
+                </span>
+            </div>
 
-        <div class="profile__item ">
-            <span class="profile__label">
-                تلفن شخص ثالث :
-                <span style="color:red">*</span>
-            </span>
-            <span class="profile__text">
-                <input id="ThirdPersonTell" style="direction:ltr" type="text"
-                       placeholder="تلفن شخص ثالث" name="thirdPersonTell"
-                       title="تلفن شخص ثالث" onkeyup="validateNumber(this);"
-                       onchange="validateNumber(this)"
-                       value="@(Model.thirdPersonTell)" class="mandatory">
-            </span>
-        </div>
+            <div class="profile__item ">
+                <span class="profile__label">
+                    تلفن شخص ثالث :
+                </span>
+                <span class="profile__text">
+                    <input id="thirdPersonTell" style="direction:ltr" type="text"
+                           placeholder="تلفن شخص ثالث" name="thirdPersonTell"
+                           title="تلفن شخص ثالث" onkeyup="validateNumber(this);"
+                           onchange="validateNumber(this)"
+                           value="@(Model.thirdPersonTell)" class="mandatory">
+                </span>
+            </div>
         }
         <div class="profile__item ">
             <span class="profile__label">ایمیل :</span>
@@ -151,9 +154,9 @@
             </span>
         </div>
         <div class="profile__title">اطلاعات حساب بانکی</div>
-        <div class="profile__item no-column">
-            <span class="profile__tip">اطلاعات حساب بانکی جهت انتقال وجه به حساب شما</span>
-        </div>
+        @*<div class="profile__item no-column">
+                <span class="profile__tip">اطلاعات حساب بانکی جهت انتقال وجه به حساب شما</span>
+            </div>*@
         <div class="profile__item ">
             <span class="profile__label">
                 نام صاحب حساب :
@@ -203,14 +206,6 @@
                        style="text-align:left;"><span style="margin:auto 5px">IR</span>
             </span>
         </div>
-        @*}
-            else
-            {
-                <input type="hidden" name="bankFname" value="@Model.bankFname">
-                <input type="hidden" name="bankLname" value="@Model.bankLname">
-                <input type="hidden" name="bankCardNumber" value="@Model.bankCardNumber">
-                <input type="hidden" name="shabaNumber" value="@Model.shabaNumber">
-            }*@
         <input type="submit" value="ثبت ویرایش" class="profile__submit" />
     </form>
 </div>
@@ -275,50 +270,65 @@
                 $("#profile_lname").focus();
                 return false;
             }
-            if ($("#profile_mobile").val() == "") {
-                alertify.error("لطفا تلفن همراه خود را وارد کنید");
-                $("#profile_mobile").focus();
-                return false;
-            }
-            if (!validateMobile($('#profile_mobile').val())) {
-                alertify.error("لطفا تلفن همراه خود را درست و با اعداد انگلیسی وارد نمایید");
-                $("#profile_mobile").focus();
-                return false;
-            }
+
+            var mainMobile = $('#mainMobile').val();
             var mobile2 = $('#mobile2').val();
-            if (mobile2 != null && mobile2 != '') {
+            if (mobile2) {
                 if (!validateMobile(mobile2)) {
                     alertify.error("لطفا تلفن همراه خود را درست و با اعداد انگلیسی وارد نمایید");
                     $("#mobile2").focus();
                     return false;
                 }
-            }
-            if ($('#profile_mobile').val() == $('#mobile2').val()) {
-                alertify.error("شماره های تلفن همراه نمیتوانند یکی باشند");
-                $("#mobile2").focus();
-                return false;
-            }
-            if ($('#Tell').val() != '' && !validateTell($('#Tell').val()) && !validateMobile($('#Tell').val())) {
-                alertify.error("لطفا تلفن ثابت خود را درست و با اعداد انگلیسی وارد نمایید");
-                $("#Tell").focus();
-                return false;
-            }
-            t_p_tell = $('#ThirdPersonTell').val();
-            if (!validateTell(t_p_tell) && !validateMobile(t_p_tell)) {
-                alertify.error("لطفا تلفن شخص ثالث را درست و با اعداد انگلیسی وارد نمایید");
-                $("#ThirdPersonTell").focus();
-                return false;
+                if (mobile2 === mainMobile) {
+                    alertify.error("شماره موبایل 2 تکراری است");
+                    $("#mobile2").focus();
+                    return false;
+                }
             }
 
-            if (t_p_tell != null && t_p_tell != '')
-            {
-                if (t_p_tell == $("#profile_mobile").val() || t_p_tell == $("#mobile2").val() || t_p_tell == $("#Tell").val())
-                {
-                    alertify.error("تلفن شخص ثالث باید با شماره های دیگر متفاوت باشد");
+            var mobile3 = $('#mobile3').val();
+            if (mobile3) {
+                if (!validateMobile(mobile3)) {
+                    alertify.error("لطفا تلفن همراه خود را درست و با اعداد انگلیسی وارد نمایید");
+                    $("#mobile3").focus();
+                    return false;
+                }
+                if (mobile3 === mainMobile || mobile2 === mobile3) {
+                    alertify.error("شماره موبایل 3 تکراری است");
+                    $("#mobile3").focus();
+                    return false;
+                }
+            }
+
+            var tell = $('#tell').val();
+            if (tell) {
+                if (!validateTell(tell) && !validateMobile(tell)) {
+                    alertify.error("لطفا تلفن ثابت خود را درست و با اعداد انگلیسی وارد نمایید");
+                    $("#tell").focus();
+                    return false;
+                }
+                if (tell === mainMobile || tell === mobile2 || tell === mobile3) {
+                    alertify.error("شماره ثابت تکراری است");
+                    $("#tell").focus();
+                    return false;
+                }
+            }
+
+            thirdPersonTell = $('#thirdPersonTell').val();
+            if (thirdPersonTell) {
+                if (!validateTell(thirdPersonTell) && !validateMobile(thirdPersonTell)) {
+                    alertify.error("لطفا تلفن شخص ثالث را درست و با اعداد انگلیسی وارد نمایید");
+                    $("#thirdPersonTell").focus();
+                    return false;
+                }
+                if (thirdPersonTell === mainMobile || thirdPersonTell == mobile2 ||
+                    thirdPersonTell === mobile3 || thirdPersonTell === tell) {
+                    alertify.error("شماره شخص ثالث تکراری است");
                     $("#ThirdPersonTell").focus();
                     return false;
                 }
             }
+
             var bankCardNumber = $("#BankCardNumber").val();
             if (bankCardNumber.length == 0)
             {
@@ -343,15 +353,14 @@
                 $("#ShabaNumber").focus();
                 return false;
             }
-            $("#email").val($("#email").val().replaceAll(" ", ""));
-            if ($("#email").val() != null && $("#email").val() != '' && !validateEmail($("#email").val()))
-            {
-                alertify.error("ایمیل اشتباه است، لطفا بررسی کنید");
-                $("#email").focus();
-                return false;
-            }
 
             return true;
         });
+
+        function showChangeMainMobileForm() {
+            showInfoMessage('ویرایش شماره موبایل اصلی', '',
+                { contentUrl: '/user/changemainphonenumber', buttons: [], fullScreen: screen.width < 781 }
+            );
+        }
     </script>
 }

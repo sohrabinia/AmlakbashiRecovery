@@ -34,22 +34,23 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.User
             {
                 modelState.AddModelError(nameof(shebaNumber), "shebaNumber is incorrect");
             }
-            if (PhoneUtility.ValidateCallableNumber(phoneNumber2) == false)
+            if (string.IsNullOrEmpty(phoneNumber3) == false &&
+                PhoneUtility.ValidatePhoneNumber(phoneNumber2) == false)
             {
                 modelState.AddModelError(nameof(phoneNumber2), "phoneNumber2 is incorrect");
             }
             if (string.IsNullOrEmpty(phoneNumber3) == false &&
-                PhoneUtility.ValidateCallableNumber(phoneNumber3) == false)
+                PhoneUtility.ValidatePhoneNumber(phoneNumber3) == false)
             {
                 modelState.AddModelError(nameof(phoneNumber3), "phoneNumber3 is incorrect");
             }
             if (string.IsNullOrEmpty(landLinePhoneNumber) == false &&
-                PhoneUtility.ValidateCallableNumber(landLinePhoneNumber) == false)
+                PhoneUtility.ValidatePhoneNumber(landLinePhoneNumber) == false)
             {
                 modelState.AddModelError(nameof(landLinePhoneNumber), "landLinePhoneNumber is incorrect");
             }
             if (string.IsNullOrEmpty(this.thirdPersonPhoneNumber) == false &&
-                PhoneUtility.ValidateCallableNumber(thirdPersonPhoneNumber) == false)
+                PhoneUtility.ValidatePhoneNumber(thirdPersonPhoneNumber) == false)
             {
                 modelState.AddModelError(nameof(thirdPersonPhoneNumber), "thirdPersonPhoneNumber is incorrect");
             }

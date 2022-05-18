@@ -1,4 +1,5 @@
-﻿using Amlakbashi.Core.Common.AppService;
+﻿using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.DTOs.UserDTOs;
 using Amlakbashi.Core.DTOs.WebService.Requests.User;
 using Amlakbashi.Core.Entities;
@@ -32,6 +33,8 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
             ActionLog.ActionSourceEnum source, out List<string> errors);
         Task<bool> UpdateAsync(UserPutProfileRequest request);
+        Task<ServiceResult<bool>> UpdateMainPhoneNumberAsync(int userId, string newMainPhoneNumber);
+        Task<ServiceResult> VerifyNewMainPhoneNumber(int userId, string verifyCode);
         void UpdateState(int userId, bool state, int currentUserId = 0,
             ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         Task UpdatePhoneNumberConfirmedAsync(string guid, bool confirm);
@@ -66,7 +69,8 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void SendSms(UserContactDTO userContact);
         IList<string> GetAllIdentityUsernamesByState(User.UserState state = User.UserState.Acticved);
         AppUser GetIdentityUser(string phrase, bool isEmail = false);
-        Task<AppUser> GetIdentityUserByIdAsync(string id);
+        Task<AppUser> FindIdentityByIdAsync(string id);
+        Task<AppUser> FindIdentityByUsernameAsync(string username);
         void AddIdentityUser(AppUser user);
         bool AddClaimsToUser(string username, IList<Claim> claims);
         void RemoveClaimsFromUser(string username, IList<Claim> claims);
@@ -74,6 +78,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         IdentityResult ChangeIdentityUserPassword(string username, string currentPassword, string newPassword);
         IdentityResult ChangePassword(string username, string currentPassword, string newPassword);
         void UpdateIdentityUser(AppUser user);
+        Task<bool> UpdateIdentityAsync(AppUser user);
         IList<AppRole> GetAllRoles();
         IList<string> GetAllRoleNames();
         IList<string> GetUserRoles(string username);

@@ -1,5 +1,4 @@
 ﻿using Amlakbashi.Application;
-using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Data;
@@ -14,10 +13,8 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Hangfire;
 using Hangfire.SqlServer;
-using log4net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -27,7 +24,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using StackExchange.Redis;
 using System;
@@ -260,7 +256,7 @@ namespace Amlakbashi.Host
                 Credential = GoogleCredential.FromFile(env.ContentRootPath + "/amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json")
             });
 
-            //IdentityDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
+            IdentityDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
             AmlakbashiDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
         }
     }

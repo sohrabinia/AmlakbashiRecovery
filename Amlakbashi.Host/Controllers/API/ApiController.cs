@@ -31,7 +31,7 @@ namespace Amlakbashi.Host.Controllers.API
 {
     public partial class ApiController : Controller
     {
-        private string client_id = "7e1dff94-4f78-4eba-af9f-e54605925e5c";
+        private string client_id = "7e1dff94-4f78-4eba-af9f-e54605925e5z";
         private const string bearerScheme = JwtBearerDefaults.AuthenticationScheme;
         private readonly IReportItemAppService reportItemService;
         private readonly ICommentAppService commentService;

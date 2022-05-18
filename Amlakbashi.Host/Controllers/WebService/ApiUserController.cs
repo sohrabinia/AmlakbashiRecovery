@@ -51,9 +51,8 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost]
         public async Task<IActionResult> LoginOrRegister(LoginRequest request)
         {
-            var isCorrectNumber = string.IsNullOrEmpty(request.phoneNumber) == false && (PhoneUtility.ValidateLocalNumber(request.phoneNumber) ||
-                (request.phoneNumber.Length > 10 && (request.phoneNumber.Substring(0, 1) == "+" || request.phoneNumber.Substring(0, 2) == "00")));
-            if (!isCorrectNumber)
+            var isCorrectNumber = PhoneUtility.ValidatePhoneNumber(request.phoneNumber);
+            if (isCorrectNumber == false)
             {
                 return BadRequest();
             }
@@ -108,7 +107,7 @@ namespace Amlakbashi.Host.Controllers.WebService
 
         private async Task<IActionResult> Login(LoginRequest request)
         {
-            var identityUser = userService.GetIdentityUser(request.phoneNumber);
+            var identityUser = await userService.FindIdentityByUsernameAsync(request.phoneNumber);
 
             if (identityUser != null && identityUser.State == Entities.User.UserState.Suspend)
             {
@@ -144,18 +143,14 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost("verify")]
         public async Task<IActionResult> LoginVerify(LoginVerifyRequest request)
         {
-            var identityUser = await userService.GetIdentityUserByIdAsync(request.guid);
+            var identityUser = await userService.FindIdentityByIdAsync(request.guid);
             if (identityUser == null)
             {
                 return NotFound();
             }
-            if (identityUser.Code != request.verifyCode)
+            if (identityUser.IsVerifyCodeValid(request.verifyCode) == false)
             {
                 return BadRequest("verify code not valid");
-            }
-            if ((DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
-            {
-                return BadRequest("verify code lifetime ended");
             }
 
             var isIranNumber = PhoneUtility.IsNumberForIran(identityUser.UserName);
@@ -177,7 +172,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost("resendcode")]
         public async Task<IActionResult> ResendVerifyCode(ResendVerifyCodeRequest request)
         {
-            var identityUser = await userService.GetIdentityUserByIdAsync(request.guid);
+            var identityUser = await userService.FindIdentityByIdAsync(request.guid);
             if (identityUser == null)
             {
                 return NotFound();
@@ -198,7 +193,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 return Unauthorized();
             }
-            var identityUser = await userService.GetIdentityUserByIdAsync(principal.GetGuid());
+            var identityUser = await userService.FindIdentityByIdAsync(principal.GetGuid());
             if (identityUser == null || identityUser.SecurityStamp != refreshTokenClaim)
             {
                 return Unauthorized();
@@ -250,7 +245,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 return NotFound();
             }
-            var identityUser = await userService.GetIdentityUserByIdAsync(User.GetGuid());
+            var identityUser = await userService.FindIdentityByIdAsync(User.GetGuid());
             var bankCard = bankCardService.GetByUserId(user.Id);
             var response = new UserGetProfileResponse()
             {

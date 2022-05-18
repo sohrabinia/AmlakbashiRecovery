@@ -191,7 +191,6 @@
     <None Include="Views\Reserve\Chat.cshtml" />
     <None Include="Views\Reserve\Edit.cshtml" />
     <None Include="Views\Reserve\GuestReceipt.cshtml" />
-    <None Include="Views\Reserve\Index.cshtml" />
     <None Include="Views\Reserve\Invoice.cshtml" />
     <None Include="Views\Reserve\ReserveItemManager.cshtml" />
     <None Include="Views\Reserve\_AddGuestPayment.cshtml" />
