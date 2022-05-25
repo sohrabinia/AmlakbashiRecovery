@@ -44,9 +44,9 @@ namespace Amlakbashi.Application.Services.UserServices.EventHandlers
         public Task Handle(CreateAdvertiseBasicEvent notification, CancellationToken cancellationToken)
         {
             var user = repository.Query(q => q.FirstOrDefault(f => f.Id == notification.userId));
-            if (user.UserGeneralType == (int)UserGeneralTypeEnum.Guest)
+            if (user.Type == (int)UserGeneralTypeEnum.Guest)
             {
-                user.UserGeneralType = (int)UserGeneralTypeEnum.Host;
+                user.Type = (int)UserGeneralTypeEnum.Host;
                 repository.Update(user);
                 repository.Save();
             }
@@ -60,7 +60,7 @@ namespace Amlakbashi.Application.Services.UserServices.EventHandlers
             if (user.PrizeCreditTransactions != null &&
                 user.PrizeCreditTransactions.Any())
             {
-                user.PrizeCredit = user.PrizeCreditTransactions.OrderByDescending(o => o.Id)
+                user.GiftWalletAmount = user.PrizeCreditTransactions.OrderByDescending(o => o.Id)
                     .FirstOrDefault().RemainedPrice;
                 repository.Update(user);
                 repository.Save();
@@ -102,7 +102,7 @@ namespace Amlakbashi.Application.Services.UserServices.EventHandlers
         {
             var user = repository.Find(notification.UserId);
             var oldUser = user.ShallowCopy();
-            user.Credit = notification.currentCredit;
+            user.WalletAmount = notification.currentCredit;
             repository.Update(user);
             repository.Save();
 

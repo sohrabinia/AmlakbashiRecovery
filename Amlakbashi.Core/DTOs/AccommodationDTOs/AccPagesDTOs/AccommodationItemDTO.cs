@@ -178,7 +178,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             dto.SuspendedComment = suspendeComment;
             dto.SuspendedCommentReserveId = scReserveId;
             var accUser = advertise.User;
-            dto.AccUser = accUser != null ? advertise.User : new User() { FName = "", LName = "" };
+            dto.AccUser = accUser != null ? advertise.User : new User() { FirstName = "", LastName = "" };
             dto.TypeUrlString = AdvertiseUrlLocalization.GetAdvertiseTypeUrlString((AdvertiseType)advertise.TypeID);
             dto.TypeUserString = AdvertiseMainLocalization.GetAdvertiseTypeUserString((AdvertiseType)advertise.TypeID);
             dto.VillaChildren = villaChildren.Select(s => (AccommodationVillaItemDTO)s).ToList();

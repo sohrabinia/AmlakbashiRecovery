@@ -46,7 +46,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             var hostlerUser = Repository.Find<User, int>(reserve.Advertise.UserID);
             if (sendSms)
             {
-                ReserveSendSms guestContact = new ReserveSendSms()
+                mediator.Send(new ScheduleReserveSendSmsCommand(new ReserveSendSms()
                 {
                     ScheduledTime = DateTime.Now.Add(new TimeSpan(0, 5, 0)),
                     initial = false,
@@ -57,10 +57,9 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     reserve_id = reserve.Id.ToString(),
                     doer_title = reserve.HostResponse == HostResponseEnum.None ?
                         "میزبان" : "شما"
-                };
-                mediator.Send(new ScheduleReserveSendSmsCommand(guestContact));
+                }));
 
-                ReserveSendSms hostContact = new ReserveSendSms()
+                mediator.Send(new ScheduleReserveSendSmsCommand(new ReserveSendSms()
                 {
                     ScheduledTime = DateTime.Now.Add(new TimeSpan(0, 5, 0)),
                     initial = false,
@@ -71,8 +70,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     reserve_id = reserve.Id.ToString(),
                     doer_title = reserve.HostResponse == HostResponseEnum.None ?
                         "میزبان" : "شما"
-                };
-                mediator.Send(new ScheduleReserveSendSmsCommand(hostContact));
+                }));
             }
         }
     }

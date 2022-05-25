@@ -18,7 +18,7 @@ namespace Amlakbashi.Data.Identity
                 return;
             }
             context.Database.Migrate();
-            SeedData(context);
+            //SeedData(context);
         }
 
         private static void SeedData(IdentityDB context)

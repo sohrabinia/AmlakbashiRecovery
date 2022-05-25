@@ -100,7 +100,7 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
                 IQueryable<User> all_user = repository.Query(q => q
                     .Include(i => i.HostReserves)
                     .Where(x => (request.UserId < 1 ? true : x.Id == request.UserId) &&
-                        x.UserGeneralType > 0));
+                        x.Type > 0));
 
                 all_user = all_user.Where(w => w.Advertises.Any());
                 long score_item;

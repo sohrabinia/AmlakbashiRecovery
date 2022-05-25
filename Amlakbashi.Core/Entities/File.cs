@@ -52,7 +52,6 @@ namespace Amlakbashi.Core.Entities
         public const string AdvertiseLicenseImagesDirectory = "content/licenses";
         public const string ImageChacheDerectory = "content/imgcache";
 
-        //public string FilePathWithoutTildeAndSlash { get { return FilePath.Replace("~/", ""); } }
         public string CorrectedFilePath {
             get {
                 return FilePath.StartsWith('~') ? FilePath.Replace("~/", "") : 

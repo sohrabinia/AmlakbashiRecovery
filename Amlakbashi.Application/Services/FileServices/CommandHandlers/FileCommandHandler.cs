@@ -459,7 +459,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                         {
                             var fileName = $"advertise_{acc.Id}_{item.Id}";
                             var oldFilePath = Path.Combine(host.WebRootPath, item.CorrectedFilePath);
-                            var newDbFilePath = $"~/content/advertise/{fileName}.jpg";
+                            var newDbFilePath = $"content/advertise/{fileName}.jpg";
                             var newFilePath = $"{host.WebRootPath}/content/advertise/{fileName}.jpg";
                             if (File.Exists(oldFilePath))
                             {
@@ -497,10 +497,6 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 oldFile.LastModifyDate = DateTime.Now;
                 fileRepository.Update(oldFile);
                 fileRepository.Save();
-                if (File.Exists(host.WebRootPath + oldFile.FilePath))
-                {
-                    File.Delete(host.WebRootPath + oldFile.FilePath);
-                }
             }
             else
             {
@@ -521,7 +517,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 Directory.CreateDirectory(host.WebRootPath + "/content/licenses");
             }
 
-            using (var stream = File.Create(host.WebRootPath + filepath))
+            using (var stream = File.Create(Path.Combine(host.WebRootPath, filepath)))
             {
                 request.NewLicenseFile.CopyTo(stream);
             }

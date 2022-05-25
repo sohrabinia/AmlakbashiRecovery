@@ -109,12 +109,12 @@ namespace Amlakbashi.Core.Common.Utilities
             return number.Replace(" ", "").Replace("+", "00");
         }
 
-        public static string NormalizePhoneNumber(string phone_number)
+        public static string NormalizePhoneNumber(string phoneNumber)
         {
-            return string.IsNullOrEmpty(phone_number) ? null :
-                (IsNumberForIran(phone_number) ?
-                InternationalNumberToLocal(phone_number) :
-                InternationalNumberToCallable(phone_number));
+            return string.IsNullOrEmpty(phoneNumber) ? null :
+                (IsNumberForIran(phoneNumber) ?
+                InternationalNumberToLocal(phoneNumber) :
+                InternationalNumberToCallable(phoneNumber));
         }
 
         public static bool ValidatePhoneNumber(string phoneNumber)

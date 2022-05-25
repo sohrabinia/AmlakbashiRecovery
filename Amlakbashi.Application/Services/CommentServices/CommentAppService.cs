@@ -87,7 +87,7 @@ namespace Amlakbashi.Application.Services.CommentServices
         public CommentListResponse GetForHost(int userId, bool seenByHost = true, int page = 1, int pageItemCount = 20)
         {
             var user = Repository.Find<User, int>(userId);
-            if (user == null || user.UserGeneralType != 1)
+            if (user == null || user.Type != 1)
             {
                 return null;
             }
@@ -109,7 +109,7 @@ namespace Amlakbashi.Application.Services.CommentServices
         private void UpdateHostCommentsToSeened(int userId)
         {
             var user = Repository.Find<User, int>(userId);
-            if (user == null || user.UserGeneralType != 1)
+            if (user == null || user.Type != 1)
             {
                 return;
             }

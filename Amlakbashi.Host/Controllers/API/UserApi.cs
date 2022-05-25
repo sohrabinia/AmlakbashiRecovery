@@ -58,8 +58,8 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     string failReason;
                     user = new User();
-                    user.Mobile = international_mobile;
-                    user.MainMobile = international_mobile;
+                    user.PhoneNumber2 = international_mobile;
+                    user.PhoneNumber = international_mobile;
                     user.AmlakbashiScore = 1000;
                     userService.Insert(user);
 
@@ -111,8 +111,8 @@ namespace Amlakbashi.Host.Controllers.API
                     code = code,
                     mobile = international_mobile,
                     user_id = user.Id,
-                    fname = string.IsNullOrEmpty(user.FName) ? "" : user.FName,
-                    lname = string.IsNullOrEmpty(user.LName) ? "" : user.LName,
+                    fname = string.IsNullOrEmpty(user.FirstName) ? "" : user.FirstName,
+                    lname = string.IsNullOrEmpty(user.LastName) ? "" : user.LastName,
                     notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
                     isNew = isNew,
                     phoneConfirmed = identityUser.PhoneNumberConfirmed
@@ -168,8 +168,8 @@ namespace Amlakbashi.Host.Controllers.API
                 {
                     string failReason;
                     user = new User();
-                    user.Mobile = international_mobile;
-                    user.MainMobile = international_mobile;
+                    user.PhoneNumber2 = international_mobile;
+                    user.PhoneNumber = international_mobile;
                     user.AmlakbashiScore = 1000;
                     userService.Insert(user);
 
@@ -222,8 +222,8 @@ namespace Amlakbashi.Host.Controllers.API
                     code = code,
                     mobile = international_mobile,
                     user_id = user.Id,
-                    fname = string.IsNullOrEmpty(user.FName) ? "" : user.FName,
-                    lname = string.IsNullOrEmpty(user.LName) ? "" : user.LName,
+                    fname = string.IsNullOrEmpty(user.FirstName) ? "" : user.FirstName,
+                    lname = string.IsNullOrEmpty(user.LastName) ? "" : user.LastName,
                     notification_token = fcm_notification ? user.FcmAppNotificationToken : user.AppNotificationToken,
                     isNew = isNew,
                     phoneConfirmed = identityUser.PhoneNumberConfirmed
@@ -785,7 +785,7 @@ namespace Amlakbashi.Host.Controllers.API
             {
                 var prId = int.Parse(presentorCode);
                 var prUser = userService.Find(prId);
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                 user.PresentorUserID = prUser.Id;
                 userService.UpdatePresentorUser(user.Id, prUser.Id);
                 if (user.PresentorUserID > 0)
@@ -798,7 +798,7 @@ namespace Amlakbashi.Host.Controllers.API
                         UserEmail = identityUser.Email,
                         UserId = user.Id.ToString(),
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
-                        UserMainMobile = user.MainMobile,
+                        UserMainMobile = user.PhoneNumber,
                         Type = UserContactType.CouponPresent,
                         Extra1 = prUser.FullName,
                         Extra2 = "5%"
@@ -855,7 +855,7 @@ namespace Amlakbashi.Host.Controllers.API
                         reasonColor = "#4285F4"
                     });
                 }
-                return GenerateJsonResult(new { credit = user.Credit, creditTransactions = dtoList });
+                return GenerateJsonResult(new { credit = user.WalletAmount, creditTransactions = dtoList });
             }
             catch (Exception exc)
             {
@@ -874,7 +874,7 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                 var user_data = UserDTO.Generate(user, identityUser);
                 var bankCard = bankCardService.GetByUserId(user.Id);
                 if (bankCard != null)
@@ -936,8 +936,8 @@ namespace Amlakbashi.Host.Controllers.API
                 }
                 return GenerateJsonResult(new
                 {
-                    firstName = user.FName != null ? user.FName : "",
-                    lastName = user.LName != null ? user.LName : "",
+                    firstName = user.FirstName != null ? user.FirstName : "",
+                    lastName = user.LastName != null ? user.LastName : "",
                     photoId = user.PhotoStatus == (int)Entities.User.UserPhotoState.publish ? user.PhotoID : 0
                 });
             }
@@ -1131,7 +1131,7 @@ namespace Amlakbashi.Host.Controllers.API
         {
             try
             {
-                var identityUser = userService.GetIdentityUser(GetUser().MainMobile);
+                var identityUser = userService.GetIdentityUser(GetUser().PhoneNumber);
                 var code = new Random().Next(111111, 999999).ToString();
                 identityUser.EmailCode = code;
                 if (identityUser.Email != email)
@@ -1159,7 +1159,7 @@ namespace Amlakbashi.Host.Controllers.API
         {
             try
             {
-                var identityUser = userService.GetIdentityUser(GetUser().MainMobile);
+                var identityUser = userService.GetIdentityUser(GetUser().PhoneNumber);
                 if (identityUser.EmailCode == code)
                 {
                     identityUser.EmailConfirmed = true;
@@ -1181,7 +1181,7 @@ namespace Amlakbashi.Host.Controllers.API
             try
             {
                 var user = GetUser();
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                 return GenerateJsonResult(new { status = 1, email = identityUser.Email });
             }
             catch (Exception exc)

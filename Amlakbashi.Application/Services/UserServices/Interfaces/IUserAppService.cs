@@ -32,7 +32,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         bool Update(UserEditDTO editedUser, int adminId);
         bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
             ActionLog.ActionSourceEnum source, out List<string> errors);
-        Task<bool> UpdateAsync(UserPutProfileRequest request);
+        Task<ServiceResult> UpdateAsync(UserPutProfileRequest request);
         Task<ServiceResult<bool>> UpdateMainPhoneNumberAsync(int userId, string newMainPhoneNumber);
         Task<ServiceResult> VerifyNewMainPhoneNumber(int userId, string verifyCode);
         void UpdateState(int userId, bool state, int currentUserId = 0,

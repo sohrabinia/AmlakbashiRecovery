@@ -232,23 +232,23 @@ namespace Portal.Controllers
                     }
                     if (userType > -1)
                     {
-                        recievers = recievers.Where(w => w.UserGeneralType == userType);
+                        recievers = recievers.Where(w => w.Type == userType);
                     }
                     if (norouzPriceStatus == 1)
                     {
-                        recievers = recievers.Where(w => w.UserGeneralType == 1 &&
+                        recievers = recievers.Where(w => w.Type == 1 &&
                             w.Advertises.Any(a => a.NorouzPrice == 0) == false);
                     }
                     else if (norouzPriceStatus == 2)
                     {
-                        recievers = recievers.Where(w => w.UserGeneralType == 1 &&
+                        recievers = recievers.Where(w => w.Type == 1 &&
                             w.Advertises.Any(a => a.NorouzPrice == 0));
                     }
                 }
 
                 if (template == "SetNorouzPrice")
                 {
-                    recievers = recievers.Where(w => w.UserGeneralType == 1);
+                    recievers = recievers.Where(w => w.Type == 1);
                 }
 
                 if (confirmRequired)
@@ -258,7 +258,7 @@ namespace Portal.Controllers
                 }
                 else
                 {
-                    var phoneNumbers = recievers.Select(x => x.MainMobile).ToList();
+                    var phoneNumbers = recievers.Select(x => x.PhoneNumber).ToList();
                     phoneNumbers = phoneNumbers.Where(w => PhoneUtility.IsNumberForIran(w)).ToList();
                     if (template == "SetNorouzPrice")
                     {
@@ -267,9 +267,9 @@ namespace Portal.Controllers
                         {
                             userService.SendSms(new Amlakbashi.Core.Infrastructure.UserContact.UserContactDTO()
                             {
-                                UserMainMobile = recieverUser.MainMobile,
+                                UserMainMobile = recieverUser.PhoneNumber,
                                 Type = Amlakbashi.Core.Infrastructure.UserContact.UserContactType.HostUpdatePrice,
-                                Extra1 = !string.IsNullOrEmpty(recieverUser.LName) ? recieverUser.LName : "-"
+                                Extra1 = !string.IsNullOrEmpty(recieverUser.LastName) ? recieverUser.LastName : "-"
                             });
                         }
                         return GenerateJsonResult(new { status = 2, message = "" });
@@ -511,14 +511,14 @@ namespace Portal.Controllers
                 IQueryable<User> users = userService.GetAllAsIQueryable();
                 var identityUserList = userService.GetAllIdentityUsernamesByState();
                 var userList = users.Where(x => x.NotificationToken != null).ToList();
-                userList = userList.Where(w => identityUserList.Contains(w.MainMobile)).ToList();
+                userList = userList.Where(w => identityUserList.Contains(w.PhoneNumber)).ToList();
                 switch (user_type)
                 {
                     case 0:
-                        userList = userList.Where(x => x.UserGeneralType == 0).ToList();
+                        userList = userList.Where(x => x.Type == 0).ToList();
                         break;
                     case 1:
-                        userList = userList.Where(x => x.UserGeneralType > 0).ToList();
+                        userList = userList.Where(x => x.Type > 0).ToList();
                         var userIds = advertiseService.FilterAdmin(province, city, area).Select(s => s.UserID).Distinct().ToList();
                         userList = userList.Where(w => userIds.Contains(w.Id)).ToList();
                         break;
@@ -597,18 +597,18 @@ namespace Portal.Controllers
         {
             var identityUsers = userService.GetAllIdentityUsernamesByState();
             IQueryable<User> users = userService.GetAllAsIQueryable();
-            users = users.Where(x => x.MainMobile != null && x.MainMobile.Length > 0 && x.MainMobile.StartsWith("+"));
-            users = users.OrderByDescending(x => identityUsers.Contains(x.MainMobile)).
+            users = users.Where(x => x.PhoneNumber != null && x.PhoneNumber.Length > 0 && x.PhoneNumber.StartsWith("+"));
+            users = users.OrderByDescending(x => identityUsers.Contains(x.PhoneNumber)).
                 ThenByDescending(x => x.Id);
             var result = new List<WaCoronaAdvMsgHelper>();
             foreach (var user in users)
             {
-                var mobile = user.MainMobile.Replace("+98 ", "98");
-                var userName = !string.IsNullOrEmpty(user.FName) ?
-                            (user.FName + " عزیز، کاربر املاک باشی") :
+                var mobile = user.PhoneNumber.Replace("+98 ", "98");
+                var userName = !string.IsNullOrEmpty(user.FirstName) ?
+                            (user.FirstName + " عزیز، کاربر املاک باشی") :
                             (
-                                !string.IsNullOrEmpty(user.LName) ?
-                                    (user.LName + " عزیز، کاربر املاک باشی") :
+                                !string.IsNullOrEmpty(user.LastName) ?
+                                    (user.LastName + " عزیز، کاربر املاک باشی") :
                                     "کاربر عزیز املاک باشی"
                             );
                 result.Add(new WaCoronaAdvMsgHelper() { mobile = mobile, userName = userName });
@@ -623,21 +623,21 @@ namespace Portal.Controllers
             return new WaCoronaAdvMsgHelper[] {
                     new WaCoronaAdvMsgHelper() {
                         mobile = "989121197156",
-                        userName = !string.IsNullOrEmpty(user1.FName) ?
-                            (user1.FName + " عزیز، کاربر املاک باشی") :
+                        userName = !string.IsNullOrEmpty(user1.FirstName) ?
+                            (user1.FirstName + " عزیز، کاربر املاک باشی") :
                             (
-                                !string.IsNullOrEmpty(user1.LName) ?
-                                    (user1.LName + " عزیز، کاربر املاک باشی") :
+                                !string.IsNullOrEmpty(user1.LastName) ?
+                                    (user1.LastName + " عزیز، کاربر املاک باشی") :
                                     "کاربر عزیز املاک باشی"
                             )
                     },
                     new WaCoronaAdvMsgHelper() {
                         mobile = "989212085439",
-                        userName = !string.IsNullOrEmpty(user2.FName) ?
-                            (user2.FName + " عزیز، کاربر املاک باشی") :
+                        userName = !string.IsNullOrEmpty(user2.FirstName) ?
+                            (user2.FirstName + " عزیز، کاربر املاک باشی") :
                             (
-                                !string.IsNullOrEmpty(user2.LName) ?
-                                    (user2.LName + " عزیز، کاربر املاک باشی") :
+                                !string.IsNullOrEmpty(user2.LastName) ?
+                                    (user2.LastName + " عزیز، کاربر املاک باشی") :
                                     "کاربر عزیز املاک باشی"
                             )
                     }

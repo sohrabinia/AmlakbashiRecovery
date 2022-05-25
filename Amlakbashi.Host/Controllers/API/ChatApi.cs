@@ -61,7 +61,7 @@ namespace Amlakbashi.Host.Controllers.API
                         profileImageId = _self ?
                             (user.PhotoStatus == (int)Entities.User.UserPhotoState.publish && user.PhotoID != null ? (long)user.PhotoID : 0) :
                             (partyUser.PhotoStatus == (int)Entities.User.UserPhotoState.publish && partyUser.PhotoID != null ? (long)partyUser.PhotoID : 0),
-                        profileName = _self ? user.FullName : partyUser.LName
+                        profileName = _self ? user.FullName : partyUser.LastName
                     });
                 }
                 return GenerateJsonResult(new { items = chatDtos });

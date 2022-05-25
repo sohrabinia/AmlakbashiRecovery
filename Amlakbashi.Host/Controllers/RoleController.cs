@@ -35,13 +35,13 @@ namespace Amlakbashi.Host.Controllers
         public IActionResult EditUserRole(int userId)
         {
             var user = userService.Find(userId);
-            var userRoles = userService.GetUserRoles(user.MainMobile);
+            var userRoles = userService.GetUserRoles(user.PhoneNumber);
             var allRoles = userService.GetAllRoleNames();
             UserRoleManagementDTO dto = new UserRoleManagementDTO()
             {
                 UserId = user.Id,
                 Fullname = user.FullName,
-                MainMobile = user.MainMobile,
+                MainMobile = user.PhoneNumber,
                 AllRoles = allRoles,
                 CurrentRoles = userRoles
             };

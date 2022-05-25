@@ -58,7 +58,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                     reserve_id = StringUtility.PersianNumberToEnglish(reserve_id);
                 if (selectType == Reserve.ReserveManagerSelectType.All)
                 {
-                    selectType = currentUser.UserGeneralType > 0 ?
+                    selectType = currentUser.Type > 0 ?
                         Reserve.ReserveManagerSelectType.Host : Reserve.ReserveManagerSelectType.Guest;
                 }
                 Dictionary<Reserve.ReserveCategory, int> countDict;

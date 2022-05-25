@@ -324,7 +324,7 @@ namespace Amlakbashi.Accounting
             ActionSourceEnum actionSource = ActionSourceEnum.Undefined)
         {
             var user = repository.FindUser(userId);
-            currentCredit = user.Credit + amount;
+            currentCredit = user.WalletAmount + amount;
             var newCreditTransaction = new CreditTransaction()
             {
                 UserID = userId,
@@ -352,7 +352,7 @@ namespace Amlakbashi.Accounting
             {
                 var diffPrice = editedCreditTransaction.Price - creditTransaction.Price;
                 var user = repository.FindUser(creditTransaction.UserID);
-                var newCredit = user.Credit + diffPrice;
+                var newCredit = user.WalletAmount + diffPrice;
                 var newCreditTransaction = new CreditTransaction()
                 {
                     UserID = creditTransaction.UserID,
@@ -377,7 +377,7 @@ namespace Amlakbashi.Accounting
             ActionLog.ActionSourceEnum actionSource)
         {
             var user = repository.FindUser(userId);
-            var newPrizeCredit = user.PrizeCredit + amount;
+            var newPrizeCredit = user.GiftWalletAmount + amount;
             var prizeCreditId = prizeCreditTransactionService.Insert(userId, amount, newPrizeCredit, type, reserveId, customTitle);
             mediator.Publish(new PrizeCreditUpdateEvent(user.Id, actionSource, doerUserId));
             return prizeCreditId;
@@ -387,7 +387,7 @@ namespace Amlakbashi.Accounting
             long reserveId, string customTitle, int doerUserId, ActionLog.ActionSourceEnum actionSource)
         {
             var user = repository.FindUser(userId);
-            var newPrizeCredit = user.PrizeCredit - amount;
+            var newPrizeCredit = user.GiftWalletAmount - amount;
             var prizeCreditId = prizeCreditTransactionService.Insert(userId, amount, newPrizeCredit, type, reserveId, customTitle);
             mediator.Publish(new PrizeCreditUpdateEvent(user.Id, actionSource, doerUserId));
             return prizeCreditId;
@@ -401,7 +401,7 @@ namespace Amlakbashi.Accounting
                 return;
             }
             var user = repository.FindUser(reserve.UserID);
-            var newPrizeCredit = user.PrizeCredit + reserve.PrizePrice;
+            var newPrizeCredit = user.GiftWalletAmount + reserve.PrizePrice;
             prizeCreditTransactionService.Insert(reserve.UserID,
                 reserve.PrizePrice, newPrizeCredit,
                 PrizeTransactionType.IncreaseRefund, reserveId);
@@ -414,7 +414,7 @@ namespace Amlakbashi.Accounting
         {
             var reserve = repository.FindReserve(reserveId);
             var user = repository.FindUser(reserve.UserID);
-            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             if (user.PresentorUserID < 1 ||
                 user.PresentorPrizeGiven)
             {
@@ -427,7 +427,7 @@ namespace Amlakbashi.Accounting
             mediator.Publish(new PresentorPrizeGivenEvent(user.Id, actionSource, doerUserId));
             var contact = new UserContactDTO()
             {
-                UserMainMobile = user.MainMobile,
+                UserMainMobile = user.GetNoticesPhoneNumber(),
                 UserAppNotificationToken = user.AppNotificationToken,
                 UserEmail = identityUser.Email,
                 EmailConfirmed = identityUser.EmailConfirmed,
@@ -444,7 +444,7 @@ namespace Amlakbashi.Accounting
         {
             var reserve = repository.FindReserve(reserveId);
             var guestUser = reserve.GuestUser;
-            var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
+            var guestIdentityUser = userManager.FindByNameAsync(guestUser.PhoneNumber).Result;
             if (guestUser.RecieveAppreciateDiscount)
             {
                 return;
@@ -456,7 +456,7 @@ namespace Amlakbashi.Accounting
                 discountCouponService.Insert(guestUser.Id, DiscountCoupon.DiscountCouponType.Appreciate, 5);
                 var contact = new UserContactDTO()
                 {
-                    UserMainMobile = guestUser.MainMobile,
+                    UserMainMobile = guestUser.GetNoticesPhoneNumber(),
                     UserAppNotificationToken = guestUser.AppNotificationToken,
                     UserEmail = guestIdentityUser.Email,
                     EmailConfirmed = guestIdentityUser.EmailConfirmed,
@@ -484,17 +484,17 @@ namespace Amlakbashi.Accounting
             var reserve = repository.FindReserve(reserveId);
             var user = repository.FindUser(reserve.UserID);
             long amount = 0;
-            if (user.PrizeCredit > 0)
+            if (user.GiftWalletAmount > 0)
             {
                 var maxAmount = reserve.TotalPrice / 2;
-                amount = Math.Min(user.PrizeCredit, maxAmount);
+                amount = Math.Min(user.GiftWalletAmount, maxAmount);
             }
             if (amount < 1)
             {
                 return;
             }
 
-            var newPrizeCredit = user.PrizeCredit + reserve.PrizePrice;
+            var newPrizeCredit = user.GiftWalletAmount + reserve.PrizePrice;
             var prizeCreditId = prizeCreditTransactionService.Insert(reserve.UserID, reserve.PrizePrice, newPrizeCredit,
                 PrizeCreditTransaction.PrizeTransactionType.IncreaseRefund, reserveId);
 
@@ -970,7 +970,7 @@ namespace Amlakbashi.Accounting
             }
             else if (usePrize)
             {
-                prizeAvailable = GetReservePrizeAvailable(reserve.TotalPrice, user.PrizeCredit);
+                prizeAvailable = GetReservePrizeAvailable(reserve.TotalPrice, user.GiftWalletAmount);
             }
 
             var price_to_pay = (payType == ReservePaymentType.GuestDeposite ?
@@ -1000,7 +1000,7 @@ namespace Amlakbashi.Accounting
                     objPay.UserID = userId;
                     return paymentService.Insert(objPay);
                 case ReservePaymentMethod.AmlakbashiCredit:
-                    if (user.Credit < price_to_pay)
+                    if (user.WalletAmount < price_to_pay)
                     {
                         return 0;
                     }
@@ -1049,7 +1049,7 @@ namespace Amlakbashi.Accounting
                         ResNum = payment.Id.ToString(),
                         Amount = payment.TotalPrice,
                         RedirectUrl = samanRedirectUrl,
-                        CellNumber = payment.User.MainMobile
+                        CellNumber = payment.User.PhoneNumber
                     };
                     epay = paymentOperator.GetSamanPaymentToken(request).Result;
                     break;
@@ -1139,7 +1139,7 @@ namespace Amlakbashi.Accounting
             var payment = paymentService.Find(paymentId);
             if (payment.Status == Payment.PaymentStatus.Paid)
             {
-                msg = "این تراکنش تکراری میباشد";
+                msg = "این تراکنش تکراری می باشد";
                 return false;
             }
             payment.RefID = long.Parse(referenceNumber);
@@ -1148,10 +1148,10 @@ namespace Amlakbashi.Accounting
             payment.Status = Payment.PaymentStatus.Paid;
             payment.PayDate = transactionDate;
             var user = repository.FindUser(userId);
-            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             var contact = new UserContactDTO()
             {
-                UserMainMobile = user.MainMobile,
+                UserMainMobile = user.GetNoticesPhoneNumber(),
                 UserAppNotificationToken = user.AppNotificationToken,
                 UserEmail = identityUser.Email,
                 EmailConfirmed = identityUser.EmailConfirmed,
@@ -1171,8 +1171,7 @@ namespace Amlakbashi.Accounting
                     payment.PrizePrice, true));
                 if (payment.ReserveID != null)
                 {
-                    var hostPhoneNumber = payment.Reserve.HostUser.Mobile ?? payment.Reserve.HostUser.MainMobile;
-                    msg = $"{msg} شماره تماس میزبان: {PhoneUtility.InternationalNumberToLocal(hostPhoneNumber)}";
+                    msg = $"{msg} شماره تماس میزبان: {payment.Reserve.HostUser.GetNormalizedNoticesPhoneNumber()}";
                 }
             }
             else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString())
@@ -1194,8 +1193,7 @@ namespace Amlakbashi.Accounting
                 }
                 if (payment.ReserveID != null)
                 {
-                    var hostPhoneNumber = payment.Reserve.HostUser.Mobile ?? payment.Reserve.HostUser.MainMobile;
-                    msg = $"{msg} شماره تماس میزبان: {PhoneUtility.InternationalNumberToLocal(hostPhoneNumber)}";
+                    msg = $"{msg} شماره تماس میزبان: {payment.Reserve.HostUser.GetNormalizedNoticesPhoneNumber()}";
                 }
             }
             paymentService.Update(payment);
@@ -1349,7 +1347,7 @@ namespace Amlakbashi.Accounting
             {
                 UserID = user.Id,
                 Date = DateTime.Now,
-                TotalPrice = user.Credit * 10,
+                TotalPrice = user.WalletAmount * 10,
                 BankId = BankEnum.Pasargad,
                 Method = Payment.PaymentMethod.Podium,
                 Type = Payment.PaymentType.Expenditure,
@@ -1364,7 +1362,7 @@ namespace Amlakbashi.Accounting
                 DestLastName = hostBankCard.LName,
                 PaymentId = payment.Id,
                 Timestamp = payment.Date,
-                Amount = user.Credit * 10,
+                Amount = user.WalletAmount * 10,
                 CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
             };
 
@@ -1376,7 +1374,7 @@ namespace Amlakbashi.Accounting
                     HasError = false,
                     Message = "پرداخت با موفقیت انجام شد",
                     ErrorMessage = "پرداخت انجام نشد",
-                    PayablePrice = user.Credit,
+                    PayablePrice = user.WalletAmount,
                     TraceNumber = "123456789"
                 };
             }
@@ -1387,10 +1385,10 @@ namespace Amlakbashi.Accounting
 
             if (result.HasError == false)
             {
-                result.PayablePrice = user.Credit;
+                result.PayablePrice = user.WalletAmount;
                 long newCredit;
                 var transactionCause = "تسویه کیف پول";
-                var creditTransactionId = DecreaseCredit(user.Id, user.Credit, long.Parse(result.TraceNumber), 0, out newCredit,
+                var creditTransactionId = DecreaseCredit(user.Id, user.WalletAmount, long.Parse(result.TraceNumber), 0, out newCredit,
                     CreditTransaction.WalletTransactionReason.Other, transactionCause, payment.Id, operatorId, ActionSourceEnum.AdminPanel);
                 mediator.Publish(new CreditTransactionUpdateEvent(user.Id, newCredit, ActionSourceEnum.AdminPanel, operatorId));
                 payment.PayDate = DateTime.Now;
@@ -1463,7 +1461,7 @@ namespace Amlakbashi.Accounting
                     var user = repository.FindUser(payment.UserID);
                     long newCredit;
                     var transactionCause = "تسویه کیف پول";
-                    var creditTransactionId = DecreaseCredit(user.Id, user.Credit, long.Parse(result.RefrenceNumber), 0, out newCredit,
+                    var creditTransactionId = DecreaseCredit(user.Id, user.WalletAmount, long.Parse(result.RefrenceNumber), 0, out newCredit,
                         CreditTransaction.WalletTransactionReason.Other, transactionCause, payment.Id, operatorId, ActionSourceEnum.AdminPanel);
                     mediator.Publish(new CreditTransactionUpdateEvent(user.Id, newCredit, ActionSourceEnum.AdminPanel, operatorId));
                     payment.PayDate = DateTime.Now;

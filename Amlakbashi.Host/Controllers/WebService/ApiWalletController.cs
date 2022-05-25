@@ -52,7 +52,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpGet("amount")]
         public IActionResult GetWalletAmount()
         {
-            return Ok(new { walletAmount = userAccessor.CurrentUser.Credit });
+            return Ok(new { walletAmount = userAccessor.CurrentUser.WalletAmount });
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

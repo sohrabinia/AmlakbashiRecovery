@@ -509,6 +509,7 @@ function ToggleFavorite($this, $id) {
         }
     }, false);
 }
+
 function onClickFavouriteBtn(elem) {
     ToggleFavorite($(elem), $(elem).attr("advertise_id"));
 }

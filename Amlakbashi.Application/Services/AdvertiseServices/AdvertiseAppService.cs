@@ -2892,10 +2892,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             advertise.Reserves.Add(reserve);
             Repository.Update(advertise);
             Repository.Save();
-            var identityUser = userManager.FindByNameAsync(advertise.User.MainMobile).Result;
+            var identityUser = userManager.FindByNameAsync(advertise.User.PhoneNumber).Result;
             var contact = new UserContactDTO()
             {
-                UserMainMobile = advertise.User.MainMobile,
+                UserMainMobile = advertise.User.GetNoticesPhoneNumber(),
                 UserAppNotificationToken = advertise.User.AppNotificationToken,
                 UserEmail = identityUser.Email,
                 EmailConfirmed = identityUser.EmailConfirmed,

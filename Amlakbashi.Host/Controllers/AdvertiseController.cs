@@ -137,7 +137,7 @@ namespace Amlakbashi.Host.Controllers
                 if (objad.UserID != ad.UserID)
                 {
                     var host_user = userService.Find(ad.UserID);
-                    if (host_user.UserGeneralType < 1)
+                    if (host_user.Type < 1)
                     {
                         userService.UpdateUserGeneralType(host_user.Id, Entities.User.UserGeneralTypeEnum.Host);
                     }

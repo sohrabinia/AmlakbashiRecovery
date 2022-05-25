@@ -63,18 +63,21 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             var isPaidCompletely = accounting.IsReservePaidCompletely(ReserveId);
             var remainedAmount = accounting.GetReserveRemainedAmount(ReserveId);
             var advertise = reserve.Advertise;
+
             var hostlerUser = Repository.Find<User, int>(advertise.UserID);
-            var hostPhoneNumber = hostlerUser.Mobile ?? hostlerUser.MainMobile;
+            var hostIdentityUser = userManager.FindByNameAsync(hostlerUser.PhoneNumber).Result;
+            var hostPhoneNumber = hostlerUser.GetNormalizedNoticesPhoneNumber();
+
             var guestUser = reserve.GuestUser;
-            var guestPhoneNumber = guestUser.Mobile ?? guestUser.MainMobile;
-            if (isPaidCompletely)
+            var guestIdentityUser = userManager.FindByNameAsync(guestUser.PhoneNumber).Result;
+            var guestPhoneNumber = guestUser.GetNormalizedNoticesPhoneNumber();
+            if (sendSms)
             {
-                if (sendSms)
+                if (isPaidCompletely)
                 {
-                    var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
-                    var guestContact = new UserContactDTO()
+                    mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                     {
-                        UserMainMobile = guestUser.MainMobile,
+                        UserMainMobile = guestUser.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = guestUser.AppNotificationToken,
                         UserEmail = guestIdentityUser.Email,
                         EmailConfirmed = guestIdentityUser.EmailConfirmed,
@@ -82,16 +85,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.GuestReservedTotalPayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(hostPhoneNumber) ?
-                            PhoneUtility.InternationalNumberToLocal(hostPhoneNumber) :
-                            PhoneUtility.InternationalNumberToCallable(hostPhoneNumber)
-                    };
-                    mediator.Enqueue(new SendMessageCommand(guestContact));
+                        AudienceMobile = hostPhoneNumber
+                    }));
 
-                    var hostIdentityUser = userManager.FindByNameAsync(hostlerUser.MainMobile).Result;
-                    var hostContact = new UserContactDTO()
+                    mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                     {
-                        UserMainMobile = hostlerUser.MainMobile,
+                        UserMainMobile = hostlerUser.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = hostlerUser.AppNotificationToken,
                         UserEmail = hostIdentityUser.Email,
                         EmailConfirmed = hostIdentityUser.EmailConfirmed,
@@ -100,21 +99,14 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.HostReservedTotalPayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(guestPhoneNumber) ?
-                            PhoneUtility.InternationalNumberToLocal(guestPhoneNumber) :
-                            PhoneUtility.InternationalNumberToCallable(guestPhoneNumber)
-                    };
-                    mediator.Enqueue(new SendMessageCommand(hostContact));
+                        AudienceMobile = guestPhoneNumber
+                    }));
                 }
-            }
-            else
-            {
-                if (sendSms)
+                else
                 {
-                    var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
-                    var guestContact = new UserContactDTO()
+                    mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                     {
-                        UserMainMobile = guestUser.MainMobile,
+                        UserMainMobile = guestUser.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = guestUser.AppNotificationToken,
                         UserEmail = guestIdentityUser.Email,
                         EmailConfirmed = guestIdentityUser.EmailConfirmed,
@@ -122,18 +114,14 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.GuestReservedDepositePayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(hostPhoneNumber) ?
-                            PhoneUtility.InternationalNumberToLocal(hostPhoneNumber) :
-                            PhoneUtility.InternationalNumberToCallable(hostPhoneNumber),
+                        AudienceMobile = hostPhoneNumber,
                         Price = paidPrice.ToString(),
                         RemainPrice = remainedAmount.ToString()
-                    };
-                    mediator.Enqueue(new SendMessageCommand(guestContact));
+                    }));
 
-                    var hostIdentityUser = userManager.FindByNameAsync(hostlerUser.MainMobile).Result;
-                    var hostContact = new UserContactDTO()
+                    mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                     {
-                        UserMainMobile = hostlerUser.MainMobile,
+                        UserMainMobile = hostlerUser.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = hostlerUser.AppNotificationToken,
                         UserEmail = hostIdentityUser.Email,
                         EmailConfirmed = hostIdentityUser.EmailConfirmed,
@@ -142,15 +130,13 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.HostReservedDepositePayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(guestPhoneNumber) ?
-                            PhoneUtility.InternationalNumberToLocal(guestPhoneNumber) :
-                            PhoneUtility.InternationalNumberToCallable(guestPhoneNumber),
+                        AudienceMobile = guestPhoneNumber,
                         Price = paidPrice.ToString(),
                         RemainPrice = remainedAmount.ToString()
-                    };
-                    mediator.Enqueue(new SendMessageCommand(hostContact));
+                    }));
                 }
             }
+
             if (advertise.Count <= 1)
             {
                 mediator.Send(new RejectRequestsInTimeCommand(reserve.AdvertiseID,

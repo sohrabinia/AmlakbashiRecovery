@@ -11,32 +11,15 @@ namespace Amlakbashi.Core.Entities
 {
     public class User : Entity<int>, ISoftDelete
     {
-        [Column("Id")]
         public override int Id { get; set; }
-
-        [Column("FirstName")]
-        public string FName { get; set; }
-
-        [Column("LastName")]
-        public string LName { get; set; }
-
-        [Column("PhoneNumber")]
-        public string MainMobile { get; set; }
-
-        [Column("PhoneNumber2")]
-        public string Mobile { get; set; }
-
-        [Column("PhoneNumber3")]
-        public string Mobile2 { get; set; }
-
-        [Column("LandlinePhoneNumber")]
-        public string Tell { get; set; }
-
-        [Column("ThirdPersonPhoneNumber")]
-        public string ThirdPersonTell { get; set; }
-
-        [Column("Type")]
-        public int UserGeneralType { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string PhoneNumber2 { get; set; }
+        public string PhoneNumber3 { get; set; }
+        public string LandlinePhoneNumber { get; set; }
+        public string ThirdPersonPhoneNumber { get; set; }
+        public int Type { get; set; }
         public string NotificationToken { get; set; }
         public string AppNotificationToken { get; set; }
         public string FcmAppNotificationToken { get; set; }
@@ -48,21 +31,20 @@ namespace Amlakbashi.Core.Entities
         public InstantReserveAccessEnum InstantReserveAccess { get; set; }
         public long? PhotoID { get; set; }
         public int PhotoStatus { get; set; }
-
-        [Column("Description")]
-        public string Address { get; set; }
-
-        [Column("WalletAmount")]
-        public long Credit { get; set; }
-
-        [Column("GiftWalletAmount")]
-        public long PrizeCredit { get; set; }
+        public string Description { get; set; }
+        public long WalletAmount { get; set; }
+        public long GiftWalletAmount { get; set; }
         public int PresentorUserID { get; set; }
         public bool PresentorPrizeGiven { get; set; }
         public bool RecieveAppreciateDiscount { get; set; }
         public string ContactPhone { get; set; }
         public bool ForbiddenRegionsAccess { get; set; }
+        public NoticesPhoneNumberEnum NoticesPhoneNumber { get; set; } = NoticesPhoneNumberEnum.PhoneNumber;
         public bool IsDeleted { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey("PhotoID")]
+        public virtual File Photo { get; set; }
 
         [JsonIgnore]
         [InverseProperty("HostUser")]
@@ -70,10 +52,6 @@ namespace Amlakbashi.Core.Entities
 
         [JsonIgnore]
         public virtual ICollection<Advertise> Advertises { get; set; }
-
-        [JsonIgnore]
-        [ForeignKey("PhotoID")]
-        public virtual File Photo { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<UserFavorite> Favorite { get; set; }
@@ -121,8 +99,8 @@ namespace Amlakbashi.Core.Entities
         {
             get
             {
-                return (!string.IsNullOrEmpty(FName) ? FName + " " : "") +
-                    (!string.IsNullOrEmpty(LName) ? LName : "");
+                return (!string.IsNullOrEmpty(FirstName) ? FirstName + " " : "") +
+                    (!string.IsNullOrEmpty(LastName) ? LastName : "");
             }
         }
 
@@ -130,11 +108,11 @@ namespace Amlakbashi.Core.Entities
         {
             var list = new List<string>()
             {
-                Mobile, Mobile2, Tell, ThirdPersonTell
+                PhoneNumber2, PhoneNumber3, LandlinePhoneNumber, ThirdPersonPhoneNumber
             };
             if (withMainPhoneNumber)
             {
-                list.Add(MainMobile);
+                list.Add(PhoneNumber);
             }
             return list;
         }
@@ -144,15 +122,15 @@ namespace Amlakbashi.Core.Entities
             switch (type)
             {
                 case PhoneType.MainMobile:
-                    return MainMobile;
+                    return PhoneNumber;
                 case PhoneType.LandLine:
-                    return Tell;
+                    return LandlinePhoneNumber;
                 case PhoneType.OtherMobile1:
-                    return Mobile;
+                    return PhoneNumber2;
                 case PhoneType.OtherMobile2:
-                    return Mobile2;
+                    return PhoneNumber3;
                 case PhoneType.ThirdPerson:
-                    return ThirdPersonTell;
+                    return ThirdPersonPhoneNumber;
                 default:
                     return "";
             }
@@ -168,33 +146,34 @@ namespace Amlakbashi.Core.Entities
             return PhoneUtility.InternationalNumberToCallable(GetPhoneNumber(type));
         }
 
-        public void SetPhoneNumber(PhoneType type, string international_number)
+        public string GetNormalizedNoticesPhoneNumber()
         {
-            switch (type)
+            switch (NoticesPhoneNumber)
             {
-                case PhoneType.MainMobile:
-                    MainMobile = international_number;
-                    break;
-                case PhoneType.LandLine:
-                    Tell = international_number;
-                    break;
-                case PhoneType.OtherMobile1:
-                    Mobile = international_number;
-                    break;
-                case PhoneType.OtherMobile2:
-                    Mobile2 = international_number;
-                    break;
-                case PhoneType.ThirdPerson:
-                    ThirdPersonTell = international_number;
-                    break;
+                case NoticesPhoneNumberEnum.PhoneNumber:
+                    return PhoneUtility.NormalizePhoneNumber(PhoneNumber);
+                case NoticesPhoneNumberEnum.PhoneNumber2:
+                    return PhoneUtility.NormalizePhoneNumber(PhoneNumber2);
+                case NoticesPhoneNumberEnum.PhoneNumber3:
+                    return PhoneUtility.NormalizePhoneNumber(PhoneNumber3);
+                default:
+                    return null;
             }
         }
 
-        public void SetLocalPhoneNumber(PhoneType type, string local_number,
-            int country_code)
+        public string GetNoticesPhoneNumber()
         {
-            var international_number = PhoneUtility.LocalNumberToInternational(local_number, country_code);
-            SetPhoneNumber(type, international_number);
+            switch (NoticesPhoneNumber)
+            {
+                case NoticesPhoneNumberEnum.PhoneNumber:
+                    return PhoneNumber;
+                case NoticesPhoneNumberEnum.PhoneNumber2:
+                    return PhoneNumber2;
+                case NoticesPhoneNumberEnum.PhoneNumber3:
+                    return PhoneNumber3;
+                default:
+                    return null;
+            }
         }
 
         public User ShallowCopy()
@@ -357,6 +336,13 @@ namespace Amlakbashi.Core.Entities
             Verified = 1,
             Banned = 2,
             Requested = 3
+        }
+
+        public enum NoticesPhoneNumberEnum
+        {
+            PhoneNumber = 1,
+            PhoneNumber2 = 2,
+            PhoneNumber3 = 3
         }
     }
 }

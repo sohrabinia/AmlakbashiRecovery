@@ -1,11 +1,13 @@
 ﻿@using Entities = Amlakbashi.Core.Entities;
+
 @model User
+
 <div class="user-contact__container">
     <div class="user-contact__profile">
         <span class="user-contact__extra-msg" style="color:#EA4335"></span>
         @if (Model.PhotoID > 0 && Model.PhotoStatus == (int)Entities.User.UserPhotoState.publish)
         {
-            <img src='@string.Format("/عکس-پروفایل-{0}", Model.PhotoID)' width="80" height="80" rel="عکس پروفایل"/>
+            <img src='@string.Format("/عکس-پروفایل-{0}", Model.PhotoID)' width="80" height="80" rel="عکس پروفایل" />
         }
         else
         {
@@ -22,25 +24,24 @@
         </span>
     </div>
     <div class="user-contact__mobile">
-        @if (Model.Mobile != null)
-        {
-            <a href="tel:@Model.Mobile">
+        <a href="tel:@Model.PhoneNumber">
+            <i class="fa fa-phone"></i>
+            <span>@Model.GetLocalPhoneNumber(Entities.User.PhoneType.MainMobile)</span>
+        </a>
+    </div>
+    @if (string.IsNullOrEmpty(Model.PhoneNumber2) == false)
+    {
+        <div class="user-contact__mobile">
+            <a href="tel:@Model.PhoneNumber2">
                 <i class="fa fa-phone"></i>
                 <span>@Model.GetLocalPhoneNumber(Entities.User.PhoneType.OtherMobile1)</span>
             </a>
-        }
-        else
-        {
-            <a href="tel:@Model.MainMobile">
-                <i class="fa fa-phone"></i>
-                <span>@Model.GetLocalPhoneNumber(Entities.User.PhoneType.MainMobile)</span>
-            </a>
-        }
-    </div>
-    @if (!string.IsNullOrEmpty(Model.Mobile2))
+        </div>
+    }
+    @if (string.IsNullOrEmpty(Model.PhoneNumber3) == false)
     {
         <div class="user-contact__mobile">
-            <a href="tel:@Model.Mobile2">
+            <a href="tel:@Model.PhoneNumber3">
                 <i class="fa fa-phone"></i>
                 <span>@Model.GetLocalPhoneNumber(Entities.User.PhoneType.OtherMobile2)</span>
             </a>

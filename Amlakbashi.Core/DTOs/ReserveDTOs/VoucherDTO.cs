@@ -54,10 +54,9 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             dto.accRoomCountString = reserve.Advertise.Room < 1 ? "بدون اتاق" : reserve.Advertise.Room + " خوابه";
             dto.hostUserId = reserve.HostUserID;
             dto.hostFullName = reserve.HostUser.FullName;
-            dto.hostMobile = expired || isInvoice ? "-" : 
-                PhoneUtility.NormalizePhoneNumber(reserve.HostUser.Mobile ?? reserve.HostUser.MainMobile);
+            dto.hostMobile = expired || isInvoice ? "-" : reserve.HostUser.GetNormalizedNoticesPhoneNumber();
             dto.guestUserId = reserve.UserID;
-            dto.guestMobile = isInvoice ? "-" : PhoneUtility.NormalizePhoneNumber(reserve.GuestUser.Mobile ?? reserve.GuestUser.MainMobile);
+            dto.guestMobile = isInvoice ? "-" : reserve.GuestUser.GetNormalizedNoticesPhoneNumber();
             dto.guestFullName = reserve.GuestUser.FullName;
             dto.guestCount = reserve.NumberOfGuests;
             dto.reserveTotalPrice = reserve.TotalPrice;

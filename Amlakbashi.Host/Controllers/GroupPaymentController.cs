@@ -457,11 +457,11 @@ namespace Amlakbashi.Host.Controllers
                         var reservePayment = reservePayments[i];
                         var targetReserve = reserveService.Find(reservePayment.ReserveID);
                         var hostUser = userService.Find(targetReserve.Advertise.UserID);
-                        var hostIdentityUser = userService.GetIdentityUser(hostUser.MainMobile);
+                        var hostIdentityUser = userService.GetIdentityUser(hostUser.PhoneNumber);
                         accounting.ScheduleSendMessageGroupPayment(new UserContactDTO()
                         {
                             UserEmail = hostIdentityUser.Email,
-                            UserMainMobile = hostUser.MainMobile,
+                            UserMainMobile = hostUser.PhoneNumber,
                             Type = UserContactType.SiteClearingHost,
                             Price = reservePayment.Price.ToString(),
                             AdvertiseId = targetReserve.AdvertiseID.ToString(),
@@ -500,7 +500,7 @@ namespace Amlakbashi.Host.Controllers
                     HostUserId = item.HostUserID,
                     GuestUserId = item.UserID,
                     HostBankCardFullName = hostBankCardFullName,
-                    HostUserCredit = hostUser.Credit,
+                    HostUserCredit = hostUser.WalletAmount,
                     HostUserFullName = hostUser.FullName,
                     HostPayablePrice = PriceUtility.CalculateHostPayablePrice(item.TotalPrice,
                         accounting.GetReservePaidAmount(item.Id, Reserve.StatusStringType.Guest), item.CouponPrice,
@@ -521,7 +521,7 @@ namespace Amlakbashi.Host.Controllers
                     HostUserId = item.HostUserID,
                     GuestUserId = item.UserID,
                     HostBankCardFullName = hostBankCardFullName,
-                    HostUserCredit = hostUser.Credit,
+                    HostUserCredit = hostUser.WalletAmount,
                     HostUserFullName = hostUser.FullName,
                     HostPayablePrice = PriceUtility.CalculateHostPayablePrice(item.TotalPrice,
                         accounting.GetReservePaidAmount(item.Id, Reserve.StatusStringType.Guest), item.CouponPrice,
@@ -542,7 +542,7 @@ namespace Amlakbashi.Host.Controllers
                     HostUserId = item.HostUserID,
                     GuestUserId = item.UserID,
                     HostBankCardFullName = hostBankCardFullName,
-                    HostUserCredit = hostUser.Credit,
+                    HostUserCredit = hostUser.WalletAmount,
                     HostUserFullName = hostUser.FullName,
                     HostPayablePrice = PriceUtility.CalculateHostPayablePrice(item.TotalPrice,
                         accounting.GetReservePaidAmount(item.Id, Reserve.StatusStringType.Guest), item.CouponPrice,
@@ -588,7 +588,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     ReserveId = reserveItem.Id,
                     HostUserId = reserveItem.HostUserID,
-                    HostUserCredit = userService.Find(reserveItem.HostUserID).Credit,
+                    HostUserCredit = userService.Find(reserveItem.HostUserID).WalletAmount,
                     HostBankCardFullName = hostBankCardFullName,
                     HostPayablePrice = PriceUtility.CalculateHostPayablePrice(reserveItem.TotalPrice,
                         accounting.GetReservePaidAmount(reserveItem.Id, Reserve.StatusStringType.Guest),

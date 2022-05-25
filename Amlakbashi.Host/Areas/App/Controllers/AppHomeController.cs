@@ -157,7 +157,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
         public ActionResult Dashboard()
         {
             ViewBag.userId = userAccessor.CurrentUser.Id;
-            ViewBag.userGeneralType = userAccessor.CurrentUser.UserGeneralType;
+            ViewBag.userGeneralType = userAccessor.CurrentUser.Type;
             ViewBag.alert_msg = TempData["alert"];
             return View();
         }

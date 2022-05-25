@@ -129,7 +129,7 @@ namespace Amlakbashi.Host.Controllers.API
             int number_of_guests, string cid, int buildNumber = 0)
         {
             var user = GetUser();
-            var identityUser = userService.GetIdentityUser(user.MainMobile);
+            var identityUser = userService.GetIdentityUser(user.PhoneNumber);
             if (!ClientAuthenticate(cid))
             {
                 return null;
@@ -284,7 +284,7 @@ namespace Amlakbashi.Host.Controllers.API
                 reserveService.ExistHostGuest(user_id, out has_host_reserve, out has_guest_reserve);
                 return GenerateJsonResult(new
                 {
-                    isHost = user.UserGeneralType > (int)Entities.User.UserGeneralTypeEnum.Guest,
+                    isHost = user.Type > (int)Entities.User.UserGeneralTypeEnum.Guest,
                     hasHostReserve = has_host_reserve,
                     hasGuestReserve = has_guest_reserve,
                     profileImageId = user.PhotoStatus == (int)Entities.User.UserPhotoState.publish ? user.PhotoID : 0
@@ -824,9 +824,9 @@ namespace Amlakbashi.Host.Controllers.API
                 var data = new
                 {
                     status = 1,
-                    currentCredit = user.Credit,
+                    currentCredit = user.WalletAmount,
                     couponPrice = couponPrice,
-                    prizePrice = accounting.GetReservePrizeAvailable(reserve.TotalPrice, user.PrizeCredit),
+                    prizePrice = accounting.GetReservePrizeAvailable(reserve.TotalPrice, user.GiftWalletAmount),
                     couponCalculationPrice = reserve.CouponCalculationPrice
                 };
                 return GenerateJsonResult(data);

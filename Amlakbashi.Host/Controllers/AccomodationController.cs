@@ -2292,11 +2292,11 @@ namespace Amlakbashi.Host.Controllers
             bool verifyEmail = false;
             bool isNumberForIran = false;
             string userEmailAddress = "";
-            if (currentUser != null && string.IsNullOrEmpty(currentUser.MainMobile) == false)
+            if (currentUser != null && string.IsNullOrEmpty(currentUser.PhoneNumber) == false)
             {
-                var identityUser = userService.GetIdentityUser(currentUser.MainMobile);
+                var identityUser = userService.GetIdentityUser(currentUser.PhoneNumber);
                 verifyEmail = identityUser.EmailConfirmed;
-                isNumberForIran = PhoneUtility.IsNumberForIran(currentUser.MainMobile);
+                isNumberForIran = PhoneUtility.IsNumberForIran(currentUser.PhoneNumber);
                 userEmailAddress = identityUser.Email;
             }
             var is_favourited = currentUser.Id > 0 &&
@@ -2819,7 +2819,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var user = userAccessor.CurrentUser;
-                if (user.Id > 0 && user.UserGeneralType > 0)
+                if (user.Id > 0 && user.Type > 0)
                 {
                     var userAccs = user.Advertises;
                     if (userAccs != null && userAccs.Count == 1 && userAccs.FirstOrDefault().HygieneProtocol == null)

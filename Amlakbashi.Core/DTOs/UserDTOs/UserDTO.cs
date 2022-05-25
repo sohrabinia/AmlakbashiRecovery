@@ -25,15 +25,15 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
         public string bankFname { get; set; }
         public string bankLname { get; set; }
         public int userGeneralType { get; set; }
-        public int CancelInstantReserveLimit { get; set; }
         public bool hasPassword { get; set; }
+        public User.NoticesPhoneNumberEnum noticesPhoneNumber { get; set; }
 
         public static UserDTO Generate(User user, AppUser identityUser)
         {
             UserDTO dto = new UserDTO();
             dto.id = user.Id;
-            dto.fname = user.FName;
-            dto.lname = user.LName;
+            dto.fname = user.FirstName;
+            dto.lname = user.LastName;
             dto.email = identityUser.Email;
 
             dto.mainMobile = PhoneUtility.IsNumberForIran(
@@ -61,9 +61,9 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                     user.GetLocalPhoneNumber(User.PhoneType.ThirdPerson) :
                 user.GetCallablePhoneNumber(User.PhoneType.ThirdPerson);
 
-            dto.userGeneralType = user.UserGeneralType;
-            dto.CancelInstantReserveLimit = user.CancelInstantReserveLimit;
+            dto.userGeneralType = user.Type;
             dto.hasPassword = identityUser.PasswordHash != null;
+            dto.noticesPhoneNumber = user.NoticesPhoneNumber;
             return dto;
         }
 
@@ -151,6 +151,13 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                     errors.Add("لطفا در قسمت نام خانوادگی فقط از حروف استفاده کنید");
                     has_error = true;
                 }
+            }
+            if (Enum.IsDefined(typeof(User.NoticesPhoneNumberEnum), noticesPhoneNumber) == false ||
+                (noticesPhoneNumber == User.NoticesPhoneNumberEnum.PhoneNumber2 && string.IsNullOrEmpty(this.mobile2)) ||
+                (noticesPhoneNumber == User.NoticesPhoneNumberEnum.PhoneNumber3 && string.IsNullOrEmpty(this.mobile3)))
+            {
+                errors.Add("شماره ارسال اعلامیه ها اشتباه است");
+                has_error = true;
             }
             return !has_error;
         }

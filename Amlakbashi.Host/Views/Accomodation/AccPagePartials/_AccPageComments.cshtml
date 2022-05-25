@@ -40,7 +40,7 @@
                         <div class="advertise-page__comment-title-image">
                             @if (user.PhotoID > 0 && user.PhotoStatus == (int)Entities.User.UserPhotoState.publish)
                             {
-                                <img style="border-radius:90px;" src='@string.Format("/عکس-پروفایل_کوچک-{0}", user.PhotoID)' alt='@(string.Format("عکس پروفایل {0}", user.FName))' ‌ width="40" height="40" />
+                                <img style="border-radius:90px;" src='@string.Format("/عکس-پروفایل_کوچک-{0}", user.PhotoID)' alt='@(string.Format("عکس پروفایل {0}", user.FirstName))' ‌ width="40" height="40" />
                             }
                             else
                             {
@@ -48,7 +48,7 @@
                             }
                         </div>
                         <div class="advertise-page__comment-title-info">
-                            <p>@user.FName</p>
+                            <p>@user.FirstName</p>
                             <p>@StringUtility.EnglishNumberToPersian(DateTimeUtility.ConvertDate(comment.Comment.CreateDate))</p>
                         </div>
                         <div>

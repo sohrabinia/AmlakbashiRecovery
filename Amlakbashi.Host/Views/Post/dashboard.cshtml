@@ -34,7 +34,7 @@
             var gifTtravel = string.Format("/post/presentandprize?userid={0}", userId);
             var favorite = string.Format("/post/favoritemanager?userid={0}", userId);
         }
-        @if (userAccessor.CurrentUser.UserGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
+        @if (userAccessor.CurrentUser.Type == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
         {
             @await Html.PartialAsync("_DashboardAccount", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "title", "رزرو های من  " }, { "href", Reserve + string.Format("&selecttype={0}&category={1}", 1, 1) }, { "class", "fa-book" } })

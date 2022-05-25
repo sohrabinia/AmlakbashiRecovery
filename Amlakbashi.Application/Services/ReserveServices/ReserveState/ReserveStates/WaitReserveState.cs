@@ -50,10 +50,10 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             if (sendSms)
             {
                 var guestUser = reserve.GuestUser;
-                var identityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
-                var contact = new UserContactDTO()
+                var identityUser = userManager.FindByNameAsync(guestUser.PhoneNumber).Result;
+                mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                 {
-                    UserMainMobile = guestUser.MainMobile,
+                    UserMainMobile = guestUser.GetNoticesPhoneNumber(),
                     UserAppNotificationToken = guestUser.AppNotificationToken,
                     UserEmail = identityUser.Email,
                     EmailConfirmed = identityUser.EmailConfirmed,
@@ -63,8 +63,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     AdvertiseId = reserve.AdvertiseID.ToString(),
                     UserId = guestUser.Id.ToString(),
                     ReserveId = reserve.Id.ToString()
-                };
-                mediator.Enqueue(new SendMessageCommand(contact));
+                }));
             }
             mediator.Send(new ScheduleReservePaymentCommand(ReserveId));
         }

@@ -843,28 +843,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return reserve;
         }
 
-        public void SendReserveRequestSmsToHost(Reserve reserve, string fromDate, string toDate)
-        {
-            var contact = new UserContactDTO()
-            {
-                UserMainMobile = reserve.HostUser.MainMobile,
-                UserAppNotificationToken = reserve.HostUser.AppNotificationToken,
-                UserEmail = "",
-                EmailConfirmed = false,
-                UserFcmAppNotificationToken = reserve.HostUser.FcmAppNotificationToken,
-                UserNotificationToken = reserve.HostUser.NotificationToken,
-                Type = UserContactType.ReserveRequest,
-                AdvertiseId = reserve.AdvertiseID.ToString(),
-                UserId = string.Format("{0:n0}", reserve.TotalPrice - (reserve.TotalPrice * 0.1f)), // به جای کد مهمان، در این فیلد سهم میزبان فرستاده می شود
-                ReserveId = reserve.Id.ToString(),
-                Extra1 = fromDate,
-                Extra2 = toDate + Environment.NewLine + "به مدت " + (reserve.EndDate - reserve.StartDate).TotalDays + " شب" +
-                            Environment.NewLine + "مبلغ: " + string.Format("{0:n0}", reserve.TotalPrice) + " تومان",
-                Extra3 = reserve.NumberOfGuests.ToString() + " نفر" + Environment.NewLine + "کد رزرو: " + reserve.Id
-            };
-            mediator.Enqueue(new SendMessageCommand(contact));
-        }
-
         public bool UpdateNew(ReserveIndexEditDTO dto, out string msg, int doerUserId, ActionSourceEnum actionSource)
         {
             var reserve = Repository.Query(q => q.Include("Advertise.User.Advertises").FirstOrDefault(f => f.Id == dto.Id));
@@ -1277,19 +1255,18 @@ namespace Amlakbashi.Application.Services.ReserveServices
             Repository.Update(reserve);
             Repository.Save();
             var advertise = reserve.Advertise;
-            if (accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest) > 0
-                || reserve.DepositPrice == 0)
+            if (accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest) > 0 || reserve.DepositPrice == 0)
             {
                 if (is_host)
                 {
-                    msg = "درخواست لغو شما ارسال شد و در درست بررسی است";
+                    msg = "درخواست لغو رزرو شما ارسال شده و در حال بررسی است";
                 }
                 else
                 {
                     var hostUser = Repository.Find<User, int>(advertise.UserID);
-                    var host_contact_str = "شماره تماس: " + (string.IsNullOrEmpty(hostUser.Mobile) ? hostUser.GetLocalPhoneNumber(User.PhoneType.MainMobile) : hostUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1)) +
-                        (!string.IsNullOrEmpty(hostUser.Mobile2) ? " و " + hostUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile2) : "");
-                    msg = string.Format("لطفا با میزبان خود آقا/خانم {0} تماس بگیرید {1} و خسارت کنسلی را تایید کنید و نتیجه را به ما اعلام فرمایید. شماره تماس املاک باشی: 02632565304", hostUser.FullName, host_contact_str);
+                    var host_contact_str = "شماره تماس: " + hostUser.GetNormalizedNoticesPhoneNumber();
+                    //msg = string.Format("لطفا با میزبان خود آقا/خانم {0} تماس بگیرید {1} و خسارت کنسلی را تایید کنید و نتیجه را به ما اعلام فرمایید. شماره تماس املاک باشی: 02632565304", hostUser.FullName, host_contact_str);
+                    msg = $"لطفا با میزبان خود آقا/خانم {hostUser.FullName} تماس بگیرید {host_contact_str} و خسارت کنسلی را تایید کنید و نتیجه را به ما اعلام فرمایید. شماره تماس املاک باشی: 02632565304";
                 }
                 isPending = true;
                 mediator.Send(new SetReserveStatusCommand(reserve_id,
@@ -1423,7 +1400,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
         {
             if (selectType == ReserveManagerSelectType.All)
             {
-                if (currentUser.UserGeneralType == (int)User.UserGeneralTypeEnum.Guest)
+                if (currentUser.Type == (int)User.UserGeneralTypeEnum.Guest)
                     selectType = ReserveManagerSelectType.Guest;
                 else
                     selectType = ReserveManagerSelectType.Host;
@@ -1611,6 +1588,28 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
             msg = "عملیات با موفقیت انجام شد";
             return true;
+        }
+
+        private void SendReserveRequestSmsToHost(Reserve reserve, string fromDate, string toDate)
+        {
+            var contact = new UserContactDTO()
+            {
+                UserMainMobile = reserve.HostUser.GetNoticesPhoneNumber(),
+                UserAppNotificationToken = reserve.HostUser.AppNotificationToken,
+                UserEmail = "",
+                EmailConfirmed = false,
+                UserFcmAppNotificationToken = reserve.HostUser.FcmAppNotificationToken,
+                UserNotificationToken = reserve.HostUser.NotificationToken,
+                Type = UserContactType.ReserveRequest,
+                AdvertiseId = reserve.AdvertiseID.ToString(),
+                UserId = string.Format("{0:n0}", reserve.TotalPrice - (reserve.TotalPrice * 0.1f)), // به جای کد مهمان، در این فیلد سهم میزبان فرستاده می شود
+                ReserveId = reserve.Id.ToString(),
+                Extra1 = fromDate,
+                Extra2 = toDate + Environment.NewLine + "به مدت " + (reserve.EndDate - reserve.StartDate).TotalDays + " شب" +
+                            Environment.NewLine + "مبلغ: " + string.Format("{0:n0}", reserve.TotalPrice) + " تومان",
+                Extra3 = reserve.NumberOfGuests.ToString() + " نفر" + Environment.NewLine + "کد رزرو: " + reserve.Id
+            };
+            mediator.Enqueue(new SendMessageCommand(contact));
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs
             var guestUser = reserve.GuestUser;
             dto.ReserveId = reserve.Id;
             dto.UserId = guestUser.Id;
-            dto.CurrentCredit = guestUser.Credit;
+            dto.CurrentCredit = guestUser.WalletAmount;
             dto.TotalPrice = reserve.TotalPrice;
             dto.DepositePrice = reserve.DepositPrice;
             dto.CouponId = couponId;

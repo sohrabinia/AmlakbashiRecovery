@@ -146,7 +146,7 @@
                     <i class="fa fa-search"></i>
                     <input name="search" type="text" class="search-style" placeholder="جستجو در املاک باشی">
                 </div>*@
-            <a href="@(userAccessor.CurrentUser.UserGeneralType != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id): string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id))" class="add-advertise-box">
+            <a href="@(userAccessor.CurrentUser.Type != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id): string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id))" class="add-advertise-box">
                 <p class="add-advertise-style"> رزرو های من </p>
             </a>
         </header>
@@ -187,12 +187,12 @@
                     <li class="main-navigation_list-item @(ViewBag.advertise!=null ? "menu__item--active" : "")"><a href="/accomodation/accbasicform"><i class="fa fa-plus"></i> افزودن آگهی</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
-                        if (userAccessor.CurrentUser.UserGeneralType != (int)Entities.User.UserGeneralTypeEnum.Guest)
+                        if (userAccessor.CurrentUser.Type != (int)Entities.User.UserGeneralTypeEnum.Guest)
                         {
                             <li class="main-navigation_list-item @(ViewBag.personal != null ? "menu__item--active" : "")"><a href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)"><i class="fas fa-list-alt"></i> آگهی های من</a></li>
                             <li class="main-navigation_list-item @(ViewBag.advertise_comment != null ? "menu__item--active" : "")"><a href="/comment/advertisecommentmanager"><i class="fa fa-th-list"></i> نظرات آگهی ها <vc:not-seen-comment-count></vc:not-seen-comment-count></a></li>
                         }
-                        if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+                        if (userAccessor.CurrentUser.Type == (int)Entities.User.UserGeneralTypeEnum.Guest)
                         {
                             <li class="main-navigation_list-item @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id)"><i class="fa fa-book"></i> رزرو ها</a></li>
                         }
@@ -201,7 +201,7 @@
                             <li class="main-navigation_list-item @(ViewBag.reserveHost != null ? "menu__item--active" : "")"><a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=0&selectType=2", userAccessor.CurrentUser.Id)"><i class="fa fa-book"></i> رزرو بعنوان میزبان </li>
                             <li class="main-navigation_list-item  @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a href="@string.Format("/reserve/reserveitemmanager?user_id={0}&category=1&selectType=1", userAccessor.CurrentUser.Id)"><i class="fa fa-book"></i> رزرو به عنوان مهمان</a></li>
                         }
-                        if (userAccessor.CurrentUser.UserGeneralType > 0)
+                        if (userAccessor.CurrentUser.Type > 0)
                         {
                             <li class="main-navigation_list-item @(ViewBag.Invoice != null ? "menu__item--active" : "")"><a href="/reserve/invoice"><i class="fa fa-list"></i> صورت حساب رزرو ها</a></li>
                         }
@@ -209,15 +209,11 @@
                         <li class="main-navigation_list-item @(ViewBag.profile != null ? "menu__item--active " : "")"><a href="@string.Format("/user/profilemanager")"><i class="fas fa-user"></i>پروفایل من</a></li>
                         <li class="main-navigation_list-item @(ViewBag.UserCredit != null ? "menu__item--active " : "")"><a href="/user/usercreditmanager"><i class="fa fa-money-bill-alt"></i> کیف پول</a></li>
                         <li class="main-navigation_list-item @(ViewBag.favorite != null ? "menu__item--active" : "")"><a href="@string.Format("/post/favoritemanager")"><i class="fas fa-heart"></i> علاقه مندی های من</a></li>
-                        if (userAccessor.CurrentUser.UserGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
+                        if (userAccessor.CurrentUser.Type == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest)
                         {
                             <li class="main-navigation_list-item @(ViewBag.advertise!=null ? "menu__item--active" : "")"><a href="/accomodation/accbasicform"><i class="fa fa-plus"></i> میزبان شوید</a></li>
                         }
                         <li class="main-navigation_list-item"><a href="/user/signout"><i class="fas fa-sign-out-alt"></i>خروج از حساب کاربری</a></li>
-                    }
-                    else
-                    {
-                        <li class="main-navigation_list-item"><a href="/user/Mobilelogin"><i class="fas fa-sign-out-alt"></i>خروج از حساب کاربری</a></li>
                     }
                 </ul>
             </nav>

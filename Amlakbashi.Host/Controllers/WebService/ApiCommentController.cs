@@ -40,7 +40,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         public IActionResult GetForHostPanel(bool seenByHost = true, int page = 1, int pageItemCount = 20)
         {
             var user = userAccessor.CurrentUser;
-            if (user.UserGeneralType != 1)
+            if (user.Type != 1)
             {
                 return BadRequest();
             }

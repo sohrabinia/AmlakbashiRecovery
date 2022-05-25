@@ -75,10 +75,10 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         {
             var reserve = reserveRepository.Find(request.reserveId);
             var hostlerUser = reserveRepository.Find<User, int>(reserve.Advertise.UserID);
-            var hostlerIdentityUser = userManager.FindByNameAsync(hostlerUser.MainMobile).Result;
+            var hostlerIdentityUser = userManager.FindByNameAsync(hostlerUser.PhoneNumber).Result;
             var contact = new UserContactDTO()
             {
-                UserMainMobile = hostlerUser.MainMobile,
+                UserMainMobile = hostlerUser.GetNoticesPhoneNumber(),
                 UserAppNotificationToken = hostlerUser.AppNotificationToken,
                 UserEmail = hostlerIdentityUser.Email,
                 EmailConfirmed = hostlerIdentityUser.EmailConfirmed,
@@ -123,10 +123,10 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                     return Task.FromResult(Unit.Value);
                 }
                 var guestUser = reserve.GuestUser;
-                var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
+                var guestIdentityUser = userManager.FindByNameAsync(guestUser.PhoneNumber).Result;
                 var contact = new UserContactDTO()
                 {
-                    UserMainMobile = guestUser.MainMobile,
+                    UserMainMobile = guestUser.GetNoticesPhoneNumber(),
                     UserAppNotificationToken = guestUser.AppNotificationToken,
                     UserEmail = guestIdentityUser.Email,
                     EmailConfirmed = guestIdentityUser.EmailConfirmed,
@@ -368,7 +368,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             {
                 var advertise = reserve.Advertise;
                 var hostlerUser = reserveRepository.Find<User, int>(advertise.UserID);
-                if (PhoneUtility.IsNumberForIran(hostlerUser.MainMobile))
+                if (PhoneUtility.IsNumberForIran(hostlerUser.PhoneNumber))
                 {
                     userContact.SendReserveRequestCall(hostlerUser, reserve.AdvertiseID);
                 }
@@ -382,7 +382,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             if (reserve.Status == ReserveStatus.WaitForReserve)
             {
                 var guestUser = reserve.GuestUser;
-                if (PhoneUtility.IsNumberForIran(guestUser.MainMobile))
+                if (PhoneUtility.IsNumberForIran(guestUser.PhoneNumber))
                 {
                     userContact.SendPayReserveCall(guestUser, reserve.AdvertiseID);
                 }

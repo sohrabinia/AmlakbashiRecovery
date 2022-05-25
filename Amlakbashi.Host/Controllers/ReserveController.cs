@@ -235,7 +235,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(dto.Id);
-                var currentIdentityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+                var currentIdentityUser = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
                 var userAllowEdit = reserve.Status < ReserveStatus.Reserved ||
                     userService.UserAllowPolicy(currentIdentityUser, Policies.Reserve_Edit_Reserved);
                 if (userAllowEdit == false)
@@ -351,7 +351,7 @@ namespace Amlakbashi.Host.Controllers
                     reserve_id = StringUtility.PersianNumberToEnglish(reserve_id);
                 if (selectType == ReserveManagerSelectType.All)
                 {
-                    selectType = currentUser.UserGeneralType > 0 ?
+                    selectType = currentUser.Type > 0 ?
                         ReserveManagerSelectType.Host : ReserveManagerSelectType.Guest;
                 }
                 Dictionary<ReserveCategory, int> countDict;
@@ -1149,7 +1149,7 @@ namespace Amlakbashi.Host.Controllers
                             hostBankCard.ShabaNumber : "",
                     UserName = hostName,
                     UserId = hostUser.Id,
-                    UserCredit = hostUser.Credit
+                    UserCredit = hostUser.WalletAmount
                 };
                 return PartialView("_SiteClearingHostInfo", model);
             }
@@ -1308,10 +1308,10 @@ namespace Amlakbashi.Host.Controllers
 
                 if (sendSms)
                 {
-                    var identityUser = userService.GetIdentityUser(reserve.HostUser.MainMobile);
+                    var identityUser = userService.GetIdentityUser(reserve.HostUser.PhoneNumber);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserMainMobile = reserve.HostUser.MainMobile,
+                        UserMainMobile = reserve.HostUser.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = reserve.HostUser.AppNotificationToken,
                         UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = reserve.HostUser.FcmAppNotificationToken,
@@ -1400,10 +1400,10 @@ namespace Amlakbashi.Host.Controllers
                 if (result.HasError == false && sendSms)
                 {
                     var user = userService.Find(result.UserId);
-                    var identityUser = userService.GetIdentityUser(user.MainMobile);
+                    var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserMainMobile = user.MainMobile,
+                        UserMainMobile = user.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
@@ -1565,10 +1565,10 @@ namespace Amlakbashi.Host.Controllers
             {
                 var reserve = reserveService.Find(reserve_id);
                 var user = userService.Find(reserve.Advertise.UserID);
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                 userService.SendMessage(new UserContactDTO()
                 {
-                    UserMainMobile = user.MainMobile,
+                    UserMainMobile = user.GetNoticesPhoneNumber(),
                     UserAppNotificationToken = user.AppNotificationToken,
                     UserEmail = identityUser.Email,
                     UserFcmAppNotificationToken = user.FcmAppNotificationToken,
@@ -1876,7 +1876,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (reserve.shouldFollow)
                 {
-                    var currentUserIdentity = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+                    var currentUserIdentity = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
                     var editAllowed = userService.UserAllowPolicy(currentUserIdentity, Policies.Reserve_Edit_Reserved);
                     if (editAllowed == false)
                     {
@@ -2218,7 +2218,7 @@ namespace Amlakbashi.Host.Controllers
             var guestUser = reserve.GuestUser;
             var coupon = accounting.GetMostValuableDiscountCouponIfAny(guestUser.Id);
             var model = ReservePaymentDTO.Generate(reserve,
-                accounting.GetReservePrizeAvailable(reserve.TotalPrice, guestUser.PrizeCredit),
+                accounting.GetReservePrizeAvailable(reserve.TotalPrice, guestUser.GiftWalletAmount),
                 coupon == null ? 0 : accounting.CalculateDiscountCouponPrice(coupon.Percent, reserve.CouponCalculationPrice),
                 coupon == null ? 0 : coupon.Id,
                 accounting.GetReservePaidAmount(reserve.Id, Reserve.StatusStringType.Guest));
@@ -2391,7 +2391,7 @@ namespace Amlakbashi.Host.Controllers
                     errorMessage = "شماره تراکنش تکراری می باشد";
                 }
                 else if ((ReservePayment.ReservePaymentMethod)method == ReservePayment.ReservePaymentMethod.AmlakbashiCredit &&
-                    reserve.GuestUser.Credit < price)
+                    reserve.GuestUser.WalletAmount < price)
                 {
                     invalidData = true;
                     errorMessage = "موجودی کیف پول کافی نمی باشد";
@@ -2459,7 +2459,7 @@ namespace Amlakbashi.Host.Controllers
             }
 
             var startDate = DateTime.Parse("01/01/2021");
-            var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+            var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
             if ((discountCodeType == DiscountCoupon.DiscountCouponType.Moupon ||
                 discountCodeType == DiscountCoupon.DiscountCouponType.Instagram) &&
                 identityUser.CreateDate.Value.Date < startDate.Date)

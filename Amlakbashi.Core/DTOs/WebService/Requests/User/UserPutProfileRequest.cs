@@ -21,6 +21,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.User
         public string bankCardOwnerFirstName { get; set; }
         public string bankCardOwnerLastName { get; set; }
         public string shebaNumber { get; set; }
+        public Entities.User.NoticesPhoneNumberEnum noticesPhoneNumber { get; set; }
 
         public bool IsValid(ModelStateDictionary modelState)
         {
@@ -73,6 +74,12 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.User
             if (string.IsNullOrEmpty(email) == false && EmailUtility.ValidateEmail(email) == false)
             {
                 modelState.AddModelError(nameof(email), "email is incorrect");
+            }
+            if (Enum.IsDefined(typeof(Entities.User.NoticesPhoneNumberEnum), noticesPhoneNumber) == false ||
+                (noticesPhoneNumber == Entities.User.NoticesPhoneNumberEnum.PhoneNumber2 && string.IsNullOrEmpty(phoneNumber2)) ||
+                (noticesPhoneNumber == Entities.User.NoticesPhoneNumberEnum.PhoneNumber3 && string.IsNullOrEmpty(phoneNumber3)))
+            {
+                modelState.AddModelError(nameof(email), "noticesphonenumber is incorrect");
             }
             return modelState.IsValid;
         }

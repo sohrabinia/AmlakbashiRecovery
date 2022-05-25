@@ -127,7 +127,7 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
         public void SendReserveRequestCall(User user, long advertiseId)
         {
 #if DEBUG
-            var mobile = PhoneUtility.InternationalNumberToLocal(user.MainMobile);
+            var mobile = PhoneUtility.InternationalNumberToLocal(user.PhoneNumber);
             if (AdminMobiles.Contains(mobile) == false)
                 return;
 #endif
@@ -137,7 +137,7 @@ namespace Amlakbashi.Core.Infrastructure.UserContact
         public void SendPayReserveCall(User user, long advertiseId)
         {
 #if DEBUG
-            var mobile = PhoneUtility.InternationalNumberToLocal(user.MainMobile);
+            var mobile = PhoneUtility.InternationalNumberToLocal(user.PhoneNumber);
             if (AdminMobiles.Contains(mobile) == false)
                 return;
 #endif

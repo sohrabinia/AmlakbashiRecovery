@@ -47,10 +47,10 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             Repository.Save();
             if (sendSms)
             {
-                var identityUser = userManager.FindByNameAsync(reserve.GuestUser.MainMobile).Result;
-                var contact = new UserContactDTO()
+                var identityUser = userManager.FindByNameAsync(reserve.GuestUser.PhoneNumber).Result;
+                mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                 {
-                    UserMainMobile = reserve.GuestUser.MainMobile,
+                    UserMainMobile = reserve.GuestUser.GetNoticesPhoneNumber(),
                     UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
                     UserEmail = identityUser.Email,
                     EmailConfirmed = identityUser.EmailConfirmed,
@@ -59,8 +59,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     Type = UserContactType.GuestStayStarted,
                     AdvertiseId = reserve.AdvertiseID.ToString(),
                     ReserveId = reserve.Id.ToString()
-                };
-                mediator.Enqueue(new SendMessageCommand(contact));
+                }));
             }
         }
     }

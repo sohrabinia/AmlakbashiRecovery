@@ -41,11 +41,11 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Reserves
                 hostName = reserve.HostUser.FullName,
                 hostImageUrl = reserve.HostUser.GetUserImageApiUrl(),
                 hostPhoneNumber = reserve.Status == Reserve.ReserveStatus.Reserved ||
-                        reserve.Status == Reserve.ReserveStatus.Started ? reserve.HostUser.MainMobile : null,
+                        reserve.Status == Reserve.ReserveStatus.Started ? reserve.HostUser.PhoneNumber : null,
                 guestName = reserve.GuestUser.FullName,
                 guestImageUrl = reserve.GuestUser.GetUserImageApiUrl(),
                 guestPhoneNumber = reserve.Status == Reserve.ReserveStatus.Reserved ||
-                        reserve.Status == Reserve.ReserveStatus.Started ? reserve.GuestUser.MainMobile : null,
+                        reserve.Status == Reserve.ReserveStatus.Started ? reserve.GuestUser.PhoneNumber : null,
                 residencyInfo = reserve.Advertise
             };
             return response;

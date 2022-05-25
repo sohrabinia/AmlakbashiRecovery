@@ -32,16 +32,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
         public override bool CanTransitTo(ReserveStatus status)
         {
             return false;
-            //switch (status)
-            //{
-            //    case ReserveStatus.Started:
-            //    case ReserveStatus.Reserved:
-            //    case ReserveStatus.CashPay:
-            //    case ReserveStatus.CanceledByHost:
-            //        return true;
-            //    default:
-            //        return false;
-            //}
         }
 
         public override void OnTransition(ReserveStatus prevStatus,
@@ -58,10 +48,10 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             Repository.Save();
             if (sendSms)
             {
-                var identityUser = userManager.FindByNameAsync(reserve.GuestUser.MainMobile).Result;
-                var contact = new UserContactDTO()
+                var identityUser = userManager.FindByNameAsync(reserve.GuestUser.PhoneNumber).Result;
+                mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                 {
-                    UserMainMobile = reserve.GuestUser.MainMobile,
+                    UserMainMobile = reserve.GuestUser.GetNoticesPhoneNumber(),
                     UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
                     UserEmail = identityUser.Email,
                     EmailConfirmed = identityUser.EmailConfirmed,
@@ -70,8 +60,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     Type = UserContactType.GuestCancelRequestSent,
                     ReserveId = reserve.Id.ToString(),
                     AdvertiseId = reserve.AdvertiseID.ToString()
-                };
-                mediator.Enqueue(new SendMessageCommand(contact));
+                }));
             }
             reserveSupportManager.ReserveCancelAfterDoneHandler(ReserveId);
         }

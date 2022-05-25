@@ -1,5 +1,4 @@
-﻿using Amlakbashi.Core.Common.Repository;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -18,6 +17,18 @@ namespace Amlakbashi.Data
                 return;
             }
             context.Database.Migrate();
+            SeedData(context);
+        }
+
+        private static void SeedData(AmlakbashiDB context)
+        {
+            var users = context.Users.Where(x => string.IsNullOrEmpty(x.PhoneNumber2) == false);
+            foreach (var item in users)
+            {
+                item.NoticesPhoneNumber = Core.Entities.User.NoticesPhoneNumberEnum.PhoneNumber2;
+                context.Update(item);
+            }
+            context.SaveChanges();
         }
     }
 }

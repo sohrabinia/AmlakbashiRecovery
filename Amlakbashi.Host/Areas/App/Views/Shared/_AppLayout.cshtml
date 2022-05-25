@@ -157,7 +157,7 @@
                 {
                     <a class="master__menu-item" href="/app/home/main">خانه</a>
                 }
-                @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+                @if (userAccessor.CurrentUser.Type == (int)Entities.User.UserGeneralTypeEnum.Guest)
                 {
                     <a class="master__menu-item" href="/app/reserve/list?selectType=1">رزرو ها</a>
                     <a class="master__menu-item" href="/app/advertise/updatebasic">ثبت آگهی</a>

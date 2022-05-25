@@ -48,10 +48,10 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             if (sendSms)
             {
                 var hostlerUser = Repository.Find<User, int>(reserve.Advertise.UserID);
-                var identityUser = userManager.FindByNameAsync(hostlerUser.MainMobile).Result;
-                var contact = new UserContactDTO()
+                var identityUser = userManager.FindByNameAsync(hostlerUser.PhoneNumber).Result;
+                mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                 {
-                    UserMainMobile = hostlerUser.MainMobile,
+                    UserMainMobile = hostlerUser.GetNoticesPhoneNumber(),
                     UserAppNotificationToken = hostlerUser.AppNotificationToken,
                     UserEmail = identityUser.Email,
                     EmailConfirmed = identityUser.EmailConfirmed,
@@ -61,8 +61,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     AdvertiseId = reserve.AdvertiseID.ToString(),
                     UserId = hostlerUser.Id.ToString(),
                     ReserveId = reserve.Id.ToString()
-                };
-                mediator.Enqueue(new SendMessageCommand(contact));
+                }));
             }
         }
     }

@@ -227,11 +227,11 @@ namespace Amlakbashi.Host.Controllers.WebService
         public IActionResult HostProfile(int id)
         {
             var user = userService.Find(id);
-            if (user == null || user.UserGeneralType == 0)
+            if (user == null || user.Type == 0)
             {
                 return NotFound();
             }
-            var identityUser = userService.GetIdentityUser(user.MainMobile);
+            var identityUser = userService.GetIdentityUser(user.PhoneNumber);
             HostProfileResponse response = user;
             response.hostCreateDate = StringUtility.EnglishNumberToPersian(DateTimeUtility.ConvertDate(identityUser.CreateDate.Value));
             return Ok(response);
@@ -249,17 +249,18 @@ namespace Amlakbashi.Host.Controllers.WebService
             var bankCard = bankCardService.GetByUserId(user.Id);
             var response = new UserGetProfileResponse()
             {
-                phoneNumber = user.MainMobile,
-                phoneNumber2 = user.Mobile,
-                phoneNumber3 = user.Mobile2,
-                landLinePhoneNumber = user.Tell,
-                thirdPersonPhoneNumber = user.ThirdPersonTell,
-                firstName = user.FName,
-                lastName = user.LName,
+                phoneNumber = user.PhoneNumber,
+                phoneNumber2 = user.PhoneNumber2,
+                phoneNumber3 = user.PhoneNumber3,
+                landLinePhoneNumber = user.LandlinePhoneNumber,
+                thirdPersonPhoneNumber = user.ThirdPersonPhoneNumber,
+                firstName = user.FirstName,
+                lastName = user.LastName,
                 email = identityUser.Email,
                 bankCardNumber = bankCard.BankCardNumber,
                 bankCardOwnerName = bankCard.FullName,
                 shebaNumber = bankCard.ShabaNumber,
+                noticesPhoneNumber = user.NoticesPhoneNumber,
                 imageUrl = user.GetCurrentUserImageApiUrl()
             };
             return Ok(response);
@@ -273,8 +274,51 @@ namespace Amlakbashi.Host.Controllers.WebService
                 return BadRequest(ModelState);
             }
             request.id = userAccessor.CurrentUser.Id;
-            await userService.UpdateAsync(request);
+            var result = await userService.UpdateAsync(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
             return Ok();
+        }
+
+        [HttpPost("phonenumber/update")]
+        public async Task<IActionResult> UpdateMainPhoneNumber(UpdatePhoneNumberRequest request)
+        {
+            var result = await userService.UpdateMainPhoneNumberAsync(userAccessor.CurrentUser.Id, request.newPhoneNumber);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            if (result.Result) // foreigner number
+            {
+                var newToken = await userService.GenerateJwtTokenAsync(User.GetGuid(),
+                    configuration["JwtConfig:Secret"], User.GetUserPanelType());
+                return Ok(new
+                {
+                    requireVerify = false,
+                    token = newToken
+                });
+            }
+            return Ok(new {
+                requireVerify = true
+            });
+        }
+
+        [HttpPost("phonenumber/verify")]
+        public async Task<IActionResult> VerifyMainPhoneNumber(VerifyPhoneNumberRequest request)
+        {
+            var result = await userService.VerifyNewMainPhoneNumber(userAccessor.CurrentUser.Id, request.verifyCode);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            var newToken = await userService.GenerateJwtTokenAsync(User.GetGuid(),
+                configuration["JwtConfig:Secret"], User.GetUserPanelType());
+            return Ok(new
+            {
+                token = newToken
+            });
         }
 
         [HttpGet("referralCode")]

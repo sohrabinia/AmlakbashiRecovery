@@ -8,7 +8,7 @@
 <div class="comment__new">
     <input type="hidden" id="AdvertiseID" value="@Model.advertiseId" />
     <div id="write_comment_root" style="@(user_is_authenticated ? "" : "display: none;")">
-        <input class="js-cm-mobile" type="hidden" value="@(userAccessor.CurrentUser.Mobile ?? userAccessor.CurrentUser.MainMobile)" />
+        @*<input class="js-cm-mobile" type="hidden" value="@(userAccessor.CurrentUser.PhoneNumber2 ?? userAccessor.CurrentUser.PhoneNumber)" />*@
         <input id="UserId" value="@user_id" type="hidden" />
         <div>
             <div>لطفا با امتیاز دهی و نظر درباره اقامتگاه دیگران را راهنمایی کنید</div>

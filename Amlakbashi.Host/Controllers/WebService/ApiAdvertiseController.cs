@@ -94,7 +94,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             advertiseService.UpdateAccView(id);
             var response = new AdvertiseResponse();
             response = advertise;
-            var hostCreateDate = userService.GetIdentityUser(advertise.User.MainMobile).CreateDate;
+            var hostCreateDate = userService.GetIdentityUser(advertise.User.PhoneNumber).CreateDate;
             if (hostCreateDate != null)
             {
                 response.hostCreateDate = StringUtility.EnglishNumberToPersian(DateTimeUtility.ConvertDate(hostCreateDate.Value));
