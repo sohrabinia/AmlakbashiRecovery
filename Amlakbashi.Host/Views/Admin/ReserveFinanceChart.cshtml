@@ -1,8 +1,11 @@
-﻿@{
+﻿@using Amlakbashi.Core.Common.Utilities;
+
+@model Dictionary<string, Amlakbashi.Core.DTOs.PaymentDTOs.PaymentStatisticsDTOs.PaymentChartDTO>
+
+@{
     ViewBag.Title = "نمودار آماری";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
-@model Dictionary<string, Amlakbashi.Core.DTOs.PaymentDTOs.PaymentStatisticsDTOs.PaymentChartDTO>
 
 <div style="width:100%;">
     @using (Html.BeginForm("ReserveFinanceChart", "admin", FormMethod.Post))
@@ -15,7 +18,7 @@
             <div class="dynamic-filter__item">
                 <div class="dynamic-filter__label">انتخاب ماه :</div>
                 <div class="dynamic-filter__property">
-                    <select name="selected_month"> 
+                    <select name="selected_month">
                         <option is-selected="@(ViewBag.selected_month == 1)" value="1">فروردین</option>
                         <option is-selected="@(ViewBag.selected_month == 2)" value="2">اردیبهشت</option>
                         <option is-selected="@(ViewBag.selected_month == 3)" value="3">خرداد</option>
@@ -41,16 +44,19 @@
                     </select>
                 </div>
             </div>
-
             <div class="dynamic-filter__button">
                 <input type="submit" value="فیلتر" />
             </div>
         </div>
-
-                            }
+    }
+</div>
+<div style="margin-top: 20px; font-size: large;">
+    <span>مبلغ کل رزروها: @string.Format("{0:n0}", Model[$"Total Reserve {DateTimeUtility.GetPersianMonthName(ViewBag.selected_month)} {ViewBag.selected_year}"].AmountList.Sum())</span>
+    <span style="margin: 0 100px;">سهم املاک باشی: @string.Format("{0:n0}", Model[$"Site Portion {DateTimeUtility.GetPersianMonthName(ViewBag.selected_month)} {ViewBag.selected_year}"].AmountList.Sum())</span>
+    <span>مبلغ میزبان ها: @string.Format("{0:n0}", Model[$"Host Creditor {DateTimeUtility.GetPersianMonthName(ViewBag.selected_month)} {ViewBag.selected_year}"].AmountList.Sum())</span>
 </div>
 <div style="clear:both ;"></div>
-<div style="direction:ltr;margin-top:50px;">
+<div style="direction:ltr;margin-top:20px;">
     <div id="container" style="width:100%; height:400px;"></div>
 </div>
 @section ScriptBlock

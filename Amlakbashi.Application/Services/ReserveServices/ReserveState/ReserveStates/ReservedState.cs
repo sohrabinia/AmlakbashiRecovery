@@ -6,7 +6,6 @@ using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
-using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using Amlakbashi.Mediator.Commands.ReserveCommands;
 using Amlakbashi.Mediator.Commands.UserCommands;
@@ -64,7 +63,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             var remainedAmount = accounting.GetReserveRemainedAmount(ReserveId);
             var advertise = reserve.Advertise;
 
-            var hostlerUser = Repository.Find<User, int>(advertise.UserID);
+            var hostlerUser = Repository.Find<User, int>(reserve.HostUserID);
             var hostIdentityUser = userManager.FindByNameAsync(hostlerUser.PhoneNumber).Result;
             var hostPhoneNumber = hostlerUser.GetNormalizedNoticesPhoneNumber();
 

@@ -399,28 +399,23 @@ namespace Amlakbashi.Host.Controllers
                 }
                 else if (sort_order == 2)//By No Response Reserves
                 {
-                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
-                        r.HostResponse == 0));
+                    model = model.OrderByDescending(u => u.HostReserves.Count(r => r.HostResponse == 0));
                 }
                 else if (sort_order == 3)//By Rejected Reserves
                 {
-                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
-                        r.Status == 0));
+                    model = model.OrderByDescending(u => u.HostReserves.Count(r => r.Status == 0));
                 }
                 else if (sort_order == 4)//By Rejected For Home Full
                 {
-                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
-                        (int)r.HostResponse == 4));
+                    model = model.OrderByDescending(u => u.HostReserves.Count(r => (int)r.HostResponse == 4));
                 }
                 else if (sort_order == 5)//By Reserved
                 {
-                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
-                        (int)r.Status >= 5 && (int)r.Status <= 8));
+                    model = model.OrderByDescending(u => u.HostReserves.Count(r => (int)r.Status >= 5 && (int)r.Status <= 8));
                 }
                 else if (sort_order == 6)//By Canceled Reserves
                 {
-                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
-                        (int)r.Status >= 10 && (int)r.Status <= 12));
+                    model = model.OrderByDescending(u => u.HostReserves.Count(r => (int)r.Status >= 10 && (int)r.Status <= 12));
                 }
 
                 var PageNumber = page ?? 1;

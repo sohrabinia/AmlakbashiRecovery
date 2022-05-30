@@ -74,7 +74,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
         public Task<Unit> Handle(HostCanceledForReservedMessageCommand request, CancellationToken cancellationToken)
         {
             var reserve = reserveRepository.Find(request.reserveId);
-            var hostlerUser = reserveRepository.Find<User, int>(reserve.Advertise.UserID);
+            var hostlerUser = reserveRepository.Find<User, int>(reserve.HostUserID);
             var hostlerIdentityUser = userManager.FindByNameAsync(hostlerUser.PhoneNumber).Result;
             var contact = new UserContactDTO()
             {
@@ -366,8 +366,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             var reserve = reserveRepository.Find(request.ReserveId);
             if (reserve.Status == ReserveStatus.WaitForResponse)
             {
-                var advertise = reserve.Advertise;
-                var hostlerUser = reserveRepository.Find<User, int>(advertise.UserID);
+                var hostlerUser = reserveRepository.Find<User, int>(reserve.HostUserID);
                 if (PhoneUtility.IsNumberForIran(hostlerUser.PhoneNumber))
                 {
                     userContact.SendReserveRequestCall(hostlerUser, reserve.AdvertiseID);

@@ -66,7 +66,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                     ReserveId = reserve.Id.ToString()
                 }));
             }
-            mediator.Enqueue(new UpdateUserScoreCommand(reserve.Advertise.UserID));
+            mediator.Enqueue(new UpdateUserScoreCommand(reserve.HostUserID));
             mediator.Enqueue(new UpdateAdvertiseScoreCommand(reserve.AdvertiseID));
         }
     }

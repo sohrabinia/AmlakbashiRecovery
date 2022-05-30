@@ -1,4 +1,7 @@
 ﻿@using Amlakbashi.Core.Common.Utilities;
+
+@model ActionLog
+
 @{
     ViewBag.Title = "مشاهده تغییرات لاگ";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
@@ -14,13 +17,16 @@
             diff = DetailedComparer.DetailedCompare<User>(
                 Model.PreviousData, Model.CurrentData);
             break;
+        case ActionLog.ActionTypeEnum.Advertise:
+            diff = DetailedComparer.DetailedCompare<Advertise>(
+                Model.PreviousData, Model.CurrentData);
+            break;
         default:
             diff = null;
             break;
     }
-
 }
-@model ActionLog
+
 <div>
     @if (string.IsNullOrEmpty(Model.PreviousData))
     {

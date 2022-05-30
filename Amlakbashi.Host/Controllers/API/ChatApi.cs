@@ -86,7 +86,7 @@ namespace Amlakbashi.Host.Controllers.API
                 var reserve = reserveService.Find(reserveId);
                 var user_id = user.Id;
                 var guest_user_id = reserve.UserID;
-                var host_user_id = reserve.Advertise.UserID;
+                var host_user_id = reserve.HostUserID;
                 var is_guest = user_id == guest_user_id;
 
                 string newText;

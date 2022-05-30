@@ -142,7 +142,7 @@ namespace Amlakbashi.Host.Controllers
                         userService.UpdateUserGeneralType(host_user.Id, Entities.User.UserGeneralTypeEnum.Host);
                     }
                 }
-                advertiseService.Edit(ad);
+                advertiseService.Edit(ad, userAccessor.CurrentUser.Id);
                 return RedirectToAction(nameof(NewIndex));
             }
             catch (Exception exc)
@@ -337,8 +337,7 @@ namespace Amlakbashi.Host.Controllers
                         val = "شما مجوز انجام این کار را ندارید."
                     });
                 }
-                advertiseService.AddAdvertiseHostReplyComment(
-                    user_id, advertiseID, text);
+                advertiseService.AddAdvertiseHostReplyComment(user_id, advertiseID, text);
                 return GenerateJsonResult(new
                 {
                     status = 1,

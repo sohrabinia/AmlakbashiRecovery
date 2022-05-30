@@ -39,7 +39,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public bool accVisitedByGuest { get; set; }
         public bool ContactWithHost { get; set; }
         public bool ContactWithGuest { get; set; }
-        public string hostResponseString { get; set; }
+        //public string hostResponseString { get; set; }
 
         public static ReserveAdminItemDTO Generate(Reserve reserve,
             SupporterStatus supportStatus, long guestPaidPrice,
@@ -142,10 +142,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                 {
                     title = "درصد سایت",
                     type = PaymentHelperDTO.PaymentType.HostSitePortion,
-                    //transactionId = hostSitePortionTransactionId,
                     amount = hostSitePortionPrice,
-                    //dateString = DateTimeUtility.GregorianToPersianDate(hostSitePortionDate).Remove(0, 2) +
-                    //    "_" + hostSitePortionDate.ToString("HH:mm")
                 });
             }
             var hostPayablePrice = PriceUtility.CalculateHostPayablePrice(

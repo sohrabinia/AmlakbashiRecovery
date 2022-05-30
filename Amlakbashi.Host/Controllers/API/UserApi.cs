@@ -926,8 +926,7 @@ namespace Amlakbashi.Host.Controllers.API
                     var reserve = reserveService.Find(reserveId);
                     if (forHost)
                     {
-                        var advertise = reserve.Advertise;
-                        user = userService.Find(advertise.UserID);
+                        user = userService.Find(reserve.HostUserID);
                     }
                     else
                     {

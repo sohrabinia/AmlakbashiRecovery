@@ -196,9 +196,8 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.Id = reserve_id;
                 ViewBag.GuestUserID = reserve.UserID;
                 ViewBag.GuestPhotoID = reserve.GuestUser.PhotoID;
-                var acc = reserve.Advertise;
-                ViewBag.HostUserID = acc.UserID;
-                ViewBag.HostPhotoID = userService.Find(acc.UserID).PhotoID;
+                ViewBag.HostUserID = reserve.HostUserID;
+                ViewBag.HostPhotoID = reserve.HostUser.PhotoID;
                 var model = chatService.UpdateSupportReadStatusByReserveId(reserve_id);
                 reserveAdminHubServer.ChatReadFromServer(reserve_id, model.Count());
                 return View(model.OrderByDescending(x => x.Id));
@@ -374,10 +373,9 @@ namespace Amlakbashi.Host.Controllers
                 }
                 foreach (var reserve in reserves)
                 {
-                    var advertise = reserve.Advertise;
                     var paidAmount = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest);
                     var unreadChatCount = chatService.GetNotReadCountByReserveId(reserve.Id, currentUser.Id);
-                    var rulesDict = advertiseService.GetRulesDictionary(advertise.Id);
+                    var rulesDict = advertiseService.GetRulesDictionary(reserve.AdvertiseID);
                     var item = ReserveDashboardItemDTO.Generate(
                         reserve, index, isGuest, isHost, userAccessor.CurrentUser.Id,
                         paidAmount + reserve.CouponPrice + reserve.PrizePrice,
@@ -521,9 +519,8 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
                 var currentUser = userAccessor.CurrentUser;
-                if (!(is_host && advertise.UserID == currentUser.Id) &&
+                if (!(is_host && reserve.HostUserID == currentUser.Id) &&
                     !(!is_host && reserve.UserID == currentUser.Id))
                 {
                     return GenerateJsonResult(new
@@ -556,9 +553,8 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertsie = reserve.Advertise;
                 var currentUser = userAccessor.CurrentUser;
-                if ((is_host ? advertsie.UserID != currentUser.Id :
+                if ((is_host ? reserve.HostUserID != currentUser.Id :
                     reserve.UserID != currentUser.Id) ||
                     reserve.Status != (is_host ? ReserveStatus.CancelRequestByHost :
                     ReserveStatus.CancelRequestByGuest))
@@ -633,8 +629,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                if ((advertise.UserID != userAccessor.CurrentUser.Id || reserve.Status != Reserve.ReserveStatus.CashPay))
+                if ((reserve.HostUserID != userAccessor.CurrentUser.Id || reserve.Status != Reserve.ReserveStatus.CashPay))
                 {
                     return Redirect("/");
                 }
@@ -656,9 +651,8 @@ namespace Amlakbashi.Host.Controllers
                     msg = "شما پراخت نقدی مهمان را تایید نکردید";
                 }
                 ViewBag.msg = msg;
-                ViewBag.user_id = advertise.UserID;
+                ViewBag.user_id = reserve.HostUserID;
                 ViewBag.selectType = Reserve.ReserveManagerSelectType.Host;
-
                 return View("ReserveItemManager");
             }
             catch (Exception exc)
@@ -667,8 +661,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.msg = "متاسفانه عملیات با خطا مواجه شد. مجددا تلاش کنید";
                 ViewBag.user_id = userAccessor.CurrentUser.Id;
                 ViewBag.selectType = Reserve.ReserveManagerSelectType.Host;
-                return View("ReserveItemManager", reserveService.GetListByUserId(userAccessor.CurrentUser.Id,
-                    Reserve.ReserveManagerSelectType.Host));
+                return View("ReserveItemManager");
             }
         }
 
@@ -703,8 +696,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                if (advertise.UserID != userAccessor.CurrentUser.Id)
+                if (reserve.HostUserID != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new { val = 0 });
                 }
@@ -757,21 +749,18 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                var userId = userAccessor.CurrentUser.Id;
-                if (advertise.UserID != userId)
+                if (reserve.HostUserID != userAccessor.CurrentUser.Id)
                 {
                     return RedirectToAction("PublicLogin", "User",
                         new
                         {
                             returnUrl = "/reserve/reserveresponsebynotif?reserve_id=" +
-                        reserve_id + "&host_response=" + host_response
+                                reserve_id + "&host_response=" + host_response
                         });
                 }
                 reserveService.SetHostResponse(reserve_id, (Reserve.HostResponseEnum)host_response,
                     true, ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
                 var msg = "جواب شما ثبت شد";
-                var rejectReason = "";
                 switch ((Reserve.HostResponseEnum)host_response)
                 {
                     case Reserve.HostResponseEnum.Accepted:
@@ -782,24 +771,14 @@ namespace Amlakbashi.Host.Controllers
                         break;
                     case Reserve.HostResponseEnum.RejectedPrice:
                         msg = "درخواست رزرو رد شد. شما مینوانید از بخش آگهی های من قیمت هر روز را جداگانه تعریف کنید و یا قیمت آگهی خود را ویرایش کنید";
-                        rejectReason = "price";
                         break;
                     case Reserve.HostResponseEnum.RejectedHomeFull:
                         msg = "درخواست رزرو رد شد. شما میتوانید از بخش آگهی های من و با کلیک بر روی دکمه تعیین روز های پر، روزهایی که پر هستند را تعیین کنید";
-                        rejectReason = "home_full";
                         break;
                 }
-                //ViewBag.host_response_status = 1;
-                //ViewBag.host_response = host_response;
-                //ViewBag.host_response_msg = msg;
-                //ViewBag.reject_reason = rejectReason;
-                //ViewBag.host_response_reserve_id = reserve_id;
-                //ViewBag.user_id = advertise.UserID;
-                //ViewBag.selectType = Reserve.ReserveManagerSelectType.Host;
-                //ViewBag.msg = "";
 
                 return Redirect("/reserve/reserveitemmanager?reserve_id=" + reserve_id +
-                    "&user_id=" + advertise.UserID +
+                    "&user_id=" + reserve.HostUserID +
                     "&selecttype=" + (int)Reserve.ReserveManagerSelectType.Host);
             }
             catch (Exception exc)
@@ -952,17 +931,8 @@ namespace Amlakbashi.Host.Controllers
                         long price;
                         var reserve = reserveService.Find(reserve_id);
                         current_reserve_status = (int)reserve.Status;
-                        var advertise = reserve.Advertise;
-                        //if (advertise.UserID != userAccessor.CurrentUser.Id)
-                        //{
-                        //    return new JsonResult()
-                        //    {
-                        //        Data = new { status = 0, msg = "شما مجوز این عملیات را ندارید" },
-                        //        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                        //    };
-                        //}
                         var payment_id = accounting.PayAmlakbashiPortion(reserve_id, pay_type, out already_payed,
-                            out price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit, advertise.UserID, userAccessor.DoerUser.Id);
+                            out price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit, reserve.HostUserID, userAccessor.DoerUser.Id);
                         if (already_payed)
                         {
                             if (reserve.Status == Reserve.ReserveStatus.WaitForReserve)
@@ -990,7 +960,7 @@ namespace Amlakbashi.Host.Controllers
                         }
                         else
                         {
-                            current_reserve_status = (int)reserveService.FinalizeReserve(reserve_id, payment_id, price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit, ActionLog.ActionSourceEnum.AdminPanel, userAccessor.DoerUser.Id, advertise.UserID, 0, 0, false);
+                            current_reserve_status = (int)reserveService.FinalizeReserve(reserve_id, payment_id, price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit, ActionLog.ActionSourceEnum.AdminPanel, userAccessor.DoerUser.Id, reserve.HostUserID, 0, 0, false);
                             var msg = " پرداخت شما با موفقیت انجام شد . شماره تراکنش پرداخت شما " + payment_id + "می باشد .";
                             return GenerateJsonResult(new
                             {
@@ -1103,7 +1073,6 @@ namespace Amlakbashi.Host.Controllers
                     return PartialView("_SiteClearingHostInfo");
                 }
 
-                var advertise = reserve.Advertise;
                 var hostUser = reserve.HostUser;
 
                 var guestPaidAmount = accounting.GetReservePaidAmount(reserveId, StatusStringType.Guest);
@@ -1517,15 +1486,13 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                var host_user = userService.Find(advertise.UserID);
                 var guestPaidAmount = accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(),
                     StatusStringType.Guest);
                 var payable_price = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guestPaidAmount,
                     reserve.CouponPrice, reserve.PrizePrice);
                 var days = (int)(reserve.EndDate - reserve.StartDate).TotalDays;
                 long newCredit;
-                var transaction_id = accounting.IncreaseCredit(advertise.UserID, payable_price, 0, reserve_id,
+                var transaction_id = accounting.IncreaseCredit(reserve.HostUserID, payable_price, 0, reserve_id,
                     out newCredit, CreditTransaction.WalletTransactionReason.Clearing);
                 if (accounting.InsertReservePayment(userAccessor.CurrentUser.Id,
                     reserve_id, transaction_id, 0,
@@ -1564,15 +1531,14 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var user = userService.Find(reserve.Advertise.UserID);
-                var identityUser = userService.GetIdentityUser(user.PhoneNumber);
+                var identityUser = userService.GetIdentityUser(reserve.HostUser.PhoneNumber);
                 userService.SendMessage(new UserContactDTO()
                 {
-                    UserMainMobile = user.GetNoticesPhoneNumber(),
-                    UserAppNotificationToken = user.AppNotificationToken,
+                    UserMainMobile = reserve.HostUser.GetNoticesPhoneNumber(),
+                    UserAppNotificationToken = reserve.HostUser.AppNotificationToken,
                     UserEmail = identityUser.Email,
-                    UserFcmAppNotificationToken = user.FcmAppNotificationToken,
-                    UserNotificationToken = user.NotificationToken,
+                    UserFcmAppNotificationToken = reserve.HostUser.FcmAppNotificationToken,
+                    UserNotificationToken = reserve.HostUser.NotificationToken,
                     Type = UserContactType.SiteClearingHostWithCredit,
                     TransactionId = transaction_id.ToString(),
                     Price = payable_price.ToString(),
@@ -1594,8 +1560,6 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                var guest_user = userService.Find(reserve.UserID);
                 var guest_payed_price = accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(),
                     Reserve.StatusStringType.Guest);
                 long newCredit;
@@ -1735,7 +1699,7 @@ namespace Amlakbashi.Host.Controllers
                 ((long)((allRefundsOfReserve == null || allRefundsOfReserve.Any() == false) ? 0 : allRefundsOfReserve.Sum(x => x.Price)));
 
                 long _guestPaidPrice = 0;
-                var hostUserId = item.Advertise.UserID;
+                var hostUserId = item.HostUserID;
                 var _hostPaidPrice = accounting.GetReservePaymentPrice(
                     item.Id, ReservePayment.ReservePaymentType.GuestDeposite,
                     out _host_site_portion_pay_date, out _host_site_portion_transaction_id, hostUserId);
@@ -2017,20 +1981,14 @@ namespace Amlakbashi.Host.Controllers
         {
             int user_id = userAccessor.CurrentUser.Id;
             var reserve = reserveService.Find(reserve_id);
-            var advertise = reserve.Advertise;
             if (reserve.UserID != user_id &&
-                advertise.UserID != user_id)
+                reserve.HostUserID != user_id)
             {
                 return RedirectToAction("AccessDenied", "Errors");
             }
-            //ViewBag.index = index.ToString();
-            //ViewBag.is_guest = is_guest.ToString();
-            //ViewBag.is_host = is_host.ToString();
-            //ViewBag.user_id = user_id;
-            //ViewBag.chatCount = chatService.GetNotReadCountByReserveId(reserve_id, user_id);
             var paidAmount = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest);
             var unreadChatCount = chatService.GetNotReadCountByReserveId(reserve.Id, user_id);
-            var rulesDict = advertiseService.GetRulesDictionary(advertise.Id);
+            var rulesDict = advertiseService.GetRulesDictionary(reserve.HostUserID);
             var model = ReserveDashboardItemDTO.Generate(
                 reserve, index, is_guest, is_host, user_id,
                 paidAmount + reserve.CouponPrice + reserve.PrizePrice,
@@ -2153,14 +2111,14 @@ namespace Amlakbashi.Host.Controllers
             {
                 reserveService.UpdateRatingShownToGuest(reserveid, true);
             }
-            var acc = reserve.Advertise;
             var user_id = userid > 0 ? userid : reserve.UserID;
             ViewBag.user_id = user_id;
             ViewBag.comment = commentService.GetByAccSenderUser(reserve.AdvertiseID,
                 user_id > 0 ? user_id : userAccessor.CurrentUser.Id);
             var model = UserRatingDTO.Generate(reportItemService.GetAccUserRatings(
-                reserve.AdvertiseID, user_id) as List<ReportItem>, acc.Id,
-                acc.Title, regionService.Find(acc.City == null ? 0 : (int)acc.City).PersianName);
+                reserve.AdvertiseID, user_id) as List<ReportItem>, reserve.AdvertiseID,
+                reserve.Advertise.Title, regionService.Find(reserve.Advertise.City == null ? 0 :
+                (int)reserve.Advertise.City).PersianName);
             return PartialView("_Rating", model);
         }
 
@@ -2250,8 +2208,7 @@ namespace Amlakbashi.Host.Controllers
         public IActionResult InvoiceItemPopup(long id)
         {
             var reserve = reserveService.Find(id);
-            var acc = reserve.Advertise;
-            if (acc.UserID != userAccessor.CurrentUser.Id)
+            if (reserve.HostUserID != userAccessor.CurrentUser.Id)
             {
                 return null;
             }
@@ -2280,7 +2237,7 @@ namespace Amlakbashi.Host.Controllers
             ((long)((allRefundsOfReserve == null || allRefundsOfReserve.Any() == false) ? 0 : allReservePayments.Sum(x => x.Price)));
 
             long _guestPaidPrice = 0;
-            var hostUserId = reserve.Advertise.UserID;
+            var hostUserId = reserve.HostUserID;
             var _hostPaidPrice = accounting.GetReservePaymentPrice(
                 reserve.Id, ReservePayment.ReservePaymentType.GuestDeposite,
                 out _host_site_portion_pay_date, out _host_site_portion_transaction_id, hostUserId);

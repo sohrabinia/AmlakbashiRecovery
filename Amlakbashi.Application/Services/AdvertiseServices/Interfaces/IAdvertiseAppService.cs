@@ -44,7 +44,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void AddSupporterInfo(long id, string text, User supporter);
         void UpdateAccView(long accId);
         AdvertiseDirector GetAdvertisePageData(long id, out Dictionary<AdvertiseType, IList<AdvertiseDirector>> childrenDirectors);
-        void Edit(Advertise editedAd);
+        void Edit(Advertise editedAd, int adminId);
 
         //##############
         Task<ServiceResult<long>> CreateAsync(AdvertisePostCreateRequest request);

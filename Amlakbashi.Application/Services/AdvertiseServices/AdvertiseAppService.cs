@@ -626,9 +626,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return query.ToList();
         }
 
-        public void Edit(Advertise editedAd)
+        public void Edit(Advertise editedAd, int adminId)
         {
-            var advertise = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedAd.Id));
+            var advertise = Repository.Find(editedAd.Id);
+            var shallowAdvertise = advertise.ShallowCopy();
+
             advertise.Title = editedAd.Title;
             advertise.MetaTitle = editedAd.MetaTitle;
             advertise.MetaDescription = editedAd.MetaDescription;
@@ -650,8 +652,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 advertise.AmlakbashiScore = editedAd.AmlakbashiScore;
             }
             advertise.Description = editedAd.Description;
+            advertise.LastModifyDate = DateTime.Now;
             Repository.Update(advertise);
             Repository.Save();
+            mediator.Publish(new AdvertiseUpdateEvent(shallowAdvertise, advertise,
+                ActionLog.ActionSourceEnum.AdminPanel, adminId));
             mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
             mediator.Send(new RemoveCategoryItemCacheCommand(advertise.Id));
         }

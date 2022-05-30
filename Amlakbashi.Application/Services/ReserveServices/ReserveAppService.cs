@@ -113,7 +113,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             }
             if (dto.HostUserId > 0)
             {
-                reserves = reserves.Where(x => x.Advertise.UserID == dto.HostUserId);
+                reserves = reserves.Where(x => x.HostUserID == dto.HostUserId);
             }
             if (!string.IsNullOrEmpty(dto.SiteClearingDate))
             {
@@ -371,29 +371,11 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return response;
         }
 
-        public IList<Reserve> GetListByUserId(int userId,
-            Reserve.ReserveManagerSelectType selectType = Reserve.ReserveManagerSelectType.All)
-        {
-            var data = Repository.Query(q => q);
-            var model = new List<Reserve>();
-            if (selectType == Reserve.ReserveManagerSelectType.Host ||
-                selectType == Reserve.ReserveManagerSelectType.All)
-            {
-                model.AddRange(data.Where(w => w.Advertise.UserID == userId));
-            }
-            if (selectType == Reserve.ReserveManagerSelectType.Guest ||
-                selectType == Reserve.ReserveManagerSelectType.All)
-            {
-                model.AddRange(data.Where(w => w.UserID == userId));
-            }
-            return data.ToList();
-        }
-
         public IList<Reserve> GetListByUserId(int userId, bool isHost = false)
         {
             if (isHost)
             {
-                return Repository.Query(q => q.Where(w => w.Advertise.UserID == userId).ToList());
+                return Repository.Query(q => q.Where(w => w.HostUserID == userId).ToList());
             }
             else
             {
@@ -406,7 +388,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
         {
             if (isHost)
             {
-                return Repository.Query(q => q.Where(w => w.Advertise.UserID == userId && w.Status == status &&
+                return Repository.Query(q => q.Where(w => w.HostUserID == userId && w.Status == status &&
                     w.RatingShownToGuest == RatingShownToGuest).ToList());
             }
             else
@@ -421,7 +403,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             IQueryable<Reserve> data;
             if (isHost)
             {
-                data = Repository.Query(q => q.Where(w => w.Advertise.UserID == userId));
+                data = Repository.Query(q => q.Where(w => w.HostUserID == userId));
             }
             else
             {
@@ -480,7 +462,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public IList<Reserve> GetByUserId(int userId)
         {
-            return Repository.Query(q => q.Where(w => w.Advertise.UserID == userId &&
+            return Repository.Query(q => q.Where(w => w.HostUserID == userId &&
                 w.Status != ReserveStatus.Deleted)).ToList();
         }
 
@@ -651,7 +633,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public Reserve FirstHavingUserId(int userId, ReserveStatus status)
         {
-            return Repository.Query(q => q.FirstOrDefault(f => f.Advertise.UserID == userId && f.Status == status));
+            return Repository.Query(q => q.FirstOrDefault(f => f.HostUserID == userId && f.Status == status));
         }
 
         public Reserve GetRelatedReserveByUser(int userId, out bool isHost)
@@ -836,13 +818,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             return serviceResult;
         }
 
-        public Reserve Insert(Reserve reserve)
-        {
-            Repository.Insert(reserve);
-            Repository.Save();
-            return reserve;
-        }
-
         public bool UpdateNew(ReserveIndexEditDTO dto, out string msg, int doerUserId, ActionSourceEnum actionSource)
         {
             var reserve = Repository.Query(q => q.Include("Advertise.User.Advertises").FirstOrDefault(f => f.Id == dto.Id));
@@ -894,10 +869,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 dto.Status == Reserve.ReserveStatus.CanceledByHost &&
                 accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(), Reserve.StatusStringType.Guest) > 0)
             {
-                var acc = reserve.Advertise;
-                var hostUser = reserve.HostUser;
-                var hostAccs = hostUser.Advertises;
-                var hostCancelCount = hostAccs.Sum(x => x.InstantReserveCancels);
+                var hostCancelCount = reserve.HostUser.Advertises.Sum(x => x.InstantReserveCancels);
                 int penaltyPrice = 0;
                 if (hostCancelCount == 0)
                 {
@@ -910,16 +882,16 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 if (penaltyPrice > 0)
                 {
                     long newCredit;
-                    accounting.DecreaseCredit(hostUser.Id, penaltyPrice, 0, 0, out newCredit, CreditTransaction.WalletTransactionReason.Other, "جریمه لغو رزرو آنی کد " + dto.Id, null, doerUserId, ActionLog.ActionSourceEnum.AdminPanel);
+                    accounting.DecreaseCredit(reserve.HostUserID, penaltyPrice, 0, 0, out newCredit, CreditTransaction.WalletTransactionReason.Other, "جریمه لغو رزرو آنی کد " + dto.Id, null, doerUserId, ActionLog.ActionSourceEnum.AdminPanel);
                 }
                 reserve.InstantReserveCancelHost = true;
 
-                mediator.Send(new IncreaseInstantReserveCancelCommand(acc.Id));
-                if (hostCancelCount > hostUser.CancelInstantReserveLimit - 1)
+                mediator.Send(new IncreaseInstantReserveCancelCommand(reserve.AdvertiseID));
+                if (hostCancelCount > reserve.HostUser.CancelInstantReserveLimit - 1)
                 {
-                    mediator.Send(new ChangeInstantReserveAccessCommand(hostUser.Id,
+                    mediator.Send(new ChangeInstantReserveAccessCommand(reserve.HostUserID,
                         User.InstantReserveAccessEnum.Banned, doerUserId, actionSource));
-                    mediator.Send(new UpdateInstantReserveStatusCommand(acc.Id, Advertise.InstantReserveStatusEnum.None, doerUserId, actionSource));
+                    mediator.Send(new UpdateInstantReserveStatusCommand(reserve.AdvertiseID, Advertise.InstantReserveStatusEnum.None, doerUserId, actionSource));
                 }
             }
             reserve.NumberOfGuests = dto.GuestCount;
@@ -1037,7 +1009,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             ActionSourceEnum actionSource, int doerUserId)
         {
             var reserve = Repository.Find(reserveId);
-            var advertise = reserve.Advertise;
             if (reserve.UserID != user_id)
             {
                 msg = "شما مجوز این کار را ندارید";
@@ -1201,8 +1172,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             int userId, ActionSourceEnum actionSource, int doerUserId)
         {
             var reserve = Repository.Find(reserveId);
-            var advertise = reserve.Advertise;
-            if (advertise.UserID != userId || reserve.Status != ReserveStatus.CashPay)
+            if (reserve.HostUserID != userId || reserve.Status != ReserveStatus.CashPay)
             {
                 msg = "شما مجوز این کار را ندارید";
                 return false;
@@ -1228,7 +1198,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public void ExistHostGuest(int userId, out bool hasHost, out bool hasGuest)
         {
-            hasHost = Repository.Query(q => q.Any(w => w.Advertise.UserID == userId));
+            hasHost = Repository.Query(q => q.Any(w => w.HostUserID == userId));
             hasGuest = Repository.Query(q => q.Any(w => w.UserID == userId));
         }
 
@@ -1254,7 +1224,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             reserve.CancelReason = cancel_reason;
             Repository.Update(reserve);
             Repository.Save();
-            var advertise = reserve.Advertise;
             if (accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest) > 0 || reserve.DepositPrice == 0)
             {
                 if (is_host)
@@ -1263,9 +1232,8 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 }
                 else
                 {
-                    var hostUser = Repository.Find<User, int>(advertise.UserID);
+                    var hostUser = Repository.Find<User, int>(reserve.HostUserID);
                     var host_contact_str = "شماره تماس: " + hostUser.GetNormalizedNoticesPhoneNumber();
-                    //msg = string.Format("لطفا با میزبان خود آقا/خانم {0} تماس بگیرید {1} و خسارت کنسلی را تایید کنید و نتیجه را به ما اعلام فرمایید. شماره تماس املاک باشی: 02632565304", hostUser.FullName, host_contact_str);
                     msg = $"لطفا با میزبان خود آقا/خانم {hostUser.FullName} تماس بگیرید {host_contact_str} و خسارت کنسلی را تایید کنید و نتیجه را به ما اعلام فرمایید. شماره تماس املاک باشی: 02632565304";
                 }
                 isPending = true;
@@ -1588,6 +1556,13 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
             msg = "عملیات با موفقیت انجام شد";
             return true;
+        }
+
+        private Reserve Insert(Reserve reserve)
+        {
+            Repository.Insert(reserve);
+            Repository.Save();
+            return reserve;
         }
 
         private void SendReserveRequestSmsToHost(Reserve reserve, string fromDate, string toDate)

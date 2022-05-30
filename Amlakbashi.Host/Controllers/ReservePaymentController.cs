@@ -146,7 +146,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     return GenerateJsonResult(new { status = 1, askBeforeSubmit = false });
                 }
-                var user = userService.Find(reserve.Advertise.UserID);
+                var user = userService.Find(reserve.HostUserID);
                 if (!confirmed)
                 {
                     var host_name = user.FirstName + " " + user.LastName;

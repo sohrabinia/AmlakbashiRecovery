@@ -1,6 +1,8 @@
 ﻿@using Amlakbashi.Core.DTOs.ReserveDTOs;
 @using Amlakbashi.Core.Common.Utilities;
+
 @model ReserveGuestReceiptDTO
+
 @{
     ViewBag.Title = Model.Reserve.Status == Reserve.ReserveStatus.WaitForReserve ? "پیش فاکتور درخواست رزرو" : "رسید رزرو مهمان";
     Layout = null;
@@ -13,6 +15,7 @@
 
     var payable_price = Model.PayablePrice;
 }
+
 <style type="text/css">
     @@font-face {
         font-family: "Biransans";
@@ -205,7 +208,7 @@
             </div>
             <div>
                 <span>کد کاربری میزبان</span>
-                <span>@(advertise.UserID)</span>
+                <span>@(Model.Reserve.HostUserID)</span>
             </div>
         </div>
     </div>

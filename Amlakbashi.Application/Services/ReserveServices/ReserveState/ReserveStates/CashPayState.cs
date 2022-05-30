@@ -47,7 +47,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             Repository.Save();
             if (sendSms)
             {
-                var hostlerUser = Repository.Find<User, int>(reserve.Advertise.UserID);
+                var hostlerUser = Repository.Find<User, int>(reserve.HostUserID);
                 var identityUser = userManager.FindByNameAsync(hostlerUser.PhoneNumber).Result;
                 mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                 {

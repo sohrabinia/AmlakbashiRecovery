@@ -81,6 +81,8 @@ namespace Amlakbashi.Core.Entities
                     return "حساب بانکی";
                 case ActionTypeEnum.User:
                     return "کاربر";
+                case ActionTypeEnum.Advertise:
+                    return "آگهی";
                 default:
                     return "";
             }
@@ -93,6 +95,8 @@ namespace Amlakbashi.Core.Entities
                 case ActionTypeEnum.BankCard:
                 case ActionTypeEnum.User:
                     return "کد کاربری";
+                case ActionTypeEnum.Advertise:
+                    return "کد آگهی";
                 default:
                     return "";
             }

@@ -19,7 +19,7 @@
 
 @using (Html.BeginForm("Index", "ReservePayment", FormMethod.Post))
 {
-    <a href="/ReservePayment/AddEdit" class="add">افزودن پرداخت</a>
+    @*<a href="/ReservePayment/AddEdit" class="add">افزودن پرداخت</a>*@
     <div>
         <table>
             <tr>
@@ -121,7 +121,6 @@
         {
             Idx++;
             var reserve = item.Reserve;
-            var advertise = reserve.Advertise;
             <tr class="table-content-row">
                 <td>
                     @Idx
@@ -134,7 +133,7 @@
                     @(
                     (item.PaymentType == (int)ReservePayment.ReservePaymentType.GuestClearing ||
                     item.PaymentType == (int)ReservePayment.ReservePaymentType.GuestDeposite) &&
-                        item.UserID == advertise.UserID && item.UserID != reserve.UserID ?
+                        item.UserID == reserve.HostUserID && item.UserID != reserve.UserID ?
                      "پرداخت درصد سایت توسط میزبان": PaymentLocalization.GetPaymentTypePersianString(item.PaymentType)
                 )
                 </td>

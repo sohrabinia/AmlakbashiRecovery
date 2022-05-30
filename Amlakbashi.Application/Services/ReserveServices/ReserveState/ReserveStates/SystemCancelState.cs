@@ -43,7 +43,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             accounting.RefundCouponIfAny(reserve.Id);
             accounting.RefundPrizeCreditIfAny(reserve.Id);
             var guestUser = reserve.GuestUser;
-            var hostlerUser = Repository.Find<User, int>(reserve.Advertise.UserID);
+            var hostlerUser = Repository.Find<User, int>(reserve.HostUserID);
             if (sendSms)
             {
                 mediator.Send(new ScheduleReserveSendSmsCommand(new ReserveSendSms()

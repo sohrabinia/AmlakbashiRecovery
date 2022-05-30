@@ -838,7 +838,7 @@
                 gtag('event', 'purchase', {
                     "category": "ecommerce",
                     "transaction_id": payment_transaction_id,
-                    "affiliation": "@(advertise != null ? advertise.UserID.ToString() : "")",
+                    "affiliation": "@(advertise != null ? reserve.HostUserID.ToString() : "")",
                     "title": "@(advertise != null ? advertise.Title : "")",
                     "label": "@(advertise != null ? advertise.Title : "")",
                     "value": 0@(reserve != null ? reserve.TotalPrice : 0),

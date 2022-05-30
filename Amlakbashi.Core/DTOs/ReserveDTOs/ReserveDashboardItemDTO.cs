@@ -48,7 +48,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             var dto = new ReserveDashboardItemDTO();
             dto.reserveId = reserve.Id;
             dto.instantReserve = reserve.InstantReserve;
-            dto.advertiseId = advertise.Id;
+            dto.advertiseId = reserve.AdvertiseID;
             dto.index = index;
             dto.isGuest = isGuest;
             dto.isHostler = isHostler;
@@ -56,7 +56,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             dto.advertiseTitle = advertise.Title;
             dto.advertiseSlug = advertise.Slug;
             dto.userId = userId;
-            dto.hostlerUserId = advertise.UserID;
+            dto.hostlerUserId = reserve.HostUserID;
             dto.guestUserId = reserve.UserID;
             dto.audiencePhotoId = isGuest ?
                 (hostlerUser.PhotoStatus != 2 ? 0 : (hostlerUser.PhotoID == null ? 0 : (long)hostlerUser.PhotoID)) :

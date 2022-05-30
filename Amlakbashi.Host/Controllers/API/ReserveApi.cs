@@ -221,7 +221,7 @@ namespace Amlakbashi.Host.Controllers.API
                     });
                 }
                 var reserve = reserveService.Find(reserve_id);
-                if (reserve.Advertise.UserID != user.Id)
+                if (reserve.HostUserID != user.Id)
                 {
                     return GenerateJsonResult(new { status = 0, msg = "شما میزبان این آگهی نیستید" });
                 }
@@ -315,7 +315,7 @@ namespace Amlakbashi.Host.Controllers.API
                     ApiReserveItemDTO dto = item;
                     bool for_host = true;
                     var status = (Reserve.ReserveStatus)item.Status;
-                    var host_user = userService.Find(item.Advertise.UserID);
+                    var host_user = userService.Find(item.HostUserID);
                     var guest_user = userService.Find(item.UserID);
                     var call_available = status == Reserve.ReserveStatus.Reserved
                         || status == Reserve.ReserveStatus.CashPay
@@ -362,7 +362,7 @@ namespace Amlakbashi.Host.Controllers.API
                     ApiReserveItemDTO dto = item;
                     bool for_host = false;
                     var status = (Reserve.ReserveStatus)item.Status;
-                    var host_user = userService.Find(item.Advertise.UserID);
+                    var host_user = userService.Find(item.HostUserID);
                     var guest_user = userService.Find(item.UserID);
                     var call_available = status == Reserve.ReserveStatus.Reserved
                         || status == Reserve.ReserveStatus.CashPay
@@ -633,8 +633,7 @@ namespace Amlakbashi.Host.Controllers.API
             {
                 var user = GetUser();
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                if (!(is_host && advertise.UserID == user.Id) &&
+                if (!(is_host && reserve.HostUserID == user.Id) &&
                     !(!is_host && reserve.UserID == user.Id))
                 {
                     return GenerateJsonResult(new
@@ -677,8 +676,7 @@ namespace Amlakbashi.Host.Controllers.API
             {
                 var user = GetUser();
                 var reserve = reserveService.Find(reserve_id);
-                var advertsie = reserve.Advertise;
-                if ((is_host ? advertsie.UserID != user.Id :
+                if ((is_host ? reserve.HostUserID != user.Id :
                     reserve.UserID != user.Id) ||
                     reserve.Status != (is_host ? ReserveStatus.CancelRequestByHost :
                     ReserveStatus.CancelRequestByGuest))
@@ -743,7 +741,7 @@ namespace Amlakbashi.Host.Controllers.API
             }
             var user = GetUser();
             var reserve = reserveService.Find(reserve_id);
-            if (user.Id != reserve.Advertise.UserID)
+            if (user.Id != reserve.HostUserID)
             {
                 return GenerateJsonResult(new
                 {
@@ -772,10 +770,9 @@ namespace Amlakbashi.Host.Controllers.API
                 var reserve = reserveService.Find(reserve_id);
                 var user_id = user.Id;
                 var guest_user_id = reserve.UserID;
-                var host_user_id = reserve.Advertise.UserID;
                 var is_guest = user_id == guest_user_id;
 
-                if (user_id != guest_user_id && user_id != host_user_id)
+                if (user_id != guest_user_id && user_id != reserve.HostUserID)
                 {
                     return GenerateJsonResult(new
                     {

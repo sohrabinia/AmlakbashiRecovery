@@ -670,9 +670,7 @@ namespace Amlakbashi.Accounting
                     excludingPayments.Add(item);
                     continue;
                 }
-                var advertise = item.Advertise;
-                var hostUser = repository.FindUser(advertise.UserID);
-                var bankCard = repository.FindBankCardByUserId(hostUser.Id);
+                var bankCard = repository.FindBankCardByUserId(item.HostUserID);
                 if (bankCard == null || string.IsNullOrEmpty(bankCard.BankCardNumber) ||
                     item.PaymentHasError)
                 {

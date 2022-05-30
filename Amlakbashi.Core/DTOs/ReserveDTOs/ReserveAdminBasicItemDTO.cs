@@ -43,8 +43,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
 
         public static implicit operator ReserveAdminBasicItemDTO(Reserve reserve)
         {
-            var advertise = reserve.Advertise;
-            var linkAdvertise = advertise.ParentOrSelf;
+            var linkAdvertise = reserve.Advertise.ParentOrSelf;
             var reserveSupports = reserve.GetRelatedSupports();
             var generatedSupporters = new List<SupporterHelperDTO>();
             foreach (var rs in reserveSupports)
@@ -88,7 +87,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                 status = (int)reserve.Status,
                 guestUserId = reserve.UserID,
                 guestName = guestName,
-                hostUserId = advertise.UserID,
+                hostUserId = reserve.HostUserID,
                 guestCount = reserve.NumberOfGuests,
                 statusString = ReserveLocalization.GetStatusString((int)reserve.Status,
                     Reserve.StatusStringType.Site),
