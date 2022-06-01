@@ -297,7 +297,6 @@
   <ItemGroup>
     <Folder Include="Logs\HangfireLogs\" />
     <Folder Include="Logs\ImpersonationLogs\" />
-    <Folder Include="Logs\Logs\" />
     <Folder Include="wwwroot\Content\blogpost\" />
     <Folder Include="wwwroot\Content\ErrorLog\" />
     <Folder Include="wwwroot\Content\files\" />

@@ -49,7 +49,8 @@ namespace Amlakbashi.Host
 
         public IConfigurationRoot Configuration { get; private set; }
         public ILifetimeScope AutofacContainer { get; private set; }
-        private const string crossOriginPolicyName = "AllowCrossOrigins";
+        private const string frontendCorsPolicyName = "frontendCorsPolicy";
+        private const string mediatorsCorsPolicyName = "mediatorCorsPolicy";
 
         // ConfigureServices is where you register dependencies. This gets
         // called by the runtime before the ConfigureContainer method, below.
@@ -147,14 +148,18 @@ namespace Amlakbashi.Host
 
             services.AddCors(options =>
             {
-                options.AddPolicy(crossOriginPolicyName, policy =>
+                options.AddPolicy(frontendCorsPolicyName, policyBuilder =>
                 {
                     var crossOrigins = new List<string>();
                     crossOrigins.Add("http://localhost:3000");
                     crossOrigins.Add("https://localhost:3000");
                     crossOrigins.Add("http://next.amlakbashi.com:3000");
                     crossOrigins.Add("https://next.amlakbashi.com:3000");
-                    policy.WithOrigins(crossOrigins.ToArray()).AllowAnyHeader().AllowAnyMethod();
+                    policyBuilder.WithOrigins(crossOrigins.ToArray()).AllowAnyHeader().AllowAnyMethod();
+                });
+                options.AddPolicy(mediatorsCorsPolicyName, policyBuiler =>
+                {
+                    policyBuiler.WithOrigins("https://adminvila.com/").AllowAnyHeader().AllowAnyMethod();
                 });
             });
         }
@@ -209,7 +214,6 @@ namespace Amlakbashi.Host
             app.UseAntiXssMiddleware();
 #endif
 
-            app.UseCors(crossOriginPolicyName);
             app.UseResponseCaching();
             app.UseStaticFiles(new StaticFileOptions
             {
@@ -230,7 +234,7 @@ namespace Amlakbashi.Host
             });
             app.UseRouting();
             UrlRewriteConfig.Config(app);
-
+            app.UseCors(frontendCorsPolicyName);
             app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();

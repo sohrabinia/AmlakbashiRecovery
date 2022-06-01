@@ -1979,21 +1979,29 @@ namespace Amlakbashi.Host.Controllers
         public ActionResult GetReserveItemPartial(long reserve_id, int index,
             bool is_guest, bool is_host)
         {
-            int user_id = userAccessor.CurrentUser.Id;
-            var reserve = reserveService.Find(reserve_id);
-            if (reserve.UserID != user_id &&
-                reserve.HostUserID != user_id)
+            try
             {
-                return RedirectToAction("AccessDenied", "Errors");
+                int user_id = userAccessor.CurrentUser.Id;
+                var reserve = reserveService.Find(reserve_id);
+                if (reserve.UserID != user_id &&
+                    reserve.HostUserID != user_id)
+                {
+                    return RedirectToAction("AccessDenied", "Errors");
+                }
+                var paidAmount = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest);
+                var unreadChatCount = chatService.GetNotReadCountByReserveId(reserve.Id, user_id);
+                var rulesDict = advertiseService.GetRulesDictionary(reserve.AdvertiseID);
+                var model = ReserveDashboardItemDTO.Generate(
+                    reserve, index, is_guest, is_host, user_id,
+                    paidAmount + reserve.CouponPrice + reserve.PrizePrice,
+                    unreadChatCount, rulesDict);
+                return PartialView("_ReserveItem", model);
             }
-            var paidAmount = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest);
-            var unreadChatCount = chatService.GetNotReadCountByReserveId(reserve.Id, user_id);
-            var rulesDict = advertiseService.GetRulesDictionary(reserve.HostUserID);
-            var model = ReserveDashboardItemDTO.Generate(
-                reserve, index, is_guest, is_host, user_id,
-                paidAmount + reserve.CouponPrice + reserve.PrizePrice,
-                unreadChatCount, rulesDict);
-            return PartialView("_ReserveItem", model);
+            catch (Exception exc)
+            {
+                logger.Error("Reserve.GetReserveItemPartial", exc);
+                return BadRequest();
+            }
         }
 
         [Authorize]

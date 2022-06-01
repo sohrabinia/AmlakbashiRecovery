@@ -142,5 +142,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         IList<Advertise> GetNorouzAdvertises(int count);
         void SetHygieneProtocol(long id, HygieneProtocolStatus value);
         void UpdateAlbumPhoto(long advertiseId);
+        Task<ServiceResult> UpdateCalendarAsync(AdvertiseUpdateCalendarRequest request);
     }
 }

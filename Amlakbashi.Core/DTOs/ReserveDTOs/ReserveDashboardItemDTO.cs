@@ -43,8 +43,6 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             int unreadChatCount, Dictionary<string,string> rulesDict)
         {
             var advertise = reserve.Advertise;
-            var guestUser = reserve.GuestUser;
-            var hostlerUser = reserve.HostUser;
             var dto = new ReserveDashboardItemDTO();
             dto.reserveId = reserve.Id;
             dto.instantReserve = reserve.InstantReserve;
@@ -59,8 +57,8 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             dto.hostlerUserId = reserve.HostUserID;
             dto.guestUserId = reserve.UserID;
             dto.audiencePhotoId = isGuest ?
-                (hostlerUser.PhotoStatus != 2 ? 0 : (hostlerUser.PhotoID == null ? 0 : (long)hostlerUser.PhotoID)) :
-                (guestUser.PhotoStatus != 2 ? 0 : (guestUser.PhotoID == null ? 0 : (long)guestUser.PhotoID));
+                (reserve.HostUser.PhotoStatus != 2 ? 0 : (reserve.HostUser.PhotoID == null ? 0 : (long)reserve.HostUser.PhotoID)) :
+                (reserve.GuestUser.PhotoStatus != 2 ? 0 : (reserve.GuestUser.PhotoID == null ? 0 : (long)reserve.GuestUser.PhotoID));
             dto.startDateString = DateTimeUtility.GregorianToPersianDate(reserve.StartDate);
             dto.staydays = DateTimeUtility.GetDatRangeDays(reserve.StartDate, reserve.EndDate);
             dto.guestCount = reserve.NumberOfGuests;

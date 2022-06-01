@@ -339,6 +339,19 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
+        [HttpPost("calendar")]
+        public async Task<IActionResult> UpdateCalendar(AdvertiseUpdateCalendarRequest request)
+        {
+            request.userId = userAccessor.CurrentUser.Id;
+            request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
+            var result = await advertiseService.UpdateCalendarAsync(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok();
+        }
+
         [HttpGet("favorite")]
         public AdvertiseListResponse GetFavorites(int page = 1)
         {

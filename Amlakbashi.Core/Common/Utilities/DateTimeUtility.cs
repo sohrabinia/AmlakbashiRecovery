@@ -51,6 +51,24 @@ namespace Amlakbashi.Core.Common.Utilities
             }
         }
 
+        public static bool IsValidPersianDate(string date)
+        {
+            var stringDateParts = date.Split(',');
+            if (stringDateParts.Length != 3)
+            {
+                return false;
+            }
+            int integerDateParts;
+            foreach (var item in stringDateParts)
+            {
+                if(int.TryParse(item, out integerDateParts) == false)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public static string PersianTodayString
         {
             get
@@ -392,6 +410,11 @@ namespace Amlakbashi.Core.Common.Utilities
                 }
             }
             is_holiday_pike = previous_holidays + next_holidays + 1 > 2;
+        }
+
+        public static bool IsStartDateLowerThanEndDate(string persianStartDate, string persianEndDate)
+        {
+            return PersianDateToGregorian(persianStartDate) < PersianDateToGregorian(persianEndDate);
         }
     }
 }

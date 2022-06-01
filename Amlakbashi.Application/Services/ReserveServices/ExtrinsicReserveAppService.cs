@@ -1,4 +1,4 @@
-using Amlakbashi.Application.Services.ReserveServices.Interfaces;
+﻿using Amlakbashi.Application.Services.ReserveServices.Interfaces;
 using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Common.Utilities;

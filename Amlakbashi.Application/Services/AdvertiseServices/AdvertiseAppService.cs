@@ -37,6 +37,8 @@ using Amlakbashi.Core.Infrastructure.FilterHelpers.Interfaces;
 using Amlakbashi.Core.DTOs.WebService.Responses.Advertises;
 using Amlakbashi.Application.DTOs;
 using System.Threading.Tasks;
+using static Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs.CheckSetOccupiedDTO;
+using static Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs.CheckUnsetOccupiedDTO;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
@@ -2951,6 +2953,92 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             advertise.AlbumPhoto = advertise.Photos.Count == 0 ? "," : ("," + string.Join(",", photoIds) + ",");
             Repository.Update(advertise);
             Repository.Save();
+        }
+
+        public async Task<ServiceResult> UpdateCalendarAsync(AdvertiseUpdateCalendarRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var advertise = Repository.Find(request.advertiseId);
+            if (advertise == null)
+            {
+                serviceResult.AddError("advertise id is incorrect");
+                return serviceResult;
+            }
+            if (request.userId > 0 && advertise.UserID != request.userId)
+            {
+                serviceResult.AddError("user id is incorrect");
+                return serviceResult;
+            }
+            if (DateTimeUtility.IsValidPersianDate(request.fromDate) == false ||
+                (string.IsNullOrEmpty(request.toDate) == false &&
+                DateTimeUtility.IsValidPersianDate(request.toDate) == false))
+            {
+                serviceResult.AddError("date format is incorrect");
+                return serviceResult;
+            }
+            if (string.IsNullOrEmpty(request.toDate) == false &&
+                DateTimeUtility.IsStartDateLowerThanEndDate(request.fromDate, request.toDate) == false)
+            {
+                serviceResult.AddError("date is incorrect");
+                return serviceResult;
+            }
+
+            var garegorianToDate = string.IsNullOrEmpty(request.toDate) ?
+                DateTimeUtility.PersianDateToGregorian(request.fromDate) :
+                DateTimeUtility.PersianDateToGregorian(request.toDate);
+            request.toDate = DateTimeUtility.GregorianToPersianDate(garegorianToDate.AddDays(1));
+
+            if (request.status == 1)
+            {
+                if (request.userId == 0)
+                {
+                    request.userId = advertise.UserID;
+                }
+                return await InsertExtrinsicReserveDatesAsync(request, advertise.Count);
+            }
+            else
+            {
+                return DeleteExtrinsicReserveDates(request);
+            }
+        }
+
+        private async Task<ServiceResult> InsertExtrinsicReserveDatesAsync(AdvertiseUpdateCalendarRequest request,
+            int advertiseCount)
+        {
+            var serviceResult = new ServiceResult();
+            var checkResult = CheckSetAsOccupiedDateRange(request.advertiseId, request.fromDate, request.toDate);
+            if (checkResult.Result != CheckSetOccupiedResult.OK &&
+                checkResult.Result != CheckSetOccupiedResult.ContainsReserveRequest)
+            {
+                serviceResult.AddError("date is incorrect");
+                return serviceResult;
+            }
+
+            await mediator.Send(new InsertExtrinsicReserveCommand(request.advertiseId,
+                request.fromDate, request.toDate, request.actionSource, request.userId, advertiseCount));
+            if (DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date) == request.fromDate)
+            {
+                UnsetTodayEmpty(request.advertiseId);
+            }
+            return serviceResult;
+        }
+
+        private ServiceResult DeleteExtrinsicReserveDates(AdvertiseUpdateCalendarRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var checkResult = CheckUnsetOccupiedDateRange(request.advertiseId, request.fromDate, request.toDate);
+            if (checkResult.Result != CheckUnsetOccupiedResult.OK)
+            {
+                serviceResult.AddError("date is incorrect");
+                return serviceResult;
+
+            }
+            DeleteExtrinsicReserves(request.advertiseId, request.fromDate, request.toDate);
+            if (DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date) == request.fromDate)
+            {
+                SetAsTodayEmpty(request.advertiseId);
+            }
+            return serviceResult;
         }
     }
 }
