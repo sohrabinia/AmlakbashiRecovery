@@ -30,7 +30,7 @@ namespace Amlakbashi.Core.Entities
             WebsiteDashboard = 2,
             Application = 3,
             AdminPanel = 4,
-            MediatorApi = 5
+            ThirdPartyApp = 5
         }
 
         public enum ActionTypeEnum

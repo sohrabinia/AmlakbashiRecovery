@@ -50,7 +50,7 @@ namespace Amlakbashi.Host
         public IConfigurationRoot Configuration { get; private set; }
         public ILifetimeScope AutofacContainer { get; private set; }
         private const string frontendCorsPolicyName = "frontendCorsPolicy";
-        private const string mediatorsCorsPolicyName = "mediatorCorsPolicy";
+        private const string mediatorsCorsPolicyName = "thirdPartyCorsPolicy";
 
         // ConfigureServices is where you register dependencies. This gets
         // called by the runtime before the ConfigureContainer method, below.

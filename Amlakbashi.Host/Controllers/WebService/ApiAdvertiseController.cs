@@ -340,11 +340,23 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpPost("calendar")]
-        public async Task<IActionResult> UpdateCalendar(AdvertiseUpdateCalendarRequest request)
+        public async Task<IActionResult> UpdateCalendarData(AdvertiseUpdateCalendarRequest request)
         {
             request.userId = userAccessor.CurrentUser.Id;
             request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
             var result = await advertiseService.UpdateCalendarAsync(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok();
+        }
+
+        [HttpPost("manualprice")]
+        public IActionResult UpdateManualPrice(AdvertiseUpdatePriceRequest request,
+            [FromServices] IPriceTableAppService priceTableService)
+        {
+            var result = priceTableService.UpdateAdvertiseManualPrices(request);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());

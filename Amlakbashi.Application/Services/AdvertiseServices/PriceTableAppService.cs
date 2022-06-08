@@ -6,6 +6,8 @@ using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.DTOs.WebService.Requests.Advertises;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
@@ -58,6 +60,63 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Save();
             msg = null;
             return true;
+        }
+
+        public ServiceResult UpdateAdvertiseManualPrices(AdvertiseUpdatePriceRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            if (request.price < 30000)
+            {
+                serviceResult.AddError("minimum price is 50000");
+                return serviceResult;
+            }
+            if (DateTimeUtility.IsValidPersianDate(request.fromDate) == false)
+            {
+                serviceResult.AddError("fromDate is incorrect");
+                return serviceResult;
+            }
+            if (string.IsNullOrEmpty(request.toDate) == false &&
+                (DateTimeUtility.IsValidPersianDate(request.toDate) == false ||
+                DateTimeUtility.IsStartDateLowerThanEndDate(request.fromDate, request.toDate) == false))
+            {
+                serviceResult.AddError("toDate is incorrect");
+                return serviceResult;
+            }
+
+            var advertisePrices = Repository.Query(q => q.Where(x => x.AdvertiseID == request.advertiseId));
+            var persianDateRange = DateTimeUtility.PersianDateRangeToList(request.fromDate, request.toDate, true, true);
+            int persianYear, persianMonth, persianDay;
+            PriceTable priceTable;
+            foreach (var persianDate in persianDateRange)
+            {
+                var gregorianDate = DateTimeUtility.PersianDateToGregorian(persianDate);
+                var d = Array.ConvertAll(persianDate.Split(','), x => int.Parse(x));
+                persianYear = d[0];
+                persianMonth = d[1];
+                persianDay = d[2];
+
+                priceTable = advertisePrices.FirstOrDefault(x => x.Year == persianYear
+                    && x.Month == persianMonth && x.Day == persianDay);
+                if (priceTable != null)
+                {
+                    priceTable.Price = request.price;
+                    Repository.Update(priceTable);
+                }
+                else
+                {
+                    Repository.Insert(new PriceTable()
+                    {
+                        AdvertiseID = request.advertiseId,
+                        Price = request.price,
+                        Year = persianYear,
+                        Month = persianMonth,
+                        Day = persianDay,
+                        UnixDate = DateTimeUtility.DateValueOfJS(gregorianDate)
+                    });
+                }
+            }
+            Repository.Save();
+            return serviceResult;
         }
     }
 }

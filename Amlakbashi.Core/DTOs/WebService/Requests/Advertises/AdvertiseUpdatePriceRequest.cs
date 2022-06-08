@@ -16,7 +16,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         public string fromDate { get; set; }
         public string toDate { get; set; }
 
-        [Range(50000, int.MaxValue)]
+        [Range(30000, int.MaxValue)]
         public int price { get; set; }
 
         [BindNever]

@@ -5,22 +5,23 @@ using System.Threading.Tasks;
 using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
 using Amlakbashi.Core.DTOs.WebService.Requests.Advertises;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
+using Amlakbashi.Host.Filters;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Amlakbashi.Host.Controllers.WebService
 {
     [ApiController]
-    [Route("api/mediator")]
-    [EnableCors("frontendCorsPolicy")]
-    public class ApiMediatorController : ApiBaseController
+    [Route("api/tp")]
+    [AuthorizeThirdPartyApp]
+    [EnableCors("thirdPartyCorsPolicy")]
+    public class ApiThirdPartyController : ApiBaseController
     {
         private readonly IAdvertiseAppService advertiseService;
         private readonly IPriceTableAppService priceTableService;
 
-        public ApiMediatorController(IAdvertiseAppService advertiseService,
+        public ApiThirdPartyController(IAdvertiseAppService advertiseService,
             IPriceTableAppService priceTableService)
         {
             this.advertiseService = advertiseService;
@@ -30,7 +31,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost("advertise/calendar")]
         public async Task<IActionResult> UpdateAdvertiseCalendar(AdvertiseUpdateCalendarRequest request)
         {
-            request.actionSource = ActionLog.ActionSourceEnum.MediatorApi;
+            request.actionSource = ActionLog.ActionSourceEnum.ThirdPartyApp;
             var result = await advertiseService.UpdateCalendarAsync(request);
             if (result.HasError())
             {
@@ -40,14 +41,12 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpPost("advertise/manualprice")]
-        public async Task<IActionResult> UpdateAdvertiseManualPrice(AdvertiseUpdatePriceRequest request)
+        public IActionResult UpdateAdvertiseManualPrice(AdvertiseUpdatePriceRequest request)
         {
-            string msg;
-            var done = priceTableService.SetAccommodationPriceInDate(
-                request.advertiseId, request.fromDate, request.toDate, request.price, out msg);
-            if (done == false)
+            var result = priceTableService.UpdateAdvertiseManualPrices(request);
+            if (result.HasError())
             {
-                return BadRequest(msg);
+                return BadRequest(result.GetErrors());
             }
             return Ok();
         }
