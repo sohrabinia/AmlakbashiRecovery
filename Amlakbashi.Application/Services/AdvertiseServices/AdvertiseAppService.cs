@@ -716,7 +716,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult<long>> UpdateBasicInfoAsync(AdvertisePutBasicInfoRequest request)
+        public async Task<ServiceResult<long>> UpdateBasicInfoAsync(AdvertisePostBasicInfoRequest request)
         {
             var serviceResult = new ServiceResult<long>();
             var advertise = Repository.Find(request.advertiseId);
@@ -733,7 +733,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult> UpdateGeneralInfoAsync(AdvertisePutGeneralInfoRequest request)
+        public async Task<ServiceResult> UpdateGeneralInfoAsync(AdvertisePostGeneralInfoRequest request)
         {
             var serviceResult = new ServiceResult();
             var advertise = Repository.Find(request.advertiseId);
@@ -780,7 +780,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult> UpdateSupplementaryInfoAsync(AdvertisePutSupplementaryInfoRequest request)
+        public async Task<ServiceResult> UpdateSupplementaryInfoAsync(AdvertisePostSupplementaryInfoRequest request)
         {
             var serviceResult = new ServiceResult();
             var advertise = Repository.Find(request.advertiseId);
@@ -795,7 +795,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 return serviceResult;
             }
             var shallowAdvertise = advertise.ShallowCopy();
-            PropertyCopier<AdvertisePutSupplementaryInfoRequest, Advertise>.CopyInsensetive(request, advertise);
+            PropertyCopier<AdvertisePostSupplementaryInfoRequest, Advertise>.CopyInsensetive(request, advertise);
             advertise.LastModifyDate = DateTime.Now;
             advertise.PoolFeatures = Advertise.GetPoolFeatureFlag(request.poolHotWater,
                 request.poolFiltration, request.poolOpen, request.poolCovered);
@@ -816,7 +816,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult> UpdateFinalInfoAsync(AdvertisePutFinalInfoRequest request)
+        public async Task<ServiceResult> UpdateFinalInfoAsync(AdvertisePostFinalInfoRequest request)
         {
             var serviceResult = new ServiceResult();
             var advertise = Repository.Find(request.advertiseId);
@@ -826,7 +826,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 return serviceResult;
             }
             var shallowAdvertise = advertise.ShallowCopy();
-            PropertyCopier<AdvertisePutFinalInfoRequest, Advertise>.CopyInsensetive(request, advertise);
+            PropertyCopier<AdvertisePostFinalInfoRequest, Advertise>.CopyInsensetive(request, advertise);
             advertise.MoreThanCapacity = request.extraCapacity;
             advertise.MoreThanCapacityPrice = request.extraCapacityPrice;
             advertise.RentPrice = request.monthlyPrice;
@@ -856,7 +856,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult> CreateHotelRoomAsync(AdvertisePutHotelRoomInfoRequest request)
+        public async Task<ServiceResult> CreateHotelRoomAsync(AdvertisePostHotelRoomInfoRequest request)
         {
             var serviceResult = new ServiceResult();
             var parentAdvertise = Repository.Find(request.parentId);
@@ -920,7 +920,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult> UpdateHotelRoomInfoAsync(AdvertisePutHotelRoomInfoRequest request)
+        public async Task<ServiceResult> UpdateHotelRoomInfoAsync(AdvertisePostHotelRoomInfoRequest request)
         {
             var serviceResult = new ServiceResult();
             var advertise = Repository.Find(request.unitId);
@@ -931,7 +931,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             var shallowAdvertise = advertise.ShallowCopy();
             var shallowParentAdvertise = advertise.Parent.ShallowCopy();
-            PropertyCopier<AdvertisePutHotelRoomInfoRequest, Advertise>.CopyInsensetive(request, advertise);
+            PropertyCopier<AdvertisePostHotelRoomInfoRequest, Advertise>.CopyInsensetive(request, advertise);
             advertise.MoreThanCapacity = request.extraCapacity;
             advertise.MoreThanCapacityPrice = request.extraCapacityPrice;
             advertise.RentPrice = request.monthlyPrice;
@@ -2988,7 +2988,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 DateTimeUtility.PersianDateToGregorian(request.toDate);
             request.toDate = DateTimeUtility.GregorianToPersianDate(garegorianToDate.AddDays(1));
 
-            if (request.status == 1)
+            if (request.full)
             {
                 if (request.userId == 0)
                 {

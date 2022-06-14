@@ -20,7 +20,6 @@ namespace Amlakbashi.Host.Controllers.WebService
     {
         private readonly IAdvertiseAppService advertiseService;
         private readonly IPriceTableAppService priceTableService;
-
         public ApiThirdPartyController(IAdvertiseAppService advertiseService,
             IPriceTableAppService priceTableService)
         {
@@ -28,27 +27,70 @@ namespace Amlakbashi.Host.Controllers.WebService
             this.priceTableService = priceTableService;
         }
 
-        [HttpPost("advertise/calendar")]
-        public async Task<IActionResult> UpdateAdvertiseCalendar(AdvertiseUpdateCalendarRequest request)
-        {
-            request.actionSource = ActionLog.ActionSourceEnum.ThirdPartyApp;
-            var result = await advertiseService.UpdateCalendarAsync(request);
-            if (result.HasError())
-            {
-                return BadRequest(result.GetErrors());
-            }
-            return Ok();
-        }
+        //[HttpPost("adminvila")]
+        //public async Task<IActionResult> UpdateAdvertiseCalendarAndPrice(AdvertiseAdminVilaRequest request)
+        //{
+        //    long advertiseId = 0;
+        //    var advertiseIdString = request.sites.Find(x => x.siteName == "amlakbashi")?.vilaNo;
+        //    long.TryParse(advertiseIdString, out advertiseId);
+        //    if (advertiseId < 1)
+        //    {
+        //        return BadRequest("advertise id is incorrect");
+        //    }
 
-        [HttpPost("advertise/manualprice")]
-        public IActionResult UpdateAdvertiseManualPrice(AdvertiseUpdatePriceRequest request)
-        {
-            var result = priceTableService.UpdateAdvertiseManualPrices(request);
-            if (result.HasError())
-            {
-                return BadRequest(result.GetErrors());
-            }
-            return Ok();
-        }
+        //    foreach (var item in request.dates)
+        //    {
+        //        item.date.Replace('-', ',');
+        //        var calendarResult = await advertiseService.UpdateCalendarAsync(new AdvertiseUpdateCalendarRequest() {
+        //            fromDate = item.date,
+        //            actionSource = ActionLog.ActionSourceEnum.ThirdPartyApp,
+        //            advertiseId = advertiseId,
+        //            full = item.reserved
+        //        });
+        //        if (calendarResult.HasError())
+        //        {
+        //            return BadRequest(calendarResult.GetErrors());
+        //        }
+
+        //        if (item.price > 0)
+        //        {
+        //            var priceResult = priceTableService.UpdateAdvertiseManualPrices(new AdvertiseUpdatePriceRequest()
+        //            {
+        //                fromDate = item.date,
+        //                actionSource = ActionLog.ActionSourceEnum.ThirdPartyApp,
+        //                advertiseId = advertiseId,
+        //                price = item.price
+        //            });
+        //            if (priceResult.HasError())
+        //            {
+        //                return BadRequest(priceResult.GetErrors());
+        //            }
+        //        }
+        //    }
+        //    return Ok();
+        //}
+
+        //[HttpPost("advertise/calendar")]
+        //public async Task<IActionResult> UpdateAdvertiseCalendar(AdvertiseUpdateCalendarRequest request)
+        //{
+        //    request.actionSource = ActionLog.ActionSourceEnum.ThirdPartyApp;
+        //    var result = await advertiseService.UpdateCalendarAsync(request);
+        //    if (result.HasError())
+        //    {
+        //        return BadRequest(result.GetErrors());
+        //    }
+        //    return Ok();
+        //}
+
+        //[HttpPost("advertise/manualprice")]
+        //public IActionResult UpdateAdvertiseManualPrice(AdvertiseUpdatePriceRequest request)
+        //{
+        //    var result = priceTableService.UpdateAdvertiseManualPrices(request);
+        //    if (result.HasError())
+        //    {
+        //        return BadRequest(result.GetErrors());
+        //    }
+        //    return Ok();
+        //}
     }
 }

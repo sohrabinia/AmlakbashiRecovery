@@ -3,8 +3,8 @@ using Amlakbashi.Application.Services.FileServices.Interfaces;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.DTOs.WebService.Requests.Files;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
+using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -25,27 +25,25 @@ namespace Amlakbashi.Host.Controllers.WebService
     {
         private readonly IFileAppService fileService;
         private readonly IUserAppService userService;
-        private readonly IUserAccessor userAccessor;
         private readonly IWebHostEnvironment webHostEnvironment;
         public ApiFileController(IFileAppService fileService,
             IUserAppService userService,
-            IUserAccessor userAccessor,
             IWebHostEnvironment webHostEnvironment)
         {
             this.fileService = fileService;
             this.userService = userService;
-            this.userAccessor = userAccessor;
             this.webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet("user")]
         public IActionResult GetUserProfileImage()
         {
-            if (userAccessor.CurrentUser.PhotoID == null)
+            var user = userService.Find(User.GetId());
+            if (user.PhotoID == null)
             {
                 return NotFound();
             }
-            return File(userAccessor.CurrentUser.Photo.CorrectedFilePath);
+            return File(user.Photo.CorrectedFilePath);
         }
 
         [AllowAnonymous]
@@ -67,12 +65,12 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 return BadRequest();
             }
-            var result = await fileService.UpdateUserProfileImageAsync(userAccessor.CurrentUser.Id, image);
+            var result = await fileService.UpdateUserProfileImageAsync(User.GetId(), image);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());
             }
-            userService.UpdateProfilePhoto(userAccessor.CurrentUser.Id, result.Result,
+            userService.UpdateProfilePhoto(User.GetId(), result.Result,
                 Core.Entities.User.UserPhotoState.ready_publish);
             return CreatedAtAction(nameof(GetUserProfileImage), null);
         }
@@ -93,7 +91,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 return BadRequest(ModelState);
             }
-            request.userId = userAccessor.CurrentUser.Id;
+            request.userId = User.GetId();
             var result = await fileService.AddAdvertiseImagesAsync(request);
             if (result.HasError())
             {
@@ -107,7 +105,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         public async Task<IActionResult> DeleteAdvertiseImage(long advertiseId, long fileId,
             [FromServices] IAdvertiseAppService advertiseService)
         {
-            var result = await fileService.DeleteAdvertiseImage(advertiseId, fileId, userAccessor.CurrentUser.Id);
+            var result = await fileService.DeleteAdvertiseImage(advertiseId, fileId, User.GetId());
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());
@@ -134,7 +132,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 return BadRequest(ModelState);
             }
-            request.userId = userAccessor.CurrentUser.Id;
+            request.userId = User.GetId();
             var result = await fileService.UpdateAdvertiseLicenseImageAsync(request);
             if (result.HasError())
             {

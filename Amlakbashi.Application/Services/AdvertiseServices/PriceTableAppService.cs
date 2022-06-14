@@ -67,7 +67,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var serviceResult = new ServiceResult();
             if (request.price < 30000)
             {
-                serviceResult.AddError("minimum price is 50000");
+                serviceResult.AddError("minimum price is 30000");
                 return serviceResult;
             }
             if (DateTimeUtility.IsValidPersianDate(request.fromDate) == false)
@@ -84,9 +84,18 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
 
             var advertisePrices = Repository.Query(q => q.Where(x => x.AdvertiseID == request.advertiseId));
-            var persianDateRange = DateTimeUtility.PersianDateRangeToList(request.fromDate, request.toDate, true, true);
             int persianYear, persianMonth, persianDay;
             PriceTable priceTable;
+            List<string> persianDateRange = new List<string>();
+            if (string.IsNullOrEmpty(request.toDate))
+            {
+                persianDateRange.Add(request.fromDate);
+            }
+            else
+            {
+                persianDateRange = DateTimeUtility.PersianDateRangeToList(request.fromDate, request.toDate, true, true);
+            }
+
             foreach (var persianDate in persianDateRange)
             {
                 var gregorianDate = DateTimeUtility.PersianDateToGregorian(persianDate);

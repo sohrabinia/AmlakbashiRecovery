@@ -39,7 +39,15 @@ namespace Amlakbashi.Host.Extensions
 
         public static string GetGuid(this ClaimsPrincipal userPrincipal)
         {
-            return userPrincipal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return userPrincipal?.FindFirst("guid")?.Value;
+        }
+
+        public static int GetId(this ClaimsPrincipal userPrincipal)
+        {
+            var stringId = userPrincipal?.FindFirst("id")?.Value;
+            int id = 0;
+            int.TryParse(stringId, out id);
+            return id;
         }
 
         public static string GetRefreshToken(this ClaimsPrincipal userPrincipal)

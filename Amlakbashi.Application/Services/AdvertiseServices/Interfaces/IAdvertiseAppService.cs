@@ -48,12 +48,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
 
         //##############
         Task<ServiceResult<long>> CreateAsync(AdvertisePostCreateRequest request);
-        Task<ServiceResult<long>> UpdateBasicInfoAsync(AdvertisePutBasicInfoRequest request);
-        Task<ServiceResult> UpdateGeneralInfoAsync(AdvertisePutGeneralInfoRequest request);
-        Task<ServiceResult> UpdateSupplementaryInfoAsync(AdvertisePutSupplementaryInfoRequest request);
-        Task<ServiceResult> UpdateFinalInfoAsync(AdvertisePutFinalInfoRequest request);
-        Task<ServiceResult> CreateHotelRoomAsync(AdvertisePutHotelRoomInfoRequest request);
-        Task<ServiceResult> UpdateHotelRoomInfoAsync(AdvertisePutHotelRoomInfoRequest request);
+        Task<ServiceResult<long>> UpdateBasicInfoAsync(AdvertisePostBasicInfoRequest request);
+        Task<ServiceResult> UpdateGeneralInfoAsync(AdvertisePostGeneralInfoRequest request);
+        Task<ServiceResult> UpdateSupplementaryInfoAsync(AdvertisePostSupplementaryInfoRequest request);
+        Task<ServiceResult> UpdateFinalInfoAsync(AdvertisePostFinalInfoRequest request);
+        Task<ServiceResult> CreateHotelRoomAsync(AdvertisePostHotelRoomInfoRequest request);
+        Task<ServiceResult> UpdateHotelRoomInfoAsync(AdvertisePostHotelRoomInfoRequest request);
         //##############
 
         AdvertiseDirector GetBasicForm(long id, out bool isEdit, out int level);

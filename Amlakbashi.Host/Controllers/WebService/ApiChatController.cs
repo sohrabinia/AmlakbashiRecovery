@@ -4,6 +4,7 @@ using Amlakbashi.Core.DTOs.WebService.Responses.Chats;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
+using Amlakbashi.Host.Extensions;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Amlakbashi.Host.Hubs.Dashboard.HubServers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,20 +25,17 @@ namespace Amlakbashi.Host.Controllers.WebService
         private readonly IChatAppService chatService;
         private readonly IReserveAppService reserveService;
         private readonly IReserveAutoCancelAppService reserveAutoCancelService;
-        private readonly IUserAccessor userAccessor;
         private readonly IReserveDashboardHubServer reserveDashboardHubServer;
         private readonly IReserveAdminHubServer reserveAdminHubServer;
         public ApiChatController(IChatAppService chatService,
             IReserveAppService reserveService,
             IReserveAutoCancelAppService reserveAutoCancelService,
-            IUserAccessor userAccessor,
             IReserveDashboardHubServer reserveDashboardHubServer,
             IReserveAdminHubServer reserveAdminHubServer)
         {
             this.chatService = chatService;
             this.reserveService = reserveService;
             this.reserveAutoCancelService = reserveAutoCancelService;
-            this.userAccessor = userAccessor;
             this.reserveDashboardHubServer = reserveDashboardHubServer;
             this.reserveAdminHubServer = reserveAdminHubServer;
         }
@@ -48,7 +46,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             var chats = chatService.GetReserveChats(reserveId);
             if (chats != null)
             {
-                chatService.UpdateReserveChatsReadStatus(reserveId, userAccessor.CurrentUser.Id);
+                chatService.UpdateReserveChatsReadStatus(reserveId, User.GetId());
                 reserveDashboardHubServer.ReloadChatFromServer(reserveId);
             }
 
@@ -58,7 +56,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 message = x.Text,
                 time = $"{x.CreateTime.Hour}:{x.CreateTime.Minute}",
                 viewed = x.IsViewed == Chat.ReadStatusEnum.Read,
-                forUser = x.UserID == userAccessor.CurrentUser.Id
+                forUser = x.UserID == User.GetId()
             }));
             return response;
         }
@@ -66,7 +64,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost]
         public IActionResult Post(ChatPostMessageRequest request)
         {
-            var result = chatService.Insert(request.reserveId, userAccessor.CurrentUser.Id, request.message);
+            var result = chatService.Insert(request.reserveId, User.GetId(), request.message);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());

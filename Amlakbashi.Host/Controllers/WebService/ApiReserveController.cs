@@ -3,7 +3,6 @@ using Amlakbashi.Application.Services.ReserveServices.Interfaces;
 using Amlakbashi.Core.DTOs.WebService.Requests.Reserves;
 using Amlakbashi.Core.DTOs.WebService.Responses.Reserves;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
 using Amlakbashi.Host.Extensions;
 using Amlakbashi.Host.Filters;
@@ -25,22 +24,19 @@ namespace Amlakbashi.Host.Controllers.WebService
         private readonly IReserveAppService reserveService;
         private readonly IReserveAutoCancelAppService reserveAutoCancelService;
         private readonly IAccountingFacade accounting;
-        private readonly IUserAccessor userAccessor;
         public ApiReserveController(IReserveAppService reserveService,
             IReserveAutoCancelAppService reserveAutoCancelService,
-            IAccountingFacade accounting,
-            IUserAccessor userAccessor)
+            IAccountingFacade accounting)
         {
             this.reserveService = reserveService;
             this.reserveAutoCancelService = reserveAutoCancelService;
             this.accounting = accounting;
-            this.userAccessor = userAccessor;
         }
 
         [HttpGet]
         public ReserveListResponse Get([FromQuery] ReserveGetListRequest request)
         {
-            request.userId = userAccessor.CurrentUser.Id;
+            request.userId = User.GetId();
             request.panel = User.GetUserPanelType();
             var response = reserveService.Filter(request);
             foreach (var item in response.reserveList)
@@ -60,7 +56,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost]
         public async Task<IActionResult> Submit(ReservePostRequest request)
         {
-            request.userId = userAccessor.CurrentUser.Id;
+            request.userId = User.GetId();
 
             var validateResult = reserveService.Validate(request);
             if (validateResult.HasError())
@@ -78,7 +74,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpGet("invoice/{reserveId:long}")]
         public IActionResult Invoice(long reserveId)
         {
-            var response = reserveService.GetInvoice(reserveId, userAccessor.CurrentUser.Id);
+            var response = reserveService.GetInvoice(reserveId, User.GetId());
             if (response == null)
             {
                 return BadRequest();
@@ -98,17 +94,18 @@ namespace Amlakbashi.Host.Controllers.WebService
                 });
             }
             var reserve = reserveService.Find(request.reserveId);
-            if (reserve == null || reserve.UserID != userAccessor.CurrentUser.Id)
+            var userId = User.GetId();
+            if (reserve == null || reserve.UserID != userId)
             {
                 return NotFound(new {
                     reserveId = "reserve id is incorrect"
                 });
             }
 
-            var coupon = accounting.FindDiscountCoupon(userAccessor.CurrentUser.Id, discountCodeType);
+            var coupon = accounting.FindDiscountCoupon(userId, discountCodeType);
             if (coupon == null)
             {
-                coupon = accounting.InsertDiscountCoupon(userAccessor.CurrentUser.Id, discountCodeType, 5);
+                coupon = accounting.InsertDiscountCoupon(userId, discountCodeType, 5);
             }
             else
             {
@@ -130,14 +127,14 @@ namespace Amlakbashi.Host.Controllers.WebService
         public IActionResult SubmitHostResponse(ReservePostHostResponseRequest request)
         {
             var reserve = reserveService.Find(request.reserveId);
-            if (reserve == null || reserve.HostUserID != userAccessor.CurrentUser.Id ||
+            if (reserve == null || reserve.HostUserID != User.GetId() ||
                 (reserve.Status != Reserve.ReserveStatus.WaitForResponse &&
                 reserve.Status != Reserve.ReserveStatus.WaitForReserve))
             {
                 return BadRequest();
             }
             reserveService.SetHostResponse(request.reserveId, request.hostResponse, true,
-                ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
+                ActionLog.ActionSourceEnum.WebsiteDashboard, User.GetId());
             return Ok();
         }
 
@@ -145,7 +142,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Guest)]
         public async Task<IActionResult> Start(ReservePostStartRequest request)
         {
-            request.userId = userAccessor.CurrentUser.Id;
+            request.userId = User.GetId();
             request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
             var result = await reserveService.StartAsync(request);
             if (result.HasError())
@@ -158,7 +155,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost("cancel")]
         public async Task<IActionResult> Cancel(ReservePostCancelRequest request)
         {
-            request.userId = userAccessor.CurrentUser.Id;
+            request.userId = User.GetId();
             request.panel = User.GetUserPanelType();
             request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
             var result = await reserveService.CancelAsync(request);

@@ -101,11 +101,11 @@
                 <i class="fas fa-bars js-berger-menu"></i>
             </div>
             <a class="header-logo-style" asp-area="app" asp-controller="home" asp-action="main">
-                <img srcset="~/Resource/img/amlakbashi-logo-900w.png 900w,
-                ~/Resource/img/amlakbashi-logo-680w.png 680w"
+                <img srcset="/Resource/img/amlakbashi-logo-900w.png 900w,
+                /Resource/img/amlakbashi-logo-680w.png 680w"
                      sizes="(max-width: 500px) 680px,
                     900px"
-                     src="~/Resource/img/amlakbashi-logo-900w.png"
+                     src="/Resource/img/amlakbashi-logo-900w.png"
                      alt="logo">
             </a>
             <a href="@(userAccessor.CurrentUser.Type != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? "/app/reserve/list?category=0&selectType=2" : "/app/reserve/list?category=1&selectType=1")" class="add-advertise-box">

@@ -13,7 +13,6 @@ using Microsoft.Extensions.Configuration;
 using Amlakbashi.Core.DTOs.WebService.Requests.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Amlakbashi.Host.Authentication;
 using Microsoft.AspNetCore.Http;
 using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Hosting;
@@ -29,20 +28,17 @@ namespace Amlakbashi.Host.Controllers.WebService
         private readonly IUserAppService userService;
         private readonly IBankCardAppService bankCardService;
         private readonly IFileAppService fileService;
-        private readonly IUserAccessor userAccessor;
         private readonly IConfiguration configuration;
         private readonly IWebHostEnvironment webHostEnvironment;
         public ApiUserController(IUserAppService userService,
             IBankCardAppService bankCardService,
             IFileAppService fileService,
-            IUserAccessor userAccessor,
             IConfiguration configuration,
             IWebHostEnvironment webHostEnvironment)
         {
             this.userService = userService;
             this.bankCardService = bankCardService;
             this.fileService = fileService;
-            this.userAccessor = userAccessor;
             this.configuration = configuration;
             this.webHostEnvironment = webHostEnvironment;
         }
@@ -240,8 +236,8 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            var user = userAccessor.CurrentUser;
-            if (user == null || user.Id == 0)
+            var user = userService.Find(User.GetId());
+            if (user == null)
             {
                 return NotFound();
             }
@@ -266,14 +262,14 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(response);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Profile(UserPutProfileRequest request)
+        [HttpPost]
+        public async Task<IActionResult> Profile(UserPostProfileRequest request)
         {
             if (request.IsValid(ModelState) == false)
             {
                 return BadRequest(ModelState);
             }
-            request.id = userAccessor.CurrentUser.Id;
+            request.id = User.GetId();
             var result = await userService.UpdateAsync(request);
             if (result.HasError())
             {
@@ -285,7 +281,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost("phonenumber/update")]
         public async Task<IActionResult> UpdateMainPhoneNumber(UpdatePhoneNumberRequest request)
         {
-            var result = await userService.UpdateMainPhoneNumberAsync(userAccessor.CurrentUser.Id, request.newPhoneNumber);
+            var result = await userService.UpdateMainPhoneNumberAsync(User.GetId(), request.newPhoneNumber);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());
@@ -308,7 +304,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost("phonenumber/verify")]
         public async Task<IActionResult> VerifyMainPhoneNumber(VerifyPhoneNumberRequest request)
         {
-            var result = await userService.VerifyNewMainPhoneNumber(userAccessor.CurrentUser.Id, request.verifyCode);
+            var result = await userService.VerifyNewMainPhoneNumber(User.GetId(), request.verifyCode);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());
@@ -324,7 +320,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpGet("referralCode")]
         public IActionResult GetReferralCode()
         {
-            return Ok(userAccessor.CurrentUser.Id);
+            return Ok(User.GetId());
         }
 
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = Policies.Payment_Actions)]

@@ -384,7 +384,7 @@ namespace Amlakbashi.Application.Services.UserServices
             return true;
         }
 
-        public async Task<ServiceResult> UpdateAsync(UserPutProfileRequest request)
+        public async Task<ServiceResult> UpdateAsync(UserPostProfileRequest request)
         {
             var serviceResult = new ServiceResult();
             var user = Repository.Find(request.id);
@@ -404,7 +404,6 @@ namespace Amlakbashi.Application.Services.UserServices
             user.NoticesPhoneNumber = request.noticesPhoneNumber;
 
             var identityUser = GetIdentityUser(user.PhoneNumber);
-            identityUser.Email = request.email;
             await UpdateIdentityAsync(identityUser);
 
             var bankCard = user.BankCards == null || user.BankCards.Any() == false ? null : user.BankCards.FirstOrDefault();
@@ -1170,15 +1169,16 @@ namespace Amlakbashi.Application.Services.UserServices
             var userRoles = await userManager.GetRolesAsync(identityUser);
             panel = panel != null ? panel.Value : (User.UserGeneralTypeEnum)user.Type;
             var claims = new List<Claim>();
-
+            
+            claims.Add(new Claim("guid", identityUser.Id));
+            //claims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
+            claims.Add(new Claim("id", user.Id.ToString()));
+            claims.Add(new Claim("refreshToken", identityUser.SecurityStamp));
+            claims.Add(new Claim("panel", panel == User.UserGeneralTypeEnum.Guest ? "guest" : "host"));
             foreach (var role in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, identityUser.Id));
-            claims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
-            claims.Add(new Claim("refreshToken", identityUser.SecurityStamp));
-            claims.Add(new Claim("panel", panel == User.UserGeneralTypeEnum.Guest ? "guest" : "host"));
 
             var symmetricKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret));
             var token = new JwtSecurityToken(

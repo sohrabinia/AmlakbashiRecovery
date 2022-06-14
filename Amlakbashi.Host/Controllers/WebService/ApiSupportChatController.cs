@@ -5,8 +5,8 @@ using Amlakbashi.Core.DTOs.WebService.Requests.SupportChats;
 using Amlakbashi.Core.DTOs.WebService.Responses.SupportChats;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
-using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
+using Amlakbashi.Host.Extensions;
 using Amlakbashi.Host.Hubs.Admin.HubServers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Controllers.WebService
 {
@@ -26,25 +25,22 @@ namespace Amlakbashi.Host.Controllers.WebService
         private readonly ISupportChatMessageAppService supportChatMessageService;
         private readonly IUserAppService userService;
         private readonly ISupportChatAdminHubServer supportChatAdminHubServer;
-        private readonly IUserAccessor userAccessor;
         public ApiSupportChatController(ISupportChatAppService supportChatService,
             ISupportChatMessageAppService supportChatMessageService,
             IUserAppService userService,
-            ISupportChatAdminHubServer supportChatAdminHubServer,
-            IUserAccessor userAccessor)
+            ISupportChatAdminHubServer supportChatAdminHubServer)
         {
             this.supportChatService = supportChatService;
             this.supportChatMessageService = supportChatMessageService;
             this.userService = userService;
             this.supportChatAdminHubServer = supportChatAdminHubServer;
-            this.userAccessor = userAccessor;
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public SupportChatResponse Get()
         {
-            SupportChat supportChat = supportChatService.GetByUserId(userAccessor.CurrentUser.Id);
+            SupportChat supportChat = supportChatService.GetByUserId(User.GetId());
             if (supportChat != null)
             {
                 var supportChatMessageIds = supportChatService.UpdateMessagesReadStatus(supportChat.Id);
@@ -72,14 +68,14 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult Post(SupportChatPostMessageRequest request)
         {
-            SupportChat supportChat = supportChatService.GetByUserId(userAccessor.CurrentUser.Id);
+            SupportChat supportChat = supportChatService.GetByUserId(User.GetId());
             if (supportChat == null)
             {
-                supportChat = supportChatService.Insert(userAccessor.CurrentUser.Id);
+                supportChat = supportChatService.Insert(User.GetId());
             }
 
             var messageId = supportChatMessageService.Insert(request.message, SupportChatMessage.TypeEnum.User,
-                supportChat.Id, userAccessor.CurrentUser.Id);
+                supportChat.Id, User.GetId());
             supportChatAdminHubServer.AddChatMessageFromServer(supportChat.Id, messageId);
 
             string autoMessage = string.Empty;

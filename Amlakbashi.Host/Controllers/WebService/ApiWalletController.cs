@@ -2,15 +2,14 @@
 using Amlakbashi.Application.Services.UserServices.Interfaces;
 using Amlakbashi.Core.DTOs.WebService.Responses.Wallets;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
+using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Controllers.WebService
 {
@@ -20,21 +19,18 @@ namespace Amlakbashi.Host.Controllers.WebService
     {
         private readonly IUserAppService userService;
         private readonly IAccountingFacade accounting;
-        private readonly IUserAccessor userAccessor;
         public ApiWalletController(IUserAppService userService,
-            IAccountingFacade accounting,
-            IUserAccessor userAccessor)
+            IAccountingFacade accounting)
         {
             this.userService = userService;
             this.accounting = accounting;
-            this.userAccessor = userAccessor;
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public WalletTransactionListResponse Get(int page = 1, int pageItemCount = 20)
         {
-            var walletTransactionPagedList = accounting.GetUserWalletTransactions(userAccessor.CurrentUser.Id, page, pageItemCount);
+            var walletTransactionPagedList = accounting.GetUserWalletTransactions(User.GetId(), page, pageItemCount);
             return new WalletTransactionListResponse() {
                 pagingInfo = walletTransactionPagedList.PagingInfo,
                 transactionList = walletTransactionPagedList.List.Select(x=> new WalletTransactionListItemResponse()
@@ -52,7 +48,8 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpGet("amount")]
         public IActionResult GetWalletAmount()
         {
-            return Ok(new { walletAmount = userAccessor.CurrentUser.WalletAmount });
+            var user = userService.Find(User.GetId());
+            return Ok(new { walletAmount = user.WalletAmount });
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -65,7 +62,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             }
             var payment = new Payment()
             {
-                UserID = userAccessor.CurrentUser.Id,
+                UserID = User.GetId(),
                 Date = DateTime.Now,
                 TotalPrice = price * 10,
                 ProductType = CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString()

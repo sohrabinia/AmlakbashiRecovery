@@ -16,9 +16,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         [Required]
         public string fromDate { get; set; }
         public string toDate { get; set; }
-
-        [Range(0, 1)]
-        public int status { get; set; }
+        public bool full { get; set; }
 
         [BindNever]
         public ActionLog.ActionSourceEnum actionSource { get; set; }

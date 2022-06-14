@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
 {
-    public class AdvertisePutBasicInfoRequest
+    public class AdvertisePostBasicInfoRequest
     {
         [Range(1, int.MaxValue)]
         public long advertiseId { get; set; }

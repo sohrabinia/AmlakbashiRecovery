@@ -2,8 +2,8 @@
 using Amlakbashi.Application.Services.CommentServices.Interfaces;
 using Amlakbashi.Core.DTOs.WebService.Requests.Comments;
 using Amlakbashi.Core.Entities;
-using Amlakbashi.Host.Authentication;
 using Amlakbashi.Host.Controllers.Base;
+using Amlakbashi.Host.Extensions;
 using Amlakbashi.Host.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Controllers.WebService
 {
@@ -23,28 +22,20 @@ namespace Amlakbashi.Host.Controllers.WebService
         private readonly ICommentAppService commentService;
         private readonly IReportItemAppService reportItemService;
         private readonly IAdvertiseAppService advertiseService;
-        private readonly IUserAccessor userAccessor;
         public ApiCommentController(ICommentAppService commentService,
             IReportItemAppService reportItemService,
-            IAdvertiseAppService advertiseService,
-            IUserAccessor userAccessor)
+            IAdvertiseAppService advertiseService)
         {
             this.commentService = commentService;
             this.reportItemService = reportItemService;
             this.advertiseService = advertiseService;
-            this.userAccessor = userAccessor;
         }
         
         [HttpGet]
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetForHostPanel(bool seenByHost = true, int page = 1, int pageItemCount = 20)
         {
-            var user = userAccessor.CurrentUser;
-            if (user.Type != 1)
-            {
-                return BadRequest();
-            }
-            var response = commentService.GetForHost(user.Id, seenByHost, page, pageItemCount);
+            var response = commentService.GetForHost(User.GetId(), seenByHost, page, pageItemCount);
             return Ok(response);
         }
 
@@ -53,15 +44,15 @@ namespace Amlakbashi.Host.Controllers.WebService
         public IActionResult SubmitGuestComment(CommentPostGuestRequest request)
         {
             var advertise = advertiseService.Find(request.advertiseId);
-            var canUserSetComment = advertise?.Reserves.Any(x => x.UserID == userAccessor.CurrentUser.Id &&
+            var canUserSetComment = advertise?.Reserves.Any(x => x.UserID == User.GetId() &&
                     x.Status == Reserve.ReserveStatus.Completed && x.EndDate.Date.AddDays(30) >= DateTime.Now.Date);
             if (advertise == null || canUserSetComment != true)
             {
                 return BadRequest();
             }
 
-            commentService.SubmitGuestComment(userAccessor.CurrentUser.Id, request.advertiseId, request.text);
-            reportItemService.Submit(userAccessor.CurrentUser.Id, request.advertiseId, request.scores);
+            commentService.SubmitGuestComment(User.GetId(), request.advertiseId, request.text);
+            reportItemService.Submit(User.GetId(), request.advertiseId, request.scores);
             return Created("", null);
         }
 
@@ -69,7 +60,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult SubmitHostReply(CommentPostHostRequest request)
         {
-            request.userId = userAccessor.CurrentUser.Id;
+            request.userId = User.GetId();
             var result = commentService.SubmitHostReply(request);
             if (result.HasError())
             {

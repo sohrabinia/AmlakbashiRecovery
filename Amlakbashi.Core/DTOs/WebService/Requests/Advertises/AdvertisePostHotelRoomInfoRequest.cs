@@ -7,10 +7,18 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
 {
-    public class AdvertisePutFinalInfoRequest
+    public class AdvertisePostHotelRoomInfoRequest
     {
+        public long unitId { get; set; }
+
         [Range(1, long.MaxValue)]
-        public long advertiseId { get; set; }
+        public long parentId { get; set; }
+
+        [Required]
+        public string title { get; set; }
+
+        [Required]
+        public string description { get; set; }
 
         [Range(1, int.MaxValue)]
         public int capacity { get; set; }
@@ -43,7 +51,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         public int metrazh { get; set; }
 
         [Range(0, int.MaxValue)]
-        public int roomCount { get; set; }
+        public int count { get; set; }
 
         [Range(0, int.MaxValue)]
         public int singleBedCount { get; set; }
@@ -53,11 +61,6 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
 
         [Range(0, int.MaxValue)]
         public int blanketsAndMattressesCount { get; set; }
-
-        public Advertise.ParkingItems parking { get; set; }
-
-        public Advertise.FloorItems floor { get; set; }
-
         public Advertise.ExtraBlanketCountItems extraBlanketCount { get; set; }
 
         [BindNever]
@@ -65,16 +68,6 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
 
         public bool IsValid(ModelStateDictionary modelState)
         {
-            if (parking == Advertise.ParkingItems.Unset || parking == Advertise.ParkingItems.Jointly ||
-                Enum.IsDefined(typeof(Advertise.ParkingItems), parking) == false)
-            {
-                modelState.AddModelError(nameof(parking), "value is incorrect");
-            }
-            if (floor == Advertise.FloorItems.Unset ||
-                Enum.IsDefined(typeof(Advertise.FloorItems), floor) == false)
-            {
-                modelState.AddModelError(nameof(floor), "value is incorrect");
-            }
             if (extraBlanketCount == Advertise.ExtraBlanketCountItems.Unset ||
                 Enum.IsDefined(typeof(Advertise.ExtraBlanketCountItems), extraBlanketCount) == false)
             {

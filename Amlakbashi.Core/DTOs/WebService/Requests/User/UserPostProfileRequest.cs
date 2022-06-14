@@ -7,21 +7,22 @@ using System.Text.RegularExpressions;
 
 namespace Amlakbashi.Core.DTOs.WebService.Requests.User
 {
-    public class UserPutProfileRequest
+    public class UserPostProfileRequest
     {
-        public int id { get; set; }
         public string firstName { get; set; }
         public string lastName { get; set; }
         public string phoneNumber2 { get; set; }
         public string phoneNumber3 { get; set; }
         public string landLinePhoneNumber { get; set; }
         public string thirdPersonPhoneNumber { get; set; }
-        public string email { get; set; }
         public string bankCardNumber { get; set; }
         public string bankCardOwnerFirstName { get; set; }
         public string bankCardOwnerLastName { get; set; }
         public string shebaNumber { get; set; }
         public Entities.User.NoticesPhoneNumberEnum noticesPhoneNumber { get; set; }
+
+        [BindNever]
+        public int id { get; set; }
 
         public bool IsValid(ModelStateDictionary modelState)
         {
@@ -71,15 +72,11 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.User
             {
                 modelState.AddModelError(nameof(bankCardOwnerLastName), "bankCardOwnerLastName is incorrect");
             }
-            if (string.IsNullOrEmpty(email) == false && EmailUtility.ValidateEmail(email) == false)
-            {
-                modelState.AddModelError(nameof(email), "email is incorrect");
-            }
             if (Enum.IsDefined(typeof(Entities.User.NoticesPhoneNumberEnum), noticesPhoneNumber) == false ||
                 (noticesPhoneNumber == Entities.User.NoticesPhoneNumberEnum.PhoneNumber2 && string.IsNullOrEmpty(phoneNumber2)) ||
                 (noticesPhoneNumber == Entities.User.NoticesPhoneNumberEnum.PhoneNumber3 && string.IsNullOrEmpty(phoneNumber3)))
             {
-                modelState.AddModelError(nameof(email), "noticesphonenumber is incorrect");
+                modelState.AddModelError(nameof(noticesPhoneNumber), "noticesphonenumber is incorrect");
             }
             return modelState.IsValid;
         }
