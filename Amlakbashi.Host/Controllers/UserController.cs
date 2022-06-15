@@ -752,16 +752,16 @@ namespace Amlakbashi.Host.Controllers
                     if (identityUser.EmailConfirmed && identityUser.State == Entities.User.UserState.Acticved)
                     {
                         if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null ||
-                            (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 10, 0, 0))
+                            (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
                         {
                             identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
                             identityUser.SendVerification = DateTime.Now;
                             userService.UpdateIdentityUser(identityUser);
                         }
-                        string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد ورود شما در املاک باشی: {identityUser.EmailCode}</div></div>";
+                        string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد ورود شما در املاک باشی: <b>{identityUser.EmailCode}</b></div></div>";
 #if !DEBUG
                         EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
-                            "تایید ایمیل ثبت نام", strbody);
+                            "املاک باشی: تایید ورود به حساب کاربری", strbody);
 #endif
                     }
                     return GenerateJsonResult(new
@@ -829,10 +829,10 @@ namespace Amlakbashi.Host.Controllers
                     identityUser.SendVerification = DateTime.Now;
                     identityUser.EmailConfirmed = false;
                     userService.UpdateIdentityUser(identityUser);
-                    string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
+                    string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید ایمیل شما در املاک باشی: <b>{code}</b></div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
-                    "تایید ایمیل ثبت نام", strbody);
+                    "املاک باشی: تایید ایمیل ثبت نام", strbody);
 #endif
                     return GenerateJsonResult(new { status = 1 });
                 }
@@ -884,16 +884,16 @@ namespace Amlakbashi.Host.Controllers
                 if (identityUser != null)
                 {
                     if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null ||
-                        (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 10, 0, 0))
+                        (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
                     {
                         identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
                         identityUser.SendVerification = DateTime.Now;
                         userService.UpdateIdentityUser(identityUser);
                     }
-                    string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {identityUser.EmailCode}</div></div>";
+                    string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px'><div>کد تایید ایمیل شما در املاک باشی: <b>{identityUser.EmailCode}</b></div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
-                    "کد تایید فراموشی رمز عبور", strbody);
+                    "املاک باشی: فراموشی رمز عبور", strbody);
 #endif
                     return GenerateJsonResult(new { status = 1 });
                 }
@@ -1248,10 +1248,10 @@ namespace Amlakbashi.Host.Controllers
                 identityUser.SendVerification = DateTime.Now;
                 identityUser.EmailConfirmed = false;
                 userService.UpdateIdentityUser(identityUser);
-                string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
+                string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید ایمیل شما در املاک باشی: <b>{code}</b></div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
-                    "تایید ایمیل ثبت نام", strbody);
+                    "املاک باشی: تایید ایمیل جدید", strbody);
 #endif
                 return GenerateJsonResult(new { status = 1 });
             }

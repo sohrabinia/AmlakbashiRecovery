@@ -1,6 +1,7 @@
 ﻿using Amlakbashi.Application.DTOs;
 using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.DTOs.UserDTOs;
+using Amlakbashi.Core.DTOs.WebService.Requests.Accounts;
 using Amlakbashi.Core.DTOs.WebService.Requests.User;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Identity.Entities;

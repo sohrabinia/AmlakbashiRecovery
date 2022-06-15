@@ -28,6 +28,7 @@ using System.Text;
 using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Application.DTOs;
 using Amlakbashi.Core.DTOs.WebService.Responses.User;
+using Amlakbashi.Core.DTOs.WebService.Requests.Accounts;
 
 namespace Amlakbashi.Application.Services.UserServices
 {

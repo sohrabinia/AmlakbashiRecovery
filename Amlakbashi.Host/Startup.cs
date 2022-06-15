@@ -252,7 +252,6 @@ namespace Amlakbashi.Host
                 {
                     TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects
                 });
-
             backgroundStartup.Startup();
 
             FirebaseApp.Create(new AppOptions()

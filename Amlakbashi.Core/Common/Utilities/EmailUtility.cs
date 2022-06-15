@@ -19,8 +19,8 @@ namespace Amlakbashi.Core.Common.Utilities
             Attachment attachment = null)
         {
             MailMessage message = new MailMessage();
-            message.From = new MailAddress(department.ToString() +
-                "@" + WebsiteUrl, WebsiteName, System.Text.Encoding.UTF8);
+            message.From = new MailAddress(department.ToString() + "@" + WebsiteUrl,
+                WebsiteName, System.Text.Encoding.UTF8);
             foreach (string item in to)
             {
                 message.To.Add(new MailAddress(item));

@@ -11,11 +11,11 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                 name: "default",
                 pattern: "{controller=Post}/{action=Page}");
 
-            endpointRouteBuilder.MapControllerRoute(
-                name: "DefaultApi",
-                pattern: "api/{action}",
-                defaults: new { controller = "Api" }
-            );
+            //endpointRouteBuilder.MapControllerRoute(
+            //    name: "DefaultApi",
+            //    pattern: "api/{action}",
+            //    defaults: new { controller = "Api" }
+            //);
         }
     }
 }
