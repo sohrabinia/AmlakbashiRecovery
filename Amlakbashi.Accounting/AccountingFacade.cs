@@ -509,9 +509,10 @@ namespace Amlakbashi.Accounting
         }
 
         // Payment Functions
-        public IList<Payment> FilterPayments(long refid, int status, int uid, long reserveId, DateTime fromDate, DateTime toDate)
+        public IList<Payment> FilterPayments(long refid, int status, int uid,
+            long reserveId, DateTime fromDate, DateTime toDate, BankEnum bank, int type)
         {
-            return paymentService.Filter(refid, status, uid, reserveId, fromDate, toDate);
+            return paymentService.Filter(refid, status, uid, reserveId, fromDate, toDate, bank, type);
         }
 
         public IList<Payment> GetPaymentRange(DateTime fromDate, DateTime toDate, int status, IList<int> userIds = null,
@@ -547,7 +548,7 @@ namespace Amlakbashi.Accounting
             {
                 return null;
             }
-            var response = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.Date);
+            var response = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.CreateDate);
             response.PaymentId = payment.Id.ToString();
             if ((response.Result && payment.Status == Payment.PaymentStatus.NotPaid) ||
                 (response.Result == false && payment.Status == Payment.PaymentStatus.Paid))
@@ -570,11 +571,11 @@ namespace Amlakbashi.Accounting
             {
                 return false;
             }
-            var result = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.Date);
+            var result = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.CreateDate);
             if (result.Result == true && payment.Status == Payment.PaymentStatus.NotPaid)
             {
-                payment.Authority = result.TransactionReferenceId;
-                payment.RefID = Convert.ToInt64(result.ReferenceNumber);
+                payment.TransactionId = result.TransactionReferenceId;
+                payment.ReferenceNumber = Convert.ToInt64(result.ReferenceNumber);
                 payment.TraceNumber = result.TraceNumber;
                 payment.PayDate = DateTime.Parse(result.TransactionDate);
                 payment.Status = Payment.PaymentStatus.Paid;
@@ -583,8 +584,8 @@ namespace Amlakbashi.Accounting
             }
             else if (result.Result == false && payment.Status == Payment.PaymentStatus.Paid)
             {
-                payment.Authority = null;
-                payment.RefID = 0;
+                payment.TransactionId = null;
+                payment.ReferenceNumber = 0;
                 payment.TraceNumber = null;
                 payment.PayDate = null;
                 payment.Status = Payment.PaymentStatus.NotPaid;
@@ -826,9 +827,9 @@ namespace Amlakbashi.Accounting
                 case ReservePaymentMethod.EPay:
                     var objPay = new Payment();
                     objPay.ReserveID = (int)reserveId;
-                    objPay.Date = DateTime.Now;
+                    objPay.CreateDate = DateTime.Now;
                     objPay.ProductType = payment_string;
-                    objPay.TotalPrice = price * 10;
+                    objPay.Amount = price * 10;
                     objPay.UserID = doerUserId;
                     return paymentService.Insert(objPay);
                 case ReservePaymentMethod.AmlakbashiCredit:
@@ -922,14 +923,14 @@ namespace Amlakbashi.Accounting
                         Count(w => user_list.Contains(w.UserID));
                     payment_amount = paymentService.Filter(1, fromDate, toDate).
                         Where(w => user_list.Contains(w.UserID)).
-                        Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                        Select(p => (long?)p.Amount).Sum() ?? 0;
                 }
                 else
                 {
                     payment_count = paymentService.Filter(1, fromDate, toDate).Count();
                     payment_amount = paymentService.Filter(1, fromDate, toDate).
-                        Where(w => w.TotalPrice > 0).
-                        Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                        Where(w => w.Amount > 0).
+                        Select(p => (long?)p.Amount).Sum() ?? 0;
                 }
                 CountMonthValue.Add(payment_count);
                 AmountMonthValue.Add(payment_amount);
@@ -992,9 +993,9 @@ namespace Amlakbashi.Accounting
                     objPay.ReserveID = (int)reserveId;
                     objPay.CouponID = coupon == null ? 0 : coupon.Id;
                     objPay.PrizePrice = prizeAvailable;
-                    objPay.Date = DateTime.Now;
+                    objPay.CreateDate = DateTime.Now;
                     objPay.ProductType = payment_string;
-                    objPay.TotalPrice = price_to_pay * 10;
+                    objPay.Amount = price_to_pay * 10;
                     objPay.UserID = userId;
                     return paymentService.Insert(objPay);
                 case ReservePaymentMethod.AmlakbashiCredit:
@@ -1045,7 +1046,7 @@ namespace Amlakbashi.Accounting
                     var request = new SamanRequestTokenDTO()
                     {
                         ResNum = payment.Id.ToString(),
-                        Amount = payment.TotalPrice,
+                        Amount = payment.Amount,
                         RedirectUrl = samanRedirectUrl,
                         CellNumber = payment.User.PhoneNumber
                     };
@@ -1058,7 +1059,7 @@ namespace Amlakbashi.Accounting
                         pasargadRedirectUrl += "?RedirectUrl=" + redirectUrl;
                     }
                     epay = paymentOperator.GetPasargadPaymentData(bank, paymentId,
-                        payment.TotalPrice, pasargadRedirectUrl);
+                        payment.Amount, pasargadRedirectUrl);
                     break;
                 default:
                     epay.HasError = true;
@@ -1066,8 +1067,8 @@ namespace Amlakbashi.Accounting
                     break;
             }
 
-            payment.BankId = bank;
-            payment.Date = epay.Date;
+            payment.Bank = bank;
+            payment.CreateDate = epay.Date;
             UpdatePayment(payment);
 
             return epay;
@@ -1084,7 +1085,7 @@ namespace Amlakbashi.Accounting
                     referenceNumber = checkPaymentResult.ReferenceNumber;
                     var payment = paymentService.Find(response.iN);
                     var verifyPaymentResult = paymentOperator.VerifyPasargadPayment(BankEnum.Pasargad,
-                        paymentResult, payment.Id, payment.TotalPrice);
+                        paymentResult, payment.Id, payment.Amount);
                     if (verifyPaymentResult)
                     {
                         DateTime transactionDate = DateTime.Parse(checkPaymentResult.TransactionDate);
@@ -1109,11 +1110,11 @@ namespace Amlakbashi.Accounting
             {
                 var verifyEpayResult = paymentOperator.VerifySamanEpay(response.RefNum).Result;
                 double verfiyEpayAmout = double.Parse(verifyEpayResult);
-                if (verfiyEpayAmout == payment.TotalPrice)
+                if (verfiyEpayAmout == payment.Amount)
                 {
                     return GiveProduct(response.ResNum, payment.UserID, response.RRN,
                             response.RefNum, response.TraceNo, DateTime.Now,
-                            out msg, response.ActionSource);
+                            out msg, response.ActionSource, response.SecurePan);
                 }
             }
             msg = "عملیات پرداخت با خطا مواجه شد";
@@ -1132,7 +1133,7 @@ namespace Amlakbashi.Accounting
 
         private bool GiveProduct(int paymentId, int userId, string referenceNumber,
             string transactionReferenceId, string traceNumber, DateTime transactionDate, out string msg,
-            ActionSourceEnum actionSource)
+            ActionSourceEnum actionSource, string creditCardNumber = null)
         {
             var payment = paymentService.Find(paymentId);
             if (payment.Status == Payment.PaymentStatus.Paid)
@@ -1140,11 +1141,15 @@ namespace Amlakbashi.Accounting
                 msg = "این تراکنش تکراری می باشد";
                 return false;
             }
-            payment.RefID = long.Parse(referenceNumber);
-            payment.Authority = transactionReferenceId;
+            payment.ReferenceNumber = long.Parse(referenceNumber);
+            payment.TransactionId = transactionReferenceId;
             payment.TraceNumber = traceNumber;
             payment.Status = Payment.PaymentStatus.Paid;
             payment.PayDate = transactionDate;
+            if (string.IsNullOrEmpty(creditCardNumber) == false && creditCardNumber.Length <= 16)
+            {
+                payment.CreditCardNumber = creditCardNumber;
+            }
             var user = repository.FindUser(userId);
             var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             var contact = new UserContactDTO()
@@ -1156,16 +1161,16 @@ namespace Amlakbashi.Accounting
                 UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                 UserNotificationToken = user.NotificationToken,
                 Type = UserContactType.payment,
-                TransactionId = payment.RefID.ToString()
+                TransactionId = payment.ReferenceNumber.ToString()
             };
             mediator.Enqueue(new SendMessageCommand(contact));
-            var price = payment.TotalPrice / 10;
-            msg = $"پرداخت شما با موفقیت انجام شد. شماره تراکنش پرداخت شما {payment.RefID} می باشد.";
+            var price = payment.Amount / 10;
+            msg = $"پرداخت شما با موفقیت انجام شد. شماره تراکنش پرداخت شما {payment.ReferenceNumber} می باشد.";
             long currentCredit;
             if (payment.ProductType.Contains("Reserve"))
             {
                 mediator.Send(new FinalizeReserveCommand(payment.ReserveID == null ? 0 : (long)payment.ReserveID,
-                    payment.RefID, price, ReservePaymentMethod.EPay, actionSource, payment.UserID, -1, payment.CouponID,
+                    payment.ReferenceNumber, price, ReservePaymentMethod.EPay, actionSource, payment.UserID, -1, payment.CouponID,
                     payment.PrizePrice, true));
                 if (payment.ReserveID != null)
                 {
@@ -1174,12 +1179,12 @@ namespace Amlakbashi.Accounting
             }
             else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString())
             {
-                payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.RefID, 0, out currentCredit,
+                payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.ReferenceNumber, 0, out currentCredit,
                     CreditTransaction.WalletTransactionReason.Charge, null, paymentId, payment.UserID, actionSource);
             }
             else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Inc_Then_Res.ToString())
             {
-                payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.RefID, 0, out currentCredit,
+                payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.ReferenceNumber, 0, out currentCredit,
                     CreditTransaction.WalletTransactionReason.Charge, null, paymentId, payment.UserID, actionSource);
                 var creditTransactionId = DecreaseCredit(payment.UserID, payment.ReservePrice, 0, payment.ReserveID == null ? 0 : (long)payment.ReserveID,
                     out currentCredit, CreditTransaction.WalletTransactionReason.Reserve, null, null, payment.UserID, actionSource);
@@ -1260,9 +1265,9 @@ namespace Amlakbashi.Accounting
             var payment = new Payment()
             {
                 UserID = hostUser.Id,
-                Date = DateTime.Now,
-                TotalPrice = payablePrice * 10,
-                BankId = BankEnum.Pasargad,
+                CreateDate = DateTime.Now,
+                Amount = payablePrice * 10,
+                Bank = BankEnum.Pasargad,
                 Method = Payment.PaymentMethod.Podium,
                 Type = Payment.PaymentType.Expenditure,
                 Status = Payment.PaymentStatus.NotPaid,
@@ -1276,7 +1281,7 @@ namespace Amlakbashi.Accounting
                 DestFirstName = hostBankCard.FName,
                 DestLastName = hostBankCard.LName,
                 PaymentId = payment.Id,
-                Timestamp = payment.Date,
+                Timestamp = payment.CreateDate,
                 Amount = payablePrice * 10,
                 CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
             };
@@ -1344,9 +1349,9 @@ namespace Amlakbashi.Accounting
             var payment = new Payment()
             {
                 UserID = user.Id,
-                Date = DateTime.Now,
-                TotalPrice = user.WalletAmount * 10,
-                BankId = BankEnum.Pasargad,
+                CreateDate = DateTime.Now,
+                Amount = user.WalletAmount * 10,
+                Bank = BankEnum.Pasargad,
                 Method = Payment.PaymentMethod.Podium,
                 Type = Payment.PaymentType.Expenditure,
                 Status = Payment.PaymentStatus.NotPaid,
@@ -1359,7 +1364,7 @@ namespace Amlakbashi.Accounting
                 DestFirstName = hostBankCard.FName,
                 DestLastName = hostBankCard.LName,
                 PaymentId = payment.Id,
-                Timestamp = payment.Date,
+                Timestamp = payment.CreateDate,
                 Amount = user.WalletAmount * 10,
                 CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
             };
@@ -1401,7 +1406,7 @@ namespace Amlakbashi.Accounting
         public CheckShebaPaymentResultDTO CheckShebaPaymentStatus(long paymentId)
         {
             var payment = paymentService.Find((int)paymentId);
-            string date = payment.Date.ToString("yyyy/MM/dd");
+            string date = payment.CreateDate.ToString("yyyy/MM/dd");
             var result = bankingOperator.CheckShebaPaymentStatus(date, paymentId.ToString());
             result.PaymentStatus = payment.Status;
             result.PaymentId = payment.Id;
@@ -1415,7 +1420,7 @@ namespace Amlakbashi.Accounting
             {
                 return false;
             }
-            string date = payment.Date.ToString("yyyy/MM/dd");
+            string date = payment.CreateDate.ToString("yyyy/MM/dd");
             var result = bankingOperator.CheckShebaPaymentStatus(date, paymentId.ToString());
             if (result.HasError)
             {
@@ -1440,7 +1445,7 @@ namespace Amlakbashi.Accounting
                         PaymentType = (int)reservePaymentType,
                         ReserveID = (long)reserve.Id,
                         UserID = operatorId,
-                        Price = payment.TotalPrice / 10,
+                        Price = payment.Amount / 10,
                         PaymentMethod = (int)ReservePayment.ReservePaymentMethod.Podium,
                         CreateDate = DateTime.Now,
                         OperatorID = operatorId,

@@ -41,7 +41,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             }
 
             request.phoneNumber = PhoneUtility.CorrectPhoneNumberIfPossible(request.phoneNumber);
-            var identityUser = userService.GetIdentityUser(request.phoneNumber);
+            var identityUser = await userService.FindIdentityByUsernameAsync(request.phoneNumber);
 
             if (identityUser == null)
             {
@@ -52,8 +52,7 @@ namespace Amlakbashi.Host.Controllers.WebService
 
         private async Task<IActionResult> Register(LoginRequest request)
         {
-            var isIranNumber = PhoneUtility.IsNumberForIran(request.phoneNumber);
-
+            var isIranNumber = request.IsIranNumber();
             if (isIranNumber == false && EmailUtility.ValidateEmail(request.email) == false)
             {
                 ModelState.AddModelError(nameof(request.email), "email not valid");
@@ -75,46 +74,45 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 return BadRequest();
             }
+            await userService.SendVerifyCode(identityUser);
 
             return Created("/api/user", new {
                 isNewUser = true,
                 guid = identityUser.Id,
                 username = identityUser.UserName,
-                state = Entities.User.UserState.InActived,
-                stateDesc = Entities.User.UserState.InActived.ToString(),
-                isIranNumber = isIranNumber
+                state = identityUser.State,
+                stateDesc = identityUser.State.ToString(),
+                IsForeigner = identityUser.IsForeigner
             });
         }
 
         private async Task<IActionResult> Login(LoginRequest request)
         {
             var identityUser = await userService.FindIdentityByUsernameAsync(request.phoneNumber);
-
-            if (identityUser != null && identityUser.State == Entities.User.UserState.Suspend)
+            if (identityUser.State == Entities.User.UserState.Suspend)
             {
                 return StatusCode(StatusCodes.Status403Forbidden);
             }
 
-            var isIranNumber = PhoneUtility.IsNumberForIran(request.phoneNumber);
-            if (isIranNumber == false)
+            if (identityUser.IsForeigner)
             {
                 if (EmailUtility.ValidateEmail(request.email) == false)
                 {
                     ModelState.AddModelError(nameof(request.email), "email not valid");
                     return BadRequest(ModelState);
                 }
-                await userService.UpdateEmailAsync(identityUser.Id, request.email, false);
+                await userService.UpdateEmailAsync(identityUser.Id, request.email, false); // update email any time
             }
 
             await userService.UpdateVerifyCodeAsync(identityUser.Id);
-            userService.SendVerifyCode(identityUser);
+            await userService.SendVerifyCode(identityUser);
 
             return Ok(new {
                 guid = identityUser.Id,
                 username = identityUser.UserName,
                 state = identityUser.State,
                 stateDesc = identityUser.State.ToString(),
-                isIranNumber = isIranNumber,
+                IsForeigner = identityUser.IsForeigner,
                 isNewUser = false,
             });
         }
@@ -133,15 +131,15 @@ namespace Amlakbashi.Host.Controllers.WebService
                 return BadRequest("verify code not valid");
             }
 
-            var isIranNumber = PhoneUtility.IsNumberForIran(identityUser.UserName);
-            if (isIranNumber && identityUser.PhoneNumberConfirmed == false)
+            if (identityUser.IsForeigner == false && identityUser.PhoneNumberConfirmed == false)
             {
                 await userService.UpdatePhoneNumberConfirmedAsync(identityUser.Id, true);
             }
-            if (isIranNumber == false && identityUser.EmailConfirmed == false)
+            if (identityUser.IsForeigner && identityUser.EmailConfirmed == false)
             {
                 await userService.UpdateEmailConfirmedAsync(identityUser.Id, true);
             }
+
             var jwtToken = await userService.GenerateJwtTokenAsync(identityUser.Id, configuration["JwtConfig:Secret"]);
             return Ok(new
             {
@@ -159,7 +157,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 return NotFound();
             }
             await userService.UpdateVerifyCodeAsync(identityUser.Id);
-            userService.SendVerifyCode(identityUser);
+            await userService.SendVerifyCode(identityUser);
             return NoContent();
         }
 

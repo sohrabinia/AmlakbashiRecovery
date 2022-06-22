@@ -535,8 +535,8 @@ namespace Amlakbashi.Core.Entities
             var payments = Payments.Where(w => w.Status == Payment.PaymentStatus.NotPaid && w.Type == Payment.PaymentType.Income);
             if (payments.Any())
             {
-                var paymentsList = payments.OrderByDescending(x => x.Date).ToList();
-                var lastDate = paymentsList.Last().Date;
+                var paymentsList = payments.OrderByDescending(x => x.CreateDate).ToList();
+                var lastDate = paymentsList.Last().CreateDate;
                 lastTryDateStr = DateTimeUtility.GregorianToPersianDate(lastDate).Remove(0, 2);
                 lastTryDateStr += (" " + lastDate.ToString("HH:mm"));
                 return paymentsList.Count;

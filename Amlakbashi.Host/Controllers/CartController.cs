@@ -13,11 +13,7 @@ using System;
 using System.Collections.Generic;
 using X.PagedList;
 using Amlakbashi.Core.Common.Utilities;
-using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Host.Extensions;
-using System.Xml.Linq;
-using Newtonsoft.Json;
-using System.Dynamic;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
 using System.Text;
@@ -120,31 +116,11 @@ namespace Amlakbashi.Host.Controllers
                     action = "http404"
                 });
             }
-            payment.Date = DateTime.Now;
-            payment.BankId = 0;
+            payment.CreateDate = DateTime.Now;
+            payment.Bank = 0;
             accounting.UpdatePayment(payment);
-            ViewBag.PayPrice = payment.TotalPrice;
-            ViewBag.PayDate = DateTimeUtility.ConvertDate(payment.Date);
-            ViewBag.redirectUrl = redirectUrl;
-            return View(payment);
-        }
-
-        public ActionResult TestPerformPay(int paymentId, string redirectUrl = null)
-        {
-            var payment = accounting.FindPayment(paymentId);
-            if (payment == null || payment.Status == Payment.PaymentStatus.Paid)
-            {
-                return RedirectToRoute(new
-                {
-                    controller = "errors",
-                    action = "http404"
-                });
-            }
-            payment.Date = DateTime.Now;
-            payment.BankId = 0;
-            accounting.UpdatePayment(payment);
-            ViewBag.PayPrice = payment.TotalPrice;
-            ViewBag.PayDate = DateTimeUtility.ConvertDate(payment.Date);
+            ViewBag.PayPrice = payment.Amount;
+            ViewBag.PayDate = DateTimeUtility.ConvertDate(payment.CreateDate);
             ViewBag.redirectUrl = redirectUrl;
             return View(payment);
         }
@@ -206,7 +182,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 if (epayResult)
                 {
-                    return Redirect(redirectUrl + "?done=true&price=" + payment.TotalPrice);
+                    return Redirect(redirectUrl + "?done=true&price=" + payment.Amount);
                 }
                 else
                 {
@@ -253,21 +229,6 @@ namespace Amlakbashi.Host.Controllers
             }
             return Redirect(string.Format("/{0}/{1}", redirect_controller, redirect_action));
         }
-
-        //[Authorize(Policy = Policies.Payment_Actions)]
-        //public IActionResult CheckPasargadPaymentResult(int paymentId)
-        //{
-        //    try
-        //    {
-        //        var result = accounting.CheckPaymentResult(paymentId);
-        //        return PartialView("_CheckPaymentResult", result);
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("Cart.CheckPasargadPaymentResult", exc);
-        //        return PartialView("_CheckPaymentResult");
-        //    }
-        //}
 
 #if DEBUG
         public ActionResult LocalPay(int paymentId, string redirectUrl = null)

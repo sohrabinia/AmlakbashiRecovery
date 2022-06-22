@@ -33,6 +33,7 @@ using Amlakbashi.Application.Services.ReserveServices.Interfaces;
 using Amlakbashi.Application.Services.FileServices.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
+using Amlakbashi.Core.Services.Interfaces;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -109,7 +110,6 @@ namespace Amlakbashi.Host.Controllers
                 prop.IssuedUtc = expireTime;
                 prop.IsPersistent = true;
 
-                //signInManager.SignOutAsync().Wait();
                 userService.SignOut();
                 signInManager.SignInAsync(identityUser, prop).Wait();
 
@@ -758,10 +758,10 @@ namespace Amlakbashi.Host.Controllers
                             identityUser.SendVerification = DateTime.Now;
                             userService.UpdateIdentityUser(identityUser);
                         }
-                        string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد ورود شما در املاک باشی: <b>{identityUser.EmailCode}</b></div></div>";
+                        string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailCode}</b></div></div>";
 #if !DEBUG
                         EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
-                            "املاک باشی: تایید ورود به حساب کاربری", strbody);
+                            "املاک باشی: کد تایید ورود به حساب کاربری", strbody);
 #endif
                     }
                     return GenerateJsonResult(new
@@ -829,7 +829,7 @@ namespace Amlakbashi.Host.Controllers
                     identityUser.SendVerification = DateTime.Now;
                     identityUser.EmailConfirmed = false;
                     userService.UpdateIdentityUser(identityUser);
-                    string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید ایمیل شما در املاک باشی: <b>{code}</b></div></div>";
+                    string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{code}</b></div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
                     "املاک باشی: تایید ایمیل ثبت نام", strbody);
@@ -890,7 +890,7 @@ namespace Amlakbashi.Host.Controllers
                         identityUser.SendVerification = DateTime.Now;
                         userService.UpdateIdentityUser(identityUser);
                     }
-                    string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px'><div>کد تایید ایمیل شما در املاک باشی: <b>{identityUser.EmailCode}</b></div></div>";
+                    string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailCode}</b></div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
                     "املاک باشی: فراموشی رمز عبور", strbody);
@@ -1248,7 +1248,7 @@ namespace Amlakbashi.Host.Controllers
                 identityUser.SendVerification = DateTime.Now;
                 identityUser.EmailConfirmed = false;
                 userService.UpdateIdentityUser(identityUser);
-                string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید ایمیل شما در املاک باشی: <b>{code}</b></div></div>";
+                string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{code}</b></div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
                     "املاک باشی: تایید ایمیل جدید", strbody);
@@ -1339,8 +1339,8 @@ namespace Amlakbashi.Host.Controllers
                 var payment = new Payment()
                 {
                     UserID = userAccessor.CurrentUser.Id,
-                    Date = DateTime.Now,
-                    TotalPrice = price * 10,
+                    CreateDate = DateTime.Now,
+                    Amount = price * 10,
                     ReserveID = reserveId,
                     CouponID = couponId,
                     PrizePrice = prizePrice,

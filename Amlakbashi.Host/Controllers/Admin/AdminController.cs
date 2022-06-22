@@ -329,7 +329,7 @@ namespace Portal.Controllers
                         long payment_amount = 0;
                         var payments = accounting.GetPaymentRange(fromDate, toDate, 1, user_list);
                         payment_count = payments.Count;
-                        payment_amount = payments.Select(s => (long?)s.TotalPrice).Sum() ?? 0;
+                        payment_amount = payments.Select(s => (long?)s.Amount).Sum() ?? 0;
                         CountMonthValue.Insert(0, payment_count);
                         AmountMonthValue.Insert(0, payment_amount);
                         toDate = fromDate;
@@ -352,12 +352,12 @@ namespace Portal.Controllers
                         if (extra_filter)
                         {
                             payment_amount1 = accounting.GetPaymentRange(fromDate, toDate, 1, user_list).
-                                Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                                Select(p => (long?)p.Amount).Sum() ?? 0;
                         }
                         else
                         {
                             payment_amount1 = accounting.GetPaymentRange(fromDate, toDate, 1, null, true).
-                                Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                                Select(p => (long?)p.Amount).Sum() ?? 0;
                         }
 
                         var toDate2 = toDate.AddMonths(-1);
@@ -366,12 +366,12 @@ namespace Portal.Controllers
                         if (extra_filter)
                         {
                             payment_amount2 = accounting.GetPaymentRange(fromDate2, toDate2, 1, user_list).
-                                Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                                Select(p => (long?)p.Amount).Sum() ?? 0;
                         }
                         else
                         {
                             payment_amount2 = accounting.GetPaymentRange(fromDate2, toDate2, 1, null, true).
-                                Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                                Select(p => (long?)p.Amount).Sum() ?? 0;
 
                         }
 

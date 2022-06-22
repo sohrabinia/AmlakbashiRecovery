@@ -63,8 +63,8 @@ namespace Amlakbashi.Host.Controllers.WebService
             var payment = new Payment()
             {
                 UserID = User.GetId(),
-                Date = DateTime.Now,
-                TotalPrice = price * 10,
+                CreateDate = DateTime.Now,
+                Amount = price * 10,
                 ProductType = CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString()
             };
             accounting.InsertPayment(payment);

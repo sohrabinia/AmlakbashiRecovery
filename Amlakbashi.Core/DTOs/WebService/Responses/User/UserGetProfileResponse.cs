@@ -15,7 +15,8 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.User
         public string thirdPersonPhoneNumber { get; set; }
         public string email { get; set; }
         public string bankCardNumber { get; set; }
-        public string bankCardOwnerName { get; set; }
+        public string bankCardOwnerFirstName { get; set; }
+        public string bankCardOwnerLastName { get; set; }
         public string shebaNumber { get; set; }
         public Entities.User.NoticesPhoneNumberEnum noticesPhoneNumber { get; set; }
         public string imageUrl { get; set; }

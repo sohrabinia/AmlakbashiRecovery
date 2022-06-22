@@ -29,7 +29,7 @@ namespace Amlakbashi.Core.Identity.Entities
 
         public bool IsVerifyCodeValid(string code)
         {
-            return Code == code && (DateTime.Now - SendVerification) <= new TimeSpan(0, 0, 2, 0, 0);
+            return (IsForeigner ? EmailCode : Code) == code && (DateTime.Now - SendVerification) <= new TimeSpan(0, 0, 2, 0, 0);
         }
     }
 }

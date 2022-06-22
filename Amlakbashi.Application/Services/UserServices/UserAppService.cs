@@ -27,8 +27,8 @@ using Amlakbashi.Core.DTOs.WebService.Requests.User;
 using System.Text;
 using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Application.DTOs;
-using Amlakbashi.Core.DTOs.WebService.Responses.User;
 using Amlakbashi.Core.DTOs.WebService.Requests.Accounts;
+using Amlakbashi.Core.Services.Interfaces;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
@@ -40,13 +40,15 @@ namespace Amlakbashi.Application.Services.UserServices
         private readonly IPasswordValidator<AppUser> passwordValidator;
         private readonly RoleManager<AppRole> roleManager;
         private readonly SignInManager<AppUser> signInManager;
+        private readonly IEmailSenderService emailSender;
         public UserAppService(IRepository<User, int> repository,
             IUserContactFacade userContact,
             IMediator mediator,
             UserManager<AppUser> userManager,
             IPasswordValidator<AppUser> passwordValidator,
             RoleManager<AppRole> roleManager,
-            SignInManager<AppUser> signInManager) : base(repository)
+            SignInManager<AppUser> signInManager,
+            IEmailSenderService emailSender) : base(repository)
         {
             this.mediator = mediator;
             this.userContact = userContact;
@@ -54,6 +56,7 @@ namespace Amlakbashi.Application.Services.UserServices
             this.passwordValidator = passwordValidator;
             this.roleManager = roleManager;
             this.signInManager = signInManager;
+            this.emailSender = emailSender;
         }
 
         public IList<User> GetAll()
@@ -161,16 +164,17 @@ namespace Amlakbashi.Application.Services.UserServices
                 return null;
             }
 
-            var verifyCode = new Random().Next(1111, 9999).ToString();
             identityUser = new AppUser()
             {
                 UserName = request.phoneNumber,
                 PhoneNumber = request.phoneNumber,
                 CreateDate = DateTime.Now,
                 State = User.UserState.InActived,
-                Code = verifyCode,
+                Code = StringUtility.GenerateVerifyCode(),
+                EmailCode = StringUtility.GenerateVerifyCode(6),
                 SendVerification = DateTime.Now,
-                Email = request.email
+                Email = request.email,
+                IsForeigner = request.IsIranNumber() == false
             };
             var result = await userManager.CreateAsync(identityUser);
 
@@ -206,7 +210,7 @@ namespace Amlakbashi.Application.Services.UserServices
             await userManager.UpdateAsync(identityUser);
         }
 
-        public void SetReferralCode(int userId, int referralUserId)
+        private void SetReferralCode(int userId, int referralUserId)
         {
             var referralUser = Repository.Find(referralUserId);
             if (referralUser != null)
@@ -233,20 +237,17 @@ namespace Amlakbashi.Application.Services.UserServices
             }
         }
 
-        public void SendVerifyCode(AppUser identityUser)
+        public async Task SendVerifyCode(AppUser identityUser)
         {
-            var isIranNumber = PhoneUtility.IsNumberForIran(identityUser.PhoneNumber);
-            if (isIranNumber)
+            if (identityUser.IsForeigner)
             {
-                var callableNumber = PhoneUtility.InternationalNumberToLocal(identityUser.PhoneNumber);
-                SendVerificationSms(callableNumber, identityUser.Code);
+                await emailSender.SendAsync(identityUser.Email, StringUtility.VerifyEmailSubject(),
+                    StringUtility.VerifyEmailContent(identityUser.EmailCode));
             }
             else
             {
-                string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد ورود شما در املاک باشی: {identityUser.Code}</div></div>";
-#if !DEBUG
-                EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email }, "تایید ایمیل", strbody);
-#endif
+                var callableNumber = PhoneUtility.InternationalNumberToLocal(identityUser.PhoneNumber);
+                SendVerificationSms(callableNumber, identityUser.Code);
             }
         }
 
@@ -550,7 +551,6 @@ namespace Amlakbashi.Application.Services.UserServices
             await UpdateIdentityAsync(identityUser);
             await UpdatePhoneNumberAsync(user.Id, internationalMobile);
             await userManager.UpdateSecurityStampAsync(identityUser);
-            //await signInManager.SignInAsync(identityUser, true);
             return serviceResult;
         }
 
@@ -628,21 +628,26 @@ namespace Amlakbashi.Application.Services.UserServices
             userManager.UpdateAsync(identityUser).Wait();
         }
 
-        public async Task<string> UpdateVerifyCodeAsync(string guid)
+        public async Task<ServiceResult> UpdateVerifyCodeAsync(string guid)
         {
+            var serviceResult = new ServiceResult();
             var identityUser = await userManager.FindByIdAsync(guid);
-            if (identityUser != null)
+            if (identityUser == null)
             {
-                var newCode = new Random().Next(1111, 9999).ToString();
-                identityUser.Code = newCode;
-                identityUser.SendVerification = DateTime.Now;
-                var result = await userManager.UpdateAsync(identityUser);
-                if (result.Succeeded)
-                {
-                    return newCode;
-                }
+                serviceResult.AddError("user not found");
+                return serviceResult;
             }
-            return null;
+
+            identityUser.Code = StringUtility.GenerateVerifyCode();
+            identityUser.EmailCode = StringUtility.GenerateVerifyCode(6);
+            identityUser.SendVerification = DateTime.Now;
+            var result = await userManager.UpdateAsync(identityUser);
+            if (result.Succeeded == false)
+            {
+                serviceResult.AddError(result.Errors.First().Description);
+                return serviceResult;
+            }
+            return serviceResult;
         }
 
         public void UpdatePresentorUser(int userId, int pid)
@@ -1172,7 +1177,6 @@ namespace Amlakbashi.Application.Services.UserServices
             var claims = new List<Claim>();
             
             claims.Add(new Claim("guid", identityUser.Id));
-            //claims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
             claims.Add(new Claim("id", user.Id.ToString()));
             claims.Add(new Claim("refreshToken", identityUser.SecurityStamp));
             claims.Add(new Claim("panel", panel == User.UserGeneralTypeEnum.Guest ? "guest" : "host"));

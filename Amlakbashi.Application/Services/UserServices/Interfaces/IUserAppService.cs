@@ -29,7 +29,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         User GetActivatedUserByEmail(string email, bool includeFavorite = false);
         void Insert(User user, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         Task<AppUser> RegisterAsync(LoginRequest request);
-        void SendVerifyCode(AppUser identityUser);
+        Task SendVerifyCode(AppUser identityUser);
         bool Update(UserEditDTO editedUser, int adminId);
         bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
             ActionLog.ActionSourceEnum source, out List<string> errors);
@@ -46,7 +46,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
             ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         void UpdateCreateDate(int userId, DateTime time);
         void UpdateSendVerification(int userId, DateTime time, string code = null);
-        Task<string> UpdateVerifyCodeAsync(string guid);
+        Task<ServiceResult> UpdateVerifyCodeAsync(string guid);
         void UpdatePresentorUser(int userId, int pid);
         void UpdateFNameLName(int userId, string newFName, string newLName);
         void UpdateDesc(int userId, string desc);

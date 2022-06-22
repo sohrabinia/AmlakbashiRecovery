@@ -24,7 +24,7 @@
                 @if (Model.ProductType == "Credit_Inc_Then_Res")
                 {
                     <div style="padding: 5px;">مبلغ رزرو: @(string.Format("{0:n0}", Model.ReservePrice * 10)) ریال</div>
-                    <div style="padding: 5px;">موجودی کیف پول: @(string.Format("{0:n0}", (Model.ReservePrice - (Model.TotalPrice / 10)) * 10)) ریال</div>
+                    <div style="padding: 5px;">موجودی کیف پول: @(string.Format("{0:n0}", (Model.ReservePrice - (Model.Amount / 10)) * 10)) ریال</div>
                 }
                 <div style="padding: 5px 0 15px 0;">مبلغ قابل پرداخت: @string.Format("{0:n0}", ViewBag.PayPrice) ریال</div>
                 <div style="padding: 5px 0 15px 0;">

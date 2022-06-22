@@ -1537,7 +1537,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 accounting.UsePrizeCreditForReserve(reserveId, payment.UserID, ActionSourceEnum.AdminPanel);
                 reserve = Repository.Find(reserveId);
             }
-            var paymentType = payment.TotalPrice >=
+            var paymentType = payment.Amount >=
                 (reserve.TotalPrice - reserve.CouponPrice - reserve.PrizePrice) ?
                 ReservePaymentType.GuestClearing :
                 ReservePaymentType.GuestDeposite;
@@ -1545,11 +1545,11 @@ namespace Amlakbashi.Application.Services.ReserveServices
             {
                 CreateDate = DateTime.Now,
                 UserID = reserve.UserID,
-                TransactionID = long.Parse(payment.Authority),
-                RefID = payment.RefID,
+                TransactionID = long.Parse(payment.TransactionId),
+                RefID = payment.ReferenceNumber,
                 ReserveID = reserve.Id,
                 PaymentType = (int)paymentType,
-                Price = payment.TotalPrice / 10,
+                Price = payment.Amount / 10,
                 PaymentMethod = (int)ReservePaymentMethod.EPay
             };
             accounting.InsertReservePayment(reservePayment);

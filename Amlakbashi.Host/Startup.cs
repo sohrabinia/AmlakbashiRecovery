@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Application;
 using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.DTOs;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Data;
 using Amlakbashi.Data.Identity;
@@ -162,6 +163,11 @@ namespace Amlakbashi.Host
                     policyBuiler.WithOrigins("https://adminvila.com/").AllowAnyHeader().AllowAnyMethod();
                 });
             });
+
+            //var emailConfig = Configuration
+            //    .GetSection("EmailConfiguration")
+            //    .Get<EmailConfiguration>();
+            //services.AddSingleton(emailConfig);
         }
 
         // ConfigureContainer is where you can register things directly
