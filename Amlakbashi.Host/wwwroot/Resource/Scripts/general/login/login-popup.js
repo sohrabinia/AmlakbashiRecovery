@@ -271,6 +271,19 @@ function login(step) {
                 if (ret.doLogin) {
                     $('.login_form').hide();
                     $("#loginVerifyForeignNumberEmailForm").show();
+                    $("#email_resend_form").show();
+                    if (can_send_login_message) {
+                        can_send_login_message = false;
+                        startCountDown($("#email_count_down_timer")[0], function () {
+                            can_send_login_message = true;
+                            $("#email_count_down_timer").html("");
+                            $("#email_resend_button").attr("onclick", "resend_login_sms()");
+                            $("#email_resend_button").html("درخواست ارسال مجدد").css({ 'cursor': 'pointer', 'color': '#242424', 'font': '13px Miransans' });
+                            $("#email_resend_button").click(function () {
+                                $("#email_resend_button").css({ 'cursor': 'auto', 'color': '#ccc' });
+                            })
+                        });
+                    }
                     currentLoginStep = loginStepEnum.verifyEmail;
                 }
                 else {
@@ -297,6 +310,19 @@ function getForeignNumberEmail() {
         if (ret.status == 1) {
             $('.login_form').hide();
             $("#loginVerifyForeignNumberEmailForm").show();
+            $("#email_resend_form").show();
+            if (can_send_login_message) {
+                can_send_login_message = false;
+                startCountDown($("#email_count_down_timer")[0], function () {
+                    can_send_login_message = true;
+                    $("#email_count_down_timer").html("");
+                    $("#email_resend_button").attr("onclick", "resend_login_sms()");
+                    $("#email_resend_button").html("درخواست ارسال مجدد").css({ 'cursor': 'pointer', 'color': '#242424', 'font': '13px Miransans' });
+                    $("#email_resend_button").click(function () {
+                        $("#email_resend_button").css({ 'cursor': 'auto', 'color': '#ccc' });
+                    })
+                });
+            }
             currentLoginStep = loginStepEnum.verifyEmail;
         } else {
             alertify.error('کد وارد شده اشتباه است');
@@ -512,37 +538,6 @@ function login_verification() {
         });
 }
 
-//function registerEmail() {
-//    var email = $("#email").val();
-//    myajax("user/PopupRegisterEmail", "email=" + email,
-//        function (ret) {
-//            if (ret.status == 1) {
-//                $('.login_form').hide();
-//                $("#confirmEmailForm").show();
-//            }
-//            else {
-//                alertify.error(ret.msg);
-//            }
-//        });
-//}
-
-//function confirmEmail() {
-//    var emailCode = $("#emailCode").val();
-//    myajax("user/PopupConfirmEmail", "emailcode=" + emailCode,
-//        function (ret) {
-//            if (ret.status == 1) {
-//                $('.login__container').hide();
-//                $('.login__bg').hide();
-//                onLoginFinish();
-//                alertify.success("ایمیل شما با موفقیت ثبت شد");
-//                verifyEmail = true;
-//            }
-//            else {
-//                alertify.error("کد وارد شده اشتباه است");
-//            }
-//        });
-//}
-
 function resend_login_sms() {
     if (login_in_progress) {
         return;
@@ -555,6 +550,8 @@ function resend_login_sms() {
         if (ret.status == 1) {
             $("#resend_button").removeAttr("onclick");
             $("#resend_button").append('<span id="count_down_timer"></span>');
+            $("#email_resend_button").removeAttr("onclick");
+            $("#email_resend_button").append('<span id="email_count_down_timer"></span>');
             if (can_send_login_message) {
                 can_send_login_message = false;
                 startCountDown($("#count_down_timer")[0], function () {
@@ -563,10 +560,20 @@ function resend_login_sms() {
                     $("#resend_button").attr("onclick", "resend_login_sms()");
                     $("#resend_button").html("درخواست ارسال مجدد ").css({ 'cursor': 'pointer', 'color': '#242424' });
                 });
+                startCountDown($("#email_count_down_timer")[0], function () {
+                    can_send_login_message = true;
+                    $("#email_count_down_timer").html("");
+                    $("#email_resend_button").attr("onclick", "resend_login_sms()");
+                    $("#email_resend_button").html("درخواست ارسال مجدد").css({ 'cursor': 'pointer', 'color': '#242424', 'font': '13px Miransans' });
+                    $("#email_resend_button").click(function () {
+                        $("#email_resend_button").css({ 'cursor': 'auto', 'color': '#ccc' });
+                    })
+                });
             }
         }
     });
 }
+
 $(".icon-back").click(function () {
     can_send_login_message = true;
     $(".input-code").hide();
@@ -581,6 +588,7 @@ $(".icon-back").click(function () {
     //$("#mobile").prop("disabled", false).css({ 'cursor': 'pointer', 'opacity': '1' });
     //$(".iti__flag-container").prop("disabled", false).css({ 'cursor': 'pointer', 'opacity': '1' });
 });
+
 function resend_login_email(email) {
     if (login_in_progress) {
         return;
@@ -612,11 +620,13 @@ function resend_login_email(email) {
             });
     });
 }
+
 function restart_login() {
     $(".login_form").hide();
     $("#login_form").show();
 
 }
+
 function login_success(mobile, isNew) {
     //$("#fname").val(fname == null ? "" : fname);
     //$("#lname").val(lname == null ? "" : lname);
@@ -726,6 +736,7 @@ function show_email_verification_form(email, onDone) {
         onDone();
     }
 }
+
 $("#edit_mail_button").click(function () {
     $("#email_verification_form").hide();
     $("#resend_form_email").hide();
@@ -733,6 +744,7 @@ $("#edit_mail_button").click(function () {
     $("#login_form_email").show();
     $("#email").focus;
 })
+
 function verification_success() {
     alertify.success("با موفقیت وارد حساب خود شدید");
     let dashboardLink = $(".master_header-account");
@@ -761,6 +773,7 @@ function onMobileKeyPress(e) {
     if (e.which == 32)
         return false;
 }
+
 function check_login_mobile() {
     var number = intl.getNumber();
     console.log('number coming from intl: ' + number);
@@ -804,6 +817,7 @@ function startCountDown(elem, onDone) {
         }
     }, 1000);
 }
+
 $(function () {
     $('#mobile').keyup(function (e) {
         var ctrlKey = 67, vKey = 86;
@@ -812,6 +826,7 @@ $(function () {
         }
     });
 });
+
 function persianToEnglish(input) {
     var inputstring = input;
     var persian = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"]

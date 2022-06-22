@@ -693,7 +693,8 @@ namespace Amlakbashi.Host.Controllers
 
                 if (identityUser == null)
                 {
-                    user = new User() {
+                    user = new User()
+                    {
                         PhoneNumber = international_mobile,
                         AmlakbashiScore = 1000,
                         NoticesPhoneNumber = Entities.User.NoticesPhoneNumberEnum.PhoneNumber
@@ -936,20 +937,39 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(mobile_international);
                 if (identityUser != null)
                 {
-                    var code = identityUser.Code;
-                    if (string.IsNullOrEmpty(code) ||
-                        identityUser.SendVerification == null ||
-                        (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 10, 0, 0))
+                    if (identityUser.IsForeigner)
                     {
-                        code = new Random().Next(1111, 9999).ToString();
-                        userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                        if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null ||
+                        (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
+                        {
+                            identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
+                            identityUser.SendVerification = DateTime.Now;
+                            userService.UpdateIdentityUser(identityUser);
+                        }
+                        string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailCode}</b></div></div>";
+#if !DEBUG
+                        EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
+                            "املاک باشی: کد تایید ورود به حساب کاربری", strbody);
+#endif
                     }
+                    else
+                    {
+                        var code = identityUser.Code;
+                        if (string.IsNullOrEmpty(code) ||
+                            identityUser.SendVerification == null ||
+                            (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
+                        {
+                            code = new Random().Next(1111, 9999).ToString();
+                            userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                        }
 
-                    var mobileNumber = PhoneUtility.IsNumberForIran(mobile_international) ?
-                        PhoneUtility.InternationalNumberToLocal(mobile_international) :
-                        PhoneUtility.InternationalNumberToCallable(mobile_international);
-                    userService.SendVerificationSms(mobileNumber, code);
-                    ViewBag.msg = TempData["msg"];
+                        var mobileNumber = PhoneUtility.IsNumberForIran(mobile_international) ?
+                            PhoneUtility.InternationalNumberToLocal(mobile_international) :
+                            PhoneUtility.InternationalNumberToCallable(mobile_international);
+                        userService.SendVerificationSms(mobileNumber, code);
+                        ViewBag.msg = TempData["msg"];
+                        //return GenerateJsonResult(new { status = 1 });
+                    }
                     return GenerateJsonResult(new { status = 1 });
                 }
                 return GenerateJsonResult(new
@@ -1328,7 +1348,7 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_UserContact", userService.Find(user_id));
         }
 
-        #endregion
+#endregion
 
         [Authorize]
         public JsonResult IncreaseCredit(long price, long? reserveId = null,

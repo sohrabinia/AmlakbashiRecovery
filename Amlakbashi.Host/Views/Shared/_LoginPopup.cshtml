@@ -57,6 +57,7 @@
                     <p class="login__please-enter-mobile">لطفا <b>کد ارسال شده</b> به ایمیل ثبت شده خود را وارد کنید</p>
                     <p style="color: black; font-size: 10px;">در صورت عدم مشاهده ایمیل، لطفا قسمت اسپم (Spam) ایمیل خود را چک کنید.</p>
                     <input class="login__box-input" type="email" name="verifyEmailCode" id="verifyEmailCode" value="">
+                    @await Html.PartialAsync("_resend-form-login", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "email_resend_form" }, { "title", "درخواست ارسال مجدد" }, { "id_resend", "email_resend_button" }, { "id_count_down_timer", "email_count_down_timer" } })
                     <input id="btnVerifyForeignNumberEmailForm" type="submit" onclick="verifyForeignNumberEmail()" value="تایید ایمیل" class="login__box-button" />
                 </div>
                 @*<div id="login_form_email" class="login_form" style="display:none">
