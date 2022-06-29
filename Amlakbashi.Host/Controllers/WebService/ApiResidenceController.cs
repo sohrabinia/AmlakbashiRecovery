@@ -23,14 +23,14 @@ namespace Amlakbashi.Host.Controllers.WebService
     [ApiController]
     [Route("api/advertise")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class ApiAdvertiseController : ApiBaseController
+    public class ApiResidenceController : ApiBaseController
     {
         private readonly IAdvertiseAppService advertiseService;
         private readonly ICategoryAppService categoryService;
         private readonly IRegionAppService regionService;
         private readonly IUserAppService userService;
         private readonly ICacheManager cacheManager;
-        public ApiAdvertiseController(IAdvertiseAppService advertiseService,
+        public ApiResidenceController(IAdvertiseAppService advertiseService,
             ICategoryAppService categoryService,
             IRegionAppService regionService,
             IUserAppService userService,

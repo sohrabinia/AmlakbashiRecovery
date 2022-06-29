@@ -17,7 +17,7 @@ namespace Amlakbashi.Data
                 return;
             }
             context.Database.Migrate();
-            SeedData(context);
+            //SeedData(context);
         }
 
         private static void SeedData(AmlakbashiDB context)

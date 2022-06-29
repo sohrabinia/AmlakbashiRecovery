@@ -171,17 +171,16 @@
                 </ul>
             </nav>
             <main class="main">
-                @if (userAccessor.CurrentUser.Type == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Host)
+                @*@if (userAccessor.CurrentUser.Type == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Host)
                 {
                     <div class="" style="width:100%; text-align: center; direction: rtl; font: 14px Miransans; padding: 10px 20px; margin-bottom: 10px; border: 1px solid darkgray; background-color: #eee; border-radius: 5px;">
                         <span style="color: red;">توجه: </span>
                         در صورتی که به دستور مقامات و سازمان های دولتی و به دلیل همه گیری ویروس کرونا، امکان سفر مهمان طی روز های نوروز میسر نباشد، کلیه مبلغ رزرو به مهمان عودت می گردد.
                     </div>
-                }
+                }*@
 
                 <div class="" style="width:100%; text-align: center; direction: rtl; font: 14px Miransans; padding: 10px 20px; margin-bottom: 20px; border: 1px solid darkgray; background-color: #eee; border-radius: 5px;">
-                    @*<span style="color: red;">توجه: </span>*@
-                    کاربر گرامی، شماره حساب پاسارگاد دارید؟ اگر شبا پاسارگاد را ثبت کنید حتی در ایام تعطیل و نوروز هم واریزی های سایت ما بلافاصله به حساب شما خواهد نشست.
+                    کاربر گرامی، شماره حساب پاسارگاد دارید؟ اگر شبا پاسارگاد را ثبت کنید حتی در ایام تعطیل هم واریزی های سایت ما بلافاصله به حساب شما خواهد نشست.
                 </div>
 
                 @RenderBody()
@@ -319,13 +318,6 @@
         }
 
         $(document).ready(function () {
-            @*@{
-                var reserveToRate = ReserveDepend.GetReserveToRate();
-                if (reserveToRate != null)
-                {
-                    @:ratingDialog(@(reserveToRate.ReserveID));
-                }
-            }*@
             setTimeout(getReserveToRate, 5000);
             setTimeout(initializePresentPrize, 1000);
         });

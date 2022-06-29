@@ -40,8 +40,9 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public bool DisableAutoCancel { get; set; }
         public bool AccVisitedByGuest { get; set; }
         public bool ShouldFollow { get; set; }
-        public bool CanDoClearing { get; set; }
-        public bool MustDoClearing { get; set; }
+        public bool canBeDoneCheckout { get; set; }
+        public bool canBeDoneEarlyCheckout { get; set; }
+        public bool mustBeDoneCheckout { get; set; }
         public bool MustRefund { get; set; }
         public bool CanBePaidByHost { get; set; }
     }

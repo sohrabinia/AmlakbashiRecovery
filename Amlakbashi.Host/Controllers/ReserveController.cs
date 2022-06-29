@@ -161,8 +161,9 @@ namespace Amlakbashi.Host.Controllers
                 model.SupportStateColor = ReserveSupport.GetSupportStatusColor(supportStatus);
                 model.SupportStateString = ReserveSupport.GetSupportStatusString(supportStatus);
                 model.CanGrantSupport = canGrantSupport;
-                model.CanDoClearing = accounting.ReserveCanClear(reserve.Id);
-                model.MustDoClearing = model.CanDoClearing &&
+                model.canBeDoneCheckout = accounting.ReserveCanClear(reserve.Id);
+                model.canBeDoneEarlyCheckout = model.canBeDoneCheckout && reserve.EarlyCheckoutStatus == EarlyCheckoutEnum.ConfirmedByGuest;
+                model.mustBeDoneCheckout = model.canBeDoneCheckout &&
                     DateTimeUtility.GetSiteClearingDate(reserve.StartDate, reserve.EndDate) <= DateTime.Now;
                 bool refundDone;
                 model.MustRefund = accounting.ReserveShouldRefund(reserve.Id, reserve.Status, out refundDone) && !refundDone;
@@ -1610,35 +1611,35 @@ namespace Amlakbashi.Host.Controllers
             return Redirect(url);
         }
 
-        [Authorize]
-        public JsonResult SetHostCallDate(long reserve_id)
-        {
-            try
-            {
-                reserveService.UpdateHostCallDate(reserve_id, DateTime.Now);
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Reserve.SetHostCallDate", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
+        //[Authorize]
+        //public JsonResult SetHostCallDate(long reserve_id)
+        //{
+        //    try
+        //    {
+        //        reserveService.UpdateHostCallDate(reserve_id, DateTime.Now);
+        //        return GenerateJsonResult(new { status = 1 });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("Reserve.SetHostCallDate", exc);
+        //        return GenerateJsonResult(new { status = 0 });
+        //    }
+        //}
 
-        [Authorize]
-        public JsonResult SetGuestCallDate(long reserve_id)
-        {
-            try
-            {
-                reserveService.UpdateGuestCallDate(reserve_id, DateTime.Now);
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Reserve.SetGuestCallDate", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
+        //[Authorize]
+        //public JsonResult SetGuestCallDate(long reserve_id)
+        //{
+        //    try
+        //    {
+        //        reserveService.UpdateGuestCallDate(reserve_id, DateTime.Now);
+        //        return GenerateJsonResult(new { status = 1 });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("Reserve.SetGuestCallDate", exc);
+        //        return GenerateJsonResult(new { status = 0 });
+        //    }
+        //}
 
         [HttpGet]
         [Authorize]
@@ -2477,6 +2478,29 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.ReserveByPaymentReinquiry", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطا مواجه شد."
+                });
+            }
+        }
+
+        [Authorize]
+        public IActionResult UpdateEarlyCheckout(long reserveId, Reserve.EarlyCheckoutEnum earlyCheckout)
+        {
+            try
+            {
+                var result = reserveService.UpdateEarlyCheckout(reserveId, userAccessor.CurrentUser.Id, earlyCheckout);
+                return GenerateJsonResult(new
+                {
+                    status = result.HasError() ? 0 : 1,
+                    msg = result.GetErrors().FirstOrDefault()
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Reserve.ConfirmEarlyCheckout", exc);
                 return GenerateJsonResult(new
                 {
                     status = 0,

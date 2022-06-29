@@ -59,8 +59,8 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         void UpdateAccVisitedByGuest(long id, bool value);
         void UpdateDisableAutoCancel(long id, bool value);
         void UpdateExcludeGroup(long id, bool value);
-        void UpdateHostCallDate(long id, DateTime value);
-        void UpdateGuestCallDate(long id, DateTime value);
+        //void UpdateHostCallDate(long id, DateTime value);
+        //void UpdateGuestCallDate(long id, DateTime value);
         void UpdatePaymentHasError(long id, bool value);
         void UpdatePaymentHasError(IList<long> ids, bool value);
         void UpdateCanselDiscussion(long id, string text, User user);
@@ -86,5 +86,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         void SendReserveRequestCall(long reserveId);
         void SendPayReserveCall(long reserveId);
         bool ReserveByPaymentReinquiry(long reserveId, long paymentId, out string msg);
+        ServiceResult UpdateEarlyCheckout(long reserveId, int userId, Reserve.EarlyCheckoutEnum earlyCheckout);
     }
 }

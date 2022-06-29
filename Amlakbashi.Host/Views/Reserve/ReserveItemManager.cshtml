@@ -557,6 +557,7 @@
             var url = '/Reserve/GuestPayReserve?reserve_id=' + reserve_id + '&pay_reserve_type=1';
             window.location.href = url;
         }
+
         function finish(reserve_id) {
             //var advertise = guestAdvertiseRatingArray[index];
             myajax("Reserve/Finish", "reserve_id=" + reserve_id,
@@ -571,11 +572,13 @@
                     }
                 });
         }
+
         function rating(reserve_id) {
             ratingDialog(reserve_id, function(){
                 reserveDashboardHubConnection.invoke('reloadReserveItem', reserve_id);
             });
         }
+
         var mainChat = null;
         var chatInput = null;
         var cancel_discussion_box = null;
@@ -764,6 +767,55 @@
             });
         }
 
+        function requestEarlyCheckout(reserveId, isReserveStarted) {
+            if (isReserveStarted == false) {
+                showErrorMessage('تسویه', 'امکان تسویه رزرو پیش از شروع سفر وجود ندارد.');
+                return;
+            }
+            showNoYesMessage('درخواست تسویه پیش از موعد',
+                'میزبان گرامی، توجه فرمایید که برای تسویه پیش از موعد مقرر سایت، نیاز به تایید مهمان می باشد.' +
+                '<br/><br/>' +
+                'آیا درخواست تسویه پیش از موعد مقرر ثبت شود؟',
+                function () {
+                    myajax("reserve/updateearlycheckout", "reserveId=" + reserveId + "&earlycheckout=" + 1, function (ret) {
+                        if (ret.status == 1) {
+                            $("div[data-id='" + reserveId + "'] #request_early_checkout_btn").hide();
+                            alertify.success('درخواست شما ثبت شد');
+                        }
+                        else {
+                            alertify.error(ret.msg);
+                        }
+                    });
+                });
+        }
+
+        function confirmEarlyCheckout(reserveId, isReserveStarted, isRequestByHost) {
+            if (isReserveStarted === false) {
+                showErrorMessage('تسویه', 'امکان تسویه رزرو پیش از شروع سفر وجود ندارد.');
+                return;
+            }
+            if (isRequestByHost === false) {
+                showErrorMessage('تسویه', 'میزبان درخواست تسویه پیش از موعد نداده است.');
+                return;
+            }
+            showNoYesMessage('تسویه پیش از موعد با میزبان',
+                'مهمان گرامی، پیش از تایید این گزینه، لطفا از صحت اطلاعات مندرج در آگهی و محل اقامت خود اطمینان حاصل کنید. ' +
+                'زیرا پس از تایید شما، در صورت بروز مشکل، بازگردانی وجه پرداختی شما از جانب سایت امکانپذیر نمی باشد.' +
+                '<br/><br/>' +
+                'آیا از تسویه با میزبان، پیش از موعد مقرر مطمئن هستید؟',
+                function () {
+                    myajax("reserve/updateearlycheckout", "reserveId=" + reserveId + "&earlycheckout=" + 2, function (ret) {
+                        if (ret.status == 1) {
+                            $("div[data-id='" + reserveId + "'] #confirm_early_checkout_btn").hide();
+                            alertify.success('تسویه پیش از موعد رزرو مورد نظر فعال شد');
+                        }
+                        else {
+                            alertify.error(ret.msg);
+                        }
+                    });
+                });
+        }
+
         function confirmAndContactUser(user_id, onClose, extra_msg, reserve_id, is_guest)
         {
             $.confirm({
@@ -782,19 +834,21 @@
                 },
             });
         }
+
         function contactUser(user_id, onClose, extra_msg, reserve_id, is_guest) {
             if (extra_msg !== ""){
                 confirmAndContactUser(user_id, onClose, extra_msg, reserve_id, is_guest);
                 return;
             }
-            if (is_guest) {
-                myajax('Reserve/SetGuestCallDate','reserve_id='+ reserve_id ,null,false);
-            }
-            else {
-                myajax('Reserve/SetHostCallDate','reserve_id=' + reserve_id ,null,false);
-            }
+            //if (is_guest) {
+            //    myajax('Reserve/SetGuestCallDate','reserve_id='+ reserve_id ,null,false);
+            //}
+            //else {
+            //    myajax('Reserve/SetHostCallDate','reserve_id=' + reserve_id ,null,false);
+            //}
             showInfoMessage('  شماره تماس  ' ,'', {contentUrl:'/User/ContactUserPopup?user_id=' + user_id});
         }
+
         function showRules( adcertise_rules , id_reserve ){
             if ($(id_reserve)){
                 var rules_string;

@@ -666,14 +666,13 @@ namespace Amlakbashi.Accounting
             excludingPayments = new List<Reserve>();
             foreach (var item in reserves)
             {
-                if (item.ExcludeGroupPayment)
-                {
-                    excludingPayments.Add(item);
-                    continue;
-                }
+                //if (item.ExcludeGroupPayment)
+                //{
+                //    excludingPayments.Add(item);
+                //    continue;
+                //}
                 var bankCard = repository.FindBankCardByUserId(item.HostUserID);
-                if (bankCard == null || string.IsNullOrEmpty(bankCard.BankCardNumber) ||
-                    item.PaymentHasError)
+                if (bankCard == null || string.IsNullOrEmpty(bankCard.BankCardNumber) /*|| item.PaymentHasError*/)
                 {
                     paymentsWithError.Add(item);
                     continue;

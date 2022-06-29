@@ -165,5 +165,31 @@ namespace Amlakbashi.Host.Controllers.WebService
             }
             return Ok();
         }
+
+        [HttpPost("earlycheckout/request")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
+        public IActionResult RequestEarlyCheckoutByHost(ReserveEarlyCheckoutRequest request)
+        {
+            var result = reserveService.UpdateEarlyCheckout(request.reserveId, User.GetId(),
+                Reserve.EarlyCheckoutEnum.RequestedByHost);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok();
+        }
+
+        [HttpPost("earlycheckout/confirm")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Guest)]
+        public IActionResult ConfirmEarlyCheckoutByGuest(ReserveEarlyCheckoutRequest request)
+        {
+            var result = reserveService.UpdateEarlyCheckout(request.reserveId, User.GetId(),
+                Reserve.EarlyCheckoutEnum.ConfirmedByGuest);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok();
+        }
     }
 }

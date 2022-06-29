@@ -4,14 +4,16 @@ using Amlakbashi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Amlakbashi.Data.Migrations
 {
     [DbContext(typeof(AmlakbashiDB))]
-    partial class AmlakbashiDBModelSnapshot : ModelSnapshot
+    [Migration("20220627112147_update-reserve-properties-and-add-earlycheckout")]
+    partial class updatereservepropertiesandaddearlycheckout
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1457,8 +1459,8 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<bool>("DisableAutoCancel")
                         .HasColumnType("bit");
 
-                    b.Property<int>("EarlyCheckoutStatus")
-                        .HasColumnType("int");
+                    b.Property<bool>("EarlyCheckout")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -2415,19 +2417,19 @@ namespace Amlakbashi.Data.Migrations
                     b.HasOne("Amlakbashi.Core.Entities.Advertise", "Advertise")
                         .WithMany("Reserves")
                         .HasForeignKey("AdvertiseID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Amlakbashi.Core.Entities.User", "HostUser")
                         .WithMany("HostReserves")
                         .HasForeignKey("HostUserID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Amlakbashi.Core.Entities.User", "GuestUser")
                         .WithMany("Reserves")
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Advertise");

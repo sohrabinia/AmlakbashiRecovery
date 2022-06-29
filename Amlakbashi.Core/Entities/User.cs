@@ -51,6 +51,10 @@ namespace Amlakbashi.Core.Entities
         public virtual ICollection<Reserve> HostReserves { get; set; }
 
         [JsonIgnore]
+        [InverseProperty("GuestUser")]
+        public virtual ICollection<Reserve> Reserves { get; set; }
+
+        [JsonIgnore]
         public virtual ICollection<Advertise> Advertises { get; set; }
 
         [JsonIgnore]
@@ -87,10 +91,6 @@ namespace Amlakbashi.Core.Entities
         [JsonIgnore]
         [InverseProperty("Supporter")]
         public virtual ICollection<ReserveSupport> ReserveSupportsAsSupporter { get; set; }
-
-        [JsonIgnore]
-        [InverseProperty("GuestUser")]
-        public virtual ICollection<Reserve> Reserves { get; set; }
 
         #region Functions
 

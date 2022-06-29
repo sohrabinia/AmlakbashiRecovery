@@ -1,5 +1,4 @@
-﻿using Amlakbashi.Core.Common.Entity;
-using Amlakbashi.Core.Common.Utilities;
+﻿using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities.Interfaces;
 using Newtonsoft.Json;
 using System;
@@ -10,58 +9,76 @@ using static Amlakbashi.Core.Entities.ReservePayment;
 
 namespace Amlakbashi.Core.Entities
 {
-    public class Reserve : Entity<long>, IReserve, ISoftDelete
+    public class Reserve : Entity<long>, IReserve
     {
         #region Properties
-        [Column("ReserveID")]
+
+        [Column("Id")]
         public override long Id { get; set; }
+        public DateTime CreateDate { get; set; }
         public ReserveStatus Status { get; set; }
+
+        [Column("GuestId")]
         public int UserID { get; set; }
+
+        [Column("HostId")]
         public int HostUserID { get; set; }
+
+        [Column("ResidenceId")]
         public long AdvertiseID { get; set; }
         public HostResponseEnum HostResponse { get; set; }
+        public DateTime HostResponseDate { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public int NumberOfGuests { get; set; }
+        public bool InstantReserve { get; set; }
+        public bool InstantReserveCancelHost { get; set; }
         public long TotalPrice { get; set; }
         public long DepositPrice { get; set; }
-        public int NumberOfGuests { get; set; }
-        public ReserveStatus CancelState { get; set; }
-        public DateTime? CancelDate { get; set; }
-        public string CancelReason { get; set; }
-        public DateTime CreateDate { get; set; }
-        public DateTime HostResponseDate { get; set; }
-        public DateTime? HostCallDate { get; set; }
-        public DateTime? GuestCallDate { get; set; }
-        public bool PaymentGTAGRegistered { get; set; }
-        public string SupportInfo { get; set; }
-        public int SupportState { get; set; }
-        public string SupporterIds { get; set; }
-        public bool RatingShownToGuest { get; set; }
-        public bool shouldFollow { get; set; }
-        public int GuestCallState { get; set; }
-        public int HostCallState { get; set; }
-        public string CancelDiscussion { get; set; }
-        public bool PaymentHasError { get; set; }
-        public bool ExcludeGroupPayment { get; set; }
-        public bool InstantReserve { get; set; }
-        public bool Archive { get; set; }
-        public bool InstantReserveCancelHost { get; set; }
+
+        [Column("CouponId")]
         public long CouponID { get; set; }
         public long CouponPrice { get; set; }
-        public long PrizePrice { get; set; }
-        public long PrizeTransactionID { get; set; }
         public long CouponCalculationPrice { get; set; }
-        public bool DisableAutoCancel { get; set; }
-        public bool AccVisitedByGuest { get; set; }
-        public bool IsDeleted { get; set; }
+        public long PrizePrice { get; set; }
 
-        [ForeignKey("AdvertiseID")]
+        [Column("PrizeTransactionId")]
+        public long PrizeTransactionID { get; set; }
+        //public bool EarlyCheckout { get; set; }
+        public EarlyCheckoutEnum EarlyCheckoutStatus { get; set; }
+        public DateTime? CancelDate { get; set; }
+        public ReserveStatus CancelState { get; set; }
+        public string CancelReason { get; set; }
+        public string CancelDiscussion { get; set; }
+        public int HostCallState { get; set; }
+        public int GuestCallState { get; set; }
+        public string SupportInfo { get; set; }
+
+        [Column("ShouldFollowUp")]
+        public bool shouldFollow { get; set; }
+        public bool DisableAutoCancel { get; set; }
+
+        [Column("VisitResidenceByGuest")]
+        public bool AccVisitedByGuest { get; set; }
+        public bool Archive { get; set; }
+        public bool RatingShownToGuest { get; set; }
+        public bool PaymentGTAGRegistered { get; set; }
+
+        //public bool PaymentHasError { get; set; }
+        //public DateTime? HostCallDate { get; set; }
+        //public DateTime? GuestCallDate { get; set; }
+        //public int SupportState { get; set; }
+        //public string SupporterIds { get; set; }
+        //public bool ExcludeGroupPayment { get; set; }
+        //public bool IsDeleted { get; set; }
+
+        [ForeignKey(nameof(AdvertiseID))]
         public virtual Advertise Advertise { get; set; }
 
-        [ForeignKey("UserID")]
+        [ForeignKey(nameof(UserID))]
         public virtual User GuestUser { get; set; }
 
-        [ForeignKey("HostUserID")]
+        [ForeignKey(nameof(HostUserID))]
         public virtual User HostUser { get; set; }
 
         [JsonIgnore]
@@ -85,8 +102,9 @@ namespace Amlakbashi.Core.Entities
 
         public int InitialPriority;
         public int Priority;
-        public long Temp_HostPayablePrice;
+        //public long Temp_HostPayablePrice;
 
+        [NotMapped]
         public long TotalPayablePrice
         {
             get
@@ -98,7 +116,12 @@ namespace Amlakbashi.Core.Entities
         public static string[] CancelReasons = { };
 
         #region Enums
-        public enum StatusStringType { Guest = 0, Host = 1, Site = 2 }
+        public enum StatusStringType 
+        { 
+            Guest = 0, 
+            Host = 1, 
+            Site = 2 
+        }
 
         public enum ReserveStatus
         {
@@ -150,6 +173,7 @@ namespace Amlakbashi.Core.Entities
             Guest = 1,
             Host = 2
         }
+
         public enum GuestPayResult
         {
             AlreadyPaid = 0,
@@ -159,6 +183,14 @@ namespace Amlakbashi.Core.Entities
             NotEnoughCredit = 4,
             Paid = 5,
         }
+
+        public enum EarlyCheckoutEnum
+        {
+            Unset = 0,
+            RequestedByHost = 1,
+            ConfirmedByGuest = 2
+        }
+
         #endregion
 
         #region Functions

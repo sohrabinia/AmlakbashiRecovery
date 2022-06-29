@@ -12,25 +12,14 @@ namespace Amlakbashi.Core.Entities
     /// </summary>
     public class Payment : Entity<int>
     {
-        //[Column("Id")]
         public override int Id { get; set; }
         public int UserID { get; set; }
-
-        //[Column("TransactionId")]
         public string TransactionId { get; set; }
-
-        //[Column("ReferenceNumber")]
         public long ReferenceNumber { get; set; }
         public string TraceNumber { get; set; }
-
-        //[Column("Amount")]
         public long Amount { get; set; }
-
-        //[Column("CreateDate")]
         public DateTime CreateDate { get; set; }
         public DateTime? PayDate { get; set; }
-
-        //[Column("Bank")]
         public BankEnum Bank { get; set; }
         public PaymentStatus Status { get; set; }
         public PaymentType Type { get; set; }

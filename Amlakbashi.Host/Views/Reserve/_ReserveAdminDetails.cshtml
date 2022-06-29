@@ -118,15 +118,21 @@ else
             <i class="fas fa-donate" title="افزودن پرداخت مهمان" onclick="addGuestPayment(@Model.Id)"></i>
             <a asp-controller="reservepayment" asp-action="index" asp-route-reserve_Id="@Model.Id" target="_blank" class="fas fa-file-invoice-dollar" title="لیست پرداخت ها"></a>
             <a asp-controller="payment" asp-action="index" asp-route-reserveId="@Model.Id" target="_blank" class="fa fa-credit-card" title="لیست پرداخت های آنلاین"></a>
-            @if (Model.MustDoClearing)
+
+            @if (Model.mustBeDoneCheckout)
             {
                 <i class="fas fa-money-check-alt clearing-btn" onclick="showSiteClearingHostPopup(@Model.Id)" style="color:orange;" title="تسویه میزبان"></i>
                 <i class="fas fa-wallet clearing-btn" onclick="siteClearingHostWithCredit(@Model.Id, this)" style="color:orange;" title="تسویه میزبان با کیف پول"></i>
             }
-            else if (Model.CanDoClearing)
+            else if (Model.canBeDoneEarlyCheckout)
             {
-                <i class="fas fa-money-check-alt clearing-btn" onclick="showSiteClearingHostPopup(@Model.Id)" style="color:green;" title="تسویه میزبان"></i>
-                <i class="fas fa-wallet clearing-btn" onclick="siteClearingHostWithCredit(@Model.Id, this)" style="color:green;" title="تسویه میزبان با کیف پول"></i>
+                <i class="fas fa-money-check-alt clearing-btn" onclick="showSiteClearingHostPopup(@Model.Id)" style="color:green;" title="تسویه میزبان (پیش از موعد)"></i>
+                <i class="fas fa-wallet clearing-btn" onclick="siteClearingHostWithCredit(@Model.Id, this)" style="color:green;" title="تسویه میزبان با کیف پول (پیش از موعد)"></i>
+            }
+            else if (Model.canBeDoneCheckout)
+            {
+                <i class="fas fa-money-check-alt clearing-btn" onclick="showSiteClearingHostPopup(@Model.Id)" title="تسویه میزبان"></i>
+                <i class="fas fa-wallet clearing-btn" onclick="siteClearingHostWithCredit(@Model.Id, this)" title="تسویه میزبان با کیف پول"></i>
             }
             @if (Model.MustRefund)
             {

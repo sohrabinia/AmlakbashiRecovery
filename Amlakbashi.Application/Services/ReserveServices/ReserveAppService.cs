@@ -115,7 +115,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             {
                 reserves = reserves.Where(x => x.HostUserID == dto.HostUserId);
             }
-            if (!string.IsNullOrEmpty(dto.SiteClearingDate))
+            if (string.IsNullOrEmpty(dto.SiteClearingDate) == false)
             {
                 reserves = reserves.Where(x => x.Status == Reserve.ReserveStatus.Reserved ||
                     x.Status == Reserve.ReserveStatus.Started ||
@@ -123,8 +123,16 @@ namespace Amlakbashi.Application.Services.ReserveServices
                     x.Status == Reserve.ReserveStatus.CashPay);
                 var gregorian_clearing_date = DateTimeUtility.PersianDateToGregorian(
                     StringUtility.PersianNumberToEnglish(dto.SiteClearingDate).Replace('/', ','));
-                reserves = reserves.Where(w => (EF.Functions.DateDiffDay(w.StartDate, w.EndDate) > 1 ?
+                if (gregorian_clearing_date == DateTime.Now.Date)
+                {
+                    reserves = reserves.Where(w => (EF.Functions.DateDiffDay(w.StartDate, w.EndDate) > 1 ?
+                    w.StartDate.AddDays(2) : w.EndDate) <= gregorian_clearing_date || w.EarlyCheckoutStatus == EarlyCheckoutEnum.ConfirmedByGuest);
+                }
+                else
+                {
+                    reserves = reserves.Where(w => (EF.Functions.DateDiffDay(w.StartDate, w.EndDate) > 1 ?
                     w.StartDate.AddDays(2) : w.EndDate) <= gregorian_clearing_date);
+                }
             }
             if (dto.StayDurationFrom > 0)
             {
@@ -865,7 +873,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             }
 
             if (reserve.InstantReserve &&
-                !reserve.InstantReserveCancelHost &&
+                reserve.InstantReserveCancelHost == false &&
                 dto.Status == Reserve.ReserveStatus.CanceledByHost &&
                 accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(), Reserve.StatusStringType.Guest) > 0)
             {
@@ -906,7 +914,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public void UpdateShouldFollow(long id, string text, User user)
         {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
+            var data = Repository.Find(id);
             data.shouldFollow = !data.shouldFollow;
             if (data.shouldFollow)
             {
@@ -918,7 +926,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public void UpdateSupporterInfo(long id, string text, User user)
         {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
+            var data = Repository.Find(id);
             data.AddSupportInfo(text, user);
             Repository.Update(data);
             Repository.Save();
@@ -926,7 +934,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public void UpdateRatingShownToGuest(long id, bool showRate)
         {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
+            var data = Repository.Find(id);
             data.RatingShownToGuest = showRate;
             Repository.Update(data);
             Repository.Save();
@@ -934,7 +942,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public void UpdatePaymentGTAGRegistered(long id, bool value)
         {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
+            var data = Repository.Find(id);
             data.PaymentGTAGRegistered = value;
             Repository.Update(data);
             Repository.Save();
@@ -942,7 +950,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public void UpdateDisableAutoCancel(long id, bool value)
         {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
+            var data = Repository.Find(id);
             data.DisableAutoCancel = value;
             Repository.Update(data);
             Repository.Save();
@@ -950,31 +958,31 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public void UpdateAccVisitedByGuest(long id, bool value)
         {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
+            var data = Repository.Find(id);
             data.AccVisitedByGuest = value;
             Repository.Update(data);
             Repository.Save();
         }
 
-        public void UpdateHostCallDate(long id, DateTime value)
-        {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            data.HostCallDate = value;
-            Repository.Update(data);
-            Repository.Save();
-        }
+        //public void UpdateHostCallDate(long id, DateTime value)
+        //{
+        //    var data = Repository.Find(id);
+        //    data.HostCallDate = value;
+        //    Repository.Update(data);
+        //    Repository.Save();
+        //}
 
-        public void UpdateGuestCallDate(long id, DateTime value)
-        {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            data.GuestCallDate = value;
-            Repository.Update(data);
-            Repository.Save();
-        }
+        //public void UpdateGuestCallDate(long id, DateTime value)
+        //{
+        //    var data = Repository.Find(id);
+        //    data.GuestCallDate = value;
+        //    Repository.Update(data);
+        //    Repository.Save();
+        //}
 
         public int UpdateCallState(long id, string hostOrGuest)
         {
-            var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
+            var data = Repository.Find(id);
             var newState = 0;
             if (hostOrGuest == "h")
             {
@@ -1067,7 +1075,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
         public void UpdateExcludeGroup(long id, bool value)
         {
             var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            data.ExcludeGroupPayment = value;
+            //data.ExcludeGroupPayment = value;
             Repository.Update(data);
             Repository.Save();
         }
@@ -1075,7 +1083,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
         public void UpdatePaymentHasError(long id, bool value)
         {
             var data = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            data.PaymentHasError = value;
+            //data.PaymentHasError = value;
             Repository.Update(data);
             Repository.Save();
         }
@@ -1085,7 +1093,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var data = Repository.Query(q => q.Where(w => ids.Contains(w.Id)));
             foreach (var item in data)
             {
-                item.PaymentHasError = value;
+                //item.PaymentHasError = value;
                 Repository.Update(item);
             }
             Repository.Save();
@@ -1556,6 +1564,33 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
             msg = "عملیات با موفقیت انجام شد";
             return true;
+        }
+
+        public ServiceResult UpdateEarlyCheckout(long reserveId, int userId, Reserve.EarlyCheckoutEnum earlyCheckout)
+        {
+            var serviceResult = new ServiceResult();
+            var reserve = Repository.Find(reserveId);
+            if (reserve == null || reserve.Status != ReserveStatus.Started)
+            {
+                serviceResult.AddError("کد رزرو اشتباه است");
+                return serviceResult;
+            }
+            if ((earlyCheckout == EarlyCheckoutEnum.ConfirmedByGuest && reserve.UserID != userId) ||
+                (earlyCheckout == EarlyCheckoutEnum.RequestedByHost && reserve.HostUserID != userId))
+            {
+                serviceResult.AddError("شما مجوز این عملیات را ندارید");
+                return serviceResult;
+            }
+            if (earlyCheckout == EarlyCheckoutEnum.ConfirmedByGuest && reserve.EarlyCheckoutStatus != EarlyCheckoutEnum.RequestedByHost)
+            {
+                serviceResult.AddError("درخواست تسویه پیش از موعد از طرف میزبان ثبت نشده است");
+                return serviceResult;
+            }
+
+            reserve.EarlyCheckoutStatus = earlyCheckout;
+            Repository.Update(reserve);
+            Repository.Save();
+            return serviceResult;
         }
 
         private Reserve Insert(Reserve reserve)

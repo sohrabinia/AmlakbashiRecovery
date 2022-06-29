@@ -37,6 +37,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public bool cancelIsAvailable { get; set; }
         public string rulesString { get; set; }
         public bool isRecently { get; set; }
+        public EarlyCheckoutEnum earlyCheckout { get; set; }
 
         public static ReserveDashboardItemDTO Generate(Reserve reserve,
             int index, bool isGuest, bool isHostler, int userId, long paidAmount,
@@ -76,6 +77,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             dto.cancelIsAvailable = (isGuest && Reserve.CancelIsAvailableForGuest((int)reserve.Status)) ||
                 (isHostler && Reserve.CancelIsAvailableForHost((int)reserve.Status));
             dto.isRecently = (DateTime.Now - reserve.CreateDate).TotalHours <= 24 ? true : false;
+            dto.earlyCheckout = reserve.EarlyCheckoutStatus;
             return dto;
         }
     }

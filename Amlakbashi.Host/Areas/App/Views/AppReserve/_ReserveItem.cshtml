@@ -2,7 +2,6 @@
 @model Amlakbashi.Core.DTOs.ReserveDTOs.ReserveDashboardItemDTO
 
 @{
-    //string adv_link = string.Format("/{0}/{1}", "اجاره-روزانه", Model.advertiseSlug);
     string adv_link = $"/app/advertise/item/{Model.advertiseId}";
     var img_src = Model.advertisePhotoId > 0 ? string.Format("/عکس-آگهی/{0}", Model.advertiseSlug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
 
@@ -127,13 +126,22 @@
             <div onclick="confirmCashPay(@(Model.reserveId),false)" class="reserve-dashboard__item-container-button bottun_bill_reserve">
                 @*<i class="fa fa-ban"></i>*@
                 مبلغ را به صورت نقدی دریافت نکردم
-            </div> 
+            </div>
         }
         else if (Model.status == Reserve.ReserveStatus.CancelRequestByHost)
         {
             <div onclick="refuseCancelReserve(@Model.reserveId,true)" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
                 انصراف از لغو
             </div>
+        }
+        if (Model.status == Reserve.ReserveStatus.Reserved || Model.status == Reserve.ReserveStatus.Started)
+        {
+            if (Model.earlyCheckout == Reserve.EarlyCheckoutEnum.Unset)
+            {
+                <div id="request_early_checkout_btn" onclick="requestEarlyCheckout(@Model.reserveId, @(Model.status == Reserve.ReserveStatus.Started ? "true" : "false"))" class="reserve-dashboard__item-container-button" style="order: 5; color: black; border: 1px solid black;">
+                    درخواست تسویه
+                </div>
+            }
         }
         switch ((Reserve.ReserveStatus)Model.status)
         {
@@ -260,12 +268,17 @@
                 انصراف از لغو
             </div>
         }
-        @*else if (Model.Status == (int)Reserve.ReserveStatus.Completed)
+
+        if (Model.status == Reserve.ReserveStatus.Reserved ||
+            Model.status == Reserve.ReserveStatus.Started)
+        {
+            if (Model.earlyCheckout != Reserve.EarlyCheckoutEnum.ConfirmedByGuest)
             {
-                <div onclick="rating(@Model.Id)" class="reserve-dashboard__item-container-button" style="background-color:#4285F4">
-                    <span>نظرسنجی</span>
+                <div id="confirm_early_checkout_btn" onclick='confirmEarlyCheckout(@Model.reserveId, @(Model.status == Reserve.ReserveStatus.Started ? "true" : "false"), @(Model.earlyCheckout == Reserve.EarlyCheckoutEnum.RequestedByHost ? "true" : "false"))' class="reserve-dashboard__item-container-button" style="order: 5; color: black; border: 1px solid black;">
+                    تسویه با میزبان
                 </div>
-            }*@
+            }
+        }
         if (Model.status == Reserve.ReserveStatus.Started ||
             Model.status == Reserve.ReserveStatus.Completed)
         {
@@ -293,17 +306,17 @@
     }
     @if (Model.cancelIsAvailable)
     {
-<div onclick="cancelReserve(@Model.reserveId,@(Model.isHostler ? "true" : "false"), @(Model.instantReserve ? "true" : "false"), @((int)Model.status > 4 && (int)Model.status < 9 ? "true" : "false"))" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
-    @*<i class="fa fa-times"></i>*@
-    @if (Model.status == Reserve.ReserveStatus.WaitForReserve || Model.status == Reserve.ReserveStatus.WaitForResponse)
-    {
-        @:لغو رزرو
-    }
-    else
-    {
-        @:درخواست لغو رزرو
-    }
-</div>
+        <div onclick="cancelReserve(@Model.reserveId,@(Model.isHostler ? "true" : "false"), @(Model.instantReserve ? "true" : "false"), @((int)Model.status > 4 && (int)Model.status < 9 ? "true" : "false"))" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
+            @*<i class="fa fa-times"></i>*@
+            @if (Model.status == Reserve.ReserveStatus.WaitForReserve || Model.status == Reserve.ReserveStatus.WaitForResponse)
+            {
+                @:لغو رزرو
+            }
+            else
+            {
+                @:درخواست لغو رزرو
+            }
+        </div>
     }
     @if (Model.isHostler && Model.status != Reserve.ReserveStatus.Rejected)
     {

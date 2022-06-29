@@ -73,6 +73,10 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                     //{
                     //    is_holiday_pike = true;
                     //}
+                    if (jalaliDate == "1401,4,26")
+                    {
+                        is_holiday_pike = true;
+                    }
                     // ##########
 
                     if (is_norouz && advertise.NorouzPrice > 0)
