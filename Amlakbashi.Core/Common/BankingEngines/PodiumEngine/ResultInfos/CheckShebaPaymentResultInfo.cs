@@ -8,14 +8,18 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.ResultInfos
     [Serializable]
     public class CheckShebaPaymentResultInfo : PodiumResultInfo
     {
-        public CheckShebaPaymentResultData Data { get; set; }
+        public CheckShebaPaymentResultData ResultData { get; set; }
     }
 
     [Serializable]
     public class CheckShebaPaymentResultData
     {
-        public string RefrenceNumber { get; set; }
-        public string Key { get; set; }
-        public string Value { get; set; }
+        public string TransactionNumber { get; set; }
+        public string TransactionDate { get; set; }
+        public string TransactionTime { get; set; }
+        public string BankName { get; set; }
+        public string State { get; set; }
+        public int Amount { get; set; }
+        public int BranchId { get; set; }
     }
 }

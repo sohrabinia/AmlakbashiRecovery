@@ -7,8 +7,6 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.RequestInfos
     [Serializable]
     public class ShebaVerificationRequestInfo : PodiumRequestInfo
     {
-        public string UserName { get; set; }
-        public string Sheba { get; set; }
-        public string Timestamp { get; set; }
+        public string Iban { get; set; }
     }
 }

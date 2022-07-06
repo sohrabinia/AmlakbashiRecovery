@@ -7,7 +7,6 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
 {
     public class ShebaPaymentRequestDTO
     {
-        public string DestDepositNumber { get; set; }
         public string DestSheba { get; set; }
         public string DestFirstName { get; set; }
         public string DestLastName { get; set; }
@@ -17,5 +16,6 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
         public string DestComment { get; set; }
         public long PaymentId { get; set; }
         public DateTime Timestamp { get; set; }
+        public string TransactionId { get; set; }
     }
 }

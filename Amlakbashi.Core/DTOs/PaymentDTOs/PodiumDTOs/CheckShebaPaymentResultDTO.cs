@@ -8,8 +8,11 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
     public class CheckShebaPaymentResultDTO : BankingResultDTO
     {
         public string RefrenceNumber { get; set; }
-        public string Key { get; set; }
-        public string Value { get; set; }
+        public string Status { get; set; }
+        public string TransactionDate { get; set; }
+        public string TransactionTime { get; set; }
+        public string BankName { get; set; }
+        public int Amount { get; set; }
         public Payment.PaymentStatus PaymentStatus { get; set; }
         public int PaymentId { get; set; }
     }

@@ -57,9 +57,9 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                 CancelInstantReserveLimit = user.CancelInstantReserveLimit,
                 InstantReserveCancelCount = user.Advertises.Sum(x => x.InstantReserveCancels),
                 EmailAddress = identityUser.Email,
-                LastSendedEmailCode = identityUser.EmailCode,
-                LastSendedSmsCode = identityUser.Code,
-                UserState = identityUser.State,
+                LastSendedEmailCode = identityUser.EmailVerifyCode,
+                LastSendedSmsCode = identityUser.VerifyCode,
+                UserState = identityUser.Status,
                 OwnerShip = user.OwnerShip,
                 ContactPhone = string.IsNullOrEmpty(user.ContactPhone) == false && user.ContactPhone == "1",
                 ForbiddenRegionsAccess = user.ForbiddenRegionsAccess

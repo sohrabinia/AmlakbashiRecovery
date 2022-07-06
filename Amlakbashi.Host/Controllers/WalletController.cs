@@ -205,7 +205,9 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new
                 {
                     status = result.HasError ? 0 : 1,
-                    msg = result.HasError ? result.ErrorMessage : result.Message
+                    msg = result.HasError ? result.ErrorMessage : result.Message,
+                    traceNumber = result.TraceNumber,
+                    recieverFullName = result.RecieverFullName
                 });
             }
             catch (Exception exc)

@@ -36,5 +36,14 @@ namespace Amlakbashi.Core.Common.Utilities
             var is_valid = sum % 10 == 0;
             return is_valid;
         }
+
+        public static string GeneratePodiumTransactionId()
+        {
+            var orgCode = "4321";
+            var randomString = "27184910";
+            var timestamp = DateTimeUtility.DateValueOfJS(DateTime.Now);
+            var asciiValue = Encoding.ASCII.GetBytes($"{orgCode}{randomString}{timestamp}").Sum(x => x);
+            return $"{orgCode}-{randomString}-{timestamp}-{asciiValue}";
+        }
     }
 }

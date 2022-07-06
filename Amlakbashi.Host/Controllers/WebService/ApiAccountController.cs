@@ -80,8 +80,8 @@ namespace Amlakbashi.Host.Controllers.WebService
                 isNewUser = true,
                 guid = identityUser.Id,
                 username = identityUser.UserName,
-                state = identityUser.State,
-                stateDesc = identityUser.State.ToString(),
+                state = identityUser.Status,
+                stateDesc = identityUser.Status.ToString(),
                 IsForeigner = identityUser.IsForeigner
             });
         }
@@ -89,7 +89,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         private async Task<IActionResult> Login(LoginRequest request)
         {
             var identityUser = await userService.FindIdentityByUsernameAsync(request.phoneNumber);
-            if (identityUser.State == Entities.User.UserState.Suspend)
+            if (identityUser.Status == Entities.User.UserState.Suspend)
             {
                 return StatusCode(StatusCodes.Status403Forbidden);
             }
@@ -110,8 +110,8 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok(new {
                 guid = identityUser.Id,
                 username = identityUser.UserName,
-                state = identityUser.State,
-                stateDesc = identityUser.State.ToString(),
+                state = identityUser.Status,
+                stateDesc = identityUser.Status.ToString(),
                 IsForeigner = identityUser.IsForeigner,
                 isNewUser = false,
             });

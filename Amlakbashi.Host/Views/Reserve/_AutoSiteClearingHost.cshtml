@@ -53,7 +53,9 @@ else
                 }
                 else {
                     reserveAdminHubConnection.invoke('reserveCleared', @ViewBag.reserveId);
-                    showInfoMessage('پرداخت موفق', '<p style="color: blue;">' + response.msg + '</p>');
+                    showInfoMessage('پرداخت موفق', '<p style="color: blue;">' + response.msg + '</p>' +
+                        '<br/>' + '<p>شماره پیگیری: ' + response.traceNumber + '</p>' +
+                        '<p>نام دریافت کننده وجه: ' + response.recieverFullName + '</p>');
                     if (typeof hidePopup === 'function') {
                         hidePopup();
                     }

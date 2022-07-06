@@ -3,13 +3,17 @@ using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Results;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.ResultInfos;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.RequestInfos;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
+using Amlakbashi.Core.Common.Utilities;
+using System;
+using System.Text;
+using System.Linq;
 
 namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
 {
     public class ShebaPaymentRequest : PodiumRequest<ShebaPaymentResult, ShebaPaymentResultInfo, ShebaPaymentRequestInfo>
     {
-        private const string apiKey = "0a84cf56a4cc4951bfd64f2c700d61d5";
-        private const string productId = "445929";
+        private const string apiKey = "9dd495943cea4dcd8380419d566b1b04";
+        private const string productId = "1076566";
         private const string sourceDepositNumber = "3902.800.97374.1";
         private const string sourceSheba = "IR440570390280000097374001";
 
@@ -18,22 +22,24 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
         {
             request = new ShebaPaymentRequestInfo()
             {
-                UserName = userName,
-                SourceDepositNumber = sourceDepositNumber,
-                DestDepositNumber = requestDTO.DestDepositNumber,
-                SourceSheba = sourceSheba,
-                DestSheba = requestDTO.DestSheba,
-                DestFirstName = requestDTO.DestFirstName,
-                DestLastName = requestDTO.DestLastName,
+                SourceDepNum = sourceDepositNumber,
+                DestinationIban = requestDTO.DestSheba,
+                RecieverFullName = $"{requestDTO.DestFirstName} {requestDTO.DestLastName}",
                 Amount = requestDTO.Amount,
-                PaymentId = requestDTO.PaymentId,
-                SourceComment = requestDTO.SourceComment,
+                SrcComment = requestDTO.SourceComment,
                 DestComment = requestDTO.DestComment,
-                CentralBankTransferDetailType = (int)requestDTO.CentralBankTransferDetailType,
-                Timestamp = requestDTO.Timestamp.ToString("yyyy/MM/dd HH:mm:ss:FFF")
+                DetailType = (int)requestDTO.CentralBankTransferDetailType,
+                senderReturnDepositNumber = sourceDepositNumber,
+                TransactionDate = DateTimeUtility.GregorianToPersianDateWithSlash(DateTime.Now),
+                TransactionId = requestDTO.TransactionId,
+                TransactionBillNumber = requestDTO.PaymentId.ToString(),
+                SourceTMBillNumber = $"*{requestDTO.PaymentId}",
+                Description = "انتقال وجه خارجی",
+                CustomerNumber = "",
+                DestBankCode = "-1"
             };
         }
-        
+
         protected override RequestData GetRequestData()
         {
             string jsonRequest = request.GenerateJson();
@@ -41,8 +47,7 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
             {
                 scProductId = productId,
                 scApiKey = apiKey,
-                request = jsonRequest,
-                signature = GenerateSignature(jsonRequest)
+                request = jsonRequest
             };
         }
     }

@@ -13,8 +13,10 @@ namespace Amlakbashi.Accounting.BankingContext.BankingEngines
             var result = new ShebaPaymentResultDTO();
             if (data.hasError == false && data.BankResult.IsSuccess)
             {
-                result.TraceNumber = data.BankResult.Data;
+                result.TraceNumber = data.BankResult.EndToEndId;
                 result.Message = data.BankResult.Message;
+                result.TransactionId = data.BankResult.TransactionId;
+                result.RecieverFullName = data.BankResult.RecieverFullNam;
             }
             else
             {
@@ -30,13 +32,14 @@ namespace Amlakbashi.Accounting.BankingContext.BankingEngines
             var result = new ShebaVerificationResultDTO();
             if (data.hasError == false && data.BankResult.IsSuccess)
             {
-                result.Sheba = data.BankResult.Data.Sheba;
-                result.AccountStatus = data.BankResult.Data.AccountStatusName;
+                result.Sheba = data.BankResult.iban;
+                result.AccountStatus = data.BankResult.accountStatus;
                 result.Message = data.BankResult.Message;
-                result.Owners = data.BankResult.Data.AccountOwners.Select(s=>new BankAccountOwnerDTO() {
+                result.Owners = data.BankResult.ibanAccountOwnerList.Select(s => new BankAccountOwnerDTO()
+                {
                     firstName = s.firstName,
                     lastName = s.lastName
-                }) .ToList();
+                }).ToList();
             }
             else
             {
@@ -46,15 +49,18 @@ namespace Amlakbashi.Accounting.BankingContext.BankingEngines
             return result;
         }
 
-        public CheckShebaPaymentResultDTO CheckShebaPaymentStatus(string date, string paymentId)
+        public CheckShebaPaymentResultDTO CheckShebaPaymentStatus(string transactionId, string traceNumber)
         {
-            var data = new CheckShebaPaymentRequest(date, paymentId).Send();
+            var data = new CheckShebaPaymentRequest(transactionId, traceNumber).Send();
             var result = new CheckShebaPaymentResultDTO();
             if (data.hasError == false && data.BankResult.IsSuccess)
             {
-                result.RefrenceNumber = data.BankResult.Data.RefrenceNumber;
-                result.Key = data.BankResult.Data.Key;
-                result.Value = data.BankResult.Data.Value;
+                result.RefrenceNumber = data.BankResult.ResultData.TransactionNumber;
+                result.Status = data.BankResult.ResultData.State;
+                result.Amount = data.BankResult.ResultData.Amount;
+                result.BankName = data.BankResult.ResultData.BankName;
+                result.TransactionDate = data.BankResult.ResultData.TransactionDate;
+                result.TransactionTime = data.BankResult.ResultData.TransactionTime;
             }
             else
             {

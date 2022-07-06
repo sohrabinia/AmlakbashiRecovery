@@ -8,9 +8,7 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.RequestInfos
     [Serializable]
     public class CheckShebaPaymentRequestInfo : PodiumRequestInfo
     {
-        public string UserName { get; set; }
-        public string Date { get; set; }
-        public string PaymentId { get; set; }
-        public string Timestamp { get; set; }
+        public string EndToEndId { get; set; }
+        public string TransactionId { get; set; }
     }
 }

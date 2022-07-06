@@ -1270,7 +1270,8 @@ namespace Amlakbashi.Accounting
                 Method = Payment.PaymentMethod.Podium,
                 Type = Payment.PaymentType.Expenditure,
                 Status = Payment.PaymentStatus.NotPaid,
-                ReserveID = reserveId
+                ReserveID = reserveId,
+                TransactionId = BankUtility.GeneratePodiumTransactionId()
             };
             paymentService.Insert(payment);
 
@@ -1282,7 +1283,10 @@ namespace Amlakbashi.Accounting
                 PaymentId = payment.Id,
                 Timestamp = payment.CreateDate,
                 Amount = payablePrice * 10,
-                CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
+                CentralBankTransferDetailType = CentralBankTransferEnum.CCPA,
+                TransactionId = payment.TransactionId,
+                SourceComment = "تسویه رزرو",
+                DestComment = "تسویه رزرو"
             };
 
             ShebaPaymentResultDTO result;
@@ -1354,6 +1358,7 @@ namespace Amlakbashi.Accounting
                 Method = Payment.PaymentMethod.Podium,
                 Type = Payment.PaymentType.Expenditure,
                 Status = Payment.PaymentStatus.NotPaid,
+                TransactionId = BankUtility.GeneratePodiumTransactionId()
             };
             paymentService.Insert(payment);
 
@@ -1365,7 +1370,10 @@ namespace Amlakbashi.Accounting
                 PaymentId = payment.Id,
                 Timestamp = payment.CreateDate,
                 Amount = user.WalletAmount * 10,
-                CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
+                CentralBankTransferDetailType = CentralBankTransferEnum.CCPA,
+                TransactionId = payment.TransactionId,
+                SourceComment = "تسویه کیف پول",
+                DestComment = "تسویه کیف پول"
             };
 
             ShebaPaymentResultDTO result;
@@ -1405,8 +1413,7 @@ namespace Amlakbashi.Accounting
         public CheckShebaPaymentResultDTO CheckShebaPaymentStatus(long paymentId)
         {
             var payment = paymentService.Find((int)paymentId);
-            string date = payment.CreateDate.ToString("yyyy/MM/dd");
-            var result = bankingOperator.CheckShebaPaymentStatus(date, paymentId.ToString());
+            var result = bankingOperator.CheckShebaPaymentStatus(payment.TransactionId, payment.TraceNumber);
             result.PaymentStatus = payment.Status;
             result.PaymentId = payment.Id;
             return result;
@@ -1420,7 +1427,7 @@ namespace Amlakbashi.Accounting
                 return false;
             }
             string date = payment.CreateDate.ToString("yyyy/MM/dd");
-            var result = bankingOperator.CheckShebaPaymentStatus(date, paymentId.ToString());
+            var result = bankingOperator.CheckShebaPaymentStatus(payment.TransactionId, payment.TraceNumber);
             if (result.HasError)
             {
                 return false;

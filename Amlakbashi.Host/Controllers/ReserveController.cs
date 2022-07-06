@@ -492,7 +492,7 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new { val = 2 });
                 }
                 var identityUser = userService.GetIdentityUser(User.Identity.Name);
-                if (identityUser.State != Entities.User.UserState.Acticved)
+                if (identityUser.Status != Entities.User.UserState.Acticved)
                 {
                     return GenerateJsonResult(new { val = 3 });
                 }
@@ -1388,7 +1388,9 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new
                 {
                     status = result.HasError ? 0 : 1,
-                    msg = result.HasError ? result.ErrorMessage : result.Message
+                    msg = result.HasError ? result.ErrorMessage : result.Message,
+                    traceNumber = result.TraceNumber,
+                    recieverFullName = result.RecieverFullName
                 });
             }
             catch (Exception exc)

@@ -453,7 +453,7 @@ namespace Amlakbashi.Host.Controllers
                         User = item,
                         BankCard = bankCardService.GetByUserId(item.Id),
                         InstantReserveCancel = advertiseService.GetInstantReserveCancelCount(item.Id),
-                        State = userService.GetIdentityUser(item.PhoneNumber).State
+                        State = userService.GetIdentityUser(item.PhoneNumber).Status
                     };
                     userListDTO.UserItems.Add(itemDTO);
                 }
@@ -708,7 +708,7 @@ namespace Amlakbashi.Host.Controllers
                         PhoneNumber = international_mobile,
                         CreateDate = DateTime.Now,
                         PhoneNumberConfirmed = false,
-                        State = Entities.User.UserState.InActived,
+                        Status = Entities.User.UserState.InActived,
                         IsForeigner = isNumberForIran == false
                     };
                     userService.AddIdentityUser(identityUser);
@@ -728,7 +728,7 @@ namespace Amlakbashi.Host.Controllers
                     });
                 }
 
-                if (identityUser.State == Entities.User.UserState.Suspend)
+                if (identityUser.Status == Entities.User.UserState.Suspend)
                 {
                     return GenerateJsonResult(new
                     {
@@ -750,16 +750,16 @@ namespace Amlakbashi.Host.Controllers
 
                 if (isNumberForIran == false)
                 {
-                    if (identityUser.EmailConfirmed && identityUser.State == Entities.User.UserState.Acticved)
+                    if (identityUser.EmailConfirmed && identityUser.Status == Entities.User.UserState.Acticved)
                     {
-                        if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null ||
-                            (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
+                        if (string.IsNullOrEmpty(identityUser.EmailVerifyCode) || identityUser.LastSentVerifyCodeDate == null ||
+                            (DateTime.Now - identityUser.LastSentVerifyCodeDate) > new TimeSpan(0, 0, 5, 0, 0))
                         {
-                            identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
-                            identityUser.SendVerification = DateTime.Now;
+                            identityUser.EmailVerifyCode = new Random().Next(111111, 999999).ToString();
+                            identityUser.LastSentVerifyCodeDate = DateTime.Now;
                             userService.UpdateIdentityUser(identityUser);
                         }
-                        string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailCode}</b></div></div>";
+                        string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailVerifyCode}</b></div></div>";
 #if !DEBUG
                         EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
                             "املاک باشی: کد تایید ورود به حساب کاربری", strbody);
@@ -770,11 +770,11 @@ namespace Amlakbashi.Host.Controllers
                         status = 5,
                         mobile = mobile,
                         isNumberForIran = isNumberForIran,
-                        doLogin = identityUser.EmailConfirmed && identityUser.State == Entities.User.UserState.Acticved
+                        doLogin = identityUser.EmailConfirmed && identityUser.Status == Entities.User.UserState.Acticved
                     });
                 }
 
-                if (identityUser.PhoneNumberConfirmed == false || identityUser.State == Entities.User.UserState.InActived)
+                if (identityUser.PhoneNumberConfirmed == false || identityUser.Status == Entities.User.UserState.InActived)
                 {
                     userService.UpdateSendVerification(user.Id, DateTime.Now, code);
                     userService.SendVerificationSms(callableNumber, code);
@@ -825,9 +825,9 @@ namespace Amlakbashi.Host.Controllers
                 if (identityUser != null)
                 {
                     var code = new Random().Next(111111, 999999).ToString();
-                    identityUser.EmailCode = code;
+                    identityUser.EmailVerifyCode = code;
                     identityUser.Email = email;
-                    identityUser.SendVerification = DateTime.Now;
+                    identityUser.LastSentVerifyCodeDate = DateTime.Now;
                     identityUser.EmailConfirmed = false;
                     userService.UpdateIdentityUser(identityUser);
                     string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{code}</b></div></div>";
@@ -856,7 +856,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var mobileInternational = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var identityUser = userService.GetIdentityUser(mobileInternational);
-                if (identityUser != null && identityUser.EmailCode == code)
+                if (identityUser != null && identityUser.EmailVerifyCode == code)
                 {
                     identityUser.EmailConfirmed = true;
                     identityUser.PhoneNumberConfirmed = true;
@@ -884,14 +884,14 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(mobileInternational);
                 if (identityUser != null)
                 {
-                    if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null ||
-                        (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
+                    if (string.IsNullOrEmpty(identityUser.EmailVerifyCode) || identityUser.LastSentVerifyCodeDate == null ||
+                        (DateTime.Now - identityUser.LastSentVerifyCodeDate) > new TimeSpan(0, 0, 5, 0, 0))
                     {
-                        identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
-                        identityUser.SendVerification = DateTime.Now;
+                        identityUser.EmailVerifyCode = new Random().Next(111111, 999999).ToString();
+                        identityUser.LastSentVerifyCodeDate = DateTime.Now;
                         userService.UpdateIdentityUser(identityUser);
                     }
-                    string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailCode}</b></div></div>";
+                    string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailVerifyCode}</b></div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
                     "املاک باشی: فراموشی رمز عبور", strbody);
@@ -939,14 +939,14 @@ namespace Amlakbashi.Host.Controllers
                 {
                     if (identityUser.IsForeigner)
                     {
-                        if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null ||
-                        (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
+                        if (string.IsNullOrEmpty(identityUser.EmailVerifyCode) || identityUser.LastSentVerifyCodeDate == null ||
+                        (DateTime.Now - identityUser.LastSentVerifyCodeDate) > new TimeSpan(0, 0, 5, 0, 0))
                         {
-                            identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
-                            identityUser.SendVerification = DateTime.Now;
+                            identityUser.EmailVerifyCode = new Random().Next(111111, 999999).ToString();
+                            identityUser.LastSentVerifyCodeDate = DateTime.Now;
                             userService.UpdateIdentityUser(identityUser);
                         }
-                        string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailCode}</b></div></div>";
+                        string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailVerifyCode}</b></div></div>";
 #if !DEBUG
                         EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
                             "املاک باشی: کد تایید ورود به حساب کاربری", strbody);
@@ -954,10 +954,10 @@ namespace Amlakbashi.Host.Controllers
                     }
                     else
                     {
-                        var code = identityUser.Code;
+                        var code = identityUser.VerifyCode;
                         if (string.IsNullOrEmpty(code) ||
-                            identityUser.SendVerification == null ||
-                            (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 5, 0, 0))
+                            identityUser.LastSentVerifyCodeDate == null ||
+                            (DateTime.Now - identityUser.LastSentVerifyCodeDate) > new TimeSpan(0, 0, 5, 0, 0))
                         {
                             code = new Random().Next(1111, 9999).ToString();
                             userService.UpdateSendVerification(user.Id, DateTime.Now, code);
@@ -1001,7 +1001,7 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(mobile_international);
                 if (verifyByEmail)
                 {
-                    if (identityUser.EmailCode != code)
+                    if (identityUser.EmailVerifyCode != code)
                     {
                         return GenerateJsonResult(
                         new
@@ -1013,7 +1013,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 else
                 {
-                    if (identityUser.Code != code)
+                    if (identityUser.VerifyCode != code)
                     {
                         return GenerateJsonResult(
                         new
@@ -1049,7 +1049,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var identityUser = userService.GetIdentityUser(mobile_international);
-                var correct = identityUser != null && code == identityUser.Code;
+                var correct = identityUser != null && code == identityUser.VerifyCode;
                 if (correct)
                 {
                     identityUser.PhoneNumberConfirmed = true;
@@ -1081,7 +1081,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var mobileInternational = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var identityUser = userService.GetIdentityUser(mobileInternational);
-                if (identityUser != null && identityUser.Code == code)
+                if (identityUser != null && identityUser.VerifyCode == code)
                 {
                     signInManager.SignInAsync(identityUser, true).Wait();
                     return GenerateJsonResult(new { status = 1 });
@@ -1131,9 +1131,9 @@ namespace Amlakbashi.Host.Controllers
                 int user_id;
                 string errorMsg;
                 var identityUser = userService.GetIdentityUser(mobile_international);
-                if (identityUser != null && identityUser.Code == code)
+                if (identityUser != null && identityUser.VerifyCode == code)
                 {
-                    if (identityUser.State == Entities.User.UserState.Suspend)
+                    if (identityUser.Status == Entities.User.UserState.Suspend)
                     {
                         return GenerateJsonResult(new { status = 0, msg = "حساب کاربری شما معلق شده است. لطفا با پشتیبان تماس بگیرید" });
                     }
@@ -1142,7 +1142,7 @@ namespace Amlakbashi.Host.Controllers
                     {
                         return GenerateJsonResult(new { status = 0, msg = errorMsg });
                     }
-                    if (identityUser.State == Entities.User.UserState.InActived)
+                    if (identityUser.Status == Entities.User.UserState.InActived)
                     {
                         Dictionary<string, string> errors;
                         if (userService.SignInRegister(user_id, fname, lname, out errors))
@@ -1190,9 +1190,9 @@ namespace Amlakbashi.Host.Controllers
                 int user_id;
                 string errorMsg;
                 var identityUser = userService.GetIdentityUser(mobile_international);
-                if (identityUser != null && identityUser.EmailCode == code)
+                if (identityUser != null && identityUser.EmailVerifyCode == code)
                 {
-                    if (identityUser.State == Entities.User.UserState.Suspend)
+                    if (identityUser.Status == Entities.User.UserState.Suspend)
                     {
                         return GenerateJsonResult(new { status = 0, msg = "حساب کاربری شما معلق شده است. لطفا با پشتیبان تماس بگیرید" });
                     }
@@ -1201,7 +1201,7 @@ namespace Amlakbashi.Host.Controllers
                     {
                         return GenerateJsonResult(new { status = 0, msg = errorMsg });
                     }
-                    if (identityUser.State == Entities.User.UserState.InActived)
+                    if (identityUser.Status == Entities.User.UserState.InActived)
                     {
                         Dictionary<string, string> errors;
                         if (userService.SignInRegister(user_id, fname, lname, out errors))
@@ -1263,9 +1263,9 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
                 var code = new Random().Next(111111, 999999).ToString();
-                identityUser.EmailCode = code;
+                identityUser.EmailVerifyCode = code;
                 identityUser.Email = email;
-                identityUser.SendVerification = DateTime.Now;
+                identityUser.LastSentVerifyCodeDate = DateTime.Now;
                 identityUser.EmailConfirmed = false;
                 userService.UpdateIdentityUser(identityUser);
                 string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{code}</b></div></div>";
@@ -1288,7 +1288,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
-                if (identityUser.EmailCode == emailCode)
+                if (identityUser.EmailVerifyCode == emailCode)
                 {
                     identityUser.EmailConfirmed = true;
                     userService.UpdateIdentityUser(identityUser);
@@ -1605,7 +1605,7 @@ namespace Amlakbashi.Host.Controllers
             return GenerateJsonResult(
                 new
                 {
-                    val = identityUser.State == Entities.User.UserState.Suspend,
+                    val = identityUser.Status == Entities.User.UserState.Suspend,
                     user_id = userAccessor.CurrentUser.Id
                 });
         }

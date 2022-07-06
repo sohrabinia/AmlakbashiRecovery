@@ -24,16 +24,24 @@ else if (Model.HasError)
 else
 {
     <div>
-        <span>شماره ارجاع درخواست:</span>
+        <span>شماره پیگیری:</span>
         <span>@Model.RefrenceNumber</span>
     </div>
     <div>
-        <span>کد وضعیت انتقال وجه:</span>
-        <span>@Model.Key</span>
+        <span>وضعیت:</span>
+        <span>@Model.Status</span>
     </div>
     <div>
-        <span>شرح وضعیت:</span>
-        <span>@Model.Value</span>
+        <span>تاریخ:</span>
+        <span>@Model.TransactionDate</span>
+    </div>
+    <div>
+        <span>زمان:</span>
+        <span>@Model.TransactionTime</span>
+    </div>
+    <div>
+        <span>مبلغ:</span>
+        <span>@Model.Amount</span>
     </div>
     <br />
     @if (Model.PaymentStatus == Payment.PaymentStatus.NotPaid)

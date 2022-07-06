@@ -1,27 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using static Amlakbashi.Core.Entities.User;
 
 namespace Amlakbashi.Core.Identity.Entities
 {
     public class AppUser : IdentityUser
     {
-        [Column("VerifyCode")]
-        public string Code { get; set; }
-
-        [Column("EmailVerifyCode")]
-        public string EmailCode { get; set; }
-
+        public string VerifyCode { get; set; }
+        public string EmailVerifyCode { get; set; }
         public DateTime? CreateDate { get; set; }
-
-        [Column("LastSentVerifyCodeDate")]
-        public DateTime? SendVerification { get; set; }
-
-        [Column("Status")]
-        public UserState State { get; set; }
-
+        public DateTime? LastSentVerifyCodeDate { get; set; }
+        public UserState Status { get; set; }
         public bool IsForeigner { get; set; }
 
         [StringLength(1000)]
@@ -29,7 +19,7 @@ namespace Amlakbashi.Core.Identity.Entities
 
         public bool IsVerifyCodeValid(string code)
         {
-            return (IsForeigner ? EmailCode : Code) == code && (DateTime.Now - SendVerification) <= new TimeSpan(0, 0, 2, 0, 0);
+            return (IsForeigner ? EmailVerifyCode : VerifyCode) == code && (DateTime.Now - LastSentVerifyCodeDate) <= new TimeSpan(0, 0, 2, 0, 0);
         }
     }
 }

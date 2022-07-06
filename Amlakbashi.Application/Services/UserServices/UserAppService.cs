@@ -117,7 +117,7 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             var identityUser = userManager.FindByNameAsync(mainMobile).Result;
             if (identityUser != null &&
-                (identityUser.State == User.UserState.Acticved || identityUser.State == User.UserState.ReserveBanned))
+                (identityUser.Status == User.UserState.Acticved || identityUser.Status == User.UserState.ReserveBanned))
             {
                 if (includeFavorite)
                 {
@@ -133,7 +133,7 @@ namespace Amlakbashi.Application.Services.UserServices
         public User GetActivatedUserByEmail(string email, bool includeFavorite = false)
         {
             var identityUser = userManager.FindByEmailAsync(email).Result;
-            if (identityUser != null && identityUser.State == User.UserState.Acticved)
+            if (identityUser != null && identityUser.Status == User.UserState.Acticved)
             {
                 if (includeFavorite)
                 {
@@ -169,10 +169,10 @@ namespace Amlakbashi.Application.Services.UserServices
                 UserName = request.phoneNumber,
                 PhoneNumber = request.phoneNumber,
                 CreateDate = DateTime.Now,
-                State = User.UserState.InActived,
-                Code = StringUtility.GenerateVerifyCode(),
-                EmailCode = StringUtility.GenerateVerifyCode(6),
-                SendVerification = DateTime.Now,
+                Status = User.UserState.InActived,
+                VerifyCode = StringUtility.GenerateVerifyCode(),
+                EmailVerifyCode = StringUtility.GenerateVerifyCode(6),
+                LastSentVerifyCodeDate = DateTime.Now,
                 Email = request.email,
                 IsForeigner = request.IsIranNumber() == false
             };
@@ -242,12 +242,12 @@ namespace Amlakbashi.Application.Services.UserServices
             if (identityUser.IsForeigner)
             {
                 await emailSender.SendAsync(identityUser.Email, StringUtility.VerifyEmailSubject(),
-                    StringUtility.VerifyEmailContent(identityUser.EmailCode));
+                    StringUtility.VerifyEmailContent(identityUser.EmailVerifyCode));
             }
             else
             {
                 var callableNumber = PhoneUtility.InternationalNumberToLocal(identityUser.PhoneNumber);
-                SendVerificationSms(callableNumber, identityUser.Code);
+                SendVerificationSms(callableNumber, identityUser.VerifyCode);
             }
         }
 
@@ -257,9 +257,9 @@ namespace Amlakbashi.Application.Services.UserServices
             var shallowUser = user.ShallowCopy();
 
             var identityUser = GetIdentityUser(user.PhoneNumber);
-            if (identityUser.State != editedUser.UserState)
+            if (identityUser.Status != editedUser.UserState)
             {
-                identityUser.State = editedUser.UserState;
+                identityUser.Status = editedUser.UserState;
                 UpdateIdentityUser(identityUser);
             }
 
@@ -504,8 +504,8 @@ namespace Amlakbashi.Application.Services.UserServices
                 var callableNumber = PhoneUtility.InternationalNumberToLocal(internationalMobile);
                 var code = new Random().Next(1111, 9999).ToString();
                 identityUser.Temp = internationalMobile;
-                identityUser.SendVerification = DateTime.Now;
-                identityUser.Code = code;
+                identityUser.LastSentVerifyCodeDate = DateTime.Now;
+                identityUser.VerifyCode = code;
                 await UpdateIdentityAsync(identityUser);
                 SendVerificationSms(callableNumber, code);
                 serviceResult.Result = false;
@@ -561,11 +561,11 @@ namespace Amlakbashi.Application.Services.UserServices
             var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             if (state)
             {
-                identityUser.State = User.UserState.Acticved;
+                identityUser.Status = User.UserState.Acticved;
             }
             else
             {
-                identityUser.State = User.UserState.InActived;
+                identityUser.Status = User.UserState.InActived;
             }
             userManager.UpdateAsync(identityUser).Wait();
         }
@@ -620,10 +620,10 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
             var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
-            identityUser.SendVerification = time;
+            identityUser.LastSentVerifyCodeDate = time;
             if (code != null)
             {
-                identityUser.Code = code;
+                identityUser.VerifyCode = code;
             }
             userManager.UpdateAsync(identityUser).Wait();
         }
@@ -638,9 +638,9 @@ namespace Amlakbashi.Application.Services.UserServices
                 return serviceResult;
             }
 
-            identityUser.Code = StringUtility.GenerateVerifyCode();
-            identityUser.EmailCode = StringUtility.GenerateVerifyCode(6);
-            identityUser.SendVerification = DateTime.Now;
+            identityUser.VerifyCode = StringUtility.GenerateVerifyCode();
+            identityUser.EmailVerifyCode = StringUtility.GenerateVerifyCode(6);
+            identityUser.LastSentVerifyCodeDate = DateTime.Now;
             var result = await userManager.UpdateAsync(identityUser);
             if (result.Succeeded == false)
             {
@@ -842,7 +842,7 @@ namespace Amlakbashi.Application.Services.UserServices
             if (identityUser != null)
             {
                 var user = Repository.Query(q => q.OrderBy(u => u.Id).FirstOrDefault(u => u.PhoneNumber == mobile));
-                if (identityUser.State == User.UserState.InActived)
+                if (identityUser.Status == User.UserState.InActived)
                 {
                     user.AmlakbashiScore = 1000;
                     if (!string.IsNullOrEmpty(presentorCode))
@@ -897,7 +897,7 @@ namespace Amlakbashi.Application.Services.UserServices
 
         public IList<string> GetAllIdentityUsernamesByState(User.UserState state = User.UserState.Acticved)
         {
-            return userManager.Users.Where(w => w.State == state).Select(s => s.UserName).ToList();
+            return userManager.Users.Where(w => w.Status == state).Select(s => s.UserName).ToList();
         }
 
         public AppUser GetIdentityUser(string phrase, bool isEmail = false)
