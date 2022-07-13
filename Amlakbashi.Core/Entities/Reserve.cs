@@ -44,7 +44,6 @@ namespace Amlakbashi.Core.Entities
 
         [Column("PrizeTransactionId")]
         public long PrizeTransactionID { get; set; }
-        //public bool EarlyCheckout { get; set; }
         public EarlyCheckoutEnum EarlyCheckoutStatus { get; set; }
         public DateTime? CancelDate { get; set; }
         public ReserveStatus CancelState { get; set; }
@@ -63,14 +62,6 @@ namespace Amlakbashi.Core.Entities
         public bool Archive { get; set; }
         public bool RatingShownToGuest { get; set; }
         public bool PaymentGTAGRegistered { get; set; }
-
-        //public bool PaymentHasError { get; set; }
-        //public DateTime? HostCallDate { get; set; }
-        //public DateTime? GuestCallDate { get; set; }
-        //public int SupportState { get; set; }
-        //public string SupporterIds { get; set; }
-        //public bool ExcludeGroupPayment { get; set; }
-        //public bool IsDeleted { get; set; }
 
         [ForeignKey(nameof(AdvertiseID))]
         public virtual Advertise Advertise { get; set; }
@@ -102,7 +93,6 @@ namespace Amlakbashi.Core.Entities
 
         public int InitialPriority;
         public int Priority;
-        //public long Temp_HostPayablePrice;
 
         [NotMapped]
         public long TotalPayablePrice
@@ -189,6 +179,28 @@ namespace Amlakbashi.Core.Entities
             Unset = 0,
             RequestedByHost = 1,
             ConfirmedByGuest = 2
+        }
+
+        public enum ReserveCancelType
+        {
+            Unset = 0,
+            CancelByGuestForGuestProblem = 1,
+            CancelByGuestForHostProblem = 2,
+            CancelByHostForHostProblem = 3,
+            CancelByHostForGuestProblem = 4
+        }
+
+        public enum ReserveCancelReasons
+        {
+            Unset = 0,
+
+            Guest_Guest_HighPrice = 1,
+
+            Guest_Host_IncorrectResidenceInfo = 51,
+
+            Host_Host_LowPrice = 101,
+
+            Host_Guest_IncorrectIdentityEvidence = 151
         }
 
         #endregion
@@ -560,6 +572,12 @@ namespace Amlakbashi.Core.Entities
                 default:
                     return null;
             }
+        }
+
+        public static IList<ReserveCancelReasons> GetReserveCancelReasonsByUserType(User.UserGeneralTypeEnum userType)
+        {
+            var reasonsArray = (Reserve.ReserveCancelReasons[])Enum.GetValues(typeof(Reserve.ReserveCancelReasons));
+            return reasonsArray.Where(x=> userType == User.UserGeneralTypeEnum.Guest ? (int)x > 0 &&(int)x <= 100 : (int)x > 100).ToList();
         }
 
         public int GetPaymentTriesCount(out string lastTryDateStr)

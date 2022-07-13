@@ -1,0 +1,39 @@
+﻿@model IList<Reserve.ReserveCancelReasons>
+
+<p>لطفا دلیل لغو رزرو را انتخاب کنید:</p>
+<div style="padding: 10px;">
+    @foreach (var item in Model)
+    {
+        <input type="radio" name="reason" value="@item" />
+        <label>@(ReserveLocalization.GetReserveCancelReasonsTitle(item))</label>
+        <br>
+    }
+    <input type="radio" name="reason" value="0" on />
+    <label>سایر</label>
+    <br>
+    <textarea id="reasonDesc" placeholder="لطفا دلیل لغو رزرو را شرح دهید ..." style="display: none;"></textarea>
+</div>
+<div style="text-align: center;">
+    <button onclick="popupMsgList[0].btnClick(0, true);" style="padding: 5px 10px; border: 1px solid darkgray; border-radius: 5px; margin-left: 10px;">انصراف</button>
+    <button onclick="getCancelationInfo()" style="padding: 5px 10px; background-color: #fDc831; border: 1px solid darkgray; border-radius: 5px;">لغو رزرو</button>
+</div>
+
+<script>
+    $('input[type=radio][name=reason]').change(function () {
+        if (this.value == 0) {
+            $('textarea#reasonDesc').show();
+        }
+        else {
+            $('textarea#reasonDesc').hide();
+        }
+    });
+
+    function getCancelationInfo() {
+        var reserveId = @ViewBag.reserveId;
+        var reasonDesc = $('#reasonDesc').val();
+        var reason = $('input[name="reason"]:checked').val();
+        showInfoMessage('تایید لغو رزرو ' + reserveId, '', {
+            contentUrl: '/reserve/GetCancelationInfo?reserveId=' + reserveId + '&reason=' + reason + '&reasonDesc=' + reasonDesc
+            });
+    }
+</script>

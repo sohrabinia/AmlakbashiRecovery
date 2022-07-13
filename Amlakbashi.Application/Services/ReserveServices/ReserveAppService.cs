@@ -814,7 +814,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 DepositPrice = depositePrice,
                 InstantReserve = isInstantReserve,
                 CouponCalculationPrice = couponCalculationPrice,
-                Status = isInstantReserve ? Reserve.ReserveStatus.WaitForReserve : 
+                Status = isInstantReserve ? Reserve.ReserveStatus.WaitForReserve :
                     Reserve.ReserveStatus.WaitForResponse
             };
             Insert(reserve);
@@ -1259,12 +1259,11 @@ namespace Amlakbashi.Application.Services.ReserveServices
             }
         }
 
-        public async Task<ServiceResult> CancelAsync(ReservePostCancelRequest request)
+        public ServiceResult<long> GetCancelationInfo(ReservePostCancelRequest request)
         {
-            var serviceResult = new ServiceResult();
+            var serviceResult = new ServiceResult<long>();
             var reserve = Repository.Find(request.reserveId);
-            if ((request.panel == User.UserGeneralTypeEnum.Guest && reserve.UserID != request.userId) ||
-                (request.panel == User.UserGeneralTypeEnum.Host && reserve.HostUserID != request.userId))
+            if ((reserve.UserID == request.userId || reserve.HostUserID == request.userId) == false)
             {
                 serviceResult.AddError("user is incorrect");
             }
@@ -1272,28 +1271,107 @@ namespace Amlakbashi.Application.Services.ReserveServices
             {
                 serviceResult.AddError("cannot cancel this reserve");
             }
+            if (request.reason == ReserveCancelReasons.Unset && string.IsNullOrEmpty(request.reasonDesc))
+            {
+                serviceResult.AddError("select reason");
+            }
+            if (serviceResult.HasError())
+            {
+                return serviceResult;
+            }
+
+            switch (request.cancelType)
+            {
+                case ReserveCancelType.CancelByGuestForGuestProblem:
+                    var lossPrices = priceCalculator.CaculateReserveCancelationLoss(reserve);
+                    serviceResult.Result = lossPrices.HostPortion + lossPrices.SitePortion;
+                    break;
+                case ReserveCancelType.CancelByHostForHostProblem:
+                    serviceResult.Result = (long)Math.Round(reserve.TotalPrice * 0.1, 0);
+                    break;
+                case ReserveCancelType.CancelByGuestForHostProblem:
+                case ReserveCancelType.CancelByHostForGuestProblem:
+                default:
+                    break;
+            }
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> CancelAsync(ReservePostCancelRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var reserve = Repository.Find(request.reserveId);
+            if ((reserve.UserID == request.userId || reserve.HostUserID == request.userId) == false)
+            {
+                serviceResult.AddError("user is incorrect");
+            }
+            if (reserve.Status > ReserveStatus.Started)
+            {
+                serviceResult.AddError("cannot cancel this reserve");
+            }
+            if (request.reason == ReserveCancelReasons.Unset && string.IsNullOrEmpty(request.reasonDesc))
+            {
+                serviceResult.AddError("select reason");
+            }
             if (serviceResult.HasError())
             {
                 return serviceResult;
             }
 
             var targetStatus = ReserveStatus.Default;
-            if (accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest) > 0)
-            {
-                targetStatus = request.panel == User.UserGeneralTypeEnum.Host ?
-                    ReserveStatus.CancelRequestByHost : ReserveStatus.CancelRequestByGuest;
-            }
-            else
+            var guestPayedPrice = accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(), StatusStringType.Guest);
+            if (guestPayedPrice <= 0)
             {
                 targetStatus = request.panel == User.UserGeneralTypeEnum.Host ?
                     ReserveStatus.CanceledByHost : ReserveStatus.CanceledByGuest;
             }
+            else
+            {
+                long newCredit = 0;
+                long guestRefundCreditTransactionId = 0;
+                switch (request.cancelType)
+                {
+                    case ReserveCancelType.CancelByGuestForGuestProblem:
+                        targetStatus = ReserveStatus.CanceledByGuest;
+                        var lossPrices = priceCalculator.CaculateReserveCancelationLoss(reserve);
+                        guestRefundCreditTransactionId = accounting.IncreaseCredit(reserve.UserID, guestPayedPrice, 0,
+                            reserve.Id, out newCredit, CreditTransaction.WalletTransactionReason.Refund);
+                        accounting.InsertReservePayment(request.userId, reserve.Id, guestRefundCreditTransactionId, 0,
+                            ReservePaymentType.SiteRefundToGuest, guestPayedPrice,
+                            ReservePaymentMethod.AmlakbashiCredit, request.userId);
+                        accounting.DecreaseCredit(reserve.UserID, lossPrices.SitePortion + lossPrices.HostPortion, 0, reserve.Id,
+                            out newCredit, CreditTransaction.WalletTransactionReason.Other, $"خسارت کنسلی رزرو {reserve.Id}");
+                        accounting.IncreaseCredit(reserve.HostUserID, lossPrices.HostPortion, 0, reserve.Id,
+                            out newCredit, CreditTransaction.WalletTransactionReason.Other, $"خسارت کنسلی رزرو {reserve.Id}");
+                        break;
+                    case ReserveCancelType.CancelByGuestForHostProblem:
+                        targetStatus = ReserveStatus.CancelRequestByGuest;
+                        break;
+                    case ReserveCancelType.CancelByHostForHostProblem:
+                        targetStatus = ReserveStatus.CanceledByHost;
+                        guestRefundCreditTransactionId = accounting.IncreaseCredit(reserve.UserID, guestPayedPrice, 0,
+                            reserve.Id, out newCredit, CreditTransaction.WalletTransactionReason.Refund);
+                        accounting.InsertReservePayment(request.userId, reserve.Id, guestRefundCreditTransactionId, 0,
+                            ReservePaymentType.SiteRefundToGuest, guestPayedPrice,
+                            ReservePaymentMethod.AmlakbashiCredit, request.userId);
+                        accounting.DecreaseCredit(reserve.HostUserID, (long)Math.Round(reserve.TotalPrice * 0.1, 0), 0, reserve.Id,
+                            out newCredit, CreditTransaction.WalletTransactionReason.Other, $"خسارت کنسلی رزرو {reserve.Id}");
+                        break;
+                    case ReserveCancelType.CancelByHostForGuestProblem:
+                        targetStatus = ReserveStatus.CancelRequestByHost;
+                        break;
+                    default:
+                        targetStatus = request.panel == User.UserGeneralTypeEnum.Host ?
+                            ReserveStatus.CancelRequestByHost : ReserveStatus.CancelRequestByGuest;
+                        break;
+                }
+            }
+
             var changeStatusResult = await mediator.Send(new SetReserveStatusCommand(reserve.Id, targetStatus, true,
                 request.actionSource, request.userId));
-
             if (changeStatusResult)
             {
-                reserve.CancelReason = request.reason;
+                reserve.CancelReason = request.reasonDesc;
                 Repository.Update(reserve);
                 Repository.Save();
             }

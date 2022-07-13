@@ -29,6 +29,8 @@ using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
 using static Amlakbashi.Core.Entities.ReservePayment;
+using System.Threading.Tasks;
+using Amlakbashi.Core.DTOs.WebService.Requests.Reserves;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -547,6 +549,53 @@ namespace Amlakbashi.Host.Controllers
                     msg = "متاسفانه درخواست لغو رزرو با خطا مواجه شد"
                 });
             }
+        }
+
+        [Authorize]
+        public IActionResult ShowCancelDialog(long reserveId)
+        {
+            var reserve = reserveService.Find(reserveId);
+            var userType = reserve.UserID == userAccessor.CurrentUser.Id ?
+                Entities.User.UserGeneralTypeEnum.Guest : Entities.User.UserGeneralTypeEnum.Host;
+            ViewBag.reserveId = reserveId;
+            return PartialView("_CancelDialog", Reserve.GetReserveCancelReasonsByUserType(userType));
+        }
+
+        [Authorize]
+        public IActionResult GetCancelationInfo(ReservePostCancelRequest request)
+        {
+            request.userId = userAccessor.CurrentUser.Id;
+            request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
+            var result = reserveService.GetCancelationInfo(request);
+            ViewBag.reserveId = request.reserveId;
+            ViewBag.reason = request.reason;
+            ViewBag.reasonDesc = request.reasonDesc;
+            if (result.HasError())
+            {
+                ViewBag.hasError = true;
+                ViewBag.errorMessage = result.GetErrors().First();
+            }
+            return PartialView("_CancelationInfo", result.Result);
+        }
+
+        [Authorize]
+        public async Task<JsonResult> Cancel(ReservePostCancelRequest request)
+        {
+            request.userId = userAccessor.CurrentUser.Id;
+            request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
+            var result = await reserveService.CancelAsync(request);
+            if (result.HasError())
+            {
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = result.GetErrors().First()
+                });
+            }
+            return GenerateJsonResult(new
+            {
+                status = 1
+            });
         }
 
         public JsonResult RefuseCancelReserve(long reserve_id, bool is_host)

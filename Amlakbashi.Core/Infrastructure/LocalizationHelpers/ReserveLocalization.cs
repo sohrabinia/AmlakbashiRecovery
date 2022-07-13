@@ -224,5 +224,22 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "";
             }
         }
+
+        public static string GetReserveCancelReasonsTitle(Reserve.ReserveCancelReasons reason)
+        {
+            switch (reason)
+            {
+                case ReserveCancelReasons.Guest_Guest_HighPrice:
+                    return "قیمت بالا";
+                case ReserveCancelReasons.Guest_Host_IncorrectResidenceInfo:
+                    return "نادرست بودن اطلاعات آگهی";
+                case ReserveCancelReasons.Host_Host_LowPrice:
+                    return "قیمت پایین";
+                case ReserveCancelReasons.Host_Guest_IncorrectIdentityEvidence:
+                    return "کامل نبودن مدارک هویتی";
+                default:
+                    return "";
+            }
+        }
     }
 }

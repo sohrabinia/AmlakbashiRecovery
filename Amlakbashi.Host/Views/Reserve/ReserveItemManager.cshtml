@@ -170,6 +170,7 @@
             }, undefined, { noText: 'انصراف', yesText: ' لغو رزرو', autoClose: false });
             is_canceling_reserve = false;
         }
+
         console.log(@ViewBag.GuestPhotoID);
         function refuseCancelReserve(reserve_id, is_host) {
             $.confirm({
@@ -215,6 +216,10 @@
                     }
                 }
             });
+        }
+
+        function cancel(reserveId) {
+            showInfoMessage('لغو رزرو ' + reserveId, '', { contentUrl: '/reserve/ShowCancelDialog?reserveId=' + reserveId, fullScreen: screen.width < 781 });
         }
 
         function confirmCashPay(reserve_id, confirm_state) {

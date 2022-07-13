@@ -6,7 +6,7 @@
     var img_src = Model.advertisePhotoId > 0 ? string.Format("/عکس-آگهی/{0}", Model.advertiseSlug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
 
     var panedingList = new List<int>()
-    {
+{
         (int)Reserve.ReserveStatus.WaitForResponse,
         (int)Reserve.ReserveStatus.WaitForReserve
     };
@@ -299,15 +299,18 @@
     }
     @if (Model.cancelIsAvailable)
     {
-        <div onclick="cancelReserve(@Model.reserveId,@(Model.isHostler ? "true" : "false"), @(Model.instantReserve ? "true" : "false"), @((int)Model.status > 4 && (int)Model.status < 9 ? "true" : "false"))" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
-            @if (Model.status == Reserve.ReserveStatus.WaitForReserve || Model.status == Reserve.ReserveStatus.WaitForResponse)
-            {
-                @:لغو رزرو
-            }
-            else
-            {
-                @:درخواست لغو رزرو
-            }
+        @*<div onclick="cancelReserve(@Model.reserveId,@(Model.isHostler ? "true" : "false"), @(Model.instantReserve ? "true" : "false"), @((int)Model.status > 4 && (int)Model.status < 9 ? "true" : "false"))" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
+                @if (Model.status == Reserve.ReserveStatus.WaitForReserve || Model.status == Reserve.ReserveStatus.WaitForResponse)
+                {
+                    @:لغو رزرو
+                }
+                else
+                {
+                    @:درخواست لغو رزرو
+                }
+            </div>*@
+        <div onclick="cancel(@Model.reserveId)" class="reserve-dashboard__item-container-button reserve-dashboard__cancle_reserver">
+            لغو رزرو
         </div>
     }
     @if (Model.isHostler && Model.status != Reserve.ReserveStatus.Rejected)

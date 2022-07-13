@@ -12,8 +12,10 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Reserves
         [Range(1, int.MaxValue)]
         public int reserveId { get; set; }
 
-        [Required]
-        public string reason { get; set; }
+        [Range(0, 200)]
+        public Reserve.ReserveCancelReasons reason { get; set; }
+
+        public string reasonDesc { get; set; }
 
         [BindNever]
         public int userId { get; set; }
@@ -23,5 +25,32 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Reserves
 
         [BindNever]
         public ActionLog.ActionSourceEnum actionSource { get; set; }
+
+        [BindNever]
+        public Reserve.ReserveCancelType cancelType { 
+            get 
+            {
+                if (reason > 0 && (int)reason <= 50)
+                {
+                    return Reserve.ReserveCancelType.CancelByGuestForGuestProblem;
+                }
+                else if ((int)reason > 50 && (int)reason <= 100)
+                {
+                    return Reserve.ReserveCancelType.CancelByGuestForHostProblem;
+                }
+                else if ((int)reason > 100 && (int)reason <= 150)
+                {
+                    return Reserve.ReserveCancelType.CancelByHostForHostProblem;
+                }
+                else if ((int)reason > 150 && (int)reason <= 200)
+                {
+                    return Reserve.ReserveCancelType.CancelByHostForGuestProblem;
+                }
+                else
+                {
+                    return Reserve.ReserveCancelType.Unset;
+                }
+            } 
+        }
     }
 }

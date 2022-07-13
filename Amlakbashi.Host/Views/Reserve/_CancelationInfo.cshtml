@@ -1,0 +1,55 @@
+﻿@model long
+
+@if (ViewBag.hasError == true)
+{
+    <p>@ViewBag.errorMessage</p>
+}
+else
+{
+    @if (Model == 0)
+    {
+        <p>کاربر گرامی، لغو این رزرو بنابر دلیل انتخابی شما، نیازمند بررسی کارشناسان ما می باشد.</p>
+        <p>آیا از درخواست خود مبنی بر لغو این رزرو مطمئن هستید؟</p>
+    }
+    else
+    {
+        <p>کاربر گرامی، لطفا توجه فرمایید که لغو رزرو مورد نظر مشمول جریمه به مبلغ زیر می باشد:</p>
+        <p>مبلغ خسارت لغو رزرو: @string.Format("{0:n0}", Model) تومان</p>
+        <br />
+        <p>آیا از درخواست خود مبنی بر لغو این رزرو مطمئن هستید؟</p>
+    }
+    <div style="text-align: center;">
+        <button onclick="popupMsgList[1].btnClick(0, true);" style="padding: 5px 10px; border: 1px solid darkgray; border-radius: 5px; margin-left: 10px;">انصراف</button>
+        <button onclick="doCancel()" style="padding: 5px 10px; background-color: #fDc831; border: 1px solid darkgray; border-radius: 5px;">تایید</button>
+    </div>
+}
+
+<script>
+    function doCancel() {
+        $.ajax({
+            url: "/reserve/cancel",
+            type: "post",
+            data: {
+                reserveId: '@ViewBag.reserveId',
+                reason: '@ViewBag.reason',
+                reasonDesc: '@ViewBag.reasonDesc'
+            },
+            beforeSend: function () {
+
+            },
+            success: function (response) {
+                if (response.status == 0) {
+                    alertify.error(response.msg);
+                }
+                else {
+                    alertify.success("رزرو مورد نظر با موفقیت لغو شد");
+                    popupMsgList[1].btnClick(0, true);
+                    popupMsgList[0].btnClick(0, true);
+                }
+            },
+            error: function (ret) {
+                alertify.error("عملیات با خطا مواجه شد");
+            }
+        });
+    }
+</script>

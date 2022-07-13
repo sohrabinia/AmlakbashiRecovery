@@ -1,6 +1,7 @@
 ﻿using Amlakbashi.Core.Common.Localization;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.AccommodationDTOs;
+using Amlakbashi.Core.DTOs.ReserveDTOs;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.PriceHelpers.Interfaces;
 using System;
@@ -29,7 +30,6 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                 var price = (long)Math.Round(((double)days * (double)((double)advertise.RentPrice / 30f) / 10000f), 0) * 10000;
                 price += (moreThanCapacity * advertise.MoreThanCapacityPrice) * days;
                 priceWithoutDiscount = price;
-                //couponCalculationPrice = (long)Math.Round((double)advertise.RentPrice / 30f);
                 return price;
             }
             var from = DateTimeUtility.PersianDateToGregorian(startDate);
@@ -121,6 +121,54 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                 }
             }
             return result;
+        }
+
+        public ReserveCancelationLossDTO CaculateReserveCancelationLoss(Reserve reserve)
+        {
+            var startDate = reserve.StartDate.AddHours(14);
+            var endDate = reserve.EndDate.AddHours(12);
+            var remainedHours = (startDate - DateTime.Now).TotalHours;
+            var reserveDaysCount = (reserve.EndDate - reserve.StartDate).TotalDays;
+            int holidayPikeDayCount = 0;
+            for (DateTime gregorianDate = reserve.StartDate; gregorianDate <= reserve.EndDate; gregorianDate = gregorianDate.AddDays(1))
+            {
+                bool isHoliday;
+                bool isHolidayPike;
+                bool isNorouz;
+                localization.GetJalaliDateHolidayStatus(DateTimeUtility.GregorianToPersianDate(gregorianDate),
+                    out isHoliday, out isHolidayPike, out isNorouz);
+                if (isHolidayPike || isNorouz)
+                {
+                    holidayPikeDayCount += 1;
+                }
+            }
+
+            var dto = new ReserveCancelationLossDTO()
+            {
+                SitePortion = (long)Math.Round(reserve.TotalPrice * 0.1, 0)
+            };
+            if (holidayPikeDayCount > 0 && (reserveDaysCount / holidayPikeDayCount) > 2)
+            {
+                if (remainedHours < 168)
+                {
+                    dto.HostPortion = (long)Math.Round(reserve.TotalPrice * 0.9, 0);
+                }
+            }
+            else
+            {
+                if (remainedHours < 72)
+                {
+                    long couponPrice = 0;
+                    var datePrices = CalculateJalaliDatePrices(reserve.StartDate, reserve.StartDate.AddDays(1), reserve.Advertise,
+                        out couponPrice, Math.Max(0, reserve.NumberOfGuests - reserve.Advertise.Capacity));
+                    dto.HostPortion = (long)Math.Round(datePrices.First().Value.price * 0.9, 0);
+                    if (remainedHours < 14)
+                    {
+                        dto.HostPortion += (long)Math.Round(datePrices.Last().Value.price * 0.9, 0);
+                    }
+                }
+            }
+            return dto;
         }
     }
 }

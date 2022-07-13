@@ -152,6 +152,20 @@ namespace Amlakbashi.Host.Controllers.WebService
             return Ok();
         }
 
+        [HttpGet("cancel")]
+        public IActionResult GetCancelationInfo(ReservePostCancelRequest request)
+        {
+            request.userId = User.GetId();
+            request.panel = User.GetUserPanelType();
+            request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
+            var result = reserveService.GetCancelationInfo(request);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            return Ok(result.Result);
+        }
+
         [HttpPost("cancel")]
         public async Task<IActionResult> Cancel(ReservePostCancelRequest request)
         {
