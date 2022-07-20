@@ -45,7 +45,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         void CancelReserve(User user, long reserve_id, int cancel_reason_code,
             string cancel_reason_string, bool is_host, out string msg,
             out bool isPending, ActionSourceEnum actionSource, int doerUserId);
-        ServiceResult<long> GetCancelationInfo(ReservePostCancelRequest request);
+        ServiceResult<ReserveCancelationLossDTO> GetCancelationInfo(ReservePostCancelRequest request);
         Task<ServiceResult> CancelAsync(ReservePostCancelRequest request);
         void RefuseCancelReserve(User user, long reserve_id, bool is_host, out string msg,
             ActionSourceEnum actionLog, int doerUserId);

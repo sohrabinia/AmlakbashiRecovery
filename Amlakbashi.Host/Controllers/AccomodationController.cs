@@ -1421,9 +1421,9 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(id);
                 var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s));
                 var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
-                return GenerateJsonResult(new 
-                { 
-                    status = 1, 
+                return GenerateJsonResult(new
+                {
+                    status = 1,
                     occupiedList = occupiedList,
                     extrinsicList = extrinsicList
                 });
@@ -1462,8 +1462,9 @@ namespace Amlakbashi.Host.Controllers
                     acc = advertiseService.Find(acc.Id, true);
                     var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
                     var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
-                    return GenerateJsonResult(new { 
-                        status = 1, 
+                    return GenerateJsonResult(new
+                    {
+                        status = 1,
                         msg = "محدوده انتخاب شده به عنوان روز های پر ثبت شد",
                         occupiedList = occupiedList,
                         extrinsicList = extrinsicList,
@@ -2369,35 +2370,35 @@ namespace Amlakbashi.Host.Controllers
             advertiseService.RequestInstantReserve(id, ignoreMsg, userId,
                 userAccessor.DoerUser.Id, ActionLog.ActionSourceEnum.WebsiteDashboard,
                 userAccessor.CurrentUser.InstantReserveAccess, out needMsg);
-            acc = advertiseService.Find(id);
+            //acc = advertiseService.Find(id);
             InstantReserveRequestResultDTO result;
-            if (needMsg)
+            //if (needMsg)
+            //{
+            result = new InstantReserveRequestResultDTO()
             {
-                result = new InstantReserveRequestResultDTO()
-                {
-                    status = 1,
-                    needMsg = true
-                };
-            }
-            else
-            {
-                result = new InstantReserveRequestResultDTO()
-                {
-                    status = 1,
-                    needMsg = false,
-                    msg = acc.InstantReserveStatus == InstantReserveStatusEnum.Requested ?
-                          "درخواست فعال سازی شما ارسال شد و بعد از تایید کارشناس این امکان برای این اقامتگاه فعال میشود" :
-                          "امکان رزرو آنی برای این اقامتگاه فعال شد",
-                    newData = new InstantReserveDetailDTO()
-                    {
-                        status = acc.InstantReserveStatus,
-                        statusString = AdvertiseMainLocalization.GetInstantReserveStatusString(acc.InstantReserveStatus),
-                        statusColor = AdvertiseStyleHelper.GetInstantReserveStatusColor(acc.InstantReserveStatus),
-                        banned = userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned,
-                        buttonTitle = AdvertiseMainLocalization.GetInstantReserveButtonTitle(acc.InstantReserveStatus, userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
-                    }
-                };
-            }
+                status = 1,
+                needMsg = true
+            };
+            //}
+            //else
+            //{
+            //    result = new InstantReserveRequestResultDTO()
+            //    {
+            //        status = 1,
+            //        needMsg = false,
+            //        msg = acc.InstantReserveStatus == InstantReserveStatusEnum.Requested ?
+            //              "درخواست فعال سازی شما ارسال شد و بعد از تایید کارشناس این امکان برای این اقامتگاه فعال میشود" :
+            //              "امکان رزرو آنی برای این اقامتگاه فعال شد",
+            //        newData = new InstantReserveDetailDTO()
+            //        {
+            //            status = acc.InstantReserveStatus,
+            //            statusString = AdvertiseMainLocalization.GetInstantReserveStatusString(acc.InstantReserveStatus),
+            //            statusColor = AdvertiseStyleHelper.GetInstantReserveStatusColor(acc.InstantReserveStatus),
+            //            banned = userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned,
+            //            buttonTitle = AdvertiseMainLocalization.GetInstantReserveButtonTitle(acc.InstantReserveStatus, userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
+            //        }
+            //    };
+            //}
             return GenerateJsonResult(result);
         }
 
@@ -2407,15 +2408,15 @@ namespace Amlakbashi.Host.Controllers
             var acc = advertiseService.Find(id);
             if (acc.UserID != userId)
             {
-                return GenerateJsonResult(new InstantReserveRequestResultDTO()
+                return GenerateJsonResult(new
                 {
                     status = 0,
                     msg = "شما مجوز این کار را ندارید"
-                } as dynamic);
+                });
             }
             if (userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
             {
-                return GenerateJsonResult(new InstantReserveRequestResultDTO()
+                return GenerateJsonResult(new
                 {
                     status = 0,
                     msg = "این امکان برای شما غیر فعال شده است"

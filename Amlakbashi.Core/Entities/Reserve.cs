@@ -621,6 +621,16 @@ namespace Amlakbashi.Core.Entities
             return any_payments ? payments.Sum(x => x.Price) : 0;
         }
 
+        public long GetGuestPaidAmount()
+        {
+            var guestPaidAmount = ReservePayments.Where(
+                        x => x.PaymentType == (int)ReservePaymentType.GuestDeposite ||
+                        x.PaymentType == (int)ReservePaymentType.GuestClearing).Sum(x=>x.Price);
+            var siteRefundToGuestAmount = ReservePayments.Where(
+                x => x.PaymentType == (int)ReservePaymentType.SiteRefundToGuest).Sum(x => x.Price);
+            return guestPaidAmount - siteRefundToGuestAmount;
+        }
+
         public IList<ReserveSupport> GetRelatedSupports()
         {
             var supports = GuestUser.ReserveSupportsAsGuest.AsQueryable();

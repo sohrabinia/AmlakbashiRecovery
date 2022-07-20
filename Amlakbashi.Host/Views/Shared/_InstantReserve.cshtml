@@ -1,17 +1,37 @@
-﻿@*< !--item 5-- >*@
-@using Entities = Amlakbashi.Core.Entities;
+﻿@using Entities = Amlakbashi.Core.Entities;
 @model Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs.DashboardAccDTO
 
-@{var instantReserveAccess = (User.InstantReserveAccessEnum)int.Parse(ViewData["instantReserveAccess"].ToString());
+@{
+    var instantReserveAccess = (User.InstantReserveAccessEnum)int.Parse(ViewData["instantReserveAccess"].ToString());
     var instantReserveBanned = instantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned;
 }
 
-@switch (instantReserveAccess)
+@if (instantReserveBanned)
+{
+    <div class="main-quick-reserve" id="js-instant-reserve-@Model.id" onclick="instantReserve(@Model.id , @ViewData["UserID"], true)" style="background-color:@( instantReserveBanned ? "#EA4335" : Amlakbashi.Core.Infrastructure.StyleHelpers.AdvertiseStyleHelper.GetInstantReserveStatusColor(Model.instantReserveStatus));">
+        مشاهده دلیل ممنوعیت
+    </div>
+}
+else
+{
+    <p style="margin: 10px;">در صورت فعالسازی رزرو آنی، درخواست های رزرو به صورت خودکار پذیرفته شده و نیازی به تایید شما برای پرداخت مهمان نمی باشد.</p>
+    <label class="quick-reserve-button">
+        <label class="strintantReserve">رزرو آنی  </label>
+        <input class="input_instant-reserve" type="checkbox" is-checked="@(Model.instantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed)" id="checkbox-@Model.id" onchange="instantReserveButton(@Model.id , @ViewData["UserID"], this)" />
+        <span class="on-or-off-box">
+            <span class="on">فعال</span>
+            <span class="off">غیرفعال</span>
+        </span>
+        <i class="button-instant-reserve"></i>
+    </label>
+}
+
+@*@switch (instantReserveAccess)
 {
     case Entities.User.InstantReserveAccessEnum.Verified:
         <label class="quick-reserve-button">
             <label class="strintantReserve">رزرو آنی  </label>
-            <input class="input_instant-reserve" type="checkbox" is-checked="@(Model.instantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed)" id="checkbox-@Model.id" onchange="instantReserveButton(@Model.id , @ViewData["UserID"], this)"/>
+            <input class="input_instant-reserve" type="checkbox" is-checked="@(Model.instantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed)" id="checkbox-@Model.id" onchange="instantReserveButton(@Model.id , @ViewData["UserID"], this)" />
             <span class="on-or-off-box">
                 <span class="on">فعال</span>
                 <span class="off">غیرفعال</span>
@@ -31,15 +51,16 @@
                 {
                     case Advertise.InstantReserveStatusEnum.None:
                         @:ارسال درخواست رزرو آنی
-                    break;
+                        break;
                     case Advertise.InstantReserveStatusEnum.Requested:
                         @:لغو رزرو آنی
-                    break;
+                        break;
                 }
             }
         </div>
         break;
-}
+}*@
+
 <a id="instantReserve-@Model.id" class="wrapper-left help-quick-reserve" target="_blank" href="https://blog.amlakbashi.com/%d8%b1%d8%a7%d9%87%d9%86%d9%85%d8%a7%db%8c-%d8%a7%d8%b3%d8%aa%d9%81%d8%a7%d8%af%d9%87-%d8%a7%d8%b2-%d8%a7%d9%85%da%a9%d8%a7%d9%86-%d8%b1%d8%b2%d8%b1%d9%88-%d8%a2%d9%86%db%8c-%d8%af%d8%b1-%d8%a7%d9%85/">
     <i class="far fa-question-circle"></i>
 </a>

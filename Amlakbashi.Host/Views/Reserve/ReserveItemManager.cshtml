@@ -218,8 +218,44 @@
             });
         }
 
-        function cancel(reserveId) {
-            showInfoMessage('لغو رزرو ' + reserveId, '', { contentUrl: '/reserve/ShowCancelDialog?reserveId=' + reserveId, fullScreen: screen.width < 781 });
+        function doCancel(reserveId) {
+            var tip_text = '';
+            var cancleText = `${tip_text}<div id="cancel_reason_container"><span id="cancel_reason_span" style="display:block;padding:5px;">لطفا دلیل لغو سفر را بنویسید:</span><textarea id="cancel_reason_input" style="width:100%" placeholder="لطفا فارسی تایپ کنید"></textarea></div>`
+            closeCancelingReserve = showNoYesMessage('لغو رزرو', `${cancleText}`, function () {
+                reasonDesc = $("#cancel_reason_input").val();
+                if (!reasonDesc) {
+                    alertify.error('لطفا دلیل لغو سفر را بنویسید');
+                } else {
+                    $.ajax({
+                        url: "/reserve/cancel",
+                        type: "post",
+                        data: {
+                            reserveId: reserveId,
+                            reason: 0,
+                            reasonDesc: reasonDesc
+                        },
+                        beforeSend: function () {
+
+                        },
+                        success: function (response) {
+                            if (response.status == 0) {
+                                alertify.error(response.msg);
+                            }
+                            else {
+                                alertify.success("رزرو مورد نظر با موفقیت لغو شد");
+                                closeCancelingReserve.close();
+                            }
+                        },
+                        error: function (ret) {
+                            alertify.error("عملیات با خطا مواجه شد");
+                        }
+                    });
+                }
+            }, undefined, { noText: 'انصراف', yesText: ' لغو رزرو', autoClose: false });
+        }
+
+        function showCancelDialog(reserveId) {
+            showInfoMessage('لغو رزرو ' + reserveId, '', { contentUrl: '/reserve/ShowCancelDialog?reserveId=' + reserveId });
         }
 
         function confirmCashPay(reserve_id, confirm_state) {

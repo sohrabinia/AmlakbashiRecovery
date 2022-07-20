@@ -73,10 +73,10 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                     //{
                     //    is_holiday_pike = true;
                     //}
-                    if (jalaliDate == "1401,4,26")
-                    {
-                        is_holiday_pike = true;
-                    }
+                    //if (DateTimeUtility.ManualHolidayPeakPersianDates.Contains(jalaliDate))
+                    //{
+                    //    is_holiday_pike = true;
+                    //}
                     // ##########
 
                     if (is_norouz && advertise.NorouzPrice > 0)
@@ -123,14 +123,30 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
             return result;
         }
 
-        public ReserveCancelationLossDTO CaculateReserveCancelationLoss(Reserve reserve)
+        public ReserveCancelationLossDTO CaculateGuestReserveCancelationLoss(Reserve reserve)
         {
             var startDate = reserve.StartDate.AddHours(14);
-            var endDate = reserve.EndDate.AddHours(12);
             var remainedHours = (startDate - DateTime.Now).TotalHours;
             var reserveDaysCount = (reserve.EndDate - reserve.StartDate).TotalDays;
-            int holidayPikeDayCount = 0;
-            for (DateTime gregorianDate = reserve.StartDate; gregorianDate <= reserve.EndDate; gregorianDate = gregorianDate.AddDays(1))
+            int holidayPeakDayCount = 0;
+            var guestPaidAmount = reserve.GetGuestPaidAmount();
+
+            var dto = new ReserveCancelationLossDTO()
+            {
+                SitePortion = (long)Math.Round(reserve.TotalPrice * 0.1, 0)
+            };
+            if ((reserve.StartDate - reserve.CreateDate).TotalHours < 6)
+            {
+                long couponPrice = 0;
+                var datePrices = CalculateJalaliDatePrices(reserve.StartDate, reserve.StartDate.AddDays(1), reserve.Advertise,
+                        out couponPrice, Math.Max(0, reserve.NumberOfGuests - reserve.Advertise.Capacity));
+                var firstDayHostPortion = (long)Math.Round(datePrices.First().Value.price * 0.9, 0);
+                dto.HostPortion = (long)Math.Round(firstDayHostPortion * 0.5, 0);
+                dto.GuestPortion = guestPaidAmount - (dto.SitePortion + dto.HostPortion);
+                return dto;
+            }
+
+            for (DateTime gregorianDate = reserve.StartDate; gregorianDate < reserve.EndDate; gregorianDate = gregorianDate.AddDays(1))
             {
                 bool isHoliday;
                 bool isHolidayPike;
@@ -139,15 +155,11 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                     out isHoliday, out isHolidayPike, out isNorouz);
                 if (isHolidayPike || isNorouz)
                 {
-                    holidayPikeDayCount += 1;
+                    holidayPeakDayCount += 1;
                 }
             }
 
-            var dto = new ReserveCancelationLossDTO()
-            {
-                SitePortion = (long)Math.Round(reserve.TotalPrice * 0.1, 0)
-            };
-            if (holidayPikeDayCount > 0 && (reserveDaysCount / holidayPikeDayCount) > 2)
+            if (holidayPeakDayCount > 0 && (reserveDaysCount / holidayPeakDayCount) < 2)
             {
                 if (remainedHours < 168)
                 {
@@ -159,15 +171,21 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                 if (remainedHours < 72)
                 {
                     long couponPrice = 0;
-                    var datePrices = CalculateJalaliDatePrices(reserve.StartDate, reserve.StartDate.AddDays(1), reserve.Advertise,
+                    var datePrices = CalculateJalaliDatePrices(reserve.StartDate, reserve.StartDate.AddDays(2), reserve.Advertise,
                         out couponPrice, Math.Max(0, reserve.NumberOfGuests - reserve.Advertise.Capacity));
-                    dto.HostPortion = (long)Math.Round(datePrices.First().Value.price * 0.9, 0);
-                    if (remainedHours < 14)
+                    var realHostPortion = (long)Math.Round(datePrices.First().Value.price * 0.9, 0);
+                    if (remainedHours < 14 && reserveDaysCount > 1)
                     {
-                        dto.HostPortion += (long)Math.Round(datePrices.Last().Value.price * 0.9, 0);
+                        realHostPortion += (long)Math.Round(datePrices.ElementAt(1).Value.price * 0.9, 0);
+                        if (reserveDaysCount >= 30)
+                        {
+                            realHostPortion += (long)Math.Round(datePrices.Last().Value.price * 0.9, 0);
+                        }
                     }
+                    dto.HostPortion = guestPaidAmount >= realHostPortion ? realHostPortion : guestPaidAmount - dto.SitePortion;
                 }
             }
+            dto.GuestPortion = guestPaidAmount - (dto.SitePortion + dto.HostPortion);
             return dto;
         }
     }

@@ -832,9 +832,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var isPaidDeposit = reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePayment.ReservePaymentType.GuestDeposite ||
                 a.PaymentType == (int)ReservePayment.ReservePaymentType.GuestClearing);
 
-            //var isPaidDeposit = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest) >=
-            //    reserve.DepositPrice - reserve.CouponPrice - reserve.PrizePrice;
-
             if (isPaidDeposit == false && (dto.Status == ReserveStatus.Reserved || dto.Status == ReserveStatus.CashPay ||
                 dto.Status == ReserveStatus.Started || dto.Status == ReserveStatus.Completed ||
                 dto.Status == ReserveStatus.CancelRequestByGuest || dto.Status == ReserveStatus.CancelRequestByHost))
@@ -875,32 +872,21 @@ namespace Amlakbashi.Application.Services.ReserveServices
             if (reserve.InstantReserve &&
                 reserve.InstantReserveCancelHost == false &&
                 dto.Status == Reserve.ReserveStatus.CanceledByHost &&
-                accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(), Reserve.StatusStringType.Guest) > 0)
+                reserve.GetGuestPaidAmount() > 0)
             {
                 var hostCancelCount = reserve.HostUser.Advertises.Sum(x => x.InstantReserveCancels);
-                int penaltyPrice = 0;
-                if (hostCancelCount == 0)
-                {
-                    penaltyPrice = (int)Math.Floor(reserve.TotalPrice * 0.1f);
-                }
-                else if (hostCancelCount > 0)
-                {
-                    penaltyPrice = (int)Math.Floor(reserve.TotalPrice * 0.15f);
-                }
-                if (penaltyPrice > 0)
-                {
-                    long newCredit;
-                    accounting.DecreaseCredit(reserve.HostUserID, penaltyPrice, 0, 0, out newCredit, CreditTransaction.WalletTransactionReason.Other, "جریمه لغو رزرو آنی کد " + dto.Id, null, doerUserId, ActionLog.ActionSourceEnum.AdminPanel);
-                }
+                long newCredit;
+                accounting.DecreaseCredit(reserve.HostUserID, (int)Math.Floor(reserve.TotalPrice * 0.1f), 0, 0, out newCredit,
+                    CreditTransaction.WalletTransactionReason.Other, "جریمه لغو رزرو آنی کد " + dto.Id,
+                    null, doerUserId, ActionLog.ActionSourceEnum.AdminPanel);
                 reserve.InstantReserveCancelHost = true;
-
-                mediator.Send(new IncreaseInstantReserveCancelCommand(reserve.AdvertiseID));
-                if (hostCancelCount > reserve.HostUser.CancelInstantReserveLimit - 1)
-                {
-                    mediator.Send(new ChangeInstantReserveAccessCommand(reserve.HostUserID,
-                        User.InstantReserveAccessEnum.Banned, doerUserId, actionSource));
-                    mediator.Send(new UpdateInstantReserveStatusCommand(reserve.AdvertiseID, Advertise.InstantReserveStatusEnum.None, doerUserId, actionSource));
-                }
+                //mediator.Send(new IncreaseInstantReserveCancelCommand(reserve.AdvertiseID));
+                //if (hostCancelCount > reserve.HostUser.CancelInstantReserveLimit - 1)
+                //{
+                //    mediator.Send(new ChangeInstantReserveAccessCommand(reserve.HostUserID,
+                //        User.InstantReserveAccessEnum.Banned, doerUserId, actionSource));
+                //    mediator.Send(new UpdateInstantReserveStatusCommand(reserve.AdvertiseID, Advertise.InstantReserveStatusEnum.None, doerUserId, actionSource));
+                //}
             }
             reserve.NumberOfGuests = dto.GuestCount;
             reserve.TotalPrice = dto.TotalPrice;
@@ -1259,21 +1245,21 @@ namespace Amlakbashi.Application.Services.ReserveServices
             }
         }
 
-        public ServiceResult<long> GetCancelationInfo(ReservePostCancelRequest request)
+        public ServiceResult<ReserveCancelationLossDTO> GetCancelationInfo(ReservePostCancelRequest request)
         {
-            var serviceResult = new ServiceResult<long>();
+            var serviceResult = new ServiceResult<ReserveCancelationLossDTO>();
             var reserve = Repository.Find(request.reserveId);
             if ((reserve.UserID == request.userId || reserve.HostUserID == request.userId) == false)
             {
-                serviceResult.AddError("user is incorrect");
+                serviceResult.AddError("شما مجوز این کار را ندارید");
             }
             if (reserve.Status > ReserveStatus.Started)
             {
-                serviceResult.AddError("cannot cancel this reserve");
+                serviceResult.AddError("امکان لغو این رزرو وجود ندارد");
             }
             if (request.reason == ReserveCancelReasons.Unset && string.IsNullOrEmpty(request.reasonDesc))
             {
-                serviceResult.AddError("select reason");
+                serviceResult.AddError("لطفا دلیل لغو رزرو را انتخاب کنید");
             }
             if (serviceResult.HasError())
             {
@@ -1283,11 +1269,13 @@ namespace Amlakbashi.Application.Services.ReserveServices
             switch (request.cancelType)
             {
                 case ReserveCancelType.CancelByGuestForGuestProblem:
-                    var lossPrices = priceCalculator.CaculateReserveCancelationLoss(reserve);
-                    serviceResult.Result = lossPrices.HostPortion + lossPrices.SitePortion;
+                    serviceResult.Result = priceCalculator.CaculateGuestReserveCancelationLoss(reserve);
                     break;
                 case ReserveCancelType.CancelByHostForHostProblem:
-                    serviceResult.Result = (long)Math.Round(reserve.TotalPrice * 0.1, 0);
+                    serviceResult.Result = new ReserveCancelationLossDTO() 
+                    { 
+                        SitePortion = (long)Math.Round(reserve.TotalPrice * 0.1, 0)
+                    };
                     break;
                 case ReserveCancelType.CancelByGuestForHostProblem:
                 case ReserveCancelType.CancelByHostForGuestProblem:
@@ -1303,15 +1291,15 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var reserve = Repository.Find(request.reserveId);
             if ((reserve.UserID == request.userId || reserve.HostUserID == request.userId) == false)
             {
-                serviceResult.AddError("user is incorrect");
+                serviceResult.AddError("شما مجوز این کار را ندارید");
             }
-            if (reserve.Status > ReserveStatus.Started)
+            if (reserve.Status > ReserveStatus.Started || reserve.Status == ReserveStatus.Rejected)
             {
-                serviceResult.AddError("cannot cancel this reserve");
+                serviceResult.AddError("امکان لغو این رزرو وجود ندارد");
             }
             if (request.reason == ReserveCancelReasons.Unset && string.IsNullOrEmpty(request.reasonDesc))
             {
-                serviceResult.AddError("select reason");
+                serviceResult.AddError("لطفا دلیل لغو رزرو را انتخاب کنید");
             }
             if (serviceResult.HasError())
             {
@@ -1320,9 +1308,9 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
             var targetStatus = ReserveStatus.Default;
             var guestPayedPrice = accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(), StatusStringType.Guest);
-            if (guestPayedPrice <= 0)
+            if (reserve.Status == ReserveStatus.WaitForResponse || reserve.Status == ReserveStatus.WaitForReserve)
             {
-                targetStatus = request.panel == User.UserGeneralTypeEnum.Host ?
+                targetStatus = request.userId == reserve.HostUserID ?
                     ReserveStatus.CanceledByHost : ReserveStatus.CanceledByGuest;
             }
             else
@@ -1333,7 +1321,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 {
                     case ReserveCancelType.CancelByGuestForGuestProblem:
                         targetStatus = ReserveStatus.CanceledByGuest;
-                        var lossPrices = priceCalculator.CaculateReserveCancelationLoss(reserve);
+                        var lossPrices = priceCalculator.CaculateGuestReserveCancelationLoss(reserve);
                         guestRefundCreditTransactionId = accounting.IncreaseCredit(reserve.UserID, guestPayedPrice, 0,
                             reserve.Id, out newCredit, CreditTransaction.WalletTransactionReason.Refund);
                         accounting.InsertReservePayment(request.userId, reserve.Id, guestRefundCreditTransactionId, 0,
@@ -1361,7 +1349,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                         targetStatus = ReserveStatus.CancelRequestByHost;
                         break;
                     default:
-                        targetStatus = request.panel == User.UserGeneralTypeEnum.Host ?
+                        targetStatus = request.userId == reserve.HostUserID ?
                             ReserveStatus.CancelRequestByHost : ReserveStatus.CancelRequestByGuest;
                         break;
                 }
@@ -1371,7 +1359,14 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 request.actionSource, request.userId));
             if (changeStatusResult)
             {
-                reserve.CancelReason = request.reasonDesc;
+                if (request.reason == ReserveCancelReasons.Unset)
+                {
+                    reserve.CancelReason = request.reasonDesc;
+                }
+                else
+                {
+                    reserve.CancelReason = ReserveLocalization.GetReserveCancelReasonsTitle(request.reason);
+                }
                 Repository.Update(reserve);
                 Repository.Save();
             }

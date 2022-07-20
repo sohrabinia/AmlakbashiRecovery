@@ -18,6 +18,6 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers.Interfaces
             DateTime from, DateTime to, Advertise advertise,
             out long couponCalculationPrice, int moreThanCapacity = 0);
 
-        ReserveCancelationLossDTO CaculateReserveCancelationLoss(Reserve reserve);
+        ReserveCancelationLossDTO CaculateGuestReserveCancelationLoss(Reserve reserve);
     }
 }

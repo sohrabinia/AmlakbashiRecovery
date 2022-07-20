@@ -567,9 +567,6 @@ namespace Amlakbashi.Host.Controllers
             request.userId = userAccessor.CurrentUser.Id;
             request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
             var result = reserveService.GetCancelationInfo(request);
-            ViewBag.reserveId = request.reserveId;
-            ViewBag.reason = request.reason;
-            ViewBag.reasonDesc = request.reasonDesc;
             if (result.HasError())
             {
                 ViewBag.hasError = true;

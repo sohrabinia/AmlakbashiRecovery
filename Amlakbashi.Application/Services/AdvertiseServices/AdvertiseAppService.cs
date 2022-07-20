@@ -742,7 +742,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 serviceResult.AddError("advertise not found");
                 return serviceResult;
             }
-            if (request.mainImageId > 0 && advertise.Photos.Any(x=>x.Id == request.mainImageId) == false)
+            if (request.mainImageId > 0 && advertise.Photos.Any(x => x.Id == request.mainImageId) == false)
             {
                 serviceResult.AddError("main image id is incorrect");
                 return serviceResult;
@@ -1877,39 +1877,56 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             using (var tran = new TransactionScope())
             {
                 needMsg = false;
-                var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-                if (currInstantReserveAccess == User.InstantReserveAccessEnum.Verified)
+                var residence = Repository.Find(id);
+                if (residence.User.InstantReserveAccess == User.InstantReserveAccessEnum.Banned)
                 {
-                    if (acc.InstantReserveStatus != InstantReserveStatusEnum.Confirmed)
-                    {
-                        acc.InstantReserveStatus = InstantReserveStatusEnum.Confirmed;
-                        Repository.Update(acc);
-                        Repository.Save();
-                        mediator.Publish(new ChangeInstantReserveStatusEvent(id, acc.UserID,
-                                acc.InstantReserveStatus, actionSource, doerUserId));
-                    }
+                    return;
                 }
-                else
-                {
-                    if (ignoreMsg || currInstantReserveAccess == User.InstantReserveAccessEnum.Requested)
-                    {
-                        var currInstantReserveStatus = acc.InstantReserveStatus;
-                        if (currInstantReserveStatus != InstantReserveStatusEnum.Requested)
-                        {
-                            acc.InstantReserveStatus = InstantReserveStatusEnum.Requested;
-                            Repository.Update(acc);
-                            Repository.Save();
-                            mediator.Publish(new ChangeInstantReserveStatusEvent(id, acc.UserID,
-                                acc.InstantReserveStatus, actionSource, doerUserId));
-                        }
-                    }
-                    else
-                    {
-                        needMsg = true;
-                    }
-                }
+                residence.InstantReserveStatus = InstantReserveStatusEnum.Confirmed;
+                Repository.Update(residence);
+                Repository.Save();
+                mediator.Publish(new ChangeInstantReserveStatusEvent(id, residence.UserID,
+                        residence.InstantReserveStatus, actionSource, doerUserId));
+                mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
                 tran.Complete();
             }
+
+            //using (var tran = new TransactionScope())
+            //{
+            //    needMsg = false;
+            //    var acc = Repository.Find(id);
+            //    if (currInstantReserveAccess == User.InstantReserveAccessEnum.Verified)
+            //    {
+            //        if (acc.InstantReserveStatus != InstantReserveStatusEnum.Confirmed)
+            //        {
+            //            acc.InstantReserveStatus = InstantReserveStatusEnum.Confirmed;
+            //            Repository.Update(acc);
+            //            Repository.Save();
+            //            mediator.Publish(new ChangeInstantReserveStatusEvent(id, acc.UserID,
+            //                    acc.InstantReserveStatus, actionSource, doerUserId));
+            //        }
+            //    }
+            //    else
+            //    {
+            //        if (ignoreMsg || currInstantReserveAccess == User.InstantReserveAccessEnum.Requested)
+            //        {
+            //            var currInstantReserveStatus = acc.InstantReserveStatus;
+            //            if (currInstantReserveStatus != InstantReserveStatusEnum.Requested)
+            //            {
+            //                acc.InstantReserveStatus = InstantReserveStatusEnum.Requested;
+            //                Repository.Update(acc);
+            //                Repository.Save();
+            //                mediator.Publish(new ChangeInstantReserveStatusEvent(id, acc.UserID,
+            //                    acc.InstantReserveStatus, actionSource, doerUserId));
+            //            }
+            //        }
+            //        else
+            //        {
+            //            needMsg = true;
+            //        }
+            //    }
+            //    tran.Complete();
+            //}
         }
 
         public void CancelInstantReserve(long id, int userId, int doerUserId,
@@ -1917,12 +1934,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             using (var tran = new TransactionScope())
             {
-                var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
+                var acc = Repository.Find(id);
                 acc.InstantReserveStatus = InstantReserveStatusEnum.None;
                 Repository.Update(acc);
                 Repository.Save();
                 mediator.Publish(new ChangeInstantReserveStatusEvent(id,
                     userId, acc.InstantReserveStatus, actionSource, doerUserId));
+                mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
                 tran.Complete();
             }
         }

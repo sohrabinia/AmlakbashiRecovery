@@ -163,7 +163,10 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 return BadRequest(result.GetErrors());
             }
-            return Ok(result.Result);
+            return Ok(new
+            {
+                result.Result
+            });
         }
 
         [HttpPost("cancel")]
