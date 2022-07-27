@@ -468,13 +468,15 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 string msg;
+                bool isInstantReserve = false;
                 var ok = advertiseService.CheckReserve(userAccessor.CurrentUser.Id, advertise_id,
-                    number_of_guests, from_date, to_date, out msg);
+                    number_of_guests, from_date, to_date, out msg, out isInstantReserve);
 
                 return GenerateJsonResult(new
                 {
                     val = ok ? 1 : 0,
-                    msg = msg
+                    msg = msg,
+                    isInstantReserve
                 });
             }
             catch (Exception exc)
@@ -484,8 +486,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        public JsonResult ReserveRequest(int advertise_id, string from_date, string to_date,
-            int number_of_guests, bool instant_reserve = false)
+        public JsonResult ReserveRequest(int advertise_id, string from_date, string to_date, int number_of_guests)
         {
             try
             {
@@ -501,8 +502,7 @@ namespace Amlakbashi.Host.Controllers
                 string msg;
                 long reserveId;
                 var done = advertiseService.ReserveRequest(advertise_id,
-                    userAccessor.CurrentUser.Id, from_date, to_date, number_of_guests,
-                    instant_reserve, out msg, out reserveId);
+                    userAccessor.CurrentUser.Id, from_date, to_date, number_of_guests, out msg, out reserveId);
                 return GenerateJsonResult(new
                 {
                     val = done ? 1 : 0,

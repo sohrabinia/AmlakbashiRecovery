@@ -229,7 +229,9 @@ namespace Amlakbashi.Application.Services.Category
             //filter instant reserve accommodations
             if (instant_reserve != null && instant_reserve == "1")
             {
-                advertises = advertises.Where(a => a.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed);
+                //advertises = advertises.Where(a => a.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent);
+                advertises = advertises.Where(a => a.InstantReserveStatus == InstantReserveStatusEnum.Permanent ||
+                    a.InstantReserveDates.Any());
             }
 
             //filter by price
@@ -289,6 +291,7 @@ namespace Amlakbashi.Application.Services.Category
                 }
                 advertises = advertiseFilter.FilterEmptyInRange(advertises, range);
             }
+
             IOrderedQueryable<Advertise> model_output;
             if (capacity_int > 0)
             {
@@ -369,6 +372,11 @@ namespace Amlakbashi.Application.Services.Category
                             .OrderBy(x => 0);
                     }
                 }
+            }
+            if (instant_reserve != null && instant_reserve == "1")
+            {
+                model_output = model_output.ThenByDescending(x => x.InstantReserveStatus == InstantReserveStatusEnum.Permanent ||
+                    x.InstantReserveDates.Any(a =>a.Date == DateTime.Now.Date));
             }
             switch ((SortOrder)sort)
             {

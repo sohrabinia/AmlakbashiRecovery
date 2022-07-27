@@ -47,7 +47,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             response.roomCount = advertise.Room;
             response.rate = advertise.AverageUserRating;
             response.rateCount = advertise.UserRatingDict().Count;
-            response.instantReserve = advertise.InstantReserveStatus == Entities.Advertise.InstantReserveStatusEnum.Confirmed;
+            response.instantReserve = advertise.InstantReserveStatus == Entities.Advertise.InstantReserveStatusEnum.Permanent;
             response.discountPercent = discountPercent;
             response.provinceName = advertise.RegionProvince.PersianName;
             response.cityName = advertise.RegionCity.PersianName;

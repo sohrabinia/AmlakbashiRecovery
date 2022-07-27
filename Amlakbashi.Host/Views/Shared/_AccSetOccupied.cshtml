@@ -1,14 +1,13 @@
 ﻿@model Advertise
 
-@if (true)
-{
-    @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" }, { "noImageLazy", true } })
-    <div class="acc-set-date__input-container">
-        <div onclick="setAsOccupied(this)" class="acc-set-date__button acc-set-date__occ-btn acc-set-date__disabled-button">پر است</div>
-        <div onclick="removeFromOccupied(this)" class="acc-set-date__button acc-set-date__empty-btn acc-set-date__disabled-button">خالی است</div>
-    </div>
-    <div class="acc-set-date__date-string"></div>
-    <script type="text/javascript">
+@await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" }, { "noImageLazy", true } })
+<div class="acc-set-date__input-container">
+    <div onclick="setAsOccupied(this)" class="acc-set-date__button acc-set-date__occ-btn acc-set-date__disabled-button">پر است</div>
+    <div onclick="removeFromOccupied(this)" class="acc-set-date__button acc-set-date__empty-btn acc-set-date__disabled-button">خالی است</div>
+</div>
+<div class="acc-set-date__date-string"></div>
+
+<script type="text/javascript">
     var occupiedListStr = '@ViewBag.occupiedList';
     occupiedListStr = occupiedListStr.replaceAll('&quot;', '"');
     var occupiedList = JSON.parse(occupiedListStr);
@@ -182,5 +181,4 @@
                     });
             });
     }
-    </script>
-}
+</script>

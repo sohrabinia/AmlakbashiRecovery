@@ -262,10 +262,10 @@ namespace Amlakbashi.Host.Controllers
                             model = model.Where(x => staffMobiles.Contains(x.PhoneNumber));
                             break;
                         case Entities.User.UserFilterType.InstantReserveRequest:
-                            model = model.Where(x => x.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Requested);
+                            //model = model.Where(x => x.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Requested);
                             break;
                         case Entities.User.UserFilterType.InstantReserveAllow:
-                            model = model.Where(x => x.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Verified);
+                            //model = model.Where(x => x.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Verified);
                             break;
                         case Entities.User.UserFilterType.PhotoChangeRequest:
                             model = model.Where(x => x.PhotoStatus == (int)Entities.User.UserPhotoState.ready_publish);
@@ -452,7 +452,7 @@ namespace Amlakbashi.Host.Controllers
                     {
                         User = item,
                         BankCard = bankCardService.GetByUserId(item.Id),
-                        InstantReserveCancel = advertiseService.GetInstantReserveCancelCount(item.Id),
+                        //InstantReserveCancel = advertiseService.GetInstantReserveCancelCount(item.Id),
                         State = userService.GetIdentityUser(item.PhoneNumber).Status
                     };
                     userListDTO.UserItems.Add(itemDTO);
@@ -487,13 +487,13 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize(Policy = Policies.User_General_Edit)]
         [HttpPost]
-        public ActionResult Edit(UserEditDTO editedUser)
+        public async Task<IActionResult> Edit(UserEditDTO editedUser)
         {
             try
             {
                 if (editedUser.IsValid())
                 {
-                    userService.Update(editedUser, userAccessor.DoerUser.Id);
+                    await userService.Update(editedUser, userAccessor.DoerUser.Id);
                     return RedirectToAction(nameof(Edit), new { id = editedUser.Id });
                 }
                 return View(editedUser);
@@ -1698,73 +1698,73 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_LoginPopup");
         }
 
-        [Authorize(Policy = Policies.User_Host_Support)]
-        public ActionResult GetInstantReserveAccs(int userid)
-        {
-            var model = advertiseService.GetInstantReserveAdvertisesByUserId(userid, InstantReserveStatusEnum.Requested);
-            var childrenIds = new List<long>();
+        //[Authorize(Policy = Policies.User_Host_Support)]
+        //public ActionResult GetInstantReserveAccs(int userid)
+        //{
+        //    var model = advertiseService.GetInstantReserveAdvertisesByUserId(userid, InstantReserveStatusEnum.Requested);
+        //    var childrenIds = new List<long>();
 
-            var allParents = model.Where(x => x.Childs.Any());
-            foreach (var parent in allParents)
-            {
-                childrenIds.AddRange(parent.Childs.Select(x => x.Id));
-            }
-            model = model.Where(x => !childrenIds.Contains(x.Id)).ToList();
-            ViewBag.userid = userid;
-            return PartialView("_InstantReserveConfirm", model);
-        }
+        //    var allParents = model.Where(x => x.Childs.Any());
+        //    foreach (var parent in allParents)
+        //    {
+        //        childrenIds.AddRange(parent.Childs.Select(x => x.Id));
+        //    }
+        //    model = model.Where(x => !childrenIds.Contains(x.Id)).ToList();
+        //    ViewBag.userid = userid;
+        //    return PartialView("_InstantReserveConfirm", model);
+        //}
 
-        [Authorize(Policy = Policies.User_Host_Support)]
-        public JsonResult ConfirmInstantReserve(long id)
-        {
-            try
-            {
-                var advertise = advertiseService.Find(id);
-                advertiseService.UpdateInstantReserveStatus(advertise.UserID, InstantReserveStatusEnum.None, true);
-                advertiseService.UpdateInstantReserveStatus(id, InstantReserveStatusEnum.Confirmed, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
-                userService.UpdateInstantReserveAccess(advertise.UserID, Entities.User.InstantReserveAccessEnum.Verified, userAccessor.CurrentUser.Id);
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("User.ConfirmInstantReserve", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
+        //[Authorize(Policy = Policies.User_Host_Support)]
+        //public JsonResult ConfirmInstantReserve(long id)
+        //{
+        //    try
+        //    {
+        //        var advertise = advertiseService.Find(id);
+        //        advertiseService.UpdateInstantReserveStatus(advertise.UserID, InstantReserveStatusEnum.None, true);
+        //        advertiseService.UpdateInstantReserveStatus(id, InstantReserveStatusEnum.Confirmed, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
+        //        userService.UpdateInstantReserveAccess(advertise.UserID, Entities.User.InstantReserveAccessEnum.Verified, userAccessor.CurrentUser.Id);
+        //        return GenerateJsonResult(new { status = 1 });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("User.ConfirmInstantReserve", exc);
+        //        return GenerateJsonResult(new { status = 0 });
+        //    }
+        //}
 
-        [Authorize(Policy = Policies.User_Host_Support)]
-        public JsonResult ConfirmAllInstantReserves(long userid)
-        {
-            try
-            {
-                var user = userService.Find((int)userid);
-                advertiseService.UpdateInstantReserveStatus((int)userid, InstantReserveStatusEnum.Confirmed, true);
-                userService.UpdateInstantReserveAccess(user.Id, Entities.User.InstantReserveAccessEnum.Verified, userAccessor.CurrentUser.Id);
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("User.ConfirmAllInstantReserves", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
+        //[Authorize(Policy = Policies.User_Host_Support)]
+        //public JsonResult ConfirmAllInstantReserves(long userid)
+        //{
+        //    try
+        //    {
+        //        var user = userService.Find((int)userid);
+        //        advertiseService.UpdateInstantReserveStatus((int)userid, InstantReserveStatusEnum.Confirmed, true);
+        //        userService.UpdateInstantReserveAccess(user.Id, Entities.User.InstantReserveAccessEnum.Verified, userAccessor.CurrentUser.Id);
+        //        return GenerateJsonResult(new { status = 1 });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("User.ConfirmAllInstantReserves", exc);
+        //        return GenerateJsonResult(new { status = 0 });
+        //    }
+        //}
 
-        [Authorize(Policy = Policies.User_Host_Support)]
-        public JsonResult CancellAllInstantReserves(long userid)
-        {
-            try
-            {
-                var user = userService.Find((int)userid);
-                advertiseService.UpdateInstantReserveStatus((int)userid, InstantReserveStatusEnum.None, true);
-                userService.UpdateInstantReserveAccess(user.Id, Entities.User.InstantReserveAccessEnum.None, userAccessor.CurrentUser.Id);
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("User.CancellAllInstantReserves", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
+        //[Authorize(Policy = Policies.User_Host_Support)]
+        //public JsonResult CancellAllInstantReserves(long userid)
+        //{
+        //    try
+        //    {
+        //        var user = userService.Find((int)userid);
+        //        advertiseService.UpdateInstantReserveStatus((int)userid, InstantReserveStatusEnum.None, true);
+        //        userService.UpdateInstantReserveAccess(user.Id, Entities.User.InstantReserveAccessEnum.None, userAccessor.CurrentUser.Id);
+        //        return GenerateJsonResult(new { status = 1 });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("User.CancellAllInstantReserves", exc);
+        //        return GenerateJsonResult(new { status = 0 });
+        //    }
+        //}
 
         [Authorize(Policy = Policies.User_Credit)]
         public JsonResult IncreasePrizeCreditCustom(int id, long amount, string title)

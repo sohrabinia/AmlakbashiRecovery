@@ -26,13 +26,14 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
         public bool ContactPhone { get; set; }
         public User.UserState UserState { get; set; }
         public long Credit { get; set; }
-        public int CancelInstantReserveLimit { get; set; }
+        //public int CancelInstantReserveLimit { get; set; }
         public bool ForbiddenRegionsAccess { get; set; }
 
-        public int InstantReserveCancelCount { get; set; }
+        //public int InstantReserveCancelCount { get; set; }
         public string EmailAddress { get; set; }
         public string LastSendedSmsCode { get; set; }
         public string LastSendedEmailCode { get; set; }
+        public bool DisableInstantReserve { get; set; }
 
         public bool HasError { get; set; } = false;
         public List<string> ErrorMessages { get; set; } = new List<string>();
@@ -54,15 +55,16 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                 ThirdPersonTell = user.ThirdPersonPhoneNumber,
                 AmlakbashiScore = user.AmlakbashiScore,
                 Credit = user.WalletAmount,
-                CancelInstantReserveLimit = user.CancelInstantReserveLimit,
-                InstantReserveCancelCount = user.Advertises.Sum(x => x.InstantReserveCancels),
+                //CancelInstantReserveLimit = user.CancelInstantReserveLimit,
+                //InstantReserveCancelCount = user.Advertises.Sum(x => x.InstantReserveCancels),
                 EmailAddress = identityUser.Email,
                 LastSendedEmailCode = identityUser.EmailVerifyCode,
                 LastSendedSmsCode = identityUser.VerifyCode,
                 UserState = identityUser.Status,
                 OwnerShip = user.OwnerShip,
                 ContactPhone = string.IsNullOrEmpty(user.ContactPhone) == false && user.ContactPhone == "1",
-                ForbiddenRegionsAccess = user.ForbiddenRegionsAccess
+                ForbiddenRegionsAccess = user.ForbiddenRegionsAccess,
+                DisableInstantReserve = user.DisableInstantReserve
             };
         }
 

@@ -778,9 +778,10 @@ namespace Amlakbashi.Application.Services.ReserveServices
             bool isInstantReserve = false;
             var startGaregorianDate = DateTimeUtility.PersianDateToGregorian(request.fromDate);
             var endGaregorianDate = DateTimeUtility.PersianDateToGregorian(request.toDate);
-            if (advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed)
+            if (advertise.IsReserveInstant(startGaregorianDate, endGaregorianDate))
             {
-                isInstantReserve = startGaregorianDate <= DateTime.Now.AddDays(advertise.MaxInstantReserveStart).Date;
+                //isInstantReserve = startGaregorianDate <= DateTime.Now.AddDays(advertise.MaxInstantReserveStart).Date;
+                isInstantReserve = true;
             }
             long withoutDiscountPrice, couponCalculationPrice;
             var days = DateTimeUtility.GetPersianDateRangeDays(request.fromDate, request.toDate);
@@ -874,7 +875,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 dto.Status == Reserve.ReserveStatus.CanceledByHost &&
                 reserve.GetGuestPaidAmount() > 0)
             {
-                var hostCancelCount = reserve.HostUser.Advertises.Sum(x => x.InstantReserveCancels);
+                //var hostCancelCount = reserve.HostUser.Advertises.Sum(x => x.InstantReserveCancels);
                 long newCredit;
                 accounting.DecreaseCredit(reserve.HostUserID, (int)Math.Floor(reserve.TotalPrice * 0.1f), 0, 0, out newCredit,
                     CreditTransaction.WalletTransactionReason.Other, "جریمه لغو رزرو آنی کد " + dto.Id,

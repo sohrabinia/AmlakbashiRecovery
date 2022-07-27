@@ -105,14 +105,14 @@ else
                     <div class="more-filter-row">
                         <div class="item-filter-box">
                             <label class="title-filter">وضعیت رزرو آنی</label>
-                            <select name="InstatntReserveStatus" class="input-stlye">
+                            <select name="InstantReserveStatus" class="input-stlye">
                                 <option value="-1">همه وضعیت ها</option>
                                 @{
                                     var instantReserveStatusArr = (Advertise.InstantReserveStatusEnum[])Enum.GetValues(typeof(Advertise.InstantReserveStatusEnum));
                                 }
                                 @foreach (var st in instantReserveStatusArr)
                                 {
-                                    <option is-selected="@((int)st == Model.InstatntReserveStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetInstantReserveStatusString(st)</option>
+                                    <option is-selected="@((int)st == Model.InstantReserveStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetInstantReserveStatusString(st)</option>
                                 }
                             </select>
                         </div>

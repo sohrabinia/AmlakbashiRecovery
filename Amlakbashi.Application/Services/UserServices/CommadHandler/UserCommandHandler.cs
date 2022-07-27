@@ -23,7 +23,7 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
     public class UserCommandHandler : IRequestHandler<ScheduleSendCustomSms>,
         IRequestHandler<ScheduleSendGroupNotificationCommand>,
         IRequestHandler<ScheduleSendNotificationCommand>,
-        IRequestHandler<ChangeInstantReserveAccessCommand>,
+        //IRequestHandler<ChangeInstantReserveAccessCommand>,
         IRequestHandler<UpdateUserScoreCommand>,
         IRequestHandler<SendMessageCommand>,
         IRequestHandler<SendSmsCommand>,
@@ -71,27 +71,27 @@ namespace Amlakbashi.Application.Services.UserServices.CommadHandler
             return Task.FromResult(Unit.Value);
         }
 
-        public Task<Unit> Handle(ChangeInstantReserveAccessCommand request, CancellationToken cancellationToken)
-        {
-            var user = repository.Query(q => q.FirstOrDefault(f => f.Id == request.userId));
-            var shallowUser = user.ShallowCopy();
-            user.InstantReserveAccess = request.instantReserveAccess;
-            if (request.doerUserId > 0)
-            {
-                mediator.Publish(new UserUpdateEvent(shallowUser, user, request.actionSource, request.doerUserId));
-            }
-            if (request.instantReserveAccess == User.InstantReserveAccessEnum.Banned)
-            {
-                var accs = user.Advertises;
-                foreach (var item in accs)
-                {
-                    item.InstantReserveStatus = Advertise.InstantReserveStatusEnum.None;
-                }
-            }
-            repository.Update(user);
-            repository.Save();
-            return Task.FromResult(Unit.Value);
-        }
+        //public Task<Unit> Handle(ChangeInstantReserveAccessCommand request, CancellationToken cancellationToken)
+        //{
+        //    var user = repository.Query(q => q.FirstOrDefault(f => f.Id == request.userId));
+        //    var shallowUser = user.ShallowCopy();
+        //    user.InstantReserveAccess = request.instantReserveAccess;
+        //    if (request.doerUserId > 0)
+        //    {
+        //        mediator.Publish(new UserUpdateEvent(shallowUser, user, request.actionSource, request.doerUserId));
+        //    }
+        //    if (request.instantReserveAccess == User.InstantReserveAccessEnum.Banned)
+        //    {
+        //        var accs = user.Advertises;
+        //        foreach (var item in accs)
+        //        {
+        //            item.InstantReserveStatus = Advertise.InstantReserveStatusEnum.None;
+        //        }
+        //    }
+        //    repository.Update(user);
+        //    repository.Save();
+        //    return Task.FromResult(Unit.Value);
+        //}
 
         public Task<Unit> Handle(UpdateUserScoreCommand request, CancellationToken cancellationToken)
         {

@@ -13,6 +13,7 @@ using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using Amlakbashi.Mediator.Events.AdvertiseEvents;
 using Microsoft.EntityFrameworkCore;
 using Amlakbashi.Mediator.Commands.CategoryCommands;
+using Amlakbashi.Mediator.Events.UserEvents;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
 {
@@ -23,14 +24,15 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
         INotificationHandler<ChangeAdvertiseAddressEvent>,
         INotificationHandler<ChangeAdvertiseRulesEvent>,
         INotificationHandler<ChangeAdvertisePriceEvent>,
-        INotificationHandler<ChangeInstantReserveStatusEvent>,
+        //INotificationHandler<ChangeInstantReserveStatusEvent>,
         INotificationHandler<ChangeStayDurationEvent>,
         INotificationHandler<ChangeNorouzPriceEvent>,
         INotificationHandler<ChangeMaxInstantReserveStartEvent>,
         INotificationHandler<CreateAdvertiseBasicEvent>,
         INotificationHandler<CreateAdvertiseGeneralEvent>,
         INotificationHandler<AddHotelChildEvent>,
-        INotificationHandler<AddComplexChildEvent>
+        INotificationHandler<AddComplexChildEvent>,
+        INotificationHandler<UpdateUserInstantReserveEvent>
     {
         private readonly IMediator mediator;
         private readonly IRepository<Advertise, long> advertiseRepository;
@@ -167,18 +169,18 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             return Task.CompletedTask;
         }
 
-        public Task Handle(ChangeInstantReserveStatusEvent notification, CancellationToken cancellationToken)
-        {
-            var acc = advertiseRepository.Find(notification.advertiseId);
-            foreach (var item in acc.Childs)
-            {
-                item.InstantReserveStatus = acc.InstantReserveStatus;
-            }
-            advertiseRepository.Update(acc);
-            advertiseRepository.Save();
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-            return Task.CompletedTask;
-        }
+        //public Task Handle(ChangeInstantReserveStatusEvent notification, CancellationToken cancellationToken)
+        //{
+        //    var acc = advertiseRepository.Find(notification.advertiseId);
+        //    foreach (var item in acc.Childs)
+        //    {
+        //        item.InstantReserveStatus = acc.InstantReserveStatus;
+        //    }
+        //    advertiseRepository.Update(acc);
+        //    advertiseRepository.Save();
+        //    mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
+        //    return Task.CompletedTask;
+        //}
 
         public Task Handle(ChangeStayDurationEvent notification, CancellationToken cancellationToken)
         {
@@ -363,6 +365,21 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
             child.MetaDescription = AdvertiseSeoLocalization.GetMetaDescription(child, cityTitle, areaTitle);
 
             advertiseRepository.Update(child);
+            advertiseRepository.Save();
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(UpdateUserInstantReserveEvent notification, CancellationToken cancellationToken)
+        {
+            var residences = advertiseRepository.Query(q => q.Where(w => w.UserID == notification.UserId));
+            var instantReserveStatus = notification.IsDisabled == true ? InstantReserveStatusEnum.InActive :
+                InstantReserveStatusEnum.Calendar;
+            foreach (var item in residences)
+            {
+                item.InstantReserveStatus = instantReserveStatus;
+                item.InstantReserveDates.Clear();
+                advertiseRepository.Update(item);
+            }
             advertiseRepository.Save();
             return Task.CompletedTask;
         }

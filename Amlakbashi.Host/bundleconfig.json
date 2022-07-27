@@ -90,6 +90,14 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/css/acc-manager.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/dashboard/host-panel.css",
+      "wwwroot/resource/css/dashboard/numberinput.css",
+      "wwwroot/resource/css/general/popup-calendar.css"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/css/master-admin.min.css",
     "inputFiles": [
       "wwwroot/resource/admin.css",
@@ -99,7 +107,7 @@
       "wwwroot/resource/alertify.js-0.3.11/themes/alertify.default.css",
       "wwwroot/resource/alertify.js-0.3.11/themes/alertify.core.css",
       "wwwroot/resource/resource/loader.min.css",
-      "wwwroot/Resource/persian-date-picker/persian-datepicker.min.css",
+      "wwwroot/resource/persian-date-picker/persian-datepicker.min.css",
       "wwwroot/resource/jquery-confirm/jquery-confirm.min.css",
       "wwwroot/resource/css/general/message-popup.css&v=2",
       "wwwroot/resource/star-rating/star-rating.css",
@@ -277,6 +285,15 @@
       "wwwroot/resource/scripts/general/jalali-date-picker.js",
       "wwwroot/resource/scripts/general/home-page-search.js",
       "wwwroot/resource/scripts/general/increase-decrease-button.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/acc-manager.min.js",
+    "inputFiles": [
+      "wwwroot/resource/Scripts/dashboard/host-panel.js",
+      "wwwroot/resource/Scripts/dashboard/accDatePicker.js",
+      "wwwroot/resource/Scripts/dashboard/ajax-accomodation.js",
+      "wwwroot/resource/Scripts/dashboard/numberInput.js"
     ]
   },
   {

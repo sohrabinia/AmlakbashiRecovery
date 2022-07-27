@@ -12,7 +12,7 @@ namespace Amlakbashi.Core.Entities
     public class Advertise : Entity<long>
     {
         #region Properties
-        [Column("AdvertiseID")]
+        //[Column("AdvertiseID")]
         public override long Id { get; set; }
         public string Title { get; set; }
 
@@ -50,7 +50,7 @@ namespace Amlakbashi.Core.Entities
         public long AdvertiseScore { get; set; }
         public int AmlakbashiScore { get; set; }
 
-        [Column("AdvertiseMode")]
+        //[Column("AdvertiseMode")]
         public AdvertiseMode Mode { get; set; }
         public bool IsContactAvailable { get; set; }
         public bool AllowParty { get; set; }
@@ -107,7 +107,7 @@ namespace Amlakbashi.Core.Entities
         public string LocationString { get; set; }
         public int BasePrice { get; set; }
         public string SupportInfo { get; set; }
-        public int InstantReserveCancels { get; set; }
+        //public int InstantReserveCancels { get; set; }
         public InstantReserveStatusEnum InstantReserveStatus { get; set; }
         public int MaxInstantReserveStart { get; set; } = 30;
         public int MinReserveDays { get; set; }
@@ -184,6 +184,9 @@ namespace Amlakbashi.Core.Entities
 
         [JsonIgnore]
         public virtual ICollection<File> Photos { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<InstantReserveDate> InstantReserveDates { get; set; } = new List<InstantReserveDate>();
         #endregion
 
         public bool HasDiscount;
@@ -574,6 +577,23 @@ namespace Amlakbashi.Core.Entities
                 dic.Add(item.Id, $"{GeneralData.WebsiteUrl}/api/file/advertise/{Id}/{item.Id}");
             }
             return dic;
+        }
+
+        public bool IsReserveInstant(DateTime fromDate, DateTime toDate)
+        {
+            if (InstantReserveStatus != InstantReserveStatusEnum.Calendar)
+            {
+                return InstantReserveStatus == InstantReserveStatusEnum.InActive ? false : true;
+            }
+            var dateList = DateTimeUtility.DateRangeToList(fromDate, toDate);
+            foreach (var item in dateList)
+            {
+                if (InstantReserveDates.Any(x=> x.Date == item.Date) == false)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         #endregion
@@ -1064,10 +1084,17 @@ namespace Amlakbashi.Core.Entities
 
         public enum InstantReserveStatusEnum
         {
-            None = 0,
-            Requested = 1,
-            Confirmed = 2
+            Calendar = 0,
+            Permanent = 1,
+            InActive = 2
         }
+
+        //public enum InstantReserveStatusEnum
+        //{
+        //    None = 0,
+        //    Requested = 1,
+        //    Confirmed = 2
+        //}
 
         public enum NotVerifyReasonsEnum
         {

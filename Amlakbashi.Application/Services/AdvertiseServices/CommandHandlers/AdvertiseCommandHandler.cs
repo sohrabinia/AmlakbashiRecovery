@@ -27,8 +27,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
         IRequestHandler<UpdateAccTidinessRatingCommand>,
         IRequestHandler<UpdateAdvertiseOccupiedCommand>,
         IRequestHandler<InsertExtrinsicReserveCommand>,
-        IRequestHandler<UpdateInstantReserveStatusCommand>,
-        IRequestHandler<IncreaseInstantReserveCancelCommand>,
+        //IRequestHandler<UpdateInstantReserveStatusCommand>,
+        //IRequestHandler<IncreaseInstantReserveCancelCommand>,
         IRequestHandler<SetExtrinsicReserveForWaitForResponseCommand>,
         IRequestHandler<InsertExtrinsicReserveByDateListCommand>,
         IRequestHandler<RemoveCategoryItemCacheCommand>,
@@ -249,7 +249,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                 w.Status == AdvertiseStatus.Published &&
                 w.TodayIsEmpty == true &&
                 w.InstantReserveStatus !=
-                InstantReserveStatusEnum.Confirmed));
+                InstantReserveStatusEnum.Permanent));
             foreach (var item in notInstantReserveAdvertises)
             {
                 item.TodayIsEmpty = false;
@@ -258,8 +258,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             advertiseRepository.Save();
             IQueryable<Advertise> instantReserveAdvertises = advertiseRepository
                 .Query(q => q.Include(i => i.OccupiedTables).
-                Where(w => w.InstantReserveStatus ==
-                InstantReserveStatusEnum.Confirmed &
+                Where(w => w.InstantReserveStatus == InstantReserveStatusEnum.Permanent &
                 w.Status == AdvertiseStatus.Published));
             var today = DateTime.Now.Date;
             foreach (var advertise in instantReserveAdvertises)
@@ -392,26 +391,26 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             return Task.FromResult(Unit.Value);
         }
 
-        public Task<Unit> Handle(UpdateInstantReserveStatusCommand request, CancellationToken cancellationToken)
-        {
-            var data = advertiseRepository.Find(request.advertiseId);
-            data.InstantReserveStatus = request.status;
-            advertiseRepository.Update(data);
-            advertiseRepository.Save();
-            mediator.Publish(new ChangeInstantReserveStatusEvent(request.advertiseId,
-                data.UserID, request.status, request.actionSource,
-                request.doerUserId));
-            return Task.FromResult(Unit.Value);
-        }
+        //public Task<Unit> Handle(UpdateInstantReserveStatusCommand request, CancellationToken cancellationToken)
+        //{
+        //    var data = advertiseRepository.Find(request.advertiseId);
+        //    data.InstantReserveStatus = request.status;
+        //    advertiseRepository.Update(data);
+        //    advertiseRepository.Save();
+            //mediator.Publish(new ChangeInstantReserveStatusEvent(request.advertiseId,
+            //    data.UserID, request.status, request.actionSource,
+            //    request.doerUserId));
+        //    return Task.FromResult(Unit.Value);
+        //}
 
-        public Task<Unit> Handle(IncreaseInstantReserveCancelCommand request, CancellationToken cancellationToken)
-        {
-            var acc = advertiseRepository.Find(request.advertiseId);
-            acc.InstantReserveCancels++;
-            advertiseRepository.Update(acc);
-            advertiseRepository.Save();
-            return Task.FromResult(Unit.Value);
-        }
+        //public Task<Unit> Handle(IncreaseInstantReserveCancelCommand request, CancellationToken cancellationToken)
+        //{
+        //    var acc = advertiseRepository.Find(request.advertiseId);
+        //    acc.InstantReserveCancels++;
+        //    advertiseRepository.Update(acc);
+        //    advertiseRepository.Save();
+        //    return Task.FromResult(Unit.Value);
+        //}
 
         public Task<Unit> Handle(SetExtrinsicReserveForWaitForResponseCommand request, CancellationToken cancellationToken)
         {

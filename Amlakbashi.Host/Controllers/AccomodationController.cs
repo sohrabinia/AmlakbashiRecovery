@@ -33,6 +33,7 @@ using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs;
 using Amlakbashi.Core.Common.Caching;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -2304,8 +2305,6 @@ namespace Amlakbashi.Host.Controllers
                 currentUser.Favorite != null &&
                 currentUser.Favorite.Any(f => f.AdvertiseID == id);
             var user_is_autenticated = User.Identity.IsAuthenticated;
-            //List<long> occupiedList;
-            //Dictionary<string, DatePriceDTO> priceDict;
             var occupiedList = advertise.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s));
             var priceDict = advertiseService.GetAccPriceDatesInfo(id);
             var maxInstantReserveDate = DateTime.Now.Date.AddDays(advertise.MaxInstantReserveStart);
@@ -2316,7 +2315,7 @@ namespace Amlakbashi.Host.Controllers
                 rules_string = rules_string,
                 short_rules_string = short_rules_string,
                 price_property_dict = price_property_dict,
-                instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed,
+                instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent,
                 instantReserveMaxStart = advertise.MaxInstantReserveStart,
                 maxReserveStartDate = DateTimeUtility.GregorianToPersianDate(maxInstantReserveDate).Replace(",", "/").Substring(2),
                 maxInstantReserveStartUnix = DateTimeUtility.DateValueOfJS(maxInstantReserveDate),
@@ -2327,10 +2326,6 @@ namespace Amlakbashi.Host.Controllers
                 userEmailAddress = userEmailAddress
             };
             advertiseService.AddToAdvertiseVisit(id);
-            //return GenerateJsonResult(new
-            //{
-            //    Data = data
-            //});
             return GenerateJsonResult(data);
         }
 
@@ -2345,104 +2340,72 @@ namespace Amlakbashi.Host.Controllers
             });
         }
 
-        [Authorize]
-        public JsonResult InstantReserveRequest(long id,
-            bool ignoreMsg, int userId)
-        {
-            var acc = advertiseService.Find(id);
-            if (acc.UserID != userId)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "شما مجوز این کار را ندارید"
-                });
-            }
-            if (userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "این امکان برای شما غیر فعال شده است"
-                });
-            }
-            bool needMsg;
-            advertiseService.RequestInstantReserve(id, ignoreMsg, userId,
-                userAccessor.DoerUser.Id, ActionLog.ActionSourceEnum.WebsiteDashboard,
-                userAccessor.CurrentUser.InstantReserveAccess, out needMsg);
-            //acc = advertiseService.Find(id);
-            InstantReserveRequestResultDTO result;
-            //if (needMsg)
-            //{
-            result = new InstantReserveRequestResultDTO()
-            {
-                status = 1,
-                needMsg = true
-            };
-            //}
-            //else
-            //{
-            //    result = new InstantReserveRequestResultDTO()
-            //    {
-            //        status = 1,
-            //        needMsg = false,
-            //        msg = acc.InstantReserveStatus == InstantReserveStatusEnum.Requested ?
-            //              "درخواست فعال سازی شما ارسال شد و بعد از تایید کارشناس این امکان برای این اقامتگاه فعال میشود" :
-            //              "امکان رزرو آنی برای این اقامتگاه فعال شد",
-            //        newData = new InstantReserveDetailDTO()
-            //        {
-            //            status = acc.InstantReserveStatus,
-            //            statusString = AdvertiseMainLocalization.GetInstantReserveStatusString(acc.InstantReserveStatus),
-            //            statusColor = AdvertiseStyleHelper.GetInstantReserveStatusColor(acc.InstantReserveStatus),
-            //            banned = userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned,
-            //            buttonTitle = AdvertiseMainLocalization.GetInstantReserveButtonTitle(acc.InstantReserveStatus, userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
-            //        }
-            //    };
-            //}
-            return GenerateJsonResult(result);
-        }
+        //[Authorize]
+        //public JsonResult InstantReserveRequest(long id,
+        //    bool ignoreMsg, int userId)
+        //{
+        //    var acc = advertiseService.Find(id);
+        //    if (acc.UserID != userId)
+        //    {
+        //        return GenerateJsonResult(new
+        //        {
+        //            status = 0,
+        //            msg = "شما مجوز این کار را ندارید"
+        //        });
+        //    }
+        //    if (userAccessor.CurrentUser.DisableInstantReserve)
+        //    {
+        //        return GenerateJsonResult(new
+        //        {
+        //            status = 0,
+        //            msg = "این امکان برای شما غیر فعال شده است"
+        //        });
+        //    }
+        //    bool needMsg;
+        //    advertiseService.RequestInstantReserve(id, ignoreMsg, userId,
+        //        userAccessor.DoerUser.Id, ActionLog.ActionSourceEnum.WebsiteDashboard, out needMsg);
+        //    InstantReserveRequestResultDTO result;
+        //    result = new InstantReserveRequestResultDTO()
+        //    {
+        //        status = 1,
+        //        needMsg = true
+        //    };
+        //    return GenerateJsonResult(result);
+        //}
 
-        [Authorize]
-        public JsonResult InstantReserveCancel(long id, int userId)
-        {
-            var acc = advertiseService.Find(id);
-            if (acc.UserID != userId)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "شما مجوز این کار را ندارید"
-                });
-            }
-            if (userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "این امکان برای شما غیر فعال شده است"
-                });
-            }
-            advertiseService.CancelInstantReserve(id, userId, userAccessor.DoerUser.Id,
-                ActionLog.ActionSourceEnum.WebsiteDashboard);
-            var result = new InstantReserveRequestResultDTO()
-            {
-                status = 1,
-                newData = new InstantReserveDetailDTO()
-                {
-                    status = acc.InstantReserveStatus,
-                    statusString = AdvertiseMainLocalization.GetInstantReserveStatusString(acc.InstantReserveStatus),
-                    statusColor = AdvertiseStyleHelper.GetInstantReserveStatusColor(acc.InstantReserveStatus),
-                    banned = userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned,
-                    buttonTitle = AdvertiseMainLocalization.GetInstantReserveButtonTitle(acc.InstantReserveStatus, userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
-                }
-            };
-            return GenerateJsonResult(result);
-        }
+        //[Authorize]
+        //public JsonResult InstantReserveCancel(long id, int userId)
+        //{
+        //    var acc = advertiseService.Find(id);
+        //    if (acc.UserID != userId)
+        //    {
+        //        return GenerateJsonResult(new
+        //        {
+        //            status = 0,
+        //            msg = "شما مجوز این کار را ندارید"
+        //        });
+        //    }
+        //    if (userAccessor.CurrentUser.DisableInstantReserve)
+        //    {
+        //        return GenerateJsonResult(new
+        //        {
+        //            status = 0,
+        //            msg = "این امکان برای شما غیر فعال شده است"
+        //        });
+        //    }
+        //    advertiseService.CancelInstantReserve(id, userId, userAccessor.DoerUser.Id,
+        //        ActionLog.ActionSourceEnum.WebsiteDashboard);
+        //    var result = new InstantReserveRequestResultDTO()
+        //    {
+        //        status = 1
+        //    };
+        //    return GenerateJsonResult(result);
+        //}
 
-        public string GetInstnatReserveBanReason(long id)
-        {
-            return advertiseService.GetInstantReserveBanReason(id);
-        }
+        //public string GetInstnatReserveBanReason(long id)
+        //{
+        //    return advertiseService.GetInstantReserveBanReason(id);
+        //}
 
         public ActionResult UserRatingDetailPopup(long id, int userid)
         {
@@ -2693,6 +2656,53 @@ namespace Amlakbashi.Host.Controllers
             ViewBag.occupiedList = SerializeUtility.SerializeToJS(occupiedList);
             ViewBag.extrinsicList = SerializeUtility.SerializeToJS(extrinsicList);
             return PartialView("_AccSetOccupied", acc);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> UpdatePermanentInstantReserve(long residenceId, bool active)
+        {
+            var result = await advertiseService.UpdateInstantReserveStatus(residenceId,
+                active ? InstantReserveStatusEnum.Permanent : InstantReserveStatusEnum.Calendar);
+            return GenerateJsonResult(new
+            {
+                status = result ? 1 : 0
+            });
+        }
+
+        [Authorize]
+        public IActionResult GetInstantReserveDates(long residenceId)
+        {
+            var residence = advertiseService.Find(residenceId);
+            if (residence == null || residence.UserID != userAccessor.CurrentUser.Id)
+            {
+                ViewBag.errorMessage = "شما مجوز ندارید";
+                return PartialView("_InstantReserveDates");
+            }
+            var instantReserveDates = residence.InstantReserveDates.Select(x => DateTimeUtility.DateValueOfJS(x.Date)).ToList();
+            ViewBag.instantReserveDates = SerializeUtility.SerializeToJS(instantReserveDates);
+            return PartialView("_InstantReserveDates", residence);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> AddInstantReserveDates(long residenceId, string fromDate, string toDate)
+        {
+            var result = await advertiseService.AddInstantReserveDates(residenceId, fromDate, toDate, userAccessor.CurrentUser.Id);
+            return GenerateJsonResult(new
+            {
+                status = result.HasError() ? 0 : 1,
+                instantReserveDates = result.HasError() ? null : SerializeUtility.SerializeToJS(result.Result)
+            });
+        }
+
+        [Authorize]
+        public async Task<IActionResult> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate)
+        {
+            var result = await advertiseService.DeleteInstantReserveDates(residenceId, fromDate, toDate, userAccessor.CurrentUser.Id);
+            return GenerateJsonResult(new
+            {
+                status = result.HasError() ? 0 : 1,
+                instantReserveDates = result.HasError() ? null : SerializeUtility.SerializeToJS(result.Result)
+            });
         }
 
         public IActionResult GetAccUrlById(string id)

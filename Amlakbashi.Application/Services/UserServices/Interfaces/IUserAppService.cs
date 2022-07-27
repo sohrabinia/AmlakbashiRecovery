@@ -30,7 +30,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void Insert(User user, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         Task<AppUser> RegisterAsync(LoginRequest request);
         Task SendVerifyCode(AppUser identityUser);
-        bool Update(UserEditDTO editedUser, int adminId);
+        Task<bool> Update(UserEditDTO editedUser, int adminId);
         bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
             ActionLog.ActionSourceEnum source, out List<string> errors);
         Task<ServiceResult> UpdateAsync(UserPostProfileRequest request);
@@ -52,8 +52,8 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void UpdateDesc(int userId, string desc);
         Task UpdateEmailAsync(string guid, string email, bool confirm);
         void UpdateLastNotifPermetionTicks(int userId, long ticks);
-        void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
-            int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
+        //void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
+        //    int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         void UpdateUserNotificationToken(int userId, string token);
         void UpdateFcmNotificationToken(int userId, string token);
         void UpdateAppNotificationToken(int userId, string token);

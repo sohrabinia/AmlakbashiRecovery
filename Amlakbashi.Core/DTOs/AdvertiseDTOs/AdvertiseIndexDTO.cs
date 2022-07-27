@@ -15,7 +15,7 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public Advertise.AdvertiseType Type { get; set; } = Advertise.AdvertiseType.All;
         public int UserId { get; set; } = -1;
         public string Sort { get; set; } = "score";
-        public int InstatntReserveStatus { get; set; } = -1;
+        public int InstantReserveStatus { get; set; } = -1;
         public string MinReserveNorouzFromDate { get; set; } = "";
         public int ImageCountMin { get; set; } = 0;
         public int ImageCountMax { get; set; } = 0;

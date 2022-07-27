@@ -132,12 +132,12 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
         {
             switch (status)
             {
-                case InstantReserveStatusEnum.None:
+                case InstantReserveStatusEnum.Calendar:
+                    return "تقویمی";
+                case InstantReserveStatusEnum.Permanent:
+                    return "دائمی";
+                case InstantReserveStatusEnum.InActive:
                     return "غیرفعال";
-                case InstantReserveStatusEnum.Requested:
-                    return "در انتظار تایید";
-                case InstantReserveStatusEnum.Confirmed:
-                    return "فعال";
                 default:
                     return "";
             }
@@ -149,11 +149,11 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                 return "مشاهده دلیل ممنوعیت";
             switch (status)
             {
-                case InstantReserveStatusEnum.None:
+                case InstantReserveStatusEnum.Calendar:
                     return "درخواست امکان رزرو آنی";
-                case InstantReserveStatusEnum.Requested:
+                case InstantReserveStatusEnum.Permanent:
                     return "لغو رزرو آنی";
-                case InstantReserveStatusEnum.Confirmed:
+                case InstantReserveStatusEnum.InActive:
                     return "غیرفعال سازی";
                 default:
                     return "";

@@ -75,7 +75,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs
             dto.regionString = advertise.LocationString;
             dto.rating = advertise.AverageUserRating;
             dto.hasChild = advertise.Mode == Advertise.AdvertiseMode.Parent;
-            dto.instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed;
+            //dto.instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed;
             dto.minReserveDays = advertise.MinReserveDays;
             dto.maxReserveDays = advertise.MaxReserveDays;
             return dto;

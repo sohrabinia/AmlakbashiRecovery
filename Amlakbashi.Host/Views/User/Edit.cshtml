@@ -16,7 +16,7 @@
     <input type="hidden" name="EmailAddress" value="@Model.EmailAddress" />
     <input type="hidden" name="LastSendedEmailCode" value="@Model.LastSendedEmailCode" />
     <input type="hidden" name="LastSendedSmsCode" value="@Model.LastSendedSmsCode" />
-    <input type="hidden" name="InstantReserveCancelCount" value="@Model.InstantReserveCancelCount" />
+    @*<input type="hidden" name="InstantReserveCancelCount" value="@Model.InstantReserveCancelCount" />*@
     <input type="hidden" name="Credit" value="@Model.Credit" />
     <input type="hidden" name="UserScore" value="@Model.UserScore" />
     <table>
@@ -168,8 +168,7 @@
             </td>
             <td></td>
         </tr>
-
-        <tr>
+        @*<tr>
             <td class="label">
                 محدودیت کنسلی رزرو آنی (میزبان) :
             </td>
@@ -177,7 +176,8 @@
                 @Html.EditorFor(model => model.CancelInstantReserveLimit)
             </td>
             <td>تعداد کنسلی ها: @Model.InstantReserveCancelCount</td>
-        </tr>
+            <td></td>
+        </tr>*@
         <tr>
             <td>آدرس ایمیل کاربر: @Model.EmailAddress</td>
             <td>آخرین کد ارسال شده پیامک: @Model.LastSendedSmsCode</td>
@@ -187,14 +187,20 @@
         <tr>
             <td>
                 <div style="text-align:right">
-                    <span>تماس با کاربر:</span>
                     <input id="complete_profile_contact_checkbox" name="ContactPhone" type="checkbox" value="true" is-checked="@Model.ContactPhone" />
+                    <label>تماس با کاربر</label>
                 </div>
             </td>
             <td>
                 <div style="text-align:right">
-                    <span>امکان دسترسی به مناطق ممنوعه:</span>
                     <input name="ForbiddenRegionsAccess" type="checkbox" value="true" is-checked="@Model.ForbiddenRegionsAccess" />
+                    <label>امکان دسترسی به مناطق ممنوعه</label>
+                </div>
+            </td>
+            <td>
+                <div style="text-align:right">
+                    <input name="DisableInstantReserve" type="checkbox" value="true" is-checked="@Model.DisableInstantReserve" />
+                    <label>غیرفعالسازی رزرو آنی</label>
                 </div>
             </td>
         </tr>

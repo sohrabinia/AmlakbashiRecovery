@@ -65,7 +65,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             dto.RateCount = 0; //TODO replace with proper value
             dto.PhotoID = advertise.PhotoID == null ? 0 : (int)advertise.PhotoID;
             dto.HasChild = has_child;
-            dto.instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed;
+            dto.instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent;
             dto.minReserveDays = advertise.MinReserveDays;
             dto.maxReserveDays = advertise.MaxReserveDays;
             dto.address = advertise.Address;

@@ -163,7 +163,7 @@
         <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.Host))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.Host ? "#fdd835" : "#ffffff")">میزبان</div>
         <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.Guest))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.Guest ? "#fdd835" : "#ffffff")">مهمان</div>
         <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.Staff))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.Staff ? "#fdd835" : "#ffffff")">کارمندان</div>
-        <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.InstantReserveRequest))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ? "#fdd835" : "#ffffff")">درخواست رزرو آنی</div>
+        @*<div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.InstantReserveRequest))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ? "#fdd835" : "#ffffff")">درخواست رزرو آنی</div>*@
         <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.InstantReserveAllow))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow ? "#fdd835" : "#ffffff")">رزرو آنی</div>
         <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.PhotoChangeRequest))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.PhotoChangeRequest ? "#fdd835" : "#ffffff")">در انتظار تایید عکس</div>
     </div>
@@ -269,16 +269,16 @@
                     }
                     @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest)
                     {
-                        <td>
+                        @*<td>
                             <div onclick="showInstantReserveMsg(@item.User.Id)" style="cursor:pointer;border-radius:5px;background-color:#fdd835;padding:5px;">تایید درخواست</div>
-                        </td>
+                        </td>*@
                     }
                     @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
                     {
                         <td>
                             <div style="display:flex;flex-flow:row;">
-                                <div style="margin:0 10px;color:@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "red" : "#34A853")">@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "ممنوع" : "فعال")</div>
-                                <div>تعداد لغو:‌ @item.InstantReserveCancel</div>
+                                @*<div style="margin:0 10px;color:@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "red" : "#34A853")">@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "ممنوع" : "فعال")</div>*@
+                                @*<div>تعداد لغو:‌ @item.InstantReserveCancel</div>*@
                             </div>
                         </td>
                     }
@@ -682,51 +682,51 @@
 
         var instantReserveMsg;
 
-        function showInstantReserveMsg(id) {
-            instantReserveMsg = showInfoMessage('تایید رزرو آنی', '',
-                {
-                    contentUrl: '/user/getinstantreserveaccs?userid=' + id,
-                    onClose: function (){
-                        $('#js-filter-form').submit();
-                    }
-                });
-        }
+        //function showInstantReserveMsg(id) {
+        //    instantReserveMsg = showInfoMessage('تایید رزرو آنی', '',
+        //        {
+        //            contentUrl: '/user/getinstantreserveaccs?userid=' + id,
+        //            onClose: function (){
+        //                $('#js-filter-form').submit();
+        //            }
+        //        });
+        //}
 
-        function confirmInstantReserve(elem) {
-            myajax('user/confirminstantreserve', 'id=' + $(elem).attr('js-acc-id'), function (ret) {
-                if (ret.status == 1) {
-                    alertify.success('تایید شد');
-                    $(elem).remove();
-                }
-                else {
-                    alertify.error('عملیات با خطای فنی مواجه شد');
-                }
-            });
-        }
+        //function confirmInstantReserve(elem) {
+        //    myajax('user/confirminstantreserve', 'id=' + $(elem).attr('js-acc-id'), function (ret) {
+        //        if (ret.status == 1) {
+        //            alertify.success('تایید شد');
+        //            $(elem).remove();
+        //        }
+        //        else {
+        //            alertify.error('عملیات با خطای فنی مواجه شد');
+        //        }
+        //    });
+        //}
 
-        function confirmInstantReserveAll(elem) {
-            myajax('user/confirmallinstantreserves', 'userid=' + $(elem).attr('js-user-id'), function (ret) {
-                if (ret.status == 1) {
-                    alertify.success('تایید شد');
-                    instantReserveMsg.close();
-                }
-                else {
-                    alertify.error('عملیات با خطای فنی مواجه شد');
-                }
-            });
-        }
+        //function confirmInstantReserveAll(elem) {
+        //    myajax('user/confirmallinstantreserves', 'userid=' + $(elem).attr('js-user-id'), function (ret) {
+        //        if (ret.status == 1) {
+        //            alertify.success('تایید شد');
+        //            instantReserveMsg.close();
+        //        }
+        //        else {
+        //            alertify.error('عملیات با خطای فنی مواجه شد');
+        //        }
+        //    });
+        //}
 
-        function cancelInstantReserveAll(elem) {
-            myajax('user/cancellallinstantreserves', 'userid=' + $(elem).attr('js-user-id'), function (ret) {
-                if (ret.status == 1) {
-                    alertify.success('لغو شد');
-                    instantReserveMsg.close();
-                }
-                else {
-                    alertify.error('عملیات با خطای فنی مواجه شد');
-                }
-            });
-        }
+        //function cancelInstantReserveAll(elem) {
+        //    myajax('user/cancellallinstantreserves', 'userid=' + $(elem).attr('js-user-id'), function (ret) {
+        //        if (ret.status == 1) {
+        //            alertify.success('لغو شد');
+        //            instantReserveMsg.close();
+        //        }
+        //        else {
+        //            alertify.error('عملیات با خطای فنی مواجه شد');
+        //        }
+        //    });
+        //}
 
         $(".js-filter-date-picker").persianDatepicker({
             altField: '#to_date-alt',

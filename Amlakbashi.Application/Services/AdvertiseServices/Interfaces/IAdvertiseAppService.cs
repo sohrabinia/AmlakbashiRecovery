@@ -32,7 +32,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         IList<Advertise> GetAdvertisesByUserId(int userId, bool includeCommentsAndReports = false);
         IList<long> GetAdvertiseIdsByUserId(int userId);
         IList<Advertise> GetNotChildAdvertisesByUserId(int userId);
-        IList<Advertise> GetInstantReserveAdvertisesByUserId(int userId, InstantReserveStatusEnum instantStatus);
+        //IList<Advertise> GetInstantReserveAdvertisesByUserId(int userId, InstantReserveStatusEnum instantStatus);
         IList<Advertise> GetAdvertisesByStatus(AdvertiseStatus status, bool haveSlug = false);
         IList<Advertise> GetMostLiked(int count, bool beInstantReserve = false);
         List<string> GetAdvertiseTags(Advertise advertise);
@@ -86,15 +86,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void SetAsTodayEmpty(long id);
         void UnsetTodayEmpty(long id);
         Dictionary<string, string> GetAdvertiseListPrices(List<long> ids);
-        void RequestInstantReserve(long id,
-            bool ignoreMsg, int userId,
-            int doerUserId, ActionLog.ActionSourceEnum actionSource,
-            User.InstantReserveAccessEnum currInstantReserveAccess,
-            out bool needMsg);
-        void CancelInstantReserve(long id, int userId, int doerUserId,
-            ActionLog.ActionSourceEnum actionSource);
-        string GetInstantReserveBanReason(long id);
-        int GetInstantReserveCancelCount(int userId);
+        //void RequestInstantReserve(long id,
+        //    bool ignoreMsg, int userId,
+        //    int doerUserId, ActionLog.ActionSourceEnum actionSource,
+        //    out bool needMsg);
+        //void CancelInstantReserve(long id, int userId, int doerUserId,
+        //    ActionLog.ActionSourceEnum actionSource);
+        //string GetInstantReserveBanReason(long id);
+        //int GetInstantReserveCancelCount(int userId);
         void SetStayDuration(long id, int min, int max);
         bool SetPrices(long id, PriceInputDTO prices, out Dictionary<string, string> errors);
         void SetNorouzPrice(long id, int norouzPrice, int overCapacityPrice = 0);
@@ -116,8 +115,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         ApiHotelUnitDTO GetHotelUnitDTO(long id, out int userId);
         bool UpdateHotelUnitDTO(ApiHotelUnitDTO editedData, out List<string> errors);
         ApiNorouzPriceDTO GetNorouzPriceDTO(long id, out int userId);
-        void UpdateInstantReserveStatus(int userId, InstantReserveStatusEnum status, bool forRequested = false);
-        void UpdateInstantReserveStatus(long accId, InstantReserveStatusEnum status, int doerUserId, ActionSourceEnum actionSource);
+        Task<bool> UpdateInstantReserveStatus(long residenceId, InstantReserveStatusEnum status);
         void SetNorouzPrice(long id, int norouzPrice, int overCapacityPrice = 0, int buildNumber = 0);
         IEnumerable<Advertise> GetMostViewedAdvertisesInCity(int city_id, int province_id, int type_id, int count);
         IEnumerable<Advertise> GetMostViewedAdvertisesByType(int type_id, int count);
@@ -128,7 +126,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         IList<string> GetOccupiedDatesInRange(long advertiseId, string persianFrom, string persianTo);
         CheckUnsetOccupiedDTO CheckUnsetOccupiedDateRange(long advertiseId, string from_date, string to_date);
         CheckSetOccupiedDTO CheckSetAsOccupiedDateRange(long advertiseId, string from_date, string to_date);
-        bool CheckReserve(int currentUserId, long advertiseId, int guestCount, string startDate, string endDate, out string msg);
+        bool CheckReserve(int currentUserId, long advertiseId, int guestCount, string startDate, string endDate,
+            out string msg, out bool isInstantReserve);
         long GetReservePrice(long advertiseId, string startDate, string endDate, int guestCount,
             out long priceWithoutDiscount, out long couponCalculationPrice);
         bool AddAdvertiseComment(int userId, long advertiseId, string text,
@@ -138,10 +137,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         Dictionary<string, string> GetRulesDictionary(long id);
         void DeleteExtrinsicReserves(long advertiseId, string from_date, string to_date, bool withLastDay = false);
         bool ReserveRequest(long advertiseId, int userId, string startDate,
-            string endDate, int guestCount, bool instantReserve, out string msg, out long reserveId);
+            string endDate, int guestCount, out string msg, out long reserveId);
         IList<Advertise> GetNorouzAdvertises(int count);
         void SetHygieneProtocol(long id, HygieneProtocolStatus value);
         void UpdateAlbumPhoto(long advertiseId);
         Task<ServiceResult> UpdateCalendarAsync(AdvertiseUpdateCalendarRequest request);
+        Task<ServiceResult<List<long>>> AddInstantReserveDates(long residenceId, string fromDate, string toDate, int userId);
+        Task<ServiceResult<List<long>>> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate, int userId);
     }
 }

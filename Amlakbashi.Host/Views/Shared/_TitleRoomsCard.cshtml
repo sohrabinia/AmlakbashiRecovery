@@ -28,10 +28,5 @@
             @await Html.PartialAsync("_MinAndMaxDay", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "js-min-input", "js-min-input-" + Model.id }, { "js-max-input", "js-max-input-" + Model.id }, { "minReserve", Model.minReserveDays }, { "maxReserve", Model.maxReserveDays }, { "id", Model.id } })
         </div>
-        <p class="title-box"> رزروآنی</p>
-        <div class="instantReserve style-instant-reserve">
-            @await Html.PartialAsync("_InstantReserve", Model, new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "instantReserveAccess", ViewData["ReserveAccess"] }, { "UserID", ViewBag.UserID } })
-        </div>
     </div>
 </div>

@@ -10,16 +10,14 @@
 }
 
 @section StyleLink{
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/dashboard/host-panel.css&v=10">
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/dashboard/numberinput.css&v=1">
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/popup-calendar.css">
-}
-
-@section ScriptLink{
-    <script src="/file/getjs?src=/resource/Scripts/dashboard/host-panel.js&v=3"></script>
-    <script src="/file/getjs?src=/resource/Scripts/dashboard/accDatePicker.js&v=2"></script>
-    <script src="/file/getjs?src=/resource/Scripts/dashboard/ajax-accomodation.js&v=4"></script>
-    <script src="/file/getjs?src=/resource/Scripts/dashboard/numberInput.js&v=1"></script>
+    <environment include="Development">
+        <link rel="stylesheet" type="text/css" href="/resource/css/dashboard/host-panel.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/dashboard/numberinput.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/popup-calendar.css" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" type="text/css" href="/css/min/acc-manager.min.css" asp-append-version="true" />
+    </environment>
 }
 
 <form id="filter-banner" action="/post/accomodationmanager" method="get" class="form-filter-banner">
@@ -32,8 +30,6 @@
                 <option value="enable" is-selected="@((string)ViewBag.type == "enable")">تایید شده</option>
                 <option value="disable" is-selected="@((string)ViewBag.type == "disable")">غیر فعال</option>
                 <option value="ready" is-selected="@((string)ViewBag.type == "ready")">در انتظار تایید</option>
-                @*<option value="ready" is-selected="@((string)ViewBag.type == "notcomplete")">تکمیل نشده</option>*@
-                @*<option value="ready" is-selected="@((string)ViewBag.type == "notready")">تایید نشده</option>*@
             </select>
         </span>
     </span>
@@ -103,6 +99,7 @@
                         @*<a style="opacity:@(item.mainType == AccMainType.Single ?  "1" : "0" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>*@
                         @*<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item icons-desktop" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img class="noroz-style-icon" width="30" height="30" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>*@
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
+                        <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="رزرو آنی" class="icons-item calndar-icon icons-desktop" onclick="getInstantReserveDates(@item.id)"><i class="fas fa-bolt" style="font-size: 16px; padding: 6px 9px;"></i></a>
                         @*<a title="حذف" onclick="deleteButton(@item.id ,this)" class="icons-item trash-icon icons-desktop"><i class="fa fa-trash"></i></a>*@
                         <a href="@item.editUrl" class="icons-item edit-icon-banner icons-desktop" target="_blank"><i class="fas fa-pencil-alt"></i></a>
                         <a title="تنظیمات " data-type='@item.mainType.ToString().ToLower()' class="icons-item setting-icon icons-desktop"><i class="fa fa-cog"></i></a>
@@ -127,6 +124,7 @@
                         @*<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-s" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="30" height="30" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>*@
                         @*<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-xs" href="/accomodation/accextraform?id=@(item.id)#norouz-price-input-section"><img width="24" height="24" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_24x24" /></a>*@
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
+                        <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="رزرو آنی" class="icons-item calndar-icon icons-desktop" onclick="getInstantReserveDates(@item.id)"><i class="fas fa-bolt" style="font-size: 16px; padding: 6px 9px;"></i></a>
                         @*<a title="حذف " class="icons-item trash-icon" onclick="deleteButton(@item.id , this)"><i class="fa fa-trash"></i></a>*@
                         <a href="@item.editUrl" class="icons-item edit-icon-banner" target="_blank"><i class="fas fa-pencil-alt"></i></a>
                         <a title="تنظیمات " data-type='@item.mainType.ToString().ToLower()' class="icons-item setting-icon"><i class="fa fa-cog"></i></a>
@@ -160,12 +158,12 @@
                                 <div class="button_reason_not_verified" onclick="showReasons(@item.id)">دلیل عدم تایید<div></div></div>
                             }
                         </div>
-                        @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                        @*@await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", " رزرو آنی" } })
                         <div class="instantReserve container-item">
                             @await Html.PartialAsync("_InstantReserve", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "instantReserveAccess", (int)Model.instantReserveAccess }, { "UserID", ViewBag.UserID } })
-                        </div>
+                        </div>*@
                         @await Html.PartialAsync("_EditFast", item)
                         <div class="day-set-@item.id">
                             @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
@@ -183,7 +181,7 @@
                 <!-- Start-room-type-list -->
                 <div class="room-type-list">
                     @await Html.PartialAsync("_TitleRoomsCard", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "UserID", ViewBag.UserID }, { "ReserveAccess", (int)Model.instantReserveAccess } })
+        new ModelStateDictionary()) { { "UserID", ViewBag.UserID }})
                     <div class="style_title-list">
                         @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", " تنظیم واحد ها " } })
@@ -271,7 +269,7 @@
                 <!-- Start-list-room-card  -->
                 <div class="list-room-card">
                     @await Html.PartialAsync("_TitleRoomsCard", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "UserID", ViewBag.UserID }, { "ReserveAccess", (int)Model.instantReserveAccess } })
+        new ModelStateDictionary()) { { "UserID", ViewBag.UserID }})
                     <div class="style_title-list">
                         @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", " تنظیم واحد ها " } })
@@ -331,6 +329,18 @@
         @Html.PagedListPager((IPagedList)Model.accList, page => Url.Action("accomodationmanager", "post", new { page, type = (string)ViewBag.type }), new PagedListRenderOptions { LinkToFirstPageFormat = "ابتدا", LinkToPreviousPageFormat = "قبلی", LinkToNextPageFormat = "بعدی", LinkToLastPageFormat = "انتها", MaximumPageNumbersToDisplay = 5 })
     </div>
 </div>
+
+@section ScriptLink{
+    <environment include="Development">
+        <script src="/resource/Scripts/dashboard/host-panel.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/accDatePicker.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/ajax-accomodation.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/numberInput.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/acc-manager.min.js" asp-append-version="true"></script>
+    </environment>
+}
 
 @section ScriptBlock{
     <script type="text/javascript">

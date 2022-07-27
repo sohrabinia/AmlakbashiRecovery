@@ -13,7 +13,7 @@ using Amlakbashi.Mediator.Events.UserEvents;
 namespace Amlakbashi.Application.Services.UserServices.EventHandlers
 {
     internal class UserEventHandler :
-        INotificationHandler<ChangeInstantReserveStatusEvent>,
+        //INotificationHandler<ChangeInstantReserveStatusEvent>,
         INotificationHandler<CreateAdvertiseBasicEvent>,
         INotificationHandler<PrizeCreditUpdateEvent>,
         INotificationHandler<PresentorPrizeGivenEvent>,
@@ -27,19 +27,20 @@ namespace Amlakbashi.Application.Services.UserServices.EventHandlers
             this.repository = repository;
             this.mediator = mediator;
         }
-        public Task Handle(ChangeInstantReserveStatusEvent notification, CancellationToken cancellationToken)
-        {
-            if (notification.newStatus == InstantReserveStatusEnum.Requested)
-            {
-                var user = repository.Query(q => q.FirstOrDefault(f => f.Id == notification.userId));
-                var oldUser = user.ShallowCopy();
-                user.InstantReserveAccess = InstantReserveAccessEnum.Requested;
-                repository.Update(user);
-                repository.Save();
-                mediator.Publish(new UserUpdateEvent(oldUser, user, notification.actionSource, notification.doerUserId));
-            }
-            return Task.CompletedTask;
-        }
+
+        //public Task Handle(ChangeInstantReserveStatusEvent notification, CancellationToken cancellationToken)
+        //{
+        //    if (notification.newStatus == InstantReserveStatusEnum.Requested)
+        //    {
+        //        var user = repository.Query(q => q.FirstOrDefault(f => f.Id == notification.userId));
+        //        var oldUser = user.ShallowCopy();
+        //        user.InstantReserveAccess = InstantReserveAccessEnum.Requested;
+        //        repository.Update(user);
+        //        repository.Save();
+        //        mediator.Publish(new UserUpdateEvent(oldUser, user, notification.actionSource, notification.doerUserId));
+        //    }
+        //    return Task.CompletedTask;
+        //}
 
         public Task Handle(CreateAdvertiseBasicEvent notification, CancellationToken cancellationToken)
         {

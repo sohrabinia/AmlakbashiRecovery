@@ -27,8 +27,9 @@ namespace Amlakbashi.Core.Entities
         public int OwnerShip { get; set; }
         public int AmlakbashiScore { get; set; }
         public long UserScore { get; set; }
-        public int CancelInstantReserveLimit { get; set; } = 3;
-        public InstantReserveAccessEnum InstantReserveAccess { get; set; }
+        //public int CancelInstantReserveLimit { get; set; } = 3;
+        //public InstantReserveAccessEnum InstantReserveAccess { get; set; }
+        public bool DisableInstantReserve { get; set; }
         public long? PhotoID { get; set; }
         public int PhotoStatus { get; set; }
         public string Description { get; set; }

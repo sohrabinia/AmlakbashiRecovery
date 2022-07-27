@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Common.Repository
 {
@@ -19,6 +20,7 @@ namespace Amlakbashi.Core.Common.Repository
         TEntity Find<TEntity, TKey>(TKey id) where TEntity : Entity<TKey>, new();
         void Reload(T entity);
         T Find(K id);
+        Task<T> FindAsync(K id);
         void RemoveChildren<TChild, TChildKey, R>(K id, string collectionName, Func<IEnumerable<TChild>, R> query) where TChild : Entity<TChildKey>, new();
     }
 }

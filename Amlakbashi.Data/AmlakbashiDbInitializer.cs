@@ -17,17 +17,30 @@ namespace Amlakbashi.Data
                 return;
             }
             context.Database.Migrate();
-            //SeedData(context);
+            SeedData(context);
         }
 
         private static void SeedData(AmlakbashiDB context)
         {
-            var users = context.Users.Where(x => string.IsNullOrEmpty(x.PhoneNumber2) == false);
-            foreach (var item in users)
+            var instantReserveList = context.Advertises.Where(x => (int)x.InstantReserveStatus == 1);
+            foreach (var item in instantReserveList)
             {
-                item.NoticesPhoneNumber = Core.Entities.User.NoticesPhoneNumberEnum.PhoneNumber2;
-                context.Update(item);
+                item.InstantReserveStatus = Core.Entities.Advertise.InstantReserveStatusEnum.Calendar;
             }
+
+            instantReserveList = context.Advertises.Where(x => (int)x.InstantReserveStatus == 2);
+            foreach (var item in instantReserveList)
+            {
+                if (item.Status == Core.Entities.Advertise.AdvertiseStatus.Published)
+                {
+                    item.InstantReserveStatus = Core.Entities.Advertise.InstantReserveStatusEnum.Permanent;
+                }
+                else
+                {
+                    item.InstantReserveStatus = Core.Entities.Advertise.InstantReserveStatusEnum.Calendar;
+                }
+            }
+
             context.SaveChanges();
         }
     }

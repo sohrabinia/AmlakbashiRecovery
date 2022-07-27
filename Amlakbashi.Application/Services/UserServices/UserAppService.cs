@@ -251,9 +251,9 @@ namespace Amlakbashi.Application.Services.UserServices
             }
         }
 
-        public bool Update(UserEditDTO editedUser, int adminId)
+        public async Task<bool> Update(UserEditDTO editedUser, int adminId)
         {
-            var user = Repository.Find(editedUser.Id);
+            var user = await Repository.FindAsync(editedUser.Id);
             var shallowUser = user.ShallowCopy();
 
             var identityUser = GetIdentityUser(user.PhoneNumber);
@@ -274,30 +274,15 @@ namespace Amlakbashi.Application.Services.UserServices
             user.PhoneNumber3 = editedUser.Mobile2;
             user.LandlinePhoneNumber = editedUser.Tell;
             user.ThirdPersonPhoneNumber = editedUser.ThirdPersonTell;
-
-            if (editedUser.CancelInstantReserveLimit > 0 &&
-                editedUser.CancelInstantReserveLimit != user.CancelInstantReserveLimit)
+            if (user.DisableInstantReserve != editedUser.DisableInstantReserve)
             {
-                user.CancelInstantReserveLimit = editedUser.CancelInstantReserveLimit;
-                if (user.Advertises.Sum(x => x.InstantReserveCancels) > user.CancelInstantReserveLimit)
-                {
-                    user.InstantReserveAccess = User.InstantReserveAccessEnum.Banned;
-                    foreach (var item in user.Advertises)
-                    {
-                        item.InstantReserveStatus = Advertise.InstantReserveStatusEnum.None;
-                    }
-                }
-                else
-                {
-                    if (user.InstantReserveAccess == User.InstantReserveAccessEnum.Banned)
-                    {
-                        user.InstantReserveAccess = User.InstantReserveAccessEnum.None;
-                    }
-                }
+                user.DisableInstantReserve = editedUser.DisableInstantReserve;
+                await mediator.Publish(new UpdateUserInstantReserveEvent(user.Id, user.DisableInstantReserve));
             }
+
             Repository.Update(user);
             Repository.Save();
-            mediator.Publish(new UserUpdateEvent(shallowUser, user, ActionLog.ActionSourceEnum.AdminPanel, adminId));
+            await mediator.Publish(new UserUpdateEvent(shallowUser, user, ActionLog.ActionSourceEnum.AdminPanel, adminId));
             return true;
         }
 
@@ -691,12 +676,12 @@ namespace Amlakbashi.Application.Services.UserServices
             Repository.Save();
         }
 
-        public void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
-            int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel)
-        {
-            mediator.Send(new ChangeInstantReserveAccessCommand(userId,
-                instantReserveAccess, currentUserId, source));
-        }
+        //public void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
+        //    int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel)
+        //{
+        //    mediator.Send(new ChangeInstantReserveAccessCommand(userId,
+        //        instantReserveAccess, currentUserId, source));
+        //}
 
         public void UpdateUserNotificationToken(int userId, string token)
         {

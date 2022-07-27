@@ -16,12 +16,10 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
     [Serializable]
     public class AccommodationManagerDTO
     {
-        public InstantReserveAccessEnum instantReserveAccess { get; set; }
         public IEnumerable<DashboardAccDTO> accList { get; set; }
         public static AccommodationManagerDTO Generate(User user, List<Advertise> input)
         {
             var data = new AccommodationManagerDTO();
-            data.instantReserveAccess = user.InstantReserveAccess;
             data.accList = new List<DashboardAccDTO>();
             var hotelAccTypes = GetHotelTypes();
             var verifiedStates = new List<AdvertiseStatus>() {

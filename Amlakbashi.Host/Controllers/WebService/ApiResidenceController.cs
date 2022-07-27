@@ -404,5 +404,39 @@ namespace Amlakbashi.Host.Controllers.WebService
                 requiredEvidences = advertise.EvidenceRequired,
             });
         }
+
+        [HttpPost("instantreserve/permanent")]
+        public async Task<IActionResult> UpdatePermanentInstantReserve(UpdatePermanentInstantReserveRequest request)
+        {
+            var result = await advertiseService.UpdateInstantReserveStatus(request.residenceId,
+                request.active ? Advertise.InstantReserveStatusEnum.Permanent : Advertise.InstantReserveStatusEnum.Calendar);
+            return result ? Ok() : BadRequest();
+        }
+
+        [HttpGet("instantreserve")]
+        public IActionResult GetInstantReserveDates(long residenceId)
+        {
+            var residence = advertiseService.Find(residenceId);
+            if (residence == null || residence.UserID != User.GetId())
+            {
+                return BadRequest("not allowed");
+            }
+            var instantReserveDates = residence.InstantReserveDates.Select(x => DateTimeUtility.DateValueOfJS(x.Date)).ToList();
+            return Ok(SerializeUtility.SerializeToJS(instantReserveDates));
+        }
+
+        [HttpPost("instantreserve")]
+        public async Task<IActionResult> AddInstantReserveDates(UpdateInstantReserveDatesRequest request)
+        {
+            var result = await advertiseService.AddInstantReserveDates(request.residenceId, request.fromDate, request.toDate, User.GetId());
+            return result.HasError() ? BadRequest(result.GetErrors()) : Ok(SerializeUtility.SerializeToJS(result.Result));
+        }
+
+        [HttpDelete("instantreserve")]
+        public async Task<IActionResult> DeleteInstantReserveDates(UpdateInstantReserveDatesRequest request)
+        {
+            var result = await advertiseService.DeleteInstantReserveDates(request.residenceId, request.fromDate, request.toDate, User.GetId());
+            return result.HasError() ? BadRequest(result.GetErrors()) : Ok(SerializeUtility.SerializeToJS(result.Result));
+        }
     }
 }

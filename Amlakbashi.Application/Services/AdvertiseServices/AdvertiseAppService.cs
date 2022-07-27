@@ -159,7 +159,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             if (request.instantReserve)
             {
-                advertises = advertises.Where(a => a.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed);
+                advertises = advertises.Where(a => a.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent);
             }
             if (request.minPrice > 0 || request.maxPrice > 0)
             {
@@ -307,11 +307,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return Repository.Query(q => q.Where(w => w.Status == status).ToList());
         }
 
-        public IList<Advertise> GetInstantReserveAdvertisesByUserId(int userId, InstantReserveStatusEnum instantStatus)
-        {
-            return Repository.Query(q => q.Where(x => x.UserID == userId &&
-                  x.InstantReserveStatus == instantStatus).ToList());
-        }
+        //public IList<Advertise> GetInstantReserveAdvertisesByUserId(int userId, InstantReserveStatusEnum instantStatus)
+        //{
+        //    return Repository.Query(q => q.Where(x => x.UserID == userId &&
+        //          x.InstantReserveStatus == instantStatus).ToList());
+        //}
 
         public IList<Advertise> GetAccListByIds(IList<long> ids, AdvertiseStatus status = AdvertiseStatus.Unset)
         {
@@ -326,7 +326,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             if (beInstantReserve)
             {
-                return Repository.Query(q => q.Where(w => w.InstantReserveStatus == InstantReserveStatusEnum.Confirmed)
+                return Repository.Query(q => q.Where(w => w.InstantReserveStatus == InstantReserveStatusEnum.Permanent)
                     .OrderByDescending(o => o.AverageUserRating).Take(count)).ToList();
             }
             return Repository.Query(q => q.OrderByDescending(o => o.AverageUserRating).Take(count)).ToList();
@@ -461,9 +461,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 var st = (Advertise.HygieneProtocolStatus)dto.HygieneProtocolStatus;
                 model = model.Where(w => w.HygieneProtocol == st);
             }
-            if (dto.InstatntReserveStatus > -1)
+            if (dto.InstantReserveStatus > -1)
             {
-                model = model.Where(x => x.InstantReserveStatus == (Advertise.InstantReserveStatusEnum)dto.InstatntReserveStatus);
+                model = model.Where(x => x.InstantReserveStatus == (Advertise.InstantReserveStatusEnum)dto.InstantReserveStatus);
             }
             if (string.IsNullOrEmpty(dto.MinReserveNorouzFromDate) == false)
             {
@@ -1868,98 +1868,60 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return result;
         }
 
-        public void RequestInstantReserve(long id,
-            bool ignoreMsg, int userId,
-            int doerUserId, ActionLog.ActionSourceEnum actionSource,
-            User.InstantReserveAccessEnum currInstantReserveAccess,
-            out bool needMsg)
-        {
-            using (var tran = new TransactionScope())
-            {
-                needMsg = false;
-                var residence = Repository.Find(id);
-                if (residence.User.InstantReserveAccess == User.InstantReserveAccessEnum.Banned)
-                {
-                    return;
-                }
-                residence.InstantReserveStatus = InstantReserveStatusEnum.Confirmed;
-                Repository.Update(residence);
-                Repository.Save();
-                mediator.Publish(new ChangeInstantReserveStatusEvent(id, residence.UserID,
-                        residence.InstantReserveStatus, actionSource, doerUserId));
-                mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
-                tran.Complete();
-            }
+        //public void RequestInstantReserve(long id,
+        //    bool ignoreMsg, int userId,
+        //    int doerUserId, ActionLog.ActionSourceEnum actionSource,
+        //    out bool needMsg)
+        //{
+        //    using (var tran = new TransactionScope())
+        //    {
+        //        needMsg = false;
+        //        var residence = Repository.Find(id);
+        //        if (residence.User.DisableInstantReserve)
+        //        {
+        //            return;
+        //        }
+        //        residence.InstantReserveStatus = InstantReserveStatusEnum.Confirmed;
+        //        Repository.Update(residence);
+        //        Repository.Save();
+        //        mediator.Publish(new ChangeInstantReserveStatusEvent(id, residence.UserID,
+        //                residence.InstantReserveStatus, actionSource, doerUserId));
+        //        mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+        //        tran.Complete();
+        //    }
+        //}
 
-            //using (var tran = new TransactionScope())
-            //{
-            //    needMsg = false;
-            //    var acc = Repository.Find(id);
-            //    if (currInstantReserveAccess == User.InstantReserveAccessEnum.Verified)
-            //    {
-            //        if (acc.InstantReserveStatus != InstantReserveStatusEnum.Confirmed)
-            //        {
-            //            acc.InstantReserveStatus = InstantReserveStatusEnum.Confirmed;
-            //            Repository.Update(acc);
-            //            Repository.Save();
-            //            mediator.Publish(new ChangeInstantReserveStatusEvent(id, acc.UserID,
-            //                    acc.InstantReserveStatus, actionSource, doerUserId));
-            //        }
-            //    }
-            //    else
-            //    {
-            //        if (ignoreMsg || currInstantReserveAccess == User.InstantReserveAccessEnum.Requested)
-            //        {
-            //            var currInstantReserveStatus = acc.InstantReserveStatus;
-            //            if (currInstantReserveStatus != InstantReserveStatusEnum.Requested)
-            //            {
-            //                acc.InstantReserveStatus = InstantReserveStatusEnum.Requested;
-            //                Repository.Update(acc);
-            //                Repository.Save();
-            //                mediator.Publish(new ChangeInstantReserveStatusEvent(id, acc.UserID,
-            //                    acc.InstantReserveStatus, actionSource, doerUserId));
-            //            }
-            //        }
-            //        else
-            //        {
-            //            needMsg = true;
-            //        }
-            //    }
-            //    tran.Complete();
-            //}
-        }
+        //public void CancelInstantReserve(long id, int userId, int doerUserId,
+        //    ActionLog.ActionSourceEnum actionSource)
+        //{
+        //    using (var tran = new TransactionScope())
+        //    {
+        //        var acc = Repository.Find(id);
+        //        acc.InstantReserveStatus = InstantReserveStatusEnum.None;
+        //        Repository.Update(acc);
+        //        Repository.Save();
+        //        //mediator.Publish(new ChangeInstantReserveStatusEvent(id,
+        //        //    userId, acc.InstantReserveStatus, actionSource, doerUserId));
+        //        mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
+        //        tran.Complete();
+        //    }
+        //}
 
-        public void CancelInstantReserve(long id, int userId, int doerUserId,
-            ActionLog.ActionSourceEnum actionSource)
-        {
-            using (var tran = new TransactionScope())
-            {
-                var acc = Repository.Find(id);
-                acc.InstantReserveStatus = InstantReserveStatusEnum.None;
-                Repository.Update(acc);
-                Repository.Save();
-                mediator.Publish(new ChangeInstantReserveStatusEvent(id,
-                    userId, acc.InstantReserveStatus, actionSource, doerUserId));
-                mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-                tran.Complete();
-            }
-        }
+        //public int GetInstantReserveCancelCount(int userId)
+        //{
+        //    var advertises = Repository.Query(q => q.Where(x => x.UserID == userId));
+        //    return advertises == null || advertises.Any() == false ? 0 :
+        //        advertises.Sum(x => x.InstantReserveCancels);
+        //}
 
-        public int GetInstantReserveCancelCount(int userId)
-        {
-            var advertises = Repository.Query(q => q.Where(x => x.UserID == userId));
-            return advertises == null || advertises.Any() == false ? 0 :
-                advertises.Sum(x => x.InstantReserveCancels);
-        }
-
-        public string GetInstantReserveBanReason(long id)
-        {
-            var allAccs = Repository.Query(q => q);
-            var acc = allAccs.FirstOrDefault(x => x.Id == id);
-            var accs = allAccs.Where(x => x.UserID == acc.UserID);
-            var countCancel = accs.Sum(x => x.InstantReserveCancels);
-            return "شما " + countCancel + " مورد لغو رزرو داشته اید و نمیتوانید از این امکان استفاده کنید.";
-        }
+        //public string GetInstantReserveBanReason(long id)
+        //{
+        //    var allAccs = Repository.Query(q => q);
+        //    var acc = allAccs.FirstOrDefault(x => x.Id == id);
+        //    var accs = allAccs.Where(x => x.UserID == acc.UserID);
+        //    var countCancel = accs.Sum(x => x.InstantReserveCancels);
+        //    return "شما " + countCancel + " مورد لغو رزرو داشته اید و نمیتوانید از این امکان استفاده کنید.";
+        //}
 
         public void SetStayDuration(long id, int min, int max)
         {
@@ -2475,31 +2437,21 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return intersects.ToList();
         }
 
-        public void UpdateInstantReserveStatus(int userId, InstantReserveStatusEnum status, bool forRequested = false)
+        public async Task<bool> UpdateInstantReserveStatus(long residenceId, InstantReserveStatusEnum status)
         {
-            var data = Repository.Query(q => q.Where(w => w.UserID == userId));
-            if (forRequested)
+            var data = await Repository.FindAsync(residenceId);
+            data.InstantReserveStatus = status;
+            if (data.Mode == AdvertiseMode.Parent)
             {
-                data = data.Where(w => w.InstantReserveStatus == InstantReserveStatusEnum.Requested);
-            }
-            foreach (var item in data)
-            {
-                item.InstantReserveStatus = status;
-                foreach (var child in item.Childs)
+                foreach (var item in data.Childs)
                 {
-                    child.InstantReserveStatus = status;
+                    item.InstantReserveStatus = status;
                 }
-                Repository.Update(item);
-                mediator.Send(new RemoveAdvertiseCacheCommand(item.Id));
             }
+            Repository.Update(data);
             Repository.Save();
-        }
-
-        public void UpdateInstantReserveStatus(long accId,
-            InstantReserveStatusEnum status, int doerUserId,
-            ActionSourceEnum actionSource)
-        {
-            mediator.Send(new UpdateInstantReserveStatusCommand(accId, status, doerUserId, actionSource));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residenceId));
+            return true;
         }
 
         public CheckUnsetOccupiedDTO CheckUnsetOccupiedDateRange(long advertiseId,
@@ -2570,8 +2522,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public bool CheckReserve(int currentUserId, long advertiseId, int guestCount,
-            string startDate, string endDate, out string msg)
+            string startDate, string endDate, out string msg, out bool isInstantReserve)
         {
+            isInstantReserve = false;
             var advertise = Repository.Find(advertiseId);
             var user = Repository.Find<User, int>(currentUserId);
             var haveReservedRequest = false;
@@ -2675,6 +2628,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 msg = "شما یک درخواست مشابه برای این آگهی دارید، برای درخواست جدید درخواست قبلی را لغو کنید";
                 return false;
             }
+            isInstantReserve = advertise.IsReserveInstant(startDateGregorian, endDateGregorian);
             msg = "در صورت موافقت روی دکمه ثبت کلیک کنید";
             return true;
         }
@@ -2833,8 +2787,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public bool ReserveRequest(long advertiseId, int userId, string startDate,
-            string endDate, int guestCount, bool instantReserve, out string msg,
-            out long reserveId)
+            string endDate, int guestCount, out string msg, out long reserveId)
         {
             if (guestCount < 1)
             {
@@ -2856,15 +2809,16 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 reserveId = 0;
                 return false;
             }
-            if (instantReserve)
-            {
-                instantReserve = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed;
-            }
-            if (instantReserve)
-            {
-                var formDateGregortian = DateTimeUtility.PersianDateToGregorian(startDate);
-                instantReserve = formDateGregortian <= DateTime.Now.AddDays(advertise.MaxInstantReserveStart).Date;
-            }
+            //if (instantReserve)
+            //{
+            //    instantReserve = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed;
+            //}
+            //if (instantReserve)
+            //{
+            //    var formDateGregortian = DateTimeUtility.PersianDateToGregorian(startDate);
+            //    instantReserve = formDateGregortian <= DateTime.Now.AddDays(advertise.MaxInstantReserveStart).Date;
+            //}
+
             long without_discount_price, couponCalculationPrice;
             var days = DateTimeUtility.GetPersianDateRangeDays(startDate, endDate);
             var total_price = priceCalculator.CalculateReservePrice(advertise, startDate, endDate, guestCount,
@@ -2895,10 +2849,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 NumberOfGuests = guestCount,
                 TotalPrice = total_price,
                 DepositPrice = depositePrice,
-                InstantReserve = instantReserve,
+                //InstantReserve = instantReserve,
                 CouponCalculationPrice = couponCalculationPrice
             };
-            reserve.Status = instantReserve ? Reserve.ReserveStatus.WaitForReserve :
+            reserve.InstantReserve = advertise.IsReserveInstant(reserve.StartDate, reserve.EndDate);
+            //reserve.Status = instantReserve ? Reserve.ReserveStatus.WaitForReserve :
+            //    Reserve.ReserveStatus.WaitForResponse;
+            reserve.Status = reserve.InstantReserve ? Reserve.ReserveStatus.WaitForReserve :
                 Reserve.ReserveStatus.WaitForResponse;
             if (user.Reserves.Count(c => c.Status == ReserveStatus.WaitForResponse) >= 3)
             {
@@ -2939,7 +2896,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             mediator.Enqueue(new SendMessageCommand(contact));
             mediator.Publish(new ReserveRequestEvent(reserve.Id));
             mediator.Enqueue(new UpdateAdvertiseScoreCommand(advertiseId));
-            msg = instantReserve ?
+            msg = reserve.InstantReserve ?
                         "لطفا مبلغ رزرو را پرداخت نمایید تا رزرو شما نهایی شود"
                         : "درخواست رزرو شما با موفقیت انجام شد. نتیجه درخواست به اطلاع شما خواهد رسید.";
             reserveId = reserve.Id;
@@ -3018,6 +2975,57 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 return DeleteExtrinsicReserveDates(request);
             }
+        }
+
+        public async Task<ServiceResult<List<long>>> AddInstantReserveDates(long residenceId, string fromDate, string toDate, int userId)
+        {
+            var serviceResult = new ServiceResult<List<long>>();
+            var residence = await Repository.FindAsync(residenceId);
+            if (residence == null || residence.UserID != userId)
+            {
+                serviceResult.AddError("user is incorrect");
+                return serviceResult;
+            }
+            var selectedPersianDates = DateTimeUtility.PersianDateRangeToList(fromDate, toDate, true, false);
+            var instantReservePersianDates = residence.InstantReserveDates.Select(s => DateTimeUtility.GregorianToPersianDate(s.Date));
+            foreach (var item in selectedPersianDates)
+            {
+                if (instantReservePersianDates.Any(x => x == item) == false)
+                {
+                    residence.InstantReserveDates.Add(new InstantReserveDate()
+                    {
+                        Date = DateTimeUtility.PersianDateToGregorian(item)
+                    });
+                }
+            }
+            Repository.Update(residence);
+            Repository.Save();
+            serviceResult.Result = residence.InstantReserveDates.Select(x => DateTimeUtility.DateValueOfJS(x.Date)).ToList();
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult<List<long>>> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate, int userId)
+        {
+            var serviceResult = new ServiceResult<List<long>>();
+            var residence = await Repository.FindAsync(residenceId);
+            if (residence == null || residence.UserID != userId)
+            {
+                serviceResult.AddError("user is incorrect");
+                return serviceResult;
+            }
+            var selectedPersianDates = DateTimeUtility.PersianDateRangeToList(fromDate, toDate, true, false);
+            foreach (var item in residence.InstantReserveDates.ToList())
+            {
+                var persianDate = DateTimeUtility.GregorianToPersianDate(item.Date);
+                if (selectedPersianDates.Any(x => x == persianDate))
+                {
+                    residence.InstantReserveDates.Remove(item);
+                }
+            }
+            Repository.Update(residence);
+            Repository.Save();
+            serviceResult.Result = residence.InstantReserveDates.Select(x => DateTimeUtility.DateValueOfJS(x.Date)).ToList();
+            return serviceResult;
         }
 
         private async Task<ServiceResult> InsertExtrinsicReserveDatesAsync(AdvertiseUpdateCalendarRequest request,
