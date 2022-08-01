@@ -32,7 +32,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         IList<Advertise> GetAdvertisesByUserId(int userId, bool includeCommentsAndReports = false);
         IList<long> GetAdvertiseIdsByUserId(int userId);
         IList<Advertise> GetNotChildAdvertisesByUserId(int userId);
-        //IList<Advertise> GetInstantReserveAdvertisesByUserId(int userId, InstantReserveStatusEnum instantStatus);
         IList<Advertise> GetAdvertisesByStatus(AdvertiseStatus status, bool haveSlug = false);
         IList<Advertise> GetMostLiked(int count, bool beInstantReserve = false);
         List<string> GetAdvertiseTags(Advertise advertise);
@@ -86,14 +85,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void SetAsTodayEmpty(long id);
         void UnsetTodayEmpty(long id);
         Dictionary<string, string> GetAdvertiseListPrices(List<long> ids);
-        //void RequestInstantReserve(long id,
-        //    bool ignoreMsg, int userId,
-        //    int doerUserId, ActionLog.ActionSourceEnum actionSource,
-        //    out bool needMsg);
-        //void CancelInstantReserve(long id, int userId, int doerUserId,
-        //    ActionLog.ActionSourceEnum actionSource);
-        //string GetInstantReserveBanReason(long id);
-        //int GetInstantReserveCancelCount(int userId);
         void SetStayDuration(long id, int min, int max);
         bool SetPrices(long id, PriceInputDTO prices, out Dictionary<string, string> errors);
         void SetNorouzPrice(long id, int norouzPrice, int overCapacityPrice = 0);

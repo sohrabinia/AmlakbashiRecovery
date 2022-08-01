@@ -376,7 +376,7 @@ namespace Amlakbashi.Application.Services.Category
             if (instant_reserve != null && instant_reserve == "1")
             {
                 model_output = model_output.ThenByDescending(x => x.InstantReserveStatus == InstantReserveStatusEnum.Permanent ||
-                    x.InstantReserveDates.Any(a =>a.Date == DateTime.Now.Date));
+                    x.InstantReserveDates.Any(a => a.Date == DateTime.Now.Date));
             }
             switch ((SortOrder)sort)
             {

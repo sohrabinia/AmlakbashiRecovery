@@ -572,7 +572,8 @@
     var instantReserveActivated;
     var instantReserveMaxStart = 30;
     var maxInstantReserveStartUnix;
-    var maxReserveStartDate;
+        var maxReserveStartDate;
+        var isInstantReserve = false;
     jalaliShowLoading();
     $.ajax({
         type: "GET",
@@ -591,7 +592,7 @@
             instantReserveMaxStart = ret.instantReserveMaxStart;
             maxInstantReserveStartUnix = ret.maxInstantReserveStartUnix;
             maxReserveStartDate = ret.maxReserveStartDate;
-            updateReserveRequestButton();
+            //updateReserveRequestButton();
             var $elem = $('.master__favourite-button');
             if (ret.is_favourited) {
                 $elem.addClass("active");

@@ -10,6 +10,7 @@ using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Host.Controllers.Base;
 using Amlakbashi.Host.Extensions;
+using Amlakbashi.Host.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -104,6 +105,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpGet("list")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public List<AdvertiseBasicInfoReponse> GetUserAdvertises(Advertise.AdvertiseStatus status = Advertise.AdvertiseStatus.Published,
             int page = 1, int pageItemCount = 20)
         {
@@ -115,6 +117,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpPost("create")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> Create(AdvertisePostCreateRequest request)
         {
             if (request.IsValid(ModelState) == false)
@@ -131,6 +134,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpGet("update/basic/{id:long}")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetBasicInfoForUpdate(long id)
         {
             var advertise = advertiseService.Find(id);
@@ -143,6 +147,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpPost("update/basic")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> UpdateBasicInfo(AdvertisePostBasicInfoRequest request)
         {
             if (request.IsValid(ModelState) == false)
@@ -159,6 +164,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpGet("update/general/{id:long}")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetGeneralInfoForUpdate(long id)
         {
             var advertise = advertiseService.Find(id);
@@ -171,6 +177,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpPost("update/general")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> UpdateGeneralInfo(AdvertisePostGeneralInfoRequest request)
         {
             var checkRegionResult = regionService.IsValidRegions(request.province, request.city, request.area);
@@ -188,6 +195,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpGet("update/supplementary/{id:long}")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetSupplementaryInfoForUpdate(long id)
         {
             var advertise = advertiseService.Find(id);
@@ -199,6 +207,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpPost("update/supplementary")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> UpdateSupplementaryInfo(AdvertisePostSupplementaryInfoRequest request)
         {
             if (request.IsValid(ModelState) == false)
@@ -215,6 +224,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpGet("update/final/{id:long}")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetFinalInfoForUpdate(long id)
         {
             var advertise = advertiseService.Find(id);
@@ -226,6 +236,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpPost("update/final")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> UpdateFinalInfo(AdvertisePostFinalInfoRequest request)
         {
             if (request.IsValid(ModelState) == false)
@@ -242,6 +253,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpGet("update/hotelroom/{id:long}")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetHotelRoomInfoForUpdate(long id)
         {
             var advertise = advertiseService.Find(id);
@@ -253,6 +265,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpPost("update/hotelroom")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> CreateOrUpdateHotelRoomInfo(AdvertisePostHotelRoomInfoRequest request)
         {
             if (request.IsValid(ModelState) == false)
@@ -337,6 +350,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpPost("calendar")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> UpdateCalendarData(AdvertiseUpdateCalendarRequest request)
         {
             request.userId = User.GetId();
@@ -350,6 +364,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpPost("manualprice")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult UpdateManualPrice(AdvertiseUpdatePriceRequest request,
             [FromServices] IPriceTableAppService priceTableService)
         {
@@ -405,16 +420,9 @@ namespace Amlakbashi.Host.Controllers.WebService
             });
         }
 
-        [HttpPost("instantreserve/permanent")]
-        public async Task<IActionResult> UpdatePermanentInstantReserve(UpdatePermanentInstantReserveRequest request)
-        {
-            var result = await advertiseService.UpdateInstantReserveStatus(request.residenceId,
-                request.active ? Advertise.InstantReserveStatusEnum.Permanent : Advertise.InstantReserveStatusEnum.Calendar);
-            return result ? Ok() : BadRequest();
-        }
-
         [HttpGet("instantreserve")]
-        public IActionResult GetInstantReserveDates(long residenceId)
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
+        public IActionResult GetInstantReserveInfo(long residenceId)
         {
             var residence = advertiseService.Find(residenceId);
             if (residence == null || residence.UserID != User.GetId())
@@ -422,10 +430,15 @@ namespace Amlakbashi.Host.Controllers.WebService
                 return BadRequest("not allowed");
             }
             var instantReserveDates = residence.InstantReserveDates.Select(x => DateTimeUtility.DateValueOfJS(x.Date)).ToList();
-            return Ok(SerializeUtility.SerializeToJS(instantReserveDates));
+            return Ok(new
+            {
+                status = residence.InstantReserveStatus,
+                dates = SerializeUtility.SerializeToJS(instantReserveDates)
+            });
         }
 
         [HttpPost("instantreserve")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> AddInstantReserveDates(UpdateInstantReserveDatesRequest request)
         {
             var result = await advertiseService.AddInstantReserveDates(request.residenceId, request.fromDate, request.toDate, User.GetId());
@@ -433,10 +446,20 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpDelete("instantreserve")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> DeleteInstantReserveDates(UpdateInstantReserveDatesRequest request)
         {
             var result = await advertiseService.DeleteInstantReserveDates(request.residenceId, request.fromDate, request.toDate, User.GetId());
             return result.HasError() ? BadRequest(result.GetErrors()) : Ok(SerializeUtility.SerializeToJS(result.Result));
+        }
+
+        [HttpPost("instantreserve/permanent")]
+        [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
+        public async Task<IActionResult> UpdatePermanentInstantReserve(UpdatePermanentInstantReserveRequest request)
+        {
+            var result = await advertiseService.UpdateInstantReserveStatus(request.residenceId,
+                request.active ? Advertise.InstantReserveStatusEnum.Permanent : Advertise.InstantReserveStatusEnum.Calendar);
+            return result ? Ok() : BadRequest();
         }
     }
 }

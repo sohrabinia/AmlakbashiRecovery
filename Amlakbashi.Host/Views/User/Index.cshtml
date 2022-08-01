@@ -164,7 +164,7 @@
         <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.Guest))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.Guest ? "#fdd835" : "#ffffff")">مهمان</div>
         <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.Staff))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.Staff ? "#fdd835" : "#ffffff")">کارمندان</div>
         @*<div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.InstantReserveRequest))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ? "#fdd835" : "#ffffff")">درخواست رزرو آنی</div>*@
-        <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.InstantReserveAllow))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow ? "#fdd835" : "#ffffff")">رزرو آنی</div>
+        @*<div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.InstantReserveAllow))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow ? "#fdd835" : "#ffffff")">رزرو آنی</div>*@
         <div onclick="toggleUserFilter(@((int)Entities.User.UserFilterType.PhotoChangeRequest))" style="border:1px solid #242424;cursor:pointer;border-radius: 5px;padding: 5px;background-color:@(data.UserFilterType == Entities.User.UserFilterType.PhotoChangeRequest ? "#fdd835" : "#ffffff")">در انتظار تایید عکس</div>
     </div>
     <div style="overflow: auto;">
@@ -208,13 +208,13 @@
                     <th>شماره کارت</th>
                     <th>شماره شبا</th>
                 }
-                @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ||
+                @*@if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest ||
                  data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
                 {
                     <th>
                         رزرو آنی
                     </th>
-                }
+                }*@
                 <th>
                     عملیات
                 </th>
@@ -267,21 +267,21 @@
                             @(bankCard != null && !string.IsNullOrEmpty(bankCard.ShabaNumber) ? bankCard.ShabaNumber : "-")
                         </td>
                     }
-                    @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest)
+                    @*@if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveRequest)
                     {
-                        @*<td>
+                        <td>
                             <div onclick="showInstantReserveMsg(@item.User.Id)" style="cursor:pointer;border-radius:5px;background-color:#fdd835;padding:5px;">تایید درخواست</div>
-                        </td>*@
+                        </td>
                     }
                     @if (data.UserFilterType == Entities.User.UserFilterType.InstantReserveAllow)
                     {
                         <td>
                             <div style="display:flex;flex-flow:row;">
-                                @*<div style="margin:0 10px;color:@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "red" : "#34A853")">@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "ممنوع" : "فعال")</div>*@
-                                @*<div>تعداد لغو:‌ @item.InstantReserveCancel</div>*@
+                                <div style="margin:0 10px;color:@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "red" : "#34A853")">@(item.User.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Banned ? "ممنوع" : "فعال")</div>
+                                <div>تعداد لغو:‌ @item.InstantReserveCancel</div>
                             </div>
                         </td>
-                    }
+                    }*@
                     @if (item.State == Entities.User.UserState.Acticved || item.State == Entities.User.UserState.ReserveBanned)
                     {
                         <td class="operation-icons">

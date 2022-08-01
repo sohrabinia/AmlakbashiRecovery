@@ -386,7 +386,6 @@ function updateDatePickerOccupied(elems, setting) {
             else if (isInstantReserve) {
                 $(this).find('.jalali-price-label').hide();
                 $(this).append('<span class="jalali-filled-label">رزرو آنی</span>');
-                $(this).addClass('jalali-occupied-day');
                 if (!setting.occupiedSelectEnabled) {
                     $(this).addClass('jalali-disabled-day');
                 }

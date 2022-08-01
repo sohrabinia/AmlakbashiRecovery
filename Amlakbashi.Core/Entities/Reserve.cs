@@ -194,13 +194,22 @@ namespace Amlakbashi.Core.Entities
         {
             Unset = 0,
 
-            Guest_Guest_HighPrice = 1,
+            Guest_Guest_TripCancellation = 1,
+            Guest_Guest_NotHavingEvidence = 2,
+            Guest_Guest_IncorrectNumberOfGuests = 3,
+            Guest_Guest_ChangeTripDate = 4,
 
             Guest_Host_IncorrectResidenceInfo = 51,
+            Guest_Host_IncorrectHost = 52,
+            Guest_Host_DirtyResidence = 53,
 
             Host_Host_LowPrice = 101,
+            Host_Host_ResidenceFull = 102,
+            Host_Host_ResidenceRebuilding = 103,
 
-            Host_Guest_IncorrectIdentityEvidence = 151
+            Host_Guest_NotHavingEvidence = 151,
+            Host_Guest_IncorrectNumberOfGuest = 152,
+            Host_Guest_IncorrectGuest = 153,
         }
 
         #endregion

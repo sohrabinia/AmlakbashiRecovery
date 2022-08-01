@@ -12,7 +12,6 @@ namespace Amlakbashi.Core.Entities
     public class Advertise : Entity<long>
     {
         #region Properties
-        //[Column("AdvertiseID")]
         public override long Id { get; set; }
         public string Title { get; set; }
 
@@ -49,8 +48,6 @@ namespace Amlakbashi.Core.Entities
         public string NotVerifyReasons { get; set; }
         public long AdvertiseScore { get; set; }
         public int AmlakbashiScore { get; set; }
-
-        //[Column("AdvertiseMode")]
         public AdvertiseMode Mode { get; set; }
         public bool IsContactAvailable { get; set; }
         public bool AllowParty { get; set; }
@@ -107,7 +104,6 @@ namespace Amlakbashi.Core.Entities
         public string LocationString { get; set; }
         public int BasePrice { get; set; }
         public string SupportInfo { get; set; }
-        //public int InstantReserveCancels { get; set; }
         public InstantReserveStatusEnum InstantReserveStatus { get; set; }
         public int MaxInstantReserveStart { get; set; } = 30;
         public int MinReserveDays { get; set; }

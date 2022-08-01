@@ -1659,36 +1659,6 @@ namespace Amlakbashi.Host.Controllers
             return Redirect(url);
         }
 
-        //[Authorize]
-        //public JsonResult SetHostCallDate(long reserve_id)
-        //{
-        //    try
-        //    {
-        //        reserveService.UpdateHostCallDate(reserve_id, DateTime.Now);
-        //        return GenerateJsonResult(new { status = 1 });
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("Reserve.SetHostCallDate", exc);
-        //        return GenerateJsonResult(new { status = 0 });
-        //    }
-        //}
-
-        //[Authorize]
-        //public JsonResult SetGuestCallDate(long reserve_id)
-        //{
-        //    try
-        //    {
-        //        reserveService.UpdateGuestCallDate(reserve_id, DateTime.Now);
-        //        return GenerateJsonResult(new { status = 1 });
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("Reserve.SetGuestCallDate", exc);
-        //        return GenerateJsonResult(new { status = 0 });
-        //    }
-        //}
-
         [HttpGet]
         [Authorize]
         public ActionResult Invoice(int? page)
