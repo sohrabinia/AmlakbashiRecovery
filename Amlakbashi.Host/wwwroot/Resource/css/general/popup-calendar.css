@@ -32,7 +32,8 @@
 .message-popup__message-content {
     overflow-y: unset;
 }
-.message-popup__message-child.message-popup__message-content .acc-set-date__date-string {
+/*.message-popup__message-child.message-popup__message-content .acc-set-date__date-string {*/
+.acc-set-date__date-string {
     /* margin: 0 auto; */
     text-align: center;
     color: #EA4335;

@@ -46,7 +46,8 @@ new ModelStateDictionary()) { { "title", " پر " }, { "Active", Model.todayIsFu
         <div class="div-unset ">
             @*<a style="display:@( Model.newCommentCount == 0 ? "none" : "inline-block");" href="/comment/advertisecommentdetail?id=@Model.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@Model.newCommentCount</span></i></a>*@
             @*<a title="نوروز" class="icons-item icons-desktop" href="/accomodation/acccomplexform?parentid=@ViewData["parentid"]&id=@(Model.id)#input-price-section"><img class="noroz-style-icon" width="25" height="25" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>*@
-            <a style="" title="رزرو آنی" class="icons-item calndar-icon icons-desktop" onclick="getInstantReserveDates(@Model.id)"><i class="fas fa-bolt" style="font-size: 16px; padding: 6px 9px;"></i></a>
+            <a title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@Model.id,'@Model.title')"><i class="fa fa-calendar-alt"></i></a>
+            <a title="رزرو آنی" class="icons-item calndar-icon" onclick="getInstantReserveDates(@Model.id)"><i class="fas fa-bolt" style="font-size: inherit;"></i></a>
             <button title="تنظیمات " class="icons-item setting-icon-complex"><i class="fa fa-cog"></i></button>
         </div>
     </div>

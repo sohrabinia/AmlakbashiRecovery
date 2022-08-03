@@ -17,6 +17,10 @@ else
 
             <div class="column-id">
                 @item.Id
+                @if (item.Mode == Advertise.AdvertiseMode.Child)
+                {
+                    <div><a asp-controller="advertise" asp-action="newindex" asp-route-id="@item.ParentId">(@item.ParentId)</a></div>
+                }
             </div>
 
             <div class="column-title">
@@ -34,8 +38,9 @@ else
                 @if (item.UserId > 0)
                 {
                     <div style="direction:ltr">
-                        <a target="_blank" href="/user/index?code=@item.UserId">@item.UserFullName</a>
-                        <br />@item.UserId
+                        <a target="_blank" href="/user/index?code=@item.UserId">@item.UserFullName
+                        <br />
+                        @item.UserId</a>
                     </div>
 
                 }

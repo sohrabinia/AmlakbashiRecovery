@@ -2062,8 +2062,8 @@ li.disabled.PagedList-ellipses a {
         padding: 0 8px;
     }
     i.fas.fa-pencil-alt, .icons-item {
-        font-size: 14px;
-        margin: 0;
+        /*font-size: 14px;*/
+        /*margin: 0;*/
     }
 
     .quick-access {

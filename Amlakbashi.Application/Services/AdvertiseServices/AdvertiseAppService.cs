@@ -441,7 +441,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public void FilterNew(AdvertiseIndexDTO dto)
         {
             IQueryable<Advertise> model = Repository.Query(q => q);
-            model = model.Where(w => w.Mode != AdvertiseMode.Child);
+            //model = model.Where(w => w.Mode != AdvertiseMode.Child);
             if (dto.Status != AdvertiseStatus.Unset)
             {
                 model = model.Where(a => a.Status == dto.Status);
@@ -452,7 +452,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             if (dto.Id > 0)
             {
-                model = model.Where(w => w.Id == dto.Id || w.Childs.Any(x => x.Id == dto.Id));
+                //model = model.Where(w => w.Id == dto.Id || w.Childs.Any(x => x.Id == dto.Id));
+                model = model.Where(w => w.Id == dto.Id);
             }
             if (dto.UserId != -1)
             {
@@ -2917,11 +2918,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var serviceResult = new ServiceResult<List<long>>();
             var residence = await Repository.FindAsync(residenceId);
-            if (residence == null || residence.UserID != userId)
-            {
-                serviceResult.AddError("user is incorrect");
-                return serviceResult;
-            }
+            //if (residence == null || residence.UserID != userId)
+            //{
+            //    serviceResult.AddError("user is incorrect");
+            //    return serviceResult;
+            //}
             var selectedPersianDates = DateTimeUtility.PersianDateRangeToList(fromDate, toDate, true, false);
             var instantReservePersianDates = residence.InstantReserveDates.Select(s => DateTimeUtility.GregorianToPersianDate(s.Date));
             foreach (var item in selectedPersianDates)
@@ -2944,11 +2945,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var serviceResult = new ServiceResult<List<long>>();
             var residence = await Repository.FindAsync(residenceId);
-            if (residence == null || residence.UserID != userId)
-            {
-                serviceResult.AddError("user is incorrect");
-                return serviceResult;
-            }
+            //if (residence == null || residence.UserID != userId)
+            //{
+            //    serviceResult.AddError("user is incorrect");
+            //    return serviceResult;
+            //}
             var selectedPersianDates = DateTimeUtility.PersianDateRangeToList(fromDate, toDate, true, false);
             foreach (var item in residence.InstantReserveDates.ToList())
             {

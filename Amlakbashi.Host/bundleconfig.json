@@ -146,7 +146,9 @@
   {
     "outputFileName": "wwwroot/css/min/admin-advertise.min.css",
     "inputFiles": [
-      "wwwroot/css/admin/advertise/admin-advertise-index.css"
+      "wwwroot/css/admin/advertise/admin-advertise-index.css",
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/general/popup-calendar.css"
     ]
   },
   // ####################################################### Scripts
@@ -341,7 +343,10 @@
   {
     "outputFileName": "wwwroot/js/min/admin-advertise.min.js",
     "inputFiles": [
-      "wwwroot/js/admin/advertise/admin-advertise-index.js"
+      "wwwroot/js/admin/advertise/admin-advertise-index.js",
+      "wwwroot/resource/Scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/Scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/Scripts/general/jalali-date-picker.js"
     ]
   },
   // App

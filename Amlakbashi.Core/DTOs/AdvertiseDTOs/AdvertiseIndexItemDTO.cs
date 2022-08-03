@@ -8,6 +8,8 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
     public class AdvertiseIndexItemDTO
     {
         public long Id { get; set; }
+        public Advertise.AdvertiseMode Mode { get; set; }
+        public long? ParentId { get; set; }
         public string Title { get; set; }
         public int UserId { get; set; }
         public DateTime CreateDate { get; set; }
@@ -25,6 +27,8 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
             var dto = new AdvertiseIndexItemDTO()
             {
                 Id = advertise.Id,
+                Mode = advertise.Mode,
+                ParentId = advertise.ParentId,
                 Title = advertise.Title,
                 UserId = advertise.UserID,
                 CreateDate = advertise.CreateDate,

@@ -10,6 +10,8 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
     public class AdvertiseIndexDetailDTO
     {
         public long Id { get; set; }
+        public Advertise.AdvertiseMode Mode { get; set; }
+        public long? ParentId { get; set; }
         public Advertise.AdvertiseStatus Status { get; set; }
         public string CreateDate { get; set; }
         public int DailyPrice { get; set; }
@@ -18,7 +20,6 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public string NorouzMinReserveDate { get; set; }
         public int SupportInfoCount { get; set; }
         public string UserFullName { get; set; } = "کاربر حذف شده";
-        public long UserScore { get; set; } = 0;
         public string CityPersianName { get; set; }
         public int UserId { get; set; }
 
@@ -27,6 +28,8 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
             return new AdvertiseIndexDetailDTO()
             {
                 Id = advertise.Id,
+                Mode = advertise.Mode,
+                ParentId = advertise.ParentId,
                 UserId = advertise.UserID,
                 CreateDate = DateTimeUtility.ConvertDate(advertise.CreateDate).ToString(),
                 DailyPrice = advertise.DailyPrice,

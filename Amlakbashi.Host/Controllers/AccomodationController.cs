@@ -1381,10 +1381,10 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(advertise_id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
-                {
-                    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
-                }
+                //if (acc.UserID != userAccessor.CurrentUser.Id)
+                //{
+                //    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
+                //}
                 if (forRemove)
                 {
                     var result = advertiseService.CheckUnsetOccupiedDateRange(
@@ -1412,6 +1412,22 @@ namespace Amlakbashi.Host.Controllers
                 logger.Error("CheckSetAsOccupiedForDateRange", exc);
                 return GenerateJsonResult(new { status = 0, msg = "متاسفانه عملیات با خطا مواجه شد" });
             }
+        }
+
+        [Authorize]
+        public IActionResult GetSetOccupiedPopup(long id)
+        {
+            var user = userAccessor.CurrentUser;
+            var acc = advertiseService.Find(id);
+            //if (acc == null || acc.UserID != user.Id)
+            //{
+            //    return PartialView("_AccSetOccupied");
+            //}
+            var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+            var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
+            ViewBag.occupiedList = SerializeUtility.SerializeToJS(occupiedList);
+            ViewBag.extrinsicList = SerializeUtility.SerializeToJS(extrinsicList);
+            return PartialView("_AccSetOccupied", acc);
         }
 
         [Authorize]
@@ -1443,10 +1459,10 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(advertise_id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
-                {
-                    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
-                }
+                //if (acc.UserID != userAccessor.CurrentUser.Id)
+                //{
+                //    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
+                //}
                 var checkResult = advertiseService.CheckSetAsOccupiedDateRange(advertise_id,
                     from_date, to_date);
                 if (checkResult.Result == CheckSetOccupiedResult.OK ||
@@ -1477,8 +1493,8 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        msg = checkResult.ToString(),
-                        occupiedList = new List<long>()
+                        msg = checkResult.ToString()
+                        //occupiedList = new List<long>()
                     });
                 }
             }
@@ -1500,14 +1516,14 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var advertise = advertiseService.Find(advertise_id);
-                if (advertise.UserID != userAccessor.CurrentUser.Id)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = 0,
-                        msg = "شما مجوز این کار را ندارید"
-                    });
-                }
+                //if (advertise.UserID != userAccessor.CurrentUser.Id)
+                //{
+                //    return GenerateJsonResult(new
+                //    {
+                //        status = 0,
+                //        msg = "شما مجوز این کار را ندارید"
+                //    });
+                //}
                 var checkResult = advertiseService.CheckUnsetOccupiedDateRange(
                     advertise_id, from_date, to_date);
                 if (checkResult.Result == CheckUnsetOccupiedResult.OK)
@@ -1537,8 +1553,8 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        msg = checkResult.ToString(),
-                        occupiedList = new List<long>()
+                        msg = checkResult.ToString()
+                        //occupiedList = new List<long>()
                     });
                 }
             }
@@ -2576,22 +2592,6 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize]
-        public IActionResult GetSetOccupiedPopup(long id)
-        {
-            var user = userAccessor.CurrentUser;
-            var acc = advertiseService.Find(id);
-            if (acc == null || acc.UserID != user.Id)
-            {
-                return PartialView("_AccSetOccupied");
-            }
-            var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
-            var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
-            ViewBag.occupiedList = SerializeUtility.SerializeToJS(occupiedList);
-            ViewBag.extrinsicList = SerializeUtility.SerializeToJS(extrinsicList);
-            return PartialView("_AccSetOccupied", acc);
-        }
-
-        [Authorize]
         public async Task<IActionResult> UpdatePermanentInstantReserve(long residenceId, bool active)
         {
             var result = await advertiseService.UpdateInstantReserveStatus(residenceId,
@@ -2606,11 +2606,11 @@ namespace Amlakbashi.Host.Controllers
         public IActionResult GetInstantReserveDates(long residenceId)
         {
             var residence = advertiseService.Find(residenceId);
-            if (residence == null || residence.UserID != userAccessor.CurrentUser.Id)
-            {
-                ViewBag.errorMessage = "شما مجوز ندارید";
-                return PartialView("_InstantReserveDates");
-            }
+            //if (residence == null || residence.UserID != userAccessor.CurrentUser.Id)
+            //{
+            //    ViewBag.errorMessage = "شما مجوز ندارید";
+            //    return PartialView("_InstantReserveDates");
+            //}
             var instantReserveDates = residence.InstantReserveDates.Select(x => DateTimeUtility.DateValueOfJS(x.Date)).ToList();
             ViewBag.instantReserveDates = SerializeUtility.SerializeToJS(instantReserveDates);
             return PartialView("_InstantReserveDates", residence);
@@ -2623,6 +2623,7 @@ namespace Amlakbashi.Host.Controllers
             return GenerateJsonResult(new
             {
                 status = result.HasError() ? 0 : 1,
+                msg = result.HasError() ? result.GetErrors().First() : null,
                 instantReserveDates = result.HasError() ? null : SerializeUtility.SerializeToJS(result.Result)
             });
         }
@@ -2634,6 +2635,7 @@ namespace Amlakbashi.Host.Controllers
             return GenerateJsonResult(new
             {
                 status = result.HasError() ? 0 : 1,
+                msg = result.HasError() ? result.GetErrors().First() : null,
                 instantReserveDates = result.HasError() ? null : SerializeUtility.SerializeToJS(result.Result)
             });
         }

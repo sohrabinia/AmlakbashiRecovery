@@ -56,16 +56,13 @@ function PublishAdvertise($id, obj) {
     });
 }
 
-//function SortDown($id, obj) {
-//    if (confirm("آیا از پرت کردن این آگهی اطمینان دارید؟")) {
-//        myajax("Advertise/SortDown", "id=" + $id, function (ret) {
-//            if (ret.status == 1) {
-//                $(obj).parent().parent().remove();
-//                alert("آگهی مورد نظر پرت شد .");
-//            }
-//        });
-//    }
-//}
+function showOccupiedCalendarPopup(id) {
+    loadPopup('/accomodation/getsetoccupiedpopup?id=' + id);
+}
+
+function showInstantReservePopup(id) {
+    loadPopup('/accomodation/GetInstantReserveDates?residenceId=' + id);
+}
 
 function SuspenAdvertise($id, obj) {
     showConfirm('آیا از تعلیق این آگهی اطمینان دارید؟', function () {

@@ -9,6 +9,8 @@
 {
     <environment include="Development">
         <link rel="stylesheet" href="/css/admin/advertise/admin-advertise-index.css" asp-append-version="true">
+        <link rel="stylesheet" href="/resource/css/general/jalali-date-picker.css" asp-append-version="true">
+        <link rel="stylesheet" href="/resource/css/general/popup-calendar.css" asp-append-version="true">
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="/css/min/admin-advertise.min.css" asp-append-version="true">
@@ -190,7 +192,10 @@ else
 @section ScriptLink
 {
     <environment include="Development">
-        <script src="~/js/admin/advertise/admin-advertise-index.js" asp-append-version="true"></script>
+        <script src="/js/admin/advertise/admin-advertise-index.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-converter.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-handler.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/general/jalali-date-picker.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">
         <script src="/js/min/admin-advertise.min.js" asp-append-version="true"></script>

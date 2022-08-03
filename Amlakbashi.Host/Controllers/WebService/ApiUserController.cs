@@ -58,7 +58,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 bankCardOwnerLastName = bankCard?.LName,
                 shebaNumber = bankCard?.ShabaNumber,
                 noticesPhoneNumber = user.NoticesPhoneNumber,
-                imageUrl = user.GetCurrentUserImageApiUrl()
+                imageUrl = user.GetUserImageApiUrl()
             };
             return Ok(response);
         }

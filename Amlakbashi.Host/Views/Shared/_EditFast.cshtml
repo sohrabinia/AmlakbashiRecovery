@@ -2,7 +2,7 @@
 @model BaseDashboardAccDTO
 <!-- Start-edit-fast  -->
 <!-- item 1 -->
-<div id="set-calendar-@Model.id">
+@*<div id="set-calendar-@Model.id">
     @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", "تنظیم تقویم" } })
     <div class="container-item js-set-date-parent" data-id="@Model.id" data-initialized="false">
@@ -17,7 +17,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@
 <!-- item 2 -->
 <div id="offer-@Model.id">
     @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),

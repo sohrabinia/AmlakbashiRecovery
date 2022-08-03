@@ -241,7 +241,7 @@ namespace Amlakbashi.Application.Services.CommentServices
         {
             var serviceResult = new ServiceResult<bool>();
             var comment = Repository.Find(requst.commentId);
-            if (comment == null || comment.HostReplyId != null)
+            if (comment == null)
             {
                 serviceResult.AddError("comment id is invalid");
                 return serviceResult;
@@ -251,16 +251,26 @@ namespace Amlakbashi.Application.Services.CommentServices
                 serviceResult.AddError("invalid user");
                 return serviceResult;
             }
-            comment.HostReply = new Comment()
+            if (comment.HostReplyId.HasValue)
             {
-                AdvertiseID = comment.AdvertiseID,
-                SeenByHost = true,
-                CreateDate = DateTime.Now,
-                LastModifyDate = DateTime.Now,
-                Status = Comment.CommentStatus.ready,
-                type = Comment.CommentType.advertiseHostReply,
-                Text = requst.text
-            };
+                comment.HostReply.Text = requst.text;
+                comment.HostReply.LastModifyDate = DateTime.Now;
+                comment.HostReply.Status = Comment.CommentStatus.ready;
+            }
+            else
+            {
+                comment.HostReply = new Comment()
+                {
+                    AdvertiseID = comment.AdvertiseID,
+                    SenderUserID = requst.userId,
+                    SeenByHost = true,
+                    CreateDate = DateTime.Now,
+                    LastModifyDate = DateTime.Now,
+                    Status = Comment.CommentStatus.ready,
+                    type = Comment.CommentType.advertiseHostReply,
+                    Text = requst.text
+                };
+            }
             Repository.Update(comment);
             Repository.Save();
             serviceResult.Result = true;
