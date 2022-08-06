@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using X.PagedList;
 using static Amlakbashi.Core.Entities.Advertise;
 using static Amlakbashi.Core.Entities.Region;
@@ -180,6 +181,17 @@ namespace Amlakbashi.Host.Controllers
                 logger.Error("NotVerify", exc);
                 return GenerateJsonResult(new { status = 0, val = "" });
             }
+        }
+
+        [Authorize(Policy = Policies.Advertise_Publish)]
+        public async Task<IActionResult> UpdateActivity(long residenceId)
+        {
+            var result = await advertiseService.UpdateActivity(residenceId);
+            return GenerateJsonResult(new
+            {
+                status = result.HasError() ? 0 : 1,
+                active = result.Result == AdvertiseStatus.Archived ? false : true
+            });
         }
 
         public ActionResult AdvertisePage(string url, string area_str = null, bool amp_version = false,

@@ -13,6 +13,7 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public Advertise.AdvertiseMode Mode { get; set; }
         public long? ParentId { get; set; }
         public Advertise.AdvertiseStatus Status { get; set; }
+        public bool Available { get; set; }
         public string CreateDate { get; set; }
         public int DailyPrice { get; set; }
         public long AdvertiseScore { get; set; }
@@ -38,6 +39,7 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
                 NorouzMinReserveDate = advertise.unixNorouzMinRequestDate < 1 ? "-" :
                     DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate)).Replace(",", "/"),
                 Status = advertise.Status,
+                Available = advertise.Available,
                 SupportInfoCount = advertise.GetSupportInfoList().Length
             };
         }

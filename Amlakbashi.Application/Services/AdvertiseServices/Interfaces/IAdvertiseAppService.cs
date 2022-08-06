@@ -79,7 +79,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void SetAvailable(long id, bool isAvailable);
         void Publish(long id, int doerUserId, ActionSourceEnum actionSource);
         void Suspend(long id);
-        AdvertiseStatus ToggleSuspension(long id);
+        Task<ServiceResult<AdvertiseStatus>> UpdateActivity(long residenceId);
         void NotVerify(long id, int currentUserId = 0);
         void SetNotVerifyReasons(long id, List<Advertise.NotVerifyReasonsEnum> reasons);
         void SetAsTodayEmpty(long id);

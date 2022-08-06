@@ -1672,7 +1672,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize]
-        public JsonResult ToggleActive(long id, bool? active)
+        public async Task<IActionResult> ToggleActive(long id, bool? active)
         {
             try
             {
@@ -1727,7 +1727,8 @@ namespace Amlakbashi.Host.Controllers
                 }
                 else
                 {
-                    newStatus = (int)advertiseService.ToggleSuspension(id);
+                    var result = await advertiseService.UpdateActivity(id);
+                    newStatus = (int)result.Result;
                 }
                 return GenerateJsonResult(new
                 {

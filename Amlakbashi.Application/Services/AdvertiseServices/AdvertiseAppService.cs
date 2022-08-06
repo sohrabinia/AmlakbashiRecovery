@@ -1793,28 +1793,39 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
-        public AdvertiseStatus ToggleSuspension(long id)
+        public async Task<ServiceResult<AdvertiseStatus>> UpdateActivity(long residenceId)
         {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            var prevAcc = acc.ShallowCopy();
-            if (acc.Status == AdvertiseStatus.Archived)
+            var serviceResult = new ServiceResult<AdvertiseStatus>();
+            var residence = await Repository.FindAsync(residenceId);
+            if (residence == null ||
+                (residence.Status == AdvertiseStatus.Published || residence.Status == AdvertiseStatus.Archived) == false)
             {
-                acc.Status = AdvertiseStatus.Published;
-                Repository.Update(acc);
-                Repository.Save();
-                mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
-                mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
+                serviceResult.AddError("آگهی اشتباه است");
+                return serviceResult;
             }
-            else if (acc.Status == AdvertiseStatus.Published)
-            {
-                acc.Status = AdvertiseStatus.Archived;
-                Repository.Update(acc);
-                Repository.Save();
-                mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
-                mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
-            }
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-            return acc.Status;
+
+            serviceResult.Result = await UpdateStatus(residence.Id,
+                residence.Status == AdvertiseStatus.Published ? AdvertiseStatus.Archived : AdvertiseStatus.Published);
+            return serviceResult;
+
+            //if (residence.Status == AdvertiseStatus.Archived)
+            //{
+            //    residence.Status = AdvertiseStatus.Published;
+            //    Repository.Update(residence);
+            //    Repository.Save();
+            //    mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
+            //    mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, residence));
+            //}
+            //else if (residence.Status == AdvertiseStatus.Published)
+            //{
+            //    residence.Status = AdvertiseStatus.Archived;
+            //    Repository.Update(residence);
+            //    Repository.Save();
+            //    mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
+            //    mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, residence));
+            //}
+            //mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            //return residence.Status;
         }
 
         public void NotVerify(long id, int currentUserId)
@@ -2963,6 +2974,19 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Save();
             serviceResult.Result = residence.InstantReserveDates.Select(x => DateTimeUtility.DateValueOfJS(x.Date)).ToList();
             return serviceResult;
+        }
+
+        private async Task<Advertise.AdvertiseStatus> UpdateStatus(long residenceId, Advertise.AdvertiseStatus status)
+        {
+            var residence = await Repository.FindAsync(residenceId);
+            var clonedResidence = residence.ShallowCopy();
+            residence.Status = status;
+            Repository.Update(residence);
+            Repository.Save();
+            await mediator.Publish(new ChangeAdvertiseStatusEvent(residenceId, clonedResidence.Status));
+            await mediator.Publish(new ChangeAdvertiseActiveEvent(clonedResidence, residence));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            return residence.Status;
         }
 
         private async Task<ServiceResult> InsertExtrinsicReserveDatesAsync(AdvertiseUpdateCalendarRequest request,

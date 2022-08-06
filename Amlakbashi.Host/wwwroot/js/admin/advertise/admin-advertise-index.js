@@ -64,12 +64,60 @@ function showInstantReservePopup(id) {
     loadPopup('/accomodation/GetInstantReserveDates?residenceId=' + id);
 }
 
-function SuspenAdvertise($id, obj) {
-    showConfirm('آیا از تعلیق این آگهی اطمینان دارید؟', function () {
-        sendGetAjax("/accomodation/suspend", "id=" + $id, function (ret) {
+//function SuspenAdvertise($id, obj) {
+//    showConfirm('آیا از تعلیق این آگهی اطمینان دارید؟', function () {
+//        sendGetAjax("/accomodation/suspend", "id=" + $id, function (ret) {
+//            if (ret.status == 1) {
+//                $(obj).remove();
+//                successAlert("آگهی مورد نظر تعلیق شد");
+//            }
+//        })
+//    });
+//}
+
+function ToggleActivity(residenceId, elem) {
+    var active = $(elem).attr('data-value');
+    var activityStr = active === "true" ? 'غیرفعال' : 'فعال';
+    showConfirm('آیا آگهی ' + activityStr + ' شود؟', function () {
+        sendGetAjax("/advertise/UpdateActivity", "residenceId=" + residenceId, function (ret) {
             if (ret.status == 1) {
-                $(obj).remove();
-                successAlert("آگهی مورد نظر تعلیق شد");
+                if (ret.active === true) {
+                    $(elem).attr('data-value', 'true');
+                    $(elem).css("color", "limegreen");
+                }
+                else {
+                    $(elem).attr('data-value', 'false');
+                    $(elem).css("color", "red");
+                }
+                successAlert("وضعیت آگهی با موفقیت تغییر یافت");
+            }
+            else {
+                errorAlert("عملیات با خطا مواجه شد");
+            }
+        })
+    });
+}
+
+function ToggleAvailable(residenceId, elem) {
+    var active = $(elem).attr('data-value');
+    active = active === 'true' ? true : false;
+    var activityStr = active === true ? 'غیرفعال' : 'فعال';
+    active = !active;
+    showConfirm('آیا آگهی ' + activityStr + ' شود؟', function () {
+        sendPostAjax("/accomodation/available", { id: residenceId, isAvailable: active }, function (ret) {
+            if (ret.status == 1) {
+                if (active === true) {
+                    $(elem).attr('data-value', 'true');
+                    $(elem).css("color", "limegreen");
+                }
+                else {
+                    $(elem).attr('data-value', 'false');
+                    $(elem).css("color", "red");
+                }
+                successAlert("وضعیت آگهی با موفقیت تغییر یافت");
+            }
+            else {
+                errorAlert("عملیات با خطا مواجه شد");
             }
         })
     });
