@@ -89,7 +89,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         bool SetPrices(long id, PriceInputDTO prices, out Dictionary<string, string> errors);
         void SetNorouzPrice(long id, int norouzPrice, int overCapacityPrice = 0);
         void SetMaxInstantReserveStart(long id, int maxInstantReserveStart);
-        void AddToAdvertiseVisit(long id);
+        //void AddToAdvertiseVisit(long id);
         IList<Advertise> GetAdvertiseRelatedItems(long id, int count = 4);
         ApiAmenitiesGetDTO GetAmenitiesDTO(long id, out int userId);
         void UpdateExtraBlanketCount(long id, ExtraBlanketCountItems data);

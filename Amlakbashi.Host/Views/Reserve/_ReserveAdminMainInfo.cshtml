@@ -24,9 +24,9 @@ else
 
             <div class="information-travel">
                 <div class="box-codes">
-                    <p>  کد آگهی :</p>
+                    <p>  کد اقامتگاه :</p>
                     <a href="/Advertise/newindex?status=-1&id=@(item.parentAccomodationId > 0 ? item.parentAccomodationId : item.accommodationId)">@item.accommodationId @(item.parentAccomodationId > 0 ? " >> " + item.parentAccomodationId : "")</a>
-                    <i class="fas fa-copy" onclick="copyStringToClipboard('@(item.accommodationId)', 'کد آگهی @(item.accommodationId)')"></i>
+                    <i class="fas fa-copy" onclick="copyStringToClipboard('@(item.accommodationId)', 'کد اقامتگاه @(item.accommodationId)')"></i>
                 </div>
                 <div class="box-codes">
                     <p>  کد میزبان : </p>

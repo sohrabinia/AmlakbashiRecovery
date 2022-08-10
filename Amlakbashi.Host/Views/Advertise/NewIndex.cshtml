@@ -1,7 +1,7 @@
 ﻿@model Amlakbashi.Core.DTOs.AdvertiseDTOs.AdvertiseIndexDTO
 
 @{
-    ViewBag.Title = "مدیریت آگهی ها";
+    ViewBag.Title = "مدیریت اقامتگاه ها";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -29,14 +29,14 @@ else
                 <button class="more-filter">فیلتر بیشتر</button>
                 <div class="bar-filter quick-filter">
                     <span><i class="fas fa-filter"></i>فیلتر :</span>
-                    <input class="input-stlye" type="text" value="@(Model.Id > 0 ? Model.Id : "")" name="AdvertiseId" placeholder="کد آگهی">
+                    <input class="input-stlye" type="text" value="@(Model.Id > 0 ? Model.Id : "")" name="AdvertiseId" placeholder="کد اقامتگاه">
                     <input class="input-stlye" type="text" value="@(Model.UserId > 0 ? Model.UserId : "")" name="HostUserId" placeholder="کد کاربر">
                     <select class="input-stlye" name="Status">
                         <option value="-1">همه وضعیت ها</option>
                         <option is-selected="@(0 == (int)Model.Status)" value="0">آماده انتشار</option>
                         <option is-selected="@(1 == (int)Model.Status)" value="1">انتشار یافته</option>
                         <option is-selected="@(2 == (int)Model.Status)" value="2">غیرفعال</option>
-                        <option is-selected="@(6 == (int)Model.Status)" value="6">آگهی جدید</option>
+                        <option is-selected="@(6 == (int)Model.Status)" value="6">اقامتگاه جدید</option>
                         <option is-selected="@(5 == (int)Model.Status)" value="5">تکمیل نشده</option>
                         <option is-selected="@(4 == (int)Model.Status)" value="4">تایید نشده</option>
                         <option is-selected="@(3 == (int)Model.Status)" value="3">حذف شده</option>
@@ -47,8 +47,8 @@ else
         </div>
         <aside class="admin-table-row admin-table-row-header">
             <p class="column-row">ردیف</p>
-            <p class="column-id">کد آگهی</p>
-            <p class="column-title">عنوان آگهی</p>
+            <p class="column-id">شناسه</p>
+            <p class="column-title">عنوان</p>
             <p class="column-city">شهر</p>
             <p class="column-user">کاربر</p>
             <p class="column-desc">توضیحات</p>
@@ -66,7 +66,7 @@ else
                 <div class="options-filter-box">
                     <div class="more-filter-row">
                         <div class="item-filter-box">
-                            <label class="title-filter">کد آگهی</label>
+                            <label class="title-filter">کد اقامتگاه</label>
                             <input class="input-stlye" type="text" value="@(Model.Id > 0 ? Model.Id : "")" name="Id">
                         </div>
                         <div class="item-filter-box">
@@ -74,7 +74,7 @@ else
                             <input class="input-stlye" type="text" value="@(Model.UserId > 0 ? Model.UserId : "")" name="UserId">
                         </div>
                         <div class="item-filter-box">
-                            <label class="title-filter">نوع آگهی</label>
+                            <label class="title-filter">نوع اقامتگاه</label>
                             <select name="Type" class="input-stlye">
                                 @{
                                     var advertiseTypes = (Advertise.AdvertiseType[])Enum.GetValues(typeof(Advertise.AdvertiseType));
@@ -90,13 +90,13 @@ else
                             </select>
                         </div>
                         <div class="item-filter-box">
-                            <label class="title-filter">وضعیت آگهی</label>
+                            <label class="title-filter">وضعیت اقامتگاه</label>
                             <select class="input-stlye" id="js-status-filter-select" name="Status">
                                 <option value="-1">همه وضعیت ها</option>
                                 <option is-selected="@(0 == (int)Model.Status)" value="0">آماده انتشار</option>
                                 <option is-selected="@(1 == (int)Model.Status)" value="1">انتشار یافته</option>
                                 <option is-selected="@(2 == (int)Model.Status)" value="2">غیرفعال</option>
-                                <option is-selected="@(6 == (int)Model.Status)" value="6">آگهی جدید</option>
+                                <option is-selected="@(6 == (int)Model.Status)" value="6">اقامتگاه جدید</option>
                                 <option is-selected="@(5 == (int)Model.Status)" value="5">تکمیل نشده</option>
                                 <option is-selected="@(4 == (int)Model.Status)" value="4">تایید نشده</option>
                                 <option is-selected="@(3 == (int)Model.Status)" value="3">حذف شده</option>
@@ -121,11 +121,11 @@ else
                         <div class="item-filter-box">
                             <label for="respons" class="title-filter">ترتیب</label>
                             <select id="js-sort-filter-select" name="Sort" class="input-stlye">
-                                <option value="score" is-selected="@("score" == Model.Sort)">امتیاز آگهی</option>
-                                <option value="date" is-selected="@("date" == Model.Sort)">تاریخ ثبت </option>
-                                <option value="modify" is-selected="@("modify" == Model.Sort)">تاریخ ویرایش </option>
-                                <option value="click" is-selected="@("click" == Model.Sort)">کلیک </option>
-                                <option value="contact" is-selected="@("contact" == Model.Sort)">نمایش تماس </option>
+                                <option value="score" is-selected="@("score" == Model.Sort)">امتیاز</option>
+                                <option value="date" is-selected="@("date" == Model.Sort)">تاریخ ثبت</option>
+                                <option value="modify" is-selected="@("modify" == Model.Sort)">تاریخ ویرایش</option>
+                                <option value="click" is-selected="@("view" == Model.Sort)">بازدید</option>
+                                @*<option value="contact" is-selected="@("contact" == Model.Sort)">نمایش تماس</option>*@
                             </select>
                         </div>
                         <div class="item-filter-box">

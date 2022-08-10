@@ -110,7 +110,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             int page = 1, int pageItemCount = 20)
         {
             var advertises = advertiseService.GetAdvertisesByUserId(User.GetId());
-            advertises = advertises.Where(x => x.Status == status).ToList();
+            advertises = advertises.Where(x => x.Mode != Advertise.AdvertiseMode.Child && x.Status == status).ToList();
             List<AdvertiseBasicInfoReponse> response = new List<AdvertiseBasicInfoReponse>();
             response.AddRange(advertises.Select(x => (AdvertiseBasicInfoReponse)x));
             return response;

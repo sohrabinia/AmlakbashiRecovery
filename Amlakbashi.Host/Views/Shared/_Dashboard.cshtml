@@ -182,15 +182,15 @@
                             }
                         </P>
                     </li>
-                    <li class="main-navigation_list-item"><a href="/"><i class="fa fa-home"></i> صفحه اصلی سایت</a></li>
+                    <li class="main-navigation_list-item"><a href="/"><i class="fa fa-home"></i> صفحه اصلی </a></li>
                     <li class="main-navigation_list-item @(ViewBag.dashboard != null ? "menu__item--active" : "")"><a href="/dashboard"><i class="fa fa-tachometer-alt"></i> حساب کاربری</a></li>
-                    <li class="main-navigation_list-item @(ViewBag.advertise!=null ? "menu__item--active" : "")"><a href="/accomodation/accbasicform"><i class="fa fa-plus"></i> افزودن آگهی</a></li>
+                    <li class="main-navigation_list-item @(ViewBag.advertise!=null ? "menu__item--active" : "")"><a href="/accomodation/accbasicform"><i class="fa fa-plus"></i> افزودن اقامتگاه</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
                         if (userAccessor.CurrentUser.Type != (int)Entities.User.UserGeneralTypeEnum.Guest)
                         {
-                            <li class="main-navigation_list-item @(ViewBag.personal != null ? "menu__item--active" : "")"><a href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)"><i class="fas fa-list-alt"></i> آگهی های من</a></li>
-                            <li class="main-navigation_list-item @(ViewBag.advertise_comment != null ? "menu__item--active" : "")"><a href="/comment/advertisecommentmanager"><i class="fa fa-th-list"></i> نظرات آگهی ها <vc:not-seen-comment-count></vc:not-seen-comment-count></a></li>
+                            <li class="main-navigation_list-item @(ViewBag.personal != null ? "menu__item--active" : "")"><a href="@string.Format("/post/personal?userid={0}", userAccessor.CurrentUser.Id)"><i class="fas fa-list-alt"></i> اقامتگاه ها</a></li>
+                            <li class="main-navigation_list-item @(ViewBag.advertise_comment != null ? "menu__item--active" : "")"><a href="/comment/advertisecommentmanager"><i class="fa fa-th-list"></i> نظرات <vc:not-seen-comment-count></vc:not-seen-comment-count></a></li>
                         }
                         if (userAccessor.CurrentUser.Type == (int)Entities.User.UserGeneralTypeEnum.Guest)
                         {

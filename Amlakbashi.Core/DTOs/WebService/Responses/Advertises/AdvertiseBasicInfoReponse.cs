@@ -1,4 +1,5 @@
-﻿using Amlakbashi.Core.Entities;
+﻿using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
         public long id { get; set; }
         public Advertise.AdvertiseStatus status { get; set; }
         public string statusTitle { get; set; }
+        public string createDate { get; set; }
         public string title { get; set; }
         public string type { get; set; }
         public int roomCount { get; set; }
@@ -26,6 +28,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
                 id = advertise.Id,
                 status = advertise.Status,
                 statusTitle = AdvertiseMainLocalization.GetAdvertiseStatusString((int)advertise.Status, true),
+                createDate = DateTimeUtility.GregorianToPersianDateWithSlash(advertise.CreateDate),
                 title = advertise.Title,
                 type = AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID),
                 roomCount = advertise.Room,

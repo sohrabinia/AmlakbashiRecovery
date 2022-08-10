@@ -145,7 +145,7 @@
                 @* Title and Acc Code *@
                 <div class="advertise-page_title_item">
                     <h1>@Model.TitleDesc.Title</h1>
-                    <p>کد آگهی : @Model.Id</p>
+                    <p>کد اقامتگاه : @Model.Id</p>
                 </div>
 
                 @* Acc Owner and Socials & Favorite *@
@@ -261,7 +261,7 @@
                         <br /><br />
                     }
                     <span class="fa fa-calendar-check"></span>
-                    تاریخ آخرین ویرایش آگهی: @StringUtility.EnglishNumberToPersian(Model.LastModifyDate)
+                    تاریخ آخرین ویرایش: @StringUtility.EnglishNumberToPersian(Model.LastModifyDate)
                 </p>
             </div>
 
@@ -311,7 +311,7 @@
     //relatedUrl += (!string.IsNullOrEmpty(Model.EmptyRangeTo) ? "&empty_range_to=" + Model.EmptyRangeTo : "");
 }
 
-<p class="item__related-title">آگهی های مرتبط:</p>
+<p class="item__related-title">اقامتگاه های مرتبط:</p>
 
 <div style="min-height: 381.56px;" class="advertise-page__related-container partialContents" data-url="@relatedUrl" data-onload="findLazyImages">
 </div>

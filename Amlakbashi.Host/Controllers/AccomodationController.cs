@@ -2342,7 +2342,7 @@ namespace Amlakbashi.Host.Controllers
                 isNumberForIran = isNumberForIran,
                 userEmailAddress = userEmailAddress
             };
-            advertiseService.AddToAdvertiseVisit(id);
+            //advertiseService.AddToAdvertiseVisit(id);
             return GenerateJsonResult(data);
         }
 
@@ -2782,5 +2782,26 @@ namespace Amlakbashi.Host.Controllers
             }
             return GenerateJsonResult(new { result = result });
         }
+
+        public IActionResult GetPricesInfo(long residenceId)
+        {
+            var residence = advertiseService.Find(residenceId);
+            var result = new ResidencePricesInfoDTO()
+            {
+                dailyPrice = residence.DailyPrice,
+                holidayPrice = residence.HolidayPrice,
+                peakHolidayPrice = residence.HolidayPikePrice,
+                monthlyPrice = (int)residence.RentPrice,
+                extraCapacityPrice = residence.MoreThanCapacityPrice,
+                norouzPrice = residence.NorouzPrice,
+                norouzExtraCapacityPrice = residence.NorouzOverCapacityPrice
+            };
+            return PartialView("_PricesInfo", result);
+        }
+
+        //public IActionResult UpdateMainPrices()
+        //{
+
+        //}
     }
 }

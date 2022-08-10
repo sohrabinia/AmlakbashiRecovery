@@ -13,9 +13,9 @@
             <form class="setting-list">
                 <div class="status-banner">
                     @await Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "title", "نمایش آگهی " }, { "Active", Model.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "true") } })
+        new ModelStateDictionary()) { { "title", "فعال " }, { "Active", Model.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "true") } })
                     @await Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "title", "عدم نمایش آگهی " }, { "Active", !Model.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "false") } })
+        new ModelStateDictionary()) { { "title", "غیرفعال " }, { "Active", !Model.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "false") } })
                 </div>
             </form>
         }

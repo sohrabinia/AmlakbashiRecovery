@@ -507,12 +507,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 model = model.Where(x => x.License == dto.License);
             }
-            if (dto.Sort == "contact")
-                model = model.OrderByDescending(a => a.ContactClick).ThenByDescending(a => a.WebVisit);
-            else if (dto.Sort == "modify")
+            if (dto.Sort == "modify")
                 model = model.OrderByDescending(a => a.LastModifyDate).ThenByDescending(a => a.CreateDate);
-            else if (dto.Sort == "click")
-                model = model.OrderByDescending(a => a.WebVisit).ThenByDescending(a => a.ContactClick);
+            else if (dto.Sort == "view")
+                model = model.OrderByDescending(a => a.WebVisit);
             else if (dto.Sort == "score")
                 model = model.OrderByDescending(a => a.AdvertiseScore);
             else
@@ -652,9 +650,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     child.UserID = editedAd.UserID;
                 }
             }
-            advertise.Overview = editedAd.Overview;
             advertise.WebVisit = editedAd.WebVisit;
-            advertise.ContactClick = editedAd.ContactClick;
             if (advertise.AmlakbashiScore != editedAd.AmlakbashiScore)
             {
                 advertise.AdvertiseScore += (editedAd.AmlakbashiScore - advertise.AmlakbashiScore);
@@ -662,19 +658,22 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             advertise.Description = editedAd.Description;
             advertise.LastModifyDate = DateTime.Now;
+            advertise.MinReserveDays = editedAd.MinReserveDays;
+            advertise.MaxReserveDays = editedAd.MaxReserveDays;
             Repository.Update(advertise);
             Repository.Save();
             mediator.Publish(new AdvertiseUpdateEvent(shallowAdvertise, advertise,
                 ActionLog.ActionSourceEnum.AdminPanel, adminId));
+            mediator.Publish(new ChangeStayDurationEvent(advertise.Id));
             mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
             mediator.Send(new RemoveCategoryItemCacheCommand(advertise.Id));
         }
 
         public void UpdateAccView(long accId)
         {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == accId));
+            var acc = Repository.Find(accId);
             acc.WebVisit += 1;
-            acc.Overview += 1;
+            //acc.Overview += 1;
             Repository.Update(acc);
             Repository.Save();
         }
@@ -1886,15 +1885,15 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return result;
         }
 
-        public void SetStayDuration(long id, int min, int max)
+        public void SetStayDuration(long residenceId, int min, int max)
         {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            acc.MinReserveDays = min;
-            acc.MaxReserveDays = max;
-            Repository.Update(acc);
+            var residence = Repository.Find(residenceId);
+            residence.MinReserveDays = min;
+            residence.MaxReserveDays = max;
+            Repository.Update(residence);
             Repository.Save();
-            mediator.Publish(new ChangeStayDurationEvent(id));
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
+            mediator.Publish(new ChangeStayDurationEvent(residenceId));
+            mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
         }
 
         public void SetNorouzPrice(long id, int norouzPrice, int overCapacityPrice = 0)
@@ -1946,14 +1945,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
-        public void AddToAdvertiseVisit(long id)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            acc.WebVisit += 1;
-            acc.Overview += 1;
-            Repository.Update(acc);
-            Repository.Save();
-        }
+        //public void AddToAdvertiseVisit(long id)
+        //{
+        //    var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
+        //    acc.WebVisit += 1;
+        //    acc.Overview += 1;
+        //    Repository.Update(acc);
+        //    Repository.Save();
+        //}
 
         public IList<Advertise> GetAdvertiseRelatedItems(long id, int count = 4)
         {
