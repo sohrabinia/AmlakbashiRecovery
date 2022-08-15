@@ -349,7 +349,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             //}
 
             dto.PagingInfo = new Core.DTOs.PagingDTO(dto.Page, reserves.Count());
-
             return reserves.OrderByDescending(x => x.Id).Skip((dto.Page - 1) * dto.PagingInfo.PageItemCount).Take(dto.PagingInfo.PageItemCount).ToList();
         }
 
@@ -506,7 +505,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                     type = PaymentHelperDTO.PaymentType.Deposite,
                     transactionId = depositeTransactionId,
                     amount = depositePaidPrice,
-                    dateString = DateTimeUtility.GregorianToPersianDate(depositePayDate).Remove(0, 2) +
+                    dateString = DateTimeUtility.GregorianToPersianDateWithSlash(depositePayDate).Remove(0, 2) +
                         " " + depositePayDate.ToString("HH:mm")
                 });
             }
@@ -518,7 +517,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                     type = PaymentHelperDTO.PaymentType.Total,
                     transactionId = totalTransactionId,
                     amount = totalPaidPrice,
-                    dateString = DateTimeUtility.GregorianToPersianDate(totalPayDate).Remove(0, 2) +
+                    dateString = DateTimeUtility.GregorianToPersianDateWithSlash(totalPayDate).Remove(0, 2) +
                         " " + totalPayDate.ToString("HH:mm")
                 });
             }
@@ -531,7 +530,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                     transactionId = clearingTransactionId,
                     title = "تسویه میزبان",
                     amount = clearingToHostAmount,
-                    dateString = DateTimeUtility.GregorianToPersianDate(clearingPaidPrice > 0 ? clearingPayDate : hostClearingDepositeDate)
+                    dateString = DateTimeUtility.GregorianToPersianDateWithSlash(clearingPaidPrice > 0 ? clearingPayDate : hostClearingDepositeDate)
                     .Remove(0, 2) + " " + clearingPayDate.ToString("HH:mm")
                 });
             }
@@ -543,7 +542,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                     type = PaymentHelperDTO.PaymentType.Refund,
                     transactionId = refundTransactionId,
                     amount = refundPaidPrice,
-                    dateString = DateTimeUtility.GregorianToPersianDate(refundPayDate).Remove(0, 2) +
+                    dateString = DateTimeUtility.GregorianToPersianDateWithSlash(refundPayDate).Remove(0, 2) +
                         " " + refundPayDate.ToString("HH:mm")
                 });
             }
@@ -556,7 +555,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
                     amount = hostSitePortionPrice,
                 });
             }
-            var createDateString = DateTimeUtility.GregorianToPersianDate(reserve.CreateDate).Remove(0, 2);
             string lastPayTryDate;
             var reserveSupports = reserve.GetRelatedSupports();
             var generatedSupporters = new List<SupporterHelperDTO>();
@@ -590,13 +588,11 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 DepositePrice = reserve.DepositPrice,
                 TotalPaidPrice = totalPaidPrice,
                 DepositePaidPrice = depositePaidPrice,
-                StartDateString = DateTimeUtility.GregorianToPersianDate(
-                    reserve.StartDate).Remove(0, 2),
-                EndDateString = DateTimeUtility.GregorianToPersianDate(
-                    reserve.EndDate).Remove(0, 2),
+                StartDateString = DateTimeUtility.GregorianToPersianDateWithSlash(reserve.StartDate).Remove(0, 2),
+                EndDateString = DateTimeUtility.GregorianToPersianDateWithSlash(reserve.EndDate).Remove(0, 2),
                 GuestCount = reserve.NumberOfGuests,
                 StayDays = DateTimeUtility.GetDatRangeDays(reserve.StartDate, reserve.EndDate),
-                CreateDateString = createDateString + " " + reserve.CreateDate.ToString("HH:mm"),
+                CreateDateString = $"{DateTimeUtility.GregorianToPersianDateWithSlash(reserve.CreateDate).Remove(0, 2)} {reserve.CreateDate.ToString("HH:mm")}",
                 GuestUserId = reserve.UserID,
                 Status = (int)reserve.Status,
                 GuestCallState = reserve.GuestCallState,
@@ -613,11 +609,14 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 HostResponseString = ReserveLocalization.GetHostResponseString((int)reserve.HostResponse),
                 HostResponseColor = ReserveStyleHelper.GetHostResponseColor((int)reserve.HostResponse),
                 HostResponseTimeString = reserve.HostResponseDate.ToString("HH:mm"),
-                HostResponseDateString = DateTimeUtility.GregorianToPersianDate(reserve.HostResponseDate).Remove(0, 2),
+                HostResponseDateString = DateTimeUtility.GregorianToPersianDateWithSlash(reserve.HostResponseDate).Remove(0, 2),
                 Supporters = generatedSupporters,
                 DisableAutoCancel = reserve.DisableAutoCancel,
                 AccVisitedByGuest = reserve.AccVisitedByGuest,
                 ShouldFollow = reserve.shouldFollow,
+                CancelDate = reserve.CancelDate.HasValue ?
+                    $"{DateTimeUtility.GregorianToPersianDateWithSlash(reserve.CancelDate.Value).Remove(0, 2)} {reserve.CancelDate.Value.ToString("HH:mm")}"
+                    : null
             };
         }
 

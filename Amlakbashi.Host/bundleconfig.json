@@ -147,6 +147,7 @@
     "outputFileName": "wwwroot/css/min/admin-advertise.min.css",
     "inputFiles": [
       "wwwroot/css/admin/advertise/admin-advertise-index.css",
+      "wwwroot/css/admin/advertise/admin-residence-index-popup.css",
       "wwwroot/resource/css/general/jalali-date-picker.css",
       "wwwroot/resource/css/general/popup-calendar.css"
     ]

@@ -1,0 +1,59 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.ResidencePricesInfoDTO
+
+    <div class="price-info-container">
+        <form class="main-prices-container">
+            <input type="hidden" name="residenceId" value="@Model.residenceId" />
+            <div class="box-input">
+                <label>قیمت روزانه :</label>
+                <input asp-for="dailyPrice" />
+            </div>
+            <div class="box-input">
+                <label>قیمت تعطیلات :</label>
+                <input asp-for="holidayPrice" />
+            </div>
+            <div class="box-input">
+                <label>قیمت پیک تعطیلات :</label>
+                <input asp-for="peakHolidayPrice" />
+            </div>
+            <div class="box-input">
+                <label>قیمت ماهانه :</label>
+                <input asp-for="monthlyPrice" />
+            </div>
+            <div class="box-input">
+                <label>قیمت نوروز :</label>
+                <input asp-for="norouzPrice" />
+            </div>
+            <div class="box-input">
+                <label>قیمت ظرفیت اضافه :</label>
+                <input asp-for="extraCapacityPrice" />
+            </div>
+            <div class="box-input">
+                <label>قیمت ظرفیت اضافه نوروز :</label>
+                <input asp-for="norouzExtraCapacityPrice" />
+            </div>
+            <div class="box-button">
+                <button type="button" onclick="updateMainPrices()">ثبت</button>
+            </div>
+        </form>
+
+        <div class="calendar-prices-container">
+            <div class="box-calendar">
+                @await Html.PartialAsync("_DatePicker", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                            new ModelStateDictionary()) { { "class", "price-date-picker" } })
+            </div>
+            <div class="box-button">
+                <input class="js-price-input" type="number">
+                <button type="button" onclick="updateManualPrices(@Model.residenceId)">ثبت قیمت</button>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+    var priceListStr = '@Model.calendarPrices';
+    priceListStr = priceListStr.replaceAll('&quot;', '"');
+    updateCalendarPrices(JSON.parse(priceListStr));
+    firstSelectedDay = undefined;
+    secondSelectedDay = undefined;
+    fromDate = undefined;
+    toDate = undefined;
+</script>

@@ -132,6 +132,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         IList<Advertise> GetNorouzAdvertises(int count);
         void SetHygieneProtocol(long id, HygieneProtocolStatus value);
         void UpdateAlbumPhoto(long advertiseId);
+        Task<ServiceResult> UpdatePricesAsync(ResidenceMainPricesDTO request, int adminId = 0);
         Task<ServiceResult> UpdateCalendarAsync(AdvertiseUpdateCalendarRequest request);
         Task<ServiceResult<List<long>>> AddInstantReserveDates(long residenceId, string fromDate, string toDate, int userId);
         Task<ServiceResult<List<long>>> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate, int userId);

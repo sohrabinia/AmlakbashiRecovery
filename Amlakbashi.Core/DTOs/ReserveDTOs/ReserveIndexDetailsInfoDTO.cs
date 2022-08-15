@@ -45,5 +45,6 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public bool mustBeDoneCheckout { get; set; }
         public bool MustRefund { get; set; }
         public bool CanBePaidByHost { get; set; }
+        public string CancelDate { get; set; }
     }
 }

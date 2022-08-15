@@ -2975,6 +2975,38 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
+        public async Task<ServiceResult> UpdatePricesAsync(ResidenceMainPricesDTO request, int adminId = 0)
+        {
+            var serviceResult = new ServiceResult();
+            var residence = await Repository.FindAsync(request.residenceId);
+            if (residence == null)
+            {
+                serviceResult.AddError("اقامتگاه یافت نشد");
+                return serviceResult;
+            }
+            if (request.dailyPrice < 30000 || request.holidayPrice < 30000 || request.peakHolidayPrice < 30000 ||
+                request.norouzPrice < 0 || request.extraCapacityPrice < 0 || request.norouzExtraCapacityPrice < 0)
+            {
+                serviceResult.AddError("قیمت های وارد شده اشتباه است");
+                return serviceResult;
+            }
+            var clonedResidence = residence.ShallowCopy();
+            residence.DailyPrice = request.dailyPrice;
+            residence.HolidayPrice = request.holidayPrice;
+            residence.HolidayPikePrice = request.peakHolidayPrice;
+            residence.RentPrice = request.monthlyPrice;
+            residence.NorouzPrice = request.norouzPrice;
+            residence.MoreThanCapacityPrice = request.extraCapacityPrice;
+            residence.NorouzOverCapacityPrice = request.norouzExtraCapacityPrice;
+            Repository.Update(residence);
+            Repository.Save();
+            await mediator.Publish(new ChangeAdvertisePriceEvent(residence.Id, residence.NorouzPrice != clonedResidence.NorouzPrice));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            await mediator.Publish(new AdvertiseUpdateEvent(clonedResidence, residence,
+                ActionLog.ActionSourceEnum.AdminPanel, adminId));
+            return serviceResult;
+        }
+
         private async Task<Advertise.AdvertiseStatus> UpdateStatus(long residenceId, Advertise.AdvertiseStatus status)
         {
             var residence = await Repository.FindAsync(residenceId);

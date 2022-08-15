@@ -27,6 +27,12 @@ else
                 {
                     <span>(@Model.HostResponseDateString @Model.HostResponseTimeString)</span>
                 }
+                @:|
+            }
+
+            @if (string.IsNullOrEmpty(Model.CancelDate) == false)
+            {
+                <span><b>زمان لغو:</b> @Model.CancelDate</span>
             }
         </div>
 

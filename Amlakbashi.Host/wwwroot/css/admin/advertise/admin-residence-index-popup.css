@@ -1,0 +1,54 @@
+﻿/* Prices */
+.price-info-container{
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+}
+
+.main-prices-container{
+    border-left: 1px solid lightgray;
+    padding-left: 20px;
+}
+
+.main-prices-container .box-input{
+    display: flex;
+    flex-flow: column;
+    margin-bottom: 10px;
+}
+
+.calendar-prices-container {
+    padding-right: 20px;
+    text-align: center;
+}
+
+.box-calendar{
+    margin-bottom: 20px;
+}
+
+.main-prices-container .box-button {
+    text-align: center;
+}
+
+.main-prices-container input, .calendar-prices-container input {
+    padding: 5px 0px;
+    text-align: center;
+    border: 1px solid #b9b9b9;
+    border-radius: 5px;
+}
+
+.main-prices-container button, .calendar-prices-container button{
+    background: #fdd835;
+    border: 1px solid #dcdcde;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px 0 16px 0;
+    font: 12px liransans;
+    transition: 0.3s;
+    width: 80px;
+}
+
+.calendar-prices-container button{
+    margin-right: 20px;
+}

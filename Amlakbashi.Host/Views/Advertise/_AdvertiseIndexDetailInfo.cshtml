@@ -43,20 +43,21 @@ else
                 <a href="/advertise/edit?id=@Model.Id" class="fa fa-edit" target="_blank" title="ویرایش"></a>
                 <i class="fa fa-calendar" onclick="showOccupiedCalendarPopup(@Model.Id)" title="تقویم"></i>
                 <i class="fa fa-bolt" onclick="showInstantReservePopup(@Model.Id)" title="رزرو آنی"></i>
+                <i class="fas fa-dollar-sign" onclick="showPricePopup(@Model.Id)" title="قیمت ها"></i>
                 @if (Model.Status == Advertise.AdvertiseStatus.FirstReady ||
-                   Model.Status == Advertise.AdvertiseStatus.ReadyToPublish ||
-                   Model.Status == Advertise.AdvertiseStatus.NotVerified ||
-                   Model.Status == Advertise.AdvertiseStatus.Deleted)
+                  Model.Status == Advertise.AdvertiseStatus.ReadyToPublish ||
+                  Model.Status == Advertise.AdvertiseStatus.NotVerified ||
+                  Model.Status == Advertise.AdvertiseStatus.Deleted)
                 {
                     <i class="fa fa-check-circle" onclick="PublishAdvertise(@Model.Id,this)" title="انتشار"></i>
                 }
                 @if (Model.Status == Advertise.AdvertiseStatus.Published ||
-                   Model.Status == Advertise.AdvertiseStatus.Archived)
+                  Model.Status == Advertise.AdvertiseStatus.Archived)
                 {
                     <i class="fa fa-power-off" onclick="ToggleActivity(@Model.Id,this)" data-value="@(Model.Status == Advertise.AdvertiseStatus.Archived ? "false" : "true")" title="فعال/غیرفعال" style="color: @(Model.Status == Advertise.AdvertiseStatus.Archived ? "red" : "limegreen");"></i>
                 }
                 @if (Model.Status != Advertise.AdvertiseStatus.NotVerified
-                   && Model.Status != Advertise.AdvertiseStatus.NotCompleted)
+                  && Model.Status != Advertise.AdvertiseStatus.NotCompleted)
                 {
                     <i class="fa fa-times" onclick="NotVerifyAdvertise(@Model.Id,this)" title="عدم تایید"></i>
                 }
@@ -67,19 +68,19 @@ else
                 <a href="/accomodation/adminbasicform?id=@Model.Id" class="fa fa-user-plus" title="کارشناسی آگهی" target="_blank"></a>
                 <a href="/advertise/edit?id=@Model.Id" class="fa fa-edit" target="_blank" title="ویرایش"></a>
                 @if (Model.Status == Advertise.AdvertiseStatus.FirstReady ||
-                  Model.Status == Advertise.AdvertiseStatus.ReadyToPublish ||
-                  Model.Status == Advertise.AdvertiseStatus.NotVerified ||
-                  Model.Status == Advertise.AdvertiseStatus.Deleted)
+                 Model.Status == Advertise.AdvertiseStatus.ReadyToPublish ||
+                 Model.Status == Advertise.AdvertiseStatus.NotVerified ||
+                 Model.Status == Advertise.AdvertiseStatus.Deleted)
                 {
                     <i class="fa fa-check-circle" onclick="PublishAdvertise(@Model.Id,this)" title="انتشار"></i>
                 }
                 @if (Model.Status == Advertise.AdvertiseStatus.Published ||
-                   Model.Status == Advertise.AdvertiseStatus.Archived)
+                  Model.Status == Advertise.AdvertiseStatus.Archived)
                 {
                     <i class="fa fa-power-off" onclick="ToggleActivity(@Model.Id,this)" data-value="@(Model.Status == Advertise.AdvertiseStatus.Archived ? "0" : "1")" title="فعال/غیرفعال" style="color: @(Model.Status == Advertise.AdvertiseStatus.Archived ? "red" : "limegreen");"></i>
                 }
                 @if (Model.Status != Advertise.AdvertiseStatus.NotVerified
-                   && Model.Status != Advertise.AdvertiseStatus.NotCompleted)
+                  && Model.Status != Advertise.AdvertiseStatus.NotCompleted)
                 {
                     <i class="fa fa-times" onclick="NotVerifyAdvertise(@Model.Id,this)" title="عدم تایید"></i>
                 }
@@ -89,8 +90,9 @@ else
             {
                 <i class="fa fa-calendar" onclick="showOccupiedCalendarPopup(@Model.Id)" title="تقویم"></i>
                 <i class="fa fa-bolt" onclick="showInstantReservePopup(@Model.Id)" title="رزرو آنی"></i>
+                <i class="fas fa-dollar-sign" onclick="showPricePopup(@Model.Id)" title="قیمت ها"></i>
                 @if (Model.Status == Advertise.AdvertiseStatus.Published ||
-                   Model.Status == Advertise.AdvertiseStatus.Archived)
+                  Model.Status == Advertise.AdvertiseStatus.Archived)
                 {
                     <i class="fa fa-power-off" onclick="ToggleAvailable(@Model.Id,this)" data-value="@(Model.Available ? "true" : "false")" title="فعال/غیرفعال" style="color: @(Model.Available ? "limegreen" : "red");"></i>
                 }

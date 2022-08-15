@@ -9,6 +9,31 @@ function quickFilterProcess() {
     $('#more_filter_form').submit();
 }
 
+var currentMonth;
+var fromDate;
+var toDate;
+function calculateDateRange() {
+    debugger;
+    if (!firstSelectedDay) {
+        return;
+    }
+    fromDate = firstSelectedDay.date.replaceAll('/', ',');
+    if (secondSelectedDay != undefined) {
+        currentMonth = gregorianToJalaliDate(new Date(secondSelectedDay.value));
+        var nextDay = new Date(secondSelectedDay.value);
+        nextDay.setDate(nextDay.getDate() + 1);
+        nextDay = gregorianToJalaliDate(nextDay);
+        toDate = nextDay.dateString.replaceAll('/', ',');
+    }
+    else {
+        currentMonth = gregorianToJalaliDate(new Date(firstSelectedDay.value));
+        var nextDay = new Date(firstSelectedDay.value);
+        nextDay.setDate(nextDay.getDate() + 1);
+        nextDay = gregorianToJalaliDate(nextDay);
+        toDate = nextDay.dateString.replaceAll('/', ',');
+    }
+}
+
 function deleteAdvertise($id) {
     showConfirm('آیا از حذف این آگهی مطمئن هستید؟', function () {
         sendGetAjax("/Advertise/Delete", "id=" + $id, function (ret) {
@@ -63,17 +88,6 @@ function showOccupiedCalendarPopup(id) {
 function showInstantReservePopup(id) {
     loadPopup('/accomodation/GetInstantReserveDates?residenceId=' + id);
 }
-
-//function SuspenAdvertise($id, obj) {
-//    showConfirm('آیا از تعلیق این آگهی اطمینان دارید؟', function () {
-//        sendGetAjax("/accomodation/suspend", "id=" + $id, function (ret) {
-//            if (ret.status == 1) {
-//                $(obj).remove();
-//                successAlert("آگهی مورد نظر تعلیق شد");
-//            }
-//        })
-//    });
-//}
 
 function ToggleActivity(residenceId, elem) {
     var active = $(elem).attr('data-value');
@@ -167,3 +181,51 @@ $('#js-status-filter-select').change(function () {
         $('#js-sort-filter-select').val('modify');
     }
 });
+
+// ********* Price Popup ***********
+
+function showPricePopup(id) {
+    loadPopup('/accomodation/GetPricesInfo?residenceId=' + id);
+}
+
+function updateCalendarPrices(pricesList) {
+    firstSelectedDay = undefined;
+    secondSelectedDay = undefined;
+    updateDatePicker([$('.price-date-picker')[0]], jalaliCurrentMonth,
+        {
+            priceDict: pricesList,
+            occupiedList: [],
+            monthOffset: 0,
+            selectionType: 'multi',
+            occupiedSelectEnabled: false
+        });
+}
+
+function updateMainPrices() {
+    submitPopup('/accomodation/updatemainprices');
+}
+
+function updateManualPrices(residenceId) {
+    debugger;
+    calculateDateRange();
+    var priceInput = $('.calendar-prices-container input');
+    var price = priceInput.val();
+    if (!fromDate || !toDate) {
+        errorAlert('لطفا بازه زمانی مورد نظر را انتخاب کنید');
+        return;
+    }
+    if (price < 30000) {
+        errorAlert('قیمت وارد شده اشتباه است');
+        return;
+    }
+    sendPostAjax("/accomodation/updatemanualprices", { residenceId, fromDate, toDate, price }, function (ret) {
+        if (ret.status == 1) {
+            priceInput.val('');
+            updateCalendarPrices(ret.priceDict);
+        }
+        else {
+            errorAlert(ret.msg);
+        }
+    });
+}
+

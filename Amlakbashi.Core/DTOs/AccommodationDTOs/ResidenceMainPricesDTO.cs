@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.AccommodationDTOs
 {
-    public class ResidencePricesInfoDTO
+    public class ResidenceMainPricesDTO
     {
         public long residenceId { get; set; }
         public int dailyPrice { get; set; }
@@ -14,7 +14,5 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
         public int extraCapacityPrice { get; set; }
         public int norouzPrice { get; set; }
         public int norouzExtraCapacityPrice { get; set; }
-        //public IDictionary<string, DatePriceDTO>  calendarPrices { get; set; }
-        public string calendarPrices { get; set; }
     }
 }

@@ -2783,25 +2783,49 @@ namespace Amlakbashi.Host.Controllers
             return GenerateJsonResult(new { result = result });
         }
 
+        [Authorize(Policy = Policies.Advertise_Edit)]
         public IActionResult GetPricesInfo(long residenceId)
         {
             var residence = advertiseService.Find(residenceId);
             var result = new ResidencePricesInfoDTO()
             {
+                residenceId = residence.Id,
                 dailyPrice = residence.DailyPrice,
                 holidayPrice = residence.HolidayPrice,
                 peakHolidayPrice = residence.HolidayPikePrice,
                 monthlyPrice = (int)residence.RentPrice,
                 extraCapacityPrice = residence.MoreThanCapacityPrice,
                 norouzPrice = residence.NorouzPrice,
-                norouzExtraCapacityPrice = residence.NorouzOverCapacityPrice
+                norouzExtraCapacityPrice = residence.NorouzOverCapacityPrice,
+                calendarPrices = SerializeUtility.SerializeToJS(advertiseService.GetAccPriceDatesInfo(residenceId))
             };
             return PartialView("_PricesInfo", result);
         }
 
-        //public IActionResult UpdateMainPrices()
-        //{
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        [HttpPost]
+        public async Task<IActionResult> UpdateMainPrices(ResidenceMainPricesDTO request)
+        {
+            var result = await advertiseService.UpdatePricesAsync(request, userAccessor.CurrentUser.Id);
+            return GenerateJsonResult(new
+            {
+                status = result.HasError() ? 0 : 1,
+                msg = result.HasError() ? result.GetErrors() : null
+            });
+        }
 
-        //}
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        [HttpPost]
+        public IActionResult UpdateManualPrices(ResidenceManualPriceDTO request)
+        {
+            string msg;
+            var result = priceTableService.SetAccommodationPriceInDate(request.residenceId, request.fromDate,
+                request.toDate, request.price, out msg);
+            return GenerateJsonResult(new
+            {
+                status = result ? 1 : 0,
+                priceDict = advertiseService.GetAccPriceDatesInfo(request.residenceId)
+            });
+        }
     }
 }
