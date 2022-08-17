@@ -2827,5 +2827,49 @@ namespace Amlakbashi.Host.Controllers
                 priceDict = advertiseService.GetAccPriceDatesInfo(request.residenceId)
             });
         }
+
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        public IActionResult GetDiscountInfo(long residenceId)
+        {
+            var residence = advertiseService.Find(residenceId);
+            var result = new ResidenceDiscountInfoDTO()
+            {
+                residenceId = residence.Id,
+                discounts = residence.DiscountTables.Select(s => (AccDashboardDTOs.DiscountDTO)s).ToList(),
+                calendarPrices = SerializeUtility.SerializeToJS(advertiseService.GetAccPriceDatesInfo(residenceId))
+            };
+            return PartialView("_DiscountsInfo", result);
+        }
+
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        [HttpPost]
+        public IActionResult AddDiscount(ResidenceNewDiscountDTO request)
+        {
+            List<string> errorList;
+            var result = discountTableService.Insert(request.residenceId, DateTimeUtility.PersianDateToGregorian(request.fromDate),
+                DateTimeUtility.PersianDateToGregorian(request.toDate), request.discount, out errorList);
+            return GenerateJsonResult(new
+            {
+                status = result ? 1 : 0,
+                msg = result ? null : string.Join("\n", errorList),
+                priceDict = advertiseService.GetAccPriceDatesInfo(request.residenceId)
+            });
+        }
+
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        [HttpPost]
+        public IActionResult DeleteDiscount(int discountId)
+        {
+            var discount = discountTableService.Find(discountId);
+            if (discount != null)
+            {
+                discountTableService.Delete(discountId);
+            }
+            return GenerateJsonResult(new
+            {
+                status = discount is null ? 0 : 1,
+                priceDict = advertiseService.GetAccPriceDatesInfo(discount.AdvertiseID)
+            });
+        }
     }
 }

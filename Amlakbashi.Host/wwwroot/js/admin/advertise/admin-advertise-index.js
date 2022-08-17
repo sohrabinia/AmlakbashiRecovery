@@ -13,7 +13,6 @@ var currentMonth;
 var fromDate;
 var toDate;
 function calculateDateRange() {
-    debugger;
     if (!firstSelectedDay) {
         return;
     }
@@ -142,7 +141,7 @@ function NotVerifyAdvertise($id, obj) {
         sendGetAjax("/Advertise/NotVerify", "id=" + $id, function (ret) {
             if (ret.status == 1) {
                 $(obj).remove();
-                successAlert("آگهی مورد نظر به تایید نشده ها پیوست");
+                successAlert("وضعیت آگهی با موفقیت تغییر یافت");
             }
         });
     });
@@ -206,14 +205,13 @@ function updateMainPrices() {
 }
 
 function updateManualPrices(residenceId) {
-    debugger;
     calculateDateRange();
-    var priceInput = $('.calendar-prices-container input');
-    var price = priceInput.val();
     if (!fromDate || !toDate) {
         errorAlert('لطفا بازه زمانی مورد نظر را انتخاب کنید');
         return;
     }
+    var priceInput = $('.calendar-prices-container input');
+    var price = priceInput.val();
     if (price < 30000) {
         errorAlert('قیمت وارد شده اشتباه است');
         return;
@@ -229,3 +227,27 @@ function updateManualPrices(residenceId) {
     });
 }
 
+// *********** Discount Popup **************
+
+function showDiscountPopup(id) {
+    loadPopup('/accomodation/GetDiscountInfo?residenceId=' + id);
+}
+
+function addDiscount(residenceId) {
+    calculateDateRange();
+    if (!fromDate || !toDate) {
+        errorAlert('لطفا بازه زمانی مورد نظر را انتخاب کنید');
+        return;
+    }
+    var discountInput = $('.calendar-prices-container input');
+    var discount = discountInput.val();
+    if (discount < 1 || discount > 100) {
+        errorAlert('مقدار تخفیف وارد شده اشتباه است');
+        return;
+    }
+    sendPostAjax("/accomodation/adddiscount", { residenceId, fromDate, toDate, discount }, null, null, hidePopup);
+}
+
+function deleteDiscount(discountId) {
+    sendPostAjax("/accomodation/deletediscount", { discountId }, null, null, hidePopup);
+}

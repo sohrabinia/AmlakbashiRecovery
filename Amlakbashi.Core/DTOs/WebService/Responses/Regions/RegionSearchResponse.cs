@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Amlakbashi.Core.DTOs.WebService.Responses.Regions
 {
-    public class RegionListResponse
+    public class RegionSearchResponse
     {
         public int regionId { get; set; }
         public string provinceName { get; set; }

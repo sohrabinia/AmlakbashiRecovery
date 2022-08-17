@@ -13,13 +13,13 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
 
         public static implicit operator DiscountDTO(DiscountTable discountTable)
         {
-            var result = new DiscountDTO();
-            result.id = discountTable.Id;
-            result.percent = discountTable.Percent;
+            var dto = new DiscountDTO();
+            dto.id = discountTable.Id;
+            dto.percent = discountTable.Percent;
             var fromString = DateTimeUtility.GregorianToPersianDate(discountTable.From).Replace(",", "/");
             var toString = DateTimeUtility.GregorianToPersianDate(discountTable.To).Replace(",", "/");
-            result.dateString = fromString + " تا " + toString;
-            return result;
+            dto.dateString = fromString + " تا " + toString;
+            return dto;
         }
     }
 }

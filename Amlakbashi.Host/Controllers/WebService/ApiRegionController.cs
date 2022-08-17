@@ -24,18 +24,18 @@ namespace Amlakbashi.Host.Controllers.WebService
             this.categoryService = categoryService;
         }
 
-        [HttpGet]
-        public IActionResult Get(string phrase)
+        [HttpGet("search")]
+        public IActionResult Search(string phrase)
         {
             var regions = regionService.GetBySearchRegion(phrase);
             if (regions.Any() == false)
             {
                 return NotFound();
             }
-            var response = new List<RegionListResponse>();
+            var response = new List<RegionSearchResponse>();
             foreach (var item in regions)
             {
-                var responseItem = new RegionListResponse() {
+                var responseItem = new RegionSearchResponse() {
                     regionId = item.Id,
                     residencyCount = categoryService.GetAdvertiseCount(item.Id, (Region.AdvertiseRegion)item.Type)
                 };
@@ -59,6 +59,12 @@ namespace Amlakbashi.Host.Controllers.WebService
                 response.Add(responseItem);
             }
             return Ok(response);
+        }
+
+        [HttpGet]
+        public IActionResult GetHierarchicalList(int regionId = 0, int type = 0, bool withSubregions = false)
+        {
+            return Ok(regionService.GetList(regionId, type, withSubregions));
         }
     }
 }

@@ -22,22 +22,22 @@ using System.Threading.Tasks;
 namespace Amlakbashi.Host.Controllers.WebService
 {
     [ApiController]
-    [Route("api/advertise")]
+    [Route("api/residence")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ApiResidenceController : ApiBaseController
     {
-        private readonly IAdvertiseAppService advertiseService;
+        private readonly IAdvertiseAppService residenceService;
         private readonly ICategoryAppService categoryService;
         private readonly IRegionAppService regionService;
         private readonly IUserAppService userService;
         private readonly ICacheManager cacheManager;
-        public ApiResidenceController(IAdvertiseAppService advertiseService,
+        public ApiResidenceController(IAdvertiseAppService residenceService,
             ICategoryAppService categoryService,
             IRegionAppService regionService,
             IUserAppService userService,
             ICacheManager cacheManager)
         {
-            this.advertiseService = advertiseService;
+            this.residenceService = residenceService;
             this.categoryService = categoryService;
             this.regionService = regionService;
             this.userService = userService;
@@ -70,7 +70,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             request.categoryId = category.Id;
             request.userId = User.GetId();
 
-            var response = advertiseService.Filter(request);
+            var response = residenceService.Filter(request);
 
             //if (canUseCache)
             //{
@@ -84,12 +84,12 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpGet("{id:long}")]
         public IActionResult Get(long id)
         {
-            var advertise = advertiseService.Find(id);
+            var advertise = residenceService.Find(id);
             if (advertise == null)
             {
                 return NotFound();
             }
-            advertiseService.UpdateAccView(id);
+            residenceService.UpdateAccView(id);
             var response = new AdvertiseResponse();
             response = advertise;
             var hostCreateDate = userService.GetIdentityUser(advertise.User.PhoneNumber).CreateDate;
@@ -109,7 +109,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         public List<AdvertiseBasicInfoReponse> GetUserAdvertises(Advertise.AdvertiseStatus status = Advertise.AdvertiseStatus.Published,
             int page = 1, int pageItemCount = 20)
         {
-            var advertises = advertiseService.GetAdvertisesByUserId(User.GetId());
+            var advertises = residenceService.GetAdvertisesByUserId(User.GetId());
             advertises = advertises.Where(x => x.Mode != Advertise.AdvertiseMode.Child && x.Status == status).ToList();
             List<AdvertiseBasicInfoReponse> response = new List<AdvertiseBasicInfoReponse>();
             response.AddRange(advertises.Select(x => (AdvertiseBasicInfoReponse)x));
@@ -125,7 +125,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 return BadRequest(ModelState);
             }
             request.userId = User.GetId();
-            var result = await advertiseService.CreateAsync(request);
+            var result = await residenceService.CreateAsync(request);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());
@@ -137,7 +137,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetBasicInfoForUpdate(long id)
         {
-            var advertise = advertiseService.Find(id);
+            var advertise = residenceService.Find(id);
             if (advertise == null)
             {
                 return NotFound();
@@ -155,7 +155,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 return BadRequest(ModelState);
             }
             request.userId = User.GetId();
-            var result = await advertiseService.UpdateBasicInfoAsync(request);
+            var result = await residenceService.UpdateBasicInfoAsync(request);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());
@@ -167,7 +167,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetGeneralInfoForUpdate(long id)
         {
-            var advertise = advertiseService.Find(id);
+            var advertise = residenceService.Find(id);
             if (advertise == null)
             {
                 return NotFound();
@@ -186,7 +186,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 return BadRequest(checkRegionResult.GetErrors());
             }
             request.userId = User.GetId();
-            var result = await advertiseService.UpdateGeneralInfoAsync(request);
+            var result = await residenceService.UpdateGeneralInfoAsync(request);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());
@@ -198,7 +198,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetSupplementaryInfoForUpdate(long id)
         {
-            var advertise = advertiseService.Find(id);
+            var advertise = residenceService.Find(id);
             if (advertise == null)
             {
                 return NotFound();
@@ -215,7 +215,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 return BadRequest(ModelState);
             }
             request.userId = User.GetId();
-            var result = await advertiseService.UpdateSupplementaryInfoAsync(request);
+            var result = await residenceService.UpdateSupplementaryInfoAsync(request);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());
@@ -227,7 +227,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetFinalInfoForUpdate(long id)
         {
-            var advertise = advertiseService.Find(id);
+            var advertise = residenceService.Find(id);
             if (advertise == null)
             {
                 return NotFound();
@@ -244,7 +244,7 @@ namespace Amlakbashi.Host.Controllers.WebService
                 return BadRequest(ModelState);
             }
             request.userId = User.GetId();
-            var result = await advertiseService.UpdateFinalInfoAsync(request);
+            var result = await residenceService.UpdateFinalInfoAsync(request);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());
@@ -256,7 +256,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetHotelRoomInfoForUpdate(long id)
         {
-            var advertise = advertiseService.Find(id);
+            var advertise = residenceService.Find(id);
             if (advertise == null || advertise.Mode != Advertise.AdvertiseMode.Child)
             {
                 return NotFound();
@@ -276,11 +276,11 @@ namespace Amlakbashi.Host.Controllers.WebService
             ServiceResult result = null;
             if (request.unitId > 0)
             {
-                result = await advertiseService.UpdateHotelRoomInfoAsync(request);
+                result = await residenceService.UpdateHotelRoomInfoAsync(request);
             }
             else
             {
-                result = await advertiseService.CreateHotelRoomAsync(request);
+                result = await residenceService.CreateHotelRoomAsync(request);
             }
             if (result.HasError())
             {
@@ -293,7 +293,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpGet("searchid")]
         public IActionResult SearchId(string id)
         {
-            var advertises = advertiseService.Filter(id);
+            var advertises = residenceService.Filter(id);
             if (advertises.Any() == false)
             {
                 return NotFound();
@@ -314,7 +314,7 @@ namespace Amlakbashi.Host.Controllers.WebService
 
         [AllowAnonymous]
         [HttpGet("types")]
-        public IList<AdvertiseTypesResponse> GetAdvertiseTypes()
+        public IList<AdvertiseTypesResponse> GetResidenceTypes()
         {
             var response = new List<AdvertiseTypesResponse>();
             var advertiseTypesList = Enum.GetValues<Advertise.AdvertiseType>().ToList();
@@ -328,10 +328,25 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [AllowAnonymous]
+        [HttpGet("locationtypes")]
+        public IList<AdvertiseTypesResponse> GetResidenceLocationTypes()
+        {
+            var response = new List<AdvertiseTypesResponse>();
+            var advertiseTypesList = Enum.GetValues<Advertise.PositionType>().ToList();
+            advertiseTypesList.Remove(Advertise.PositionType.none);
+            response.AddRange(advertiseTypesList.Select(x => new AdvertiseTypesResponse()
+            {
+                name = AdvertiseMainLocalization.GetPositionTypeString((int)x),
+                value = (int)x
+            }));
+            return response;
+        }
+
+        [AllowAnonymous]
         [HttpGet("calendar/{id:long}")]
         public IActionResult GetCalendarData(long id)
         {
-            var advertise = advertiseService.Find(id);
+            var advertise = residenceService.Find(id);
             if (advertise == null)
             {
                 return NotFound();
@@ -339,7 +354,7 @@ namespace Amlakbashi.Host.Controllers.WebService
             var response = new AdvertiseCalendarResponse()
             {
                 occupiedDates = advertise.OccupiedDates().Select(x => DateTimeUtility.DateValueOfJS(x)).ToList(),
-                prices = advertiseService.GetAccPriceDatesInfo(id).Select(x => new AdvertiseCalendarPriceItemResponse()
+                prices = residenceService.GetAccPriceDatesInfo(id).Select(x => new AdvertiseCalendarPriceItemResponse()
                 {
                     date = x.Key,
                     price = x.Value.price,
@@ -355,7 +370,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         {
             request.userId = User.GetId();
             request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
-            var result = await advertiseService.UpdateCalendarAsync(request);
+            var result = await residenceService.UpdateCalendarAsync(request);
             if (result.HasError())
             {
                 return BadRequest(result.GetErrors());
@@ -379,14 +394,14 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpGet("favorite")]
         public AdvertiseListResponse GetFavorites(int page = 1)
         {
-            var favoriteAdvertises = advertiseService.GetUserFavoriteAdvertises(User.GetId(), page);
+            var favoriteAdvertises = residenceService.GetUserFavoriteAdvertises(User.GetId(), page);
             return favoriteAdvertises;
         }
 
         [HttpPost("favorite/{id:long}")]
         public IActionResult AddFavorite(long id)
         {
-            var advertise = advertiseService.Find(id);
+            var advertise = residenceService.Find(id);
             if (advertise == null)
             {
                 return NotFound();
@@ -409,7 +424,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpGet("rules/{id:long}")]
         public IActionResult GetRules(long id)
         {
-            var advertise = advertiseService.Find(id);
+            var advertise = residenceService.Find(id);
             return Ok(new
             {
                 party = advertise.AllowParty,
@@ -424,7 +439,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public IActionResult GetInstantReserveInfo(long residenceId)
         {
-            var residence = advertiseService.Find(residenceId);
+            var residence = residenceService.Find(residenceId);
             if (residence == null || residence.UserID != User.GetId())
             {
                 return BadRequest("not allowed");
@@ -441,7 +456,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> AddInstantReserveDates(UpdateInstantReserveDatesRequest request)
         {
-            var result = await advertiseService.AddInstantReserveDates(request.residenceId, request.fromDate, request.toDate, User.GetId());
+            var result = await residenceService.AddInstantReserveDates(request.residenceId, request.fromDate, request.toDate, User.GetId());
             return result.HasError() ? BadRequest(result.GetErrors()) : Ok(SerializeUtility.SerializeToJS(result.Result));
         }
 
@@ -449,7 +464,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> DeleteInstantReserveDates(UpdateInstantReserveDatesRequest request)
         {
-            var result = await advertiseService.DeleteInstantReserveDates(request.residenceId, request.fromDate, request.toDate, User.GetId());
+            var result = await residenceService.DeleteInstantReserveDates(request.residenceId, request.fromDate, request.toDate, User.GetId());
             return result.HasError() ? BadRequest(result.GetErrors()) : Ok(SerializeUtility.SerializeToJS(result.Result));
         }
 
@@ -457,7 +472,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> UpdatePermanentInstantReserve(UpdatePermanentInstantReserveRequest request)
         {
-            var result = await advertiseService.UpdateInstantReserveStatus(request.residenceId,
+            var result = await residenceService.UpdateInstantReserveStatus(request.residenceId,
                 request.active ? Advertise.InstantReserveStatusEnum.Permanent : Advertise.InstantReserveStatusEnum.Calendar);
             return result ? Ok() : BadRequest();
         }

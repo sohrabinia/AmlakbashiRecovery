@@ -1,13 +1,12 @@
-﻿/* Prices */
-.price-info-container{
+﻿.price-info-container, .discount-info-container{
     display: flex;
     flex-flow: row;
-    align-items: center;
 }
 
 .main-prices-container{
     border-left: 1px solid lightgray;
-    padding-left: 20px;
+    padding-left: 10px;
+    margin-left: 10px;
 }
 
 .main-prices-container .box-input{
@@ -17,7 +16,6 @@
 }
 
 .calendar-prices-container {
-    padding-right: 20px;
     text-align: center;
 }
 
@@ -46,9 +44,27 @@
     margin: 5px 0 16px 0;
     font: 12px liransans;
     transition: 0.3s;
-    width: 80px;
 }
 
 .calendar-prices-container button{
     margin-right: 20px;
+}
+
+.discounts-container {
+    padding-right: 10px;
+    margin-right: 10px;
+    border-right: 1px solid lightgray;
+    width: 100%;
+}
+
+.discount-item {
+    padding: 10px 0;
+    border-bottom: 1px solid lightgray;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+}
+
+.discount-item i{
+    cursor: pointer;
 }
