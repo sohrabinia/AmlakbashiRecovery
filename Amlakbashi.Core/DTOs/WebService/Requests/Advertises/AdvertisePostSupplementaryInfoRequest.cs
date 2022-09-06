@@ -10,7 +10,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
     public class AdvertisePostSupplementaryInfoRequest
     {
         [Range(1, int.MaxValue)]
-        public long advertiseId { get; set; }
+        public long residenceId { get; set; }
         public Advertise.HeatingSystemItems heatingSystem { get; set; }
         public Advertise.CoolingSystemItems coolingSystem { get; set; }
         public Advertise.WCItems wc { get; set; }
@@ -40,10 +40,10 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         public bool party { get; set; }
         public bool pets { get; set; }
         public bool smoking { get; set; }
-        public string evidenceRequired { get; set; }
+        public string requiredEvidence { get; set; }
         public string otherRules { get; set; }
-        public int ownershipType { get; set; }
-        public string ownerMobile { get; set; }
+        public Advertise.OwnershipTypeEnum ownershipType { get; set; }
+        public string ownerPhoneNumber { get; set; }
         public string ownerFullName { get; set; }
         public bool license { get; set; }
         public string licenseNumber { get; set; }
@@ -68,11 +68,11 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
             {
                 modelState.AddModelError(nameof(wc), "value is incorrect");
             }
-            if (ownershipType == 1)
+            if (ownershipType == Advertise.OwnershipTypeEnum.Intermediary)
             {
-                if (string.IsNullOrEmpty(ownerMobile))
+                if (string.IsNullOrEmpty(ownerPhoneNumber))
                 {
-                    modelState.AddModelError(nameof(ownerMobile), "value is incorrect");
+                    modelState.AddModelError(nameof(ownerPhoneNumber), "value is incorrect");
                 }
                 if (string.IsNullOrEmpty(ownerFullName))
                 {

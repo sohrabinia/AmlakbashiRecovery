@@ -195,7 +195,7 @@ namespace Amlakbashi.Application.Services.CommentServices
         {
             return Repository.Query(q => q.Count(x =>
                 x.Advertise.Status != Advertise.AdvertiseStatus.Deleted &&
-                x.Advertise.UserID == userId &&
+                x.Advertise.UserId == userId &&
                 x.Status == Comment.CommentStatus.publish &&
                 x.type == Comment.CommentType.advertise &&
                 !x.SeenByHost));
@@ -246,7 +246,7 @@ namespace Amlakbashi.Application.Services.CommentServices
                 serviceResult.AddError("comment id is invalid");
                 return serviceResult;
             }
-            if (comment.Advertise.UserID != requst.userId)
+            if (comment.Advertise.UserId != requst.userId)
             {
                 serviceResult.AddError("invalid user");
                 return serviceResult;

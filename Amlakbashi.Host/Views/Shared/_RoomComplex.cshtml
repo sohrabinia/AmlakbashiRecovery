@@ -21,7 +21,7 @@
             <span class="idBanner"> کد آگهی : @Model.id</span>
             @if (Model.floor != Advertise.FloorItems.Unset)
             {
-                <div>طبقه: @AdvertiseMainLocalization.GetPropertyValueTitle(Model.floor)</div>
+                <div>طبقه: @AdvertiseMainLocalization.GetEnumPersianName(Model.floor)</div>
             }
             @if (Model.roomCount <= 0)
             {

@@ -9,6 +9,6 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
 {
     public class PositionDTO
     {
-        public PositionType Region { get; set; }
+        public PositionType LocationType { get; set; }
     }
 }

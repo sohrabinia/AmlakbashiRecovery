@@ -7,44 +7,44 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
 {
     public class AdvertiseGetFinalInfoForUpdateResponse
     {
-        public long advertiseId { get; set; }
+        public long residenceId { get; set; }
         public int capacity { get; set; }
         public int extraCapacity { get; set; }
         public int dailyPrice { get; set; }
         public int holidayPrice { get; set; }
-        public int holidayPikePrice { get; set; }
+        public int peakHolidayPrice { get; set; }
         public int extraCapacityPrice { get; set; }
         public long monthlyPrice { get; set; }
-        public int norouzPrice { get; set; }
-        public int metrazh { get; set; }
+        public int nowruzPrice { get; set; }
+        public int buildingArea { get; set; }
         public Advertise.ParkingItems parking { get; set; }
         public int roomCount { get; set; }
         public Advertise.FloorItems floor { get; set; }
         public int singleBedCount { get; set; }
-        public int doublesBedCount { get; set; }
-        public int blanketsAndMattressesCount { get; set; }
+        public int doubleBedCount { get; set; }
+        public int blanketAndMattressCount { get; set; }
         public Advertise.ExtraBlanketCountItems extraBlanketCount { get; set; }
 
         public static implicit operator AdvertiseGetFinalInfoForUpdateResponse(Advertise advertise)
         {
             return new AdvertiseGetFinalInfoForUpdateResponse()
             {
-                advertiseId = advertise.Id,
+                residenceId = advertise.Id,
                 capacity = advertise.Capacity,
-                extraCapacity = advertise.MoreThanCapacity,
+                extraCapacity = advertise.ExtraCapacity,
                 dailyPrice = advertise.DailyPrice,
                 holidayPrice = advertise.HolidayPrice,
-                holidayPikePrice = advertise.HolidayPikePrice,
-                monthlyPrice = advertise.RentPrice,
-                norouzPrice = advertise.NorouzPrice,
-                extraCapacityPrice = advertise.MoreThanCapacityPrice,
-                metrazh = advertise.Metrazh,
+                peakHolidayPrice = advertise.PeakHolidayPrice,
+                monthlyPrice = advertise.MonthlyPrice,
+                nowruzPrice = advertise.NowruzPrice,
+                extraCapacityPrice = advertise.ExtraCapacityPrice,
+                buildingArea = advertise.BuildingArea,
                 parking = advertise.Parking,
-                roomCount = advertise.Room,
+                roomCount = advertise.RoomCount,
                 floor = advertise.Floor,
-                singleBedCount = advertise.SingleBed,
-                doublesBedCount = advertise.DoublesBed,
-                blanketsAndMattressesCount = advertise.BlanketsAndMattresses,
+                singleBedCount = advertise.SingleBedCount,
+                doubleBedCount = advertise.DoubleBedCount,
+                blanketAndMattressCount = advertise.BlanketAndMattressCount,
                 extraBlanketCount = advertise.ExtraBlanketCount
             };
         }

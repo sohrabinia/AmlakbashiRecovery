@@ -136,7 +136,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                 }
             }
 
-            if (advertise.Count <= 1)
+            if (advertise.UnitCount <= 1)
             {
                 mediator.Send(new RejectRequestsInTimeCommand(reserve.AdvertiseID,
                     reserve.StartDate, reserve.EndDate, actionSource, doerUserId,
@@ -146,7 +146,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             }
             if (DateTimeUtility.DateRangesHaveOverlap(DateTime.Now.Date, DateTime.Now.Date.AddDays(1), reserve.StartDate, reserve.EndDate))
             {
-                advertise.TodayIsEmpty = false;
+                advertise.EmptyTonight = false;
             }
             var finishDelay = new DateTime(
                 reserve.EndDate.Year,

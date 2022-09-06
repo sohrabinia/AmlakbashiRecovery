@@ -51,7 +51,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
         public Task<Unit> Handle(UpdateAdvertiseCategoriesCommand request, CancellationToken cancellationToken)
         {
             var accIds = advertiseRepository.Query(q => q.Where(
-                w => w.Id == request.advertiseId || (w.ParentId == request.advertiseId && w.Count == 0))
+                w => w.Id == request.advertiseId || (w.ParentId == request.advertiseId && w.UnitCount == 0))
                 .OrderBy(o => o.Id)).Select(s => s.Id).ToList();
 
             var catIds = new List<int>();
@@ -65,16 +65,16 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
 
                 mediator.Send(new RemoveCategoryItemCacheCommand(accId));
                 acc.Categories.Clear();
-                if (acc.IsActive == false || acc.Count > 0)
+                if (acc.IsActive == false || acc.UnitCount > 0)
                 {
-                    acc.LastModifyDate = DateTime.Now;
+                    acc.LastModifiedDate = DateTime.Now;
                     advertiseRepository.Update(acc);
                     advertiseRepository.Save();
                     continue;
                 }
 
                 var categoryIds = mediator.Send(new GetCategoriesFilterCommand(acc.TypeID, acc.CountryDirection,
-                    acc.Province, acc.City, acc.Area)).Result.Select(s => s.Id);
+                    acc.ProvinceId, acc.CityId, acc.AreaId)).Result.Select(s => s.Id);
 
                 foreach (var item in categoryIds)
                 {
@@ -86,7 +86,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                     cat.LastModifyDate = DateTime.Now;
                     catIds.Add(cat.Id);
                 }
-                acc.LastModifyDate = DateTime.Now;
+                acc.LastModifiedDate = DateTime.Now;
                 advertiseRepository.Update(acc);
                 advertiseRepository.Save();
                 mediator.Send(new RemoveCategoryItemCacheCommand(accId));
@@ -118,7 +118,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                     catIds.Add(cat.Id);
                 }
                 mediator.Send(new RemoveCategoryItemCacheCommand(accId));
-                acc.LastModifyDate = DateTime.Now;
+                acc.LastModifiedDate = DateTime.Now;
                 acc.Categories.Clear();
                 advertiseRepository.Update(acc);
             }
@@ -218,12 +218,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                 x.HostResponse == Reserve.HostResponseEnum.RejectedPrice) * 10);
             score_item -= (all_reserves.Count(x => x.HostResponse == Reserve.HostResponseEnum.RejectedHomeFull) * 20);
 
-            var user_item = advertiseRepository.Find<User, int>(acc.UserID);
+            var user_item = advertiseRepository.Find<User, int>(acc.UserId);
             if (user_item != null)
             {
                 score_item += user_item.UserScore;
             }
-            acc.AdvertiseScore = score_item;
+            acc.ResidenceScore = score_item;
             advertiseRepository.Update(acc);
             if (score_item > max_score)
                 max_score = score_item;
@@ -236,23 +236,23 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
         {
             IQueryable<Advertise> notPublishedAdvertises =
                 advertiseRepository.Query(q => q.Where(
-                    w => w.TodayIsEmpty == true &&
+                    w => w.EmptyTonight == true &&
                     w.Status != AdvertiseStatus.Published));
             foreach (var item in notPublishedAdvertises)
             {
-                item.TodayIsEmpty = false;
+                item.EmptyTonight = false;
                 advertiseRepository.Update(item);
             }
             advertiseRepository.Save();
             IQueryable<Advertise> notInstantReserveAdvertises =
                 advertiseRepository.Query(q => q.Where(w =>
                 w.Status == AdvertiseStatus.Published &&
-                w.TodayIsEmpty == true &&
+                w.EmptyTonight == true &&
                 w.InstantReserveStatus !=
                 InstantReserveStatusEnum.Permanent));
             foreach (var item in notInstantReserveAdvertises)
             {
-                item.TodayIsEmpty = false;
+                item.EmptyTonight = false;
                 advertiseRepository.Update(item);
             }
             advertiseRepository.Save();
@@ -265,17 +265,17 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             {
                 if (advertise.OccupiedDates().Any(a => a == today))
                 {
-                    if (advertise.TodayIsEmpty == true)
+                    if (advertise.EmptyTonight == true)
                     {
-                        advertise.TodayIsEmpty = false;
+                        advertise.EmptyTonight = false;
                         advertiseRepository.Update(advertise);
                     }
                 }
                 else
                 {
-                    if (advertise.TodayIsEmpty == false)
+                    if (advertise.EmptyTonight == false)
                     {
-                        advertise.TodayIsEmpty = true;
+                        advertise.EmptyTonight = true;
                         advertiseRepository.Update(advertise);
                     }
                 }
@@ -287,7 +287,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
         public Task<Unit> Handle(UpdateAccUserRatingCommand request, CancellationToken cancellationToken)
         {
             var acc = advertiseRepository.Find(request.advertiseId);
-            acc.AverageUserRating = (float)acc.ReportItems.Average(a => a.Score);
+            acc.AverageUsersScore = (float)acc.ReportItems.Average(a => a.Score);
             advertiseRepository.Update(acc);
             advertiseRepository.Save();
             return Task.FromResult(Unit.Value);
@@ -296,7 +296,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
         public Task<Unit> Handle(UpdateAccTidinessRatingCommand request, CancellationToken cancellationToken)
         {
             var acc = advertiseRepository.Find(request.advertiseId);
-            acc.TidinessUserRating = (float)acc.ReportItems.Where(
+            acc.CleaningScore = (float)acc.ReportItems.Where(
                 w => w.ReportID == 1).Average(a => a.Score);
             advertiseRepository.Update(acc);
             advertiseRepository.Save();
@@ -339,7 +339,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
                     }
                 }
             }
-            var accCount = Math.Max(acc.Count, 1);
+            var accCount = Math.Max(acc.UnitCount, 1);
             foreach (var date in extrinsicReservedDates)
             {
                 if (acc.OccupiedTables.Count(a => a.Date == date.Value) < accCount)
@@ -444,7 +444,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             }
 
             mediator.Send(new InsertExtrinsicReserveByDateListCommand(request.AdvertiseId,
-                request.SystemCanseledReserveId, dateRangeList, acc.UserID, ActionLog.ActionSourceEnum.Background));
+                request.SystemCanseledReserveId, dateRangeList, acc.UserId, ActionLog.ActionSourceEnum.Background));
 
             return Task.FromResult(Unit.Value);
         }
@@ -485,7 +485,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
             var advertise = advertiseRepository.Find(request.AdvertiseId);
             foreach (var category in advertise.Categories)
             {
-                var advertiseList = category.Advertises.OrderByDescending(o => o.AdvertiseScore).Take(12);
+                var advertiseList = category.Advertises.OrderByDescending(o => o.ResidenceScore).Take(12);
                 if (advertiseList.Contains(advertise))
                 {
                     cacheManager.Remove($"{CacheNames.Category_Item_}{category.Id}");

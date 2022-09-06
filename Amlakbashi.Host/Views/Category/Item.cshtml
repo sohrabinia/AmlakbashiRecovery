@@ -101,6 +101,10 @@
     {
         moreFilterCount++;
     }
+    if (Model.Filming == 1)
+    {
+        moreFilterCount++;
+    }
 }
 
 @section StyleBlock {
@@ -239,7 +243,7 @@
                                 @foreach (var typeFilterItem in types)
                                 {
                                     <div onclick="changeAccTypeValue(this)" class="advertise-list__filter-select-item@(Model.T > 0 ? (Model.T == (int)typeFilterItem ? " filter-selected-item" : "") : (typeFilterItem == Model.Category.Type ? " filter-selected-item" : ""))" data-value="@((int)typeFilterItem)">
-                                        <span>@AdvertiseMainLocalization.GetAdvertiseTypeUserString(typeFilterItem)</span>
+                                        <span>@AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(typeFilterItem)</span>
                                         <i class="fa fa-check"></i>
                                     </div>
                                 }
@@ -260,7 +264,7 @@
                                         continue;
                                     }
                                     <div class="advertise-list__filter-select-item@((Model.Region != null && ((int)positionFilterItem).ToString() == Model.Region.ToString()) ? " filter-selected-item" : "")" data-value="@((int)positionFilterItem)">
-                                        <span>@AdvertiseMainLocalization.GetPositionTypeString((int)positionFilterItem)</span>
+                                        <span>@AdvertiseMainLocalization.GetPositionTypePersianName((int)positionFilterItem)</span>
                                         <i class="fa fa-check"></i>
                                     </div>
                                 }
@@ -293,9 +297,9 @@
                                         <label for="js-price-range-type-3">اجاره ماهانه</label>
                                     </div>
                                     @*<div class="advertise-list__radio-item">
-                                        <input onchange="changePriceRangeType(4)" is-checked="@(Model.PriceRangeType == 4)" type="radio" id="js-price-range-type-4" name="js-price-range-type" value="4" />
-                                        <label for="js-price-range-type-4">نوروز</label>
-                                    </div>*@
+                                            <input onchange="changePriceRangeType(4)" is-checked="@(Model.PriceRangeType == 4)" type="radio" id="js-price-range-type-4" name="js-price-range-type" value="4" />
+                                            <label for="js-price-range-type-4">نوروز</label>
+                                        </div>*@
                                 </div>
                                 <div style="display: flex;justify-content: space-around;margin-bottom:10px;">
                                     <div style="border-radius:5px;padding:5px;font:13px Liransans;display: flex;flex-flow: column;">
@@ -431,6 +435,11 @@
                                         <span>چای ساز</span>
                                         <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.TeaMaker != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
+                                    <input type="hidden" id="js-filming-input" value="@(Model.Filming)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>فیلم برداری</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Filming != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -484,7 +493,7 @@
                 if (Model.Region != null && Model.Region != "-1")
                 {
                     <div onclick="removePositionFilter()" class="advertise-list__pin-filter-list-item">
-                        <span>@AdvertiseMainLocalization.GetPositionTypeString(int.Parse(Model.Region))</span>
+                        <span>@AdvertiseMainLocalization.GetPositionTypePersianName(int.Parse(Model.Region))</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
@@ -614,6 +623,13 @@
                         <i class="fa fa-times"></i>
                     </div>
                 }
+                if (Model.Filming == 1)
+                {
+                    <div onclick="removeFilmingFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>فیلم برداری</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
             }
         </div>
     </div>
@@ -622,21 +638,21 @@
 @await Html.PartialAsync("_AdvertiseFilter", Model)
 
 @*@if (Model.Category != null && Model.Category.Province == 793)
-{
-    <div style="font: 12px Miransans;
-            margin: 10px 5% 0 5%;
-            padding: 5px;
-            background-color: #fffaed;
-            background-repeat:repeat;
-            box-shadow:0 2px 4px 0 rgba(0,0,0,.3), 0 2px 8px 0 rgba(0,0,0,.1);
-            text-align: center;">
-        <div>کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.</div>
-        <div style="display:flex;justify-content:space-evenly;">
-            <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/793/استان-اصفهان/رزرو-هتل">هتل</a>
-            <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/793/استان-اصفهان/بومگردی">اقامتگاه بومگردی</a>
+    {
+        <div style="font: 12px Miransans;
+                margin: 10px 5% 0 5%;
+                padding: 5px;
+                background-color: #fffaed;
+                background-repeat:repeat;
+                box-shadow:0 2px 4px 0 rgba(0,0,0,.3), 0 2px 8px 0 rgba(0,0,0,.1);
+                text-align: center;">
+            <div>کاربر گرامی، طبق دستور قضایی، رزرو اقامتگاه در اصفهان فقط برای اماکن دارای مجوز از سازمان گردشگری امکان پذیر است.</div>
+            <div style="display:flex;justify-content:space-evenly;">
+                <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/793/استان-اصفهان/رزرو-هتل">هتل</a>
+                <a style="border: 1px solid #e5e5e5; border-radius: 5px; padding: 5px; margin: 5px; color: #242424;background-color:white;box-shadow:1px 2px 3px 0 rgb(0 0 0 / 20%);" href="/s/793/استان-اصفهان/بومگردی">اقامتگاه بومگردی</a>
+            </div>
         </div>
-    </div>
-}*@
+    }*@
 
 @*<div class="advertise-category__special-filter-container" style="width:90%;margin:auto;">*@
 @*<a class="advertise-category__norouz_button" href="/category/category?type=@(category.Type)&a_m_p_version=false&province=@(category.Province)&city=@(category.City)&area=@(Model.Area)&norouz_special=@(norouz_special ? "false" : "true")&today_empty_homes=@(today_empty_homes ? "true" : "false")&discount_homes=@(discount_homes ? "true" : "false")">
@@ -747,9 +763,9 @@
                 <span>تخفیف دار</span>
             </div>
             @*<div id="norouz-special-filter-button" onclick="toggleNorouz()" style="background-color:@(Model.NorouzSpecial ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
-                <img width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
-                <span>ویژه نوروز</span>
-            </div>*@
+                    <img width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
+                    <span>ویژه نوروز</span>
+                </div>*@
             <div id="corona-special-filter-button" onclick="toggleHygieneProtocol()" style="background-color:@(Model.HygieneProtocol ? "#fdd835" : "white")" class="advertise-list__pin-filter-item">
                 <img width="16" height="16" rel="ضدعفونی شده" title="ضدعفونی شده" src="/file/resourceimagepng?file_name=no-virus" />
                 <span>ضدعفونی شده</span>
@@ -816,7 +832,7 @@
     </div>
 </div>
 @if (Model.Category != null && !string.IsNullOrEmpty(Model.Category.CategoryPostTitle) &&
-   string.IsNullOrEmpty(Model.Category.CategoryPostText) == false)
+  string.IsNullOrEmpty(Model.Category.CategoryPostText) == false)
 {
     <div class="advertise-category__description" style="white-space:unset;border-radius: 5px;">
         <header>

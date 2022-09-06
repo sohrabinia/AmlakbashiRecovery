@@ -427,13 +427,13 @@ namespace Portal.Controllers
                 {
                     return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 }
-                var objFile = fileService.Find(advertise.PhotoID == null ? 0 : (long)advertise.PhotoID);
+                var objFile = fileService.Find(advertise.MainPhotoId == null ? 0 : (long)advertise.MainPhotoId);
                 if (objFile == null || !System.IO.File.Exists(Path.Combine(host.WebRootPath, objFile.CorrectedFilePath)))
                 {
                     return Redirect(HtmlUtility.EncodeUrlForRedirect(string.Format("/عکس-یافت-نشد-{0}-{1}", w, h)));
                 }
                 var image_extension = Path.GetExtension(objFile.FilePath).Replace(".", "");
-                var path = string.Format("content/imgcache/img{0}_{1}_{2}." + image_extension, advertise.PhotoID, w, h);
+                var path = string.Format("content/imgcache/img{0}_{1}_{2}." + image_extension, advertise.MainPhotoId, w, h);
                 var strFormat = "image/" + image_extension;
 
                 if (!System.IO.File.Exists(Path.Combine(host.WebRootPath, path)))

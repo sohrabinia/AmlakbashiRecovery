@@ -25,10 +25,10 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
             var days = DateTimeUtility.GetPersianDateRangeDays(startDate, endDate);
             couponCalculationPrice = 0;
             var moreThanCapacity = Math.Max(0, guestCount - advertise.Capacity);
-            if (advertise.RentPrice > 0 && days >= 30)
+            if (advertise.MonthlyPrice > 0 && days >= 30)
             {
-                var price = (long)Math.Round(((double)days * (double)((double)advertise.RentPrice / 30f) / 10000f), 0) * 10000;
-                price += (moreThanCapacity * advertise.MoreThanCapacityPrice) * days;
+                var price = (long)Math.Round(((double)days * (double)((double)advertise.MonthlyPrice / 30f) / 10000f), 0) * 10000;
+                price += (moreThanCapacity * advertise.ExtraCapacityPrice) * days;
                 priceWithoutDiscount = price;
                 return price;
             }
@@ -79,13 +79,13 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                     //}
                     // ##########
 
-                    if (is_norouz && advertise.NorouzPrice > 0)
+                    if (is_norouz && advertise.NowruzPrice > 0)
                     {
-                        priceWithoutDiscount = advertise.NorouzPrice;
+                        priceWithoutDiscount = advertise.NowruzPrice;
                     }
                     else if (is_holiday_pike)
                     {
-                        priceWithoutDiscount = advertise.HolidayPikePrice > 0 ? advertise.HolidayPikePrice : advertise.DailyPrice;
+                        priceWithoutDiscount = advertise.PeakHolidayPrice > 0 ? advertise.PeakHolidayPrice : advertise.DailyPrice;
                     }
                     else if (is_holiday_or_between)
                     {
@@ -98,13 +98,13 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers
                 }
                 if (moreThanCapacity > 0)
                 {
-                    if (is_norouz && advertise.NorouzOverCapacityPrice > 0)
+                    if (is_norouz && advertise.NowruzExtraCapacityPrice > 0)
                     {
-                        priceWithoutDiscount += (moreThanCapacity * advertise.NorouzOverCapacityPrice);
+                        priceWithoutDiscount += (moreThanCapacity * advertise.NowruzExtraCapacityPrice);
                     }
                     else
                     {
-                        priceWithoutDiscount += (moreThanCapacity * advertise.MoreThanCapacityPrice);
+                        priceWithoutDiscount += (moreThanCapacity * advertise.ExtraCapacityPrice);
                     }
                 }
                 var discounts = discountTables.Where(f => gregorianDate >= f.From && gregorianDate < f.To);

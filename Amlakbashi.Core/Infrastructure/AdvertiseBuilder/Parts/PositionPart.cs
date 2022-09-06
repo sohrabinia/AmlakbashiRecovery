@@ -10,14 +10,14 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
     public class PositionPart : IPart, IValidator
     {
         [Important]
-        public PositionType Position { get; set; }
+        public PositionType LocationType { get; set; }
 
         public bool Validate(out Dictionary<string, string> errors, out string msg)
         {
             errors = new Dictionary<string, string>();
-            if ((int)Position < 1)
+            if ((int)LocationType < 1)
             {
-                errors.Add("Position", LocalizationStringData.Get("ACC_VALIDATION_POSITION"));
+                errors.Add("LocationType", LocalizationStringData.Get("ACC_VALIDATION_POSITION"));
             }
             msg = null;
             return errors.Any() == false;

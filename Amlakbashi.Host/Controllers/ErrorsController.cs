@@ -39,7 +39,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     ViewBag.isAccommodation = true;
                     ViewBag.relatedCategories = categoryService.GetLinks(
-                        acc.TypeID, acc.City == null ? 0 : (int)acc.City, -1, 1);
+                        acc.TypeID, acc.CityId == null ? 0 : (int)acc.CityId, -1, 1);
                 }
                 Response.StatusCode = 404;
                 return View();

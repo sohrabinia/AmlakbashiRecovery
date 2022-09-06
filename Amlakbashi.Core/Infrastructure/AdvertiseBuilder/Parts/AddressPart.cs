@@ -9,11 +9,11 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
     public class AddressPart : IPart, IValidator
     {
         [Important]
-        public int? Province { get; set; }
+        public int? ProvinceId { get; set; }
         [Important]
-        public int? City { get; set; }
+        public int? CityId { get; set; }
         [Important]
-        public int? Area { get; set; }
+        public int? AreaId { get; set; }
         [Important]
         public string Address { get; set; }
         public double Latitude { get; set; }
@@ -22,13 +22,13 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
         public bool Validate(out Dictionary<string, string> errors, out string msg)
         {
             errors = new Dictionary<string, string>();
-            if (Province < 1)
+            if (ProvinceId.HasValue == false || ProvinceId < 1)
             {
-                errors.Add("Province", LocalizationStringData.Get("ACC_VALIDATION_PROVINCE"));
+                errors.Add("ProvinceId", LocalizationStringData.Get("ACC_VALIDATION_PROVINCE"));
             }
-            if (City < 1)
+            if (CityId.HasValue == false || CityId < 1)
             {
-                errors.Add("City", LocalizationStringData.Get("ACC_VALIDATION_CITY"));
+                errors.Add("CityId", LocalizationStringData.Get("ACC_VALIDATION_CITY"));
             }
             if (string.IsNullOrEmpty(Address))
             {

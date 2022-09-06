@@ -7,7 +7,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
 {
     public class AdvertiseGetSupplementaryInfoForUpdateResponse
     {
-        public long id { get; set; }
+        public long residenceId { get; set; }
         public Advertise.HeatingSystemItems heatingSystem { get; set; }
         public Advertise.CoolingSystemItems coolingSystem { get; set; }
         public Advertise.WCItems wc { get; set; }
@@ -34,9 +34,9 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
         public bool party { get; set; }
         public bool pets { get; set; }
         public bool smoking { get; set; }
-        public string evidenceRequired { get; set; }
+        public string requiredEvidence { get; set; }
         public string otherRules { get; set; }
-        public int ownershipStatus { get; set; }
+        public Advertise.OwnershipTypeEnum ownershipType { get; set; }
         public string ownerPhoneNumber { get; set; }
         public string ownerFullName { get; set; }
         public bool license { get; set; }
@@ -47,18 +47,18 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
         {
             return new AdvertiseGetSupplementaryInfoForUpdateResponse()
             {
-                id = advertise.Id,
+                residenceId = advertise.Id,
                 heatingSystem = advertise.HeatingSystem,
                 coolingSystem = advertise.CoolingSystem,
                 wc = advertise.WC,
-                party = advertise.AllowParty,
-                pets = advertise.AllowPets,
-                smoking = advertise.AllowSmoking,
-                evidenceRequired = advertise.EvidenceRequired,
+                party = advertise.Party,
+                pets = advertise.Pets,
+                smoking = advertise.Smoking,
+                requiredEvidence = advertise.RequiredEvidence,
                 otherRules = advertise.OtherRules,
-                ownershipStatus = advertise.OwnershipType,
+                ownershipType = advertise.OwnershipType,
                 ownerFullName = advertise.OwnerFullName,
-                ownerPhoneNumber = advertise.OwnerMobile,
+                ownerPhoneNumber = advertise.OwnerPhoneNumber,
                 pool = advertise.Pool ?? false,
                 poolFeatures = advertise.PoolFeatures,
                 elevator = advertise.Elevator ?? false,

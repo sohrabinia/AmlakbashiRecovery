@@ -33,9 +33,9 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                 var _capacityString = "";
                 if (!hasChildren)
                 {
-                    _capacityString = item.MoreThanCapacity > 0 ?
+                    _capacityString = item.ExtraCapacity > 0 ?
                         item.Capacity + " تا " + (item.Capacity +
-                        item.MoreThanCapacity) + " مهمان" :
+                        item.ExtraCapacity) + " مهمان" :
                         item.Capacity + " مهمان";
                 }
                 var _notVerifyReasons = new List<string>();
@@ -47,7 +47,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                     {
                         if (strPropertiesSelected.Contains(string.Format(",{0},", (int)reason)))
                         {
-                            _notVerifyReasons.Add(AdvertiseMainLocalization.GetNotVerifyReasonTitle((int)reason));
+                            _notVerifyReasons.Add(AdvertiseMainLocalization.GetNotVerifyReasonPersianDesc((int)reason));
                         }
                     }
                 }
@@ -90,9 +90,9 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                             {
                                 id = child.Id,
                                 title = child.Title,
-                                todayIsEmpty = child.TodayIsEmpty,
-                                todayIsFull = !child.TodayIsEmpty && _ud.Contains(todayUnix),
-                                photoUrl = string.Format("/file/accthumblarge?accid={0}&fileid={1}", child.Id, child.PhotoID == null ? 0 : child.PhotoID),
+                                todayIsEmpty = child.EmptyTonight,
+                                todayIsFull = !child.EmptyTonight && _ud.Contains(todayUnix),
+                                photoUrl = string.Format("/file/accthumblarge?accid={0}&fileid={1}", child.Id, child.MainPhotoId == null ? 0 : child.MainPhotoId),
                                 roomUnitString = unitTitle,
                                 unavailableDates = _ud,
                                 anyComment = child.Comments.Any(a =>
@@ -116,13 +116,13 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                             {
                                 id = child.Id,
                                 title = child.Title,
-                                todayIsEmpty = child.TodayIsEmpty,
-                                todayIsFull = !child.TodayIsEmpty && _ud.Contains(todayUnix),
-                                photoUrl = string.Format("/file/accthumblarge?accid={0}&fileid={1}", child.Id, child.PhotoID == null ? 0 : child.PhotoID),
+                                todayIsEmpty = child.EmptyTonight,
+                                todayIsFull = !child.EmptyTonight && _ud.Contains(todayUnix),
+                                photoUrl = string.Format("/file/accthumblarge?accid={0}&fileid={1}", child.Id, child.MainPhotoId == null ? 0 : child.MainPhotoId),
                                 previewUrl = string.Format("/accomodation/preview?id={0}", child.Id),
                                 floor = (FloorItems)child.Floor,
-                                floorString = "طبقه: " + AdvertiseMainLocalization.GetPropertyValueTitle((FloorItems)child.Floor),
-                                roomCount = child.Room,
+                                floorString = "طبقه: " + AdvertiseMainLocalization.GetEnumPersianName((FloorItems)child.Floor),
+                                roomCount = child.RoomCount,
                                 anyComment = child.Comments.Any(a =>
                                     a.type == CommentType.advertise
                                     && a.Status == CommentStatus.publish),
@@ -130,7 +130,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                                     a.type == CommentType.advertise
                                     && a.Status == CommentStatus.publish
                                     && a.SeenByHost == false),
-                                userRating = child.AverageUserRating,
+                                userRating = child.AverageUsersScore,
                                 unavailableDates = _ud,
                                 discounts = child.DiscountTables.Select(s => (DiscountDTO)s).ToList(),
                                 isVerified = _isVerified,
@@ -164,21 +164,21 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                     mainType = _mainType,
                     isVerified = _isVerified,
                     isActivated = _isActivated,
-                    photoUrl = string.Format("/file/accthumblarge?accid={0}&fileid={1}", item.Id, item.PhotoID == null ? 0 : item.PhotoID),
+                    photoUrl = string.Format("/file/accthumblarge?accid={0}&fileid={1}", item.Id, item.MainPhotoId == null ? 0 : item.MainPhotoId),
                     previewUrl = string.Format("/accomodation/preview?id={0}", item.Id),
                     editUrl = string.Format("/accomodation/accbasicform?id={0}", item.Id),
                     status = item.Status,
-                    statusString = AdvertiseMainLocalization.GetAdvertiseStatusString((int)item.Status, true),
+                    statusString = AdvertiseMainLocalization.GetAdvertiseStatusPersianName((int)item.Status, true),
                     statusColor = AdvertiseStyleHelper.GetAdvertiseStatusColor((int)item.Status),
-                    typeString = AdvertiseMainLocalization.GetAdvertiseTypeUserString(item.TypeID),
-                    minReserveDays = item.MinReserveDays,
-                    maxReserveDays = item.MaxReserveDays,
+                    typeString = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(item.TypeID),
+                    minReserveDays = item.MinReserveDuration,
+                    maxReserveDays = item.MaxReserveDuration,
                     instantReserveStatus = item.InstantReserveStatus,
-                    maxInstantReserveStart = item.MaxInstantReserveStart,
+                    maxInstantReserveStart = item.MaxInstantReserveStartTimeInterval,
                     capacityString = _capacityString,
                     todayIsEmpty = item.AnyChildrenOrSelfIsEmpty,
                     todayIsFull = !item.AnyChildrenOrSelfIsEmpty && _unavailableDates.Contains(todayUnix),
-                    locationString = item.LocationString,
+                    locationString = item.RegionsPersianTitle,
                     notVerifyReasons = _notVerifyReasons,
                     anyComment = item.Comments.Any(a =>
                                     a.type == CommentType.advertise
@@ -187,7 +187,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                                     a.type == CommentType.advertise
                                     && a.Status == CommentStatus.publish
                                     && a.SeenByHost == false),
-                    userRating = item.AverageUserRating,
+                    userRating = item.AverageUsersScore,
                     unavailableDates = _unavailableDates,
                     extrinsicDates = _extrinsicDates,
                     discounts = _mainType != AccMainType.Single ? new List<DiscountDTO>() : item.DiscountTables.Select(s => (DiscountDTO)s).ToList(),

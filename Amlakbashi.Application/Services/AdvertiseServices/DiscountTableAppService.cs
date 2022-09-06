@@ -108,11 +108,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var today = DateTime.Now.Date;
             IQueryable<DiscountTable> discounts = Repository.Query(q => q.Include(i => i.Advertise));
             discounts = discounts.Where(x => x.Percent > 4 &&
-                x.To > today && x.Advertise.Available &&
+                x.To > today && x.Advertise.Active &&
                 x.Advertise.Status ==
                 Advertise.AdvertiseStatus.Published &&
-                x.Advertise.HideInCategory == false &&
-                x.Advertise.Count < 1);
+                x.Advertise.HideInSearch == false &&
+                x.Advertise.UnitCount < 1);
             discounts = discounts.OrderByDescending(x => x.Percent).ThenBy(x => x.From);
             return discounts.Select(x => x.Advertise).Distinct().Take(count).ToList();
         }

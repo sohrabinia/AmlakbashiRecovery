@@ -9,9 +9,9 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
 {
     public class BedDTO
     {
-        public int SingleBed { get; set; }
-        public int DoublesBed { get; set; }
-        public int BlanketsAndMattresses { get; set; }
+        public int SingleBedCount { get; set; }
+        public int DoubleBedCount { get; set; }
+        public int BlanketAndMattressCount { get; set; }
         public ExtraBlanketCountItems ExtraBlanketCount { get; set; }
     }
 }

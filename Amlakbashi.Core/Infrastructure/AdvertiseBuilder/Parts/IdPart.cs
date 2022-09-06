@@ -12,7 +12,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
     public class IdPart : IPart
     {
         public long Id { get; set; }
-        public bool Available { get; set; }
+        public bool Active { get; set; }
         public AdvertiseMode Mode { get; set; }
     }
 }

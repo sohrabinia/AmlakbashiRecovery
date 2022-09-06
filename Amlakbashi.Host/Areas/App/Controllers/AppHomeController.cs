@@ -74,17 +74,17 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 home_cat.AdvertiseItems = new List<AccommodationCardDTO>();
 
                 // Initial Advertises
-                advertises = category.Advertises.OrderByDescending(o => o.AdvertiseScore).Take(advertiseItemCount).ToList();
+                advertises = category.Advertises.OrderByDescending(o => o.ResidenceScore).Take(advertiseItemCount).ToList();
                 foreach (var adv in advertises)
                 {
-                    var rate = adv.AverageUserRating;
+                    var rate = adv.AverageUsersScore;
                     var review_count = adv.ReportItems.GroupBy(g => g.UserID).Count();
                     home_cat.Advertises.Add(new HomePageAdvertiseDTO()
                     {
                         Id = adv.Id,
                         Title = adv.Title,
                         Description = adv.Description,
-                        ImageSource = adv.PhotoID > 0 ? string.Format("/عکس-آگهی/{0}", adv.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144),
+                        ImageSource = adv.MainPhotoId > 0 ? string.Format("/عکس-آگهی/{0}", adv.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144),
                         Rate = rate,
                         ReviewCount = review_count
                     });

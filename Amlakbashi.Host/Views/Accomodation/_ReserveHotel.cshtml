@@ -45,14 +45,14 @@
                             {
                                 <div>@unit_title نوع @(i + 1)</div>
                             }
-                            <div style="padding:3px;margin:auto 5px; border-radius:4px; background-color:#fdd835;color:#242424;font:13px Miransans;">تعداد @child.HotelUnitSpecific.Count @unit_title</div>
+                            <div style="padding:3px;margin:auto 5px; border-radius:4px; background-color:#fdd835;color:#242424;font:13px Miransans;">تعداد @child.HotelUnitSpecific.UnitCount @unit_title</div>
                         </div>
 
                         <div class="reserve-complex__info-container">
                             <div class="reserve-complex__iconic-info-item">
                                 @{
-                                    var capacityString = child.Capacity.MoreThanCapacity > 0 ?
-                                        child.Capacity.Capacity + " نفر مجاز + " + child.Capacity.MoreThanCapacity + " نفر اضافه" :
+                                    var capacityString = child.Capacity.ExtraCapacity > 0 ?
+                                        child.Capacity.Capacity + " نفر مجاز + " + child.Capacity.ExtraCapacity + " نفر اضافه" :
                                         child.Capacity.Capacity + " مهمان";
                                 }
                                 @if (!string.IsNullOrEmpty(capacityString))
@@ -68,25 +68,25 @@
                                         <span class="advertise-page__amenities-main-title">
                                             <img src="/file/resourceimagepng?file_name=icons/blanket" alt="تشک و پتو" width="32" height="32" /> تشک و پتو:
                                         </span>
-                                        <span class="advertise-page__amenities-main-content">@child.Bed.BlanketsAndMattresses عدد</span>
+                                        <span class="advertise-page__amenities-main-content">@child.Bed.BlanketAndMattressCount عدد</span>
                                     </div>
                                 </div>
                             }
                             else
                             {
-                                if (child.Bed.SingleBed > 0)
+                                if (child.Bed.SingleBedCount > 0)
                                 {
                                     <div class="reserve-complex__info-container">
                                         <div class="reserve-complex__iconic-info-item">
-                                            <i class="fa fa-bed"></i><span>@(child.Bed.SingleBed + " تخت یکنفره")</span>
+                                            <i class="fa fa-bed"></i><span>@(child.Bed.SingleBedCount + " تخت یکنفره")</span>
                                         </div>
                                     </div>
                                 }
-                                if (child.Bed.DoublesBed > 0)
+                                if (child.Bed.DoubleBedCount > 0)
                                 {
                                     <div class="reserve-complex__info-container">
                                         <div class="reserve-complex__iconic-info-item">
-                                            <img width="24" height="24" src="/file/resourceimagepng?file_name=icons/double-bed" alt="تخت دونفره" /><span>@(child.Bed.DoublesBed + " تخت دونفره")</span>
+                                            <img width="24" height="24" src="/file/resourceimagepng?file_name=icons/double-bed" alt="تخت دونفره" /><span>@(child.Bed.DoubleBedCount + " تخت دونفره")</span>
                                         </div>
                                     </div>
                                 }
@@ -119,58 +119,58 @@
                                         </span>
                                     </div>
                                 }
-                                @if (child.Price.HolidayPikePrice != 0)
+                                @if (child.Price.PeakHolidayPrice != 0)
                                 {
                                     <div class="advertie-page__price-item">
                                         <span class="advertise-page__price-title">
                                             قیمت پیک تعطیلات
                                         </span>
                                         <span class="advertise-page__price-content">
-                                            @string.Format("{0:n0}", child.Price.HolidayPikePrice) تومان
+                                            @string.Format("{0:n0}", child.Price.PeakHolidayPrice) تومان
                                         </span>
                                     </div>
                                 }
-                                @if (child.Price.RentPrice != 0)
+                                @if (child.Price.MonthlyPrice != 0)
                                 {
                                     <div class="advertie-page__price-item">
                                         <span class="advertise-page__price-title">
                                             اجاره ماهیانه:
                                         </span>
                                         <span class="advertise-page__price-content">
-                                            @string.Format("{0:n0}", child.Price.RentPrice) تومان
+                                            @string.Format("{0:n0}", child.Price.MonthlyPrice) تومان
                                         </span>
                                     </div>
                                 }
-                                @if (child.Price.MoreThanCapacityPrice != 0)
+                                @if (child.Price.ExtraCapacityPrice != 0)
                                 {
                                     <div class="advertie-page__price-item">
                                         <span class="advertise-page__price-title">
                                             هزینه هر مهمان بیشتر:
                                         </span>
                                         <span class="advertise-page__price-content">
-                                            @string.Format("{0:n0}", child.Price.MoreThanCapacityPrice) تومان
+                                            @string.Format("{0:n0}", child.Price.ExtraCapacityPrice) تومان
                                         </span>
                                     </div>
                                 }
-                                @if (child.Price.NorouzPrice > 0)
+                                @if (child.Price.NowruzPrice > 0)
                                 {
                                     <div class="advertie-page__price-item js-NorouzPrice">
                                         <p class="advertise-page__price-title">
                                             <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" /> قیمت روزهای نوروز:
                                         </p>
                                         <p class="advertise-page__price-content">
-                                            @string.Format("{0:n0}", child.Price.NorouzPrice) تومان
+                                            @string.Format("{0:n0}", child.Price.NowruzPrice) تومان
                                         </p>
                                     </div>
                                 }
-                                @if (child.Price.NorouzOverCapacityPrice > 0)
+                                @if (child.Price.NowruzExtraCapacityPrice > 0)
                                 {
                                     <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
                                         <span class="advertise-page__price-title">
                                             <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" /> قیمت هر مهمان اضافه نوروز:
                                         </span>
                                         <span class="advertise-page__price-content">
-                                            @string.Format("{0:n0}", child.Price.NorouzOverCapacityPrice) تومان
+                                            @string.Format("{0:n0}", child.Price.NowruzExtraCapacityPrice) تومان
                                         </span>
                                     </div>
                                 }

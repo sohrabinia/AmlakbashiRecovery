@@ -8,6 +8,6 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
 {
     public class HotelUnitSpecificDTO
     {
-        public int Count { get; set; }
+        public int UnitCount { get; set; }
     }
 }

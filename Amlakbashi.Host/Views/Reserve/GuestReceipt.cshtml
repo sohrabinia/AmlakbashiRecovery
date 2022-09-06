@@ -10,7 +10,7 @@
     var advertise = Model.Reserve.Advertise;
     var province_name = advertise.RegionProvince.PersianName;
     var city_name = advertise.RegionCity.PersianName;
-    var area_name = advertise.Area == null ? null : advertise.RegionArea.PersianName;
+    var area_name = advertise.AreaId == null ? null : advertise.RegionArea.PersianName;
     var payed_price = Model.PayedPrice;
 
     var payable_price = Model.PayablePrice;

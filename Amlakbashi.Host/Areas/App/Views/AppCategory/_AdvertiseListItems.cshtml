@@ -75,7 +75,6 @@
         foreach (var item in Model.AdvertiseItems)
         {
             counter++;
-            //var contact_available = AdvertiseDepend.IsContactAvailable(item);
             //var img_src = item.PhotoID > 0 ? string.Format("/عکس-آگهی/{0}", item.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
             var img_src = item.PhotoID > 0 ? string.Format("/file/accthumbcard?accid={0}&fileid={1}", item.AdvertiseID, item.PhotoID) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
             var city_name = item.RegionString;

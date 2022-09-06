@@ -51,7 +51,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             string norouz_special = null, string instant_reserve = null,
             int t = -1, int priceRangeType = 0, int wcType = -1,
             int wifi = 0, int washingMachine = 0, int jacuzzi = 0,
-            int poolTable = 0, int foosball = 0, int teaMaker = 0,
+            int poolTable = 0, int foosball = 0, int teaMaker = 0, int filming = 0,
             int rules_pets = 0, int rules_party = 0, int rules_smoking = 0,
             int parking = 0, int sort = 0, string roomList = "",
             string phrase = "", string hygieneProtocol = null, bool ajax = false, string path = null)
@@ -230,7 +230,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                     empty_range_from, empty_range_to, discount_homes, instant_reserve,
                     t, (Advertise.priceRangeTypes)priceRangeType,
                     wcType, wifi == 1, washingMachine == 1, jacuzzi == 1, poolTable == 1,
-                    foosball == 1, teaMaker == 1, rules_pets == 1, rules_party == 1, rules_smoking == 1,
+                    foosball == 1, teaMaker == 1, filming == 1, rules_pets == 1, rules_party == 1, rules_smoking == 1,
                     parking == 1, sort, deserializedRoomList, phrase.Replace("-", " "),
                     string.IsNullOrEmpty(hygieneProtocol) == false && hygieneProtocol == "1");
 
@@ -270,6 +270,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 categoryItemDTO.PoolTable = poolTable;
                 categoryItemDTO.Foosball = foosball;
                 categoryItemDTO.TeaMaker = teaMaker;
+                categoryItemDTO.Filming = filming;
                 categoryItemDTO.RulesPets = rules_pets;
                 categoryItemDTO.RulesParty = rules_party;
                 categoryItemDTO.RulesSmoking = rules_smoking;
@@ -280,9 +281,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 categoryItemDTO.DiscountHomes = discount_homes != null && discount_homes == "1";
                 categoryItemDTO.InstantReserve = instant_reserve != null && instant_reserve == "1";
                 categoryItemDTO.RoomList = roomList;
-                categoryItemDTO.Type = category == null ?
-                    Advertise.AdvertiseTypeToHeadType(type) :
-                    (int)category.ParentAccType;
+                categoryItemDTO.Type = (int)category.ParentAccType;
                 categoryItemDTO.T = t;
                 categoryItemDTO.Sort = sort;
                 var areaRegionRelated = area < 1 ? null : regionService.Find(area).Related;
@@ -293,7 +292,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                     : (category == null ? new List<DynamicCategory>() :
                     categoryService.GetRelatedCategories(category.Id, areaRegionRelatedIds, model.Count()));
 
-                categoryItemDTO.AnyTodayEmpty = today_empty_homes == "1" || model.Any(x => x.TodayIsEmpty || x.Childs.All(y => y.TodayIsEmpty));
+                categoryItemDTO.AnyTodayEmpty = today_empty_homes == "1" || model.Any(x => x.EmptyTonight || x.Childs.All(y => y.EmptyTonight));
 
                 var pages_count = Math.Max(1, Math.Ceiling((float)((float)model.Count() / 12f)));
                 categoryItemDTO.PagesCount = pages_count;
@@ -407,7 +406,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 categoryItemDTO.PriceString = priceString;
 
                 categoryItemDTO.AccTypeString = t > 0 ?
-                    AdvertiseMainLocalization.GetAdvertiseTypeUserString((Advertise.AdvertiseType)t) :
+                    AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser((Advertise.AdvertiseType)t) :
                     (category.Type != Advertise.AdvertiseType.All ? category.TypeString : "");
 
                 List<int> roomListIds = null;
@@ -521,7 +520,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             bool norouz_special = false, bool today_empty_homes = false,
             bool discount_homes = false, int country_direction = 0, int page = 1,
             bool instant_reserve = false, int t = -1, int priceRangeType = 0,
-            int perWC = 0, int euWC = 0,
+            int perWC = 0, int euWC = 0, int filming = 0,
             int wifi = 0, int washingMachine = 0, int jacuzzi = 0,
             int poolTable = 0, int foosball = 0, int teaMaker = 0,
             int rules_pets = 0, int rules_party = 0, int rules_smoking = 0,
@@ -742,6 +741,11 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 query_string = HtmlUtility.AddToQueryString(query_string,
                     "teaMaker", "1");
             }
+            if (filming == 1)
+            {
+                query_string = HtmlUtility.AddToQueryString(query_string,
+                    "filming", "1");
+            }
             if (rules_pets == 1)
             {
                 query_string = HtmlUtility.AddToQueryString(query_string,
@@ -797,6 +801,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 poolTable,
                 foosball,
                 teaMaker,
+                filming,
                 rules_pets,
                 rules_party,
                 rules_smoking,

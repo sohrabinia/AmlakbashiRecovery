@@ -6,8 +6,8 @@
     var capacityString = string.Empty;
     if (Model.AdvertiseMode != Advertise.AdvertiseMode.Parent)
     {
-        capacityString = Model.Capacity.MoreThanCapacity > 0 ?
-            Model.Capacity.Capacity + " نفر مجاز + " + Model.Capacity.MoreThanCapacity + " نفر اضافه" :
+        capacityString = Model.Capacity.ExtraCapacity > 0 ?
+            Model.Capacity.Capacity + " نفر مجاز + " + Model.Capacity.ExtraCapacity + " نفر اضافه" :
             Model.Capacity.Capacity + " مهمان";
     }
 }
@@ -17,13 +17,13 @@
     {
         <p class="advertise-page__basic-property-item"><i class="fa fa-users"></i>@capacityString</p>
     }
-    @if (Model.Room.Room != 0)
+    @if (Model.Room.RoomCount != 0)
     {
-        <p class="advertise-page__basic-property-item"><i class="fa fa-columns"></i>@Model.Room.Room اتاق</p>
+        <p class="advertise-page__basic-property-item"><i class="fa fa-columns"></i>@Model.Room.RoomCount اتاق</p>
     }
-    @if (Model.BuildingSize.Metrazh != 0)
+    @if (Model.BuildingSize.BuildingArea != 0)
     {
-        <p class="advertise-page__basic-property-item"><i class="fa fa-building"></i>بنا : @Model.BuildingSize.Metrazh متر</p>
+        <p class="advertise-page__basic-property-item"><i class="fa fa-building"></i>بنا : @Model.BuildingSize.BuildingArea متر</p>
     }
     @if (Model.LandArea.LandArea != 0)
     {
@@ -37,36 +37,36 @@
             @switch ((Advertise.ParkingItems)Model.Parking.Parking)
             {
                 case Advertise.ParkingItems.One:
-                    <i class="fa fa-warehouse"></i>@("1 پارکینگ")
+                    <i class="fas fa-parking"></i>@("1 پارکینگ")
                     break;
                 case Advertise.ParkingItems.Two:
-                    <i class="fa fa-warehouse"></i>@("2 پارکینگ")
+                    <i class="fas fa-parking"></i>@("2 پارکینگ")
                     break;
                 case Advertise.ParkingItems.Three:
-                    <i class="fa fa-warehouse"></i>@("3 پارکینگ")
+                    <i class="fas fa-parking"></i>@("3 پارکینگ")
                     break;
                 case Advertise.ParkingItems.MoreThanThree:
-                    <i class="fa fa-warehouse"></i>@("بیشتر از 3 پارکینگ")
+                    <i class="fas fa-parking"></i>@("بیشتر از 3 پارکینگ")
                     break;
                 @*case Advertise.ParkingItems.Jointly:
                     <i class="fa fa-warehouse"></i>@("پارکینگ مشاع")
                     break;*@
                 case Advertise.ParkingItems.NoParking:
-                    <i class="fa fa-warehouse"></i>@("بدون پارکینگ")
+                    <i class="fas fa-parking"></i>@("بدون پارکینگ")
                     break;
                 default:
                     break;
             }
         </p>
     }
-    @if (Model.Bed.SingleBed != 0)
+    @if (Model.Bed.SingleBedCount != 0)
     {
-        <p class="advertise-page__basic-property-item"><i class="fa fa-bed"></i>@Model.Bed.SingleBed تخت یک نفره</p>
+        <p class="advertise-page__basic-property-item"><i class="fa fa-bed"></i>@Model.Bed.SingleBedCount تخت یک نفره</p>
     }
-    @if (Model.Bed.DoublesBed != 0)
+    @if (Model.Bed.DoubleBedCount != 0)
     {
         <div class="advertise-page__basic-property-item">
-            <img width="24" height="24" src="/file/resourceimagepng?file_name=icons/double-bed" alt="تخت دونفره" />@Model.Bed.DoublesBed تخت دو نفره
+            <img width="24" height="24" src="/file/resourceimagepng?file_name=icons/double-bed" alt="تخت دونفره" />@Model.Bed.DoubleBedCount تخت دو نفره
         </div>
     }
     @if (Model.Floor.Floor != Advertise.FloorItems.Unset)
@@ -88,5 +88,12 @@
                     break;
             }
         </p>
+    }
+    @if ((Model.AdvertiseType.TypeID == Advertise.AdvertiseType.Villa ||
+      Model.AdvertiseType.TypeID == Advertise.AdvertiseType.House)
+      && Model.AdvertiseType.VillaType != Advertise.VillaTypeEnum.Unset)
+    {
+        var villaTypeStr = Model.AdvertiseType.VillaType == Advertise.VillaTypeEnum.Exclusive ? "ویلا دربست" : "ویلا مشترک";
+        <p class="advertise-page__basic-property-item"><i class="fas fa-warehouse"></i>@villaTypeStr</p>
     }
 </div>

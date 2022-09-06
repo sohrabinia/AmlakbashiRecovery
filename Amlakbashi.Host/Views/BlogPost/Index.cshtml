@@ -141,7 +141,7 @@
                             }
                             else
                             {
-                                @(Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianString((int)item.BlogPost.AccommodationType))
+                                @(Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianName((int)item.BlogPost.AccommodationType))
                             }
                         </td>
                         <td>
@@ -154,7 +154,7 @@
                                 <div style="display:flex;flex-flow:column;justify-content:center;align-items:center;">
                                     @if ((Advertise.PositionType)item.BlogPost.PositionType != Advertise.PositionType.none && (int)item.BlogPost.PositionType > 0)
                                     {
-                                        <div>موقعیت: @Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetPositionTypeString((int)item.BlogPost.PositionType)</div>
+                                        <div>موقعیت: @Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetPositionTypePersianName((int)item.BlogPost.PositionType)</div>
                                     }
                                     @if (item.BlogPost.PoolStatus == BlogPost.PoolStatusEnum.WithPool)
                                     {

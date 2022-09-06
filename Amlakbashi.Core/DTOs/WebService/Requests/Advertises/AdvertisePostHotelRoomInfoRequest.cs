@@ -33,7 +33,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         public int holidayPrice { get; set; }
 
         [Range(1, int.MaxValue)]
-        public int holidayPikePrice { get; set; }
+        public int peakHolidayPrice { get; set; }
 
         [Range(1, int.MaxValue)]
         public int extraCapacityPrice { get; set; }
@@ -42,13 +42,13 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         public long monthlyPrice { get; set; }
 
         [Range(1, int.MaxValue)]
-        public int norouzPrice { get; set; }
+        public int nowruzPrice { get; set; }
 
         [Range(1, int.MaxValue)]
-        public int norouzExtraCapacityPrice { get; set; }
+        public int nowruzExtraCapacityPrice { get; set; }
 
         [Range(1, int.MaxValue)]
-        public int metrazh { get; set; }
+        public int buildingArea { get; set; }
 
         [Range(0, int.MaxValue)]
         public int count { get; set; }
@@ -57,10 +57,10 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         public int singleBedCount { get; set; }
 
         [Range(0, int.MaxValue)]
-        public int doublesBedCount { get; set; }
+        public int doubleBedCount { get; set; }
 
         [Range(0, int.MaxValue)]
-        public int blanketsAndMattressesCount { get; set; }
+        public int blanketAndMattressCount { get; set; }
         public Advertise.ExtraBlanketCountItems extraBlanketCount { get; set; }
 
         [BindNever]

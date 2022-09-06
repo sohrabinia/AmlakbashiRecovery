@@ -75,19 +75,19 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                     {
                         input = input.Where(w =>
                             (w.Title != null && w.Title.Contains(str)) ||
-                            (w.LocationString != null && w.LocationString.Contains(str)) ||
+                            (w.RegionsPersianTitle != null && w.RegionsPersianTitle.Contains(str)) ||
                             (w.Title != null && w.Title.Contains(kolah)) ||
-                            (w.LocationString != null && w.LocationString.Contains(kolah)));
+                            (w.RegionsPersianTitle != null && w.RegionsPersianTitle.Contains(kolah)));
                     }
                     else
                     {
                         input = input.Where(w =>
                             (w.Title != null && w.Title.Contains(str)) ||
                             (w.Address != null && w.Address.Contains(str)) ||
-                            (w.LocationString != null && w.LocationString.Contains(str)) ||
+                            (w.RegionsPersianTitle != null && w.RegionsPersianTitle.Contains(str)) ||
                             (w.Title != null && w.Title.Contains(kolah)) ||
                             (w.Address != null && w.Address.Contains(kolah)) ||
-                            (w.LocationString != null && w.LocationString.Contains(kolah)));
+                            (w.RegionsPersianTitle != null && w.RegionsPersianTitle.Contains(kolah)));
                     }
                 }
                 else
@@ -99,13 +99,13 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                             input = input.Where(w =>
                                 (w.Title != null && w.Title.Contains("سوئیت")) ||
                                 (w.Title != null && w.Title.Contains("سوییت")) ||
-                                (w.LocationString != null && w.LocationString.Contains(str)));
+                                (w.RegionsPersianTitle != null && w.RegionsPersianTitle.Contains(str)));
                         }
                         else
                         {
                             input = input.Where(w =>
                                 (w.Title != null && w.Title.Contains(str)) ||
-                                (w.LocationString != null && w.LocationString.Contains(str)));
+                                (w.RegionsPersianTitle != null && w.RegionsPersianTitle.Contains(str)));
                         }
                     }
                     else
@@ -116,14 +116,14 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                                 (w.Title != null && w.Title.Contains("سوئیت")) ||
                                 (w.Title != null && w.Title.Contains("سوییت")) ||
                                 (w.Address != null && w.Address.Contains(str)) ||
-                                (w.LocationString != null && w.LocationString.Contains(str)));
+                                (w.RegionsPersianTitle != null && w.RegionsPersianTitle.Contains(str)));
                         }
                         else
                         {
                             input = input.Where(w =>
                                 (w.Title != null && w.Title != null && w.Title.Contains(str)) ||
                                 (w.Address != null && w.Address.Contains(str)) ||
-                                (w.LocationString != null && w.LocationString.Contains(str)));
+                                (w.RegionsPersianTitle != null && w.RegionsPersianTitle.Contains(str)));
                         }
                     }
                 }
@@ -148,13 +148,13 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                                 relatedPrice = item.Childs.Min(x => x.HolidayPrice);
                                 break;
                             case priceRangeTypes.HolidayPeak:
-                                relatedPrice = item.Childs.Min(x => x.HolidayPikePrice);
+                                relatedPrice = item.Childs.Min(x => x.PeakHolidayPrice);
                                 break;
                             case priceRangeTypes.Monthly:
-                                relatedPrice = item.Childs.Min(x => x.RentPrice);
+                                relatedPrice = item.Childs.Min(x => x.MonthlyPrice);
                                 break;
                             case priceRangeTypes.Norouz:
-                                relatedPrice = item.Childs.Min(x => x.NorouzPrice);
+                                relatedPrice = item.Childs.Min(x => x.NowruzPrice);
                                 break;
                             default:
                                 relatedPrice = item.Childs.Min(x => x.DailyPrice);
@@ -169,13 +169,13 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                                 relatedPrice = item.HolidayPrice;
                                 break;
                             case priceRangeTypes.HolidayPeak:
-                                relatedPrice = item.HolidayPikePrice;
+                                relatedPrice = item.PeakHolidayPrice;
                                 break;
                             case priceRangeTypes.Monthly:
-                                relatedPrice = item.RentPrice;
+                                relatedPrice = item.MonthlyPrice;
                                 break;
                             case priceRangeTypes.Norouz:
-                                relatedPrice = item.NorouzPrice;
+                                relatedPrice = item.NowruzPrice;
                                 break;
                             default:
                                 relatedPrice = item.DailyPrice;
@@ -203,13 +203,13 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                                 relatedPrice = item.Childs.Min(x => x.HolidayPrice);
                                 break;
                             case priceRangeTypes.HolidayPeak:
-                                relatedPrice = item.Childs.Min(x => x.HolidayPikePrice);
+                                relatedPrice = item.Childs.Min(x => x.PeakHolidayPrice);
                                 break;
                             case priceRangeTypes.Monthly:
-                                relatedPrice = item.Childs.Min(x => x.RentPrice);
+                                relatedPrice = item.Childs.Min(x => x.MonthlyPrice);
                                 break;
                             case priceRangeTypes.Norouz:
-                                relatedPrice = item.Childs.Min(x => x.NorouzPrice);
+                                relatedPrice = item.Childs.Min(x => x.NowruzPrice);
                                 break;
                             default:
                                 relatedPrice = item.Childs.Min(x => x.DailyPrice);
@@ -224,13 +224,13 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                                 relatedPrice = item.HolidayPrice;
                                 break;
                             case priceRangeTypes.HolidayPeak:
-                                relatedPrice = item.HolidayPikePrice;
+                                relatedPrice = item.PeakHolidayPrice;
                                 break;
                             case priceRangeTypes.Monthly:
-                                relatedPrice = item.RentPrice;
+                                relatedPrice = item.MonthlyPrice;
                                 break;
                             case priceRangeTypes.Norouz:
-                                relatedPrice = item.NorouzPrice;
+                                relatedPrice = item.NowruzPrice;
                                 break;
                             default:
                                 relatedPrice = item.DailyPrice;
@@ -256,11 +256,11 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                 {
                     if (room_int < 5)
                     {
-                        input = input.Where(a => a.Room == room_int);
+                        input = input.Where(a => a.RoomCount == room_int);
                     }
                     else
                     {
-                        input = input.Where(a => a.Room >= room_int);
+                        input = input.Where(a => a.RoomCount >= room_int);
                     }
                 }
             }
@@ -269,12 +269,12 @@ namespace Amlakbashi.Core.Infrastructure.FilterHelpers
                 if (roomList.Contains(5))
                 {
                     input = input.Where(a =>
-                        a.Room > 4 ||
-                        roomList.Contains(a.Room));
+                        a.RoomCount > 4 ||
+                        roomList.Contains(a.RoomCount));
                 }
                 else
                 {
-                    input = input.Where(a => roomList.Contains(a.Room));
+                    input = input.Where(a => roomList.Contains(a.RoomCount));
                 }
             }
             return input;

@@ -24,36 +24,36 @@
         </p>
     </div>
 }
-@if (Model.HolidayPikePrice != 0)
+@if (Model.PeakHolidayPrice != 0)
 {
     <div class="advertie-page__price-item js-HolidayPikePrice">
         <p class="advertise-page__price-title">
             قیمت پیک تعطیلات:
         </p>
         <p class="advertise-page__price-content">
-            @string.Format("{0:n0}", Model.HolidayPikePrice) تومان
+            @string.Format("{0:n0}", Model.PeakHolidayPrice) تومان
         </p>
     </div>
 }
-@if (Model.RentPrice != 0)
+@if (Model.MonthlyPrice != 0)
 {
     <div class="advertie-page__price-item js-RentPrice">
         <p class="advertise-page__price-title">
             اجاره ماهیانه:
         </p>
         <p class="advertise-page__price-content">
-            @string.Format("{0:n0}", Model.RentPrice) تومان
+            @string.Format("{0:n0}", Model.MonthlyPrice) تومان
         </p>
     </div>
 }
-@if (Model.MoreThanCapacityPrice != 0)
+@if (Model.ExtraCapacityPrice != 0)
 {
     <div class="advertie-page__price-item js-MoreThanCapacityPrice">
         <p class="advertise-page__price-title">
             هزینه هر مهمان بیشتر:
         </p>
         <p class="advertise-page__price-content">
-            @string.Format("{0:n0}", Model.MoreThanCapacityPrice) تومان
+            @string.Format("{0:n0}", Model.ExtraCapacityPrice) تومان
         </p>
     </div>
 }

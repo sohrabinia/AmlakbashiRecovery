@@ -170,7 +170,7 @@ namespace Amlakbashi.Application.Services.FileServices
             {
                 serviceResult.AddError("advertise id is incorrect");
             }
-            if (advertise != null && advertise.UserID != request.userId)
+            if (advertise != null && advertise.UserId != request.userId)
             {
                 serviceResult.AddError("user is incorrect");
             }
@@ -220,7 +220,7 @@ namespace Amlakbashi.Application.Services.FileServices
             {
                 serviceResult.AddError("advertise Id is incorrect");
             }
-            if (advertise.UserID != userId)
+            if (advertise.UserId != userId)
             {
                 serviceResult.AddError("user is incorrect");
             }

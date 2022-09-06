@@ -25,10 +25,13 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
         public bool WashingMachine { get; set; }
         public bool Hairdryer { get; set; }
         public WCItems WC { get; set; }
+        public EuropeanToiletTypeEnum EuropeanToiletType { get; set; }
         public bool PoolTable { get; set; }
         public bool Foosball { get; set; }
         public bool Sauna { get; set; }
         public bool Jacuzzi { get; set; }
         public bool Pool { get; set; }
+        public bool Balcony { get; set; }
+        public bool Filming { get; set; }
     }
 }

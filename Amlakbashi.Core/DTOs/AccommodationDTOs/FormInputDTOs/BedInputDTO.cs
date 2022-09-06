@@ -11,9 +11,9 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
     [Serializable]
     public class BedInputDTO
     {
-        public int SingleBed { get; set; }
-        public int DoublesBed { get; set; }
-        public int BlanketsAndMattresses { get; set; }
+        public int SingleBedCount { get; set; }
+        public int DoubleBedCount { get; set; }
+        public int BlanketAndMattressCount { get; set; }
         public ExtraBlanketCountItems ExtraBlanketCount { get; set; }
         public List<DTOSelectItem> extraBlanketSelectItems { get; set; }
         public BedInputDTO()

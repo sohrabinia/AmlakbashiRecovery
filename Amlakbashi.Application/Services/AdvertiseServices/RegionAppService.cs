@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Amlakbashi.Core.Entities.Region;
-using Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs;
 using Amlakbashi.Application.DTOs;
 using Amlakbashi.Core.DTOs.WebService.Responses.Regions;
 
@@ -51,11 +50,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public Region Find(int id)
         {
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-        }
-
-        public IList<Region> GetAll()
-        {
-            return Repository.Query(q => q).ToList();
         }
 
         public IList<RegionListDTO> GetList(int regionId, int type, bool withSubRegions)
@@ -137,12 +131,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 dic.Add(item, new string[] { provinceName, cityName, areaName });
             }
             return dic;
-        }
-
-        public ApiRegionTotalDTO GetRegionHierarchy()
-        {
-            var allRegions = Repository.Query(q => q);
-            return ApiRegionTotalDTO.Generate(allRegions);
         }
 
         public IList<Region> GetBySearchRegion(string search_string)

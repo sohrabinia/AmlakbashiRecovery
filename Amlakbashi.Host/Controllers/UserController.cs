@@ -251,7 +251,7 @@ namespace Amlakbashi.Host.Controllers
                         case Entities.User.UserFilterType.ActiveHost:
                             model = model.Where(x => x.Type == (int)Entities.User.UserGeneralTypeEnum.Host);
                             IQueryable<Advertise> allAdvertises = advertiseService.GetAllAsIQueriable();
-                            var userIds = allAdvertises.Where(x => x.Status == AdvertiseStatus.Published).Select(x => x.UserID).Distinct().ToList();
+                            var userIds = allAdvertises.Where(x => x.Status == AdvertiseStatus.Published).Select(x => x.UserId).Distinct().ToList();
                             model = model.Where(x => userIds.Contains(x.Id));
                             break;
                         case Entities.User.UserFilterType.Host:
@@ -310,8 +310,8 @@ namespace Amlakbashi.Host.Controllers
                     var unixDate = DateTimeUtility.DateValueOfJS(gregorianDate);
                     IQueryable<Advertise> advertises = advertiseService.GetAllAsIQueriable();
                     advertises = advertises.Where(x => x.Status != AdvertiseStatus.Deleted);
-                    advertises = advertises.Where(x => x.unixNorouzMinRequestDate >= unixDate);
-                    var userIds = advertises.Select(x => x.UserID).Distinct().ToList();
+                    advertises = advertises.Where(x => x.MinReserveDateForNowruz >= unixDate);
+                    var userIds = advertises.Select(x => x.UserId).Distinct().ToList();
                     model = model.Where(x => userIds.Contains(x.Id));
                 }
 
@@ -329,19 +329,19 @@ namespace Amlakbashi.Host.Controllers
                     {
                         model = model.Where(w => w.Advertises.Any(
                             wa => wa.Status != AdvertiseStatus.Deleted &&
-                            wa.Area == area));
+                            wa.AreaId == area));
                     }
                     else if (city > -1)
                     {
                         model = model.Where(w => w.Advertises.Any(
                             wa => wa.Status != AdvertiseStatus.Deleted &&
-                            wa.City == city));
+                            wa.CityId == city));
                     }
                     else if (province > -1)
                     {
                         model = model.Where(w => w.Advertises.Any(
                             wa => wa.Status != AdvertiseStatus.Deleted &&
-                            wa.Province == province));
+                            wa.ProvinceId == province));
                     }
                 }
 
@@ -376,7 +376,7 @@ namespace Amlakbashi.Host.Controllers
                 if (accId > 0)
                 {
                     var advertise = advertiseService.Find(accId);
-                    model = model.Where(x => x.Id == advertise.UserID);
+                    model = model.Where(x => x.Id == advertise.UserId);
                 }
 
                 if (advertise_count > 2)

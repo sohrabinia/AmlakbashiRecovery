@@ -12,7 +12,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
     {
         public long Id { get; set; }
         public Advertise.AdvertiseMode advertiseMode { get; set; }
-        public bool Available { get; set; }
+        public bool Active { get; set; }
         public AdvertiseTypeInputDTO advertiseType { get; set; }
         public PositionInputDTO position { get; set; }
         public BasicFormDTO()
@@ -27,7 +27,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             {
                 Id = id
             };
-            model.Available = director.GetAdvertisePart<IdPart>().Available;
+            model.Active = director.GetAdvertisePart<IdPart>().Active;
             model.advertiseMode = director.Mode;
             PropertyCopier<AdvertiseTypePart, AdvertiseTypeInputDTO>
                 .Copy(director.GetAdvertisePart<AdvertiseTypePart>(), model.advertiseType);

@@ -47,8 +47,8 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             response.id = advertise.Id;
             response.active = advertise.CanPublish();
             response.title = advertise.Title;
-            response.typeTitle = AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID);
-            response.hostId = advertise.UserID;
+            response.typeTitle = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(advertise.TypeID);
+            response.hostId = advertise.UserId;
             response.hostName = advertise.User.FullName;
             response.hostImageUrl = advertise.User.GetUserImageApiUrl();
             if (advertise.User.HostReserves.Any())
@@ -57,23 +57,23 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
                 / (float)advertise.User.HostReserves.Count) * 100;
             }
             response.capacity = advertise.Capacity;
-            response.extraCapacity = advertise.MoreThanCapacity;
-            response.roomCount = advertise.Room;
-            response.singleBedCount = advertise.SingleBed;
-            response.doubleBedCount = advertise.DoublesBed;
+            response.extraCapacity = advertise.ExtraCapacity;
+            response.roomCount = advertise.RoomCount;
+            response.singleBedCount = advertise.SingleBedCount;
+            response.doubleBedCount = advertise.DoubleBedCount;
             response.description = advertise.Description;
-            response.buildingArea = advertise.Metrazh;
+            response.buildingArea = advertise.BuildingArea;
             response.landArea = advertise.LandArea;
             response.floor = advertise.Floor.ToString();
             response.price = advertise.BasePrice;
-            response.extraCapacityPrice = advertise.MoreThanCapacityPrice;
+            response.extraCapacityPrice = advertise.ExtraCapacityPrice;
             response.rules = new AdvertiseRulesResponse()
             {
-                party = advertise.AllowParty,
-                pets = advertise.AllowPets,
-                smoking = advertise.AllowSmoking,
+                party = advertise.Party,
+                pets = advertise.Pets,
+                smoking = advertise.Smoking,
                 otherRules = advertise.OtherRules,
-                requiredEvidences = advertise.EvidenceRequired,
+                requiredEvidences = advertise.RequiredEvidence,
                 reserveCancellationRules = AdvertiseMainLocalization.GetReserveCancelationRules(),
                 nowruzReserveCancellationRules = AdvertiseMainLocalization.GetNowruzReserveCancelationRules()
             };
@@ -119,15 +119,15 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
                 response.units.AddRange(advertise.Childs.Select(x => new AdvertiseChildsResponse()
                 {
                     id = x.Id,
-                    roomCount = x.Room,
-                    singleBedCount = x.SingleBed,
-                    doubleBedCount = x.DoublesBed,
+                    roomCount = x.RoomCount,
+                    singleBedCount = x.SingleBedCount,
+                    doubleBedCount = x.DoubleBedCount,
                     capacity = x.Capacity,
-                    extraCapacity = x.MoreThanCapacity,
+                    extraCapacity = x.ExtraCapacity,
                     price = x.DailyPrice,
                     holidyPrice = x.HolidayPrice,
-                    peakHolidayPrice = x.HolidayPikePrice,
-                    extraCapacityPrice = x.MoreThanCapacityPrice
+                    peakHolidayPrice = x.PeakHolidayPrice,
+                    extraCapacityPrice = x.ExtraCapacityPrice
                 }));
             }
             response.imagesUrls = advertise.GetImagesUrls();

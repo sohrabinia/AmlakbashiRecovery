@@ -65,6 +65,7 @@ namespace Amlakbashi.Accounting.BankingContext.BankingEngines
             else
             {
                 result.HasError = true;
+                result.ErrorCode = data.errorCode;
                 result.ErrorMessage = data.hasError ? data.message : data.BankResult.Message;
             }
             return result;

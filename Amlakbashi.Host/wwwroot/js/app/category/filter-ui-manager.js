@@ -110,6 +110,7 @@ function updateSortUI(newData) {
 }
 
 function updateRegionUI(newData) {
+    debugger;
     $('div.advertise-list__sort-popup-item').removeClass("sort-item-selected");
     $('div#sortItem' + newData.sort).addClass("sort-item-selected");
     if (newData.area != -1) {
@@ -281,6 +282,15 @@ function updateMoreFilterContainerUI(newData) {
         $('#js-teamaker-input').next().find('img').attr('src', '/file/resourceimagepng?file_name=unchecked-3');
     }
 
+    if (newData.filming == '1') {
+        $('#js-filming-input').val('1');
+        $('#js-filming-input').next().find('img').attr('src', '/file/resourceimagepng?file_name=checked-3');
+    }
+    else {
+        $('#js-filming-input').val('-1');
+        $('#js-filming-input').next().find('img').attr('src', '/file/resourceimagepng?file_name=unchecked-3');
+    }
+
     if (newData.pets == '1') {
         $('#js-pets-input').val('1');
         $('#js-pets-input').next().find('img').attr('src', '/file/resourceimagepng?file_name=checked-3');
@@ -423,6 +433,10 @@ function updateMoreFilterBarUI(newData) {
 
     if (newData.teaMaker == '1') {
         $('.advertise-list__pin-filter-list-bottom').append('<div onclick="removeTeaMakerFilter()" class="advertise-list__pin-filter-list-item"><span>چای ساز </span><i class="fa fa-times"></i></div>');
+    }
+
+    if (newData.filming == '1') {
+        $('.advertise-list__pin-filter-list-bottom').append('<div onclick="removeFilmingFilter()" class="advertise-list__pin-filter-list-item"><span>فیلم برداری </span><i class="fa fa-times"></i></div>');
     }
 
     if (newData.pets == '1') {

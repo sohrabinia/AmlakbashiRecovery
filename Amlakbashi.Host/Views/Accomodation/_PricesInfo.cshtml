@@ -5,31 +5,38 @@
             <input type="hidden" name="residenceId" value="@Model.residenceId" />
             <div class="box-input">
                 <label>قیمت روزانه :</label>
-                <input asp-for="dailyPrice" />
+                <input onkeyup="onChangeInputPrice(this)" asp-for="dailyPrice" />
+                <small class="persian-price"></small>
             </div>
             <div class="box-input">
                 <label>قیمت تعطیلات :</label>
-                <input asp-for="holidayPrice" />
+                <input onkeyup="onChangeInputPrice(this)" asp-for="holidayPrice" />
+                <small class="persian-price"></small>
             </div>
             <div class="box-input">
                 <label>قیمت پیک تعطیلات :</label>
-                <input asp-for="peakHolidayPrice" />
+                <input onkeyup="onChangeInputPrice(this)" asp-for="peakHolidayPrice" />
+                <small class="persian-price"></small>
             </div>
             <div class="box-input">
                 <label>قیمت ماهانه :</label>
-                <input asp-for="monthlyPrice" />
+                <input onkeyup="onChangeInputPrice(this)" asp-for="monthlyPrice" />
+                <small class="persian-price"></small>
             </div>
             <div class="box-input">
                 <label>قیمت نوروز :</label>
-                <input asp-for="norouzPrice" />
+                <input onkeyup="onChangeInputPrice(this)" asp-for="norouzPrice" />
+                <small class="persian-price"></small>
             </div>
             <div class="box-input">
                 <label>قیمت ظرفیت اضافه :</label>
-                <input asp-for="extraCapacityPrice" />
+                <input onkeyup="onChangeInputPrice(this)" asp-for="extraCapacityPrice" />
+                <small class="persian-price"></small>
             </div>
             <div class="box-input">
                 <label>قیمت ظرفیت اضافه نوروز :</label>
-                <input asp-for="norouzExtraCapacityPrice" />
+                <input onkeyup="onChangeInputPrice(this)" asp-for="norouzExtraCapacityPrice" />
+                <small class="persian-price"></small>
             </div>
             <div class="box-button">
                 <button type="button" onclick="updateMainPrices()">ثبت</button>
@@ -42,7 +49,10 @@
                             new ModelStateDictionary()) { { "class", "price-date-picker" } })
             </div>
             <div class="box-button">
-                <input class="js-price-input" type="number">
+                <div>
+                    <input onkeyup="onChangeInputPrice(this)" class="js-price-input" type="number">
+                    <small class="persian-price"></small>
+                </div>
                 <button type="button" onclick="updateManualPrices(@Model.residenceId)">ثبت قیمت</button>
             </div>
         </div>

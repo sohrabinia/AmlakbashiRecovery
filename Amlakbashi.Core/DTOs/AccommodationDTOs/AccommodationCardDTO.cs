@@ -52,28 +52,28 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             dto.Description = advertise.Description;
             dto.Slug = advertise.Slug;
             dto.DailyPrice = advertise.BasePrice;
-            dto.NorouzPrice = advertise.NorouzPrice;
+            dto.NorouzPrice = advertise.NowruzPrice;
             dto.AdvertiseType = advertise.TypeID;
             dto.AdvertiseTypeString = !has_child ? null :
-                AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID);
-            dto.Room = advertise.Room;
+                AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(advertise.TypeID);
+            dto.Room = advertise.RoomCount;
             dto.MinCapacity = has_child ? advertise.Childs.Max(m => m.Capacity) : advertise.Capacity;
-            dto.MaxCapacity = has_child ? dto.MinCapacity : advertise.Capacity + advertise.MoreThanCapacity;
-            dto.TodayIsEmpty = advertise.TodayIsEmpty || (has_child && advertise.Childs.Any(x => x.TodayIsEmpty));
-            dto.OverallRate = advertise.AverageUserRating;
+            dto.MaxCapacity = has_child ? dto.MinCapacity : advertise.Capacity + advertise.ExtraCapacity;
+            dto.TodayIsEmpty = advertise.EmptyTonight || (has_child && advertise.Childs.Any(x => x.EmptyTonight));
+            dto.OverallRate = advertise.AverageUsersScore;
             //RateCount = rate_count,
             dto.RateCount = 0; //TODO replace with proper value
-            dto.PhotoID = advertise.PhotoID == null ? 0 : (int)advertise.PhotoID;
+            dto.PhotoID = advertise.MainPhotoId == null ? 0 : (int)advertise.MainPhotoId;
             dto.HasChild = has_child;
             dto.instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent;
-            dto.minReserveDays = advertise.MinReserveDays;
-            dto.maxReserveDays = advertise.MaxReserveDays;
+            dto.minReserveDays = advertise.MinReserveDuration;
+            dto.maxReserveDays = advertise.MaxReserveDuration;
             dto.address = advertise.Address;
             dto.DiscountPercent = discountPercent;
             dto.DiscountDateString = discountDateString;
             dto.provinceName = advertise.RegionProvince.PersianName;
             dto.cityName = advertise.RegionCity.PersianName;
-            dto.areaName = advertise.Area != null ? advertise.RegionArea.PersianName : null;
+            dto.areaName = advertise.AreaId != null ? advertise.RegionArea.PersianName : null;
             dto.RegionString = RegionLocalization.GetAccItemRegionString(dto.provinceName, dto.cityName, dto.areaName,
                         (int)advertise.CountryDirection);
             return dto;

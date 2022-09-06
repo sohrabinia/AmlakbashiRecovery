@@ -5,10 +5,10 @@
 @{
     var mainAmenities = Model.Amenities.HeatingSystem != Advertise.HeatingSystemItems.Unset ||
         Model.Amenities.CoolingSystem != Advertise.CoolingSystemItems.Unset || Model.Amenities.WC != Advertise.WCItems.Unset
-        || Model.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset || Model.Bed.BlanketsAndMattresses != 0
+        || Model.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset || Model.Bed.BlanketAndMattressCount != 0
         ? true : false;
     var detailedAmenities = Model.Elevator.Elevator || Model.Amenities.Bathroom || Model.Amenities.Pool ||
-        Model.Amenities.Sauna || Model.Amenities.Jacuzzi || Model.Amenities.TV || Model.Amenities.Wifi ||
+        Model.Amenities.Sauna || Model.Amenities.Jacuzzi || Model.Amenities.TV || Model.Amenities.Wifi || Model.Amenities.Filming ||
         Model.Amenities.WashingMachine || Model.Amenities.Refrigerator || Model.Amenities.Oven || Model.Amenities.MicrowaveOven ||
         Model.Amenities.KitchenHood || Model.Amenities.KitchenUtensils || Model.Amenities.Hairdryer || Model.Amenities.SoundSystem ||
         Model.Amenities.TeaMaker || Model.Amenities.Foosball || Model.Amenities.Golf || Model.Amenities.PoolTable ? true : false;
@@ -112,14 +112,37 @@
                                 break;
                         }
                     </div>
+
+                    @if ((Model.Amenities.WC == Advertise.WCItems.Europian ||
+                        Model.Amenities.WC == Advertise.WCItems.EuropianAndPersian) &&
+                        Model.Amenities.EuropeanToiletType != Advertise.EuropeanToiletTypeEnum.Unset)
+                    {
+                        <div class="advertise-page__amenities-main-item">
+                            <p class="advertise-page__amenities-main-title">
+                                <i class="fa fa-toilet"></i> نوع سرویس بهداشتی فرنگی:
+                            </p>
+                            @switch (Model.Amenities.EuropeanToiletType)
+                            {
+                                case Advertise.EuropeanToiletTypeEnum.Fixed:
+                                    <p class="advertise-page__amenities-main-content">ثابت</p>
+                                    break;
+                                case Advertise.EuropeanToiletTypeEnum.Portable:
+                                    <p class="advertise-page__amenities-main-content">سیار</p>
+                                    break;
+                                case Advertise.EuropeanToiletTypeEnum.FixedAndPortable:
+                                    <p class="advertise-page__amenities-main-content">ثابت و سیار</p>
+                                    break;
+                            }
+                        </div>
+                    }
                 }
-                @if (Model.Bed.BlanketsAndMattresses != 0)
+                @if (Model.Bed.BlanketAndMattressCount != 0)
                 {
                     <div class="advertise-page__amenities-main-item">
                         <p class="advertise-page__amenities-main-title">
                             <img src="/file/resourceimagepng?file_name=icons/blanket" alt="تشک و پتو" width="32" height="32" /> تشک و پتو:
                         </p>
-                        <p class="advertise-page__amenities-main-content">@Model.Bed.BlanketsAndMattresses عدد</p>
+                        <p class="advertise-page__amenities-main-content">@Model.Bed.BlanketAndMattressCount عدد</p>
                     </div>
                 }
                 @if (Model.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset)
@@ -327,6 +350,20 @@
                     <div class="advertise-page__amenities-detail-item">
                         <p>گلف <i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
                         <i class="fa fa-golf-ball"></i>
+                    </div>
+                }
+                @if (Model.Amenities.Filming)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>فیلم برداری<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <i class="fas fa-video"></i>
+                    </div>
+                }
+                @if (Model.Amenities.Balcony)
+                {
+                    <div class="advertise-page__amenities-detail-item">
+                        <p>بالکن<i class="fa fa-check" style="color: #34A853;font-size:18px;"></i></p>
+                        <i class="fas fa-ruler-horizontal"></i>
                     </div>
                 }
             </div>

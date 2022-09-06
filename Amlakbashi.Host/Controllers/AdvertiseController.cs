@@ -135,9 +135,9 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var objad = advertiseService.FindIncludingDeleted(ad.Id);
-                if (objad.UserID != ad.UserID)
+                if (objad.UserId != ad.UserId)
                 {
-                    var host_user = userService.Find(ad.UserID);
+                    var host_user = userService.Find(ad.UserId);
                     if (host_user.Type < 1)
                     {
                         userService.UpdateUserGeneralType(host_user.Id, Entities.User.UserGeneralTypeEnum.Host);
@@ -341,7 +341,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(advertiseID);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {

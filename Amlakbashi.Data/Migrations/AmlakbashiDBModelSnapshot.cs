@@ -62,35 +62,26 @@ namespace Amlakbashi.Data.Migrations
                         .HasColumnType("bigint")
                         .UseIdentityColumn();
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("AdvertiseScore")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("AlbumPhoto")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("AllowParty")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AllowPets")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AllowSmoking")
-                        .HasColumnType("bit");
-
                     b.Property<int>("AmlakbashiScore")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Area")
+                    b.Property<int?>("AreaId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Available")
-                        .HasColumnType("bit");
-
-                    b.Property<float>("AverageUserRating")
+                    b.Property<float>("AverageUsersScore")
                         .HasColumnType("real");
+
+                    b.Property<bool?>("Balcony")
+                        .HasColumnType("bit");
 
                     b.Property<int>("BasePrice")
                         .HasColumnType("int");
@@ -98,22 +89,22 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<bool?>("Bathroom")
                         .HasColumnType("bit");
 
-                    b.Property<int>("BlanketsAndMattresses")
+                    b.Property<int>("BlanketAndMattressCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BuildingArea")
                         .HasColumnType("int");
 
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
-                    b.Property<int?>("City")
+                    b.Property<int?>("CityId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ContactClick")
-                        .HasColumnType("int");
+                    b.Property<float>("CleaningScore")
+                        .HasColumnType("real");
 
                     b.Property<int>("CoolingSystem")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Count")
                         .HasColumnType("int");
 
                     b.Property<int>("CountryDirection")
@@ -128,17 +119,29 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DoublesBed")
+                    b.Property<int>("DoubleBedCount")
                         .HasColumnType("int");
 
                     b.Property<bool?>("Elevator")
                         .HasColumnType("bit");
 
-                    b.Property<string>("EvidenceRequired")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("EmptyTonight")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("EuropeanToiletType")
+                        .HasColumnType("int");
 
                     b.Property<int>("ExtraBlanketCount")
                         .HasColumnType("int");
+
+                    b.Property<int>("ExtraCapacity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExtraCapacityPrice")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("Filming")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Floor")
                         .HasColumnType("int");
@@ -155,11 +158,8 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<int>("HeatingSystem")
                         .HasColumnType("int");
 
-                    b.Property<bool>("HideInCategory")
+                    b.Property<bool>("HideInSearch")
                         .HasColumnType("bit");
-
-                    b.Property<int>("HolidayPikePrice")
-                        .HasColumnType("int");
 
                     b.Property<int>("HolidayPrice")
                         .HasColumnType("int");
@@ -169,9 +169,6 @@ namespace Amlakbashi.Data.Migrations
 
                     b.Property<int>("InstantReserveStatus")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsContactAvailable")
-                        .HasColumnType("bit");
 
                     b.Property<bool?>("Jacuzzi")
                         .HasColumnType("bit");
@@ -185,7 +182,7 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<int>("LandArea")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("LastModifyDate")
+                    b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<double>("Latitude")
@@ -200,16 +197,19 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<string>("LicenseNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LocationString")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("LocationType")
+                        .HasColumnType("int");
 
                     b.Property<double>("Longitude")
                         .HasColumnType("float");
 
-                    b.Property<int>("MaxInstantReserveStart")
+                    b.Property<long?>("MainPhotoId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("MaxInstantReserveStartTimeInterval")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaxReserveDays")
+                    b.Property<int>("MaxReserveDuration")
                         .HasColumnType("int");
 
                     b.Property<string>("MetaDescription")
@@ -218,32 +218,29 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<string>("MetaTitle")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Metrazh")
-                        .HasColumnType("int");
-
                     b.Property<bool?>("MicrowaveOven")
                         .HasColumnType("bit");
 
-                    b.Property<int>("MinReserveDays")
+                    b.Property<long>("MinReserveDateForNowruz")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("MinReserveDuration")
                         .HasColumnType("int");
 
                     b.Property<int>("Mode")
                         .HasColumnType("int");
 
-                    b.Property<int>("MoreThanCapacity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MoreThanCapacityPrice")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NorouzOverCapacityPrice")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NorouzPrice")
-                        .HasColumnType("int");
+                    b.Property<long>("MonthlyPrice")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("NotVerifyReasons")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NowruzExtraCapacityPrice")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NowruzPrice")
+                        .HasColumnType("int");
 
                     b.Property<string>("OldSlug")
                         .HasColumnType("nvarchar(max)");
@@ -254,33 +251,29 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<bool?>("Oven")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Overview")
-                        .HasColumnType("int");
-
                     b.Property<string>("OwnerFullName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OwnerID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OwnerMobile")
+                    b.Property<string>("OwnerPhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("OwnershipType")
                         .HasColumnType("int");
 
-                    b.Property<int>("ParentAccType")
-                        .HasColumnType("int");
-
                     b.Property<long?>("ParentId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("Advertise_AdvertiseID");
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Parking")
                         .HasColumnType("int");
 
-                    b.Property<long?>("PhotoID")
-                        .HasColumnType("bigint");
+                    b.Property<bool>("Party")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PeakHolidayPrice")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Pets")
+                        .HasColumnType("bit");
 
                     b.Property<bool?>("Pool")
                         .HasColumnType("bit");
@@ -291,30 +284,35 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<bool?>("PoolTable")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Position")
-                        .HasColumnType("int")
-                        .HasColumnName("Region");
-
-                    b.Property<int?>("Province")
+                    b.Property<int?>("ProvinceId")
                         .HasColumnType("int");
 
                     b.Property<bool?>("Refrigerator")
                         .HasColumnType("bit");
 
-                    b.Property<long>("RentPrice")
+                    b.Property<string>("RegionsPersianTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequiredEvidence")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("ResidenceScore")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("Room")
+                    b.Property<int>("RoomCount")
                         .HasColumnType("int");
 
                     b.Property<bool?>("Sauna")
                         .HasColumnType("bit");
 
-                    b.Property<int>("SingleBed")
+                    b.Property<int>("SingleBedCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Smoking")
+                        .HasColumnType("bit");
 
                     b.Property<bool?>("SoundSystem")
                         .HasColumnType("bit");
@@ -322,7 +320,7 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("SupportInfo")
+                    b.Property<string>("SupportDescription")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("TV")
@@ -331,19 +329,23 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<bool?>("TeaMaker")
                         .HasColumnType("bit");
 
-                    b.Property<float>("TidinessUserRating")
-                        .HasColumnType("real");
-
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("TodayIsEmpty")
-                        .HasColumnType("bit");
-
                     b.Property<int>("TypeID")
+                        .HasColumnType("int")
+                        .HasColumnName("Type");
+
+                    b.Property<int>("UnitCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserID")
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("View")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VillaType")
                         .HasColumnType("int");
 
                     b.Property<int>("WC")
@@ -352,34 +354,28 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<bool?>("WashingMachine")
                         .HasColumnType("bit");
 
-                    b.Property<int>("WebVisit")
-                        .HasColumnType("int");
-
                     b.Property<bool?>("Wifi")
                         .HasColumnType("bit");
 
-                    b.Property<long>("unixNorouzMinRequestDate")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("Area");
+                    b.HasIndex("AreaId");
 
-                    b.HasIndex("City");
+                    b.HasIndex("CityId");
 
                     b.HasIndex("LicenseFileId")
                         .IsUnique()
                         .HasFilter("[LicenseFileId] IS NOT NULL");
 
+                    b.HasIndex("MainPhotoId");
+
                     b.HasIndex("ParentId");
 
-                    b.HasIndex("PhotoID");
+                    b.HasIndex("ProvinceId");
 
-                    b.HasIndex("Province");
+                    b.HasIndex("UserId");
 
-                    b.HasIndex("UserID");
-
-                    b.ToTable("Advertises");
+                    b.ToTable("Residences");
                 });
 
             modelBuilder.Entity("Amlakbashi.Core.Entities.AdvertiseReport", b =>
@@ -2048,31 +2044,31 @@ namespace Amlakbashi.Data.Migrations
                 {
                     b.HasOne("Amlakbashi.Core.Entities.Region", "RegionArea")
                         .WithMany()
-                        .HasForeignKey("Area");
+                        .HasForeignKey("AreaId");
 
                     b.HasOne("Amlakbashi.Core.Entities.Region", "RegionCity")
                         .WithMany()
-                        .HasForeignKey("City");
+                        .HasForeignKey("CityId");
 
                     b.HasOne("Amlakbashi.Core.Entities.File", "LicenseFile")
                         .WithOne("AdvertiseLicense")
                         .HasForeignKey("Amlakbashi.Core.Entities.Advertise", "LicenseFileId");
 
+                    b.HasOne("Amlakbashi.Core.Entities.File", "MainPhoto")
+                        .WithMany("MainPhotos")
+                        .HasForeignKey("MainPhotoId");
+
                     b.HasOne("Amlakbashi.Core.Entities.Advertise", "Parent")
                         .WithMany("Childs")
                         .HasForeignKey("ParentId");
 
-                    b.HasOne("Amlakbashi.Core.Entities.File", "MainPhoto")
-                        .WithMany("MainPhotos")
-                        .HasForeignKey("PhotoID");
-
                     b.HasOne("Amlakbashi.Core.Entities.Region", "RegionProvince")
                         .WithMany()
-                        .HasForeignKey("Province");
+                        .HasForeignKey("ProvinceId");
 
                     b.HasOne("Amlakbashi.Core.Entities.User", "User")
                         .WithMany("Advertises")
-                        .HasForeignKey("UserID")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2559,7 +2555,7 @@ namespace Amlakbashi.Data.Migrations
                     b.HasOne("Amlakbashi.Core.Entities.Advertise", null)
                         .WithMany()
                         .HasForeignKey("Advertise_Id")
-                        .HasConstraintName("FK_dbo.DynamicCategoryAdvertises_dbo.Advertises_Advertise_Id")
+                        .HasConstraintName("FK_DynamicCategoryAdvertises_Residences_Advertise_Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2576,7 +2572,7 @@ namespace Amlakbashi.Data.Migrations
                     b.HasOne("Amlakbashi.Core.Entities.Advertise", null)
                         .WithMany()
                         .HasForeignKey("Advertise_Id")
-                        .HasConstraintName("FK_dbo.FileAdvertises_dbo.Advertises_Advertise_Id")
+                        .HasConstraintName("FK_FileAdvertises_Residences_Advertise_Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

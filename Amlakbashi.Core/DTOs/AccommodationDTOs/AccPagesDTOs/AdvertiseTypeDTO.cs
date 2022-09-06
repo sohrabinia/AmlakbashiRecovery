@@ -9,5 +9,6 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
     public class AdvertiseTypeDTO
     {
         public Entities.Advertise.AdvertiseType TypeID { get; set; }
+        public Entities.Advertise.VillaTypeEnum VillaType { get; set; }
     }
 }

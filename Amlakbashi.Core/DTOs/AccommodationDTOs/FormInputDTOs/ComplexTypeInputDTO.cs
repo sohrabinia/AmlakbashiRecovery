@@ -14,7 +14,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
         public List<DTOSelectItem> complexTypeSelectItems { get; set; }
         public ComplexTypeInputDTO(AdvertiseType type)
         {
-            complexTypeString = AdvertiseMainLocalization.GetAdvertiseTypeUserString(TypeID);
+            complexTypeString = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(TypeID);
             complexTypeSelectItems = GenerateAdvertiseTypeItems(type);
         }
 
@@ -25,7 +25,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
             foreach (var advType in advertiseTypes)
             {
                 result.Add(new DTOSelectItem((int)advType,
-                    AdvertiseMainLocalization.GetAdvertiseTypeUserString(advType)));
+                    AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(advType)));
             }
             return result;
         }

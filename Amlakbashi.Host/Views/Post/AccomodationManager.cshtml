@@ -266,7 +266,7 @@
                                         <div class="avatar-room">
                                             <img src="@hotelRoom.photoUrl" />
                                         </div>
-                                        <span class="details-room-complex">@hotelRoom.roomUnitString @hotelRoom.title  </span>
+                                        <span class="details-room-complex">@hotelRoom.title  </span>
                                     </div>
                                     <!-- End-wrapper-right-banner -->
                                     <!-- Start-wrapper-left-banner div-unset-->
@@ -280,6 +280,8 @@
                                         </form>
                                         <div class="div-unset ">
                                             <a style="display:@( hotelRoom.newCommentCount == 0 ? "none" : "inline-block");" href="/comment/advertisecommentdetail?id=@hotelRoom.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@hotelRoom.newCommentCount</span></i></a>
+                                            <a title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@hotelRoom.id,'@hotelRoom.title')"><i class="fa fa-calendar-alt"></i></a>
+                                            <a title="رزرو آنی" class="icons-item calndar-icon" onclick="getInstantReserveDates(@hotelRoom.id)"><i class="fas fa-bolt" style="font-size: inherit;"></i></a>
                                             <button title="تنظیمات " class="icons-item setting-icon-room"><i class="fa fa-cog"></i></button>
                                         </div>
                                     </div>

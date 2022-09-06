@@ -18,7 +18,7 @@ namespace Amlakbashi.Core.Infrastructure.DTOHelpers.EntitiesDTOHelper
             foreach (var item in arr)
             {
                 result.Add(new DTOSelectItem((int)Enum.Parse(typeof(T), item.ToString()),
-                    AdvertiseMainLocalization.GetPropertyValueTitle(item)));
+                    AdvertiseMainLocalization.GetEnumPersianName(item)));
             }
             return result;
         }

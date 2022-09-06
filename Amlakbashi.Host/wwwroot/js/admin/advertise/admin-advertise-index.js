@@ -200,6 +200,15 @@ function updateCalendarPrices(pricesList) {
         });
 }
 
+function onChangeInputPrice(inputElem) {
+    var price = $(inputElem).val();
+    if (isNaN(price)) {
+        price = 0;
+    }
+    var persianStr = price < 1 ? '' : getPriceString(price);
+    $(inputElem).next().html(persianStr);
+}
+
 function updateMainPrices() {
     submitPopup('/accomodation/updatemainprices');
 }

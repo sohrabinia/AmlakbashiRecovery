@@ -3,6 +3,7 @@ using Amlakbashi.Application.Services.BlogPostServices.Interfaces;
 using Amlakbashi.Application.Services.Category.Interfaces;
 using Amlakbashi.Application.Services.PostServices.Interfaces;
 using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Core.DTOs.WebService;
 using Amlakbashi.Core.DTOs.WebService.Responses;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
@@ -19,18 +20,18 @@ namespace Amlakbashi.Host.Controllers.WebService
     [Route("api")]
     public class ApiHomeController : ApiBaseController
     {
-        private readonly IAdvertiseAppService advertiseService;
+        private readonly IAdvertiseAppService residenceService;
         private readonly ICategoryAppService categoryService;
         private readonly IDiscountTableAppService discountTableService;
         private readonly IBlogPostAppService blogPostService;
         private readonly IPostAppService postService;
-        public ApiHomeController(IAdvertiseAppService advertiseService,
+        public ApiHomeController(IAdvertiseAppService residenceService,
             ICategoryAppService categoryService,
             IDiscountTableAppService discountTableService,
             IBlogPostAppService blogPostService,
             IPostAppService postService)
         {
-            this.advertiseService = advertiseService;
+            this.residenceService = residenceService;
             this.categoryService = categoryService;
             this.discountTableService = discountTableService;
             this.blogPostService = blogPostService;
@@ -38,7 +39,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         }
 
         [HttpGet("home")]
-        public HomePageResponse Get()
+        public HomePageResponse HomePage()
         {
             var response = new HomePageResponse();
 
@@ -78,8 +79,8 @@ namespace Amlakbashi.Host.Controllers.WebService
                 response.lastSeconds.Add(new HomePageLastSecondsResponse()
                 {
                     title = item.Title,
-                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.PhotoID}",
-                    tags = advertiseService.GetAdvertiseTags(item),
+                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.MainPhotoId}",
+                    tags = residenceService.GetAdvertiseTags(item),
                     nightlyPrice = item.BasePrice,
                     discountPercent = discount.Percent,
                     discountPrice = item.BasePrice - (item.BasePrice * discount.Percent * 0.01)
@@ -88,33 +89,33 @@ namespace Amlakbashi.Host.Controllers.WebService
 
             // most liked advertises
             response.mostLiked = new List<HomePageMostLikedResponse>();
-            var mostLikedAdvertises = advertiseService.GetMostLiked(10);
+            var mostLikedAdvertises = residenceService.GetMostLiked(10);
             foreach (var item in mostLikedAdvertises)
             {
                 response.mostLiked.Add(new HomePageMostLikedResponse()
                 {
                     title = item.Title,
-                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.PhotoID}",
-                    tags = advertiseService.GetAdvertiseTags(item),
+                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.MainPhotoId}",
+                    tags = residenceService.GetAdvertiseTags(item),
                     nightlyPrice = item.BasePrice,
                     commentsCount = item.PublishedComments().Count(),
-                    rating = item.AverageUserRating
+                    rating = item.AverageUsersScore
                 });
             }
 
             // instant reserves advertises
             response.instant = new List<HomePageInstantResponse>();
-            var mostLikedInstantReserveAdvertises = advertiseService.GetMostLiked(10, true);
+            var mostLikedInstantReserveAdvertises = residenceService.GetMostLiked(10, true);
             foreach (var item in mostLikedInstantReserveAdvertises)
             {
                 response.instant.Add(new HomePageInstantResponse()
                 {
                     title = item.Title,
-                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.PhotoID}",
-                    tags = advertiseService.GetAdvertiseTags(item),
+                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.MainPhotoId}",
+                    tags = residenceService.GetAdvertiseTags(item),
                     nightlyPrice = item.BasePrice,
                     commentsCount = item.PublishedComments().Count(),
-                    rating = item.AverageUserRating,
+                    rating = item.AverageUsersScore,
                     badgeText = "تحویل آنی"
                 });
             }
@@ -156,18 +157,14 @@ namespace Amlakbashi.Host.Controllers.WebService
             });
         }
 
-        [HttpGet("faq")]
-        public IActionResult Faq()
-        {
-            return Ok(GeneralLocalization.GetFaq());
-        }
-
         [HttpGet("{title}")]
         public IActionResult GetPost(string title)
         {
             int postId = 0;
             switch (title)
             {
+                case "faq":
+                    return Ok(GeneralLocalization.GetFaq());
                 case "about":
                     postId = 4;
                     break;
@@ -189,6 +186,12 @@ namespace Amlakbashi.Host.Controllers.WebService
                 title = post.Title,
                 description = post.Description
             });
+        }
+
+        [HttpGet("namevalue")]
+        public IEnumerable<NameValueDTO> GetEnumNameValues(NameValueDTO.EnumType type = 0)
+        {
+            return NameValueDTO.GetEnumNameValues(type);
         }
     }
 }

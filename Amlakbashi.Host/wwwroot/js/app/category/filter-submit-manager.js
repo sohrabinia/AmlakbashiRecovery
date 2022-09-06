@@ -43,6 +43,7 @@ function SetAdvertiseFilterForm(newData) {
     $('#js-pooltable-input-filter').attr('value', newData.poolTable);
     $('#js-foosball-input-filter').attr('value', newData.foosball);
     $('#js-teamaker-input-filter').attr('value', newData.teaMaker);
+    $('#js-filming-input-filter').attr('value', newData.filming);
     $('#js-pets-input-filter').attr('value', newData.pets);
     $('#js-party-input-filter').attr('value', newData.party);
     $('#js-smoking-input-filter').attr('value', newData.smoking);

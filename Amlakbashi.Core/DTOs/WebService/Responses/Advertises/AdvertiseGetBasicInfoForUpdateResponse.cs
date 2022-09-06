@@ -7,7 +7,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
 {
     public class AdvertiseGetBasicInfoForUpdateResponse
     {
-        public long advertiseId { get; set; }
+        public long residenceId { get; set; }
         public Advertise.AdvertiseType type { get; set; }
         public Advertise.PositionType locationType { get; set; }
 
@@ -15,9 +15,9 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
         {
             return new AdvertiseGetBasicInfoForUpdateResponse()
             {
-                advertiseId = advertise.Id,
+                residenceId = advertise.Id,
                 type = advertise.TypeID,
-                locationType = advertise.Position
+                locationType = advertise.LocationType
             };
         }
     }

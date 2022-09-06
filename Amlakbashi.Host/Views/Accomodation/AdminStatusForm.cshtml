@@ -83,7 +83,7 @@
                         <select name="notVerifyReasons" id="not-verify-dp" data-placeholder="انتخاب دلایل عدم تایید ..." class="chosen-select chosen-rtl" multiple>
                             @foreach (var item in not_verify_reasons)
                             {
-                                <option value="@((int)item)" is-selected="@(strPropertiesSelected.Contains(string.Format(",{0},", (int)item)))">@AdvertiseMainLocalization.GetNotVerifyReasonTitle((int)item)</option>
+                                <option value="@((int)item)" is-selected="@(strPropertiesSelected.Contains(string.Format(",{0},", (int)item)))">@AdvertiseMainLocalization.GetNotVerifyReasonPersianDesc((int)item)</option>
                             }
                         </select>
                     </div>

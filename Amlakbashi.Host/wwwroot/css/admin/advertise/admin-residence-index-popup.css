@@ -15,6 +15,10 @@
     margin-bottom: 10px;
 }
 
+.persian-price {
+    font-size: 11px;
+}
+
 .calendar-prices-container {
     text-align: center;
 }
@@ -48,6 +52,12 @@
 
 .calendar-prices-container button{
     margin-right: 20px;
+}
+
+.calendar-prices-container .box-button div {
+    display: inline-flex;
+    flex-flow: column;
+    align-items: start;
 }
 
 .discounts-container {

@@ -31,15 +31,15 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
                 Id = advertise.Id,
                 Mode = advertise.Mode,
                 ParentId = advertise.ParentId,
-                UserId = advertise.UserID,
+                UserId = advertise.UserId,
                 CreateDate = DateTimeUtility.ConvertDate(advertise.CreateDate).ToString(),
                 DailyPrice = advertise.DailyPrice,
-                AdvertiseScore = advertise.AdvertiseScore,
-                WebVisit = advertise.WebVisit,
-                NorouzMinReserveDate = advertise.unixNorouzMinRequestDate < 1 ? "-" :
-                    DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate)).Replace(",", "/"),
+                AdvertiseScore = advertise.ResidenceScore,
+                WebVisit = advertise.View,
+                NorouzMinReserveDate = advertise.MinReserveDateForNowruz < 1 ? "-" :
+                    DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.MinReserveDateForNowruz)).Replace(",", "/"),
                 Status = advertise.Status,
-                Available = advertise.Available,
+                Available = advertise.Active,
                 SupportInfoCount = advertise.GetSupportInfoList().Length
             };
         }

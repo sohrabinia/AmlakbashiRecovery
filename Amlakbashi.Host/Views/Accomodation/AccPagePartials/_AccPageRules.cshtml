@@ -5,27 +5,27 @@
 <p class="advertise-page__rules-header"><i class="fa fa-balance-scale"></i> قوانین و مقررات اقامتگاه </p>
 
 
-@if (!string.IsNullOrEmpty(Model.EvidenceRequired))
+@if (!string.IsNullOrEmpty(Model.RequiredEvidence))
 {
     <div class="advertise-page__rule-item">
         <p class="advertise-page__rule-title"><i class="fa fa-id-card"></i> مدارک مورد نیاز:</p>
-        <p class="advertise-page__rule-content" data-max-height="30">@Model.EvidenceRequired</p>
+        <p class="advertise-page__rule-content" data-max-height="30">@Model.RequiredEvidence</p>
     </div>
 }
 
 <div class="add-advertise__item advertise-page__rule-content">
-    <img width="32" height="32" alt="@(Model.AllowSmoking ? "استعمال دخانیات مجاز" : "استعمال دخانیات ممنوع")" src="/file/resourceimagepng?file_name=icons/@(Model.AllowSmoking ? "rules_smoking_allow_icon" : "rules_smoking_deny_icon")" />
-    استعمال دخانیات @(Model.AllowSmoking ? "مجاز" : "ممنوع")
+    <img width="32" height="32" alt="@(Model.Smoking ? "استعمال دخانیات مجاز" : "استعمال دخانیات ممنوع")" src="/file/resourceimagepng?file_name=icons/@(Model.Smoking ? "rules_smoking_allow_icon" : "rules_smoking_deny_icon")" />
+    استعمال دخانیات @(Model.Smoking ? "مجاز" : "ممنوع")
 </div>
 
 <div class="add-advertise__item advertise-page__rule-content">
-    <img width="32" height="32" alt="@(Model.AllowPets ? "حیوانات خانگی مجاز" : "حیوانات خانگی ممنوع")" src="/file/resourceimagepng?file_name=icons/@(Model.AllowPets ? "rules_pet_allow_icon" : "rules_pet_deny_icon")" />
-    آوردن حیوانات خانگی @(Model.AllowPets ? "مجاز" : "ممنوع")
+    <img width="32" height="32" alt="@(Model.Pets ? "حیوانات خانگی مجاز" : "حیوانات خانگی ممنوع")" src="/file/resourceimagepng?file_name=icons/@(Model.Pets ? "rules_pet_allow_icon" : "rules_pet_deny_icon")" />
+    آوردن حیوانات خانگی @(Model.Pets ? "مجاز" : "ممنوع")
 </div>
 
 <div class="add-advertise__item advertise-page__rule-content">
-    <img width="32" height="32" alt="@(Model.AllowParty ? "گرفتن مهمانی مجاز" : "گرفتن مهمانی ممنوع")" src="/file/resourceimagepng?file_name=icons/@(Model.AllowParty ? "rules_party_allow_icon" : "rules_party_deny_icon")" />
-    گرفتن مهمانی @(Model.AllowParty ? "مجاز" : "ممنوع")
+    <img width="32" height="32" alt="@(Model.Party ? "گرفتن مهمانی مجاز" : "گرفتن مهمانی ممنوع")" src="/file/resourceimagepng?file_name=icons/@(Model.Party ? "rules_party_allow_icon" : "rules_party_deny_icon")" />
+    گرفتن مهمانی @(Model.Party ? "مجاز" : "ممنوع")
 </div>
 
 @if (!string.IsNullOrEmpty(Model.OtherRules))

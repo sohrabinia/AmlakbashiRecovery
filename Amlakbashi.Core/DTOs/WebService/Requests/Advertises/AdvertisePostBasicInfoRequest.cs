@@ -10,8 +10,8 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
     public class AdvertisePostBasicInfoRequest
     {
         [Range(1, int.MaxValue)]
-        public long advertiseId { get; set; }
-        public Advertise.AdvertiseType type { get; set; }
+        public long residenceId { get; set; }
+        //public Advertise.AdvertiseType type { get; set; }
         public Advertise.PositionType locationType { get; set; }
 
         [BindNever]
@@ -19,10 +19,10 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
 
         public bool IsValid(ModelStateDictionary modelState)
         {
-            if (type == Advertise.AdvertiseType.All || type == Advertise.AdvertiseType.None)
-            {
-                modelState.AddModelError(nameof(type), "value is incorrect");
-            }
+            //if (type == Advertise.AdvertiseType.All || type == Advertise.AdvertiseType.None)
+            //{
+            //    modelState.AddModelError(nameof(type), "value is incorrect");
+            //}
             if (locationType == Advertise.PositionType.none ||
                 Enum.IsDefined(typeof(Advertise.PositionType), locationType) == false)
             {

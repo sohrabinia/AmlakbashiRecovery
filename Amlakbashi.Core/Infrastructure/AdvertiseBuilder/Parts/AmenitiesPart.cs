@@ -25,12 +25,15 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
         public bool? WashingMachine { get; set; }
         public bool? Hairdryer { get; set; }
         public WCItems WC { get; set; }
+        public EuropeanToiletTypeEnum EuropeanToiletType { get; set; }
         public bool? PoolTable { get; set; }
         public bool? Foosball { get; set; }
         public bool? Sauna { get; set; }
         public bool? Jacuzzi { get; set; }
         public bool? Pool { get; set; }
         public PoolFeaturesEnum PoolFeatures { get; set; }
+        public bool? Balcony { get; set; }
+        public bool? Filming { get; set; }
 
         public bool Validate(out Dictionary<string, string> errors, out string msg)
         {
@@ -38,6 +41,13 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
             if ((int)WC < 1)
             {
                 errors.Add("WC", null);
+            }
+            else if(WC == WCItems.Europian || WC == WCItems.EuropianAndPersian)
+            {
+                if ((int)EuropeanToiletType < 1)
+                {
+                    errors.Add("EuropeanToiletType", null);
+                }
             }
             if ((int)HeatingSystem < 1)
             {
@@ -119,9 +129,15 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
             {
                 errors.Add("Foosball", null);
             }
-
+            if (Balcony == null)
+            {
+                errors.Add("Balcony", null);
+            }
+            if (Filming == null)
+            {
+                errors.Add("Filming", null);
+            }
             msg = errors.Any() ? LocalizationStringData.Get("ACC_VALIDATION_AMENITIES") : null;
-
             return errors.Any() == false;
         }
     }

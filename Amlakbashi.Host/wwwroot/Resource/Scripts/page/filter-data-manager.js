@@ -39,6 +39,7 @@ function initializeFilterData() {
     else {
         filterInputData.hygieneProtocol = false;
     }
+    debugger;
     filterInputData.countryDirection = $('#advertise-filter-form input[name="country_direction"]').attr('value');
     filterInputData.province = $('#advertise-filter-form input[name="Province"]').attr('value');
     filterInputData.city = $('#advertise-filter-form input[name="City"]').attr('value');
@@ -64,6 +65,7 @@ function initializeFilterData() {
     filterInputData.poolTable = $('#js-pooltable-input-filter').attr('value');
     filterInputData.foosball = $('#js-foosball-input-filter').attr('value');
     filterInputData.teaMaker = $('#js-teamaker-input-filter').attr('value');
+    filterInputData.filming = $('#js-filming-input-filter').attr('value');
     filterInputData.pets = $('#js-pets-input-filter').attr('value');
     filterInputData.party = $('#js-party-input-filter').attr('value');
     filterInputData.smoking = $('#js-smoking-input-filter').attr('value');
@@ -246,6 +248,7 @@ function doMoreFilter() {
     filterInputData.poolTable = $('#js-pooltable-input').val();
     filterInputData.foosball = $('#js-foosball-input').val();
     filterInputData.teaMaker = $('#js-teamaker-input').val();
+    filterInputData.filming = $('#js-filming-input').val();
     sendNewFilterData();
     $('#js-ajax-filter').val(true);
     $('#js-more-filter-item').hide(100);
@@ -278,6 +281,7 @@ function removeMoreFilter() {
     filterInputData.poolTable = '-1';
     filterInputData.foosball = '-1';
     filterInputData.teaMaker = '-1';
+    filterInputData.filming = '-1';
     filterInputData.priceType = '0';
     sendNewFilterData();
 }
@@ -419,5 +423,12 @@ function removeTeaMakerFilter(dontSubmit) {
     filterInputData.page = 1;
     filterInputData.ajax = true;
     filterInputData.teaMaker = '-1';
+    sendNewFilterData();
+}
+
+function removeFilmingFilter(dontSubmit) {
+    filterInputData.page = 1;
+    filterInputData.ajax = true;
+    filterInputData.filming = '-1';
     sendNewFilterData();
 }

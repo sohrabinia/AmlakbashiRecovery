@@ -27,15 +27,19 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
         public bool? WashingMachine { get; set; }
         public bool? Hairdryer { get; set; }
         public WCItems WC { get; set; }
+        public EuropeanToiletTypeEnum EuropeanToiletType { get; set; }
         public bool? PoolTable { get; set; }
         public bool? Foosball { get; set; }
         public bool? Sauna { get; set; }
         public bool? Jacuzzi { get; set; }
         public bool? Pool { get; set; }
+        public bool? Balcony { get; set; }
+        public bool? Filming { get; set; }
         public PoolInputDTO PoolFeatures { get; set; }
         public List<DTOSelectItem> heatingSelectItems { get; set; }
         public List<DTOSelectItem> coolingSelectItems { get; set; }
         public List<DTOSelectItem> wcSelectItems { get; set; }
+        public List<DTOSelectItem> europeanToiletSelectItems { get; set; }
         public List<DTOCheckbox> booleanAmenities { get; set; }
 
         public AmenitiesInputDTO()
@@ -43,6 +47,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
             heatingSelectItems = AccDTOHelper.GenerateAccSelectList<HeatingSystemItems>();
             coolingSelectItems = AccDTOHelper.GenerateAccSelectList<CoolingSystemItems>();
             wcSelectItems = AccDTOHelper.GenerateAccSelectList<WCItems>();
+            europeanToiletSelectItems = AccDTOHelper.GenerateAccSelectList<EuropeanToiletTypeEnum>();
             SetCheckboxs();
         }
 
@@ -67,7 +72,6 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
         {
             var booleanAmenities = new List<DTOCheckbox>() {
                 AccDTOHelper.GenerateAccCheckbox(Property.Bathroom, Bathroom),
-                //AccDTOHelper.GenerateAccCheckbox(Property.Pool, Pool),
                 AccDTOHelper.GenerateAccCheckbox(Property.Sauna, Sauna),
                 AccDTOHelper.GenerateAccCheckbox(Property.Jacuzzi, Jacuzzi),
                 AccDTOHelper.GenerateAccCheckbox(Property.TV, TV),
@@ -83,7 +87,9 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
                 AccDTOHelper.GenerateAccCheckbox(Property.Hairdryer, Hairdryer),
                 AccDTOHelper.GenerateAccCheckbox(Property.PoolTable, PoolTable),
                 AccDTOHelper.GenerateAccCheckbox(Property.Foosball, Foosball),
-                AccDTOHelper.GenerateAccCheckbox(Property.Golf, Golf)
+                AccDTOHelper.GenerateAccCheckbox(Property.Balcony, Balcony),
+                AccDTOHelper.GenerateAccCheckbox(Property.Golf, Golf),
+                AccDTOHelper.GenerateAccCheckbox(Property.Filming, Filming)
             };
             this.booleanAmenities = booleanAmenities;
         }

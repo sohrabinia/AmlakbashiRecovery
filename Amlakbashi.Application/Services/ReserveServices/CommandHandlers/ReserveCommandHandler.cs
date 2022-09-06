@@ -211,7 +211,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                         mediator.Send(new InsertExtrinsicReserveCommand(reserve.AdvertiseID,
                             DateTimeUtility.GregorianToPersianDate(reserve.StartDate),
                             DateTimeUtility.GregorianToPersianDate(reserve.EndDate),
-                            request.actionSource, request.doerUserId, reserve.Advertise.Count));
+                            request.actionSource, request.doerUserId, reserve.Advertise.UnitCount));
                     }
                     break;
                 default:

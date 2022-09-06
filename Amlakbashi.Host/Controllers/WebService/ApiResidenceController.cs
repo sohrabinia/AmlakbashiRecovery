@@ -180,7 +180,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> UpdateGeneralInfo(AdvertisePostGeneralInfoRequest request)
         {
-            var checkRegionResult = regionService.IsValidRegions(request.province, request.city, request.area);
+            var checkRegionResult = regionService.IsValidRegions(request.provinceId, request.cityId, request.areaId);
             if (checkRegionResult.HasError())
             {
                 return BadRequest(checkRegionResult.GetErrors());
@@ -303,43 +303,13 @@ namespace Amlakbashi.Host.Controllers.WebService
             {
                 id = x.Id,
                 title = x.Title,
-                roomCount = x.Room,
+                roomCount = x.RoomCount,
                 typeTitle = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(x.TypeID),
                 provinceName = x.RegionProvince.PersianName,
                 cityName = x.RegionCity.PersianName,
                 imageUrl = x.GetMainImageUrl()
             }));
             return Ok(response);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("types")]
-        public IList<AdvertiseTypesResponse> GetResidenceTypes()
-        {
-            var response = new List<AdvertiseTypesResponse>();
-            var advertiseTypesList = Enum.GetValues<Advertise.AdvertiseType>().ToList();
-            advertiseTypesList.Remove(Advertise.AdvertiseType.None);
-            response.AddRange(advertiseTypesList.Select(x => new AdvertiseTypesResponse()
-            {
-                name = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(x),
-                value = (int)x
-            }));
-            return response;
-        }
-
-        [AllowAnonymous]
-        [HttpGet("locationtypes")]
-        public IList<AdvertiseTypesResponse> GetResidenceLocationTypes()
-        {
-            var response = new List<AdvertiseTypesResponse>();
-            var advertiseTypesList = Enum.GetValues<Advertise.PositionType>().ToList();
-            advertiseTypesList.Remove(Advertise.PositionType.none);
-            response.AddRange(advertiseTypesList.Select(x => new AdvertiseTypesResponse()
-            {
-                name = AdvertiseMainLocalization.GetPositionTypeString((int)x),
-                value = (int)x
-            }));
-            return response;
         }
 
         [AllowAnonymous]
@@ -427,11 +397,11 @@ namespace Amlakbashi.Host.Controllers.WebService
             var advertise = residenceService.Find(id);
             return Ok(new
             {
-                party = advertise.AllowParty,
-                pets = advertise.AllowPets,
-                smoking = advertise.AllowSmoking,
+                party = advertise.Party,
+                pets = advertise.Pets,
+                smoking = advertise.Smoking,
                 otherRules = advertise.OtherRules,
-                requiredEvidences = advertise.EvidenceRequired,
+                requiredEvidences = advertise.RequiredEvidence,
             });
         }
 
@@ -440,7 +410,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         public IActionResult GetInstantReserveInfo(long residenceId)
         {
             var residence = residenceService.Find(residenceId);
-            if (residence == null || residence.UserID != User.GetId())
+            if (residence == null || residence.UserId != User.GetId())
             {
                 return BadRequest("not allowed");
             }

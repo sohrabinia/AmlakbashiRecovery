@@ -51,7 +51,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             dto.index = index;
             dto.isGuest = isGuest;
             dto.isHostler = isHostler;
-            dto.advertisePhotoId = advertise.PhotoID == null ? 0 : (int)advertise.PhotoID;
+            dto.advertisePhotoId = advertise.MainPhotoId == null ? 0 : (int)advertise.MainPhotoId;
             dto.advertiseTitle = advertise.Title;
             dto.advertiseSlug = advertise.Slug;
             dto.userId = userId;

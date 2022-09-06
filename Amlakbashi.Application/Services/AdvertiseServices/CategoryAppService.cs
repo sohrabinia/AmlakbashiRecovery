@@ -84,6 +84,7 @@ namespace Amlakbashi.Application.Services.Category
           bool poolTable = false,
           bool foosball = false,
           bool teaMaker = false,
+          bool filming = false,
           bool rules_pets = false,
           bool rules_party = false,
           bool rules_smoking = false,
@@ -122,7 +123,7 @@ namespace Amlakbashi.Application.Services.Category
             //filter by phrase or area
             advertises = advertiseFilter.FilterPhrase(advertises, phrase);
             if (string.IsNullOrEmpty(phrase) && area > 0)
-                advertises = advertises.Where(x => x.Area == area);
+                advertises = advertises.Where(x => x.AreaId == area);
 
             // filter by accommodation's position 
 
@@ -130,7 +131,7 @@ namespace Amlakbashi.Application.Services.Category
             {
                 int positionInt = 0;
                 if (int.TryParse(position, out positionInt) && positionInt > 0)
-                    advertises = advertises.Where(a => a.Position == (PositionType)positionInt);
+                    advertises = advertises.Where(a => a.LocationType == (PositionType)positionInt);
             }
             //filter by parking
             advertises = advertiseFilter.FilterParking(advertises, parking, hasParking);
@@ -142,7 +143,7 @@ namespace Amlakbashi.Application.Services.Category
                 if (int.TryParse(capacity, out capacity_int) && capacity_int > 0)
                 {
                     advertises = advertises.Where(a => a.Capacity >= capacity_int ||
-                        a.Capacity + a.MoreThanCapacity >= capacity_int);
+                        a.Capacity + a.ExtraCapacity >= capacity_int);
                 }
             }
             //filter by room
@@ -190,20 +191,24 @@ namespace Amlakbashi.Application.Services.Category
             {
                 advertises = advertises.Where(a => (bool)a.TeaMaker);
             }
+            if (filming)
+            {
+                advertises = advertises.Where(a => (bool)a.Filming);
+            }
             //filter by allow pets rule
             if (rules_pets)
             {
-                advertises = advertises.Where(a => (bool)a.AllowPets);
+                advertises = advertises.Where(a => a.Pets);
             }
             //filter by allow party rule
             if (rules_party)
             {
-                advertises = advertises.Where(a => (bool)a.AllowParty);
+                advertises = advertises.Where(a => a.Party);
             }
             //filter by allow smoking rule
             if (rules_smoking)
             {
-                advertises = advertises.Where(a => (bool)a.AllowSmoking);
+                advertises = advertises.Where(a => a.Smoking);
             }
             //filter by wc type
             if (wcType != -1)
@@ -224,7 +229,7 @@ namespace Amlakbashi.Application.Services.Category
             //filter by norouz special
             if (norouz_special != null && norouz_special == "1")
             {
-                advertises = advertises.Where(a => a.NorouzPrice > 0);
+                advertises = advertises.Where(a => a.NowruzPrice > 0);
             }
             //filter instant reserve accommodations
             if (instant_reserve != null && instant_reserve == "1")
@@ -301,7 +306,7 @@ namespace Amlakbashi.Application.Services.Category
                         today_empty_homes == "1")
                     {
                         model_output = advertises
-                            .OrderByDescending(x => x.TodayIsEmpty /*|| x.Childs.Any(y => y.TodayIsEmpty)*/)
+                            .OrderByDescending(x => x.EmptyTonight /*|| x.Childs.Any(y => y.TodayIsEmpty)*/)
                             .ThenByDescending(x => x.TypeID == (AdvertiseType)priorType)
                             .ThenByDescending(x => x.Capacity == capacity_int ? 1 : 0)
                             .ThenByDescending(x => x.Capacity > capacity_int ? 1 : 0)
@@ -322,7 +327,7 @@ namespace Amlakbashi.Application.Services.Category
                         today_empty_homes == "1")
                     {
                         model_output = advertises
-                            .OrderByDescending(x => x.TodayIsEmpty /*|| x.Childs.Any(y => y.TodayIsEmpty)*/)
+                            .OrderByDescending(x => x.EmptyTonight /*|| x.Childs.Any(y => y.TodayIsEmpty)*/)
                             .ThenByDescending(x => x.Capacity == capacity_int ? 1 : 0)
                             .ThenByDescending(x => x.Capacity > capacity_int ? 1 : 0)
                             .ThenBy(x => x.Capacity > capacity_int ? x.Capacity : -x.Capacity);
@@ -339,7 +344,7 @@ namespace Amlakbashi.Application.Services.Category
             else if (!string.IsNullOrEmpty(norouz_special) && norouz_special == "1")
             {
                 var todayUnix = DateTimeUtility.DateValueOfJS(DateTime.Now.Date);
-                model_output = advertises.OrderBy(x => x.unixNorouzMinRequestDate > todayUnix ? 1 : 0);
+                model_output = advertises.OrderBy(x => x.MinReserveDateForNowruz > todayUnix ? 1 : 0);
             }
             else
             {
@@ -349,7 +354,7 @@ namespace Amlakbashi.Application.Services.Category
                         today_empty_homes == "1")
                     {
                         model_output = advertises
-                            .OrderByDescending(x => x.TodayIsEmpty /*|| x.Childs.Any(y => y.TodayIsEmpty)*/)
+                            .OrderByDescending(x => x.EmptyTonight /*|| x.Childs.Any(y => y.TodayIsEmpty)*/)
                             .ThenByDescending(x => x.TypeID == (AdvertiseType)priorType);
                     }
                     else
@@ -364,7 +369,7 @@ namespace Amlakbashi.Application.Services.Category
                         today_empty_homes == "1")
                     {
                         model_output = advertises
-                            .OrderByDescending(x => x.TodayIsEmpty /*|| x.Childs.Any(y => y.TodayIsEmpty)*/);
+                            .OrderByDescending(x => x.EmptyTonight /*|| x.Childs.Any(y => y.TodayIsEmpty)*/);
                     }
                     else
                     {
@@ -387,13 +392,13 @@ namespace Amlakbashi.Application.Services.Category
                             model_output = model_output.ThenByDescending(a => a.HolidayPrice);
                             break;
                         case priceRangeTypes.HolidayPeak:
-                            model_output = model_output.ThenByDescending(a => a.HolidayPikePrice);
+                            model_output = model_output.ThenByDescending(a => a.PeakHolidayPrice);
                             break;
                         case priceRangeTypes.Monthly:
-                            model_output = model_output.ThenByDescending(a => a.RentPrice);
+                            model_output = model_output.ThenByDescending(a => a.MonthlyPrice);
                             break;
                         case priceRangeTypes.Norouz:
-                            model_output = model_output.ThenByDescending(a => a.NorouzPrice);
+                            model_output = model_output.ThenByDescending(a => a.NowruzPrice);
                             break;
                         default:
                             model_output = model_output.ThenByDescending(a => a.BasePrice);
@@ -407,13 +412,13 @@ namespace Amlakbashi.Application.Services.Category
                             model_output = model_output.ThenBy(a => a.HolidayPrice);
                             break;
                         case priceRangeTypes.HolidayPeak:
-                            model_output = model_output.ThenBy(a => a.HolidayPikePrice);
+                            model_output = model_output.ThenBy(a => a.PeakHolidayPrice);
                             break;
                         case priceRangeTypes.Monthly:
-                            model_output = model_output.ThenBy(a => a.RentPrice);
+                            model_output = model_output.ThenBy(a => a.MonthlyPrice);
                             break;
                         case priceRangeTypes.Norouz:
-                            model_output = model_output.ThenBy(a => a.NorouzPrice);
+                            model_output = model_output.ThenBy(a => a.NowruzPrice);
                             break;
                         default:
                             model_output = model_output.ThenBy(a => a.BasePrice);
@@ -421,13 +426,13 @@ namespace Amlakbashi.Application.Services.Category
                     }
                     break;
                 case SortOrder.UserRate:
-                    model_output = model_output.ThenByDescending(a => a.AverageUserRating);
+                    model_output = model_output.ThenByDescending(a => a.AverageUsersScore);
                     break;
                 case SortOrder.Clean:
-                    model_output = model_output.ThenByDescending(a => a.TidinessUserRating);
+                    model_output = model_output.ThenByDescending(a => a.CleaningScore);
                     break;
                 default:
-                    model_output = model_output.ThenByDescending(a => a.AdvertiseScore);
+                    model_output = model_output.ThenByDescending(a => a.ResidenceScore);
                     break;
             }
             return model_output;

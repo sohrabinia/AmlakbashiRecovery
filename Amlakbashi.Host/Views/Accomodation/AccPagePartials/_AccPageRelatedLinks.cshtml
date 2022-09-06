@@ -27,9 +27,9 @@
                 @AdvertiseTypeHelper.GetTitle(provinceCat.MostAccType, 81,
                         provinceName, null, null, null)
             </a>*@
-        @if (Model.Address.Province == 1 || Model.Address.Province == 352)
+        @if (Model.Address.ProvinceId == 1 || Model.Address.ProvinceId == 352)
         {
-            var customName = Model.Address.Province == 1 ? "تهران" : "کرج";
+            var customName = Model.Address.ProvinceId == 1 ? "تهران" : "کرج";
             <a title="ویلا استخردار اطراف @customName" href="@(Model.AccCategory.ProvinceUrl + "?pool=1")" target="_blank">
                 اجاره ویلا استخردار اطراف @customName
             </a>

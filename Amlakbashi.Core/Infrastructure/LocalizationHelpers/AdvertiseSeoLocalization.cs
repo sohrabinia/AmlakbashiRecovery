@@ -166,7 +166,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه آپارتمان مبله " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه آپارتمان مبله " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Villa:
@@ -174,7 +174,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،ویلا " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،ویلا " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     str += "ویلا استخردار";
                     return str;
@@ -183,7 +183,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،رزرو هتل " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،رزرو هتل " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.HotelApartment:
@@ -191,7 +191,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،رزرو هتل آپارتمان " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،رزرو هتل آپارتمان " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Camp:
@@ -199,7 +199,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،رزرو کمپ " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،رزرو کمپ " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.TourismAccommodation:
@@ -207,7 +207,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اقامتگاه بومگردی " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اقامتگاه بومگردی " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.House:
@@ -215,7 +215,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه خانه ویلایی " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه خانه ویلایی " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.SuitAndRoom:
@@ -223,7 +223,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه اتاق و سوئیت " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه اتاق و سوئیت " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Inn:
@@ -231,7 +231,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،رزرو مسافرخانه " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،رزرو مسافرخانه " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Pansion:
@@ -239,7 +239,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه پانسیون " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه پانسیون " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Complex:
@@ -247,7 +247,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه مجتمع " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه مجتمع " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Hut:
@@ -255,7 +255,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه کلبه " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه کلبه " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 default:
@@ -280,7 +280,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه آپارتمان مبله " + location_string + " " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه آپارتمان مبله " + location_string + " " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Villa:
@@ -288,7 +288,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،ویلا " + location_string + " " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،ویلا " + location_string + " " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     str += "ویلا استخردار";
                     return str;
@@ -297,7 +297,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،رزرو هتل " + location_string + " " + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،رزرو هتل " + location_string + " " + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.HotelApartment:
@@ -305,7 +305,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،رزرو هتل آپارتمان " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،رزرو هتل آپارتمان " + location_string + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Camp:
@@ -313,7 +313,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،رزرو کمپ " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،رزرو کمپ " + location_string + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.TourismAccommodation:
@@ -321,7 +321,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اقامتگاه بومگردی " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اقامتگاه بومگردی " + location_string + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.House:
@@ -329,7 +329,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه خانه ویلایی " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه خانه ویلایی " + location_string + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.SuitAndRoom:
@@ -337,7 +337,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه اتاق و سوئیت " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه اتاق و سوئیت " + location_string + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Inn:
@@ -345,7 +345,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،رزرو مسافرخانه " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،رزرو مسافرخانه " + location_string + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Pansion:
@@ -353,7 +353,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه پانسیون " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه پانسیون " + location_string + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Complex:
@@ -361,7 +361,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه مجتمع " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه مجتمع " + location_string + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 case AdvertiseType.Hut:
@@ -369,7 +369,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     foreach (var item in regionList)
                     {
                         if (item != PositionType.none)
-                            str += ("،اجاره روزانه کلبه " + location_string + AdvertiseMainLocalization.GetPositionTypeString((int)item));
+                            str += ("،اجاره روزانه کلبه " + location_string + AdvertiseMainLocalization.GetPositionTypePersianName((int)item));
                     }
                     return str;
                 default:
@@ -453,23 +453,23 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             try
             {
                 string tmpTitle = "اجاره روزانه";
-                tmpTitle += " " + AdvertiseMainLocalization.GetAdvertiseTypePersianString((int)acc.TypeID);
+                tmpTitle += " " + AdvertiseMainLocalization.GetAdvertiseTypePersianName((int)acc.TypeID);
 
-                tmpTitle += " " + AdvertiseMainLocalization.GetPositionTypeString((int)acc.Position);
+                tmpTitle += " " + AdvertiseMainLocalization.GetPositionTypePersianName((int)acc.LocationType);
 
-                if (acc.Room > 0)
-                    tmpTitle += " " + acc.Room.ToString() + " خوابه";
+                if (acc.RoomCount > 0)
+                    tmpTitle += " " + acc.RoomCount.ToString() + " خوابه";
 
-                if (acc.Metrazh > 0)
-                    tmpTitle += " " + acc.Metrazh.ToString() + " متری";
+                if (acc.BuildingArea > 0)
+                    tmpTitle += " " + acc.BuildingArea.ToString() + " متری";
 
 
-                if (acc.City > 0)
+                if (acc.CityId > 0)
                 {
                     if (!string.IsNullOrEmpty(cityTitle))
                         tmpTitle += " در " + cityTitle;
                 }
-                if (acc.Area != null)
+                if (acc.AreaId != null)
                 {
                     if (!string.IsNullOrEmpty(areaTitle))
                         tmpTitle += "، " + areaTitle;

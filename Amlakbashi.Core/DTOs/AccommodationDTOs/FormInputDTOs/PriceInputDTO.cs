@@ -10,12 +10,13 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
         public int id { get; set; }
         public int dailyPrice { get; set; }
         public int holidayPrice { get; set; }
-        public int holidayPikePrice { get; set; }
-        public int pikeHolidayPrice { get; set; }//just to handle app
-        public int moreThanCapacityPrice { get; set; }
-        public long rentPrice { get; set; }
-        public int norouzPrice { get; set; }
-        public int norouzOverCapacityPrice { get; set; }
+        public int PeakHolidayPrice { get; set; }
+
+        //public int pikeHolidayPrice { get; set; }//just to handle app
+        public int ExtraCapacityPrice { get; set; }
+        public long MonthlyPrice { get; set; }
+        public int NowruzPrice { get; set; }
+        public int NowruzExtraCapacityPrice { get; set; }
         public int minValue { get; set; }
         public long minValueMonthly { get; set; }
         public PriceInputDTO()
@@ -32,8 +33,8 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
                 dto = new PriceInputDTO();
                 PropertyCopier<PricePart, PriceInputDTO>.CopyInsensetive(part, dto);
             }
-            if (dto != null && part != null)
-                dto.pikeHolidayPrice = part.HolidayPikePrice;
+            //if (dto != null && part != null)
+            //    dto.pikeHolidayPrice = part.PeakHolidayPrice;
             return dto;
         }
     }

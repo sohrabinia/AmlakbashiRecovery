@@ -9,16 +9,16 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
     public class AdvertisePostGeneralInfoRequest
     {
         [Range(1, int.MaxValue)]
-        public long advertiseId { get; set; }
+        public long residenceId { get; set; }
 
         [Range(1, int.MaxValue)]
-        public int province { get; set; }
+        public int provinceId { get; set; }
 
         [Range(1, int.MaxValue)]
-        public int city { get; set; }
+        public int cityId { get; set; }
 
         [Range(0, int.MaxValue)]
-        public int area { get; set; }
+        public int areaId { get; set; }
 
         [Required]
         public string address { get; set; }
@@ -31,7 +31,7 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.Advertises
         [Required]
         public string description { get; set; }
 
-        public long mainImageId { get; set; }
+        public long mainPhotoId { get; set; }
 
         [BindNever]
         public int userId { get; set; }

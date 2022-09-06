@@ -4,12 +4,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.GeneralInfos;
-using System.Security.Cryptography;
 using System.Text;
 using System;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.RequestInfos;
-using System.Xml.Linq;
-using System.Linq;
 
 namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Base
 {
@@ -32,9 +29,13 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Base
             client.DefaultRequestHeaders.Add("_token_", token);
             client.DefaultRequestHeaders.Add("_token_issuer_", tokenIssuer);
 
+#if DEBUG
+            var httpResponse = new HttpResponseMessage();
+#else
             var httpResponse = client.PostAsync(url, content).Result;
-            var stringResponse = httpResponse.Content.ReadAsStringAsync().Result;
+#endif
 
+            var stringResponse = httpResponse.Content.ReadAsStringAsync().Result;
             var responseData = JsonConvert.DeserializeObject<R>(stringResponse);
             if (responseData.hasError == false && string.IsNullOrEmpty(responseData.result.result) == false)
             {

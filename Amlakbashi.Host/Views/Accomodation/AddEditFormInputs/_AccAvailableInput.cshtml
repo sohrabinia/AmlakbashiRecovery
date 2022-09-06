@@ -2,13 +2,14 @@
 
 <div class="acc-avalible-input-style div-unset acc-amenities__box-button">
     <label for="available_0_true" class="acc-amenities__label-style">
-        نمایش
-        <input id="available_0_true" type="radio" name="available" value="true" onchange="SetAvailable(true)" @(Model ? "checked" : "")>
+        فعال
+        <input id="available_0_true" type="radio" name="active" value="true" onchange="SetAvailable(true)" @(Model ? "checked" : "")>
         <span class="checkmark-acc checkmark"></span>
     </label>
-    <label for="available_0_false" class="acc-amenities__label-style">عدم نمایش
-    <input id="available_0_false" type="radio" name="available" value="false" onchange="SetAvailable(false)" @(Model ? "" : "checked")>
-    <span class="checkmark-faild  checkmark"></span>
+    <label for="available_0_false" class="acc-amenities__label-style">
+        غیرفعال
+        <input id="available_0_false" type="radio" name="active" value="false" onchange="SetAvailable(false)" @(Model ? "" : "checked")>
+        <span class="checkmark-faild  checkmark"></span>
     </label>
 </div>
 

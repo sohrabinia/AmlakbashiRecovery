@@ -1,0 +1,12 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs.VillaTypeInputDTO
+<p class="static-advertise__label"><i class="fas fa-warehouse"></i>نوع ویلا را انتخاب کنید</p>
+<div class="static-advertise__property">
+    <select class="js-disable-error changed-input-target @(Model.mandatory ? "js-mandatory" : "" )@(ViewData.ModelState.GetValidationState("VillaType") == ModelValidationState.Invalid ? " input-validation-error" : "")" name="VillaType" id="VillaType" data-min-value="-1">
+        @foreach (var select_item in Model.villaTypeSelectItems)
+        {
+            <option is-selected="@(select_item.value == (int)Model.VillaType)" value="@select_item.value">
+                @select_item.title
+            </option>
+        }
+    </select>
+</div>

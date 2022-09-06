@@ -16,7 +16,19 @@ var jalaliHolidays = ["1401/1/1", "1401/1/2", "1401/1/3", "1401/1/4", "1401/1/13
     "1401/7/3", "1401/7/5", "1401/7/13",
     "1401/10/6",
     "1401/11/15", "1401/11/22", "1401/11/29",
-    "1401/12/17", "1401/12/29"];
+    "1401/12/17", "1401/12/29",
+
+    "1402/1/1", "1402/1/2", "1402/1/3", "1402/1/4", "1402/1/12", "1402/1/13", "1402/1/24",
+    "1402/2/2", "1402/2/3", "1402/2/26",
+    "1402/3/14", "1402/3/15",
+    "1402/4/8", "1402/4/16",
+    "1402/5/6", "1402/5/7",
+    "1402/6/15", "1402/6/23", "1402/6/25",
+    "1402/7/2", "1402/7/11",
+    "1402/9/26",
+    "1402/11/6", "1402/11/20", "1402/11/22",
+    "1402/12/7", "1402/12/29",
+];
 
 
 String.prototype.replaceAll = function (search, replacement) {
@@ -83,8 +95,8 @@ function gregorianToJalaliDate(gDate) {
         isToday: gDate.toDateString() === gToday.toDateString(),
         isPastDay: gDate < pastDayBoundary,
         isHoliday: jalaliDayOfWeek == 6 || jalaliHolidays.includes(dateStringEnglishDigit),
-        value: jYear == 1401 && jMonth == 1 && jDay == 2 ? 1647894600000 : gDateClone.valueOf()
-        //value: gDateClone.valueOf()
+        //value: jYear == 1401 && jMonth == 1 && jDay == 2 ? 1647894600000 : gDateClone.valueOf()
+        value: gDateClone.valueOf()
     };
 }
 
@@ -176,7 +188,6 @@ function getPreviousMonthJalali(jDate) {
     }
 }
 
-
 function getDiffDays(date1, date2) {
     const diffTime = Math.abs(date2 - date1);
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -186,5 +197,8 @@ function diffDaysMs(date1_ms, date2_ms) {
     var one_day = 1000 * 60 * 60 * 24;
     var difference_ms = date2_ms - date1_ms;
     var days = Math.ceil(difference_ms / one_day);
+    if ((difference_ms % one_day) === 3600000) {
+        days--;
+    }
     return days;
 }

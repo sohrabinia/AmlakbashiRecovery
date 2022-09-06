@@ -7,10 +7,10 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
 {
     public class AdvertiseGetGeneralInfoForUpdateResponse
     {
-        public long id { get; set; }
-        public int? province { get; set; }
-        public int? city { get; set; }
-        public int? area { get; set; }
+        public long residenceId { get; set; }
+        public int? provinceId { get; set; }
+        public int? cityId { get; set; }
+        public int? areaId { get; set; }
         public string address { get; set; }
         public double longitude { get; set; }
         public double latitude { get; set; }
@@ -23,16 +23,16 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
         {
             return new AdvertiseGetGeneralInfoForUpdateResponse()
             {
-                id = advertise.Id,
-                province = advertise.Province,
-                city = advertise.City,
-                area = advertise.Area,
+                residenceId = advertise.Id,
+                provinceId = advertise.ProvinceId,
+                cityId = advertise.CityId,
+                areaId = advertise.AreaId,
                 address = advertise.Address,
                 longitude = advertise.Longitude,
                 latitude = advertise.Latitude,
                 title = advertise.Title,
                 description = advertise.Description,
-                mainImageId = advertise.PhotoID,
+                mainImageId = advertise.MainPhotoId,
                 images = advertise.GetImagesIdAndUrls()
             };
         }

@@ -8,9 +8,9 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
 {
     public class AddressDTO
     {
-        public int Province { get; set; }
-        public int City { get; set; }
-        public int Area { get; set; }
+        public int ProvinceId { get; set; }
+        public int CityId { get; set; }
+        public int AreaId { get; set; }
         public string Address { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }

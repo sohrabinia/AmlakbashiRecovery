@@ -44,14 +44,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.EventHandlers
                     && region.Childs.Count > 0)
                 {
                     var advertises = regionRepository.Query<Advertise, long>(q =>
-                        q.Where(w => w.City == region.Id &&
+                        q.Where(w => w.CityId == region.Id &&
                         w.Status == Advertise.AdvertiseStatus.Published &&
-                        w.Available == true &&
-                        w.HideInCategory == false &&
-                        w.Count < 1));
+                        w.Active == true &&
+                        w.HideInSearch == false &&
+                        w.UnitCount < 1));
                     foreach (var item in region.Childs)
                     {
-                        item.CountAdvertise = advertises.Count(c => c.Area == item.Id);
+                        item.CountAdvertise = advertises.Count(c => c.AreaId == item.Id);
                     }
                 }
             }

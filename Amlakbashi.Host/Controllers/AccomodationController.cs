@@ -207,13 +207,13 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                if (data.Area < 1)
+                if (data.AreaId < 1)
                 {
-                    data.Area = null;
+                    data.AreaId = null;
                 }
-                if (data.PhotoID < 1)
+                if (data.MainPhotoId < 1)
                 {
-                    data.PhotoID = null;
+                    data.MainPhotoId = null;
                 }
                 Dictionary<string, string> errors;
                 List<string> groupErrors = new List<string>();
@@ -451,9 +451,9 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                if (data.PhotoID < 1)
+                if (data.MainPhotoId < 1)
                 {
-                    data.PhotoID = null;
+                    data.MainPhotoId = null;
                 }
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
@@ -857,13 +857,13 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                if (data.Area < 1)
+                if (data.AreaId < 1)
                 {
-                    data.Area = null;
+                    data.AreaId = null;
                 }
-                if (data.PhotoID < 1)
+                if (data.MainPhotoId < 1)
                 {
-                    data.PhotoID = null;
+                    data.MainPhotoId = null;
                 }
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
@@ -1235,9 +1235,9 @@ namespace Amlakbashi.Host.Controllers
                 {
                     saveAndNewRoom = true;
                 }
-                if (data.PhotoID < 1)
+                if (data.MainPhotoId < 1)
                 {
-                    data.PhotoID = null;
+                    data.MainPhotoId = null;
                 }
                 if (data.Pool == true)
                 {
@@ -1342,7 +1342,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var advertise = advertiseService.Find(advertise_id);
-                if (advertise.UserID != userAccessor.CurrentUser.Id)
+                if (advertise.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
                 }
@@ -1468,7 +1468,7 @@ namespace Amlakbashi.Host.Controllers
                 if (checkResult.Result == CheckSetOccupiedResult.OK ||
                     checkResult.Result == CheckSetOccupiedResult.ContainsReserveRequest)
                 {
-                    extrinsicReserveService.Insert(advertise_id, from_date, to_date, ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id, acc.Count);
+                    extrinsicReserveService.Insert(advertise_id, from_date, to_date, ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id, acc.UnitCount);
                     var todayPersian = DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date);
                     bool changeToday = false;
                     if (todayPersian == from_date)
@@ -1576,7 +1576,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -1677,7 +1677,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -1734,7 +1734,7 @@ namespace Amlakbashi.Host.Controllers
                 {
                     status = 1,
                     newValue = newStatus == (int)AdvertiseStatus.Published ? 1 : 0,
-                    statusString = AdvertiseMainLocalization.GetAdvertiseStatusString((int)newStatus),
+                    statusString = AdvertiseMainLocalization.GetAdvertiseStatusPersianName((int)newStatus),
                     statusColor = AdvertiseStyleHelper.GetAdvertiseStatusColor((int)newStatus)
                 });
             }
@@ -1755,7 +1755,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var advertise = advertiseService.Find(id);
-                if (advertise.UserID != userAccessor.CurrentUser.Id)
+                if (advertise.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -1819,7 +1819,7 @@ namespace Amlakbashi.Host.Controllers
                 }
 
                 #region Initialize DTO
-                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(model.UserID);
+                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(model.UserId);
                 var allUserReportItems = reportItemService.GetByAccList(advertiseIds);
                 Dictionary<AdvertiseType, IList<AdvertiseDirector>> childDirectors;
                 var director = advertiseService.GetAdvertisePageData(id, out childDirectors);
@@ -1833,9 +1833,9 @@ namespace Amlakbashi.Host.Controllers
 
                 if (accDTO.CanPublish == false)
                 {
-                    var regionIds = regionService.GetParentIdsByCityId(model.City == null ? 0 : (int)model.City);
+                    var regionIds = regionService.GetParentIdsByCityId(model.CityId == null ? 0 : (int)model.CityId);
                     accDTO.RelatedCategories = new List<DynamicCategory>();
-                    accDTO.RelatedCategories.Add(categoryService.GetAccItemLinks(model.Province, model.City, model.Area, model.TypeID).Last());
+                    accDTO.RelatedCategories.Add(categoryService.GetAccItemLinks(model.ProvinceId, model.CityId, model.AreaId, model.TypeID).Last());
                 }
                 #endregion
 
@@ -1860,7 +1860,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.FindIncludingDeleted(id);
-                if (userAccessor.CurrentUser.Id != acc.UserID)
+                if (userAccessor.CurrentUser.Id != acc.UserId)
                 {
                     return NotFound("صفحه ی مورد نظر موجود نمی باشد .");
                 }
@@ -1868,7 +1868,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.amp_version = false;
 
                 #region Initial DTO
-                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(acc.UserID);
+                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(acc.UserId);
                 var allUserReportItems = reportItemService.GetByAccList(advertiseIds);
                 Dictionary<AdvertiseType, IList<AdvertiseDirector>> childDirectors;
                 var director = advertiseService.GetAdvertisePageData(id, out childDirectors);
@@ -1902,7 +1902,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.amp_version = false;
 
                 #region Initial DTO
-                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(acc.UserID);
+                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(acc.UserId);
                 var allUserReportItems = reportItemService.GetByAccList(advertiseIds);
                 Dictionary<AdvertiseType, IList<AdvertiseDirector>> childDirectors;
                 var director = advertiseService.GetAdvertisePageData(id, out childDirectors);
@@ -1931,7 +1931,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var advertise = advertiseService.Find(id);
-                if (advertise.UserID != userAccessor.CurrentUser.Id)
+                if (advertise.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -1964,7 +1964,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 var discount = discountTableService.Find(discount_id);
                 var acc = advertiseService.Find(discount.AdvertiseID);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -1997,7 +1997,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -2044,7 +2044,7 @@ namespace Amlakbashi.Host.Controllers
         public JsonResult UnsetTodayEmpty(long id)
         {
             var acc = advertiseService.Find(id);
-            if (acc.UserID != userAccessor.CurrentUser.Id)
+            if (acc.UserId != userAccessor.CurrentUser.Id)
             {
                 return GenerateJsonResult(new
                 {
@@ -2059,7 +2059,7 @@ namespace Amlakbashi.Host.Controllers
             if (checkResult.Result == CheckSetOccupiedResult.OK ||
                 checkResult.Result == CheckSetOccupiedResult.ContainsReserveRequest)
             {
-                extrinsicReserveService.Insert(id, DateTime.Now.Date, ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id, acc.Count);
+                extrinsicReserveService.Insert(id, DateTime.Now.Date, ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id, acc.UnitCount);
             }
             else
             {
@@ -2110,7 +2110,7 @@ namespace Amlakbashi.Host.Controllers
         {
             var model = advertiseService.Find(accomodationId);
             var dto = new ReservePopupDTO(model.Capacity,
-                model.MoreThanCapacity,
+                model.ExtraCapacity,
                 model.GetFirstDiscountData(false, true));
             ViewBag.forceHeaderShown = true;
             return PartialView("_Reserve", dto);
@@ -2269,10 +2269,10 @@ namespace Amlakbashi.Host.Controllers
             var priceProperties = new Property[] {
                 Property.DailyPrice,
                 Property.HolidayPrice,
-                Property.HolidayPikePrice,
-                Property.MoreThanCapacityPrice,
-                Property.RentPrice,
-                Property.NorouzPrice
+                Property.PeakHolidayPrice,
+                Property.ExtraCapacityPrice,
+                Property.MonthlyPrice,
+                Property.NowruzPrice
             };
             foreach (var pr in priceProperties)
             {
@@ -2287,10 +2287,10 @@ namespace Amlakbashi.Host.Controllers
                 price_str = string.Format("{0:n0}", price_temp) + " تومان";
                 price_property_dict.Add(pr.ToString(), price_str);
             }
-            if (advertise.NorouzOverCapacityPrice > 0)
+            if (advertise.NowruzExtraCapacityPrice > 0)
             {
                 price_property_dict.Add("NorouzOverCapacityPrice",
-                    string.Format("{0:n0}", advertise.NorouzOverCapacityPrice) + " تومان");
+                    string.Format("{0:n0}", advertise.NowruzExtraCapacityPrice) + " تومان");
             }
 
             var advertise_rules = advertiseService.GetRulesDictionary(advertise.Id);
@@ -2324,7 +2324,7 @@ namespace Amlakbashi.Host.Controllers
             var user_is_autenticated = User.Identity.IsAuthenticated;
             var occupiedList = advertise.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s));
             var priceDict = advertiseService.GetAccPriceDatesInfo(id);
-            var maxInstantReserveDate = DateTime.Now.Date.AddDays(advertise.MaxInstantReserveStart);
+            var maxInstantReserveDate = DateTime.Now.Date.AddDays(advertise.MaxInstantReserveStartTimeInterval);
             var data = new
             {
                 is_favourited = is_favourited,
@@ -2333,7 +2333,7 @@ namespace Amlakbashi.Host.Controllers
                 short_rules_string = short_rules_string,
                 price_property_dict = price_property_dict,
                 instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent,
-                instantReserveMaxStart = advertise.MaxInstantReserveStart,
+                instantReserveMaxStart = advertise.MaxInstantReserveStartTimeInterval,
                 maxReserveStartDate = DateTimeUtility.GregorianToPersianDate(maxInstantReserveDate).Replace(",", "/").Substring(2),
                 maxInstantReserveStartUnix = DateTimeUtility.DateValueOfJS(maxInstantReserveDate),
                 occupiedList = occupiedList,
@@ -2371,8 +2371,8 @@ namespace Amlakbashi.Host.Controllers
                 var data = new StayDurationDTO()
                 {
                     id = acc.Id,
-                    min = acc.MinReserveDays,
-                    max = acc.MaxReserveDays
+                    min = acc.MinReserveDuration,
+                    max = acc.MaxReserveDuration
                 };
                 return GenerateJsonResult(new
                 {
@@ -2464,7 +2464,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (userAccessor.CurrentUser.Id != acc.UserID)
+                if (userAccessor.CurrentUser.Id != acc.UserId)
                 {
                     return GenerateJsonResult(new
                     {
@@ -2497,7 +2497,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (userAccessor.CurrentUser.Id != acc.UserID)
+                if (userAccessor.CurrentUser.Id != acc.UserId)
                 {
                     return GenerateJsonResult(new
                     {
@@ -2508,7 +2508,7 @@ namespace Amlakbashi.Host.Controllers
                 var data = new InstantReserveMaxStartDTO()
                 {
                     id = acc.Id,
-                    maxStart = acc.MaxInstantReserveStart
+                    maxStart = acc.MaxInstantReserveStartTimeInterval
                 };
                 return GenerateJsonResult(new
                 {
@@ -2532,7 +2532,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (userAccessor.CurrentUser.Id != acc.UserID)
+                if (userAccessor.CurrentUser.Id != acc.UserId)
                 {
                     return GenerateJsonResult(new
                     {
@@ -2571,7 +2571,7 @@ namespace Amlakbashi.Host.Controllers
         {
             var user = userAccessor.CurrentUser;
             var acc = advertiseService.Find(id);
-            if (acc.UserID != user.Id)
+            if (acc.UserId != user.Id)
             {
                 return PartialView("_AccSetPrice");
             }
@@ -2585,7 +2585,7 @@ namespace Amlakbashi.Host.Controllers
         {
             var user = userAccessor.CurrentUser;
             var acc = advertiseService.Find(id);
-            if (acc.UserID != user.Id)
+            if (acc.UserId != user.Id)
             {
                 return PartialView("_AccSetMinNorouzReserve");
             }
@@ -2653,14 +2653,14 @@ namespace Amlakbashi.Host.Controllers
 
                 string slug = "";
                 var acc = advertiseService.Find(idLong);
-                if (acc == null || acc.Status != AdvertiseStatus.Published || !acc.Available)
+                if (acc == null || acc.Status != AdvertiseStatus.Published || !acc.Active)
                 {
                     return GenerateJsonResult(new
                     {
                         status = 0
                     });
                 }
-                if (acc.Mode == AdvertiseMode.Child && acc.Count > 0)
+                if (acc.Mode == AdvertiseMode.Child && acc.UnitCount > 0)
                 {
                     slug = acc.Parent.Slug;
                 }
@@ -2690,7 +2690,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 Advertise acc = advertiseService.Find(id);
-                if (acc == null || acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc == null || acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -2720,8 +2720,8 @@ namespace Amlakbashi.Host.Controllers
         {
             var acc = advertiseService.FindIncludingDeleted(id);
             var model = blogpostService.GetAccommodationNewItems(
-                acc.City == null ? 0 : (int)acc.City, acc.Area == null ? 0 : (int)acc.Area, (int)acc.TypeID,
-                (int)acc.Position, acc.Pool == null ? false : (bool)acc.Pool, 2);
+                acc.CityId == null ? 0 : (int)acc.CityId, acc.AreaId == null ? 0 : (int)acc.AreaId, (int)acc.TypeID,
+                (int)acc.LocationType, acc.Pool == null ? false : (bool)acc.Pool, 2);
             return PartialView("_AccBlogNews", model);
         }
 
@@ -2731,7 +2731,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new { status = 0 });
                 }
@@ -2792,11 +2792,11 @@ namespace Amlakbashi.Host.Controllers
                 residenceId = residence.Id,
                 dailyPrice = residence.DailyPrice,
                 holidayPrice = residence.HolidayPrice,
-                peakHolidayPrice = residence.HolidayPikePrice,
-                monthlyPrice = (int)residence.RentPrice,
-                extraCapacityPrice = residence.MoreThanCapacityPrice,
-                norouzPrice = residence.NorouzPrice,
-                norouzExtraCapacityPrice = residence.NorouzOverCapacityPrice,
+                peakHolidayPrice = residence.PeakHolidayPrice,
+                monthlyPrice = (int)residence.MonthlyPrice,
+                extraCapacityPrice = residence.ExtraCapacityPrice,
+                norouzPrice = residence.NowruzPrice,
+                norouzExtraCapacityPrice = residence.NowruzExtraCapacityPrice,
                 calendarPrices = SerializeUtility.SerializeToJS(advertiseService.GetAccPriceDatesInfo(residenceId))
             };
             return PartialView("_PricesInfo", result);

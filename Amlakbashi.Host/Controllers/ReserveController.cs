@@ -2144,8 +2144,8 @@ namespace Amlakbashi.Host.Controllers
                 user_id > 0 ? user_id : userAccessor.CurrentUser.Id);
             var model = UserRatingDTO.Generate(reportItemService.GetAccUserRatings(
                 reserve.AdvertiseID, user_id) as List<ReportItem>, reserve.AdvertiseID,
-                reserve.Advertise.Title, regionService.Find(reserve.Advertise.City == null ? 0 :
-                (int)reserve.Advertise.City).PersianName);
+                reserve.Advertise.Title, regionService.Find(reserve.Advertise.CityId == null ? 0 :
+                (int)reserve.Advertise.CityId).PersianName);
             return PartialView("_Rating", model);
         }
 

@@ -19,14 +19,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         IList<Reserve> Filter(ReserveIndexDTO dto, int currentUserId);
         ReserveListResponse Filter(ReserveGetListRequest request);
         IList<Reserve> GetListByUserId(int userId, bool isHost = false);
-        IList<Reserve> GetListByUserId(int userId, int category, bool isHost = false);
         IList<Reserve> GetListByUserId(int userId, Reserve.ReserveStatus status, bool RatingShownToGuest,
             bool isHost = false);
         ReserveIndexDetailsInfoDTO GetReserveIndexDetailsInfo(Reserve reserve = null);
         ReserveIndexSupportInfoDTO GetReserveIndexSupportInfo(long reserveId);
         Reserve Find(long id);
         Reserve GetReserveIncludingSupport(long id);
-        IQueryable<Reserve> GetReservesIncludingSupport(List<long> ids);
         IList<Reserve> Find(IEnumerable<long> ids);
         IList<Reserve> GetByUserId(int userId);
         Reserve FirstHavingUserId(int userId, Reserve.ReserveStatus status);
@@ -60,15 +58,10 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         void UpdateAccVisitedByGuest(long id, bool value);
         void UpdateDisableAutoCancel(long id, bool value);
         void UpdateExcludeGroup(long id, bool value);
-        //void UpdateHostCallDate(long id, DateTime value);
-        //void UpdateGuestCallDate(long id, DateTime value);
         void UpdatePaymentHasError(long id, bool value);
         void UpdatePaymentHasError(IList<long> ids, bool value);
         void UpdateCanselDiscussion(long id, string text, User user);
-        bool Delete(long id, out string msg);
-        void ExistHostGuest(int userId, out bool hasHost, out bool hasGuest);
         bool UserHasRefundInProgress(int userId);
-        bool UserHasSimilarReserve(int userId, long advertiseId, DateTime startDate, DateTime endDate);
         bool CanReserveStarted(long reserveId, out DateTime canStartTime);
         bool FinishStay(long reserveId, int userId, out string msg, ActionSourceEnum actionSource,
             int doerUserId, bool sendSms = true);

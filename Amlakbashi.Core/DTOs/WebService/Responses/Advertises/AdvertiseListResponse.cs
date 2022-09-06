@@ -43,15 +43,15 @@ namespace Amlakbashi.Core.DTOs.WebService.Responses.Advertises
             response.id = advertise.Id;
             response.title = advertise.Title;
             response.price = advertise.BasePrice;
-            response.typeTitle = AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID);
-            response.roomCount = advertise.Room;
-            response.rate = advertise.AverageUserRating;
+            response.typeTitle = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(advertise.TypeID);
+            response.roomCount = advertise.RoomCount;
+            response.rate = advertise.AverageUsersScore;
             response.rateCount = advertise.UserRatingDict().Count;
             response.instantReserve = advertise.InstantReserveStatus == Entities.Advertise.InstantReserveStatusEnum.Permanent;
             response.discountPercent = discountPercent;
             response.provinceName = advertise.RegionProvince.PersianName;
             response.cityName = advertise.RegionCity.PersianName;
-            response.areaName = advertise.Area != null ? advertise.RegionArea.PersianName : null;
+            response.areaName = advertise.AreaId != null ? advertise.RegionArea.PersianName : null;
             response.imagesUrls = advertise.GetImagesUrls();
             return response;
         }

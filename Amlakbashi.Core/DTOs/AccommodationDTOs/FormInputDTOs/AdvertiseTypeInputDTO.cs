@@ -13,12 +13,12 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
     {
         public AdvertiseType TypeID { get; set; }
         public string advertiseTypeString { get; set; }
-        public bool available { get; set; }
+        public bool active { get; set; }
         public List<DTOSelectItem> advertiseTypeSelectItems { get; set; }
-        public AdvertiseTypeInputDTO(bool available)
+        public AdvertiseTypeInputDTO(bool active)
         {
-            this.available = available;
-            advertiseTypeString = AdvertiseMainLocalization.GetAdvertiseTypeUserString(TypeID);
+            this.active = active;
+            advertiseTypeString = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(TypeID);
             advertiseTypeSelectItems = GenerateAdvertiseTypeItems();
         }
 
@@ -29,7 +29,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
             foreach (var advType in advertiseTypes)
             {
                 result.Add(new DTOSelectItem((int)advType,
-                    AdvertiseMainLocalization.GetAdvertiseTypeUserString(advType)));
+                    AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(advType)));
             }
             return result;
         }

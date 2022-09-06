@@ -85,7 +85,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 }
 
                 #region Initialize DTO
-                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(model.UserID);
+                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(model.UserId);
                 var allUserReportItems = reportItemService.GetByAccList(advertiseIds);
                 Dictionary<Advertise.AdvertiseType, IList<AdvertiseDirector>> childDirectors;
                 var director = advertiseService.GetAdvertisePageData((long)advertiseId, out childDirectors);
@@ -99,9 +99,9 @@ namespace Amlakbashi.Host.Areas.App.Controllers
 
                 if (accDTO.CanPublish == false)
                 {
-                    var regionIds = regionService.GetParentIdsByCityId(model.City == null ? 0 : (int)model.City);
+                    var regionIds = regionService.GetParentIdsByCityId(model.CityId == null ? 0 : (int)model.CityId);
                     accDTO.RelatedCategories = new List<DynamicCategory>();
-                    accDTO.RelatedCategories.Add(categoryService.GetAccItemLinks(model.Province, model.City, model.Area, model.TypeID).Last());
+                    accDTO.RelatedCategories.Add(categoryService.GetAccItemLinks(model.ProvinceId, model.CityId, model.AreaId, model.TypeID).Last());
                 }
                 #endregion
 
@@ -312,13 +312,13 @@ namespace Amlakbashi.Host.Areas.App.Controllers
         {
             try
             {
-                if (data.Area < 1)
+                if (data.AreaId < 1)
                 {
-                    data.Area = null;
+                    data.AreaId = null;
                 }
-                if (data.PhotoID < 1)
+                if (data.MainPhotoId < 1)
                 {
-                    data.PhotoID = null;
+                    data.MainPhotoId = null;
                 }
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
@@ -685,9 +685,9 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 {
                     saveAndNewRoom = true;
                 }
-                if (data.PhotoID < 1)
+                if (data.MainPhotoId < 1)
                 {
-                    data.PhotoID = null;
+                    data.MainPhotoId = null;
                 }
                 if (data.Pool == true)
                 {

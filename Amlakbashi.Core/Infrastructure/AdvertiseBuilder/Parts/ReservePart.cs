@@ -4,8 +4,8 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
 {
     public class ReservePart : IPart
     {
-        public int MaxInstantReserveStart { get; set; }
-        public int MinReserveDays { get; set; }
-        public int MaxReserveDays { get; set; }
+        public int MaxInstantReserveStartTimeInterval { get; set; }
+        public int MinReserveDuration { get; set; }
+        public int MaxReserveDuration { get; set; }
     }
 }

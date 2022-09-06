@@ -47,11 +47,11 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             dto.accId = reserve.AdvertiseID;
             dto.reserveId = reserve.Id;
             dto.accTitle = reserve.Advertise.Title;
-            dto.accTypeString = AdvertiseMainLocalization.GetAdvertiseTypeUserString(reserve.Advertise.TypeID);
+            dto.accTypeString = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(reserve.Advertise.TypeID);
             dto.accAddress = expired || isInvoice ? locationString : locationString + " - " + reserve.Advertise.Address;
             dto.accCapacity = reserve.Advertise.Capacity;
-            dto.accRoomCount = reserve.Advertise.Room;
-            dto.accRoomCountString = reserve.Advertise.Room < 1 ? "بدون اتاق" : reserve.Advertise.Room + " خوابه";
+            dto.accRoomCount = reserve.Advertise.RoomCount;
+            dto.accRoomCountString = reserve.Advertise.RoomCount < 1 ? "بدون اتاق" : reserve.Advertise.RoomCount + " خوابه";
             dto.hostUserId = reserve.HostUserID;
             dto.hostFullName = reserve.HostUser.FullName;
             dto.hostMobile = expired || isInvoice ? "-" : reserve.HostUser.GetNormalizedNoticesPhoneNumber();

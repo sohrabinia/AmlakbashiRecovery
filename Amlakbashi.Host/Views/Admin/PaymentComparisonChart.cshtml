@@ -82,7 +82,7 @@
                     @{ var types2 = Advertise.GetAdvertiseTypes(Advertise.AdvertisePageType.Filter);}
                     @foreach (var item in types2)
                     {
-                        <option is-selected="@((int)ViewBag.adtype == (int)item)" value="@((int)item)">@AdvertiseMainLocalization.GetAdvertiseTypeUserString(item)</option>
+                        <option is-selected="@((int)ViewBag.adtype == (int)item)" value="@((int)item)">@AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(item)</option>
                     }
                 </select>
             </div>

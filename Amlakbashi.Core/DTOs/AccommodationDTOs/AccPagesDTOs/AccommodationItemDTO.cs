@@ -99,6 +99,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             dto.Norouz = new NorouzDTO();//PropertyCopier<NorouzPart, NorouzDTO>.Copy(director.GetAdvertisePart<NorouzPart>(), dto.Norouz);
             PropertyCopier<PositionPart, PositionDTO>.Copy(director.GetAdvertisePart<PositionPart>(), dto.Position);
             PropertyCopier<AdvertiseTypePart, AdvertiseTypeDTO>.Copy(director.GetAdvertisePart<AdvertiseTypePart>(), dto.AdvertiseType);
+            PropertyCopier<VillaTypePart, AdvertiseTypeDTO>.Copy(director.GetAdvertisePart<VillaTypePart>(), dto.AdvertiseType);
             PropertyCopier<AddressPart, AddressDTO>.Copy(director.GetAdvertisePart<AddressPart>(), dto.Address);
             PropertyCopier<RulesPart, RulesDTO>.Copy(director.GetAdvertisePart<RulesPart>(), dto.Rules);
             PropertyCopier<TitleDescPart, TitleDescDTO>.Copy(director.GetAdvertisePart<TitleDescPart>(), dto.TitleDesc);
@@ -173,14 +174,14 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             var hutChildren = childDirectors.ContainsKey(Advertise.AdvertiseType.Hut) ? childDirectors[Advertise.AdvertiseType.Hut] : new List<AdvertiseDirector>();
             dto.Id = advertise.Id;
             dto.Slug = advertise.Slug;
-            dto.LastModifyDate = DateTimeUtility.GregorianToPersianDate(advertise.LastModifyDate);
+            dto.LastModifyDate = DateTimeUtility.GregorianToPersianDate(advertise.LastModifiedDate);
             dto.Comments = commentsList;
             dto.SuspendedComment = suspendeComment;
             dto.SuspendedCommentReserveId = scReserveId;
             var accUser = advertise.User;
             dto.AccUser = accUser != null ? advertise.User : new User() { FirstName = "", LastName = "" };
             dto.TypeUrlString = AdvertiseUrlLocalization.GetAdvertiseTypeUrlString((AdvertiseType)advertise.TypeID);
-            dto.TypeUserString = AdvertiseMainLocalization.GetAdvertiseTypeUserString((AdvertiseType)advertise.TypeID);
+            dto.TypeUserString = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser((AdvertiseType)advertise.TypeID);
             dto.VillaChildren = villaChildren.Select(s => (AccommodationVillaItemDTO)s).ToList();
             dto.ApartmentChildren = apartmentChildren.Select(s => (AccommodationApartmentItemDTO)s).ToList();
             dto.SuitChildren = suitChildren.Select(s => (AccommodationSuitItemDTO)s).ToList();
@@ -199,8 +200,8 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             //advertise.GetRelatedCategories(out countryDirectionCat, out provinceCat,
             //    out cityCat, out areaCat, out countryDirectionName, out provinceName, out cityName, out areaName);
             dto.AccCategory.CountryDirection = advertise.CountryDirection != Region.CountryDirection.Unset;
-            dto.AccCategory.Province = advertise.Province != null;
-            dto.AccCategory.City = advertise.City != null;
+            dto.AccCategory.Province = advertise.ProvinceId != null;
+            dto.AccCategory.City = advertise.CityId != null;
             var categories = advertise.Categories;
             if (categories != null && categories.Any())
             {
@@ -208,15 +209,15 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
                 dto.AccCategory.CityMostAccType = cityCat?.MostAccType;
                 dto.AccCategory.CityCountAdvertise = cityCat?.CountAdvertise;
             }
-            dto.AccCategory.Area = advertise.Area == null ? false : true;
+            dto.AccCategory.Area = advertise.AreaId == null ? false : true;
             dto.AccCategory.CountryDirectionName = advertise.CountryDirection == Region.CountryDirection.Unset ? "" : Region.GetCountryDirectionString(advertise.CountryDirection);
-            dto.AccCategory.ProvinceName = advertise.Province == null ? "" : advertise.RegionProvince.PersianName;
-            dto.AccCategory.CityName = advertise.City == null ? "" : advertise.RegionCity.PersianName;
-            dto.AccCategory.AreaName = advertise.Area == null ? "" : advertise.RegionArea.PersianName;
+            dto.AccCategory.ProvinceName = advertise.ProvinceId == null ? "" : advertise.RegionProvince.PersianName;
+            dto.AccCategory.CityName = advertise.CityId == null ? "" : advertise.RegionCity.PersianName;
+            dto.AccCategory.AreaName = advertise.AreaId == null ? "" : advertise.RegionArea.PersianName;
             dto.AccCategory.CountryDirectionUrl = advertise.CountryDirection == Region.CountryDirection.Unset ? "" : CategoryUrlLocalization.RegionToUrl(advertise.CountryDirection);
-            dto.AccCategory.ProvinceUrl = advertise.Province == null ? "" : CategoryUrlLocalization.RegionToUrl(advertise.CountryDirection, advertise.RegionProvince);
-            dto.AccCategory.CityUrl = advertise.City == null ? "" : CategoryUrlLocalization.RegionToUrl(advertise.CountryDirection, advertise.RegionProvince, advertise.RegionCity);
-            dto.AccCategory.AreaUrl = advertise.Area == null ? "" : CategoryUrlLocalization.RegionToUrl(
+            dto.AccCategory.ProvinceUrl = advertise.ProvinceId == null ? "" : CategoryUrlLocalization.RegionToUrl(advertise.CountryDirection, advertise.RegionProvince);
+            dto.AccCategory.CityUrl = advertise.CityId == null ? "" : CategoryUrlLocalization.RegionToUrl(advertise.CountryDirection, advertise.RegionProvince, advertise.RegionCity);
+            dto.AccCategory.AreaUrl = advertise.AreaId == null ? "" : CategoryUrlLocalization.RegionToUrl(
                 advertise.CountryDirection, advertise.RegionProvince, advertise.RegionCity, advertise.RegionArea);
 
             var userRatingTypes = Enum.GetValues(typeof(Comment.UserRatingType)) as Comment.UserRatingType[];
@@ -273,7 +274,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             dto.CanPublish = advertise.CanPublish();
             dto.DiscountData = advertise.GetFirstDiscountData(false, true);
             dto.ReservePopupData = new ReservePopupDTO(dto.Capacity.Capacity,
-                dto.Capacity.MoreThanCapacity, dto.DiscountData);
+                dto.Capacity.ExtraCapacity, dto.DiscountData);
             return dto;
         }
 

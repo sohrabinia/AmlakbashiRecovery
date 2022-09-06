@@ -56,7 +56,7 @@ namespace Portal.Controllers
             {
                 extra_filter = true;
             }
-            List<int> user_list = advertiseService.FilterAdmin(province, city, area, adtype).Select(s => s.UserID).ToList();
+            List<int> user_list = advertiseService.FilterAdmin(province, city, area, adtype).Select(s => s.UserId).ToList();
             if (type == "monthly")
             {
                 var toDate = DateTime.Today.AddDays(1);
@@ -227,7 +227,7 @@ namespace Portal.Controllers
                         adstatus > -1 || tradeid > 0 || special > 0)
                     {
                         var advertises = advertiseService.FilterAdmin(province, city, area, adtype, false, adstatus);
-                        var advertiseUserIds = advertises.Select(s => s.UserID);
+                        var advertiseUserIds = advertises.Select(s => s.UserId);
                         recievers = recievers.Where(w => advertiseUserIds.Contains(w.Id));
                     }
                     if (userType > -1)
@@ -237,12 +237,12 @@ namespace Portal.Controllers
                     if (norouzPriceStatus == 1)
                     {
                         recievers = recievers.Where(w => w.Type == 1 &&
-                            w.Advertises.Any(a => a.NorouzPrice == 0) == false);
+                            w.Advertises.Any(a => a.NowruzPrice == 0) == false);
                     }
                     else if (norouzPriceStatus == 2)
                     {
                         recievers = recievers.Where(w => w.Type == 1 &&
-                            w.Advertises.Any(a => a.NorouzPrice == 0));
+                            w.Advertises.Any(a => a.NowruzPrice == 0));
                     }
                 }
 
@@ -316,7 +316,7 @@ namespace Portal.Controllers
                 {
                     extra_filter = true;
                 }
-                List<int> user_list = advertiseService.FilterAdmin(province, city, area, adtype).Select(s => s.UserID).ToList();
+                List<int> user_list = advertiseService.FilterAdmin(province, city, area, adtype).Select(s => s.UserId).ToList();
                 if (type == "monthly")
                 {
                     var toDate = DateTime.Today.AddDays(1);
@@ -411,7 +411,7 @@ namespace Portal.Controllers
                 if (extra_filter)
                 {
                     var query = advertiseService.FilterAdmin(province, city, area, adtype);
-                    user_list = query.Select(x => x.UserID).ToList();
+                    user_list = query.Select(x => x.UserId).ToList();
                 }
 
                 if (first_year <= 0)
@@ -519,7 +519,7 @@ namespace Portal.Controllers
                         break;
                     case 1:
                         userList = userList.Where(x => x.Type > 0).ToList();
-                        var userIds = advertiseService.FilterAdmin(province, city, area).Select(s => s.UserID).Distinct().ToList();
+                        var userIds = advertiseService.FilterAdmin(province, city, area).Select(s => s.UserId).Distinct().ToList();
                         userList = userList.Where(w => userIds.Contains(w.Id)).ToList();
                         break;
                 }

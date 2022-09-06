@@ -194,7 +194,7 @@ namespace Amlakbashi.Host.Controllers
                 AdvertiseCommentOverviewDataDTO dto = new AdvertiseCommentOverviewDataDTO();
 
                 IQueryable<Advertise> advertises = advertiseService.GetAllAsIQueriable();
-                advertises = advertises.Where(x => x.UserID == userid);
+                advertises = advertises.Where(x => x.UserId == userid);
                 advertises = advertises.Where(x => x.Status != AdvertiseStatus.Deleted);
                 var advertise_ids = advertises.Select(x => x.Id).ToList();
 
@@ -229,8 +229,8 @@ namespace Amlakbashi.Host.Controllers
                 {
                     parent = advertise.Parent;
                     url = string.Format("/{0}/{1}", "اجاره-روزانه",
-                        advertise.Count > 0 ? parent.Slug : advertise.Slug);
-                    typeString = AdvertiseMainLocalization.GetAdvertiseTypeUserString(
+                        advertise.UnitCount > 0 ? parent.Slug : advertise.Slug);
+                    typeString = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(
                         (AdvertiseType)(parent != null ? parent.TypeID : advertise.TypeID));
                     advertiseComments = comments.Where(x => x.AdvertiseID == advertise.Id);
                     commentCount = advertiseComments.Count();
@@ -263,25 +263,25 @@ namespace Amlakbashi.Host.Controllers
                     {
                         parentTitle = parent.Title;
                         isComplex = parent.Childs.Count > 0 &&
-                            parent.Childs.ElementAt(0).Count == 0;
+                            parent.Childs.ElementAt(0).UnitCount == 0;
                         if (isComplex)
                         {
                             if ((FloorItems)advertise.Floor != FloorItems.Unset)
                             {
-                                selfTitle = "طبقه: " + AdvertiseMainLocalization.GetPropertyValueTitle((FloorItems)advertise.Floor);
+                                selfTitle = "طبقه: " + AdvertiseMainLocalization.GetEnumPersianName((FloorItems)advertise.Floor);
                             }
                         }
                         else
                         {
                             if (!string.IsNullOrEmpty(advertise.Title))
                             {
-                                selfTitle = AdvertiseMainLocalization.GetHotelUnitTitle(parent.TypeID) + " " + advertise.Title;
+                                selfTitle = AdvertiseMainLocalization.GetHotelUnitPersianName(parent.TypeID) + " " + advertise.Title;
                             }
                         }
                     }
                     dto.advertisesOverviews.Add(new CommentOverviewDTO(
                         advertise.Id, parent != null ? parent.Id : 0, url,
-                        advertise.PhotoID == null ? 0 : (long)advertise.PhotoID, advertise.Title,
+                        advertise.MainPhotoId == null ? 0 : (long)advertise.MainPhotoId, advertise.Title,
                         typeString, parentTitle, selfTitle,
                         commentCount, newCommentCount, overallScore, rateCount,
                         new ScoreDetailDTO(tidiness, hostBehaviour, position,
@@ -300,21 +300,21 @@ namespace Amlakbashi.Host.Controllers
         public ActionResult AdvertiseCommentDetail(int id)
         {
             var adv = advertiseService.Find(id);
-            if (adv.UserID != userAccessor.CurrentUser.Id)
+            if (adv.UserId != userAccessor.CurrentUser.Id)
             {
                 return RedirectToAction("AccessDenied", "Errors");
             }
-            if (adv.UserID == userAccessor.CurrentUser.Id)
+            if (adv.UserId == userAccessor.CurrentUser.Id)
             {
                 commentService.SetAsSeenByHost(adv.Id);
             }
-            ViewBag.user_id = adv.UserID;
+            ViewBag.user_id = adv.UserId;
             ViewBag.UrlReferrer = string.IsNullOrEmpty(Request.Headers["Referer"]) ? "/" : Request.Headers["Referer"].ToString();
 
             AdvertiseCommentDetailDTO dto = new AdvertiseCommentDetailDTO();
             IQueryable<Advertise> advertises = advertiseService.GetAllAsIQueriable();
             var advertise = advertises.FirstOrDefault(x => x.Id == id);
-            advertises = advertises.Where(x => x.UserID == advertise.UserID);
+            advertises = advertises.Where(x => x.UserId == advertise.UserId);
             advertises = advertises.Where(x => x.Status != AdvertiseStatus.Deleted);
             var advertise_ids = advertises.Select(x => x.Id).ToList();
             IQueryable<Comment> comments = commentService.GetAllAsIQueryable();
@@ -343,8 +343,8 @@ namespace Amlakbashi.Host.Controllers
             IQueryable<ReportItem> advertiseReportItems;
             parent = advertise.Parent;
             url = string.Format("/{0}/{1}", "اجاره-روزانه",
-                advertise.Count > 0 ? parent.Slug : advertise.Slug);
-            typeString = AdvertiseMainLocalization.GetAdvertiseTypeUserString(
+                advertise.UnitCount > 0 ? parent.Slug : advertise.Slug);
+            typeString = AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(
                 (AdvertiseType)(parent != null ? parent.TypeID : advertise.TypeID));
             advertiseComments = comments.Where(x => x.AdvertiseID == advertise.Id);
             commentCount = advertiseComments.Count();
@@ -377,25 +377,25 @@ namespace Amlakbashi.Host.Controllers
             {
                 parentTitle = parent.Title;
                 isComplex = parent.Childs.Count > 0 &&
-                    parent.Childs.ElementAt(0).Count == 0;
+                    parent.Childs.ElementAt(0).UnitCount == 0;
                 if (isComplex)
                 {
                     if ((FloorItems)advertise.Floor != FloorItems.Unset)
                     {
-                        selfTitle = "طبقه: " + AdvertiseMainLocalization.GetPropertyValueTitle((FloorItems)advertise.Floor);
+                        selfTitle = "طبقه: " + AdvertiseMainLocalization.GetEnumPersianName((FloorItems)advertise.Floor);
                     }
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(advertise.Title))
                     {
-                        selfTitle = AdvertiseMainLocalization.GetHotelUnitTitle(parent.TypeID) + " " + advertise.Title;
+                        selfTitle = AdvertiseMainLocalization.GetHotelUnitPersianName(parent.TypeID) + " " + advertise.Title;
                     }
                 }
             }
             dto.Overview = new CommentOverviewDTO(
                 advertise.Id, parent != null ? parent.Id : 0, url,
-                advertise.PhotoID == null ? 0 : (long)advertise.PhotoID,
+                advertise.MainPhotoId == null ? 0 : (long)advertise.MainPhotoId,
                 advertise.Title, typeString, parentTitle, selfTitle,
                 commentCount, newCommentCount, overallScore, rateCount,
                 new ScoreDetailDTO(tidiness, hostBehaviour, position,
@@ -418,7 +418,7 @@ namespace Amlakbashi.Host.Controllers
             IQueryable<Comment> allReplyComments = commentService.GetAllAsIQueryable();
             allReplyComments = allReplyComments.Where(x => x.AdvertiseID == id);
             allReplyComments = allReplyComments.Where(x => x.type == Comment.CommentType.advertiseHostReply);
-            var hostUser = userService.Find(advertise.UserID);
+            var hostUser = userService.Find(advertise.UserId);
             foreach (var guestUser in guestUsers)
             {
                 relatedComment = advertiseComments.FirstOrDefault(x => x.SenderUserID == guestUser.Id);

@@ -110,19 +110,19 @@
         <tr>
             <td class="label">امتیاز اصلی:</td>
             <td class="value">
-                @Model.AdvertiseScore
+                @Model.ResidenceScore
             </td>
         </tr>
         <tr>
             <td class="label">تعداد بازدید:</td>
             <td class="value">
-                @Html.EditorFor(model => model.WebVisit)
+                @Html.EditorFor(model => model.View)
             </td>
         </tr>
         <tr>
             <td class="label">کد کاربر:</td>
             <td style="width:300px;">
-                @Html.EditorFor(model => model.UserID)
+                @Html.EditorFor(model => model.UserId)
             </td>
             <td></td>
         </tr>
@@ -134,11 +134,11 @@
             </td>
             <td>
                 حداقل:
-                @Html.EditorFor(model => model.MinReserveDays) روز
+                @Html.EditorFor(model => model.MinReserveDuration) روز
             </td>
             <td>
                 حداکثر:
-                @Html.EditorFor(model => model.MaxReserveDays) روز
+                @Html.EditorFor(model => model.MaxReserveDuration) روز
             </td>
         </tr>
         <tr>

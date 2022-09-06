@@ -13,9 +13,9 @@
     <script type="text/javascript">
         currentSelectedDay = undefined;
 
-    var jalaliSelectedDay = @(Model.unixNorouzMinRequestDate > 0 ? "gregorianToJalaliDate(new Date(" + Model.unixNorouzMinRequestDate + "))" : "undefined");
+    var jalaliSelectedDay = @(Model.MinReserveDateForNowruz > 0 ? "gregorianToJalaliDate(new Date(" + Model.MinReserveDateForNowruz + "))" : "undefined");
     if (jalaliSelectedDay != undefined) {
-        var value = @Model.unixNorouzMinRequestDate;
+        var value = @Model.MinReserveDateForNowruz;
         currentSelectedDay = {
             date: jalaliSelectedDay.dateString,
             value: value,

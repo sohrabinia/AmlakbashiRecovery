@@ -405,52 +405,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             }
         }
 
-        public IList<Reserve> GetListByUserId(int userId, int category, bool isHost = false)
-        {
-            IQueryable<Reserve> data;
-            if (isHost)
-            {
-                data = Repository.Query(q => q.Where(w => w.HostUserID == userId));
-            }
-            else
-            {
-                data = Repository.Query(q => q.Where(w => w.UserID == userId));
-            }
-            switch (category)
-            {
-                case -1:
-                    break;
-                case 0:
-                    data = data.Where(x => x.Status ==
-                        Reserve.ReserveStatus.WaitForResponse);
-                    break;
-                case 1:
-                    data = data.Where(x => x.Status ==
-                        Reserve.ReserveStatus.WaitForReserve);
-                    break;
-                case 2:
-                    data = data.Where(x => x.Status ==
-                        Reserve.ReserveStatus.Reserved ||
-                        x.Status == Reserve.ReserveStatus.Started ||
-                        x.Status == Reserve.ReserveStatus.CashPay ||
-                        x.Status == Reserve.ReserveStatus.CancelRequestByGuest ||
-                        x.Status == Reserve.ReserveStatus.CancelRequestByHost);
-                    break;
-                case 3:
-                    data = data.Where(x => x.Status ==
-                        Reserve.ReserveStatus.Completed);
-                    break;
-                case 4:
-                    data = data.Where(x => x.Status ==
-                        Reserve.ReserveStatus.Rejected ||
-                        x.Status == Reserve.ReserveStatus.CanceledByGuest ||
-                        x.Status == Reserve.ReserveStatus.CanceledByHost ||
-                        x.Status == Reserve.ReserveStatus.CanceledBySystem);
-                    break;
-            }
-            return data.OrderByDescending(x => x.CreateDate).ToList();
-        }
-
         public Reserve Find(long id)
         {
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
@@ -716,19 +670,19 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 serviceResult.AddError("تاریخ ورود نمی تواند از تاریخ خروج بیشتر باشد");
             }
             var days = DateTimeUtility.GetPersianDateRangeDays(request.fromDate, request.toDate);
-            if (advertise.MinReserveDays > 0 && days < advertise.MinReserveDays)
+            if (advertise.MinReserveDuration > 0 && days < advertise.MinReserveDuration)
             {
-                serviceResult.AddError($"برای رزرو این اقامتگاه باید حداقل {advertise.MinReserveDays} شب اقامت کنید");
+                serviceResult.AddError($"برای رزرو این اقامتگاه باید حداقل {advertise.MinReserveDuration} شب اقامت کنید");
             }
-            if (advertise.MaxReserveDays > 0 && days > advertise.MaxReserveDays)
+            if (advertise.MaxReserveDuration > 0 && days > advertise.MaxReserveDuration)
             {
-                serviceResult.AddError($"شما می توانید حداکثر {advertise.MaxReserveDays} شب در این اقامتگاه اقامت کنید");
+                serviceResult.AddError($"شما می توانید حداکثر {advertise.MaxReserveDuration} شب در این اقامتگاه اقامت کنید");
             }
             var todayUnix = DateTimeUtility.DateValueOfJS(DateTime.Now.Date);
-            if (advertise.unixNorouzMinRequestDate > todayUnix &&
+            if (advertise.MinReserveDateForNowruz > todayUnix &&
                 DateTimeUtility.IsNorouz(DateTimeUtility.PersianDateRangeToList(request.fromDate, request.toDate, true, false)))
             {
-                var minDateString = DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate));
+                var minDateString = DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.MinReserveDateForNowruz));
                 serviceResult.AddError($"برای رزرو نوروزی این اقامتگاه میتوانید از تاریخ {minDateString} اقدام کنید");
             }
             var minDate = DateTime.Now.TimeOfDay.Hours > 3 ? DateTime.Now.Date : DateTime.Now.Date.AddDays(-1);
@@ -756,7 +710,7 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 var deposite = (long)Math.Round((double)total_price / (double)days);
                 depositePrice = (long)(Math.Max(Math.Round(deposite / 1000f, 0), 1) * 1000);
             }
-            if (request.userId > 0 && advertise.Count < 1 &&
+            if (request.userId > 0 && advertise.UnitCount < 1 &&
                 user.UserHasSimilarReserve(request.advertiseId, startDateGregorian, endDateGregorian))
             {
                 serviceResult.AddError("شما یک درخواست مشابه برای این آگهی دارید");
@@ -1093,37 +1047,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
             Repository.Save();
         }
 
-        public bool Delete(long id, out string msg)
-        {
-            var item = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            if (accounting.GetReservePaidAmount(id, StatusStringType.Guest) > 0)
-            {
-                msg = "مهمان مبلغ رزرو را پرداخت کرده است و تا زمان عودت مبلغ، قابل حذف نیست";
-                return false;
-            }
-            var stateCategory = item.GetStateCategory();
-            if (stateCategory == ReserveCategory.Reserved)
-            {
-                msg = "این سفر، رزرو نهایی شده است و نمیتواند حذف شود";
-                return false;
-            }
-            if (stateCategory == ReserveCategory.Finished)
-            {
-                msg = "این سفر به پایان رسیده است و نمیتواند حذف شود";
-                return false;
-            }
-            if (stateCategory == null)
-            {
-                msg = "";
-                return true;
-            }
-            item.Status = ReserveStatus.Deleted;
-            Repository.Update(item);
-            Repository.Save();
-            msg = "";
-            return true;
-        }
-
         public void SetStatus(long reserveId, ReserveStatus status, bool sendSms,
             ActionLog.ActionSourceEnum actionSource, int doerUserId, bool force = false)
         {
@@ -1188,12 +1111,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 msg = "شما پراخت نقدی مهمان را تایید نکردید";
             }
             return true;
-        }
-
-        public void ExistHostGuest(int userId, out bool hasHost, out bool hasGuest)
-        {
-            hasHost = Repository.Query(q => q.Any(w => w.HostUserID == userId));
-            hasGuest = Repository.Query(q => q.Any(w => w.UserID == userId));
         }
 
         public bool UserHasRefundInProgress(int userId)
@@ -1384,13 +1301,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 "درخواست رزرو شما با موفقیت از حالت لغو خارج شد";
         }
 
-        public bool UserHasSimilarReserve(int userId, long advertiseId, DateTime startDate, DateTime endDate)
-        {
-            if (userId < 1)
-                return false;
-            return Repository.Find<User, int>(userId).UserHasSimilarReserve(advertiseId, startDate, endDate);
-        }
-
         public bool CanReserveStarted(long reserveId, out DateTime canStartTime)
         {
             var reserve = Repository.Query(q => q.FirstOrDefault(f => f.Id == reserveId));
@@ -1520,13 +1430,6 @@ namespace Amlakbashi.Application.Services.ReserveServices
                 q.Where(f => f.Id == id))
                 .Include("GuestUser.ReserveSupportsAsGuest")
                 .FirstOrDefault();
-        }
-
-        public IQueryable<Reserve> GetReservesIncludingSupport(List<long> ids)
-        {
-            return Repository.Query(q =>
-                q.Where(f => ids.Contains(f.Id))
-                .Include("GuestUser.ReserveSupportsAsGuest"));
         }
 
         public VoucherDTO GenerateVoucher(long reserveId, int currentUserId)

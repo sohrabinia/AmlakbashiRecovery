@@ -4,12 +4,12 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
 {
     public class RulesPart : IPart
     {
-        public bool AllowParty { get; set; }
-        public bool AllowPets { get; set; }
-        public bool AllowSmoking { get; set; }
+        public bool Party { get; set; }
+        public bool Pets { get; set; }
+        public bool Smoking { get; set; }
 
         [Important]
-        public string EvidenceRequired { get; set; }
+        public string RequiredEvidence { get; set; }
 
         [Important]
         public string OtherRules { get; set; }
