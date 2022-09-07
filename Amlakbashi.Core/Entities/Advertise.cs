@@ -197,9 +197,8 @@ namespace Amlakbashi.Core.Entities
 
         [JsonIgnore]
         public virtual ICollection<InstantReserveDate> InstantReserveDates { get; set; } = new List<InstantReserveDate>();
-        #endregion
 
-        //public bool HasDiscount;
+        #endregion
 
         #region Functions
 

@@ -412,7 +412,7 @@ function updateMoreFilterBarUI(newData) {
     }
 
     if (newData.filming == '1') {
-        $('.advertise-list__pin-filter-list-bottom').append('<div onclick="removeFilmingFilter()" class="advertise-list__pin-filter-list-item"><span>فیلم برداری </span><i class="fa fa-times"></i></div>');
+        $('.advertise-list__pin-filter-list-bottom').append('<div onclick="removeFilmingFilter()" class="advertise-list__pin-filter-list-item"><span>لوکیشن فیلم برداری </span><i class="fa fa-times"></i></div>');
     }
 
     if (newData.pets == '1') {

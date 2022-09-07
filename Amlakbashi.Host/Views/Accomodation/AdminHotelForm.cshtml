@@ -78,7 +78,7 @@
                         <i class="fas fa-info-circle js-help"></i>
                         <label> مشخص کنید از این نوع اتاق چه تعداد دارید: </label>
                         <button type="button" class="add"><i class="fa fa-plus"></i></button>
-                        <input type="text" name="Count" class="@(ViewData.ModelState.GetValidationState("Count") == ModelValidationState.Invalid ? "input-validation-error " : "")changed-input-target set_min-max-day js-input @ViewData["class"]" value="@Model.hotelUnitSpecific.UnitCount">
+                        <input type="text" name="UnitCount" class="@(ViewData.ModelState.GetValidationState("Count") == ModelValidationState.Invalid ? "input-validation-error " : "")changed-input-target set_min-max-day js-input @ViewData["class"]" value="@Model.hotelUnitSpecific.UnitCount">
                         <button type="button" class="sub"><i class="fa fa-minus"></i></button>
                     </div>
                 </div>

@@ -1057,8 +1057,17 @@ namespace Amlakbashi.Host.Controllers
                         {
                             message += " و در انتظار تایید کارشناس است";
                         }
-                        TempData["alert_success"] = message;
-                        return RedirectToAction("accomodationmanager", "post", new { type = "all" });
+
+                        if (string.IsNullOrEmpty(userAccessor.CurrentUser.ThirdPersonPhoneNumber))
+                        {
+                            TempData["alert_success"] = $"{message}. لطفا اطلاعات پروفایل کاربری خود را تکمیل کنید.";
+                            return RedirectToAction("profilemanager", "user");
+                        }
+                        else
+                        {
+                            TempData["alert_success"] = message;
+                            return RedirectToAction("accomodationmanager", "post", new { type = "all" });
+                        }
                 }
             }
             catch (Exception exc)
@@ -1170,8 +1179,25 @@ namespace Amlakbashi.Host.Controllers
                         parentId = data.ParentId
                     });
                 }
-                return RedirectToAction("accomodationmanager", "post", new { type = "all" });
 
+                var parentResidenceStatus = userAccessor.CurrentUser.Advertises.FirstOrDefault(f => f.Id == data.ParentId).Status;
+                var addOrEdit = isEdit ? "ویرایش" : "ثبت";
+                var message = $"آگهی شما با موفقیت {addOrEdit} شد";
+                if (parentResidenceStatus == AdvertiseStatus.ReadyToPublish)
+                {
+                    message += " و در انتظار تایید کارشناس است";
+                }
+
+                if (string.IsNullOrEmpty(userAccessor.CurrentUser.ThirdPersonPhoneNumber))
+                {
+                    TempData["alert_success"] = $"{message}. لطفا اطلاعات پروفایل کاربری خود را تکمیل کنید.";
+                    return RedirectToAction("profilemanager", "user");
+                }
+                else
+                {
+                    TempData["alert_success"] = message;
+                    return RedirectToAction("accomodationmanager", "post", new { type = "all" });
+                }
             }
             catch (Exception exc)
             {
@@ -1299,8 +1325,25 @@ namespace Amlakbashi.Host.Controllers
                         parentId = data.ParentId
                     });
                 }
-                return RedirectToAction("accomodationmanager", "post", new { type = "all" });
 
+                var parentResidenceStatus = userAccessor.CurrentUser.Advertises.FirstOrDefault(f => f.Id == data.ParentId).Status;
+                var addOrEdit = isEdit ? "ویرایش" : "ثبت";
+                var message = $"آگهی شما با موفقیت {addOrEdit} شد";
+                if (parentResidenceStatus == AdvertiseStatus.ReadyToPublish)
+                {
+                    message += " و در انتظار تایید کارشناس است";
+                }
+
+                if (string.IsNullOrEmpty(userAccessor.CurrentUser.ThirdPersonPhoneNumber))
+                {
+                    TempData["alert_success"] = $"{message}. لطفا اطلاعات پروفایل کاربری خود را تکمیل کنید.";
+                    return RedirectToAction("profilemanager", "user");
+                }
+                else
+                {
+                    TempData["alert_success"] = message;
+                    return RedirectToAction("accomodationmanager", "post", new { type = "all" });
+                }
             }
             catch (Exception exc)
             {
