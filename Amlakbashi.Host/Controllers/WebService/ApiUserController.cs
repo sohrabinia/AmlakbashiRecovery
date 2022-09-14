@@ -66,11 +66,12 @@ namespace Amlakbashi.Host.Controllers.WebService
         [HttpPost]
         public async Task<IActionResult> Profile(UserPostProfileRequest request)
         {
+            request.panel = User.GetUserPanelType();
             if (request.IsValid(ModelState) == false)
             {
                 return BadRequest(ModelState);
             }
-            request.id = User.GetId();
+            request.userId = User.GetId();
             var result = await userService.UpdateAsync(request);
             if (result.HasError())
             {

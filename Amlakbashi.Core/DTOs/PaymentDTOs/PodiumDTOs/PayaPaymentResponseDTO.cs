@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
+namespace Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs
 {
     [Serializable]
-    public class ShebaPaymentResultDTO : BankingResultDTO
+    public class PayaPaymentResponseDTO : PodiumResponseDTO
     {
         public string Message { get; set; }
         public string TraceNumber { get; set; }

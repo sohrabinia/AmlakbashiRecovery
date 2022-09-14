@@ -1,4 +1,4 @@
-﻿using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
+﻿using Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +9,9 @@ namespace Amlakbashi.Accounting.BankingContext
 {
     internal interface IBankingOperator
     {
-        ShebaVerificationResultDTO ShebaVerification(string sheba);
-        ShebaPaymentResultDTO ShebaPayment(ShebaPaymentRequestDTO reqeustDTO);
-        CheckShebaPaymentResultDTO CheckShebaPaymentStatus(string transactionId, string traceNumber);
+        ShebaVerificationResponseDTO ShebaVerification(string sheba);
+        PayaPaymentResponseDTO PayaPayment(PayaPaymentRequestDTO reqeustDTO);
+        CheckPayaPaymentResponseDTO CheckPayaPayment(string transactionId, string traceNumber);
+        CheckTransactionStatusResponseDTO CheckTransactionStatus(string transactionId);
     }
 }

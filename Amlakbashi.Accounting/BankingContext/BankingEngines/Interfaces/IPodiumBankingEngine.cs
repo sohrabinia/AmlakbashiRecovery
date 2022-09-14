@@ -1,16 +1,12 @@
-﻿using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.GeneralInfos;
-using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs;
 
 namespace Amlakbashi.Accounting.BankingContext.BankingEngines.Interfaces
 {
     internal interface IPodiumBankingEngine
     {
-        ShebaVerificationResultDTO ShebaVerification(string sheba);
-        ShebaPaymentResultDTO ShebaPayment(ShebaPaymentRequestDTO requestDTO);
-        CheckShebaPaymentResultDTO CheckShebaPaymentStatus(string transactionId, string traceNumber);
+        ShebaVerificationResponseDTO ShebaVerification(string sheba);
+        PayaPaymentResponseDTO PayaPayment(PayaPaymentRequestDTO requestDTO);
+        CheckPayaPaymentResponseDTO CheckPayaPayment(string transactionId, string traceNumber);
+        CheckTransactionStatusResponseDTO CheckTransactionStatus(string transactionId);
     }
 }

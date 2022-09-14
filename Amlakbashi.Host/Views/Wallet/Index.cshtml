@@ -34,12 +34,6 @@
                 </td>
                 <td><input type="submit" class="filter" value="فیلتر" /></td>
             </tr>
-            @*<tr>
-                    <td class="label"> شماره تراکنش :</td>
-                    <td class="minw">
-                        <input type="text" style="width:150px;" value="@ViewBag.transaction_id" name="transaction_id" />
-                    </td>
-                </tr>*@
         </table>
     </div>
 
@@ -61,7 +55,7 @@
                 دلیل
             </th>
             <th>
-                شماره پیگیری
+                شناسه پرداخت
             </th>
             <th>
                 مبلغ تراکنش
@@ -85,8 +79,8 @@
                     @Idx
                 </td>
                 <td>@item.Id</td>
-                <td>@item.UserID</td>
-                <td>@item.ReserveID</td>
+                <td><a asp-action="index" asp-controller="user" asp-route-code="@item.UserID" target="_blank">@item.UserID</a></td>
+                <td><a asp-action="newindex" asp-controller="reserve" asp-route-reserveid="@item.ReserveID" target="_blank">@item.ReserveID</a></td>
                 <td>
                     @CreditTransaction.GetCreditTransactionCauseString(item.TransactionCause, item.TransactionCauseString)
                     @if (item.TransactionCause == CreditTransaction.WalletTransactionReason.Corrective)
@@ -98,7 +92,13 @@
                         <p>(تراکنش اصلاحی: <a asp-action="index" asp-controller="wallet" asp-route-creditTransactionId="@item.CorrectiveWalletTransaction.Id">@item.CorrectiveWalletTransaction.Id</a>)</p>
                     }
                 </td>
-                <td>@item.BankTransactionID</td>
+                <td>
+                    @if (item.PaymentId.HasValue && item.Payment.Status == Payment.PaymentStatus.NotPaid)
+                    {
+                        <i class="fas fa-exclamation-circle" style="color: red; font-size: large;"></i>
+                    }
+                    <a asp-action="index" asp-controller="payment" asp-route-userid="@item.UserID">@item.PaymentId</a>
+                </td>
                 <td>
                     <p style="color: @(item.Price > 0 ? "limegreen" : "red");">@string.Format("{0:n0}", item.Price) تومان</p>
                     @if (item.CorrectiveWalletTransaction != null)

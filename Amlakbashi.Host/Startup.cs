@@ -156,10 +156,16 @@ namespace Amlakbashi.Host
                     crossOrigins.Add("https://localhost:3000");
                     crossOrigins.Add("http://next.amlakbashi.com:3000");
                     crossOrigins.Add("https://next.amlakbashi.com:3000");
+
                     crossOrigins.Add("http://host.amlakbashi.com");
                     crossOrigins.Add("https://host.amlakbashi.com");
                     crossOrigins.Add("http://host.amlakbashi.com:3000");
                     crossOrigins.Add("https://host.amlakbashi.com:3000");
+
+                    crossOrigins.Add("http://user.amlakbashi.com");
+                    crossOrigins.Add("https://user.amlakbashi.com");
+                    crossOrigins.Add("http://user.amlakbashi.com:3000");
+                    crossOrigins.Add("https://user.amlakbashi.com:3000");
                     policyBuilder.WithOrigins(crossOrigins.ToArray()).AllowAnyHeader().AllowAnyMethod();
                 });
                 options.AddPolicy(mediatorsCorsPolicyName, policyBuiler =>

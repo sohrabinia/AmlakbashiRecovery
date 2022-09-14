@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -9,20 +10,35 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.User
 {
     public class UserPostProfileRequest
     {
+        [Required]
         public string firstName { get; set; }
+
+        [Required]
         public string lastName { get; set; }
         public string phoneNumber2 { get; set; }
         public string phoneNumber3 { get; set; }
         public string landLinePhoneNumber { get; set; }
         public string thirdPersonPhoneNumber { get; set; }
+
+        [Required]
         public string bankCardNumber { get; set; }
+
+        [Required]
         public string bankCardOwnerFirstName { get; set; }
+
+        [Required]
         public string bankCardOwnerLastName { get; set; }
+
+        [Required]
         public string shebaNumber { get; set; }
+
         public Entities.User.NoticesPhoneNumberEnum noticesPhoneNumber { get; set; }
 
         [BindNever]
-        public int id { get; set; }
+        public int userId { get; set; }
+
+        [BindNever]
+        public Entities.User.UserGeneralTypeEnum panel { get; set; }
 
         public bool IsValid(ModelStateDictionary modelState)
         {
@@ -77,6 +93,11 @@ namespace Amlakbashi.Core.DTOs.WebService.Requests.User
                 (noticesPhoneNumber == Entities.User.NoticesPhoneNumberEnum.PhoneNumber3 && string.IsNullOrEmpty(phoneNumber3)))
             {
                 modelState.AddModelError(nameof(noticesPhoneNumber), "noticesphonenumber is incorrect");
+            }
+            if (panel == Entities.User.UserGeneralTypeEnum.Host &&
+                string.IsNullOrEmpty(thirdPersonPhoneNumber))
+            {
+                modelState.AddModelError(nameof(thirdPersonPhoneNumber), "thirdPersonPhoneNumber is incorrect");
             }
             return modelState.IsValid;
         }

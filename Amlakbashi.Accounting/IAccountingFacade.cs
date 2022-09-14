@@ -3,8 +3,8 @@ using Amlakbashi.Core.Common.Enums;
 using Amlakbashi.Core.DTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs;
-using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.PaymentStatisticsDTOs;
+using Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs;
 using Amlakbashi.Core.DTOs.WalletDTOs;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
@@ -142,10 +142,11 @@ namespace Amlakbashi.Accounting
 
         // Podium Services
 
-        ShebaVerificationResultDTO VerifySheba(string sheba);
-        ShebaPaymentResultDTO SiteClearingHostAutoPayment(long reserveId, int operatorId);
-        ShebaPaymentResultDTO WalletClearingAutoPayment(int userId, int operatorId);
-        CheckShebaPaymentResultDTO CheckShebaPaymentStatus(long paymentId);
+        ShebaVerificationResponseDTO VerifySheba(string sheba);
+        PayaPaymentResponseDTO SiteClearingHostAutoPayment(long reserveId, int operatorId);
+        PayaPaymentResponseDTO WalletClearingAutoPayment(int userId, int operatorId);
+        PayaPaymentResponseDTO PodiumRepayment(int paymentId, int operatorId);
+        CheckPayaPaymentResponseDTO CheckShebaPaymentStatus(long paymentId);
         bool RegisterNotPaidPayment(long paymentId, int operatorId);
     }
 }

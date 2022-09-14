@@ -2,7 +2,7 @@
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Results;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.ResultInfos;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.RequestInfos;
-using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
+using Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs;
 using Amlakbashi.Core.Common.Utilities;
 using System;
 using System.Text;
@@ -18,7 +18,7 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
         private const string sourceSheba = "IR440570390280000097374001";
 
         private readonly ShebaPaymentRequestInfo request;
-        public ShebaPaymentRequest(ShebaPaymentRequestDTO requestDTO)
+        public ShebaPaymentRequest(PayaPaymentRequestDTO requestDTO)
         {
             request = new ShebaPaymentRequestInfo()
             {

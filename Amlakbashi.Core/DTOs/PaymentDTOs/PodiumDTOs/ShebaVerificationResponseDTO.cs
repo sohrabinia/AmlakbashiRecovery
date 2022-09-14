@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
+namespace Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs
 {
     [Serializable]
-    public class ShebaVerificationResultDTO : BankingResultDTO
+    public class ShebaVerificationResponseDTO : PodiumResponseDTO
     {
         public string Sheba { get; set; }
         public string Message { get; set; }
@@ -14,5 +14,12 @@ namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
         public string BankCardName { get; set; }
         public int BankCardId { get; set; }
         public bool ShebaVerify { get; set; }
+    }
+
+    [Serializable]
+    public class BankAccountOwnerDTO
+    {
+        public string firstName { get; set; }
+        public string lastName { get; set; }
     }
 }

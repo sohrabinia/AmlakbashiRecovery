@@ -29,11 +29,7 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Base
             client.DefaultRequestHeaders.Add("_token_", token);
             client.DefaultRequestHeaders.Add("_token_issuer_", tokenIssuer);
 
-#if DEBUG
-            var httpResponse = new HttpResponseMessage();
-#else
             var httpResponse = client.PostAsync(url, content).Result;
-#endif
 
             var stringResponse = httpResponse.Content.ReadAsStringAsync().Result;
             var responseData = JsonConvert.DeserializeObject<R>(stringResponse);

@@ -663,6 +663,16 @@ namespace Amlakbashi.Core.Entities
             return supports.ToList();
         }
 
+        public bool HasFailureExpenditurePayment()
+        {
+            return Payments.Any(x => x.Type == Payment.PaymentType.Expenditure && x.Status == Payment.PaymentStatus.NotPaid);
+        }
+
+        public Payment GetFailureExpenditurePayment()
+        {
+            return Payments.FirstOrDefault(x => x.Type == Payment.PaymentType.Expenditure && x.Status == Payment.PaymentStatus.NotPaid);
+        }
+
         public int ChatCount
         {
             get

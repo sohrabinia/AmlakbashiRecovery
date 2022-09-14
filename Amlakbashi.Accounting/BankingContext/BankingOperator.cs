@@ -1,5 +1,5 @@
 ﻿using Amlakbashi.Accounting.BankingContext.BankingEngines.Interfaces;
-using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
+using Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,19 +14,24 @@ namespace Amlakbashi.Accounting.BankingContext
             this.podiumEngine = podiumEngine;
         }
 
-        public ShebaPaymentResultDTO ShebaPayment(ShebaPaymentRequestDTO reqeustDTO)
+        public PayaPaymentResponseDTO PayaPayment(PayaPaymentRequestDTO reqeustDTO)
         {
-            return podiumEngine.ShebaPayment(reqeustDTO);
+            return podiumEngine.PayaPayment(reqeustDTO);
         }
 
-        public ShebaVerificationResultDTO ShebaVerification(string sheba)
+        public ShebaVerificationResponseDTO ShebaVerification(string sheba)
         {
             return podiumEngine.ShebaVerification(sheba);
         }
 
-        public CheckShebaPaymentResultDTO CheckShebaPaymentStatus(string transactionId, string traceNumber)
+        public CheckPayaPaymentResponseDTO CheckPayaPayment(string transactionId, string traceNumber)
         {
-            return podiumEngine.CheckShebaPaymentStatus(transactionId, traceNumber);
+            return podiumEngine.CheckPayaPayment(transactionId, traceNumber);
+        }
+
+        public CheckTransactionStatusResponseDTO CheckTransactionStatus(string transactionId)
+        {
+            return podiumEngine.CheckTransactionStatus(transactionId);
         }
     }
 }

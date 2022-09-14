@@ -280,25 +280,16 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        //public IActionResult CheckPodiumPaymentStatus(long reservePaymentId)
-        //{
-        //    try
-        //    {
-        //        var result = accounting.CheckShebaPaymentStatus(reservePaymentId, true);
-        //        return PartialView("_CheckPodiumPaymentStatus", result);
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("ReservePayment.CheckPodiumPaymentStatus", exc);
-        //        return PartialView("_CheckPodiumPaymentStatus");
-        //    }
-        //}
-
         [Authorize(Policy = Policies.Reserve_Payment_Edit)]
         public JsonResult Delete(long reservePaymentId)
         {
             try
             {
+                var reservePayment = accounting.FindReservePayment(reservePaymentId);
+                if (reservePayment.PaymentId.HasValue)
+                {
+                    return GenerateJsonResult(new { status = 0 });
+                }
                 accounting.DeleteReservePayment(reservePaymentId);
                 return GenerateJsonResult(new { status = 1 });
             }

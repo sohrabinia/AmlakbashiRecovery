@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Amlakbashi.Core.Entities;
 
-namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
+namespace Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs
 {
-    public class CheckShebaPaymentResultDTO : BankingResultDTO
+    public class CheckPayaPaymentResponseDTO : PodiumResponseDTO
     {
         public string RefrenceNumber { get; set; }
         public string Status { get; set; }

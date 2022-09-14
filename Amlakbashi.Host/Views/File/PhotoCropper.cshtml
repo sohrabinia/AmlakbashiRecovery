@@ -1,11 +1,9 @@
-﻿
+﻿@model Amlakbashi.Core.Entities.File
+
 @{
     Layout = "~/Views/Shared/_Raw.cshtml";
     ViewBag.Title = "ویرایش عکس";
 }
-
-@model Amlakbashi.Core.Entities.File
-
 
 @section StyleLink
 {
@@ -13,8 +11,13 @@
     <link rel="stylesheet" href="/file/getcss?src=/resource/jquery-cropper/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/jquery-cropper/cropper.css" />
     <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/jquery-cropper/main.css" />
-
 }
+
+<style>
+    div {
+        width: unset;
+    }
+</style>
 
 <input type="hidden" id="fileid" value="@Model.Id" />
 <input type="hidden" id="accid" value="@ViewBag.accId" />
@@ -31,7 +34,7 @@
                     }
                     else
                     {
-                        <img id="image" src="/@Model.CorrectedFilePath" alt="Picture">
+                        <img id="image" src="/@Model.CorrectedFilePath" alt="Picture" asp-append-version="true">
                     }
                 </div>
             </div>
@@ -505,12 +508,6 @@
         </div>
     </div>
 </div>
-
-<style>
-    div {
-        width: unset;
-    }
-</style>
 
 @section ScriptLink
 {

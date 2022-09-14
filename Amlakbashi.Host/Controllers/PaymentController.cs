@@ -100,7 +100,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize(Policy = Policies.Payment_Actions)]
-        public IActionResult RegisterNotPaidPayment(long paymentId)
+        public IActionResult RegisterPodiumNotPaidPayment(long paymentId)
         {
             try
             {
@@ -152,6 +152,30 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new
                 {
                     status = 0
+                });
+            }
+        }
+
+        [Authorize(Policy = Policies.Payment_Actions)]
+        [HttpPost]
+        public IActionResult PodiumRepayment(int paymentId)
+        {
+            try
+            {
+                var result = accounting.PodiumRepayment(paymentId, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new
+                {
+                    status = result.HasError ? 0 : 1,
+                    msg = result.HasError ? result.ErrorMessage : result.Message
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Payment.PodiumRepayment", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد"
                 });
             }
         }

@@ -1165,7 +1165,8 @@ namespace Amlakbashi.Host.Controllers
                             hostBankCard.ShabaNumber : "",
                     UserName = hostName,
                     UserId = hostUser.Id,
-                    UserCredit = hostUser.WalletAmount
+                    UserCredit = hostUser.WalletAmount,
+                    HasFailureExpenditurePayment = reserve.HasFailureExpenditurePayment()
                 };
                 return PartialView("_SiteClearingHostInfo", model);
             }
@@ -1226,6 +1227,7 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
+                ViewBag.hasFailureExpenditurePayment = reserveService.Find(reserveId).HasFailureExpenditurePayment();
                 ViewBag.reserveId = reserveId;
                 ViewBag.userId = userAccessor.CurrentUser.Id;
                 ViewBag.price = price;
@@ -2343,7 +2345,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(id);
-                
+
                 var reservePayment = new ReservePayment()
                 {
                     CreateDate = DateTime.Now,
@@ -2357,7 +2359,7 @@ namespace Amlakbashi.Host.Controllers
                 };
                 var invalidData = false;
                 var errorMessage = "";
-                
+
                 if (reservePayment.Price <= 0)
                 {
                     invalidData = true;
@@ -2436,7 +2438,7 @@ namespace Amlakbashi.Host.Controllers
                 lowerCode == "inst8" ? DiscountCoupon.DiscountCouponType.Instagram :
                 lowerCode == "pedar1400" ? DiscountCoupon.DiscountCouponType.Pedar1400 :
                 DiscountCoupon.DiscountCouponType.Unset;
-            
+
             if (discountCodeType == DiscountCoupon.DiscountCouponType.Unset)
             {
                 return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
@@ -2456,7 +2458,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
             }
-            
+
             var coupon = accounting.FindDiscountCoupon(userAccessor.CurrentUser.Id, discountCodeType);
             if (coupon == null)
             {

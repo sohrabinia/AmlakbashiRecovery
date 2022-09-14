@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs
+namespace Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs
 {
-    public class ShebaPaymentRequestDTO
+    public class PayaPaymentRequestDTO
     {
         public string DestSheba { get; set; }
         public string DestFirstName { get; set; }

@@ -374,21 +374,20 @@ namespace Amlakbashi.Application.Services.UserServices
         public async Task<ServiceResult> UpdateAsync(UserPostProfileRequest request)
         {
             var serviceResult = new ServiceResult();
-            var user = Repository.Find(request.id);
-            if (user.Type == (int)User.UserGeneralTypeEnum.Host && string.IsNullOrEmpty(request.thirdPersonPhoneNumber))
-            {
-                serviceResult.AddError("thirdPersonPhoneNumber is required");
-                return serviceResult;
-            }
+            var user = Repository.Find(request.userId);
 
             var shallowUser = user.ShallowCopy();
             user.FirstName = request.firstName;
             user.LastName = request.lastName;
             user.PhoneNumber2 = PhoneUtility.CorrectPhoneNumberIfPossible(request.phoneNumber2);
             user.PhoneNumber3 = PhoneUtility.CorrectPhoneNumberIfPossible(request.phoneNumber3);
-            user.LandlinePhoneNumber = PhoneUtility.CorrectPhoneNumberIfPossible(request.landLinePhoneNumber);
-            user.ThirdPersonPhoneNumber = PhoneUtility.CorrectPhoneNumberIfPossible(request.thirdPersonPhoneNumber);
             user.NoticesPhoneNumber = request.noticesPhoneNumber;
+
+            if (request.panel == User.UserGeneralTypeEnum.Host)
+            {
+                user.LandlinePhoneNumber = PhoneUtility.CorrectPhoneNumberIfPossible(request.landLinePhoneNumber);
+                user.ThirdPersonPhoneNumber = PhoneUtility.CorrectPhoneNumberIfPossible(request.thirdPersonPhoneNumber);
+            }
 
             var identityUser = GetIdentityUser(user.PhoneNumber);
             await UpdateIdentityAsync(identityUser);
@@ -428,7 +427,7 @@ namespace Amlakbashi.Application.Services.UserServices
                 {
                     var newBankCard = new BankCard()
                     {
-                        UserID = request.id,
+                        UserID = request.userId,
                         BankCardNumber = request.bankCardNumber,
                         ShabaNumber = request.shebaNumber,
                         FName = request.bankCardOwnerFirstName,
