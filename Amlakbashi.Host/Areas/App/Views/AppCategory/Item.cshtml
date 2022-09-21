@@ -104,6 +104,10 @@
     {
         moreFilterCount++;
     }
+    if (Model.Exclusive == 1)
+    {
+        moreFilterCount++;
+    }
 }
 
 @section StyleBlock {
@@ -444,6 +448,11 @@
                                         <span>لوکیشن فیلم برداری</span>
                                         <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Filming != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
+                                    <input type="hidden" id="js-exclusive-input" value="@(Model.Exclusive)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>دربست</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Exclusive != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -631,6 +640,13 @@
                 {
                     <div onclick="removeFilmingFilter()" class="advertise-list__pin-filter-list-item">
                         <span>لوکیشن فیلم برداری</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.Exclusive == 1)
+                {
+                    <div onclick="removeExclusiveFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>دربست</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }

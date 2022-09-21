@@ -66,6 +66,7 @@ function initializeFilterData() {
     filterInputData.foosball = $('#js-foosball-input-filter').attr('value');
     filterInputData.teaMaker = $('#js-teamaker-input-filter').attr('value');
     filterInputData.filming = $('#js-filming-input-filter').attr('value');
+    filterInputData.exclusive = $('#js-exclusive-input-filter').attr('value');
     filterInputData.pets = $('#js-pets-input-filter').attr('value');
     filterInputData.party = $('#js-party-input-filter').attr('value');
     filterInputData.smoking = $('#js-smoking-input-filter').attr('value');
@@ -249,6 +250,7 @@ function doMoreFilter() {
     filterInputData.foosball = $('#js-foosball-input').val();
     filterInputData.teaMaker = $('#js-teamaker-input').val();
     filterInputData.filming = $('#js-filming-input').val();
+    filterInputData.exclusive = $('#js-exclusive-input').val();
     sendNewFilterData();
     $('#js-ajax-filter').val(true);
     $('#js-more-filter-item').hide(100);
@@ -282,6 +284,7 @@ function removeMoreFilter() {
     filterInputData.foosball = '-1';
     filterInputData.teaMaker = '-1';
     filterInputData.filming = '-1';
+    filterInputData.exclusive = '-1';
     filterInputData.priceType = '0';
     sendNewFilterData();
 }
@@ -430,5 +433,12 @@ function removeFilmingFilter(dontSubmit) {
     filterInputData.page = 1;
     filterInputData.ajax = true;
     filterInputData.filming = '-1';
+    sendNewFilterData();
+}
+
+function removeExclusiveFilter(dontSubmit) {
+    filterInputData.page = 1;
+    filterInputData.ajax = true;
+    filterInputData.exclusive = '-1';
     sendNewFilterData();
 }

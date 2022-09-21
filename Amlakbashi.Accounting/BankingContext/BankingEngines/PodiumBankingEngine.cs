@@ -57,7 +57,7 @@ namespace Amlakbashi.Accounting.BankingContext.BankingEngines
             if (data.hasError == false && data.BankResult.IsSuccess)
             {
                 result.RefrenceNumber = data.BankResult.ResultData.TransactionNumber;
-                result.Status = data.BankResult.ResultData.State;
+                result.Status = Enum.Parse<PayaPaymentStatusEnum>(data.BankResult.ResultData.State);
                 result.Amount = data.BankResult.ResultData.Amount;
                 result.BankName = data.BankResult.ResultData.BankName;
                 result.TransactionDate = data.BankResult.ResultData.TransactionDate;

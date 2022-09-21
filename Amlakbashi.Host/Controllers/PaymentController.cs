@@ -89,7 +89,7 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                var result = accounting.CheckShebaPaymentStatus(paymentId);
+                var result = accounting.CheckPayaPaymentStatus(paymentId);
                 return PartialView("_CheckPodiumPaymentStatus", result);
             }
             catch (Exception exc)

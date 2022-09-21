@@ -35,6 +35,7 @@ namespace Amlakbashi.Application.Services.Category.Interfaces
           bool foosball = false,
           bool teaMaker = false,
           bool filming = false,
+          bool exclusive = false,
           bool rules_pets = false,
           bool rules_party = false,
           bool rules_smoking = false,

@@ -50,6 +50,13 @@ namespace Amlakbashi.Core.Entities
         [JsonIgnore]
         public virtual ICollection<Cart> Carts { get; set; }
 
+        [NotMapped]
+        public long AmountAsToman { 
+            get {
+                return Amount / 10;
+            } 
+        }
+
         public enum PaymentStatus
         {
             NotPaid = 0,

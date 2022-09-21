@@ -1,4 +1,6 @@
-﻿@model Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs.CheckPayaPaymentResponseDTO
+﻿@using Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs;
+
+@model CheckPayaPaymentResponseDTO
 
 <style>
     .pay-btn {
@@ -11,56 +13,67 @@
 
 @if (Model == null)
 {
-<div>
-    <span>عملیات با خطا مواجه شد (خطای داخلی)</span>
-</div>
+    <div>
+        <span>عملیات با خطا مواجه شد (خطای داخلی)</span>
+    </div>
 }
 else if (Model.HasError)
 {
-<div>
-    @if (Model.ErrorCode > 0)
+    <div>
+        @if (Model.ErrorCode > 0)
         {
-    <p>کد خطا: @Model.ErrorCode</p>
+            <p>کد خطا: @Model.ErrorCode</p>
         }
-    <p>@Model.ErrorMessage</p>
-</div>
-<br />
-<div style="text-align: center;">
-    <button id="auto_payment_btn" class="pay-btn" onclick="repaymentPodiumTransaction()" type="button">پرداخت مجدد</button>
-</div>
-<div style="text-align: center;">
-    <span id="PaymentResultWaitingSpan" style="visibility:hidden; color: darkorange; margin-top: 5px;">لطفا منتظر بمانید ...</span>
-</div>
+        <p>@Model.ErrorMessage</p>
+    </div>
+    <br />
+    <div style="text-align: center;">
+        <button id="auto_payment_btn" class="pay-btn" onclick="repaymentPodiumTransaction()" type="button">پرداخت مجدد</button>
+    </div>
+    <div style="text-align: center;">
+        <span id="PaymentResultWaitingSpan" style="visibility:hidden; color: darkorange; margin-top: 5px;">لطفا منتظر بمانید ...</span>
+    </div>
 }
 else
 {
-<div>
-    <span>شماره پیگیری:</span>
-    <span>@Model.RefrenceNumber</span>
-</div>
-<div>
-    <span>وضعیت:</span>
-    <span>@Model.Status</span>
-</div>
-<div>
-    <span>تاریخ:</span>
-    <span>@Model.TransactionDate</span>
-</div>
-<div>
-    <span>زمان:</span>
-    <span>@Model.TransactionTime</span>
-</div>
-<div>
-    <span>مبلغ:</span>
-    <span>@Model.Amount</span>
-</div>
-<br />
-@if (Model.PaymentStatus == Payment.PaymentStatus.NotPaid)
+    <div>
+        <span>شماره پیگیری:</span>
+        <span>@Model.RefrenceNumber</span>
+    </div>
+    <div>
+        <span>وضعیت:</span>
+        <span>@Model.Status</span>
+    </div>
+    <div>
+        <span>تاریخ:</span>
+        <span>@Model.TransactionDate</span>
+    </div>
+    <div>
+        <span>زمان:</span>
+        <span>@Model.TransactionTime</span>
+    </div>
+    <div>
+        <span>مبلغ:</span>
+        <span>@Model.Amount</span>
+    </div>
+    <br />
+    @if (Model.PaymentStatus == Payment.PaymentStatus.NotPaid)
     {
-<div style="text-align: center;">
-    <p style="color: red;">پرداخت مورد نظر توسط بانک تایید شده، اما در املاک باشی ثبت نشده است!</p>
-    <button class="pay-btn" onclick="registerPodiumNotPaidPayment()" type="button">ثبت پرداخت</button>
-</div>
+        if (Model.Status == PayaPaymentStatusEnum.sent_recieved || Model.Status == PayaPaymentStatusEnum.registered)
+        {
+            <div style="text-align: center;">
+                <p style="color: red;">پرداخت مورد نظر توسط بانک تایید شده، اما در املاک باشی ثبت نشده است!</p>
+                <button class="pay-btn" onclick="registerPodiumNotPaidPayment()" type="button">ثبت پرداخت</button>
+            </div>
+        }
+        if (Model.Status == PayaPaymentStatusEnum.deleted || Model.Status == PayaPaymentStatusEnum.rejected ||
+            Model.Status == PayaPaymentStatusEnum.centralbank_rejected)
+        {
+            <div style="text-align: center;">
+                <p style="color: red;">پرداخت مورد نظر توسط بانک رد شد</p>
+                @*<button class="pay-btn" onclick="registerPodiumNotPaidPayment()" type="button">ثبت پرداخت</button>*@
+            </div>
+        }
     }
 }
 

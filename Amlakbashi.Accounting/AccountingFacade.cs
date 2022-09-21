@@ -1296,7 +1296,7 @@ namespace Amlakbashi.Accounting
                     PaymentType = (int)reservePaymentType,
                     ReserveID = reserveId,
                     UserID = operatorId,
-                    Price = payablePrice,
+                    Price = payment.AmountAsToman,
                     PaymentMethod = (int)ReservePayment.ReservePaymentMethod.Podium,
                     CreateDate = DateTime.Now,
                     OperatorID = operatorId,
@@ -1310,7 +1310,7 @@ namespace Amlakbashi.Accounting
                 paymentService.Update(payment);
 
                 response.UserId = hostUser.Id;
-                response.PayablePrice = payablePrice;
+                response.PayablePrice = payment.AmountAsToman;
                 response.AdvertiseId = reserve.AdvertiseID;
             }
             return response;
@@ -1369,7 +1369,7 @@ namespace Amlakbashi.Accounting
 
             if (response.HasError == false)
             {
-                response.PayablePrice = response.PayablePrice;
+                response.PayablePrice = payment.AmountAsToman;
                 var walletTransaction = creditTransactionService.Find(walletTransactionId);
                 walletTransaction.BankTransactionID = long.Parse(response.TraceNumber);
                 creditTransactionService.Update(walletTransaction);
@@ -1444,7 +1444,7 @@ namespace Amlakbashi.Accounting
                         PaymentType = (int)reservePaymentType,
                         ReserveID = (long)reserve.Id,
                         UserID = operatorId,
-                        Price = payment.Amount / 10,
+                        Price = payment.AmountAsToman,
                         PaymentMethod = (int)ReservePayment.ReservePaymentMethod.Podium,
                         CreateDate = DateTime.Now,
                         OperatorID = operatorId,
@@ -1499,7 +1499,7 @@ namespace Amlakbashi.Accounting
                         PaymentType = (int)reservePaymentType,
                         ReserveID = (long)reserve.Id,
                         UserID = operatorId,
-                        Price = payment.Amount / 10,
+                        Price = payment.AmountAsToman,
                         PaymentMethod = (int)ReservePayment.ReservePaymentMethod.Podium,
                         CreateDate = DateTime.Now,
                         OperatorID = operatorId,
@@ -1523,7 +1523,7 @@ namespace Amlakbashi.Accounting
             }
         }
 
-        public CheckPayaPaymentResponseDTO CheckShebaPaymentStatus(long paymentId)
+        public CheckPayaPaymentResponseDTO CheckPayaPaymentStatus(long paymentId)
         {
             var payment = paymentService.Find((int)paymentId);
             var result = bankingOperator.CheckPayaPayment(payment.TransactionId, payment.TraceNumber);
@@ -1556,7 +1556,7 @@ namespace Amlakbashi.Accounting
             var response = bankingOperator.CheckTransactionStatus(transactionId);
             if (response.HasError)
             {
-                if (response.ErrorAgent == ExpenditurePaymentErrorAgent.PasargadBank && response.ErrorCode == 1108)
+                if (response.ErrorAgent == ExpenditurePaymentErrorAgent.PasargadBank && response.ErrorCode == 1108) // تراکنش یافت نشد
                 {
                     response.HasError = false;
                 }

@@ -85,6 +85,7 @@ namespace Amlakbashi.Application.Services.Category
           bool foosball = false,
           bool teaMaker = false,
           bool filming = false,
+          bool exclusive = false,
           bool rules_pets = false,
           bool rules_party = false,
           bool rules_smoking = false,
@@ -194,6 +195,11 @@ namespace Amlakbashi.Application.Services.Category
             if (filming)
             {
                 advertises = advertises.Where(a => (bool)a.Filming);
+            }
+            if (exclusive && (category.Type == AdvertiseType.All || category.Type == AdvertiseType.Villa ||
+                category.Type == AdvertiseType.House))
+            {
+                advertises = advertises.Where(x => x.VillaType == VillaTypeEnum.Exclusive);
             }
             //filter by allow pets rule
             if (rules_pets)

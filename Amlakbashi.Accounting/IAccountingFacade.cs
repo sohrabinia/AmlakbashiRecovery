@@ -146,7 +146,7 @@ namespace Amlakbashi.Accounting
         PayaPaymentResponseDTO SiteClearingHostAutoPayment(long reserveId, int operatorId);
         PayaPaymentResponseDTO WalletClearingAutoPayment(int userId, int operatorId);
         PayaPaymentResponseDTO PodiumRepayment(int paymentId, int operatorId);
-        CheckPayaPaymentResponseDTO CheckShebaPaymentStatus(long paymentId);
+        CheckPayaPaymentResponseDTO CheckPayaPaymentStatus(long paymentId);
         bool RegisterNotPaidPayment(long paymentId, int operatorId);
     }
 }
