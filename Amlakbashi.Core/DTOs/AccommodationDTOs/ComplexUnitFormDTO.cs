@@ -14,7 +14,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
         public long Id { get; set; }
         public long ParentId { get; set; }
         public Advertise.AdvertiseType ParentType { get; set; }
-        public bool Available { get; set; }
+        public bool Active { get; set; }
         public ComplexTypeInputDTO type { get; set; }
         public TitleDescInputDTO titleAndDesc { get; set; }
         public MetaTitleDescInputDTO metaTitleAndDesc { get; set; }
@@ -55,7 +55,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             {
                 Id = id,
                 ParentId = parentId,
-                Available = director.GetAdvertisePart<IdPart>().Available
+                Active = director.GetAdvertisePart<IdPart>().Active
             };
             PropertyCopier<AdvertiseTypePart, ComplexTypeInputDTO>.Copy(director.GetAdvertisePart<AdvertiseTypePart>(), model.type);
             model.capacity = director.GetAdvertisePart<CapacityPart>();
@@ -73,7 +73,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             model.buildingSize = director.GetAdvertisePart<BuildingSizePart>();
 
             model.photo.accId = id;
-            model.photo.accTitle = AdvertiseMainLocalization.PhotoTitle(director.AdvertiseType, director.Mode);
+            model.photo.accTitle = AdvertiseMainLocalization.GetPhotoPersianTitle(director.AdvertiseType, director.Mode);
             return model;
         }
     }

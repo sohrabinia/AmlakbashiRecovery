@@ -1,5 +1,4 @@
-﻿using Amlakbashi.Core.Common.Entity;
-using Amlakbashi.Core.Common.Utilities;
+﻿using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities.Interfaces;
 using Newtonsoft.Json;
 using System;
@@ -10,58 +9,67 @@ using static Amlakbashi.Core.Entities.ReservePayment;
 
 namespace Amlakbashi.Core.Entities
 {
-    public class Reserve : Entity<long>, IReserve, ISoftDelete
+    public class Reserve : Entity<long>, IReserve
     {
         #region Properties
-        [Column("ReserveID")]
+
+        [Column("Id")]
         public override long Id { get; set; }
+        public DateTime CreateDate { get; set; }
         public ReserveStatus Status { get; set; }
+
+        [Column("GuestId")]
         public int UserID { get; set; }
+
+        [Column("HostId")]
         public int HostUserID { get; set; }
+
+        [Column("ResidenceId")]
         public long AdvertiseID { get; set; }
         public HostResponseEnum HostResponse { get; set; }
+        public DateTime HostResponseDate { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public int NumberOfGuests { get; set; }
+        public bool InstantReserve { get; set; }
+        public bool InstantReserveCancelHost { get; set; }
         public long TotalPrice { get; set; }
         public long DepositPrice { get; set; }
-        public int NumberOfGuests { get; set; }
-        public ReserveStatus CancelState { get; set; }
-        public DateTime? CancelDate { get; set; }
-        public string CancelReason { get; set; }
-        public DateTime CreateDate { get; set; }
-        public DateTime HostResponseDate { get; set; }
-        public DateTime? HostCallDate { get; set; }
-        public DateTime? GuestCallDate { get; set; }
-        public bool PaymentGTAGRegistered { get; set; }
-        public string SupportInfo { get; set; }
-        public int SupportState { get; set; }
-        public string SupporterIds { get; set; }
-        public bool RatingShownToGuest { get; set; }
-        public bool shouldFollow { get; set; }
-        public int GuestCallState { get; set; }
-        public int HostCallState { get; set; }
-        public string CancelDiscussion { get; set; }
-        public bool PaymentHasError { get; set; }
-        public bool ExcludeGroupPayment { get; set; }
-        public bool InstantReserve { get; set; }
-        public bool Archive { get; set; }
-        public bool InstantReserveCancelHost { get; set; }
+
+        [Column("CouponId")]
         public long CouponID { get; set; }
         public long CouponPrice { get; set; }
-        public long PrizePrice { get; set; }
-        public long PrizeTransactionID { get; set; }
         public long CouponCalculationPrice { get; set; }
-        public bool DisableAutoCancel { get; set; }
-        public bool AccVisitedByGuest { get; set; }
-        public bool IsDeleted { get; set; }
+        public long PrizePrice { get; set; }
 
-        [ForeignKey("AdvertiseID")]
+        [Column("PrizeTransactionId")]
+        public long PrizeTransactionID { get; set; }
+        public EarlyCheckoutEnum EarlyCheckoutStatus { get; set; }
+        public DateTime? CancelDate { get; set; }
+        public ReserveStatus CancelState { get; set; }
+        public string CancelReason { get; set; }
+        public string CancelDiscussion { get; set; }
+        public int HostCallState { get; set; }
+        public int GuestCallState { get; set; }
+        public string SupportInfo { get; set; }
+
+        [Column("ShouldFollowUp")]
+        public bool shouldFollow { get; set; }
+        public bool DisableAutoCancel { get; set; }
+
+        [Column("VisitResidenceByGuest")]
+        public bool AccVisitedByGuest { get; set; }
+        public bool Archive { get; set; }
+        public bool RatingShownToGuest { get; set; }
+        public bool PaymentGTAGRegistered { get; set; }
+
+        [ForeignKey(nameof(AdvertiseID))]
         public virtual Advertise Advertise { get; set; }
 
-        [ForeignKey("UserID")]
+        [ForeignKey(nameof(UserID))]
         public virtual User GuestUser { get; set; }
 
-        [ForeignKey("HostUserID")]
+        [ForeignKey(nameof(HostUserID))]
         public virtual User HostUser { get; set; }
 
         [JsonIgnore]
@@ -85,8 +93,8 @@ namespace Amlakbashi.Core.Entities
 
         public int InitialPriority;
         public int Priority;
-        public long Temp_HostPayablePrice;
 
+        [NotMapped]
         public long TotalPayablePrice
         {
             get
@@ -98,7 +106,12 @@ namespace Amlakbashi.Core.Entities
         public static string[] CancelReasons = { };
 
         #region Enums
-        public enum StatusStringType { Guest = 0, Host = 1, Site = 2 }
+        public enum StatusStringType 
+        { 
+            Guest = 0, 
+            Host = 1, 
+            Site = 2 
+        }
 
         public enum ReserveStatus
         {
@@ -137,13 +150,6 @@ namespace Amlakbashi.Core.Entities
             Unsuccessful = 4
         }
 
-        public enum SupportStateEnum
-        {
-            WaitForSupport = 0,
-            Supporting = 1,
-            SupportDone = 2
-        }
-
         public enum CallState
         {
             NotCalled = 0,
@@ -157,6 +163,7 @@ namespace Amlakbashi.Core.Entities
             Guest = 1,
             Host = 2
         }
+
         public enum GuestPayResult
         {
             AlreadyPaid = 0,
@@ -166,6 +173,45 @@ namespace Amlakbashi.Core.Entities
             NotEnoughCredit = 4,
             Paid = 5,
         }
+
+        public enum EarlyCheckoutEnum
+        {
+            Unset = 0,
+            RequestedByHost = 1,
+            ConfirmedByGuest = 2
+        }
+
+        public enum ReserveCancelType
+        {
+            Unset = 0,
+            CancelByGuestForGuestProblem = 1,
+            CancelByGuestForHostProblem = 2,
+            CancelByHostForHostProblem = 3,
+            CancelByHostForGuestProblem = 4
+        }
+
+        public enum ReserveCancelReasons
+        {
+            Unset = 0,
+
+            Guest_Guest_TripCancellation = 1,
+            Guest_Guest_NotHavingEvidence = 2,
+            Guest_Guest_IncorrectNumberOfGuests = 3,
+            Guest_Guest_ChangeTripDate = 4,
+
+            Guest_Host_IncorrectResidenceInfo = 51,
+            Guest_Host_IncorrectHost = 52,
+            Guest_Host_DirtyResidence = 53,
+
+            Host_Host_LowPrice = 101,
+            Host_Host_ResidenceFull = 102,
+            Host_Host_ResidenceRebuilding = 103,
+
+            Host_Guest_NotHavingEvidence = 151,
+            Host_Guest_IncorrectNumberOfGuest = 152,
+            Host_Guest_IncorrectGuest = 153,
+        }
+
         #endregion
 
         #region Functions
@@ -443,15 +489,6 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        public int[] GetSupporterIds()
-        {
-            if (string.IsNullOrEmpty(SupporterIds))
-            {
-                return new int[0];
-            }
-            return Array.ConvertAll(SupporterIds.Split(','), x => int.Parse(x));
-        }
-
         public ReserveCategory? GetStateCategory()
         {
             switch (Status)
@@ -478,30 +515,78 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        public static int[] GetReserveCategoryStates(Reserve.ReserveCategory category)
+        public static IList<ReserveStatus> GetHostCategoryStates(Reserve.ReserveCategory category)
         {
             switch (category)
             {
                 case Reserve.ReserveCategory.WaitForHostResponse:
-                    return new int[] { (int)ReserveStatus.WaitForResponse };
+                    return new List<ReserveStatus>() { 
+                        ReserveStatus.WaitForResponse
+                    };
                 case Reserve.ReserveCategory.WaitForGuestPayment:
-                    return new int[] { (int)ReserveStatus.WaitForReserve };
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.WaitForReserve
+                    };
                 case Reserve.ReserveCategory.Reserved:
-                    return new int[] { (int)ReserveStatus.Reserved,
-                        (int)ReserveStatus.Started,
-                        (int)ReserveStatus.CashPay,
-                        (int)ReserveStatus.CancelRequestByGuest,
-                        (int)ReserveStatus.CancelRequestByHost};
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.Reserved,
+                        ReserveStatus.Started,
+                        ReserveStatus.CashPay,
+                        ReserveStatus.CancelRequestByGuest,
+                        ReserveStatus.CancelRequestByHost
+                    };
                 case Reserve.ReserveCategory.Finished:
-                    return new int[] { (int)ReserveStatus.Completed };
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.Completed
+                    };
                 case Reserve.ReserveCategory.Unsuccessful:
-                    return new int[] { (int)ReserveStatus.Rejected,
-                        (int)ReserveStatus.CanceledByGuest,
-                        (int)ReserveStatus.CanceledByHost,
-                        (int)ReserveStatus.CanceledBySystem};
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.Rejected,
+                        ReserveStatus.CanceledBySystem,
+                        ReserveStatus.CanceledByHost,
+                        ReserveStatus.CanceledByGuest
+                    };
                 default:
-                    return new int[] { };
+                    return null;
             }
+        }
+
+        public static IList<ReserveStatus> GetGuestCategoryStates(Reserve.ReserveCategory category)
+        {
+            var statusList = new List<ReserveStatus>();
+            switch (category)
+            {
+                case Reserve.ReserveCategory.WaitForHostResponse:
+                case Reserve.ReserveCategory.WaitForGuestPayment:
+                case Reserve.ReserveCategory.Reserved:
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.WaitForResponse,
+                        ReserveStatus.WaitForReserve,
+                        ReserveStatus.Reserved,
+                        ReserveStatus.Started,
+                        ReserveStatus.CashPay,
+                        ReserveStatus.CancelRequestByGuest,
+                        ReserveStatus.CancelRequestByHost};
+                case Reserve.ReserveCategory.Finished:
+                    return new List<ReserveStatus>() { 
+                        ReserveStatus.Completed 
+                    };
+                case Reserve.ReserveCategory.Unsuccessful:
+                    return new List<ReserveStatus>() {
+                        ReserveStatus.Rejected,
+                        ReserveStatus.CanceledByHost,
+                        ReserveStatus.CanceledByGuest,
+                        ReserveStatus.CanceledBySystem
+                    };
+                default:
+                    return null;
+            }
+        }
+
+        public static IList<ReserveCancelReasons> GetReserveCancelReasonsByUserType(User.UserGeneralTypeEnum userType)
+        {
+            var reasonsArray = (Reserve.ReserveCancelReasons[])Enum.GetValues(typeof(Reserve.ReserveCancelReasons));
+            return reasonsArray.Where(x=> userType == User.UserGeneralTypeEnum.Guest ? (int)x > 0 &&(int)x <= 100 : (int)x > 100).ToList();
         }
 
         public int GetPaymentTriesCount(out string lastTryDateStr)
@@ -509,8 +594,8 @@ namespace Amlakbashi.Core.Entities
             var payments = Payments.Where(w => w.Status == Payment.PaymentStatus.NotPaid && w.Type == Payment.PaymentType.Income);
             if (payments.Any())
             {
-                var paymentsList = payments.OrderByDescending(x => x.Date).ToList();
-                var lastDate = paymentsList.Last().Date;
+                var paymentsList = payments.OrderByDescending(x => x.CreateDate).ToList();
+                var lastDate = paymentsList.Last().CreateDate;
                 lastTryDateStr = DateTimeUtility.GregorianToPersianDate(lastDate).Remove(0, 2);
                 lastTryDateStr += (" " + lastDate.ToString("HH:mm"));
                 return paymentsList.Count;
@@ -545,6 +630,16 @@ namespace Amlakbashi.Core.Entities
             return any_payments ? payments.Sum(x => x.Price) : 0;
         }
 
+        public long GetGuestPaidAmount()
+        {
+            var guestPaidAmount = ReservePayments.Where(
+                        x => x.PaymentType == (int)ReservePaymentType.GuestDeposite ||
+                        x.PaymentType == (int)ReservePaymentType.GuestClearing).Sum(x=>x.Price);
+            var siteRefundToGuestAmount = ReservePayments.Where(
+                x => x.PaymentType == (int)ReservePaymentType.SiteRefundToGuest).Sum(x => x.Price);
+            return guestPaidAmount - siteRefundToGuestAmount;
+        }
+
         public IList<ReserveSupport> GetRelatedSupports()
         {
             var supports = GuestUser.ReserveSupportsAsGuest.AsQueryable();
@@ -568,6 +663,16 @@ namespace Amlakbashi.Core.Entities
             return supports.ToList();
         }
 
+        public bool HasFailureExpenditurePayment()
+        {
+            return Payments.Any(x => x.Type == Payment.PaymentType.Expenditure && x.Status == Payment.PaymentStatus.NotPaid);
+        }
+
+        public Payment GetFailureExpenditurePayment()
+        {
+            return Payments.FirstOrDefault(x => x.Type == Payment.PaymentType.Expenditure && x.Status == Payment.PaymentStatus.NotPaid);
+        }
+
         public int ChatCount
         {
             get
@@ -580,8 +685,8 @@ namespace Amlakbashi.Core.Entities
         {
             get
             {
-                return Chats ==  null ? 0 : Chats.Count(c =>
-                    c.SupportReadStatus == (int)Chat.ReadStatusEnum.NotRead);
+                return Chats == null ? 0 : Chats.Count(c =>
+                   c.SupportReadStatus == (int)Chat.ReadStatusEnum.NotRead);
             }
         }
         #endregion

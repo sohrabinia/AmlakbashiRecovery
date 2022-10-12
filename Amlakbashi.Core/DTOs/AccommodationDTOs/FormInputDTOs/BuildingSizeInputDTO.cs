@@ -7,7 +7,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
     [Serializable]
     public class BuildingSizeInputDTO
     {
-        public int Metrazh { get; set; }
+        public int BuildingArea { get; set; }
         public bool mandatory { get; set; }
 
         public BuildingSizeInputDTO(bool mandatory)

@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Core.DTOs.AccommodationDTOs;
+using Amlakbashi.Core.DTOs.ReserveDTOs;
 using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,7 @@ namespace Amlakbashi.Core.Infrastructure.PriceHelpers.Interfaces
         IDictionary<string, DatePriceDTO> CalculateJalaliDatePrices(
             DateTime from, DateTime to, Advertise advertise,
             out long couponCalculationPrice, int moreThanCapacity = 0);
+
+        ReserveCancelationLossDTO CaculateGuestReserveCancelationLoss(Reserve reserve);
     }
 }

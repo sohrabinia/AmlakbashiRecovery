@@ -57,7 +57,7 @@ function setTodayFull(id, elem) {
 function instantReserve(id, userId, banned) {
     var $elem = $('#js-instant-reserve-' + id);
     if (banned) {
-        showInfoMessage('دلیل ممنوعیت', '', { contentUrl: '/accomodation/getInstnatReserveBanReason?id=' + id });
+        //showInfoMessage('دلیل ممنوعیت', '', { contentUrl: '/accomodation/getInstnatReserveBanReason?id=' + id });
         return;
     } else {
         instantReserveRequest(id, userId, false, $elem);
@@ -426,6 +426,14 @@ function showOccupiedPopup(id, title) {
     showInfoMessage('  کد آگهی: ' + id, '', { contentUrl: '/accomodation/getsetoccupiedpopup?id=' + id, fullScreen: screen.width < 781 });
 }
 
+function getInstantReserveDates(id) {
+    showInfoMessage('رزرو آنی آگهی ' + id, '', { contentUrl: '/accomodation/GetInstantReserveDates?residenceId=' + id });
+}
+
 function showNorouzPopup(id) {
     showInfoMessage('  کد آگهی: ' + id, '', { contentUrl: '/accomodation/getsetminnorouzreservepopup?id=' + id, fullScreen: screen.width < 781 });
+}
+
+function showVideoUploadPopup(id) {
+    showInfoMessage('کد آگهی: ' + id, '', { contentUrl: '/accomodation/getVideoInfo?residenceId=' + id, fullScreen: screen.width < 781 });
 }

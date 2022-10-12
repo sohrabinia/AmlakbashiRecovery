@@ -1,9 +1,12 @@
 ﻿using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
 using Amlakbashi.Application.Services.BlogPostServices.Interfaces;
 using Amlakbashi.Application.Services.Category.Interfaces;
+using Amlakbashi.Application.Services.PostServices.Interfaces;
 using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Core.DTOs.WebService;
 using Amlakbashi.Core.DTOs.WebService.Responses;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,26 +17,29 @@ using System.Threading.Tasks;
 namespace Amlakbashi.Host.Controllers.WebService
 {
     [ApiController]
-    [Route("api/home")]
+    [Route("api")]
     public class ApiHomeController : ApiBaseController
     {
-        private readonly IAdvertiseAppService advertiseService;
+        private readonly IAdvertiseAppService residenceService;
         private readonly ICategoryAppService categoryService;
         private readonly IDiscountTableAppService discountTableService;
         private readonly IBlogPostAppService blogPostService;
-        public ApiHomeController(IAdvertiseAppService advertiseService,
+        private readonly IPostAppService postService;
+        public ApiHomeController(IAdvertiseAppService residenceService,
             ICategoryAppService categoryService,
             IDiscountTableAppService discountTableService,
-            IBlogPostAppService blogPostService)
+            IBlogPostAppService blogPostService,
+            IPostAppService postService)
         {
-            this.advertiseService = advertiseService;
+            this.residenceService = residenceService;
             this.categoryService = categoryService;
             this.discountTableService = discountTableService;
             this.blogPostService = blogPostService;
+            this.postService = postService;
         }
 
-        [HttpGet]
-        public HomePageResponse Get()
+        [HttpGet("home")]
+        public HomePageResponse HomePage()
         {
             var response = new HomePageResponse();
 
@@ -73,8 +79,8 @@ namespace Amlakbashi.Host.Controllers.WebService
                 response.lastSeconds.Add(new HomePageLastSecondsResponse()
                 {
                     title = item.Title,
-                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.PhotoID}",
-                    tags = advertiseService.GetAdvertiseTags(item),
+                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.MainPhotoId}",
+                    tags = residenceService.GetAdvertiseTags(item),
                     nightlyPrice = item.BasePrice,
                     discountPercent = discount.Percent,
                     discountPrice = item.BasePrice - (item.BasePrice * discount.Percent * 0.01)
@@ -83,33 +89,33 @@ namespace Amlakbashi.Host.Controllers.WebService
 
             // most liked advertises
             response.mostLiked = new List<HomePageMostLikedResponse>();
-            var mostLikedAdvertises = advertiseService.GetMostLiked(10);
+            var mostLikedAdvertises = residenceService.GetMostLiked(10);
             foreach (var item in mostLikedAdvertises)
             {
                 response.mostLiked.Add(new HomePageMostLikedResponse()
                 {
                     title = item.Title,
-                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.PhotoID}",
-                    tags = advertiseService.GetAdvertiseTags(item),
+                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.MainPhotoId}",
+                    tags = residenceService.GetAdvertiseTags(item),
                     nightlyPrice = item.BasePrice,
                     commentsCount = item.PublishedComments().Count(),
-                    rating = item.AverageUserRating
+                    rating = item.AverageUsersScore
                 });
             }
 
             // instant reserves advertises
             response.instant = new List<HomePageInstantResponse>();
-            var mostLikedInstantReserveAdvertises = advertiseService.GetMostLiked(10, true);
+            var mostLikedInstantReserveAdvertises = residenceService.GetMostLiked(10, true);
             foreach (var item in mostLikedInstantReserveAdvertises)
             {
                 response.instant.Add(new HomePageInstantResponse()
                 {
                     title = item.Title,
-                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.PhotoID}",
-                    tags = advertiseService.GetAdvertiseTags(item),
+                    imageUrl = $"{GeneralData.WebsiteUrl}/file/accthumbxlarge?accid={item.Id}&fileid={item.MainPhotoId}",
+                    tags = residenceService.GetAdvertiseTags(item),
                     nightlyPrice = item.BasePrice,
                     commentsCount = item.PublishedComments().Count(),
-                    rating = item.AverageUserRating,
+                    rating = item.AverageUsersScore,
                     badgeText = "تحویل آنی"
                 });
             }
@@ -131,89 +137,61 @@ namespace Amlakbashi.Host.Controllers.WebService
             return response;
         }
 
-        [HttpGet("old")]
-        public async Task<IActionResult> GetOld()
+        [HttpGet("contact")]
+        public IActionResult Contact()
         {
-            var response = new HomePageResponse();
-
-            List<string> tags = new List<string>();
-            tags.Add("آپارتمان");
-            tags.Add("3 خوابه");
-            tags.Add("تهران");
-            tags.Add("تهران");
-
-            response.residencyTypes = new Dictionary<string, int>();
-            response.residencyTypes.Add("villa", 1295);
-            response.residencyTypes.Add("furnished", 10893);
-            response.residencyTypes.Add("ecotourism", 2666);
-            response.residencyTypes.Add("hotel", 1313);
-
-            response.mostViewed = new List<HomePageMostViewedResponse>();
-            for (int i = 0; i < 10; i++)
+            var supportPhoneNumbers = GeneralLocalization.GetSupportPhoneNumbers();
+            var address = GeneralLocalization.GetAmlakbashiAddress();
+            var supportChatAutoQuestions = Enum.GetValues<SupportChat.AutoQuestion>().ToList();
+            Dictionary<string, string> questions = new Dictionary<string, string>();
+            foreach (var item in supportChatAutoQuestions)
             {
-                response.mostViewed.Add(new HomePageMostViewedResponse()
-                {
-                    cityName = "یزد",
-                    imageUrl = "/Images/AdImages/LuxuryApartment.png",
-                    residencyCount = 212
-                });
+                questions.Add(SupportChatLocalization.GetQuestionTitle(item),
+                    SupportChatLocalization.GetQuestionText(item));
             }
-
-            response.lastSeconds = new List<HomePageLastSecondsResponse>();
-            for (int i = 0; i < 10; i++)
+            return Ok(new
             {
-                response.lastSeconds.Add(new HomePageLastSecondsResponse()
-                {
-                    title = "آپارتمان لاکچری استخردار شمال تهران",
-                    imageUrl = "/Images/AdImages/LuxuryApartment.png",
-                    tags = tags,
-                    nightlyPrice = 4000000,
-                    discountPercent = 17
-                });
-            }
+                faq = questions,
+                address = address,
+                phoneNumbers = supportPhoneNumbers
+            });
+        }
 
-            response.mostLiked = new List<HomePageMostLikedResponse>();
-            for (int i = 0; i < 10; i++)
+        [HttpGet("{title}")]
+        public IActionResult GetPost(string title)
+        {
+            int postId = 0;
+            switch (title)
             {
-                response.mostLiked.Add(new HomePageMostLikedResponse()
-                {
-                    title = "آپارتمان لاکچری استخردار شمال تهران",
-                    imageUrl = "/Images/AdImages/LuxuryApartment.png",
-                    tags = tags,
-                    nightlyPrice = 4000000,
-                    commentsCount = 126,
-                    rating = 4.3
-                });
+                case "faq":
+                    return Ok(GeneralLocalization.GetFaq());
+                case "about":
+                    postId = 4;
+                    break;
+                case "help":
+                    postId = 8;
+                    break;
+                case "feedback":
+                    postId = 24;
+                    break;
+                case "rules":
+                    postId = 25;
+                    break;
+                default:
+                    return NotFound();
             }
-
-            response.instant = new List<HomePageInstantResponse>();
-            for (int i = 0; i < 10; i++)
+            var post = postService.Filter(Post.PostStatus.Published, postId).FirstOrDefault();
+            return Ok(new
             {
-                response.instant.Add(new HomePageInstantResponse()
-                {
-                    title = "آپارتمان لاکچری استخردار شمال تهران",
-                    imageUrl = "/Images/AdImages/LuxuryApartment.png",
-                    tags = tags,
-                    nightlyPrice = 4000000,
-                    commentsCount = 126,
-                    rating = 4.3,
-                    badgeText = "تحویل آنی"
-                });
-            }
+                title = post.Title,
+                description = post.Description
+            });
+        }
 
-            response.mag = new List<HomePageMagResponse>();
-            for (int i = 0; i < 10; i++)
-            {
-                response.mag.Add(new HomePageMagResponse()
-                {
-                    title = "آپارتمان لاکچری استخردار شمال تهران",
-                    imageUrl = "/Images/AdImages/LuxuryApartment.png",
-                    link = "#",
-                    summary = "...یکی ار مهمترین دلایلی که مردم شمال و جنوب کشور را برای سفر انتخاب میکنند، وجود سواحل بسیار زیبای"
-                });
-            }
-
-            return Ok(response);
+        [HttpGet("namevalue")]
+        public IEnumerable<NameValueDTO> GetEnumNameValues(NameValueDTO.EnumType type = 0)
+        {
+            return NameValueDTO.GetEnumNameValues(type);
         }
     }
 }

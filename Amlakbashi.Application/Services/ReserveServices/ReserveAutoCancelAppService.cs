@@ -17,13 +17,19 @@ namespace Amlakbashi.Application.Services.ReserveServices
         {
         }
 
+        public DateTime? GetReserveExpireTime(long reserveId)
+        {
+            var reserveAutoCancel = Repository.Query(q => q.FirstOrDefault(w => w.ReserveId == reserveId));
+            return reserveAutoCancel?.ScheduledTime;
+        }
+
         public void UpdateScheduledTime(long reserveId, int delayInMinute = 30)
         {
             var data = Repository.Query(q => q.FirstOrDefault(w => w.ReserveId == reserveId));
             if (data != null)
             {
-                var delay = DateTimeUtility.DelayAvoidingNightTime(new TimeSpan(0, delayInMinute, 0));
-                data.ScheduledTime = DateTime.Now.Add(delay);
+                var delay = DateTimeUtility.DelayAvoidingNightTime(new TimeSpan(0, 5, 0));
+                data.ScheduledTime = DateTime.Now.Add(delay.Add(new TimeSpan(0, 25, 0)));
                 Repository.Update(data);
                 Repository.Save();
             }

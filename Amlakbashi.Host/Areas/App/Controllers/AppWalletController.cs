@@ -28,7 +28,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
         public IActionResult List()
         {
             var user = userAccessor.CurrentUser;
-            ViewBag.Credit = user.Credit;
+            ViewBag.Credit = user.WalletAmount;
             ViewBag.UserID = user.Id;
             var model = accounting.GetCreditListByUserId(user.Id);
             return View(model);

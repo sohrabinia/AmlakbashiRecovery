@@ -1,4 +1,7 @@
-﻿using Amlakbashi.Core.Common.AppService;
+﻿using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.Common.AppService;
+using Amlakbashi.Core.DTOs.WebService.Requests.Comments;
+using Amlakbashi.Core.DTOs.WebService.Responses.Comments;
 using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -19,10 +22,12 @@ namespace Amlakbashi.Application.Services.CommentServices.Interfaces
         Comment GetParent(int id);
         Comment GetByAccSenderUser(long advertiseId, long senderUserId);
         Comment GetHostReply(long accId, long senderUserId);
+        CommentListResponse GetForHost(int userId, bool seenByHost = true, int page = 1, int pageItemCount = 20);
         void Insert(Comment newComment);
+        void SubmitGuestComment(int userId, long advertiseId, string text);
+        ServiceResult<bool> SubmitHostReply(CommentPostHostRequest requst);
         void Update(Comment editedComment);
         void UpdateStatus(long id, Comment.CommentStatus status, string suspendReason = "");
-        void SetAsSeenByHost(int accId);
         void SetAsSeenByHost(long accId);
         string GetNotVerifyReasonIfExists(long accId, int accUserid, int currentUserId);
         bool AnyComment(long advertiseId);

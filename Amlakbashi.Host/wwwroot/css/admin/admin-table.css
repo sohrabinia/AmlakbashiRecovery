@@ -87,7 +87,7 @@ aside.admin-table-row .box-more-options .function-buttons i, aside.admin-table-r
 }
 
 aside.admin-table-row .box-more-options .function-buttons i:hover, aside.admin-table-row .box-more-options .function-buttons a:hover {
-  font-size: 23px;
+  /*font-size: 23px;*/
   color: #dab200;
 }
 

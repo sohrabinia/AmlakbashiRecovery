@@ -136,5 +136,75 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
 
             return has_forbidden_characters;
         }
+
+        private static List<string> ForbiddenContainWords = new List<string>()
+        {
+            "6037",
+            "5892",
+            "6276",
+            "6279",
+            "6280",
+            "6277",
+            "5029",
+            "6274",
+            "6221",
+            "5022",
+            "6219",
+            "6393",
+            "6396",
+            "6362",
+            "5028",
+            "6104",
+            "6273",
+            "5894",
+            "پلاک",
+            "بلاك",
+            "کوچه",
+            "كوجه",
+            "09",
+            "۰۹",
+            "صفر",
+            "صفرنه",
+            "نهصد",
+            "نهصدو",
+            "دیوار",
+            "شیپور",
+            "شيبور",
+            "جاکو",
+        };
+        private static List<string> ForbiddenEqualWords = new List<string>()
+        {
+            "ص",
+            "ف",
+            "ر",
+            "ن",
+            "ه",
+            "د",
+        };
+        private static List<string> ForbiddenStartedCharacters = new List<string>()
+        {
+            "0",
+            "۰",
+            "9",
+            "۹",
+            "+9",
+            "+۹",
+        };
+        public static bool HasForbiddenWord(string text)
+        {
+            var words = text.Split(' ');
+            foreach (var word in words)
+            {
+                if (BankUtility.ValidateBankCardNumber(word) ||
+                    ForbiddenContainWords.Any(x => word.Contains(x)) ||
+                    ForbiddenStartedCharacters.Any(x => word.StartsWith(x)) ||
+                    ForbiddenEqualWords.Any(x => x == word) ||
+                    Regex.IsMatch(word, @"[a-zA-Z]"))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

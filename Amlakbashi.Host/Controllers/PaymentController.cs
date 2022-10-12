@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Accounting;
 using Amlakbashi.Application.Services.UserServices.Interfaces;
+using Amlakbashi.Core.Common.Enums;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.Identity;
@@ -34,7 +35,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize(Policy = Policies.Payment_View)]
         public ActionResult Index(int? page, long referenceNumber = 0, int status = -1, int userId = -1, long reserveId = 0,
-            string fromDate = "", string toDate = "")
+            string fromDate = "", string toDate = "", BankEnum bank = BankEnum.Unknown, int type = -1)
         {
             try
             {
@@ -46,17 +47,19 @@ namespace Amlakbashi.Host.Controllers
 
                 DateTime from_date = DateTimeUtility.ConvertDate(fromDate);
                 DateTime to_date = DateTimeUtility.ConvertDate(toDate);
-                var model = accounting.FilterPayments(referenceNumber, status, userId, reserveId, from_date, to_date);
+                var model = accounting.FilterPayments(referenceNumber, status, userId, reserveId, from_date, to_date, bank, type);
 
                 ViewBag.incomeSum = model.Where(w => w.Type == Entities.Payment.PaymentType.Income &&
-                    w.Status == Entities.Payment.PaymentStatus.Paid).Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                    w.Status == Entities.Payment.PaymentStatus.Paid).Select(p => (long?)p.Amount).Sum() ?? 0;
                 ViewBag.expenditureSum = model.Where(w => w.Type == Entities.Payment.PaymentType.Expenditure &&
-                    w.Status == Entities.Payment.PaymentStatus.Paid).Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                    w.Status == Entities.Payment.PaymentStatus.Paid).Select(p => (long?)p.Amount).Sum() ?? 0;
                 ViewBag.uid = userId;
                 ViewBag.status = status;
                 ViewBag.reserveId = reserveId;
                 ViewBag.from_str = fromDate;
                 ViewBag.to_str = toDate;
+                ViewBag.bank = (int)bank;
+                ViewBag.type = type;
                 var PageNumber = page ?? 1;
                 var onePageOfModel = model.ToPagedList(PageNumber, 20);
                 ViewBag.RowIndexStart = (PageNumber * 20) - 20;
@@ -86,7 +89,7 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                var result = accounting.CheckShebaPaymentStatus(paymentId);
+                var result = accounting.CheckPayaPaymentStatus(paymentId);
                 return PartialView("_CheckPodiumPaymentStatus", result);
             }
             catch (Exception exc)
@@ -97,7 +100,7 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize(Policy = Policies.Payment_Actions)]
-        public IActionResult RegisterNotPaidPayment(long paymentId)
+        public IActionResult RegisterPodiumNotPaidPayment(long paymentId)
         {
             try
             {
@@ -149,6 +152,30 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new
                 {
                     status = 0
+                });
+            }
+        }
+
+        [Authorize(Policy = Policies.Payment_Actions)]
+        [HttpPost]
+        public IActionResult PodiumRepayment(int paymentId)
+        {
+            try
+            {
+                var result = accounting.PodiumRepayment(paymentId, userAccessor.CurrentUser.Id);
+                return GenerateJsonResult(new
+                {
+                    status = result.HasError ? 0 : 1,
+                    msg = result.HasError ? result.ErrorMessage : result.Message
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Payment.PodiumRepayment", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطای فنی مواجه شد"
                 });
             }
         }

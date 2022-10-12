@@ -37,30 +37,29 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public bool cancelIsAvailable { get; set; }
         public string rulesString { get; set; }
         public bool isRecently { get; set; }
+        public EarlyCheckoutEnum earlyCheckout { get; set; }
 
         public static ReserveDashboardItemDTO Generate(Reserve reserve,
             int index, bool isGuest, bool isHostler, int userId, long paidAmount,
             int unreadChatCount, Dictionary<string,string> rulesDict)
         {
             var advertise = reserve.Advertise;
-            var guestUser = reserve.GuestUser;
-            var hostlerUser = reserve.HostUser;
             var dto = new ReserveDashboardItemDTO();
             dto.reserveId = reserve.Id;
             dto.instantReserve = reserve.InstantReserve;
-            dto.advertiseId = advertise.Id;
+            dto.advertiseId = reserve.AdvertiseID;
             dto.index = index;
             dto.isGuest = isGuest;
             dto.isHostler = isHostler;
-            dto.advertisePhotoId = advertise.PhotoID == null ? 0 : (int)advertise.PhotoID;
+            dto.advertisePhotoId = advertise.MainPhotoId == null ? 0 : (int)advertise.MainPhotoId;
             dto.advertiseTitle = advertise.Title;
             dto.advertiseSlug = advertise.Slug;
             dto.userId = userId;
-            dto.hostlerUserId = advertise.UserID;
+            dto.hostlerUserId = reserve.HostUserID;
             dto.guestUserId = reserve.UserID;
             dto.audiencePhotoId = isGuest ?
-                (hostlerUser.PhotoStatus != 2 ? 0 : (hostlerUser.PhotoID == null ? 0 : (long)hostlerUser.PhotoID)) :
-                (guestUser.PhotoStatus != 2 ? 0 : (guestUser.PhotoID == null ? 0 : (long)guestUser.PhotoID));
+                (reserve.HostUser.PhotoStatus != 2 ? 0 : (reserve.HostUser.PhotoID == null ? 0 : (long)reserve.HostUser.PhotoID)) :
+                (reserve.GuestUser.PhotoStatus != 2 ? 0 : (reserve.GuestUser.PhotoID == null ? 0 : (long)reserve.GuestUser.PhotoID));
             dto.startDateString = DateTimeUtility.GregorianToPersianDate(reserve.StartDate);
             dto.staydays = DateTimeUtility.GetDatRangeDays(reserve.StartDate, reserve.EndDate);
             dto.guestCount = reserve.NumberOfGuests;
@@ -78,6 +77,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
             dto.cancelIsAvailable = (isGuest && Reserve.CancelIsAvailableForGuest((int)reserve.Status)) ||
                 (isHostler && Reserve.CancelIsAvailableForHost((int)reserve.Status));
             dto.isRecently = (DateTime.Now - reserve.CreateDate).TotalHours <= 24 ? true : false;
+            dto.earlyCheckout = reserve.EarlyCheckoutStatus;
             return dto;
         }
     }

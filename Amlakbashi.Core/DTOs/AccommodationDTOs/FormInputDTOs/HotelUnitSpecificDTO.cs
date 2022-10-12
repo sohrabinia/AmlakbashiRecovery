@@ -7,7 +7,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
     [Serializable]
     public class HotelUnitSpecificDTO
     {
-        public int Count { get; set; }
+        public int UnitCount { get; set; }
 
         public static implicit operator HotelUnitSpecificDTO(HotelUnitSpecificPart part)
         {

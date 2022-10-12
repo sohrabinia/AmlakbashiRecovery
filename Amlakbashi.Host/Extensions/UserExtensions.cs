@@ -1,11 +1,7 @@
 ﻿using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Core.Entities;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Extensions
 {
@@ -43,12 +39,33 @@ namespace Amlakbashi.Host.Extensions
 
         public static string GetGuid(this ClaimsPrincipal userPrincipal)
         {
-            return userPrincipal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return userPrincipal?.FindFirst("guid")?.Value;
+        }
+
+        public static int GetId(this ClaimsPrincipal userPrincipal)
+        {
+            var stringId = userPrincipal?.FindFirst("id")?.Value;
+            int id = 0;
+            int.TryParse(stringId, out id);
+            return id;
         }
 
         public static string GetRefreshToken(this ClaimsPrincipal userPrincipal)
         {
             return userPrincipal?.FindFirst("refreshToken")?.Value;
+        }
+
+        public static User.UserGeneralTypeEnum GetUserPanelType(this ClaimsPrincipal userPrincipal)
+        {
+            var type = userPrincipal?.FindFirst("panel")?.Value;
+            if (type == "host")
+            {
+                return User.UserGeneralTypeEnum.Host;
+            }
+            else
+            {
+                return User.UserGeneralTypeEnum.Guest;
+            }
         }
     }
 }

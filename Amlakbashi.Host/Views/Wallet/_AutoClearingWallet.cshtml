@@ -52,7 +52,9 @@ else
                     showInfoMessage('پرداخت ناموفق', '<p style="color: red;">' + response.msg + '</p>');
                 }
                 else {
-                    showInfoMessage('پرداخت موفق', '<p style="color: blue;">' + response.msg + '</p>');
+                    showInfoMessage('پرداخت موفق', '<p style="color: blue;">' + response.msg + '</p>' +
+                        '<br/>' + '<p>شماره پیگیری: ' + response.traceNumber + '</p>' +
+                        '<p>نام دریافت کننده وجه: ' + response.recieverFullName + '</p>');
                     popupMsgList[1].btnClick(0, true);
                     popupMsgList[0].btnClick(0, true);
                 }

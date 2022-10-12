@@ -23,8 +23,9 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public string supportStateString { get; set; }
         public string supportStateColor { get; set; }
         public List<PaymentHelperDTO> payments { get; set; }
-        public bool canDoClearing { get; set; }
-        public bool mustDoClearing { get; set; }
+        public bool canBeDoneCheckout { get; set; }
+        public bool canBeDoneEarlyCheckout { get; set; }
+        public bool mustBeDoneCheckout { get; set; }
         public bool mustRefund { get; set; }
         public bool shouldFollow { get; set; }
         public bool canBePaidByHost { get; set; }
@@ -39,7 +40,6 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
         public bool accVisitedByGuest { get; set; }
         public bool ContactWithHost { get; set; }
         public bool ContactWithGuest { get; set; }
-        public string hostResponseString { get; set; }
 
         public static ReserveAdminItemDTO Generate(Reserve reserve,
             SupporterStatus supportStatus, long guestPaidPrice,
@@ -142,10 +142,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                 {
                     title = "درصد سایت",
                     type = PaymentHelperDTO.PaymentType.HostSitePortion,
-                    //transactionId = hostSitePortionTransactionId,
                     amount = hostSitePortionPrice,
-                    //dateString = DateTimeUtility.GregorianToPersianDate(hostSitePortionDate).Remove(0, 2) +
-                    //    "_" + hostSitePortionDate.ToString("HH:mm")
                 });
             }
             var hostPayablePrice = PriceUtility.CalculateHostPayablePrice(
@@ -184,8 +181,9 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                 supportStateColor = GetSupportStatusColor(supportStatus),
                 canGrantSupport = canGrantSupport,
                 canBePaidByHost = canBePaidByHost,
-                canDoClearing = canDoClearing,
-                mustDoClearing = mustDoClearing,
+                canBeDoneCheckout = canDoClearing,
+                canBeDoneEarlyCheckout = canDoClearing && reserve.EarlyCheckoutStatus == EarlyCheckoutEnum.ConfirmedByGuest,
+                mustBeDoneCheckout = mustDoClearing,
                 mustRefund = mustRefund,
                 payments = generatedPayments,
                 depositePaidPrice = depositePaidPrice,

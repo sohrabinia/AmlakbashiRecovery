@@ -3,10 +3,8 @@ using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Identity.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.DTOs.UserDTOs
 {
@@ -17,8 +15,8 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
         public string mainMobile { get; set; }
         public string fname { get; set; }
         public string lname { get; set; }
-        public string mobile1 { get; set; }
         public string mobile2 { get; set; }
+        public string mobile3 { get; set; }
         public string tell { get; set; }
         public string thirdPersonTell { get; set; }
         public string email { get; set; }
@@ -26,24 +24,16 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
         public string shabaNumber { get; set; }
         public string bankFname { get; set; }
         public string bankLname { get; set; }
-        public int loginPriority { get; set; }
         public int userGeneralType { get; set; }
-        public int responseFrom { get; set; }
-        public int responseTo { get; set; }
-        public int accessType { get; set; }
-        public int OwnerShip { get; set; }
-        public int CancelInstantReserveLimit { get; set; }
-        public string ContactPhone { get; set; }
-        public int AmlakbashiScore { get; set; }
-        public string Address { get; set; }
         public bool hasPassword { get; set; }
+        public User.NoticesPhoneNumberEnum noticesPhoneNumber { get; set; }
 
         public static UserDTO Generate(User user, AppUser identityUser)
         {
             UserDTO dto = new UserDTO();
             dto.id = user.Id;
-            dto.fname = user.FName;
-            dto.lname = user.LName;
+            dto.fname = user.FirstName;
+            dto.lname = user.LastName;
             dto.email = identityUser.Email;
 
             dto.mainMobile = PhoneUtility.IsNumberForIran(
@@ -51,12 +41,12 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                     user.GetLocalPhoneNumber(User.PhoneType.MainMobile) :
                 user.GetCallablePhoneNumber(User.PhoneType.MainMobile);
 
-            dto.mobile1 = PhoneUtility.IsNumberForIran(
+            dto.mobile2 = PhoneUtility.IsNumberForIran(
                 user.GetPhoneNumber(User.PhoneType.OtherMobile1)) ?
                     user.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
                 user.GetCallablePhoneNumber(User.PhoneType.OtherMobile1);
 
-            dto.mobile2 = PhoneUtility.IsNumberForIran(
+            dto.mobile3 = PhoneUtility.IsNumberForIran(
                 user.GetPhoneNumber(User.PhoneType.OtherMobile2)) ?
                     user.GetLocalPhoneNumber(User.PhoneType.OtherMobile2) :
                 user.GetCallablePhoneNumber(User.PhoneType.OtherMobile2);
@@ -71,13 +61,9 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                     user.GetLocalPhoneNumber(User.PhoneType.ThirdPerson) :
                 user.GetCallablePhoneNumber(User.PhoneType.ThirdPerson);
 
-            dto.userGeneralType = user.UserGeneralType;
-            dto.OwnerShip = user.OwnerShip;
-            dto.CancelInstantReserveLimit = user.CancelInstantReserveLimit;
-            dto.ContactPhone = user.ContactPhone;
-            dto.AmlakbashiScore = user.AmlakbashiScore;
-            dto.Address = user.Address;
+            dto.userGeneralType = user.Type;
             dto.hasPassword = identityUser.PasswordHash != null;
+            dto.noticesPhoneNumber = user.NoticesPhoneNumber;
             return dto;
         }
 
@@ -92,31 +78,6 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                     errors.Add("شماره کارت وارد شده صحیح نمی باشد");
                     has_error = true;
                 }
-                //if (!string.IsNullOrEmpty(this.bankCardNumber) &&
-                //    Regex.IsMatch(@"[a-zA-Zآ-ی]", this.bankCardNumber))
-                //{
-
-                //    errors.Add("شماره کارت بانکی نمی تواند شامل حروف باشد");
-                //    has_error = true;
-                //}
-                //if (!string.IsNullOrEmpty(this.bankCardNumber) &&
-                //    this.bankCardNumber.Length != 16)
-                //{
-                //    errors.Add("شماره کارت بانکی باید 16 رقم باشد ");
-                //    has_error = true;
-                //}
-                
-                //TODO: handle this in app and then uncomment it
-                //if (string.IsNullOrEmpty(this.bankFname))
-                //{
-                //    errors.Add("لطفا نام صاحب حساب را وارد کنید");
-                //    has_error = true;
-                //}
-                //if (string.IsNullOrEmpty(this.bankLname))
-                //{
-                //    errors.Add("لطفا نام خانوادگی صاحب حساب را وارد کنید");
-                //    has_error = true;
-                //}
             }
             else
             {
@@ -140,27 +101,37 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                     has_error = true;
                 }
             }
-            if (!PhoneUtility.ValidateCallableNumber(this.mobile1))
+            if (!string.IsNullOrEmpty(this.mobile2) &&
+                !PhoneUtility.ValidatePhoneNumber(this.mobile2))
             {
-                errors.Add("شماره موبایل اشتباه است .");
+                errors.Add("شماره موبایل 2 اشتباه است");
                 has_error = true;
             }
-            if (!string.IsNullOrEmpty(this.mobile2) &&
-                !PhoneUtility.ValidateCallableNumber(this.mobile2))
+            if (!string.IsNullOrEmpty(this.mobile3) &&
+                !PhoneUtility.ValidatePhoneNumber(this.mobile3))
             {
-                errors.Add("شماره موبایل 2 اشتباه است .");
+                errors.Add("شماره موبایل 3 اشتباه است");
                 has_error = true;
             }
             if (!string.IsNullOrEmpty(this.tell) &&
-                !PhoneUtility.ValidateCallableNumber(this.tell))
+                !PhoneUtility.ValidatePhoneNumber(this.tell))
             {
-                errors.Add("شماره ثابت اشتباه است .");
+                errors.Add("شماره ثابت اشتباه است");
                 has_error = true;
             }
             if (!string.IsNullOrEmpty(this.thirdPersonTell) &&
-                !PhoneUtility.ValidateCallableNumber(this.thirdPersonTell))
+                !PhoneUtility.ValidatePhoneNumber(this.thirdPersonTell))
             {
-                errors.Add("شماره شخص ثالث اشتباه است .");
+                errors.Add("شماره شخص ثالث اشتباه است");
+                has_error = true;
+            }
+            var phoneNumbersList = new List<string>()
+            {
+                mainMobile, mobile2, mobile3, tell, thirdPersonTell
+            };
+            if (PhoneUtility.HasSamePhoneNumber(phoneNumbersList))
+            {
+                errors.Add("شماره تلفن های وارد شده یکسان هستند");
                 has_error = true;
             }
             if (!string.IsNullOrEmpty(this.fname))
@@ -168,7 +139,7 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                 var isDigitPresent = StringUtility.ContainsNumber(this.fname);
                 if (isDigitPresent)
                 {
-                    errors.Add("لطفا در قسمت نام فقط از حروف استفاده کنید .");
+                    errors.Add("لطفا در قسمت نام فقط از حروف استفاده کنید");
                     has_error = true;
                 }
             }
@@ -177,9 +148,16 @@ namespace Amlakbashi.Core.DTOs.UserDTOs
                 var isDigitPresent = StringUtility.ContainsNumber(this.lname);
                 if (isDigitPresent)
                 {
-                    errors.Add("لطفا در قسمت نام خانوادگی فقط از حروف استفاده کنید .");
+                    errors.Add("لطفا در قسمت نام خانوادگی فقط از حروف استفاده کنید");
                     has_error = true;
                 }
+            }
+            if (Enum.IsDefined(typeof(User.NoticesPhoneNumberEnum), noticesPhoneNumber) == false ||
+                (noticesPhoneNumber == User.NoticesPhoneNumberEnum.PhoneNumber2 && string.IsNullOrEmpty(this.mobile2)) ||
+                (noticesPhoneNumber == User.NoticesPhoneNumberEnum.PhoneNumber3 && string.IsNullOrEmpty(this.mobile3)))
+            {
+                errors.Add("شماره ارسال اعلامیه ها اشتباه است");
+                has_error = true;
             }
             return !has_error;
         }

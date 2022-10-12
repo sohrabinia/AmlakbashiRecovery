@@ -33,6 +33,8 @@ using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs;
 using Amlakbashi.Core.Common.Caching;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Amlakbashi.Application.Services.FileServices.Interfaces;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -206,13 +208,13 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                if (data.Area < 1)
+                if (data.AreaId < 1)
                 {
-                    data.Area = null;
+                    data.AreaId = null;
                 }
-                if (data.PhotoID < 1)
+                if (data.MainPhotoId < 1)
                 {
-                    data.PhotoID = null;
+                    data.MainPhotoId = null;
                 }
                 Dictionary<string, string> errors;
                 List<string> groupErrors = new List<string>();
@@ -450,9 +452,9 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                if (data.PhotoID < 1)
+                if (data.MainPhotoId < 1)
                 {
-                    data.PhotoID = null;
+                    data.MainPhotoId = null;
                 }
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
@@ -856,13 +858,13 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                if (data.Area < 1)
+                if (data.AreaId < 1)
                 {
-                    data.Area = null;
+                    data.AreaId = null;
                 }
-                if (data.PhotoID < 1)
+                if (data.MainPhotoId < 1)
                 {
-                    data.PhotoID = null;
+                    data.MainPhotoId = null;
                 }
                 Dictionary<string, string> errors;
                 List<string> groupErrors;
@@ -1056,8 +1058,17 @@ namespace Amlakbashi.Host.Controllers
                         {
                             message += " و در انتظار تایید کارشناس است";
                         }
-                        TempData["alert_success"] = message;
-                        return RedirectToAction("accomodationmanager", "post", new { type = "all" });
+
+                        if (string.IsNullOrEmpty(userAccessor.CurrentUser.ThirdPersonPhoneNumber))
+                        {
+                            TempData["alert_success"] = $"{message}. لطفا اطلاعات پروفایل کاربری خود را تکمیل کنید.";
+                            return RedirectToAction("profilemanager", "user");
+                        }
+                        else
+                        {
+                            TempData["alert_success"] = message;
+                            return RedirectToAction("accomodationmanager", "post", new { type = "all" });
+                        }
                 }
             }
             catch (Exception exc)
@@ -1169,8 +1180,25 @@ namespace Amlakbashi.Host.Controllers
                         parentId = data.ParentId
                     });
                 }
-                return RedirectToAction("accomodationmanager", "post", new { type = "all" });
 
+                var parentResidenceStatus = userAccessor.CurrentUser.Advertises.FirstOrDefault(f => f.Id == data.ParentId).Status;
+                var addOrEdit = isEdit ? "ویرایش" : "ثبت";
+                var message = $"آگهی شما با موفقیت {addOrEdit} شد";
+                if (parentResidenceStatus == AdvertiseStatus.ReadyToPublish)
+                {
+                    message += " و در انتظار تایید کارشناس است";
+                }
+
+                if (string.IsNullOrEmpty(userAccessor.CurrentUser.ThirdPersonPhoneNumber))
+                {
+                    TempData["alert_success"] = $"{message}. لطفا اطلاعات پروفایل کاربری خود را تکمیل کنید.";
+                    return RedirectToAction("profilemanager", "user");
+                }
+                else
+                {
+                    TempData["alert_success"] = message;
+                    return RedirectToAction("accomodationmanager", "post", new { type = "all" });
+                }
             }
             catch (Exception exc)
             {
@@ -1234,9 +1262,9 @@ namespace Amlakbashi.Host.Controllers
                 {
                     saveAndNewRoom = true;
                 }
-                if (data.PhotoID < 1)
+                if (data.MainPhotoId < 1)
                 {
-                    data.PhotoID = null;
+                    data.MainPhotoId = null;
                 }
                 if (data.Pool == true)
                 {
@@ -1298,8 +1326,25 @@ namespace Amlakbashi.Host.Controllers
                         parentId = data.ParentId
                     });
                 }
-                return RedirectToAction("accomodationmanager", "post", new { type = "all" });
 
+                var parentResidenceStatus = userAccessor.CurrentUser.Advertises.FirstOrDefault(f => f.Id == data.ParentId).Status;
+                var addOrEdit = isEdit ? "ویرایش" : "ثبت";
+                var message = $"آگهی شما با موفقیت {addOrEdit} شد";
+                if (parentResidenceStatus == AdvertiseStatus.ReadyToPublish)
+                {
+                    message += " و در انتظار تایید کارشناس است";
+                }
+
+                if (string.IsNullOrEmpty(userAccessor.CurrentUser.ThirdPersonPhoneNumber))
+                {
+                    TempData["alert_success"] = $"{message}. لطفا اطلاعات پروفایل کاربری خود را تکمیل کنید.";
+                    return RedirectToAction("profilemanager", "user");
+                }
+                else
+                {
+                    TempData["alert_success"] = message;
+                    return RedirectToAction("accomodationmanager", "post", new { type = "all" });
+                }
             }
             catch (Exception exc)
             {
@@ -1341,7 +1386,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var advertise = advertiseService.Find(advertise_id);
-                if (advertise.UserID != userAccessor.CurrentUser.Id)
+                if (advertise.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
                 }
@@ -1380,10 +1425,10 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(advertise_id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
-                {
-                    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
-                }
+                //if (acc.UserID != userAccessor.CurrentUser.Id)
+                //{
+                //    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
+                //}
                 if (forRemove)
                 {
                     var result = advertiseService.CheckUnsetOccupiedDateRange(
@@ -1414,6 +1459,22 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize]
+        public IActionResult GetSetOccupiedPopup(long id)
+        {
+            var user = userAccessor.CurrentUser;
+            var acc = advertiseService.Find(id);
+            //if (acc == null || acc.UserID != user.Id)
+            //{
+            //    return PartialView("_AccSetOccupied");
+            //}
+            var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
+            var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
+            ViewBag.occupiedList = SerializeUtility.SerializeToJS(occupiedList);
+            ViewBag.extrinsicList = SerializeUtility.SerializeToJS(extrinsicList);
+            return PartialView("_AccSetOccupied", acc);
+        }
+
+        [Authorize]
         public JsonResult GetOccupiedDates(long id)
         {
             try
@@ -1421,9 +1482,9 @@ namespace Amlakbashi.Host.Controllers
                 var acc = advertiseService.Find(id);
                 var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s));
                 var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
-                return GenerateJsonResult(new 
-                { 
-                    status = 1, 
+                return GenerateJsonResult(new
+                {
+                    status = 1,
                     occupiedList = occupiedList,
                     extrinsicList = extrinsicList
                 });
@@ -1442,16 +1503,16 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(advertise_id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
-                {
-                    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
-                }
+                //if (acc.UserID != userAccessor.CurrentUser.Id)
+                //{
+                //    return GenerateJsonResult(new { status = 0, msg = "شما مجوز این کار را ندارید" });
+                //}
                 var checkResult = advertiseService.CheckSetAsOccupiedDateRange(advertise_id,
                     from_date, to_date);
                 if (checkResult.Result == CheckSetOccupiedResult.OK ||
                     checkResult.Result == CheckSetOccupiedResult.ContainsReserveRequest)
                 {
-                    extrinsicReserveService.Insert(advertise_id, from_date, to_date, ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id, acc.Count);
+                    extrinsicReserveService.Insert(advertise_id, from_date, to_date, ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id, acc.UnitCount);
                     var todayPersian = DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date);
                     bool changeToday = false;
                     if (todayPersian == from_date)
@@ -1462,8 +1523,9 @@ namespace Amlakbashi.Host.Controllers
                     acc = advertiseService.Find(acc.Id, true);
                     var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
                     var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
-                    return GenerateJsonResult(new { 
-                        status = 1, 
+                    return GenerateJsonResult(new
+                    {
+                        status = 1,
                         msg = "محدوده انتخاب شده به عنوان روز های پر ثبت شد",
                         occupiedList = occupiedList,
                         extrinsicList = extrinsicList,
@@ -1475,8 +1537,8 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        msg = checkResult.ToString(),
-                        occupiedList = new List<long>()
+                        msg = checkResult.ToString()
+                        //occupiedList = new List<long>()
                     });
                 }
             }
@@ -1498,14 +1560,14 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var advertise = advertiseService.Find(advertise_id);
-                if (advertise.UserID != userAccessor.CurrentUser.Id)
-                {
-                    return GenerateJsonResult(new
-                    {
-                        status = 0,
-                        msg = "شما مجوز این کار را ندارید"
-                    });
-                }
+                //if (advertise.UserID != userAccessor.CurrentUser.Id)
+                //{
+                //    return GenerateJsonResult(new
+                //    {
+                //        status = 0,
+                //        msg = "شما مجوز این کار را ندارید"
+                //    });
+                //}
                 var checkResult = advertiseService.CheckUnsetOccupiedDateRange(
                     advertise_id, from_date, to_date);
                 if (checkResult.Result == CheckUnsetOccupiedResult.OK)
@@ -1535,8 +1597,8 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new
                     {
                         status = 0,
-                        msg = checkResult.ToString(),
-                        occupiedList = new List<long>()
+                        msg = checkResult.ToString()
+                        //occupiedList = new List<long>()
                     });
                 }
             }
@@ -1558,7 +1620,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -1654,12 +1716,12 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize]
-        public JsonResult ToggleActive(long id, bool? active)
+        public async Task<IActionResult> ToggleActive(long id, bool? active)
         {
             try
             {
                 var acc = advertiseService.Find(id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -1709,13 +1771,14 @@ namespace Amlakbashi.Host.Controllers
                 }
                 else
                 {
-                    newStatus = (int)advertiseService.ToggleSuspension(id);
+                    var result = await advertiseService.UpdateActivity(id);
+                    newStatus = (int)result.Result;
                 }
                 return GenerateJsonResult(new
                 {
                     status = 1,
                     newValue = newStatus == (int)AdvertiseStatus.Published ? 1 : 0,
-                    statusString = AdvertiseMainLocalization.GetAdvertiseStatusString((int)newStatus),
+                    statusString = AdvertiseMainLocalization.GetAdvertiseStatusPersianName((int)newStatus),
                     statusColor = AdvertiseStyleHelper.GetAdvertiseStatusColor((int)newStatus)
                 });
             }
@@ -1736,7 +1799,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var advertise = advertiseService.Find(id);
-                if (advertise.UserID != userAccessor.CurrentUser.Id)
+                if (advertise.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -1800,7 +1863,7 @@ namespace Amlakbashi.Host.Controllers
                 }
 
                 #region Initialize DTO
-                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(model.UserID);
+                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(model.UserId);
                 var allUserReportItems = reportItemService.GetByAccList(advertiseIds);
                 Dictionary<AdvertiseType, IList<AdvertiseDirector>> childDirectors;
                 var director = advertiseService.GetAdvertisePageData(id, out childDirectors);
@@ -1814,9 +1877,9 @@ namespace Amlakbashi.Host.Controllers
 
                 if (accDTO.CanPublish == false)
                 {
-                    var regionIds = regionService.GetParentIdsByCityId(model.City == null ? 0 : (int)model.City);
+                    var regionIds = regionService.GetParentIdsByCityId(model.CityId == null ? 0 : (int)model.CityId);
                     accDTO.RelatedCategories = new List<DynamicCategory>();
-                    accDTO.RelatedCategories.Add(categoryService.GetAccItemLinks(model.Province, model.City, model.Area, model.TypeID).Last());
+                    accDTO.RelatedCategories.Add(categoryService.GetAccItemLinks(model.ProvinceId, model.CityId, model.AreaId, model.TypeID).Last());
                 }
                 #endregion
 
@@ -1841,7 +1904,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.FindIncludingDeleted(id);
-                if (userAccessor.CurrentUser.Id != acc.UserID)
+                if (userAccessor.CurrentUser.Id != acc.UserId)
                 {
                     return NotFound("صفحه ی مورد نظر موجود نمی باشد .");
                 }
@@ -1849,7 +1912,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.amp_version = false;
 
                 #region Initial DTO
-                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(acc.UserID);
+                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(acc.UserId);
                 var allUserReportItems = reportItemService.GetByAccList(advertiseIds);
                 Dictionary<AdvertiseType, IList<AdvertiseDirector>> childDirectors;
                 var director = advertiseService.GetAdvertisePageData(id, out childDirectors);
@@ -1883,7 +1946,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.amp_version = false;
 
                 #region Initial DTO
-                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(acc.UserID);
+                var advertiseIds = advertiseService.GetAdvertiseIdsByUserId(acc.UserId);
                 var allUserReportItems = reportItemService.GetByAccList(advertiseIds);
                 Dictionary<AdvertiseType, IList<AdvertiseDirector>> childDirectors;
                 var director = advertiseService.GetAdvertisePageData(id, out childDirectors);
@@ -1912,7 +1975,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var advertise = advertiseService.Find(id);
-                if (advertise.UserID != userAccessor.CurrentUser.Id)
+                if (advertise.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -1945,7 +2008,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 var discount = discountTableService.Find(discount_id);
                 var acc = advertiseService.Find(discount.AdvertiseID);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -1978,7 +2041,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -2025,7 +2088,7 @@ namespace Amlakbashi.Host.Controllers
         public JsonResult UnsetTodayEmpty(long id)
         {
             var acc = advertiseService.Find(id);
-            if (acc.UserID != userAccessor.CurrentUser.Id)
+            if (acc.UserId != userAccessor.CurrentUser.Id)
             {
                 return GenerateJsonResult(new
                 {
@@ -2040,7 +2103,7 @@ namespace Amlakbashi.Host.Controllers
             if (checkResult.Result == CheckSetOccupiedResult.OK ||
                 checkResult.Result == CheckSetOccupiedResult.ContainsReserveRequest)
             {
-                extrinsicReserveService.Insert(id, DateTime.Now.Date, ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id, acc.Count);
+                extrinsicReserveService.Insert(id, DateTime.Now.Date, ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id, acc.UnitCount);
             }
             else
             {
@@ -2091,7 +2154,7 @@ namespace Amlakbashi.Host.Controllers
         {
             var model = advertiseService.Find(accomodationId);
             var dto = new ReservePopupDTO(model.Capacity,
-                model.MoreThanCapacity,
+                model.ExtraCapacity,
                 model.GetFirstDiscountData(false, true));
             ViewBag.forceHeaderShown = true;
             return PartialView("_Reserve", dto);
@@ -2250,10 +2313,10 @@ namespace Amlakbashi.Host.Controllers
             var priceProperties = new Property[] {
                 Property.DailyPrice,
                 Property.HolidayPrice,
-                Property.HolidayPikePrice,
-                Property.MoreThanCapacityPrice,
-                Property.RentPrice,
-                Property.NorouzPrice
+                Property.PeakHolidayPrice,
+                Property.ExtraCapacityPrice,
+                Property.MonthlyPrice,
+                Property.NowruzPrice
             };
             foreach (var pr in priceProperties)
             {
@@ -2268,10 +2331,10 @@ namespace Amlakbashi.Host.Controllers
                 price_str = string.Format("{0:n0}", price_temp) + " تومان";
                 price_property_dict.Add(pr.ToString(), price_str);
             }
-            if (advertise.NorouzOverCapacityPrice > 0)
+            if (advertise.NowruzExtraCapacityPrice > 0)
             {
                 price_property_dict.Add("NorouzOverCapacityPrice",
-                    string.Format("{0:n0}", advertise.NorouzOverCapacityPrice) + " تومان");
+                    string.Format("{0:n0}", advertise.NowruzExtraCapacityPrice) + " تومان");
             }
 
             var advertise_rules = advertiseService.GetRulesDictionary(advertise.Id);
@@ -2292,22 +2355,20 @@ namespace Amlakbashi.Host.Controllers
             bool verifyEmail = false;
             bool isNumberForIran = false;
             string userEmailAddress = "";
-            if (currentUser != null && string.IsNullOrEmpty(currentUser.MainMobile) == false)
+            if (currentUser != null && string.IsNullOrEmpty(currentUser.PhoneNumber) == false)
             {
-                var identityUser = userService.GetIdentityUser(currentUser.MainMobile);
+                var identityUser = userService.GetIdentityUser(currentUser.PhoneNumber);
                 verifyEmail = identityUser.EmailConfirmed;
-                isNumberForIran = PhoneUtility.IsNumberForIran(currentUser.MainMobile);
+                isNumberForIran = PhoneUtility.IsNumberForIran(currentUser.PhoneNumber);
                 userEmailAddress = identityUser.Email;
             }
             var is_favourited = currentUser.Id > 0 &&
                 currentUser.Favorite != null &&
                 currentUser.Favorite.Any(f => f.AdvertiseID == id);
             var user_is_autenticated = User.Identity.IsAuthenticated;
-            //List<long> occupiedList;
-            //Dictionary<string, DatePriceDTO> priceDict;
             var occupiedList = advertise.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s));
             var priceDict = advertiseService.GetAccPriceDatesInfo(id);
-            var maxInstantReserveDate = DateTime.Now.Date.AddDays(advertise.MaxInstantReserveStart);
+            var maxInstantReserveDate = DateTime.Now.Date.AddDays(advertise.MaxInstantReserveStartTimeInterval);
             var data = new
             {
                 is_favourited = is_favourited,
@@ -2315,8 +2376,8 @@ namespace Amlakbashi.Host.Controllers
                 rules_string = rules_string,
                 short_rules_string = short_rules_string,
                 price_property_dict = price_property_dict,
-                instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed,
-                instantReserveMaxStart = advertise.MaxInstantReserveStart,
+                instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent,
+                instantReserveMaxStart = advertise.MaxInstantReserveStartTimeInterval,
                 maxReserveStartDate = DateTimeUtility.GregorianToPersianDate(maxInstantReserveDate).Replace(",", "/").Substring(2),
                 maxInstantReserveStartUnix = DateTimeUtility.DateValueOfJS(maxInstantReserveDate),
                 occupiedList = occupiedList,
@@ -2325,11 +2386,7 @@ namespace Amlakbashi.Host.Controllers
                 isNumberForIran = isNumberForIran,
                 userEmailAddress = userEmailAddress
             };
-            advertiseService.AddToAdvertiseVisit(id);
-            //return GenerateJsonResult(new
-            //{
-            //    Data = data
-            //});
+            //advertiseService.AddToAdvertiseVisit(id);
             return GenerateJsonResult(data);
         }
 
@@ -2342,105 +2399,6 @@ namespace Amlakbashi.Host.Controllers
             {
                 price_dict = price_dict
             });
-        }
-
-        [Authorize]
-        public JsonResult InstantReserveRequest(long id,
-            bool ignoreMsg, int userId)
-        {
-            var acc = advertiseService.Find(id);
-            if (acc.UserID != userId)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "شما مجوز این کار را ندارید"
-                });
-            }
-            if (userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
-            {
-                return GenerateJsonResult(new
-                {
-                    status = 0,
-                    msg = "این امکان برای شما غیر فعال شده است"
-                });
-            }
-            bool needMsg;
-            advertiseService.RequestInstantReserve(id, ignoreMsg, userId,
-                userAccessor.DoerUser.Id, ActionLog.ActionSourceEnum.WebsiteDashboard,
-                userAccessor.CurrentUser.InstantReserveAccess, out needMsg);
-            acc = advertiseService.Find(id);
-            InstantReserveRequestResultDTO result;
-            if (needMsg)
-            {
-                result = new InstantReserveRequestResultDTO()
-                {
-                    status = 1,
-                    needMsg = true
-                };
-            }
-            else
-            {
-                result = new InstantReserveRequestResultDTO()
-                {
-                    status = 1,
-                    needMsg = false,
-                    msg = acc.InstantReserveStatus == InstantReserveStatusEnum.Requested ?
-                          "درخواست فعال سازی شما ارسال شد و بعد از تایید کارشناس این امکان برای این اقامتگاه فعال میشود" :
-                          "امکان رزرو آنی برای این اقامتگاه فعال شد",
-                    newData = new InstantReserveDetailDTO()
-                    {
-                        status = acc.InstantReserveStatus,
-                        statusString = AdvertiseMainLocalization.GetInstantReserveStatusString(acc.InstantReserveStatus),
-                        statusColor = AdvertiseStyleHelper.GetInstantReserveStatusColor(acc.InstantReserveStatus),
-                        banned = userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned,
-                        buttonTitle = AdvertiseMainLocalization.GetInstantReserveButtonTitle(acc.InstantReserveStatus, userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
-                    }
-                };
-            }
-            return GenerateJsonResult(result);
-        }
-
-        [Authorize]
-        public JsonResult InstantReserveCancel(long id, int userId)
-        {
-            var acc = advertiseService.Find(id);
-            if (acc.UserID != userId)
-            {
-                return GenerateJsonResult(new InstantReserveRequestResultDTO()
-                {
-                    status = 0,
-                    msg = "شما مجوز این کار را ندارید"
-                } as dynamic);
-            }
-            if (userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
-            {
-                return GenerateJsonResult(new InstantReserveRequestResultDTO()
-                {
-                    status = 0,
-                    msg = "این امکان برای شما غیر فعال شده است"
-                });
-            }
-            advertiseService.CancelInstantReserve(id, userId, userAccessor.DoerUser.Id,
-                ActionLog.ActionSourceEnum.WebsiteDashboard);
-            var result = new InstantReserveRequestResultDTO()
-            {
-                status = 1,
-                newData = new InstantReserveDetailDTO()
-                {
-                    status = acc.InstantReserveStatus,
-                    statusString = AdvertiseMainLocalization.GetInstantReserveStatusString(acc.InstantReserveStatus),
-                    statusColor = AdvertiseStyleHelper.GetInstantReserveStatusColor(acc.InstantReserveStatus),
-                    banned = userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned,
-                    buttonTitle = AdvertiseMainLocalization.GetInstantReserveButtonTitle(acc.InstantReserveStatus, userAccessor.CurrentUser.InstantReserveAccess == InstantReserveAccessEnum.Banned)
-                }
-            };
-            return GenerateJsonResult(result);
-        }
-
-        public string GetInstnatReserveBanReason(long id)
-        {
-            return advertiseService.GetInstantReserveBanReason(id);
         }
 
         public ActionResult UserRatingDetailPopup(long id, int userid)
@@ -2457,8 +2415,8 @@ namespace Amlakbashi.Host.Controllers
                 var data = new StayDurationDTO()
                 {
                     id = acc.Id,
-                    min = acc.MinReserveDays,
-                    max = acc.MaxReserveDays
+                    min = acc.MinReserveDuration,
+                    max = acc.MaxReserveDuration
                 };
                 return GenerateJsonResult(new
                 {
@@ -2550,7 +2508,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (userAccessor.CurrentUser.Id != acc.UserID)
+                if (userAccessor.CurrentUser.Id != acc.UserId)
                 {
                     return GenerateJsonResult(new
                     {
@@ -2583,7 +2541,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (userAccessor.CurrentUser.Id != acc.UserID)
+                if (userAccessor.CurrentUser.Id != acc.UserId)
                 {
                     return GenerateJsonResult(new
                     {
@@ -2594,7 +2552,7 @@ namespace Amlakbashi.Host.Controllers
                 var data = new InstantReserveMaxStartDTO()
                 {
                     id = acc.Id,
-                    maxStart = acc.MaxInstantReserveStart
+                    maxStart = acc.MaxInstantReserveStartTimeInterval
                 };
                 return GenerateJsonResult(new
                 {
@@ -2618,7 +2576,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (userAccessor.CurrentUser.Id != acc.UserID)
+                if (userAccessor.CurrentUser.Id != acc.UserId)
                 {
                     return GenerateJsonResult(new
                     {
@@ -2657,7 +2615,7 @@ namespace Amlakbashi.Host.Controllers
         {
             var user = userAccessor.CurrentUser;
             var acc = advertiseService.Find(id);
-            if (acc.UserID != user.Id)
+            if (acc.UserId != user.Id)
             {
                 return PartialView("_AccSetPrice");
             }
@@ -2671,7 +2629,7 @@ namespace Amlakbashi.Host.Controllers
         {
             var user = userAccessor.CurrentUser;
             var acc = advertiseService.Find(id);
-            if (acc.UserID != user.Id)
+            if (acc.UserId != user.Id)
             {
                 return PartialView("_AccSetMinNorouzReserve");
             }
@@ -2679,19 +2637,52 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [Authorize]
-        public IActionResult GetSetOccupiedPopup(long id)
+        public async Task<IActionResult> UpdatePermanentInstantReserve(long residenceId, bool active)
         {
-            var user = userAccessor.CurrentUser;
-            var acc = advertiseService.Find(id);
-            if (acc == null || acc.UserID != user.Id)
+            var result = await advertiseService.UpdateInstantReserveStatus(residenceId,
+                active ? InstantReserveStatusEnum.Permanent : InstantReserveStatusEnum.Calendar);
+            return GenerateJsonResult(new
             {
-                return PartialView("_AccSetOccupied");
-            }
-            var occupiedList = acc.OccupiedDates().Select(s => DateTimeUtility.DateValueOfJS(s)).ToList();
-            var extrinsicList = acc.ExtrinsicReserves.Select(s => DateTimeUtility.DateValueOfJS(s.StartDate)).ToList();
-            ViewBag.occupiedList = SerializeUtility.SerializeToJS(occupiedList);
-            ViewBag.extrinsicList = SerializeUtility.SerializeToJS(extrinsicList);
-            return PartialView("_AccSetOccupied", acc);
+                status = result ? 1 : 0
+            });
+        }
+
+        [Authorize]
+        public IActionResult GetInstantReserveDates(long residenceId)
+        {
+            var residence = advertiseService.Find(residenceId);
+            //if (residence == null || residence.UserID != userAccessor.CurrentUser.Id)
+            //{
+            //    ViewBag.errorMessage = "شما مجوز ندارید";
+            //    return PartialView("_InstantReserveDates");
+            //}
+            var instantReserveDates = residence.InstantReserveDates.Select(x => DateTimeUtility.DateValueOfJS(x.Date)).ToList();
+            ViewBag.instantReserveDates = SerializeUtility.SerializeToJS(instantReserveDates);
+            return PartialView("_InstantReserveDates", residence);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> AddInstantReserveDates(long residenceId, string fromDate, string toDate)
+        {
+            var result = await advertiseService.AddInstantReserveDates(residenceId, fromDate, toDate, userAccessor.CurrentUser.Id);
+            return GenerateJsonResult(new
+            {
+                status = result.HasError() ? 0 : 1,
+                msg = result.HasError() ? result.GetErrors().First() : null,
+                instantReserveDates = result.HasError() ? null : SerializeUtility.SerializeToJS(result.Result)
+            });
+        }
+
+        [Authorize]
+        public async Task<IActionResult> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate)
+        {
+            var result = await advertiseService.DeleteInstantReserveDates(residenceId, fromDate, toDate, userAccessor.CurrentUser.Id);
+            return GenerateJsonResult(new
+            {
+                status = result.HasError() ? 0 : 1,
+                msg = result.HasError() ? result.GetErrors().First() : null,
+                instantReserveDates = result.HasError() ? null : SerializeUtility.SerializeToJS(result.Result)
+            });
         }
 
         public IActionResult GetAccUrlById(string id)
@@ -2706,14 +2697,14 @@ namespace Amlakbashi.Host.Controllers
 
                 string slug = "";
                 var acc = advertiseService.Find(idLong);
-                if (acc == null || acc.Status != AdvertiseStatus.Published || !acc.Available)
+                if (acc == null || acc.Status != AdvertiseStatus.Published || !acc.Active)
                 {
                     return GenerateJsonResult(new
                     {
                         status = 0
                     });
                 }
-                if (acc.Mode == AdvertiseMode.Child && acc.Count > 0)
+                if (acc.Mode == AdvertiseMode.Child && acc.UnitCount > 0)
                 {
                     slug = acc.Parent.Slug;
                 }
@@ -2743,7 +2734,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 Advertise acc = advertiseService.Find(id);
-                if (acc == null || acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc == null || acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -2773,8 +2764,8 @@ namespace Amlakbashi.Host.Controllers
         {
             var acc = advertiseService.FindIncludingDeleted(id);
             var model = blogpostService.GetAccommodationNewItems(
-                acc.City == null ? 0 : (int)acc.City, acc.Area == null ? 0 : (int)acc.Area, (int)acc.TypeID,
-                (int)acc.Position, acc.Pool == null ? false : (bool)acc.Pool, 2);
+                acc.CityId == null ? 0 : (int)acc.CityId, acc.AreaId == null ? 0 : (int)acc.AreaId, (int)acc.TypeID,
+                (int)acc.LocationType, acc.Pool == null ? false : (bool)acc.Pool, 2);
             return PartialView("_AccBlogNews", model);
         }
 
@@ -2784,7 +2775,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(id);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new { status = 0 });
                 }
@@ -2819,7 +2810,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var user = userAccessor.CurrentUser;
-                if (user.Id > 0 && user.UserGeneralType > 0)
+                if (user.Id > 0 && user.Type > 0)
                 {
                     var userAccs = user.Advertises;
                     if (userAccs != null && userAccs.Count == 1 && userAccs.FirstOrDefault().HygieneProtocol == null)
@@ -2834,6 +2825,155 @@ namespace Amlakbashi.Host.Controllers
                 result = false;
             }
             return GenerateJsonResult(new { result = result });
+        }
+
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        public IActionResult GetPricesInfo(long residenceId)
+        {
+            var residence = advertiseService.Find(residenceId);
+            var result = new ResidencePricesInfoDTO()
+            {
+                residenceId = residence.Id,
+                dailyPrice = residence.DailyPrice,
+                holidayPrice = residence.HolidayPrice,
+                peakHolidayPrice = residence.PeakHolidayPrice,
+                monthlyPrice = (int)residence.MonthlyPrice,
+                extraCapacityPrice = residence.ExtraCapacityPrice,
+                norouzPrice = residence.NowruzPrice,
+                norouzExtraCapacityPrice = residence.NowruzExtraCapacityPrice,
+                calendarPrices = SerializeUtility.SerializeToJS(advertiseService.GetAccPriceDatesInfo(residenceId))
+            };
+            return PartialView("_PricesInfo", result);
+        }
+
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        [HttpPost]
+        public async Task<IActionResult> UpdateMainPrices(ResidenceMainPricesDTO request)
+        {
+            var result = await advertiseService.UpdatePricesAsync(request, userAccessor.CurrentUser.Id);
+            return GenerateJsonResult(new
+            {
+                status = result.HasError() ? 0 : 1,
+                msg = result.HasError() ? result.GetErrors() : null
+            });
+        }
+
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        [HttpPost]
+        public IActionResult UpdateManualPrices(ResidenceManualPriceDTO request)
+        {
+            string msg;
+            var result = priceTableService.SetAccommodationPriceInDate(request.residenceId, request.fromDate,
+                request.toDate, request.price, out msg);
+            return GenerateJsonResult(new
+            {
+                status = result ? 1 : 0,
+                priceDict = advertiseService.GetAccPriceDatesInfo(request.residenceId)
+            });
+        }
+
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        public IActionResult GetDiscountInfo(long residenceId)
+        {
+            var residence = advertiseService.Find(residenceId);
+            var result = new ResidenceDiscountInfoDTO()
+            {
+                residenceId = residence.Id,
+                discounts = residence.DiscountTables.Select(s => (AccDashboardDTOs.DiscountDTO)s).ToList(),
+                calendarPrices = SerializeUtility.SerializeToJS(advertiseService.GetAccPriceDatesInfo(residenceId))
+            };
+            return PartialView("_DiscountsInfo", result);
+        }
+
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        [HttpPost]
+        public IActionResult AddDiscount(ResidenceNewDiscountDTO request)
+        {
+            List<string> errorList;
+            var result = discountTableService.Insert(request.residenceId, DateTimeUtility.PersianDateToGregorian(request.fromDate),
+                DateTimeUtility.PersianDateToGregorian(request.toDate), request.discount, out errorList);
+            return GenerateJsonResult(new
+            {
+                status = result ? 1 : 0,
+                msg = result ? null : string.Join("\n", errorList),
+                priceDict = advertiseService.GetAccPriceDatesInfo(request.residenceId)
+            });
+        }
+
+        [Authorize(Policy = Policies.Advertise_Edit)]
+        [HttpPost]
+        public IActionResult DeleteDiscount(int discountId)
+        {
+            var discount = discountTableService.Find(discountId);
+            if (discount != null)
+            {
+                discountTableService.Delete(discountId);
+            }
+            return GenerateJsonResult(new
+            {
+                status = discount is null ? 0 : 1,
+                priceDict = advertiseService.GetAccPriceDatesInfo(discount.AdvertiseID)
+            });
+        }
+
+        [Authorize]
+        public IActionResult GetVideoInfo(int residenceId)
+        {
+            return PartialView("_VideoInfo", advertiseService.Find(residenceId));
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<JsonResult> UploadResidenceVideo(long residenceId, IFormFile formFile, 
+            [FromServices] IFileAppService fileService)
+        {
+            try
+            {
+                var result = await fileService.AddResidenceVideoAsync(userAccessor.CurrentUser.Id, residenceId, formFile);
+                if (result.HasError())
+                {
+                    return GenerateJsonResult(new { status = 0, msg = result.GetErrors() });
+                }
+                await advertiseService.UpdateVideoStatus(residenceId, VideoStatusEnum.Pending);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Accomodation.UploadResidenceVideo", exc);
+                return GenerateJsonResult(new { status = 0, msg = "عملیات با خطا مواجه شد" });
+            }
+        }
+
+        [Authorize(policy: Policies.Advertise_Edit)]
+        public IActionResult GetAdminVideoInfo(int residenceId)
+        {
+            return PartialView("_AdminVideoInfo", advertiseService.Find(residenceId));
+        }
+
+        [Authorize(policy: Policies.Advertise_Edit)]
+        [HttpPost]
+        public async Task<IActionResult> SetVideoStatus(int residenceId, VideoStatusEnum status,
+            [FromServices] IFileAppService fileService)
+        {
+            try
+            {
+                var residence = advertiseService.Find(residenceId);
+                if (residence.VideoStatus == VideoStatusEnum.Pending)
+                {
+                    var result = await fileService.MoveResidenceVideoToMainDirectoryAsync(residence.VideoId.Value);
+                    if (result.HasError())
+                    {
+                        return GenerateJsonResult(new { status = 0, msg = result.GetErrors() });
+                    }
+                }
+                await advertiseService.UpdateVideoStatus(residenceId, status);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Accomodation.SetVideoStatus", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
         }
     }
 }

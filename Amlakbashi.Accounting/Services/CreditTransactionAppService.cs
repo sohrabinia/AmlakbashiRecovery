@@ -1,8 +1,10 @@
 ﻿using Amlakbashi.Accounting.Services.Interfaces;
 using Amlakbashi.Core.Common.AppService;
+using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.DTOs.WalletDTOs;
 using Amlakbashi.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -33,8 +35,7 @@ namespace Amlakbashi.Accounting.Services
             {
                 data = data.Where(w => w.BankTransactionID == dto.transactionId);
             }
-            //dto.Model = data.OrderByDescending(o => o.Date).Skip((dto.page - 1) * dto.pageModelCount).Take(dto.pageModelCount).ToList();
-            dto.CreditTransactionList = data.OrderByDescending(o => o.Date).ToList();
+            dto.CreditTransactionList = data.Include(x => x.Payment).OrderByDescending(o => o.Date).ToList();
         }
 
         public IList<CreditTransaction> GetListByUserId(int userId)

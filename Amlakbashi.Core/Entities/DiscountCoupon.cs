@@ -42,5 +42,22 @@ namespace Amlakbashi.Core.Entities
             NotUsed = 0,
             Used = 1,
         }
+
+        public static DiscountCouponType GetDiscountCouponType(string discountCode)
+        {
+            switch (discountCode.ToLower())
+            {
+                case "amb5":
+                    return DiscountCouponType.Moupon;
+                case "inst8":
+                    return DiscountCouponType.Instagram;
+                case "pedar1400":
+                    return DiscountCouponType.Pedar1400;
+                case "yalda1400":
+                    return DiscountCouponType.Yalda1400;
+                default:
+                    return DiscountCouponType.Unset;
+            }
+        }
     }
 }

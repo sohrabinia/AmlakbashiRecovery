@@ -6,6 +6,7 @@ using Amlakbashi.Application.Services.SettingServices.SettingManager;
 using Amlakbashi.Core.Infrastructure.FilterHelpers;
 using Amlakbashi.Core.Infrastructure.FilterHelpers.Interfaces;
 using Amlakbashi.Application.Configurations;
+using Amlakbashi.Core;
 
 namespace Amlakbashi.Application
 {
@@ -14,6 +15,7 @@ namespace Amlakbashi.Application
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterMediatorHandlers();
+            builder.RegisterModule<CoreModule>();
             builder.RegisterModule<DataModule>();
             builder.RegisterUserContact();
             builder.RegisterModule<AccountingModule>();

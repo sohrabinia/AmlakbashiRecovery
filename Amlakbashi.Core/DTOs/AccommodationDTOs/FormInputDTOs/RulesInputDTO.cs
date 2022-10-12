@@ -11,10 +11,10 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
     [Serializable]
     public class RulesInputDTO
     {
-        public bool AllowParty { get; set; }
-        public bool AllowPets { get; set; }
-        public bool AllowSmoking { get; set; }
-        public string EvidenceRequired { get; set; }
+        public bool Party { get; set; }
+        public bool Pets { get; set; }
+        public bool Smoking { get; set; }
+        public string RequiredEvidence { get; set; }
         public string OtherRules { get; set; }
         public List<DTOCheckbox> booleanValues { get; set; }
 
@@ -39,9 +39,9 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
         {
             this.booleanValues = new List<DTOCheckbox>()
             {
-                AccDTOHelper.GenerateAccCheckbox(Property.AllowParty, AllowParty),
-                AccDTOHelper.GenerateAccCheckbox(Property.AllowPets, AllowPets),
-                AccDTOHelper.GenerateAccCheckbox(Property.AllowSmoking, AllowSmoking)
+                AccDTOHelper.GenerateAccCheckbox(Property.Party, Party),
+                AccDTOHelper.GenerateAccCheckbox(Property.Pets, Pets),
+                AccDTOHelper.GenerateAccCheckbox(Property.Smoking, Smoking)
             };
         }
     }

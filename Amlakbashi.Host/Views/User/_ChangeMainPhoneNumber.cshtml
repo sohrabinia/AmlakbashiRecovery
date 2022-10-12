@@ -1,0 +1,75 @@
+﻿
+<div style="text-align: center;">
+    <form id="enter-phone-number-form">
+        <small><b style="color: red;">توجه:</b> امکان ثبت شماره هایی که توسط آن ها حساب کاربری ایجاد شده باشد، وجود ندارد.</small>
+        <br />
+        <br />
+        <p>لطفا شماره موبایل جدید خود را وارد کنید:</p>
+        <input type="text" placeholder="شماره موبایل ..." id="newPhoneNumberTxt" />
+        <br />
+        <br />
+        <button class="btn-photo" style="width: 50px; border: 0;" type="button" onclick="popupMsgList[0].btnClick(0, true)">انصراف</button>
+        <button class="btn-photo" style="width: 50px; border: 0; background-color: #fDc831; color: black;" type="submit">ثبت</button>
+    </form>
+    <form id="enter-verify-code-form" style="display: none;">
+        <p>لطفا کد ارسال شده به شماره موبایل جدید خود را وارد کنید:</p>
+        <input type="text" placeholder="کد تایید ..." id="verifyCodeTxt" />
+        <br />
+        <br />
+        <button class="btn-photo" style="width: 50px; border: 0;" type="button" onclick="popupMsgList[0].btnClick(0, true)">انصراف</button>
+        <button class="btn-photo" style="width: 50px; border: 0; background-color: #fDc831; color: black;" type="submit">تایید</button>
+    </form>
+    <br />
+</div>
+
+<script>
+    $("#enter-phone-number-form").submit(function (e) {
+        e.preventDefault();
+        var phoneNumber = $('#newPhoneNumberTxt').val();
+        $.ajax({
+            url: "/user/ChangeMainPhoneNumber",
+            type: "post",
+            data: {
+                newMainPhoneNumber: phoneNumber
+            },
+            success: function (response) {
+                if (response.status === 1) {
+                    $('#enter-phone-number-form').hide();
+                    $('#enter-verify-code-form').show();
+                }
+                else if (response.status === 2) {
+                    location.reload();
+                }
+                else {
+                    alertify.error(response.msg);
+                }
+            },
+            error: function (ret) {
+                alertify.error("عملیات با خطا مواجه شد");
+            }
+        });
+    });
+
+    $("#enter-verify-code-form").submit(function (e) {
+        e.preventDefault();
+        var verifyCode = $('#verifyCodeTxt').val();
+        $.ajax({
+            url: "/user/VerifyChangeMainPhoneNumber",
+            type: "post",
+            data: {
+                verifyCode: verifyCode
+            },
+            success: function (response) {
+                if (response.status === 1) {
+                    location.reload();
+                }
+                else {
+                    alertify.error(response.msg);
+                }
+            },
+            error: function (ret) {
+                alertify.error("عملیات با خطا مواجه شد");
+            }
+        });
+    });
+</script>

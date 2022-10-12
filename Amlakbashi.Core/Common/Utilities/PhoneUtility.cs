@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Amlakbashi.Core.DTOs.UserDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,6 +58,7 @@ namespace Amlakbashi.Core.Common.Utilities
                 RegexOptions.IgnoreCase | RegexOptions.Singleline);
             return r.IsMatch(international_number);
         }
+
         public static bool ValidateLocalNumber(string local_number)
         {
             if (string.IsNullOrEmpty(local_number) || local_number.Length != 11)
@@ -65,6 +67,7 @@ namespace Amlakbashi.Core.Common.Utilities
                 RegexOptions.IgnoreCase | RegexOptions.Singleline);
             return r.IsMatch(local_number);
         }
+
         public static bool ValidateIranMobileNumber(string mobile_number)
         {
             if (string.IsNullOrEmpty(mobile_number))
@@ -73,27 +76,32 @@ namespace Amlakbashi.Core.Common.Utilities
                 RegexOptions.IgnoreCase | RegexOptions.Singleline);
             return r.IsMatch(mobile_number);
         }
+
         public static bool ValidateCallableNumber(string callable_number)
         {
             return !string.IsNullOrEmpty(callable_number) && ((ValidateLocalNumber(callable_number) && callable_number.Length == 11) ||
                 (callable_number.Substring(0, 2) == "00" && callable_number.Length > 11));
         }
+
         public static string InternationalNumberToLocal(string international_number)
         {
             if (string.IsNullOrEmpty(international_number))
                 return null;
             return "0" + international_number.Split(' ')[1];
         }
+
         public static string LocalNumberToInternational(string local_number, int country_code)
         {
             if (string.IsNullOrEmpty(local_number))
                 return null;
             return "+" + country_code + " " + local_number.Remove(0, 1);
         }
+
         public static bool IsNumberForIran(string number)
         {
             return !string.IsNullOrEmpty(number) && number.Substring(0, 3) == "+98";
         }
+
         public static string InternationalNumberToCallable(string number)
         {
             if (string.IsNullOrEmpty(number))
@@ -101,12 +109,27 @@ namespace Amlakbashi.Core.Common.Utilities
             return number.Replace(" ", "").Replace("+", "00");
         }
 
-        public static string NormalizePhoneNumber(string phone_number)
+        public static string NormalizePhoneNumber(string phoneNumber)
         {
-            return string.IsNullOrEmpty(phone_number) ? null :
-                (IsNumberForIran(phone_number) ?
-                InternationalNumberToLocal(phone_number) :
-                InternationalNumberToCallable(phone_number));
+            return string.IsNullOrEmpty(phoneNumber) ? null :
+                (IsNumberForIran(phoneNumber) ?
+                InternationalNumberToLocal(phoneNumber) :
+                InternationalNumberToCallable(phoneNumber));
+        }
+
+        public static bool ValidatePhoneNumber(string phoneNumber)
+        {
+            var regex = new Regex(@"^\d+$");
+            return string.IsNullOrEmpty(phoneNumber) == false &&
+                regex.IsMatch(phoneNumber) &&
+                (ValidateLocalNumber(phoneNumber) ||
+                (phoneNumber.Length > 11 && phoneNumber.Substring(0, 2) == "00"));
+        }
+
+        public static bool HasSamePhoneNumber(IEnumerable<string> phoneNumbersList)
+        {
+            phoneNumbersList = phoneNumbersList.Where(x => string.IsNullOrEmpty(x) == false);
+            return phoneNumbersList.Count() != phoneNumbersList.Distinct().Count();
         }
     }
 }

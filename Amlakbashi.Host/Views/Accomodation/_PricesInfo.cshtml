@@ -1,0 +1,69 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.ResidencePricesInfoDTO
+
+    <div class="price-info-container">
+        <form class="main-prices-container">
+            <input type="hidden" name="residenceId" value="@Model.residenceId" />
+            <div class="box-input">
+                <label>قیمت روزانه :</label>
+                <input onkeyup="onChangeInputPrice(this)" asp-for="dailyPrice" />
+                <small class="persian-price"></small>
+            </div>
+            <div class="box-input">
+                <label>قیمت تعطیلات :</label>
+                <input onkeyup="onChangeInputPrice(this)" asp-for="holidayPrice" />
+                <small class="persian-price"></small>
+            </div>
+            <div class="box-input">
+                <label>قیمت پیک تعطیلات :</label>
+                <input onkeyup="onChangeInputPrice(this)" asp-for="peakHolidayPrice" />
+                <small class="persian-price"></small>
+            </div>
+            <div class="box-input">
+                <label>قیمت ماهانه :</label>
+                <input onkeyup="onChangeInputPrice(this)" asp-for="monthlyPrice" />
+                <small class="persian-price"></small>
+            </div>
+            <div class="box-input">
+                <label>قیمت نوروز :</label>
+                <input onkeyup="onChangeInputPrice(this)" asp-for="norouzPrice" />
+                <small class="persian-price"></small>
+            </div>
+            <div class="box-input">
+                <label>قیمت ظرفیت اضافه :</label>
+                <input onkeyup="onChangeInputPrice(this)" asp-for="extraCapacityPrice" />
+                <small class="persian-price"></small>
+            </div>
+            <div class="box-input">
+                <label>قیمت ظرفیت اضافه نوروز :</label>
+                <input onkeyup="onChangeInputPrice(this)" asp-for="norouzExtraCapacityPrice" />
+                <small class="persian-price"></small>
+            </div>
+            <div class="box-button">
+                <button type="button" onclick="updateMainPrices()">ثبت</button>
+            </div>
+        </form>
+
+        <div class="calendar-prices-container">
+            <div class="box-calendar">
+                @await Html.PartialAsync("_DatePicker", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                            new ModelStateDictionary()) { { "class", "price-date-picker" } })
+            </div>
+            <div class="box-button">
+                <div>
+                    <input onkeyup="onChangeInputPrice(this)" class="js-price-input" type="number">
+                    <small class="persian-price"></small>
+                </div>
+                <button type="button" onclick="updateManualPrices(@Model.residenceId)">ثبت قیمت</button>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+    var priceListStr = '@Model.calendarPrices';
+    priceListStr = priceListStr.replaceAll('&quot;', '"');
+    updateCalendarPrices(JSON.parse(priceListStr));
+    firstSelectedDay = undefined;
+    secondSelectedDay = undefined;
+    fromDate = undefined;
+    toDate = undefined;
+</script>

@@ -10,18 +10,16 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
 {
     public class CheckShebaPaymentRequest : PodiumRequest<CheckShebaPaymentResult, CheckShebaPaymentResultInfo, CheckShebaPaymentRequestInfo>
     {
-        private const string productId = "487396";
-        private const string apiKey = "9283cddaf3064a38a515cf796c9f38df";
+        private const string productId = "1476957";
+        private const string apiKey = "9feb5d62c3f74b01b30231509e5f5e77";
 
         private readonly CheckShebaPaymentRequestInfo request;
-        public CheckShebaPaymentRequest(string date, string paymentId)
+        public CheckShebaPaymentRequest(string transactionId, string traceNumber)
         {
             request = new CheckShebaPaymentRequestInfo()
             {
-                UserName = userName,
-                Date = date,
-                PaymentId = paymentId,
-                Timestamp = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss:FFF")
+                EndToEndId = traceNumber,
+                TransactionId = transactionId
             };
         }
 
@@ -32,8 +30,7 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
             {
                 scProductId = productId,
                 scApiKey = apiKey,
-                request = jsonRequest,
-                signature = GenerateSignature(jsonRequest)
+                request = jsonRequest
             };
         }
     }

@@ -32,15 +32,25 @@ namespace Amlakbashi.Core.Entities
         [ForeignKey("UserID")]
         public virtual User User { get; set; }
 
+        public enum ScoreType
+        {
+            Cleaning = 1,
+            HostBehaviour = 2,
+            Location = 3,
+            InfoCorrectness = 4,
+            Safety = 5,
+            PriceWorth = 6
+        }
+
         public static string GetUserRatingTypeString(Comment.UserRatingType ratingType)
         {
             switch (ratingType)
             {
-                case Comment.UserRatingType.Tidiness:
+                case Comment.UserRatingType.Cleaning:
                     return "پاکیزگی اقامتگاه";
                 case Comment.UserRatingType.HostBehaviour:
                     return "برخورد میزبان";
-                case Comment.UserRatingType.Position:
+                case Comment.UserRatingType.Location:
                     return "موقعیت اقامتگاه";
                 case Comment.UserRatingType.InfoCorrectness:
                     return "صحت مطالب";

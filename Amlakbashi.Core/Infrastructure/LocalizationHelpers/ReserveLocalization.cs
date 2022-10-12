@@ -224,5 +224,40 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "";
             }
         }
+
+        public static string GetReserveCancelReasonsTitle(Reserve.ReserveCancelReasons reason)
+        {
+            switch (reason)
+            {
+                case ReserveCancelReasons.Guest_Guest_TripCancellation:
+                    return "لغو شدن سفر";
+                case ReserveCancelReasons.Guest_Guest_NotHavingEvidence:
+                    return "نداشتن مدارک هویتی";
+                case ReserveCancelReasons.Guest_Guest_IncorrectNumberOfGuests:
+                    return "تعداد نفرات اشتباه";
+                case ReserveCancelReasons.Guest_Guest_ChangeTripDate:
+                    return "تغییر زمان سفر";
+                case ReserveCancelReasons.Guest_Host_IncorrectResidenceInfo:
+                    return "مغایرت اقامتگاه با اطلاعات سایت";
+                case ReserveCancelReasons.Guest_Host_IncorrectHost:
+                    return "موجه نبودن میزبان";
+                case ReserveCancelReasons.Guest_Host_DirtyResidence:
+                    return "کثیفی اقامتگاه";
+                case ReserveCancelReasons.Host_Host_LowPrice:
+                    return "قیمت پایین";
+                case ReserveCancelReasons.Host_Host_ResidenceFull:
+                    return "پر بودن اقامتگاه";
+                case ReserveCancelReasons.Host_Host_ResidenceRebuilding:
+                    return "بازسازی اقامتگاه";
+                case ReserveCancelReasons.Host_Guest_NotHavingEvidence:
+                    return "عدم ارائه مدارک هویتی توسط مهمان";
+                case ReserveCancelReasons.Host_Guest_IncorrectNumberOfGuest:
+                    return "درست نبودن تعداد نفرات مهمان";
+                case ReserveCancelReasons.Host_Guest_IncorrectGuest:
+                    return "موجه نبودن مهمان";
+                default:
+                    return string.Empty;
+            }
+        }
     }
 }

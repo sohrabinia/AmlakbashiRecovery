@@ -39,6 +39,8 @@ namespace Amlakbashi.Core.DTOs.CategoryDTOs
         public int PoolTable { get; set; }
         public int Foosball { get; set; }
         public int TeaMaker { get; set; }
+        public int Filming { get; set; }
+        public int Exclusive { get; set; }
         public int RulesPets { get; set; }
         public int RulesParty { get; set; }
         public int RulesSmoking { get; set; }

@@ -24,8 +24,11 @@ using Amlakbashi.Core.Identity;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Amlakbashi.Core.DTOs.WebService.Requests.User;
-using Microsoft.Extensions.Configuration;
 using System.Text;
+using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.DTOs.WebService.Requests.Accounts;
+using Amlakbashi.Core.Services.Interfaces;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
@@ -37,13 +40,15 @@ namespace Amlakbashi.Application.Services.UserServices
         private readonly IPasswordValidator<AppUser> passwordValidator;
         private readonly RoleManager<AppRole> roleManager;
         private readonly SignInManager<AppUser> signInManager;
+        private readonly IEmailSenderService emailSender;
         public UserAppService(IRepository<User, int> repository,
             IUserContactFacade userContact,
             IMediator mediator,
             UserManager<AppUser> userManager,
             IPasswordValidator<AppUser> passwordValidator,
             RoleManager<AppRole> roleManager,
-            SignInManager<AppUser> signInManager) : base(repository)
+            SignInManager<AppUser> signInManager,
+            IEmailSenderService emailSender) : base(repository)
         {
             this.mediator = mediator;
             this.userContact = userContact;
@@ -51,6 +56,7 @@ namespace Amlakbashi.Application.Services.UserServices
             this.passwordValidator = passwordValidator;
             this.roleManager = roleManager;
             this.signInManager = signInManager;
+            this.emailSender = emailSender;
         }
 
         public IList<User> GetAll()
@@ -74,7 +80,7 @@ namespace Amlakbashi.Application.Services.UserServices
             {
                 return userManager.Users.Where(w => w.CreateDate >= fromDate && w.CreateDate <= toDate).Count();
             }
-            var usersMainMobile = Repository.Query(q => q.Where(u => userList.Contains(u.Id)).Select(s => s.MainMobile));
+            var usersMainMobile = Repository.Query(q => q.Where(u => userList.Contains(u.Id)).Select(s => s.PhoneNumber));
             return userManager.Users.Where(w => w.CreateDate >= fromDate && w.CreateDate <= toDate)
                 .Select(s => usersMainMobile.Contains(s.UserName)).Count();
         }
@@ -99,7 +105,7 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             if (PhoneUtility.ValidateLocalNumber(mainMobile))
                 mainMobile = PhoneUtility.LocalNumberToInternational(mainMobile, 98);
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.MainMobile == mainMobile));
+            var user = Repository.Query(q => q.FirstOrDefault(f => f.PhoneNumber == mainMobile));
             if (user == null)
             {
                 user = new User();
@@ -111,15 +117,15 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             var identityUser = userManager.FindByNameAsync(mainMobile).Result;
             if (identityUser != null &&
-                (identityUser.State == User.UserState.Acticved || identityUser.State == User.UserState.ReserveBanned))
+                (identityUser.Status == User.UserState.Acticved || identityUser.Status == User.UserState.ReserveBanned))
             {
                 if (includeFavorite)
                 {
                     return Repository.Query(q => q.Include(i => i.Favorite).FirstOrDefault(
-                        f => f.MainMobile == mainMobile));
+                        f => f.PhoneNumber == mainMobile));
                 }
                 return Repository.Query(q => q.FirstOrDefault(
-                    f => f.MainMobile == mainMobile));
+                    f => f.PhoneNumber == mainMobile));
             }
             return null;
         }
@@ -127,15 +133,15 @@ namespace Amlakbashi.Application.Services.UserServices
         public User GetActivatedUserByEmail(string email, bool includeFavorite = false)
         {
             var identityUser = userManager.FindByEmailAsync(email).Result;
-            if (identityUser != null && identityUser.State == User.UserState.Acticved)
+            if (identityUser != null && identityUser.Status == User.UserState.Acticved)
             {
                 if (includeFavorite)
                 {
                     return Repository.Query(q => q.Include(i => i.Favorite).FirstOrDefault(
-                        f => f.MainMobile == identityUser.UserName));
+                        f => f.PhoneNumber == identityUser.UserName));
                 }
                 return Repository.Query(q => q.FirstOrDefault(
-                    f => f.MainMobile == identityUser.UserName));
+                    f => f.PhoneNumber == identityUser.UserName));
             }
             return null;
         }
@@ -158,16 +164,17 @@ namespace Amlakbashi.Application.Services.UserServices
                 return null;
             }
 
-            var verifyCode = new Random().Next(1111, 9999).ToString();
             identityUser = new AppUser()
             {
                 UserName = request.phoneNumber,
                 PhoneNumber = request.phoneNumber,
                 CreateDate = DateTime.Now,
-                State = User.UserState.InActived,
-                Code = verifyCode,
-                SendVerification = DateTime.Now,
-                Email = request.email
+                Status = User.UserState.InActived,
+                VerifyCode = StringUtility.GenerateVerifyCode(),
+                EmailVerifyCode = StringUtility.GenerateVerifyCode(6),
+                LastSentVerifyCodeDate = DateTime.Now,
+                Email = request.email,
+                IsForeigner = request.IsIranNumber() == false
             };
             var result = await userManager.CreateAsync(identityUser);
 
@@ -175,8 +182,7 @@ namespace Amlakbashi.Application.Services.UserServices
             {
                 var user = new User()
                 {
-                    Mobile = request.phoneNumber,
-                    MainMobile = request.phoneNumber,
+                    PhoneNumber = request.phoneNumber,
                     AmlakbashiScore = 1000
                 };
                 Repository.Insert(user);
@@ -204,7 +210,7 @@ namespace Amlakbashi.Application.Services.UserServices
             await userManager.UpdateAsync(identityUser);
         }
 
-        public void SetReferralCode(int userId, int referralUserId)
+        private void SetReferralCode(int userId, int referralUserId)
         {
             var referralUser = Repository.Find(referralUserId);
             if (referralUser != null)
@@ -217,7 +223,7 @@ namespace Amlakbashi.Application.Services.UserServices
                     5, DiscountCoupon.DiscountCouponType.Present));
                 var contact = new UserContactDTO()
                 {
-                    UserMainMobile = user.MainMobile,
+                    UserMainMobile = user.GetNoticesPhoneNumber(),
                     UserAppNotificationToken = user.AppNotificationToken,
                     UserEmail = "",
                     EmailConfirmed = false,
@@ -231,70 +237,52 @@ namespace Amlakbashi.Application.Services.UserServices
             }
         }
 
-        public void SendVerifyCode(AppUser identityUser)
+        public async Task SendVerifyCode(AppUser identityUser)
         {
-            var isIranNumber = PhoneUtility.IsNumberForIran(identityUser.PhoneNumber);
-            if (isIranNumber)
+            if (identityUser.IsForeigner)
             {
-                var callableNumber = PhoneUtility.InternationalNumberToLocal(identityUser.PhoneNumber);
-                SendVerificationSms(callableNumber, identityUser.Code);
+                await emailSender.SendAsync(identityUser.Email, StringUtility.VerifyEmailSubject(),
+                    StringUtility.VerifyEmailContent(identityUser.EmailVerifyCode));
             }
             else
             {
-                string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد ورود شما در املاک باشی: {identityUser.Code}</div></div>";
-#if !DEBUG
-                EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email }, "تایید ایمیل", strbody);
-#endif
+                var callableNumber = PhoneUtility.InternationalNumberToLocal(identityUser.PhoneNumber);
+                SendVerificationSms(callableNumber, identityUser.VerifyCode);
             }
         }
 
-        public bool Update(UserEditDTO editedUser, int adminId)
+        public async Task<bool> Update(UserEditDTO editedUser, int adminId)
         {
-            var user = Repository.Find(editedUser.Id);
+            var user = await Repository.FindAsync(editedUser.Id);
             var shallowUser = user.ShallowCopy();
 
-            var identityUser = GetIdentityUser(user.MainMobile);
-            if (identityUser.State != editedUser.UserState)
+            var identityUser = GetIdentityUser(user.PhoneNumber);
+            if (identityUser.Status != editedUser.UserState)
             {
-                identityUser.State = editedUser.UserState;
+                identityUser.Status = editedUser.UserState;
                 UpdateIdentityUser(identityUser);
             }
 
-            user.FName = editedUser.FName;
-            user.LName = editedUser.LName;
+            user.FirstName = editedUser.FName;
+            user.LastName = editedUser.LName;
             user.OwnerShip = editedUser.OwnerShip;
             user.ContactPhone = editedUser.ContactPhone ? "1" : null;
             user.AmlakbashiScore = editedUser.AmlakbashiScore;
-            user.Address = editedUser.Address;
+            user.Description = editedUser.Address;
             user.ForbiddenRegionsAccess = editedUser.ForbiddenRegionsAccess;
-            user.Mobile = editedUser.Mobile;
-            user.Mobile2 = editedUser.Mobile2;
-            user.Tell = editedUser.Tell;
-            user.ThirdPersonTell = editedUser.ThirdPersonTell;
-
-            if (editedUser.CancelInstantReserveLimit > 0 &&
-                editedUser.CancelInstantReserveLimit != user.CancelInstantReserveLimit)
+            user.PhoneNumber2 = editedUser.Mobile;
+            user.PhoneNumber3 = editedUser.Mobile2;
+            user.LandlinePhoneNumber = editedUser.Tell;
+            user.ThirdPersonPhoneNumber = editedUser.ThirdPersonTell;
+            if (user.DisableInstantReserve != editedUser.DisableInstantReserve)
             {
-                user.CancelInstantReserveLimit = editedUser.CancelInstantReserveLimit;
-                if (user.Advertises.Sum(x => x.InstantReserveCancels) > user.CancelInstantReserveLimit)
-                {
-                    user.InstantReserveAccess = User.InstantReserveAccessEnum.Banned;
-                    foreach (var item in user.Advertises)
-                    {
-                        item.InstantReserveStatus = Advertise.InstantReserveStatusEnum.None;
-                    }
-                }
-                else
-                {
-                    if (user.InstantReserveAccess == User.InstantReserveAccessEnum.Banned)
-                    {
-                        user.InstantReserveAccess = User.InstantReserveAccessEnum.None;
-                    }
-                }
+                user.DisableInstantReserve = editedUser.DisableInstantReserve;
+                await mediator.Publish(new UpdateUserInstantReserveEvent(user.Id, user.DisableInstantReserve));
             }
+
             Repository.Update(user);
             Repository.Save();
-            mediator.Publish(new UserUpdateEvent(shallowUser, user, ActionLog.ActionSourceEnum.AdminPanel, adminId));
+            await mediator.Publish(new UserUpdateEvent(shallowUser, user, ActionLog.ActionSourceEnum.AdminPanel, adminId));
             return true;
         }
 
@@ -302,63 +290,28 @@ namespace Amlakbashi.Application.Services.UserServices
             ActionLog.ActionSourceEnum source, out List<string> errors)
         {
             if (dto.Validate(out errors) == false)
+            {
                 return false;
-            var user = Repository.Find(dto.id);
-            var shallowUser = user.ShallowCopy();
-            user.FName = dto.fname;
-            user.LName = dto.lname;
-            user.OwnerShip = dto.OwnerShip;
-            user.ContactPhone = dto.ContactPhone;
-            user.AmlakbashiScore = dto.AmlakbashiScore;
-            user.Address = dto.Address;
-            if (dto.mobile1.Substring(0, 2) == "00")
-            {
-                var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile1);
-                user.SetPhoneNumber(User.PhoneType.OtherMobile1, corrected);
             }
-            else
-            {
-                user.SetLocalPhoneNumber(User.PhoneType.OtherMobile1, dto.mobile1, 98);
-            }
-            if (!string.IsNullOrEmpty(dto.mobile2))
-            {
-                if (dto.mobile2.Substring(0, 2) == "00")
-                {
-                    var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile2);
-                    user.SetPhoneNumber(User.PhoneType.OtherMobile2, corrected);
-                }
-                else
-                {
-                    user.SetLocalPhoneNumber(User.PhoneType.OtherMobile2, dto.mobile2, 98);
-                }
-            }
-            if (!string.IsNullOrEmpty(dto.tell))
-            {
-                if (dto.tell.Substring(0, 2) == "00")
-                {
-                    var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.tell);
-                    user.SetPhoneNumber(User.PhoneType.LandLine, corrected);
-                }
-                else
-                {
-                    user.SetLocalPhoneNumber(User.PhoneType.LandLine, dto.tell, 98);
-                }
-            }
-            if (!string.IsNullOrEmpty(dto.thirdPersonTell))
-            {
-                if (dto.thirdPersonTell.Substring(0, 2) == "00")
-                {
-                    var corrected = PhoneUtility.CorrectPhoneNumberIfPossible(dto.thirdPersonTell);
-                    user.SetPhoneNumber(User.PhoneType.ThirdPerson, corrected);
-                }
-                else
-                {
-                    user.SetLocalPhoneNumber(User.PhoneType.ThirdPerson, dto.thirdPersonTell, 98);
-                }
-            }
-            var bankCards = user.BankCards;
-            var bankCardObj = bankCards == null || bankCards.Count == 0 ? null : bankCards.FirstOrDefault();
 
+            var user = Repository.Find(dto.id);
+            if (user.Type == (int)User.UserGeneralTypeEnum.Host && string.IsNullOrEmpty(dto.thirdPersonTell))
+            {
+                errors.Add("شماره شخص ثالث اجباری است");
+                return false;
+            }
+
+            var shallowUser = user.ShallowCopy();
+            user.FirstName = dto.fname;
+            user.LastName = dto.lname;
+
+            user.PhoneNumber2 = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile2);
+            user.PhoneNumber3 = PhoneUtility.CorrectPhoneNumberIfPossible(dto.mobile3);
+            user.LandlinePhoneNumber = PhoneUtility.CorrectPhoneNumberIfPossible(dto.tell);
+            user.ThirdPersonPhoneNumber = PhoneUtility.CorrectPhoneNumberIfPossible(dto.thirdPersonTell);
+            user.NoticesPhoneNumber = dto.noticesPhoneNumber;
+
+            var bankCardObj = user.BankCards == null || user.BankCards.Any() == false ? null : user.BankCards.FirstOrDefault();
             var hasChange = ((bankCardObj == null && dto.shabaNumber == null &&
                 dto.bankCardNumber == null && dto.bankFname == null && dto.bankLname == null) ||
                 (bankCardObj != null && dto.shabaNumber == bankCardObj.ShabaNumber &&
@@ -418,18 +371,185 @@ namespace Amlakbashi.Application.Services.UserServices
             return true;
         }
 
+        public async Task<ServiceResult> UpdateAsync(UserPostProfileRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var user = Repository.Find(request.userId);
+
+            var shallowUser = user.ShallowCopy();
+            user.FirstName = request.firstName;
+            user.LastName = request.lastName;
+            user.PhoneNumber2 = PhoneUtility.CorrectPhoneNumberIfPossible(request.phoneNumber2);
+            user.PhoneNumber3 = PhoneUtility.CorrectPhoneNumberIfPossible(request.phoneNumber3);
+            user.NoticesPhoneNumber = request.noticesPhoneNumber;
+
+            if (request.panel == User.UserGeneralTypeEnum.Host)
+            {
+                user.LandlinePhoneNumber = PhoneUtility.CorrectPhoneNumberIfPossible(request.landLinePhoneNumber);
+                user.ThirdPersonPhoneNumber = PhoneUtility.CorrectPhoneNumberIfPossible(request.thirdPersonPhoneNumber);
+            }
+
+            var identityUser = GetIdentityUser(user.PhoneNumber);
+            await UpdateIdentityAsync(identityUser);
+
+            var bankCard = user.BankCards == null || user.BankCards.Any() == false ? null : user.BankCards.FirstOrDefault();
+            var hasBankCardChanged = ((bankCard == null && request.shebaNumber == null &&
+                request.bankCardNumber == null && request.bankCardOwnerFirstName == null && request.bankCardOwnerLastName == null) ||
+                (bankCard != null && request.shebaNumber == bankCard.ShabaNumber &&
+                request.bankCardNumber == bankCard.BankCardNumber &&
+                request.bankCardOwnerFirstName == bankCard.FName && request.bankCardOwnerLastName == bankCard.LName)) == false;
+
+            if (hasBankCardChanged)
+            {
+                if (request.shebaNumber != null)
+                {
+                    request.shebaNumber = StringUtility.PersianNumberToEnglish(request.shebaNumber);
+                }
+                if (request.bankCardNumber != null)
+                {
+                    request.bankCardNumber = StringUtility.PersianNumberToEnglish(request.bankCardNumber);
+                }
+
+                if (bankCard != null)
+                {
+                    var shallowBankCard = bankCard.ShallowCopy();
+                    bankCard.BankCardStatus = (int)BankCard.BankCardStatusEnum.NotVerified;
+                    bankCard.ShabaStatus = (int)BankCard.BankCardStatusEnum.NotVerified;
+                    bankCard.FName = request.bankCardOwnerFirstName;
+                    bankCard.LName = request.bankCardOwnerLastName;
+                    bankCard.BankCardNumber = request.bankCardNumber;
+                    bankCard.ShabaNumber = request.shebaNumber;
+                    bankCard.LastModifyDate = DateTime.Now;
+                    await mediator.Publish(new BankCardUpdateEvent(shallowBankCard, bankCard,
+                        ActionLog.ActionSourceEnum.WebsiteDashboard, user.Id));
+                }
+                else
+                {
+                    var newBankCard = new BankCard()
+                    {
+                        UserID = request.userId,
+                        BankCardNumber = request.bankCardNumber,
+                        ShabaNumber = request.shebaNumber,
+                        FName = request.bankCardOwnerFirstName,
+                        LName = request.bankCardOwnerLastName,
+                        CreateDate = DateTime.Now,
+                        LastModifyDate = DateTime.Now,
+                        BankCardStatus = (int)BankCard.BankCardStatusEnum.NotVerified,
+                        ShabaStatus = (int)BankCard.BankCardStatusEnum.NotVerified
+                    };
+                    user.BankCards.Add(newBankCard);
+                    await mediator.Publish(new BankCardUpdateEvent(null, newBankCard,
+                        ActionLog.ActionSourceEnum.WebsiteDashboard, user.Id));
+                }
+            }
+            Repository.Update(user);
+            Repository.Save();
+            await mediator.Publish(new UserUpdateEvent(shallowUser, user, ActionLog.ActionSourceEnum.WebsiteDashboard, user.Id));
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult<bool>> UpdateMainPhoneNumberAsync(int userId, string newMainPhoneNumber)
+        {
+            var serviceResult = new ServiceResult<bool>();
+            var user = Repository.Find(userId);
+            if (user == null)
+            {
+                serviceResult.AddError("کاربر یافت نشد");
+                return serviceResult;
+            }
+            if (PhoneUtility.ValidatePhoneNumber(newMainPhoneNumber) == false)
+            {
+                serviceResult.AddError("شماره موبایل وارد شده اشتباه است");
+                return serviceResult;
+            }
+            var internationalMobile = PhoneUtility.CorrectPhoneNumberIfPossible(newMainPhoneNumber);
+            var userPhoneNumbersList = user.GetPhoneNumbersList();
+            userPhoneNumbersList.Add(internationalMobile);
+            if (PhoneUtility.HasSamePhoneNumber(userPhoneNumbersList))
+            {
+                serviceResult.AddError("شماره موبایل وارد شده با دیگر شماره های ثبت شده یکسان است");
+                return serviceResult;
+            }
+            if (await FindIdentityByUsernameAsync(internationalMobile) != null)
+            {
+                serviceResult.AddError("با شماره وارد شده حساب کاربری ایجاد شده است");
+                return serviceResult;
+            }
+            var isIranNumber = PhoneUtility.IsNumberForIran(internationalMobile);
+            if (isIranNumber == false && PhoneUtility.IsNumberForIran(user.PhoneNumber))
+            {
+                serviceResult.AddError("امکان تغییر شماره ایرانی به خارجی وجود ندارد");
+                return serviceResult;
+            }
+
+            var identityUser = await FindIdentityByUsernameAsync(user.PhoneNumber);
+            if (isIranNumber)
+            {
+                var callableNumber = PhoneUtility.InternationalNumberToLocal(internationalMobile);
+                var code = new Random().Next(1111, 9999).ToString();
+                identityUser.Temp = internationalMobile;
+                identityUser.LastSentVerifyCodeDate = DateTime.Now;
+                identityUser.VerifyCode = code;
+                await UpdateIdentityAsync(identityUser);
+                SendVerificationSms(callableNumber, code);
+                serviceResult.Result = false;
+            }
+            else
+            {
+                identityUser.PhoneNumber = internationalMobile;
+                identityUser.UserName = internationalMobile;
+                identityUser.IsForeigner = true;
+                await UpdateIdentityAsync(identityUser);
+                await UpdatePhoneNumberAsync(user.Id, internationalMobile);
+                await userManager.UpdateSecurityStampAsync(identityUser);
+                serviceResult.Result = true;
+            }
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> VerifyNewMainPhoneNumber(int userId, string verifyCode)
+        {
+            var serviceResult = new ServiceResult();
+            var user = Repository.Find(userId);
+            if (user == null)
+            {
+                serviceResult.AddError("کاربر یافت نشد");
+                return serviceResult;
+            }
+            var identityUser = await FindIdentityByUsernameAsync(user.PhoneNumber);
+            var internationalMobile = PhoneUtility.CorrectPhoneNumberIfPossible(identityUser.Temp);
+            if (PhoneUtility.ValidateInternationalNumber(internationalMobile) == false)
+            {
+                serviceResult.AddError("شماره موبایل وارد شده اشتباه است");
+                return serviceResult;
+            }
+            if (identityUser.IsVerifyCodeValid(verifyCode) == false)
+            {
+                serviceResult.AddError("کد وارد شده نامعتبر است");
+                return serviceResult;
+            }
+
+            identityUser.PhoneNumber = internationalMobile;
+            identityUser.UserName = internationalMobile;
+            identityUser.IsForeigner = false;
+            await UpdateIdentityAsync(identityUser);
+            await UpdatePhoneNumberAsync(user.Id, internationalMobile);
+            await userManager.UpdateSecurityStampAsync(identityUser);
+            return serviceResult;
+        }
+
         public void UpdateState(int userId, bool state, int currentUserId = 0,
             ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             if (state)
             {
-                identityUser.State = User.UserState.Acticved;
+                identityUser.Status = User.UserState.Acticved;
             }
             else
             {
-                identityUser.State = User.UserState.InActived;
+                identityUser.Status = User.UserState.InActived;
             }
             userManager.UpdateAsync(identityUser).Wait();
         }
@@ -475,7 +595,7 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateCreateDate(int userId, DateTime time)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             identityUser.CreateDate = time;
             userManager.UpdateAsync(identityUser).Wait();
         }
@@ -483,30 +603,35 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateSendVerification(int userId, DateTime time, string code = null)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
-            identityUser.SendVerification = time;
+            var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
+            identityUser.LastSentVerifyCodeDate = time;
             if (code != null)
             {
-                identityUser.Code = code;
+                identityUser.VerifyCode = code;
             }
             userManager.UpdateAsync(identityUser).Wait();
         }
 
-        public async Task<string> UpdateVerifyCodeAsync(string guid)
+        public async Task<ServiceResult> UpdateVerifyCodeAsync(string guid)
         {
+            var serviceResult = new ServiceResult();
             var identityUser = await userManager.FindByIdAsync(guid);
-            if (identityUser != null)
+            if (identityUser == null)
             {
-                var newCode = new Random().Next(1111, 9999).ToString();
-                identityUser.Code = newCode;
-                identityUser.SendVerification = DateTime.Now;
-                var result = await userManager.UpdateAsync(identityUser);
-                if (result.Succeeded)
-                {
-                    return newCode;
-                }
+                serviceResult.AddError("user not found");
+                return serviceResult;
             }
-            return null;
+
+            identityUser.VerifyCode = StringUtility.GenerateVerifyCode();
+            identityUser.EmailVerifyCode = StringUtility.GenerateVerifyCode(6);
+            identityUser.LastSentVerifyCodeDate = DateTime.Now;
+            var result = await userManager.UpdateAsync(identityUser);
+            if (result.Succeeded == false)
+            {
+                serviceResult.AddError(result.Errors.First().Description);
+                return serviceResult;
+            }
+            return serviceResult;
         }
 
         public void UpdatePresentorUser(int userId, int pid)
@@ -520,8 +645,8 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateFNameLName(int userId, string newFName, string newLName)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.FName = newFName;
-            user.LName = newLName;
+            user.FirstName = newFName;
+            user.LastName = newLName;
             Repository.Update(user);
             Repository.Save();
         }
@@ -537,7 +662,7 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateDesc(int userId, string desc)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.Address = desc;
+            user.Description = desc;
             Repository.Update(user);
             Repository.Save();
         }
@@ -550,12 +675,12 @@ namespace Amlakbashi.Application.Services.UserServices
             Repository.Save();
         }
 
-        public void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
-            int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel)
-        {
-            mediator.Send(new ChangeInstantReserveAccessCommand(userId,
-                instantReserveAccess, currentUserId, source));
-        }
+        //public void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
+        //    int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel)
+        //{
+        //    mediator.Send(new ChangeInstantReserveAccessCommand(userId,
+        //        instantReserveAccess, currentUserId, source));
+        //}
 
         public void UpdateUserNotificationToken(int userId, string token)
         {
@@ -627,7 +752,7 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateUserGeneralType(int userId, User.UserGeneralTypeEnum userGeneralType)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
-            user.UserGeneralType = (int)userGeneralType;
+            user.Type = (int)userGeneralType;
             Repository.Update(user);
             Repository.Save();
         }
@@ -648,7 +773,11 @@ namespace Amlakbashi.Application.Services.UserServices
 
         public void AddFavorite(int userId, long advertiseId)
         {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
+            var user = Repository.Find(userId);
+            if (user.Favorite.Any(x => x.AdvertiseID == advertiseId))
+            {
+                return;
+            }
             var favorite = new UserFavorite();
             favorite.AdvertiseID = advertiseId;
             favorite.SetDate = DateTime.Now;
@@ -657,16 +786,18 @@ namespace Amlakbashi.Application.Services.UserServices
             Repository.Save();
         }
 
-        public void DeleteFavorite(int userId, long advertiseId)
+        public bool DeleteFavorite(int userId, long advertiseId)
         {
-            var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == userId));
+            var user = Repository.Find(userId);
             var favorite = user.Favorite.FirstOrDefault(f => f.AdvertiseID == advertiseId);
-            if (favorite != null)
+            if (favorite == null)
             {
-                user.Favorite.Remove(favorite);
-                Repository.Update(user);
-                Repository.Save();
+                return false;
             }
+            user.Favorite.Remove(favorite);
+            Repository.Update(user);
+            Repository.Save();
+            return true;
         }
 
         public void SendVerificationSms(string localNumber, string code)
@@ -694,8 +825,8 @@ namespace Amlakbashi.Application.Services.UserServices
             var identityUser = userManager.FindByNameAsync(mobile).Result;
             if (identityUser != null)
             {
-                var user = Repository.Query(q => q.OrderBy(u => u.Id).FirstOrDefault(u => u.MainMobile == mobile));
-                if (identityUser.State == User.UserState.InActived)
+                var user = Repository.Query(q => q.OrderBy(u => u.Id).FirstOrDefault(u => u.PhoneNumber == mobile));
+                if (identityUser.Status == User.UserState.InActived)
                 {
                     user.AmlakbashiScore = 1000;
                     if (!string.IsNullOrEmpty(presentorCode))
@@ -714,7 +845,7 @@ namespace Amlakbashi.Application.Services.UserServices
                             5, DiscountCoupon.DiscountCouponType.Present));
                         var contact = new UserContactDTO()
                         {
-                            UserMainMobile = user.MainMobile,
+                            UserMainMobile = user.GetNoticesPhoneNumber(),
                             UserAppNotificationToken = user.AppNotificationToken,
                             UserEmail = identityUser.Email,
                             EmailConfirmed = identityUser.EmailConfirmed,
@@ -750,7 +881,7 @@ namespace Amlakbashi.Application.Services.UserServices
 
         public IList<string> GetAllIdentityUsernamesByState(User.UserState state = User.UserState.Acticved)
         {
-            return userManager.Users.Where(w => w.State == state).Select(s => s.UserName).ToList();
+            return userManager.Users.Where(w => w.Status == state).Select(s => s.UserName).ToList();
         }
 
         public AppUser GetIdentityUser(string phrase, bool isEmail = false)
@@ -767,9 +898,14 @@ namespace Amlakbashi.Application.Services.UserServices
             return user;
         }
 
-        public async Task<AppUser> GetIdentityUserByIdAsync(string id)
+        public async Task<AppUser> FindIdentityByIdAsync(string id)
         {
             return await userManager.FindByIdAsync(id);
+        }
+
+        public async Task<AppUser> FindIdentityByUsernameAsync(string username)
+        {
+            return await userManager.FindByNameAsync(username);
         }
 
         public void AddIdentityUser(AppUser user)
@@ -780,6 +916,12 @@ namespace Amlakbashi.Application.Services.UserServices
         public void UpdateIdentityUser(AppUser user)
         {
             userManager.UpdateAsync(user).Wait();
+        }
+
+        public async Task<bool> UpdateIdentityAsync(AppUser user)
+        {
+            var result = await userManager.UpdateAsync(user);
+            return result.Succeeded;
         }
 
         public IdentityResult ChangeIdentityUserPassword(string username, string password)
@@ -868,7 +1010,7 @@ namespace Amlakbashi.Application.Services.UserServices
         public IList<User> GetRoleUserList(string roleName)
         {
             var identityUsers = userManager.GetUsersInRoleAsync(roleName).Result.Select(s => s.UserName);
-            var userList = Repository.Query(q => q.Where(w => identityUsers.Contains(w.MainMobile)));
+            var userList = Repository.Query(q => q.Where(w => identityUsers.Contains(w.PhoneNumber)));
             return userList.ToList();
         }
 
@@ -876,7 +1018,7 @@ namespace Amlakbashi.Application.Services.UserServices
             out Dictionary<string, string> errors)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == user_id));
-            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             errors = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(fname))
             {
@@ -886,7 +1028,7 @@ namespace Amlakbashi.Application.Services.UserServices
                 }
                 else
                 {
-                    user.FName = fname;
+                    user.FirstName = fname;
                     Repository.Update(user);
                     Repository.Save();
                 }
@@ -903,7 +1045,7 @@ namespace Amlakbashi.Application.Services.UserServices
                 }
                 else
                 {
-                    user.LName = lname;
+                    user.LastName = lname;
                     Repository.Update(user);
                     Repository.Save();
                 }
@@ -919,7 +1061,7 @@ namespace Amlakbashi.Application.Services.UserServices
             string password, string confirmPassword, out Dictionary<string, string> errors)
         {
             var user = Repository.Query(q => q.FirstOrDefault(f => f.Id == user_id));
-            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             errors = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(fname))
             {
@@ -929,7 +1071,7 @@ namespace Amlakbashi.Application.Services.UserServices
                 }
                 else
                 {
-                    user.FName = fname;
+                    user.FirstName = fname;
                     Repository.Update(user);
                     Repository.Save();
                 }
@@ -946,7 +1088,7 @@ namespace Amlakbashi.Application.Services.UserServices
                 }
                 else
                 {
-                    user.LName = lname;
+                    user.LastName = lname;
                     Repository.Update(user);
                     Repository.Save();
                 }
@@ -1009,28 +1151,30 @@ namespace Amlakbashi.Application.Services.UserServices
             return token;
         }
 
-        public async Task<string> GenerateJwtTokenAsync(string guid, string jwtSecret)
+        public async Task<string> GenerateJwtTokenAsync(string guid, string jwtSecret,
+            User.UserGeneralTypeEnum? panel = null)
         {
             var identityUser = await userManager.FindByIdAsync(guid);
             var user = GetByMainMobile(identityUser.UserName);
-            var claims = new List<Claim>();
-
             var userRoles = await userManager.GetRolesAsync(identityUser);
+            panel = panel != null ? panel.Value : (User.UserGeneralTypeEnum)user.Type;
+            var claims = new List<Claim>();
+            
+            claims.Add(new Claim("guid", identityUser.Id));
+            claims.Add(new Claim("id", user.Id.ToString()));
+            claims.Add(new Claim("refreshToken", identityUser.SecurityStamp));
+            claims.Add(new Claim("panel", panel == User.UserGeneralTypeEnum.Guest ? "guest" : "host"));
             foreach (var role in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, identityUser.Id));
-            claims.Add(new Claim(ClaimTypes.Name, identityUser.UserName));
-            claims.Add(new Claim("type", user.UserGeneralType == 0 ? "guest" : "host"));
-            claims.Add(new Claim("refreshToken", identityUser.SecurityStamp));
 
             var symmetricKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret));
             var token = new JwtSecurityToken(
-                    issuer: "https://www.amlakbashi.com",
-                    audience: "https://www.amlakbashi.com",
+                    issuer: GeneralData.WebsiteUrl,
+                    audience: GeneralData.WebsiteUrl,
                     claims: claims,
-                    expires: DateTime.Now.AddMinutes(5),
+                    expires: DateTime.Now.AddDays(30),
                     signingCredentials: new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256));
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -1039,22 +1183,13 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             try
             {
-                var tokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = false,
-                    ValidateIssuerSigningKey = true,
-                    RequireSignedTokens = true,
-                    ValidIssuer = "https://www.amlakbashi.com",
-                    ValidAudience = "https://www.amlakbashi.com",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret))
-                };
+                var tokenValidationParameters = TokenUtility.GetTokenValidationParameters(jwtSecret, false);
                 var tokenHandler = new JwtSecurityTokenHandler();
                 SecurityToken securityToken;
                 var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
                 var jwtSecurityToken = securityToken as JwtSecurityToken;
-                if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                if (jwtSecurityToken == null ||
+                    jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase) == false)
                 {
                     return null;
                 }
@@ -1069,7 +1204,7 @@ namespace Amlakbashi.Application.Services.UserServices
         public IEnumerable<User> IdentityUsersToUsers(IEnumerable<AppUser> identityUsers)
         {
             var mainMobiles = identityUsers.Select(s => s.PhoneNumber).ToList();
-            return Repository.Query(q => q.Where(w => mainMobiles.Contains(w.MainMobile)));
+            return Repository.Query(q => q.Where(w => mainMobiles.Contains(w.PhoneNumber)));
         }
 
         public IEnumerable<AppUser> GetAllSupportEmployees()
@@ -1107,6 +1242,21 @@ namespace Amlakbashi.Application.Services.UserServices
         {
             signInManager.SignOutAsync().Wait();
             mediator.Send(new DeleteImpersonationCookiesCommand());
+        }
+
+        private async Task<bool> UpdatePhoneNumberAsync(int userId, string newPhoneNumber)
+        {
+            var user = Repository.Find(userId);
+            if (user == null)
+            {
+                return false;
+            }
+            var shallowUser = user.ShallowCopy();
+            user.PhoneNumber = newPhoneNumber;
+            Repository.Update(user);
+            Repository.Save();
+            await mediator.Publish(new UserUpdateEvent(shallowUser, user, ActionLog.ActionSourceEnum.WebsiteDashboard, user.Id));
+            return true;
         }
     }
 }

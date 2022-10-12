@@ -347,14 +347,21 @@ function updateDatePickerOccupied(elems, setting) {
         $occDays.removeClass('jalali-occupied-day');
         $occDays.removeClass('jalali-disabled-day');
         var occupied;
+        var isHostPanel = false;
+        var isExtrinsic = false;
+        var isInstantReserve = false;
         $monthElem.find('.jalali-real-day').each(function () {
             var value = parseInt($(this).attr('data-value'));
-            occupied = setting.occupiedList && setting.occupiedList.includes(value);
-            var isHostPanel = false;
-            var isExtrinsic = false;
+            if (setting.occupiedList) {
+                occupied = setting.occupiedList && setting.occupiedList.includes(value);
+            }
             if (setting.extrinsicList != undefined) {
                 isHostPanel = true;
                 isExtrinsic = occupied && setting.extrinsicList.includes(value);
+            }
+            if (setting.instantReserveDateList != undefined) {
+                isHostPanel = true;
+                isInstantReserve = setting.instantReserveDateList.includes(value);
             }
             if (occupied) {
                 $(this).find('.jalali-price-label').hide();
@@ -370,6 +377,15 @@ function updateDatePickerOccupied(elems, setting) {
                     }
                 }
                 $(this).addClass('jalali-occupied-day');
+                if (!setting.occupiedSelectEnabled) {
+                    $(this).addClass('jalali-disabled-day');
+                }
+                $(this).off('click');
+                $(this).off('hover');
+            }
+            else if (isInstantReserve) {
+                $(this).find('.jalali-price-label').hide();
+                $(this).append('<span class="jalali-filled-label">رزرو آنی</span>');
                 if (!setting.occupiedSelectEnabled) {
                     $(this).addClass('jalali-disabled-day');
                 }

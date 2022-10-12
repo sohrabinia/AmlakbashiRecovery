@@ -13,9 +13,9 @@
             <form class="setting-list">
                 <div class="status-banner">
                     @await Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "title", "نمایش آگهی " }, { "Active", Model.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "true") } })
+        new ModelStateDictionary()) { { "title", "فعال " }, { "Active", Model.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "true") } })
                     @await Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "title", "عدم نمایش آگهی " }, { "Active", !Model.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "false") } })
+        new ModelStateDictionary()) { { "title", "غیرفعال " }, { "Active", !Model.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", Model.id, "false") } })
                 </div>
             </form>
         }
@@ -27,11 +27,6 @@
         <div class="day-set-quick ">
             @await Html.PartialAsync("_MinAndMaxDay", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "js-min-input", "js-min-input-" + Model.id }, { "js-max-input", "js-max-input-" + Model.id }, { "minReserve", Model.minReserveDays }, { "maxReserve", Model.maxReserveDays }, { "id", Model.id } })
-        </div>
-        <p class="title-box"> رزروآنی</p>
-        <div class="instantReserve style-instant-reserve">
-            @await Html.PartialAsync("_InstantReserve", Model, new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "instantReserveAccess", ViewData["ReserveAccess"] }, { "UserID", ViewBag.UserID } })
         </div>
     </div>
 </div>

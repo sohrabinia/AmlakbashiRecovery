@@ -30,6 +30,11 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             this.userManager = userManager;
         }
 
+        public override bool CanTransitTo(ReserveStatus status)
+        {
+            return false;
+        }
+
         public override void OnTransition(Reserve.ReserveStatus prevStatus, bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId)
         {
             var reserve = Repository.Find(ReserveId);
@@ -47,29 +52,22 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             accounting.RefundPrizeCreditIfAny(reserve.Id);
             if (sendSms)
             {
-                var identityUser = userManager.FindByNameAsync(reserve.GuestUser.MainMobile).Result;
-                var contact = new UserContactDTO()
+                var identityUser = userManager.FindByNameAsync(reserve.GuestUser.PhoneNumber).Result;
+                mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                 {
-                    UserMainMobile = reserve.GuestUser.MainMobile,
+                    UserMainMobile = reserve.GuestUser.GetNoticesPhoneNumber(),
                     UserAppNotificationToken = reserve.GuestUser.AppNotificationToken,
                     UserEmail = identityUser.Email,
                     EmailConfirmed = identityUser.EmailConfirmed,
                     UserFcmAppNotificationToken = reserve.GuestUser.FcmAppNotificationToken,
                     UserNotificationToken = reserve.GuestUser.NotificationToken,
-                    //Type = UserContactType.GuestReserveCanceledByHost,
                     Type = UserContactType.HostReserveCanceled,
                     AdvertiseId = reserve.AdvertiseID.ToString(),
                     ReserveId = reserve.Id.ToString()
-                };
-                mediator.Enqueue(new SendMessageCommand(contact));
+                }));
             }
-            mediator.Enqueue(new UpdateUserScoreCommand(reserve.Advertise.UserID));
+            mediator.Enqueue(new UpdateUserScoreCommand(reserve.HostUserID));
             mediator.Enqueue(new UpdateAdvertiseScoreCommand(reserve.AdvertiseID));
-        }
-
-        public override bool CanTransitTo(ReserveStatus status)
-        {
-            return false;
         }
     }
 }

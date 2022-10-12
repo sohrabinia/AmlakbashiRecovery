@@ -44,6 +44,12 @@
         <label>ارسال پیامک به میزبان</label>
         <input type="checkbox" name="sendSms" value="true" checked="checked" />
     </div>
+    @if (ViewBag.hasFailureExpenditurePayment)
+    {
+        <div>
+            <p style="text-align: center;"><b style="color: red;">توجه: </b>این رزرو دارای یک پرداخت خودکار ناموفق است. لطفا قبل از ثبت پرداخت جدید، ابتدا وضعیت آن را بررسی نمایید: <small><a href="/payment/index?reserveId=@ViewBag.reserveId" target="_blank" style="color: blue;">لیست پرداخت های آنلاین</a></small></p>
+        </div>
+    }
     <div style="text-align:center;">
         <button type="button" onclick="submitManualSitePaymentForm()">ثبت پرداخت</button>
     </div>

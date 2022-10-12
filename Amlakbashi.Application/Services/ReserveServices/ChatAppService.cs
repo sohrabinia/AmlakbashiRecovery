@@ -8,6 +8,8 @@ using System.Linq;
 using MediatR;
 using Amlakbashi.Mediator.Commands.ReserveCommands;
 using Amlakbashi.Core.Common.Extensions;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+using Amlakbashi.Application.DTOs;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
@@ -43,9 +45,8 @@ namespace Amlakbashi.Application.Services.ReserveServices
 
         public IList<Chat> GetReserveChats(long reserveId)
         {
-            IQueryable<Chat> allChats = Repository.Query(q => q);
-            allChats = allChats.Where(x => x.ReserveID == reserveId).OrderBy(x => x.CreateTime);
-            return allChats.ToList();
+            return Repository.Query(q => q.Where(x => x.ReserveID == reserveId)
+                .OrderBy(x => x.CreateTime)).ToList();
         }
 
         public IList<Chat> GetListAgainstUserId(int userId, Chat.ChatStatusEnum status, Chat.ReadStatusEnum read,
@@ -86,6 +87,40 @@ namespace Amlakbashi.Application.Services.ReserveServices
                     x.SupportReadStatus == (int)Chat.ReadStatusEnum.NotRead));
         }
 
+        public ServiceResult<Chat> Insert(long reserveId, int userId, string message)
+        {
+            ServiceResult<Chat> serviceResult = new ServiceResult<Chat>();
+            var reserve = Repository.Find<Reserve, long>(reserveId);
+
+            if (userId != reserve.UserID && userId != reserve.HostUserID)
+            {
+                serviceResult.AddError("user is incorrect");
+            }
+            if (ChatLocalization.HasForbiddenWord(message))
+            {
+                serviceResult.AddError("has forbidden word");
+            }
+            if (reserve.GetStateCategory() == Reserve.ReserveCategory.Finished ||
+                reserve.GetStateCategory() == Reserve.ReserveCategory.Unsuccessful)
+            {
+                serviceResult.AddError("chat is closed for this reserve");
+            }
+            if (serviceResult.HasError())
+            {
+                return serviceResult;
+            }
+
+            serviceResult.Result = Insert(new Chat()
+            {
+                ReserveID = reserveId,
+                UserID = userId,
+                CreateTime = DateTime.Now,
+                Text = message,
+                ChatStatus = (int)Chat.ChatStatusEnum.Sent
+            });
+            return serviceResult;
+        }
+
         public Chat Insert(Chat chat)
         {
             Repository.Insert(chat);
@@ -98,6 +133,17 @@ namespace Amlakbashi.Application.Services.ReserveServices
             var ids = chats.Select(s => s.Id).ToList();
             var data = Repository.Query(q => q.Where(w => ids.Contains(w.Id)));
             foreach (var item in data)
+            {
+                item.ReadStatus = (int)Chat.ReadStatusEnum.Read;
+                Repository.Update(item);
+            }
+            Repository.Save();
+        }
+
+        public void UpdateReserveChatsReadStatus(long reserveId, int userId)
+        {
+            var chats = Repository.Query(q => q.Where(w => w.ReserveID == reserveId && w.UserID != userId));
+            foreach (var item in chats)
             {
                 item.ReadStatus = (int)Chat.ReadStatusEnum.Read;
                 Repository.Update(item);

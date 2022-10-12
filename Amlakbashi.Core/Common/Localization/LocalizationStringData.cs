@@ -19,6 +19,7 @@ namespace Amlakbashi.Core.Common.Localization
                         {"ACC_VALIDATION_GEOLOCATION", "موقعیت اقامتگاه را در نقشه وارد کنید" },
                         {"ACC_VALIDATION_CAPACITY", "ظرفیت اقامتگاه را وارد کنید" },
                         {"ACC_VALIDATION_OWNERSHIP", "وضعیت مالکیت را مشخص کنید" },
+                        {"ACC_VALIDATION_OWNERMOBILENAME", "اطلاعات مالک اقامتگاه را تکمیل کنید" },
                         {"ACC_VALIDATION_ADVERTISE_TYPE", "نوع اقامتگاه را انتخاب کنید" },
                         {"ACC_VALIDATION_POSITION", "موقعیت اقامتگاه را انتخاب کنید" },
                         {"ACC_VALIDATION_TITLE", "عنوان اقامتگاه را بنویسید" },
@@ -36,6 +37,7 @@ namespace Amlakbashi.Core.Common.Localization
                         {"ACC_VALIDATION_ELEVATOR", "لطفا آسانسور را تعیین کنید" },
                         {"ACC_VALIDATION_PARKING", "لطفا تعداد پارکینگ را مشخص کنید" },
                         {"ACC_VALIDATION_LICENSENUMBER", "لطفا شماره مجوز را وارد کنید" },
+                        {"ACC_VALIDATION_VILLATYPE", "لطفا نوع ویلا را مشخص کنید" },
                     }
                 }
         };

@@ -38,6 +38,12 @@ namespace Amlakbashi.Core.Common.Localization
                 return;
             }
             is_norouz = false;
+            if (DateTimeUtility.ManualHolidayPeakPersianDates.Contains(persian_date))
+            {
+                is_holiday_or_between = true;
+                is_holiday_pike = true;
+                return;
+            }
             is_holiday_or_between = IsPersianDateHolidayOrBetween(persian_date);
             if (!is_holiday_or_between)
             {

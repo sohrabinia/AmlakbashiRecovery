@@ -75,7 +75,6 @@
             foreach (var item in Model.AdvertiseItems)
             {
                 counter++;
-                //var contact_available = AdvertiseDepend.IsContactAvailable(item);
                 //var img_src = item.PhotoID > 0 ? string.Format("/عکس-آگهی/{0}", item.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
                 var img_src = item.PhotoID > 0 ? string.Format("/file/accthumbcard?accid={0}&fileid={1}", item.AdvertiseID, item.PhotoID) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144);
                 var city_name = item.RegionString;
@@ -138,11 +137,11 @@
                         int discount = item.DiscountPercent;
                         string date_string = item.DiscountDateString;
 
-                        if (item.NorouzPrice > 0)
+                        @*if (item.NorouzPrice > 0)
                         {
                             <p class="advertise-item__norouz-label home-page_discount-style"><img width="21" height="21" rel="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" /> @(string.Format("{0:n0}", item.NorouzPrice)) تومان</p>
-                        }
-                        else if (discount > 0)
+                        }*@
+                        if (discount > 0)
                         {
                             <p class="advertise-item__discount-label home-page_discount-style"><i class="fa fa-percent"></i>@(discount) تخفیف @date_string</p>
                         }

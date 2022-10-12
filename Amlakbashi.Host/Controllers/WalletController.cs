@@ -125,7 +125,7 @@ namespace Amlakbashi.Host.Controllers
                     ShebaNumber = bankCard != null ? bankCard.ShabaNumber : "",
                     ShebaVerified = bankCard != null &&
                             bankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.Verified,
-                    WalletCredit = user.Credit
+                    WalletCredit = user.WalletAmount
                 };
 
                 return PartialView("_UserWalletInfo", model);
@@ -149,7 +149,7 @@ namespace Amlakbashi.Host.Controllers
                     ((bankCard.FName != null ? bankCard.FName + " " : "") +
                     (bankCard.LName != null ? bankCard.LName : "")) : "";
 
-                if (user.Credit <= 0)
+                if (user.WalletAmount <= 0)
                 {
                     ViewBag.error = true;
                     ViewBag.errorMsg = "موجودی کیف پول کمتر از حد مجاز است";
@@ -165,7 +165,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.userId = userId;
                 ViewBag.shebaNumber = bankCard.ShabaNumber;
                 ViewBag.bankCardName = bankCardName;
-                ViewBag.price = user.Credit * 10;
+                ViewBag.price = user.WalletAmount * 10;
                 return PartialView("_AutoClearingWallet");
             }
             catch (Exception exc)
@@ -187,10 +187,10 @@ namespace Amlakbashi.Host.Controllers
                 if (result.HasError == false && sendSms)
                 {
                     var user = userService.Find(userId);
-                    var identityUser = userService.GetIdentityUser(user.MainMobile);
+                    var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserMainMobile = user.MainMobile,
+                        UserMainMobile = user.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
@@ -205,7 +205,9 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new
                 {
                     status = result.HasError ? 0 : 1,
-                    msg = result.HasError ? result.ErrorMessage : result.Message
+                    msg = result.HasError ? result.ErrorMessage : result.Message,
+                    traceNumber = result.TraceNumber,
+                    recieverFullName = result.RecieverFullName
                 });
             }
             catch (Exception exc)

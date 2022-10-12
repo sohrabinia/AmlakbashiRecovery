@@ -1,0 +1,40 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.ResidenceDiscountInfoDTO
+
+<div class="discount-info-container">
+    <div class="calendar-prices-container">
+        <div class="box-calendar">
+            @await Html.PartialAsync("_DatePicker", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                        new ModelStateDictionary()) { { "class", "price-date-picker" } })
+        </div>
+        <div class="box-button">
+            <input class="js-price-input" type="number">
+            <button type="button" onclick="addDiscount(@Model.residenceId)">ثبت تخفیف</button>
+        </div>
+    </div>
+    <div class="discounts-container">
+        @if (Model.discounts.Count > 0)
+        {
+            foreach (var item in Model.discounts)
+            {
+                <div class="discount-item">
+                    <span>@item.dateString - @item.percent%</span>
+                    <i onclick="deleteDiscount(@item.id)" class="fa fa-trash"></i>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="discount-item">تخفیفی ثبت نشده است</div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    var priceListStr = '@Model.calendarPrices';
+    priceListStr = priceListStr.replaceAll('&quot;', '"');
+    updateCalendarPrices(JSON.parse(priceListStr));
+    firstSelectedDay = undefined;
+    secondSelectedDay = undefined;
+    fromDate = undefined;
+    toDate = undefined;
+</script>

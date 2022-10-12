@@ -78,7 +78,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs.ApiDTOs
             dto.callAvailable = call_available;
             dto.days = DateTimeUtility.GetDatRangeDays(reserve.StartDate.Date, reserve.EndDate.Date);
             dto.dateString = from_date_persian + " تا " + to_date_persian;
-            dto.photoId = reserve.Advertise.PhotoID == null ? 0 : (int)reserve.Advertise.PhotoID;
+            dto.photoId = reserve.Advertise.MainPhotoId == null ? 0 : (int)reserve.Advertise.MainPhotoId;
             dto.statusColor = ReserveStyleHelper.GetStatusColor((int)reserve.Status);
             return dto;
         }

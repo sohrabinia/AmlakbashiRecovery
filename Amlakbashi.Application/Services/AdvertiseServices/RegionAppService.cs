@@ -6,7 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Amlakbashi.Core.Entities.Region;
-using Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs;
+using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.DTOs.WebService.Responses.Regions;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
@@ -51,9 +52,38 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
         }
 
-        public IList<Region> GetAll()
+        public IList<RegionListDTO> GetList(int regionId, int type, bool withSubRegions)
         {
-            return Repository.Query(q => q).ToList();
+            var regions = Repository.Query(q => q);
+            if (regionId > 0)
+            {
+                regions = regions.Where(x => x.Id == regionId);
+            }
+            else
+            {
+                regions = regions.Where(x => x.Type == type);
+            }
+            var result = new List<RegionListDTO>();
+
+            if (withSubRegions)
+            {
+                foreach (var item in regions)
+                {
+                    result.Add(GetSubRegions(item));
+                }
+            }
+            else
+            {
+                foreach (var item in regions)
+                {
+                    result.Add(new RegionListDTO()
+                    {
+                        regionId = item.Id,
+                        name = item.PersianName
+                    });
+                }
+            }
+            return result;
         }
 
         public IList<Region> GetByType(AdvertiseRegion type)
@@ -80,76 +110,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return Repository.Query(q => q.Where(x => x.ParentID == city).Select(x => x.Id)).ToList();
         }
 
-        public IList<Region> SearchLocationForApp(string searchString)
-        {
-            if (string.IsNullOrEmpty(searchString))
-            {
-                return new List<Region>();
-            }
-            searchString = searchString.Replace("ي", "ی");
-            if (searchString.Contains("شمال") || searchString == "شم" || searchString == "شما")
-            {
-                var result = new List<Region>();
-                result.Add(new Region() { Id = -1, PersianName = "شمال" });
-                result.Add(new Region() { Id = 1555, PersianName = "استان مازندران" });
-                result.Add(new Region() { Id = 1029, PersianName = "استان گیلان" });
-                result.Add(new Region() { Id = 1393, PersianName = "استان گلستان" });
-                return result;
-            }
-            IQueryable<Region> all_regions = Repository.Query(q => q);
-            all_regions = all_regions.Where(x => x.CountAdvertise > 0);
-            const int type_area = (int)AdvertiseRegion.Area;
-            const int type_city = (int)AdvertiseRegion.City;
-            const int type_province = (int)AdvertiseRegion.Province;
-            IEnumerable<Region> foundRegions;
-            var first_is_alef = searchString.First() == 'ا';
-            if (first_is_alef)
-            {
-                var kolah = "آ" + searchString.Remove(0, 1);
-
-                List<Region> areas = all_regions.Where(w => w.Type == type_area &&
-                w.PersianName.Contains(searchString) || w.PersianName.Contains(kolah)).ToList();
-                List<Region> cities = all_regions.Where(w => w.Type == type_city &&
-                    w.PersianName.Contains(searchString) || w.PersianName.Contains(kolah)).
-                    OrderBy(w => Math.Abs(w.PersianName.Length - searchString.Length)).ToList();
-                List<Region> provinces = all_regions.Where(w => w.Type == type_province &&
-                    w.PersianName.Contains(searchString) || w.PersianName.Contains(kolah)).
-                    OrderBy(w => Math.Abs(w.PersianName.Length - searchString.Length)).
-                    OrderBy(w => Math.Abs(w.PersianName.Length - searchString.Length)).ToList();
-                foundRegions = cities.Concat(provinces).Concat(areas).
-                    OrderBy(w => Math.Abs(w.PersianName.Length - searchString.Length)).Take(3);
-            }
-            else
-            {
-                List<Region> areas = all_regions.Where(w => w.Type == type_area &&
-                w.PersianName.Contains(searchString)).ToList();
-                List<Region> cities = all_regions.Where(w => w.Type == type_city &&
-                    w.PersianName.Contains(searchString)).
-                    OrderBy(x => Math.Abs(x.PersianName.Length - searchString.Length)).ToList();
-                List<Region> provinces = all_regions.Where(w => w.Type == type_province &&
-                    w.PersianName.Contains(searchString)).
-                    OrderBy(o => Math.Abs(o.PersianName.Length - searchString.Length)).
-                    OrderBy(o => Math.Abs(o.PersianName.Length - searchString.Length)).ToList();
-                foundRegions = cities.Concat(provinces).Concat(areas).
-                    OrderBy(o => Math.Abs(o.PersianName.Length - searchString.Length)).Take(3);
-            }
-            foreach (var region in foundRegions)
-            {
-                switch (region.Type)
-                {
-                    case type_province:
-                        region.PersianName = "استان " + region.PersianName;
-                        break;
-                    case type_area:
-                        region.PersianName = region.PersianName + " (" +
-                        all_regions.First(x => x.Id == region.ParentID).PersianName
-                        + ")";
-                        break;
-                }
-            }
-            return foundRegions.ToList();
-        }
-
         public string GetRegionName(int id)
         {
             var region = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
@@ -171,12 +131,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 dic.Add(item, new string[] { provinceName, cityName, areaName });
             }
             return dic;
-        }
-
-        public ApiRegionTotalDTO GetRegionHierarchy()
-        {
-            var allRegions = Repository.Query(q => q);
-            return ApiRegionTotalDTO.Generate(allRegions);
         }
 
         public IList<Region> GetBySearchRegion(string search_string)
@@ -203,6 +157,43 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
             return result.OrderByDescending(x => x.PersianName == search_string)
                 .ThenByDescending(x => x.CountAdvertise).Take(5).ToList();
+        }
+
+        public ServiceResult IsValidRegions(int provinceId, int cityId, int areaId)
+        {
+            var serviceResult = new ServiceResult();
+            var province = Repository.Find(provinceId);
+            if (province == null || province.Type != 0)
+            {
+                serviceResult.AddError("province is incorrect");
+            }
+            else if (province.Childs.Any(x => x.Id == cityId) == false)
+            {
+                serviceResult.AddError("city is incorrect");
+            }
+            else if (areaId > 0)
+            {
+                var city = province.Childs.FirstOrDefault(x => x.Id == cityId);
+                if (city.Childs.Any(x => x.Id == areaId) == false)
+                {
+                    serviceResult.AddError("area is incorrect");
+                }
+            }
+            return serviceResult;
+        }
+
+        private RegionListDTO GetSubRegions(Region region)
+        {
+            var dto = new RegionListDTO()
+            {
+                regionId = region.Id,
+                name = region.PersianName
+            };
+            foreach (var item in region.Childs)
+            {
+                dto.subRegions.Add(GetSubRegions(item));
+            }
+            return dto;
         }
     }
 }

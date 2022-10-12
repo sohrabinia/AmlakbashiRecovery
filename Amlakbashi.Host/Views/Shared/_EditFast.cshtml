@@ -2,13 +2,13 @@
 @model BaseDashboardAccDTO
 <!-- Start-edit-fast  -->
 <!-- item 1 -->
-<div id="set-calendar-@Model.id">
+@*<div id="set-calendar-@Model.id">
     @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", "تنظیم تقویم" } })
     <div class="container-item js-set-date-parent" data-id="@Model.id" data-initialized="false">
         <div class="calendars-edit-fast" id="calendars-edit-fast-@Model.id">
             <p class="help-text-data-picker">لطفا روز یا بازه مد نظرتان را مشخص کنید</p>
-            @await Html.PartialAsync("_DatePicker", new ViewDataDictionary(new EmptyModelMetadataProvider(), 
+            @await Html.PartialAsync("_DatePicker", new ViewDataDictionary(new EmptyModelMetadataProvider(),
                 new ModelStateDictionary()) { { "class", "date-picker-style" } })
             <p class="strDatepicker js-string"></p>
             <div class="box-set-callener buttonClick">
@@ -17,7 +17,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@
 <!-- item 2 -->
 <div id="offer-@Model.id">
     @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),

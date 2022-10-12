@@ -1,0 +1,83 @@
+﻿using Amlakbashi.Application.Services.ReserveServices.Interfaces;
+using Amlakbashi.Core.DTOs.WebService.Requests.Chats;
+using Amlakbashi.Core.DTOs.WebService.Responses.Chats;
+using Amlakbashi.Core.Entities;
+using Amlakbashi.Host.Authentication;
+using Amlakbashi.Host.Controllers.Base;
+using Amlakbashi.Host.Extensions;
+using Amlakbashi.Host.Hubs.Admin.HubServers;
+using Amlakbashi.Host.Hubs.Dashboard.HubServers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Amlakbashi.Host.Controllers.WebService
+{
+    [ApiController]
+    [Route("api/chat")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class ApiChatController : ApiBaseController
+    {
+        private readonly IChatAppService chatService;
+        private readonly IReserveAppService reserveService;
+        private readonly IReserveAutoCancelAppService reserveAutoCancelService;
+        private readonly IReserveDashboardHubServer reserveDashboardHubServer;
+        private readonly IReserveAdminHubServer reserveAdminHubServer;
+        public ApiChatController(IChatAppService chatService,
+            IReserveAppService reserveService,
+            IReserveAutoCancelAppService reserveAutoCancelService,
+            IReserveDashboardHubServer reserveDashboardHubServer,
+            IReserveAdminHubServer reserveAdminHubServer)
+        {
+            this.chatService = chatService;
+            this.reserveService = reserveService;
+            this.reserveAutoCancelService = reserveAutoCancelService;
+            this.reserveDashboardHubServer = reserveDashboardHubServer;
+            this.reserveAdminHubServer = reserveAdminHubServer;
+        }
+
+        [HttpGet("{reserveId:long}")]
+        public IList<ChatResponse> Get(long reserveId)
+        {
+            var chats = chatService.GetReserveChats(reserveId);
+            if (chats != null)
+            {
+                chatService.UpdateReserveChatsReadStatus(reserveId, User.GetId());
+                reserveDashboardHubServer.ReloadChatFromServer(reserveId);
+            }
+
+            List<ChatResponse> response = new List<ChatResponse>();
+            response.AddRange(chats.Select(x => new ChatResponse()
+            {
+                message = x.Text,
+                time = $"{x.CreateTime.Hour}:{x.CreateTime.Minute}",
+                viewed = x.IsViewed == Chat.ReadStatusEnum.Read,
+                forUser = x.UserID == User.GetId()
+            }));
+            return response;
+        }
+
+        [HttpPost]
+        public IActionResult Post(ChatPostMessageRequest request)
+        {
+            var result = chatService.Insert(request.reserveId, User.GetId(), request.message);
+            if (result.HasError())
+            {
+                return BadRequest(result.GetErrors());
+            }
+            var reserve = reserveService.Find(request.reserveId);
+            if (reserve.InstantReserve == false)
+            {
+                reserveAutoCancelService.UpdateScheduledTime(request.reserveId);
+            }
+            var reserveChatCount = chatService.GetCountByReserveId(request.reserveId);
+            reserveAdminHubServer.ChangeChatCountFromServer(request.reserveId, reserveChatCount,
+                chatService.GetNotReadSupportCountByReserveId(request.reserveId));
+            return CreatedAtAction($"/api/chat/{request.reserveId}", null);
+        }
+    }
+}

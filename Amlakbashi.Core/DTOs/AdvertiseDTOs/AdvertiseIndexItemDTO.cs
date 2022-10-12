@@ -8,6 +8,8 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
     public class AdvertiseIndexItemDTO
     {
         public long Id { get; set; }
+        public Advertise.AdvertiseMode Mode { get; set; }
+        public long? ParentId { get; set; }
         public string Title { get; set; }
         public int UserId { get; set; }
         public DateTime CreateDate { get; set; }
@@ -25,13 +27,15 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
             var dto = new AdvertiseIndexItemDTO()
             {
                 Id = advertise.Id,
+                Mode = advertise.Mode,
+                ParentId = advertise.ParentId,
                 Title = advertise.Title,
-                UserId = advertise.UserID,
+                UserId = advertise.UserId,
                 CreateDate = advertise.CreateDate,
                 DailyPrice = advertise.DailyPrice,
-                AdvertiseScore = advertise.AdvertiseScore,
-                WebVisit = advertise.WebVisit,
-                UnixNorouzMinReserveDate = advertise.unixNorouzMinRequestDate,
+                AdvertiseScore = advertise.ResidenceScore,
+                WebVisit = advertise.View,
+                UnixNorouzMinReserveDate = advertise.MinReserveDateForNowruz,
                 Status = advertise.Status,
                 SupportInfoCount = advertise.GetSupportInfoList().Length,
             };

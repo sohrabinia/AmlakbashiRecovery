@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Amlakbashi.Core.Entities
@@ -11,21 +12,15 @@ namespace Amlakbashi.Core.Entities
     /// </summary>
     public class Payment : Entity<int>
     {
-        [Column("Id")]
         public override int Id { get; set; }
         public int UserID { get; set; }
-        [Column("TransactionId")]
-        public string Authority { get; set; }
-        [Column("ReferenceNumber")]
-        public long RefID { get; set; }
+        public string TransactionId { get; set; }
+        public long ReferenceNumber { get; set; }
         public string TraceNumber { get; set; }
-        [Column("Amount")]
-        public long TotalPrice { get; set; }
-        [Column("CreateDate")]
-        public DateTime Date { get; set; }
+        public long Amount { get; set; }
+        public DateTime CreateDate { get; set; }
         public DateTime? PayDate { get; set; }
-        [Column("Bank")]
-        public BankEnum BankId { get; set; }
+        public BankEnum Bank { get; set; }
         public PaymentStatus Status { get; set; }
         public PaymentType Type { get; set; }
         public PaymentMethod Method { get; set; }
@@ -36,6 +31,9 @@ namespace Amlakbashi.Core.Entities
         public long ReservePrice { get; set; }
         public long CouponID { get; set; }
         public long PrizePrice { get; set; }
+
+        [Column(TypeName = "varchar(16)")]
+        public string CreditCardNumber { get; set; }
 
         [ForeignKey("UserID")]
         public virtual User User { get; set; }
@@ -51,6 +49,13 @@ namespace Amlakbashi.Core.Entities
 
         [JsonIgnore]
         public virtual ICollection<Cart> Carts { get; set; }
+
+        [NotMapped]
+        public long AmountAsToman { 
+            get {
+                return Amount / 10;
+            } 
+        }
 
         public enum PaymentStatus
         {

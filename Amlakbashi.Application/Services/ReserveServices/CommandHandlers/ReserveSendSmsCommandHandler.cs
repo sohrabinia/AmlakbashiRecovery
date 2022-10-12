@@ -39,7 +39,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             foreach (var item in queue)
             {
                 var user = repository.Find<User, int>(item.userId);
-                var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+                var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
                 if (identityUser == null)
                 {
                     return Task.FromResult(Unit.Value);
@@ -49,7 +49,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
                     null;
                 mediator.Enqueue(new SendMessageClassicCommand(item.initial, new UserContactDTO()
                 {
-                    UserMainMobile = user.MainMobile,
+                    UserMainMobile = user.PhoneNumber,
                     UserAppNotificationToken = user.AppNotificationToken,
                     UserEmail = identityUser.Email,
                     EmailConfirmed = identityUser.EmailConfirmed,

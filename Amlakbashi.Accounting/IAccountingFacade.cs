@@ -1,9 +1,10 @@
 ﻿using Amlakbashi.Accounting.PaymentContext;
 using Amlakbashi.Core.Common.Enums;
+using Amlakbashi.Core.DTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs;
-using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
 using Amlakbashi.Core.DTOs.PaymentDTOs.PaymentStatisticsDTOs;
+using Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs;
 using Amlakbashi.Core.DTOs.WalletDTOs;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
@@ -58,6 +59,7 @@ namespace Amlakbashi.Accounting
 
         void FilterCreditTransactions(CreditTransactionIndexDTO dto);
         IList<CreditTransaction> GetCreditListByUserId(int userId);
+        PagedList<CreditTransaction> GetUserWalletTransactions(int userId, int page, int pageItemCount);
         CreditTransaction GetCanselInstantReserveCreditTransaction(int userId, int tranCause, long id);
         CreditTransaction FindCreditTransaction(long id);
         long IncreaseCredit(int userId, long amount, long transactionId, long reserveId,
@@ -87,7 +89,8 @@ namespace Amlakbashi.Accounting
         IList<Cart> FilterCarts(int status = -1, int uid = -1, long refid = -1);
 
         // Payment Functions
-        IList<Payment> FilterPayments(long refid, int status, int uid, long reserveId, DateTime fromDate, DateTime toDate);
+        IList<Payment> FilterPayments(long refid, int status, int uid,
+            long reserveId, DateTime fromDate, DateTime toDate, BankEnum bank, int type);
         IList<Payment> GetPaymentRange(DateTime fromDate, DateTime toDate, int status, IList<int> userIds = null,
             bool byTotalPrice = false);
         int GetPaymentTriesCount(long reserveId, out string lastTryDateStr);
@@ -139,10 +142,11 @@ namespace Amlakbashi.Accounting
 
         // Podium Services
 
-        ShebaVerificationResultDTO VerifySheba(string sheba);
-        ShebaPaymentResultDTO SiteClearingHostAutoPayment(long reserveId, int operatorId);
-        ShebaPaymentResultDTO WalletClearingAutoPayment(int userId, int operatorId);
-        CheckShebaPaymentResultDTO CheckShebaPaymentStatus(long paymentId);
+        ShebaVerificationResponseDTO VerifySheba(string sheba);
+        PayaPaymentResponseDTO SiteClearingHostAutoPayment(long reserveId, int operatorId);
+        PayaPaymentResponseDTO WalletClearingAutoPayment(int userId, int operatorId);
+        PayaPaymentResponseDTO PodiumRepayment(int paymentId, int operatorId);
+        CheckPayaPaymentResponseDTO CheckPayaPaymentStatus(long paymentId);
         bool RegisterNotPaidPayment(long paymentId, int operatorId);
     }
 }

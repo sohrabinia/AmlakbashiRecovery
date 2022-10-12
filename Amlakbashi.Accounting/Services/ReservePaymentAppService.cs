@@ -277,7 +277,8 @@ namespace Amlakbashi.Accounting.Services
                     return false;
             }
             return data.Any(x => x.PaymentType == (int)ReservePaymentType.GuestClearing ||
-                x.PaymentType == (int)ReservePaymentType.GuestDeposite);
+                x.PaymentType == (int)ReservePaymentType.GuestDeposite) &&
+                data.Any(x=> x.PaymentType == (int)ReservePaymentType.SiteClearingToHost) == false;
         }
     }
 }

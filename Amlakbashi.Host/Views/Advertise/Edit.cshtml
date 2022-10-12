@@ -1,7 +1,7 @@
 ﻿@model Advertise
 
 @{
-    ViewBag.Title = "مدیریت آگهی";
+    ViewBag.Title = "ویرایش اقامتگاه";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
 
@@ -102,106 +102,77 @@
     </style>
 }
 
-<div class="title">ویرایش  آگهی</div>
+<div class="title">ویرایش  اقامتگاه</div>
 @using (Html.BeginForm("Edit", "Advertise", FormMethod.Post, new { enctype = "multipart/form-data", id = "ManageForm" }))
 {
     @Html.HiddenFor(model => model.Id)
     <table>
         <tr>
-            <td class="label">  امتیاز اصلی آگهی :</td>
+            <td class="label">امتیاز اصلی:</td>
             <td class="value">
-                @Model.AdvertiseScore
+                @Model.ResidenceScore
             </td>
         </tr>
         <tr>
-            <td class="label">  تعداد نمایش :</td>
+            <td class="label">تعداد بازدید:</td>
             <td class="value">
-                @Html.EditorFor(model => model.Overview)
+                @Html.EditorFor(model => model.View)
             </td>
         </tr>
         <tr>
-            <td class="label">  تعداد کلیک :</td>
-            <td class="value">
-                @Html.EditorFor(model => model.WebVisit)
-            </td>
-        </tr>
-        <tr>
-            <td class="label">  تعداد نمایش تماس :</td>
-            <td class="value">
-                @Html.EditorFor(model => model.ContactClick)
-            </td>
-        </tr>
-        <tr>
-            <td class="label">
-                کد کاربر :
-            </td>
+            <td class="label">کد کاربر:</td>
             <td style="width:300px;">
-                @Html.EditorFor(model => model.UserID)
+                @Html.EditorFor(model => model.UserId)
             </td>
             <td></td>
         </tr>
         <tr>
             <td class="label">
-                عنوان آگهی :
+                بازه زمانی رزروها:
+                <br />
+                <small><i style="color: red;" class="fa fa-exclamation-circle"></i> مقدار صفر به معنای بدون محدودیت است</small>
             </td>
+            <td>
+                حداقل:
+                @Html.EditorFor(model => model.MinReserveDuration) روز
+            </td>
+            <td>
+                حداکثر:
+                @Html.EditorFor(model => model.MaxReserveDuration) روز
+            </td>
+        </tr>
+        <tr>
+            <td class="label">عنوان:</td>
             <td style="width:300px;">
                 @Html.EditorFor(model => model.Title)
             </td>
             <td></td>
         </tr>
         <tr>
-            <td class="label">  عنوان برای گوگل - متا:</td>
-            <td class="value">
-                @Html.EditorFor(model => model.MetaTitle)
-            </td>
-        </tr>
-        <tr>
-            <td class="label">    آدرس URL :</td>
-            <td class="value">
-                @Html.EditorFor(model => model.Slug)
-            </td>
-        </tr>
-        <tr>
-            <td class="label">   توضیح برای گوگل - متا :</td>
-            <td class="value">
-                @Html.TextAreaFor(model => model.MetaDescription)
-            </td>
-        </tr>
-        <tr>
-            <td class="label">
-                توضیحات آگهی :
-            </td>
+            <td class="label">توضیحات:</td>
             <td style="width:300px;">
                 @Html.TextAreaFor(model => model.Description)
             </td>
             <td></td>
         </tr>
-
         <tr>
-            <td class="label">
-                تاریخ ایجاد :
-            </td>
-            <td style="width:300px;">
-                @Html.TextBoxFor(model => model.CreateDate, new { @class = "form-control datepicker" })
-            </td>
-
-            <td>
-                @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(Model.CreateDate).ToString()
+            <td class="label">آدرس URL:</td>
+            <td class="value">
+                @Html.EditorFor(model => model.Slug)
             </td>
         </tr>
         <tr>
-            <td class="label">
-                تاریخ آخرین ویرایش :
-            </td>
-            <td style="width:300px;">
-                @Html.TextBoxFor(model => model.LastModifyDate, new { @class = "form-control datepicker" })
-
-            </td>
-            <td>
-                @Amlakbashi.Core.Common.Utilities.DateTimeUtility.ConvertDate(Model.LastModifyDate).ToString()
+            <td class="label">عنوان متای گوگل:</td>
+            <td class="value">
+                @Html.EditorFor(model => model.MetaTitle)
             </td>
         </tr>
-
+        <tr>
+            <td class="label">توضیحات متای گوگل:</td>
+            <td class="value">
+                @Html.TextAreaFor(model => model.MetaDescription)
+            </td>
+        </tr>
         <tr>
             <td class="label">
                 امتیاز املاک باشی:

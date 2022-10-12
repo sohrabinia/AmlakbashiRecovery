@@ -6,7 +6,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
 {
     public class PhotoDTO
     {
-        public long? PhotoID { get; set; }
+        public long? MainPhotoId { get; set; }
         public string AlbumPhoto { get; set; }
         public long[] AlbumPhotosArray
         {

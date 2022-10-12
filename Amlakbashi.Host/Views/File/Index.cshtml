@@ -3,18 +3,20 @@
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
 @model IEnumerable<Amlakbashi.Core.Entities.File>
-
-<a href="/File/Edit" class="add">افزودن فایل</a>
+@*<a href="/File/Edit" class="add">افزودن فایل</a>*@
 <table>
     <tr>
         <th class="minw">
             ردیف
         </th>
         <th>
-            فایل
+            شناسه
         </th>
         <th>
-            Url
+            عکس
+        </th>
+        <th>
+            آدرس
         </th>
         <th>
             عملیات
@@ -32,15 +34,18 @@
                 @Idx
             </td>
             <td>
+                @item.Id
+            </td>
+            <td>
                 <img src='@string.Format("/file/imgThumbOld?FileID={0}&w=100&h=40",item.Id)' />
             </td>
             <td>
                 <span>
-                    @(item.FilePath.Replace("~", ""))
+                    @(item.CorrectedFilePath)
                 </span>
             </td>
             <td>
-                <a href="@Url.Action("Edit",new {fid= item.Id})"><span class="editicon" title="ویرایش"></span></a>
+                <a href="@Url.Action("Edit", new { fileId = item.Id })" target="_blank"><span class="editicon" title="ویرایش"></span></a>
                 <span class="deleteicon" onclick="deleteItem(@item.Id,this)" title="حذف"></span>
             </td>
         </tr>
@@ -55,7 +60,6 @@
 @section ScriptBlock
 {
     <script type="text/javascript">
-
         function deleteItem($id, obj) {
             if (confirm("آیا از حذف این آیتم اطمینان دارید ؟")) {
                 myajax("File/Delete", "id=" + $id, function (ret) {
@@ -65,6 +69,5 @@
                 });
             }
         }
-
     </script>
 }

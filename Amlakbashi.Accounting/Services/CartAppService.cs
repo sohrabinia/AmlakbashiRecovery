@@ -21,7 +21,7 @@ namespace Amlakbashi.Accounting.Services
             var model = Repository.Query(q => q);
             if (refid > 0)
             {
-                model = model.Where(w => w.Payment.RefID == refid);
+                model = model.Where(w => w.Payment.ReferenceNumber == refid);
             }
             if (uid != -1)
                 model = model.Where(c => c.UserID == uid);

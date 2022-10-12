@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+
 namespace Amlakbashi.Data
 {
     public class GenericRepository<T, K> : IRepository<T, K> where T : Entity<K>
@@ -22,19 +24,23 @@ namespace Amlakbashi.Data
         {
             dbSet.Add(obj);
         }
+
         public void Insert(IEnumerable<T> entities)
         {
             dbSet.AddRange(entities);
         }
+
         public void Update(T obj)
         {
             dbSet.Attach(obj);
             _context.Entry(obj).State = EntityState.Modified;
         }
+
         public void Attach(T obj)
         {
             dbSet.Attach(obj);
         }
+
         public void Delete(K id)
         {
             T existing = dbSet.Find(id);
@@ -56,10 +62,17 @@ namespace Amlakbashi.Data
         {
             return query(dbSet);
         }
+
         public T Find(K id)
         {
             return dbSet.Find(id);
         }
+
+        public async Task<T> FindAsync(K id)
+        {
+            return await dbSet.FindAsync(id);
+        }
+
         public TEntity Find<TEntity, TKey>(TKey id) where TEntity : Entity<TKey>, new()
         {
             return _context.Set<TEntity>().Find(id);

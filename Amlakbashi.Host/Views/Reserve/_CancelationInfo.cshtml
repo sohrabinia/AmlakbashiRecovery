@@ -1,0 +1,30 @@
+﻿@model Amlakbashi.Core.DTOs.ReserveDTOs.ReserveCancelationLossDTO
+
+@if (ViewBag.hasError == true)
+{
+    <p>@ViewBag.errorMessage</p>
+    <br />
+}
+else
+{
+    @if (Model == null)
+    {
+        <p>کاربر گرامی، لغو این رزرو بنابر دلیل انتخابی شما، نیازمند بررسی کارشناسان ما می باشد.</p>
+        <p>آیا از درخواست خود مبنی بر لغو این رزرو مطمئن هستید؟</p>
+    }
+    else
+    {
+        <p>کاربر گرامی، لطفا توجه فرمایید که لغو رزرو مورد نظر مشمول جریمه به صورت زیر می باشد:</p>
+        <p>مبلغ خسارت سایت: @string.Format("{0:n0}", Model.SitePortion) تومان</p>
+        @if (Model.HostPortion > 0 || Model.GuestPortion > 0)
+        {
+            <p>مبلغ خسارت میزبان: @string.Format("{0:n0}", Model.HostPortion) تومان</p>
+            <p>مبلغ دریافتی مهمان: @string.Format("{0:n0}", Model.GuestPortion) تومان</p>
+        }
+        <br />
+        <p>آیا از درخواست خود مبنی بر لغو این رزرو مطمئن هستید؟</p>
+    }
+    <div style="text-align: center;">
+        <button onclick="doCancel()" style="padding: 5px 10px; background-color: #fDc831; border: 1px solid darkgray; border-radius: 5px;">تایید</button>
+    </div>
+}

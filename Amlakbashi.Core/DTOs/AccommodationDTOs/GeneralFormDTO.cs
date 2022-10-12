@@ -17,6 +17,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
         public PhotoInputDTO photo { get; set; }
         public TitleDescInputDTO titleAndDesc { get; set; }
         public MetaTitleDescInputDTO metaTitleAndDesc { get; set; }
+        public VillaTypeInputDTO villaType { get; set; }
 
         public static GeneralFormDTO Generate(AdvertiseDirector director, long id)
         {
@@ -30,8 +31,9 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             model.photo = director.GetAdvertisePart<PhotoPart>();
             model.titleAndDesc = director.GetAdvertisePart<TitleDescPart>();
             model.metaTitleAndDesc = director.GetAdvertisePart<MetaTitleDescPart>();
+            model.villaType = director.GetAdvertisePart<VillaTypePart>();
             model.photo.accId = id;
-            model.photo.accTitle = AdvertiseMainLocalization.PhotoTitle(director.AdvertiseType, director.Mode);
+            model.photo.accTitle = AdvertiseMainLocalization.GetPhotoPersianTitle(director.AdvertiseType, director.Mode);
             return model;
         }
     }

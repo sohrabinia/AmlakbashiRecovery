@@ -58,7 +58,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                     reserve_id = StringUtility.PersianNumberToEnglish(reserve_id);
                 if (selectType == Reserve.ReserveManagerSelectType.All)
                 {
-                    selectType = currentUser.UserGeneralType > 0 ?
+                    selectType = currentUser.Type > 0 ?
                         Reserve.ReserveManagerSelectType.Host : Reserve.ReserveManagerSelectType.Guest;
                 }
                 Dictionary<Reserve.ReserveCategory, int> countDict;
@@ -77,10 +77,9 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 var isGuest = !isHost;
                 foreach (var reserve in reserves)
                 {
-                    var advertise = reserve.Advertise;
                     var paidAmount = accounting.GetReservePaidAmount(reserve.Id, Reserve.StatusStringType.Guest);
                     var unreadChatCount = chatService.GetNotReadCountByReserveId(reserve.Id, currentUser.Id);
-                    var rulesDict = advertiseService.GetRulesDictionary(advertise.Id);
+                    var rulesDict = advertiseService.GetRulesDictionary(reserve.AdvertiseID);
                     var item = ReserveDashboardItemDTO.Generate(
                         reserve, index, isGuest, isHost, userAccessor.CurrentUser.Id,
                         paidAmount + reserve.CouponPrice + reserve.PrizePrice,
@@ -239,7 +238,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 ((long)((allRefundsOfReserve == null || allRefundsOfReserve.Any() == false) ? 0 : allRefundsOfReserve.Sum(x => x.Price)));
 
                 long _guestPaidPrice = 0;
-                var hostUserId = item.Advertise.UserID;
+                var hostUserId = item.HostUserID;
                 var _hostPaidPrice = accounting.GetReservePaymentPrice(
                     item.Id, ReservePayment.ReservePaymentType.GuestDeposite,
                     out _host_site_portion_pay_date, out _host_site_portion_transaction_id, hostUserId);

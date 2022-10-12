@@ -194,7 +194,7 @@ namespace Amlakbashi.Host.Controllers
                     supportChatAdminHubServer.AddChatMessageFromServer(supportChat.Id, msgId);
                     portalHubServer.ReloadSupportChatFromServer(supportChat.Id, msgCount, (int)supportChat.UserID);
                 }
-                if (GeneralData.IsSupportOnline())
+                if (GeneralData.IsSupportersOnline())
                 {
                     if (questionNumber < 0)
                     {
@@ -342,7 +342,7 @@ namespace Amlakbashi.Host.Controllers
                         });
                     }
                 }
-                ViewBag.onlineSupport = GeneralData.IsSupportOnline();
+                ViewBag.onlineSupport = GeneralData.IsSupportersOnline();
                 if (model == null)
                 {
                     model = new SupportChat()
@@ -666,7 +666,7 @@ namespace Amlakbashi.Host.Controllers
 
         public ActionResult GetSupportChatUser()
         {
-            ViewBag.onlineSupport = GeneralData.IsSupportOnline();
+            ViewBag.onlineSupport = GeneralData.IsSupportersOnline();
             return PartialView("_SupportChatUser");
         }
 

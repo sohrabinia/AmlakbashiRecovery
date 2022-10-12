@@ -109,7 +109,15 @@ else
     </div>
     <br />
     <div style="text-align:center;">
-        <button class="site-clearing-btn" onclick="AutoSiteClearingHost()">پرداخت خودکار</button>
+        @if (Model.HasFailureExpenditurePayment)
+        {
+            <p style="text-align: center;"><b style="color: red;">توجه: </b>این رزرو دارای یک پرداخت خودکار ناموفق است. لطفا قبل از ثبت پرداخت جدید، ابتدا وضعیت آن را بررسی نمایید: <small><a href="/payment/index?reserveId=@Model.ReserveId" target="_blank" style="color: blue;">لیست پرداخت های آنلاین</a></small></p>
+            <br />
+        }
+        else
+        {
+            <button class="site-clearing-btn" onclick="AutoSiteClearingHost()">پرداخت خودکار</button>
+        }
         <button class="site-clearing-btn" onclick="ManualSiteClearingHost()">پرداخت دستی</button>
     </div>
 }

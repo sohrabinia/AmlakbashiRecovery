@@ -53,17 +53,12 @@ namespace Amlakbashi.Application.Services.SupportChatServices
 
         public void UpdateReadStatusList(IList<long> listId)
         {
-            List<SupportChatMessage> messages = new List<SupportChatMessage>();
             foreach (var id in listId)
             {
-                var message = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
+                var message = Repository.Find(id);
                 message.ReadStatus = ReadStatusEnum.Read;
                 Repository.Update(message);
             }
-
-            // جایگزین احتمالی حلقه بالا
-            //messages = Repository.Query(q => q.Where(w => listId.Contains(w.Id)).ToList());
-
             Repository.Save();
         }
     }

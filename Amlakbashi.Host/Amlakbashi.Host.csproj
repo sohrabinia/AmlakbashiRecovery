@@ -191,7 +191,6 @@
     <None Include="Views\Reserve\Chat.cshtml" />
     <None Include="Views\Reserve\Edit.cshtml" />
     <None Include="Views\Reserve\GuestReceipt.cshtml" />
-    <None Include="Views\Reserve\Index.cshtml" />
     <None Include="Views\Reserve\Invoice.cshtml" />
     <None Include="Views\Reserve\ReserveItemManager.cshtml" />
     <None Include="Views\Reserve\_AddGuestPayment.cshtml" />
@@ -298,11 +297,11 @@
   <ItemGroup>
     <Folder Include="Logs\HangfireLogs\" />
     <Folder Include="Logs\ImpersonationLogs\" />
-    <Folder Include="Logs\Logs\" />
     <Folder Include="wwwroot\Content\blogpost\" />
     <Folder Include="wwwroot\Content\ErrorLog\" />
     <Folder Include="wwwroot\Content\files\" />
     <Folder Include="wwwroot\Content\imgcache\" />
+    <Folder Include="wwwroot\Content\videos\" />
     <Folder Include="wwwroot\css\min\" />
     <Folder Include="wwwroot\font\" />
     <Folder Include="wwwroot\js\min\" />

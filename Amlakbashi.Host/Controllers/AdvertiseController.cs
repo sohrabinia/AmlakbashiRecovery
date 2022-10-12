@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using X.PagedList;
 using static Amlakbashi.Core.Entities.Advertise;
 using static Amlakbashi.Core.Entities.Region;
@@ -134,15 +135,15 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var objad = advertiseService.FindIncludingDeleted(ad.Id);
-                if (objad.UserID != ad.UserID)
+                if (objad.UserId != ad.UserId)
                 {
-                    var host_user = userService.Find(ad.UserID);
-                    if (host_user.UserGeneralType < 1)
+                    var host_user = userService.Find(ad.UserId);
+                    if (host_user.Type < 1)
                     {
                         userService.UpdateUserGeneralType(host_user.Id, Entities.User.UserGeneralTypeEnum.Host);
                     }
                 }
-                advertiseService.Edit(ad);
+                advertiseService.Edit(ad, userAccessor.CurrentUser.Id);
                 return RedirectToAction(nameof(NewIndex));
             }
             catch (Exception exc)
@@ -180,6 +181,17 @@ namespace Amlakbashi.Host.Controllers
                 logger.Error("NotVerify", exc);
                 return GenerateJsonResult(new { status = 0, val = "" });
             }
+        }
+
+        [Authorize(Policy = Policies.Advertise_Publish)]
+        public async Task<IActionResult> UpdateActivity(long residenceId)
+        {
+            var result = await advertiseService.UpdateActivity(residenceId);
+            return GenerateJsonResult(new
+            {
+                status = result.HasError() ? 0 : 1,
+                active = result.Result == AdvertiseStatus.Archived ? false : true
+            });
         }
 
         public ActionResult AdvertisePage(string url, string area_str = null, bool amp_version = false,
@@ -329,7 +341,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var acc = advertiseService.Find(advertiseID);
-                if (acc.UserID != userAccessor.CurrentUser.Id)
+                if (acc.UserId != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new
                     {
@@ -337,8 +349,7 @@ namespace Amlakbashi.Host.Controllers
                         val = "شما مجوز انجام این کار را ندارید."
                     });
                 }
-                advertiseService.AddAdvertiseHostReplyComment(
-                    user_id, advertiseID, text);
+                advertiseService.AddAdvertiseHostReplyComment(user_id, advertiseID, text);
                 return GenerateJsonResult(new
                 {
                     status = 1,

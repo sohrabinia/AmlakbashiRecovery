@@ -43,8 +43,7 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
 
         public static implicit operator ReserveAdminBasicItemDTO(Reserve reserve)
         {
-            var advertise = reserve.Advertise;
-            var linkAdvertise = advertise.ParentOrSelf;
+            var linkAdvertise = reserve.Advertise.ParentOrSelf;
             var reserveSupports = reserve.GetRelatedSupports();
             var generatedSupporters = new List<SupporterHelperDTO>();
             foreach (var rs in reserveSupports)
@@ -88,20 +87,17 @@ namespace Amlakbashi.Core.DTOs.ReserveDTOs
                 status = (int)reserve.Status,
                 guestUserId = reserve.UserID,
                 guestName = guestName,
-                hostUserId = advertise.UserID,
+                hostUserId = reserve.HostUserID,
                 guestCount = reserve.NumberOfGuests,
-                statusString = ReserveLocalization.GetStatusString((int)reserve.Status,
-                    Reserve.StatusStringType.Site),
+                statusString = ReserveLocalization.GetStatusString((int)reserve.Status, Reserve.StatusStringType.Site),
                 statusColor = ReserveStyleHelper.GetStatusColor((int)reserve.Status),
                 hostResponse = (int)reserve.HostResponse,
                 hostResponseString = ReserveLocalization.GetHostResponseString((int)reserve.HostResponse),
                 hostResponseColor = ReserveStyleHelper.GetHostResponseColor((int)reserve.HostResponse),
                 startDate = reserve.StartDate,
                 endDate = reserve.EndDate,
-                startDateString = DateTimeUtility.GregorianToPersianDate(
-                    reserve.StartDate).Remove(0, 2),
-                endDateString = DateTimeUtility.GregorianToPersianDate(
-                    reserve.EndDate).Remove(0, 2),
+                startDateString = DateTimeUtility.GregorianToPersianDateWithSlash(reserve.StartDate).Remove(0, 2),
+                endDateString = DateTimeUtility.GregorianToPersianDateWithSlash(reserve.EndDate).Remove(0, 2),
                 stayDays = DateTimeUtility.GetDatRangeDays(reserve.StartDate, reserve.EndDate),
                 supporters = generatedSupporters,
                 hostCallState = reserve.HostCallState,

@@ -6,7 +6,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
 {
     public class PhotoPart : IPart
     {
-        public long? PhotoID { get; set; }
+        public long? MainPhotoId { get; set; }
 
         [Important]
         public string AlbumPhoto { get; set; }

@@ -32,6 +32,8 @@ using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Application.Services.ReserveServices.Interfaces;
 using Amlakbashi.Application.Services.FileServices.Interfaces;
 using Microsoft.AspNetCore.Hosting;
+using System.Threading.Tasks;
+using Amlakbashi.Core.Services.Interfaces;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -73,14 +75,13 @@ namespace Amlakbashi.Host.Controllers
             this.host = host;
         }
 
-        #region Impersonate
         [Authorize(Policy = Policies.User_Impersonate)]
         public IActionResult Impersonate(int userId, string url)
         {
             try
             {
                 var user = userService.Find(userId, true);
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                 var admin = userAccessor.CurrentUser;
 
                 var employeesNumber = userService.GetAllEmployees().Select(s => s.PhoneNumber).ToList();
@@ -93,11 +94,11 @@ namespace Amlakbashi.Host.Controllers
                 var expireTime = DateTime.Now.AddMinutes(30);
                 var claims = new List<Claim>
                 {
-                    new Claim("ImpersonateAdminUsername", admin.MainMobile),
+                    new Claim("ImpersonateAdminUsername", admin.PhoneNumber),
                     new Claim("Impersonate", "true"),
                     new Claim("ImpersonateExpireTime", expireTime.ToString())
                 };
-                var result = userService.AddClaimsToUser(user.MainMobile, claims);
+                var result = userService.AddClaimsToUser(user.PhoneNumber, claims);
                 if (result == false)
                 {
                     TempData["userIsImpersonated"] = true;
@@ -109,7 +110,6 @@ namespace Amlakbashi.Host.Controllers
                 prop.IssuedUtc = expireTime;
                 prop.IsPersistent = true;
 
-                //signInManager.SignOutAsync().Wait();
                 userService.SignOut();
                 signInManager.SignInAsync(identityUser, prop).Wait();
 
@@ -178,7 +178,6 @@ namespace Amlakbashi.Host.Controllers
                 return Redirect("/errors/http500");
             }
         }
-        #endregion
 
         #region [ admin ]
 
@@ -191,7 +190,7 @@ namespace Amlakbashi.Host.Controllers
         [Authorize(Policy = Policies.Admin_General)]
         public ActionResult Index(int? page, string uname = "", int photo = -1,
             string username = "", string mobile = "", int code = -1, int ownership = -1, int sort_order = -1,
-            int mobile_status = -1, int status = -1, int advertise_count = -1,
+            int status = -1, int advertise_count = -1,
             int complete_profile_status = -1, int complete_profile_contact_status = -1,
             int user_general_type = -1,
             int userFilterType = -1, int card_status = -1, string minReserveNorouzFromDate = "",
@@ -227,61 +226,46 @@ namespace Amlakbashi.Host.Controllers
                     }
                 }
                 if (!string.IsNullOrEmpty(uname))
-                    model = model.Where(u => (u.FName + " " + u.LName).Contains(uname));
+                    model = model.Where(u => (u.FirstName + " " + u.LastName).Contains(uname));
 
                 if (!string.IsNullOrEmpty(username))
-                    model = model.Where(u => u.MainMobile.Contains(username));
+                    model = model.Where(u => u.PhoneNumber.Contains(username));
 
                 if (!string.IsNullOrEmpty(mobile))
-                    model = model.Where(u => u.Mobile != null && u.Mobile.Contains(mobile));
-                if (mobile_status == 0)
                 {
-                    var regex = new Regex(@"\d{10}");
-                    var filtered_user_ids = new List<int>();
-                    foreach (var item in model)
-                    {
-                        //if (String.IsNullOrEmpty(item.Mobile) || item.Mobile.Length != 11 ||
-                        //    !regex.IsMatch(item.Mobile) || !item.Mobile.StartsWith("09"))
-                        if (!PhoneUtility.ValidateInternationalNumber(item.GetPhoneNumber(Amlakbashi.Core.Entities.User.PhoneType.MainMobile))
-                            || !PhoneUtility.ValidateInternationalNumber(item.GetPhoneNumber(Amlakbashi.Core.Entities.User.PhoneType.OtherMobile1)))
-                        {
-                            filtered_user_ids.Add(item.Id);
-                        }
-                    }
-
-                    model = model.Where(u => filtered_user_ids.Contains(u.Id));
-
+                    model = model.Where(u => u.PhoneNumber.Contains(mobile) || u.PhoneNumber2.Contains(mobile) ||
+                        u.PhoneNumber3.Contains(mobile));
                 }
                 if (status != -1)
                 {
                     var identityUserList = userService.GetAllIdentityUsernamesByState((Entities.User.UserState)status);
-                    model = model.Where(x => identityUserList.Contains(x.MainMobile));
+                    model = model.Where(x => identityUserList.Contains(x.PhoneNumber));
                 }
                 if (userFilterType > -1)
                 {
                     switch ((Entities.User.UserFilterType)userFilterType)
                     {
                         case Entities.User.UserFilterType.Guest:
-                            model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest);
+                            model = model.Where(x => x.Type == (int)Entities.User.UserGeneralTypeEnum.Guest);
                             break;
                         case Entities.User.UserFilterType.ActiveHost:
-                            model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Host);
+                            model = model.Where(x => x.Type == (int)Entities.User.UserGeneralTypeEnum.Host);
                             IQueryable<Advertise> allAdvertises = advertiseService.GetAllAsIQueriable();
-                            var userIds = allAdvertises.Where(x => x.Status == AdvertiseStatus.Published).Select(x => x.UserID).Distinct().ToList();
+                            var userIds = allAdvertises.Where(x => x.Status == AdvertiseStatus.Published).Select(x => x.UserId).Distinct().ToList();
                             model = model.Where(x => userIds.Contains(x.Id));
                             break;
                         case Entities.User.UserFilterType.Host:
-                            model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Host);
+                            model = model.Where(x => x.Type == (int)Entities.User.UserGeneralTypeEnum.Host);
                             break;
                         case Entities.User.UserFilterType.Staff:
                             var staffMobiles = userService.GetAllEmployees().Select(s => s.UserName).ToList();
-                            model = model.Where(x => staffMobiles.Contains(x.MainMobile));
+                            model = model.Where(x => staffMobiles.Contains(x.PhoneNumber));
                             break;
                         case Entities.User.UserFilterType.InstantReserveRequest:
-                            model = model.Where(x => x.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Requested);
+                            //model = model.Where(x => x.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Requested);
                             break;
                         case Entities.User.UserFilterType.InstantReserveAllow:
-                            model = model.Where(x => x.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Verified);
+                            //model = model.Where(x => x.InstantReserveAccess == Entities.User.InstantReserveAccessEnum.Verified);
                             break;
                         case Entities.User.UserFilterType.PhotoChangeRequest:
                             model = model.Where(x => x.PhotoStatus == (int)Entities.User.UserPhotoState.ready_publish);
@@ -290,7 +274,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (user_general_type != -1)
                 {
-                    model = model.Where(x => x.UserGeneralType == user_general_type);
+                    model = model.Where(x => x.Type == user_general_type);
                 }
                 if (complete_profile_contact_status != -1)
                 {
@@ -307,15 +291,15 @@ namespace Amlakbashi.Host.Controllers
                 {
                     if (complete_profile_status == 0)
                     {
-                        model = model.Where(x => string.IsNullOrEmpty(x.FName) ||
-                                                 string.IsNullOrEmpty(x.LName) ||
-                                                 string.IsNullOrEmpty(x.ThirdPersonTell));
+                        model = model.Where(x => string.IsNullOrEmpty(x.FirstName) ||
+                                                 string.IsNullOrEmpty(x.LastName) ||
+                                                 string.IsNullOrEmpty(x.ThirdPersonPhoneNumber));
                     }
                     else if (complete_profile_status == 1)
                     {
-                        model = model.Where(x => !string.IsNullOrEmpty(x.FName) &&
-                         !string.IsNullOrEmpty(x.LName) &&
-                         !string.IsNullOrEmpty(x.ThirdPersonTell));
+                        model = model.Where(x => !string.IsNullOrEmpty(x.FirstName) &&
+                         !string.IsNullOrEmpty(x.LastName) &&
+                         !string.IsNullOrEmpty(x.ThirdPersonPhoneNumber));
                     }
                 }
 
@@ -326,8 +310,8 @@ namespace Amlakbashi.Host.Controllers
                     var unixDate = DateTimeUtility.DateValueOfJS(gregorianDate);
                     IQueryable<Advertise> advertises = advertiseService.GetAllAsIQueriable();
                     advertises = advertises.Where(x => x.Status != AdvertiseStatus.Deleted);
-                    advertises = advertises.Where(x => x.unixNorouzMinRequestDate >= unixDate);
-                    var userIds = advertises.Select(x => x.UserID).Distinct().ToList();
+                    advertises = advertises.Where(x => x.MinReserveDateForNowruz >= unixDate);
+                    var userIds = advertises.Select(x => x.UserId).Distinct().ToList();
                     model = model.Where(x => userIds.Contains(x.Id));
                 }
 
@@ -337,27 +321,27 @@ namespace Amlakbashi.Host.Controllers
 
                 if (area > -1 || city > -1 || province > -1)
                 {
-                    model = model.Where(x => x.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Host);
+                    model = model.Where(x => x.Type == (int)Entities.User.UserGeneralTypeEnum.Host);
                     var adminMobiles = userService.GetAllEmployees().Select(s => s.PhoneNumber)
                         .Select(s => PhoneUtility.LocalNumberToInternational(s, 98)).ToList();
-                    model = model.Where(x => !adminMobiles.Contains(x.MainMobile));
+                    model = model.Where(x => !adminMobiles.Contains(x.PhoneNumber));
                     if (area > -1)
                     {
                         model = model.Where(w => w.Advertises.Any(
                             wa => wa.Status != AdvertiseStatus.Deleted &&
-                            wa.Area == area));
+                            wa.AreaId == area));
                     }
                     else if (city > -1)
                     {
                         model = model.Where(w => w.Advertises.Any(
                             wa => wa.Status != AdvertiseStatus.Deleted &&
-                            wa.City == city));
+                            wa.CityId == city));
                     }
                     else if (province > -1)
                     {
                         model = model.Where(w => w.Advertises.Any(
                             wa => wa.Status != AdvertiseStatus.Deleted &&
-                            wa.Province == province));
+                            wa.ProvinceId == province));
                     }
                 }
 
@@ -392,7 +376,7 @@ namespace Amlakbashi.Host.Controllers
                 if (accId > 0)
                 {
                     var advertise = advertiseService.Find(accId);
-                    model = model.Where(x => x.Id == advertise.UserID);
+                    model = model.Where(x => x.Id == advertise.UserId);
                 }
 
                 if (advertise_count > 2)
@@ -411,45 +395,27 @@ namespace Amlakbashi.Host.Controllers
                 }
                 else if (sort_order == 1)//By User Credit
                 {
-                    model = model.OrderByDescending(u => u.Credit);
+                    model = model.OrderByDescending(u => u.WalletAmount);
                 }
                 else if (sort_order == 2)//By No Response Reserves
                 {
-                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
-                        r.HostResponse == 0));
+                    model = model.OrderByDescending(u => u.HostReserves.Count(r => r.HostResponse == 0));
                 }
                 else if (sort_order == 3)//By Rejected Reserves
                 {
-                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
-                        r.Status == 0));
+                    model = model.OrderByDescending(u => u.HostReserves.Count(r => r.Status == 0));
                 }
                 else if (sort_order == 4)//By Rejected For Home Full
                 {
-                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
-                        (int)r.HostResponse == 4));
+                    model = model.OrderByDescending(u => u.HostReserves.Count(r => (int)r.HostResponse == 4));
                 }
                 else if (sort_order == 5)//By Reserved
                 {
-                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
-                        (int)r.Status >= 5 && (int)r.Status <= 8));
+                    model = model.OrderByDescending(u => u.HostReserves.Count(r => (int)r.Status >= 5 && (int)r.Status <= 8));
                 }
                 else if (sort_order == 6)//By Canceled Reserves
                 {
-                    model = model.OrderByDescending(u => u.Reserves.Count(r => r.Advertise.UserID == u.Id &&
-                        (int)r.Status >= 10 && (int)r.Status <= 12));
-                }
-
-                if (mobile_status == 1)
-                {
-                    var user_list = userService.GetAll();
-                    List<int> filtered_user_ids = new List<int>();
-                    foreach (var item in model)
-                    {
-                        if (user_list.Any(u => u.Mobile == item.Mobile && u.Id != item.Id))
-                            filtered_user_ids.Add(item.Id);
-                    }
-                    model = model.Where(x => filtered_user_ids.Contains(x.Id)).
-                        OrderBy(u => u.Mobile);
+                    model = model.OrderByDescending(u => u.HostReserves.Count(r => (int)r.Status >= 10 && (int)r.Status <= 12));
                 }
 
                 var PageNumber = page ?? 1;
@@ -464,7 +430,6 @@ namespace Amlakbashi.Host.Controllers
                     Username = username,
                     Ownership = ownership,
                     SortOrder = sort_order,
-                    MobileStatus = mobile_status,
                     Status = status,
                     AdvertiseCount = advertise_count,
                     CompleteProfileStatus = complete_profile_status,
@@ -487,8 +452,8 @@ namespace Amlakbashi.Host.Controllers
                     {
                         User = item,
                         BankCard = bankCardService.GetByUserId(item.Id),
-                        InstantReserveCancel = advertiseService.GetInstantReserveCancelCount(item.Id),
-                        State = userService.GetIdentityUser(item.MainMobile).State
+                        //InstantReserveCancel = advertiseService.GetInstantReserveCancelCount(item.Id),
+                        State = userService.GetIdentityUser(item.PhoneNumber).Status
                     };
                     userListDTO.UserItems.Add(itemDTO);
                 }
@@ -509,7 +474,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var user = userService.Find(id);
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                 var model = UserEditDTO.Generate(user, identityUser);
                 return View(model);
             }
@@ -522,13 +487,13 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize(Policy = Policies.User_General_Edit)]
         [HttpPost]
-        public ActionResult Edit(UserEditDTO editedUser)
+        public async Task<IActionResult> Edit(UserEditDTO editedUser)
         {
             try
             {
                 if (editedUser.IsValid())
                 {
-                    userService.Update(editedUser, userAccessor.DoerUser.Id);
+                    await userService.Update(editedUser, userAccessor.DoerUser.Id);
                     return RedirectToAction(nameof(Edit), new { id = editedUser.Id });
                 }
                 return View(editedUser);
@@ -697,7 +662,7 @@ namespace Amlakbashi.Host.Controllers
 
         public ActionResult P(string c)
         {
-            return Redirect("/user/mobilelogin?returnrl=/&presentorcode=" + c);
+            return Redirect("/user/mobilelogin?returnUrl=/&presentorcode=" + c);
         }
 
         public JsonResult PopupLogin(string mobile = null, bool send_verification = true)
@@ -728,12 +693,12 @@ namespace Amlakbashi.Host.Controllers
 
                 if (identityUser == null)
                 {
-                    user = new User();
-                    user.Mobile = international_mobile;
-                    user.MainMobile = international_mobile;
-                    user.FName = null;
-                    user.LName = null;
-                    user.AmlakbashiScore = 1000;
+                    user = new User()
+                    {
+                        PhoneNumber = international_mobile,
+                        AmlakbashiScore = 1000,
+                        NoticesPhoneNumber = Entities.User.NoticesPhoneNumberEnum.PhoneNumber
+                    };
                     userService.Insert(user);
                     user = userService.GetByMainMobile(international_mobile);
 
@@ -743,7 +708,8 @@ namespace Amlakbashi.Host.Controllers
                         PhoneNumber = international_mobile,
                         CreateDate = DateTime.Now,
                         PhoneNumberConfirmed = false,
-                        State = Entities.User.UserState.InActived
+                        Status = Entities.User.UserState.InActived,
+                        IsForeigner = isNumberForIran == false
                     };
                     userService.AddIdentityUser(identityUser);
 
@@ -762,7 +728,7 @@ namespace Amlakbashi.Host.Controllers
                     });
                 }
 
-                if (identityUser.State == Entities.User.UserState.Suspend)
+                if (identityUser.Status == Entities.User.UserState.Suspend)
                 {
                     return GenerateJsonResult(new
                     {
@@ -784,19 +750,19 @@ namespace Amlakbashi.Host.Controllers
 
                 if (isNumberForIran == false)
                 {
-                    if (identityUser.EmailConfirmed && identityUser.State == Entities.User.UserState.Acticved)
+                    if (identityUser.EmailConfirmed && identityUser.Status == Entities.User.UserState.Acticved)
                     {
-                        if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null ||
-                            (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 10, 0, 0))
+                        if (string.IsNullOrEmpty(identityUser.EmailVerifyCode) || identityUser.LastSentVerifyCodeDate == null ||
+                            (DateTime.Now - identityUser.LastSentVerifyCodeDate) > new TimeSpan(0, 0, 5, 0, 0))
                         {
-                            identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
-                            identityUser.SendVerification = DateTime.Now;
+                            identityUser.EmailVerifyCode = new Random().Next(111111, 999999).ToString();
+                            identityUser.LastSentVerifyCodeDate = DateTime.Now;
                             userService.UpdateIdentityUser(identityUser);
                         }
-                        string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد ورود شما در املاک باشی: {identityUser.EmailCode}</div></div>";
+                        string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailVerifyCode}</b></div></div>";
 #if !DEBUG
                         EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
-                            "تایید ایمیل ثبت نام", strbody);
+                            "املاک باشی: کد تایید ورود به حساب کاربری", strbody);
 #endif
                     }
                     return GenerateJsonResult(new
@@ -804,11 +770,11 @@ namespace Amlakbashi.Host.Controllers
                         status = 5,
                         mobile = mobile,
                         isNumberForIran = isNumberForIran,
-                        doLogin = identityUser.EmailConfirmed && identityUser.State == Entities.User.UserState.Acticved
+                        doLogin = identityUser.EmailConfirmed && identityUser.Status == Entities.User.UserState.Acticved
                     });
                 }
 
-                if (identityUser.PhoneNumberConfirmed == false || identityUser.State == Entities.User.UserState.InActived)
+                if (identityUser.PhoneNumberConfirmed == false || identityUser.Status == Entities.User.UserState.InActived)
                 {
                     userService.UpdateSendVerification(user.Id, DateTime.Now, code);
                     userService.SendVerificationSms(callableNumber, code);
@@ -859,15 +825,15 @@ namespace Amlakbashi.Host.Controllers
                 if (identityUser != null)
                 {
                     var code = new Random().Next(111111, 999999).ToString();
-                    identityUser.EmailCode = code;
+                    identityUser.EmailVerifyCode = code;
                     identityUser.Email = email;
-                    identityUser.SendVerification = DateTime.Now;
+                    identityUser.LastSentVerifyCodeDate = DateTime.Now;
                     identityUser.EmailConfirmed = false;
                     userService.UpdateIdentityUser(identityUser);
-                    string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
+                    string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{code}</b></div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
-                    "تایید ایمیل ثبت نام", strbody);
+                    "املاک باشی: تایید ایمیل ثبت نام", strbody);
 #endif
                     return GenerateJsonResult(new { status = 1 });
                 }
@@ -890,7 +856,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var mobileInternational = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var identityUser = userService.GetIdentityUser(mobileInternational);
-                if (identityUser != null && identityUser.EmailCode == code)
+                if (identityUser != null && identityUser.EmailVerifyCode == code)
                 {
                     identityUser.EmailConfirmed = true;
                     identityUser.PhoneNumberConfirmed = true;
@@ -918,17 +884,17 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(mobileInternational);
                 if (identityUser != null)
                 {
-                    if (string.IsNullOrEmpty(identityUser.EmailCode) || identityUser.SendVerification == null || 
-                        (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 10, 0, 0))
+                    if (string.IsNullOrEmpty(identityUser.EmailVerifyCode) || identityUser.LastSentVerifyCodeDate == null ||
+                        (DateTime.Now - identityUser.LastSentVerifyCodeDate) > new TimeSpan(0, 0, 5, 0, 0))
                     {
-                        identityUser.EmailCode = new Random().Next(111111, 999999).ToString();
-                        identityUser.SendVerification = DateTime.Now;
+                        identityUser.EmailVerifyCode = new Random().Next(111111, 999999).ToString();
+                        identityUser.LastSentVerifyCodeDate = DateTime.Now;
                         userService.UpdateIdentityUser(identityUser);
                     }
-                    string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {identityUser.EmailCode}</div></div>";
+                    string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailVerifyCode}</b></div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
-                    "کد تایید فراموشی رمز عبور", strbody);
+                    "املاک باشی: فراموشی رمز عبور", strbody);
 #endif
                     return GenerateJsonResult(new { status = 1 });
                 }
@@ -954,38 +920,6 @@ namespace Amlakbashi.Host.Controllers
             return GenerateJsonResult(new { status = 1 });
         }
 
-        //public JsonResult PopupResendEmail(string email)
-        //{
-        //    var user = userService.GetByEmail(email);
-        //    user.ForgetCode = HashUtility.GetMd5Hash(email + "@li#$%S0hR@b!");
-        //    string strbody = "<div style='direction:rtl;text-align:right;'><div>برای تایید ایمیل خود و ورود به سایت املاک باشی روی لینک زیر کلیک کیند .</div><a style='display:block;' href='activation'>activation</a></div>";
-        //    string strlink = GeneralData.WebsiteUrl + "/user/verifyemail/?activactioncode=" + user.Id + "_" + user.ForgetCode;
-        //    strbody = strbody.Replace("activation", strlink);
-
-        //    try
-        //    {
-        //        EmailUtility.SendEmail(EmailSenderDepartment.Verification,
-        //        new List<string>() { email },
-        //        "تایید ایمیل ثبت نام",
-        //        strbody
-        //        );
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("", exc);
-        //        return GenerateJsonResult(new
-        //        {
-        //            status = 0,
-        //            msg = "متاسفانه عملیات با خطا مواجه شد: " + exc.Message
-        //        });
-        //    }
-
-        //    userService.UpdateForgetCode(user.Id, user.ForgetCode);
-        //    userService.UpdateSendVerification(user.Id, DateTime.Now);
-        //    ViewBag.msg = TempData["msg"];
-        //    return GenerateJsonResult(new { status = 1 });
-        //}
-
         public JsonResult PopupSendSmsAgain(string mobile)
         {
             try
@@ -1003,20 +937,39 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(mobile_international);
                 if (identityUser != null)
                 {
-                    var code = identityUser.Code;
-                    if (string.IsNullOrEmpty(code) ||
-                        identityUser.SendVerification == null ||
-                        (DateTime.Now - identityUser.SendVerification) > new TimeSpan(0, 0, 10, 0, 0))
+                    if (identityUser.IsForeigner)
                     {
-                        code = new Random().Next(1111, 9999).ToString();
-                        userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                        if (string.IsNullOrEmpty(identityUser.EmailVerifyCode) || identityUser.LastSentVerifyCodeDate == null ||
+                        (DateTime.Now - identityUser.LastSentVerifyCodeDate) > new TimeSpan(0, 0, 5, 0, 0))
+                        {
+                            identityUser.EmailVerifyCode = new Random().Next(111111, 999999).ToString();
+                            identityUser.LastSentVerifyCodeDate = DateTime.Now;
+                            userService.UpdateIdentityUser(identityUser);
+                        }
+                        string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px'><div>کد تایید شما در املاک باشی: <b>{identityUser.EmailVerifyCode}</b></div></div>";
+#if !DEBUG
+                        EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { identityUser.Email },
+                            "املاک باشی: کد تایید ورود به حساب کاربری", strbody);
+#endif
                     }
+                    else
+                    {
+                        var code = identityUser.VerifyCode;
+                        if (string.IsNullOrEmpty(code) ||
+                            identityUser.LastSentVerifyCodeDate == null ||
+                            (DateTime.Now - identityUser.LastSentVerifyCodeDate) > new TimeSpan(0, 0, 5, 0, 0))
+                        {
+                            code = new Random().Next(1111, 9999).ToString();
+                            userService.UpdateSendVerification(user.Id, DateTime.Now, code);
+                        }
 
-                    var mobileNumber = PhoneUtility.IsNumberForIran(mobile_international) ?
-                        PhoneUtility.InternationalNumberToLocal(mobile_international) :
-                        PhoneUtility.InternationalNumberToCallable(mobile_international);
-                    userService.SendVerificationSms(mobileNumber, code);
-                    ViewBag.msg = TempData["msg"];
+                        var mobileNumber = PhoneUtility.IsNumberForIran(mobile_international) ?
+                            PhoneUtility.InternationalNumberToLocal(mobile_international) :
+                            PhoneUtility.InternationalNumberToCallable(mobile_international);
+                        userService.SendVerificationSms(mobileNumber, code);
+                        ViewBag.msg = TempData["msg"];
+                        //return GenerateJsonResult(new { status = 1 });
+                    }
                     return GenerateJsonResult(new { status = 1 });
                 }
                 return GenerateJsonResult(new
@@ -1048,7 +1001,7 @@ namespace Amlakbashi.Host.Controllers
                 var identityUser = userService.GetIdentityUser(mobile_international);
                 if (verifyByEmail)
                 {
-                    if (identityUser.EmailCode != code)
+                    if (identityUser.EmailVerifyCode != code)
                     {
                         return GenerateJsonResult(
                         new
@@ -1060,7 +1013,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 else
                 {
-                    if (identityUser.Code != code)
+                    if (identityUser.VerifyCode != code)
                     {
                         return GenerateJsonResult(
                         new
@@ -1096,7 +1049,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 var mobile_international = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var identityUser = userService.GetIdentityUser(mobile_international);
-                var correct = identityUser != null && code == identityUser.Code;
+                var correct = identityUser != null && code == identityUser.VerifyCode;
                 if (correct)
                 {
                     identityUser.PhoneNumberConfirmed = true;
@@ -1107,8 +1060,8 @@ namespace Amlakbashi.Host.Controllers
                 {
                     status = 1,
                     correct = correct,
-                    fname = user.FName,
-                    lname = user.LName
+                    fname = user.FirstName,
+                    lname = user.LastName
                 });
             }
             catch (Exception exc)
@@ -1128,7 +1081,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 var mobileInternational = PhoneUtility.CorrectPhoneNumberIfPossible(mobile);
                 var identityUser = userService.GetIdentityUser(mobileInternational);
-                if (identityUser != null && identityUser.Code == code)
+                if (identityUser != null && identityUser.VerifyCode == code)
                 {
                     signInManager.SignInAsync(identityUser, true).Wait();
                     return GenerateJsonResult(new { status = 1 });
@@ -1178,9 +1131,9 @@ namespace Amlakbashi.Host.Controllers
                 int user_id;
                 string errorMsg;
                 var identityUser = userService.GetIdentityUser(mobile_international);
-                if (identityUser != null && identityUser.Code == code)
+                if (identityUser != null && identityUser.VerifyCode == code)
                 {
-                    if (identityUser.State == Entities.User.UserState.Suspend)
+                    if (identityUser.Status == Entities.User.UserState.Suspend)
                     {
                         return GenerateJsonResult(new { status = 0, msg = "حساب کاربری شما معلق شده است. لطفا با پشتیبان تماس بگیرید" });
                     }
@@ -1189,7 +1142,7 @@ namespace Amlakbashi.Host.Controllers
                     {
                         return GenerateJsonResult(new { status = 0, msg = errorMsg });
                     }
-                    if (identityUser.State == Entities.User.UserState.InActived)
+                    if (identityUser.Status == Entities.User.UserState.InActived)
                     {
                         Dictionary<string, string> errors;
                         if (userService.SignInRegister(user_id, fname, lname, out errors))
@@ -1237,9 +1190,9 @@ namespace Amlakbashi.Host.Controllers
                 int user_id;
                 string errorMsg;
                 var identityUser = userService.GetIdentityUser(mobile_international);
-                if (identityUser != null && identityUser.EmailCode == code)
+                if (identityUser != null && identityUser.EmailVerifyCode == code)
                 {
-                    if (identityUser.State == Entities.User.UserState.Suspend)
+                    if (identityUser.Status == Entities.User.UserState.Suspend)
                     {
                         return GenerateJsonResult(new { status = 0, msg = "حساب کاربری شما معلق شده است. لطفا با پشتیبان تماس بگیرید" });
                     }
@@ -1248,7 +1201,7 @@ namespace Amlakbashi.Host.Controllers
                     {
                         return GenerateJsonResult(new { status = 0, msg = errorMsg });
                     }
-                    if (identityUser.State == Entities.User.UserState.InActived)
+                    if (identityUser.Status == Entities.User.UserState.InActived)
                     {
                         Dictionary<string, string> errors;
                         if (userService.SignInRegister(user_id, fname, lname, out errors))
@@ -1308,17 +1261,17 @@ namespace Amlakbashi.Host.Controllers
                 {
                     return GenerateJsonResult(new { status = 0, msg = "لطفا آدرس ایمیل خود را به درستی وارد کنید" });
                 }
-                var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+                var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
                 var code = new Random().Next(111111, 999999).ToString();
-                identityUser.EmailCode = code;
+                identityUser.EmailVerifyCode = code;
                 identityUser.Email = email;
-                identityUser.SendVerification = DateTime.Now;
+                identityUser.LastSentVerifyCodeDate = DateTime.Now;
                 identityUser.EmailConfirmed = false;
                 userService.UpdateIdentityUser(identityUser);
-                string strbody = $"<div style='direction:rtl;text-align:right;'><div>کد تایید ایمیل شما در املاک باشی: {code}</div></div>";
+                string strbody = $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{code}</b></div></div>";
 #if !DEBUG
                 EmailUtility.SendEmail(EmailSenderDepartment.Verification, new List<string>() { email },
-                    "تایید ایمیل ثبت نام", strbody);
+                    "املاک باشی: تایید ایمیل جدید", strbody);
 #endif
                 return GenerateJsonResult(new { status = 1 });
             }
@@ -1334,8 +1287,8 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
-                if (identityUser.EmailCode == emailCode)
+                var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
+                if (identityUser.EmailVerifyCode == emailCode)
                 {
                     identityUser.EmailConfirmed = true;
                     userService.UpdateIdentityUser(identityUser);
@@ -1350,56 +1303,6 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        //public ActionResult VerifyEmail(string activactioncode)
-        //{
-        //    int user_id = 0;
-        //    bool verify = false;
-        //    try
-        //    {
-        //        if (string.IsNullOrEmpty(activactioncode) == false)
-        //        {
-        //            int id = int.Parse(activactioncode.Substring(0, activactioncode.IndexOf('_')));
-        //            string ac = activactioncode.Substring(activactioncode.IndexOf('_') + 1);
-        //            var user = userService.Find(id);
-        //            if (user == null || user.ForgetCode != ac)
-        //            {
-        //                user_id = 0;
-        //            }
-        //            if (user.State != (int)Entities.User.UserState.Acticved)
-        //                user.AmlakbashiScore = 1000;
-        //            user.State = (int)Entities.User.UserState.Acticved;
-        //            userService.UpdateState(user.Id, true);
-        //            user_id = user.Id;
-        //            verify = true;
-        //        }
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("", exc);
-        //        user_id = 0;
-        //    }
-        //    if (verify)
-        //    {
-        //        var user = userService.Find(user_id);
-        //        userService.UpdateLoginPriority(user_id, Entities.User.LoginPriorites.Email);
-        //        //FormsAuthentication.SetAuthCookie(user.Email, true);
-
-        //        var claims = new List<Claim>
-        //        {
-        //            new Claim(ClaimTypes.Name, user.Email)
-        //        };
-        //        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        //        HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
-        //        TempData["MessageShowOnReady"] = "ثبت نام شما با موفقیت انجام شد";
-        //        return Redirect("/");
-        //    }
-        //    else
-        //    {
-        //        return Redirect("/errors/http404");
-        //    }
-        //}
-
         [HttpGet]
         public ActionResult PublicLogin(string returnUrl = "/dashboard")
         {
@@ -1410,7 +1313,6 @@ namespace Amlakbashi.Host.Controllers
 
         public ActionResult Signout()
         {
-            //signInManager.SignOutAsync();
             userService.SignOut();
             HttpContext.Session.Clear();
             return Redirect("/");
@@ -1418,7 +1320,6 @@ namespace Amlakbashi.Host.Controllers
 
         public ActionResult LogOff()
         {
-            //signInManager.SignOutAsync();
             userService.SignOut();
             HttpContext.Session.Clear();
             return Redirect("/");
@@ -1436,7 +1337,7 @@ namespace Amlakbashi.Host.Controllers
         public ActionResult UserCreditManager()
         {
             var user = userAccessor.CurrentUser;
-            ViewBag.Credit = user.Credit;
+            ViewBag.Credit = user.WalletAmount;
             ViewBag.UserID = user.Id;
             var model = accounting.GetCreditListByUserId(user.Id);
             return View(model);
@@ -1458,8 +1359,8 @@ namespace Amlakbashi.Host.Controllers
                 var payment = new Payment()
                 {
                     UserID = userAccessor.CurrentUser.Id,
-                    Date = DateTime.Now,
-                    TotalPrice = price * 10,
+                    CreateDate = DateTime.Now,
+                    Amount = price * 10,
                     ReserveID = reserveId,
                     CouponID = couponId,
                     PrizePrice = prizePrice,
@@ -1508,10 +1409,10 @@ namespace Amlakbashi.Host.Controllers
                 if (send_sms)
                 {
                     var user = userService.Find(user_id);
-                    var identityUser = userService.GetIdentityUser(user.MainMobile);
+                    var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserMainMobile = user.MainMobile,
+                        UserMainMobile = user.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
@@ -1567,10 +1468,10 @@ namespace Amlakbashi.Host.Controllers
                 if (send_sms)
                 {
                     var user = userService.Find(user_id);
-                    var identityUser = userService.GetIdentityUser(user.MainMobile);
+                    var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserMainMobile = user.MainMobile,
+                        UserMainMobile = user.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
@@ -1600,7 +1501,7 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
-                var current_credit = userAccessor.CurrentUser.Credit;
+                var current_credit = userAccessor.CurrentUser.WalletAmount;
                 return GenerateJsonResult(new { status = 1, current_credit = current_credit });
             }
             catch (Exception exc)
@@ -1621,9 +1522,9 @@ namespace Amlakbashi.Host.Controllers
             var user = userService.Find(user_id);
             var main_mobile = PhoneUtility.NormalizePhoneNumber(
                 user.GetPhoneNumber(Entities.User.PhoneType.MainMobile));
-            var mobile_1 = PhoneUtility.NormalizePhoneNumber(
-                user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile1));
             var mobile_2 = PhoneUtility.NormalizePhoneNumber(
+                user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile1));
+            var mobile_3 = PhoneUtility.NormalizePhoneNumber(
                 user.GetPhoneNumber(Entities.User.PhoneType.OtherMobile2));
             var land_line = PhoneUtility.NormalizePhoneNumber(
                 user.GetPhoneNumber(Entities.User.PhoneType.LandLine));
@@ -1638,8 +1539,8 @@ namespace Amlakbashi.Host.Controllers
             {
                 status = 1,
                 main_mobile = main_mobile,
-                mobile_1 = mobile_1,
                 mobile_2 = mobile_2,
+                mobile_3 = mobile_3,
                 land_line = land_line,
                 third_person = third_person,
                 full_name = full_name
@@ -1693,18 +1594,18 @@ namespace Amlakbashi.Host.Controllers
 
         public JsonResult IsUserLoginBanned()
         {
-            if (User.Identity.IsAuthenticated == false || string.IsNullOrEmpty(userAccessor.CurrentUser.MainMobile))
+            if (User.Identity.IsAuthenticated == false || string.IsNullOrEmpty(userAccessor.CurrentUser.PhoneNumber))
             {
                 return GenerateJsonResult(new
                 {
                     val = false
                 });
             }
-            var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+            var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
             return GenerateJsonResult(
                 new
                 {
-                    val = identityUser.State == Entities.User.UserState.Suspend,
+                    val = identityUser.Status == Entities.User.UserState.Suspend,
                     user_id = userAccessor.CurrentUser.Id
                 });
         }
@@ -1797,73 +1698,73 @@ namespace Amlakbashi.Host.Controllers
             return PartialView("_LoginPopup");
         }
 
-        [Authorize(Policy = Policies.User_Host_Support)]
-        public ActionResult GetInstantReserveAccs(int userid)
-        {
-            var model = advertiseService.GetInstantReserveAdvertisesByUserId(userid, InstantReserveStatusEnum.Requested);
-            var childrenIds = new List<long>();
+        //[Authorize(Policy = Policies.User_Host_Support)]
+        //public ActionResult GetInstantReserveAccs(int userid)
+        //{
+        //    var model = advertiseService.GetInstantReserveAdvertisesByUserId(userid, InstantReserveStatusEnum.Requested);
+        //    var childrenIds = new List<long>();
 
-            var allParents = model.Where(x => x.Childs.Any());
-            foreach (var parent in allParents)
-            {
-                childrenIds.AddRange(parent.Childs.Select(x => x.Id));
-            }
-            model = model.Where(x => !childrenIds.Contains(x.Id)).ToList();
-            ViewBag.userid = userid;
-            return PartialView("_InstantReserveConfirm", model);
-        }
+        //    var allParents = model.Where(x => x.Childs.Any());
+        //    foreach (var parent in allParents)
+        //    {
+        //        childrenIds.AddRange(parent.Childs.Select(x => x.Id));
+        //    }
+        //    model = model.Where(x => !childrenIds.Contains(x.Id)).ToList();
+        //    ViewBag.userid = userid;
+        //    return PartialView("_InstantReserveConfirm", model);
+        //}
 
-        [Authorize(Policy = Policies.User_Host_Support)]
-        public JsonResult ConfirmInstantReserve(long id)
-        {
-            try
-            {
-                var advertise = advertiseService.Find(id);
-                advertiseService.UpdateInstantReserveStatus(advertise.UserID, InstantReserveStatusEnum.None, true);
-                advertiseService.UpdateInstantReserveStatus(id, InstantReserveStatusEnum.Confirmed, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
-                userService.UpdateInstantReserveAccess(advertise.UserID, Entities.User.InstantReserveAccessEnum.Verified, userAccessor.CurrentUser.Id);
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("User.ConfirmInstantReserve", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
+        //[Authorize(Policy = Policies.User_Host_Support)]
+        //public JsonResult ConfirmInstantReserve(long id)
+        //{
+        //    try
+        //    {
+        //        var advertise = advertiseService.Find(id);
+        //        advertiseService.UpdateInstantReserveStatus(advertise.UserID, InstantReserveStatusEnum.None, true);
+        //        advertiseService.UpdateInstantReserveStatus(id, InstantReserveStatusEnum.Confirmed, userAccessor.CurrentUser.Id, ActionLog.ActionSourceEnum.AdminPanel);
+        //        userService.UpdateInstantReserveAccess(advertise.UserID, Entities.User.InstantReserveAccessEnum.Verified, userAccessor.CurrentUser.Id);
+        //        return GenerateJsonResult(new { status = 1 });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("User.ConfirmInstantReserve", exc);
+        //        return GenerateJsonResult(new { status = 0 });
+        //    }
+        //}
 
-        [Authorize(Policy = Policies.User_Host_Support)]
-        public JsonResult ConfirmAllInstantReserves(long userid)
-        {
-            try
-            {
-                var user = userService.Find((int)userid);
-                advertiseService.UpdateInstantReserveStatus((int)userid, InstantReserveStatusEnum.Confirmed, true);
-                userService.UpdateInstantReserveAccess(user.Id, Entities.User.InstantReserveAccessEnum.Verified, userAccessor.CurrentUser.Id);
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("User.ConfirmAllInstantReserves", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
+        //[Authorize(Policy = Policies.User_Host_Support)]
+        //public JsonResult ConfirmAllInstantReserves(long userid)
+        //{
+        //    try
+        //    {
+        //        var user = userService.Find((int)userid);
+        //        advertiseService.UpdateInstantReserveStatus((int)userid, InstantReserveStatusEnum.Confirmed, true);
+        //        userService.UpdateInstantReserveAccess(user.Id, Entities.User.InstantReserveAccessEnum.Verified, userAccessor.CurrentUser.Id);
+        //        return GenerateJsonResult(new { status = 1 });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("User.ConfirmAllInstantReserves", exc);
+        //        return GenerateJsonResult(new { status = 0 });
+        //    }
+        //}
 
-        [Authorize(Policy = Policies.User_Host_Support)]
-        public JsonResult CancellAllInstantReserves(long userid)
-        {
-            try
-            {
-                var user = userService.Find((int)userid);
-                advertiseService.UpdateInstantReserveStatus((int)userid, InstantReserveStatusEnum.None, true);
-                userService.UpdateInstantReserveAccess(user.Id, Entities.User.InstantReserveAccessEnum.None, userAccessor.CurrentUser.Id);
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("User.CancellAllInstantReserves", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
+        //[Authorize(Policy = Policies.User_Host_Support)]
+        //public JsonResult CancellAllInstantReserves(long userid)
+        //{
+        //    try
+        //    {
+        //        var user = userService.Find((int)userid);
+        //        advertiseService.UpdateInstantReserveStatus((int)userid, InstantReserveStatusEnum.None, true);
+        //        userService.UpdateInstantReserveAccess(user.Id, Entities.User.InstantReserveAccessEnum.None, userAccessor.CurrentUser.Id);
+        //        return GenerateJsonResult(new { status = 1 });
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        logger.Error("User.CancellAllInstantReserves", exc);
+        //        return GenerateJsonResult(new { status = 0 });
+        //    }
+        //}
 
         [Authorize(Policy = Policies.User_Credit)]
         public JsonResult IncreasePrizeCreditCustom(int id, long amount, string title)
@@ -1923,7 +1824,7 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new
                     {
                         status = 1,
-                        desc = string.IsNullOrEmpty(user.Address) ? "" : user.Address
+                        desc = string.IsNullOrEmpty(user.Description) ? "" : user.Description
                     });
                 }
                 return GenerateJsonResult(new
@@ -1982,7 +1883,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var user = userAccessor.CurrentUser;
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                 var model = UserDTO.Generate(user, identityUser);
                 var bankCard = bankCardService.GetByUserId(user.Id);
                 if (bankCard != null)
@@ -2014,7 +1915,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 if (user.id != userAccessor.CurrentUser.Id)
                     return Redirect("/errors/http404");
-                
+
                 if (Request.Form.Files.Count > 0 && Request.Form.Files[0].Length > 0)
                 {
                     var uploadfile = Request.Form.Files[0];
@@ -2028,17 +1929,17 @@ namespace Amlakbashi.Host.Controllers
                         return RedirectToAction("profilemanager");
                     }
 
-                    string filepath = $"~/content/users/user_{user.id}.jpg";
+                    string filepath = $"{Entities.File.UserImagesDirectory}/user_{user.id}.jpg";
                     long PhotoID = 0;
                     if (userAccessor.CurrentUser.Photo != null)
                     {
                         PhotoID = userAccessor.CurrentUser.Photo.Id;
-                        var oldFilePath = host.WebRootPath + userAccessor.CurrentUser.Photo.FilePath.Replace("~", "");
+                        //var oldFilePath = host.WebRootPath + userAccessor.CurrentUser.Photo.CorrectedFilePath;
                         fileService.UpdateFilePath(PhotoID, filepath);
-                        if (System.IO.File.Exists(oldFilePath))
-                        {
-                            System.IO.File.Delete(oldFilePath);
-                        }
+                        //if (System.IO.File.Exists(oldFilePath))
+                        //{
+                        //    System.IO.File.Delete(oldFilePath);
+                        //}
                     }
                     else
                     {
@@ -2047,7 +1948,8 @@ namespace Amlakbashi.Host.Controllers
                             PostDate = DateTime.Now,
                             LastModifyDate = DateTime.Now,
                             UserID = user.id,
-                            FilePath = filepath
+                            FilePath = filepath,
+                            Type = Entities.File.FileTypeEnum.UserImage
                         };
                         PhotoID = fileService.Insert(newProfilePhoto);
                     }
@@ -2055,7 +1957,7 @@ namespace Amlakbashi.Host.Controllers
                     if (!System.IO.Directory.Exists(host.WebRootPath + "/content/users"))
                         System.IO.Directory.CreateDirectory(host.WebRootPath + "/content/users");
 
-                    using (var stream = System.IO.File.Create(host.WebRootPath + filepath.Replace("~", "")))
+                    using (var stream = System.IO.File.Create(host.WebRootPath + "/" + filepath))
                     {
                         uploadfile.CopyTo(stream);
                     }
@@ -2086,6 +1988,142 @@ namespace Amlakbashi.Host.Controllers
             {
                 logger.Error("User.ProfileManager", exc);
                 return RedirectToAction("profilemanager");
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult ChangeMainPhoneNumber()
+        {
+            try
+            {
+                return View("_ChangeMainPhoneNumber");
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.ChangeMainPhoneNumber(get)", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangeMainPhoneNumber(string newMainPhoneNumber)
+        {
+            try
+            {
+                var result = await userService.UpdateMainPhoneNumberAsync(userAccessor.CurrentUser.Id, newMainPhoneNumber);
+                if (result.HasError() == false && result.Result)
+                {
+                    var identityUser = await userService.FindIdentityByUsernameAsync(userAccessor.CurrentUser.PhoneNumber);
+                    await signInManager.SignInAsync(identityUser, true);
+                }
+                return GenerateJsonResult(new
+                {
+                    status = result.HasError() ? 0 : result.Result ? 2 : 1,
+                    msg = result.HasError() ? result.GetErrors().First() : null
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.ChangeMainPhoneNumber(post)", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطا مواجه شد"
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> VerifyChangeMainPhoneNumber(string verifyCode)
+        {
+            try
+            {
+                var result = await userService.VerifyNewMainPhoneNumber(userAccessor.CurrentUser.Id, verifyCode);
+                if (result.HasError() == false)
+                {
+                    var identityUser = await userService.FindIdentityByUsernameAsync(userAccessor.CurrentUser.PhoneNumber);
+                    await signInManager.SignInAsync(identityUser, true);
+                }
+                return GenerateJsonResult(new
+                {
+                    status = result.HasError() ? 0 : 1,
+                    msg = result.HasError() ? result.GetErrors().First() : null
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.VerifyChangeMainPhoneNumber(post)", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطا مواجه شد"
+                });
+            }
+        }
+
+        [Authorize(Policy = Policies.User_General_Edit)]
+        [HttpGet]
+        public ActionResult ChangeMainPhoneNumberByAdmin(int userId)
+        {
+            try
+            {
+                return View("_ChangeMainPhoneNumberByAdmin", userId);
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.ChangeMainPhoneNumberByAdmin(get)", exc);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+        }
+
+        [Authorize(Policy = Policies.User_General_Edit)]
+        [HttpPost]
+        public async Task<IActionResult> ChangeMainPhoneNumberByAdmin(int userId, string newMainPhoneNumber)
+        {
+            try
+            {
+                var result = await userService.UpdateMainPhoneNumberAsync(userId, newMainPhoneNumber);
+                return GenerateJsonResult(new
+                {
+                    status = result.HasError() ? 0 : result.Result ? 2 : 1,
+                    msg = result.HasError() ? result.GetErrors().First() : null
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.ChangeMainPhoneNumberByAdmin(post)", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطا مواجه شد"
+                });
+            }
+        }
+
+        [Authorize(Policy = Policies.User_General_Edit)]
+        [HttpPost]
+        public async Task<IActionResult> VerifyChangeMainPhoneNumberByAdmin(int userId, string verifyCode)
+        {
+            try
+            {
+                var result = await userService.VerifyNewMainPhoneNumber(userId, verifyCode);
+                return GenerateJsonResult(new
+                {
+                    status = result.HasError() ? 0 : 1,
+                    msg = result.HasError() ? result.GetErrors().First() : null
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("User.VerifyChangeMainPhoneNumberByAdmin", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطا مواجه شد"
+                });
             }
         }
     }

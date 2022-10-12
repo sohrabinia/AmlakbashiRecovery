@@ -1,16 +1,15 @@
 ﻿using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts;
 using System;
-using static Amlakbashi.Core.Entities.Advertise;
 
 namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
 {
     [Serializable]
     public class OwnershipInputDTO
     {
-        public int OwnershipType { get; set; }
-        public int OwnerID { get; set; }
-        public string OwnerMobile { get; set; }
+        public Advertise.OwnershipTypeEnum OwnershipType { get; set; }
+        public string OwnerPhoneNumber { get; set; }
         public string OwnerFullName { get; set; }
 
         public static implicit operator OwnershipInputDTO(OwnershipPart part)

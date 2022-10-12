@@ -29,7 +29,8 @@ namespace Amlakbashi.Core.Entities
             Website = 1,
             WebsiteDashboard = 2,
             Application = 3,
-            AdminPanel = 4
+            AdminPanel = 4,
+            ThirdPartyApp = 5
         }
 
         public enum ActionTypeEnum
@@ -81,6 +82,8 @@ namespace Amlakbashi.Core.Entities
                     return "حساب بانکی";
                 case ActionTypeEnum.User:
                     return "کاربر";
+                case ActionTypeEnum.Advertise:
+                    return "آگهی";
                 default:
                     return "";
             }
@@ -93,6 +96,8 @@ namespace Amlakbashi.Core.Entities
                 case ActionTypeEnum.BankCard:
                 case ActionTypeEnum.User:
                     return "کد کاربری";
+                case ActionTypeEnum.Advertise:
+                    return "کد آگهی";
                 default:
                     return "";
             }

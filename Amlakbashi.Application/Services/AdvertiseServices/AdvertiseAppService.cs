@@ -14,9 +14,7 @@ using Amlakbashi.Core.Infrastructure.PriceHelpers.Interfaces;
 using MediatR;
 using Amlakbashi.Mediator.Events.AdvertiseEvents;
 using System.Transactions;
-using Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs;
 using Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts;
-using Amlakbashi.Core.DTOs.AccommodationDTOs.ApiDTOs;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using static Amlakbashi.Core.Entities.Reserve;
@@ -32,20 +30,30 @@ using Amlakbashi.Mediator.Commands.FileCommands;
 using Amlakbashi.Core.DTOs.AdvertiseDTOs;
 using Amlakbashi.Mediator.Commands.CategoryCommands;
 using Microsoft.AspNetCore.Http;
+using Amlakbashi.Core.DTOs.WebService.Requests.Advertises;
+using Amlakbashi.Core.Infrastructure.FilterHelpers.Interfaces;
+using Amlakbashi.Core.DTOs.WebService.Responses.Advertises;
+using Amlakbashi.Application.DTOs;
+using System.Threading.Tasks;
+using static Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs.CheckSetOccupiedDTO;
+using static Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs.CheckUnsetOccupiedDTO;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
     internal class AdvertiseAppService : AppServiceBase<Advertise, long>, IAdvertiseAppService
     {
         private readonly IPriceCalculator priceCalculator;
+        private readonly IAdvertiseFilterHelper advertiseFilter;
         private readonly UserManager<AppUser> userManager;
         private readonly IMediator mediator;
         public AdvertiseAppService(IRepository<Advertise, long> repository,
-            IMediator mediator, IPriceCalculator priceCalculator, UserManager<AppUser> userManager) : base(repository)
+            IMediator mediator, IPriceCalculator priceCalculator,
+            UserManager<AppUser> userManager, IAdvertiseFilterHelper advertiseFilter) : base(repository)
         {
             this.mediator = mediator;
             this.priceCalculator = priceCalculator;
             this.userManager = userManager;
+            this.advertiseFilter = advertiseFilter;
         }
 
         public IQueryable<Advertise> GetAllAsIQueriable()
@@ -53,27 +61,236 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return Repository.Query(q => q);
         }
 
+        public AdvertiseListResponse Filter(AdvertiseGetListRequest request)
+        {
+            var category = Repository.Find<DynamicCategory, int>(request.categoryId);
+            var advertises = category.Advertises.AsQueryable();
+
+            advertises = advertiseFilter.FilterPhrase(advertises, request.phrase);
+            if (request.area > 0)
+            {
+                advertises = advertises.Where(x => x.AreaId == request.area);
+            }
+            if (request.locationTypes != null && request.locationTypes.Any())
+            {
+                advertises = advertises.Where(a => request.locationTypes.Contains(a.LocationType));
+            }
+            if (request.parking)
+            {
+                advertises = advertises.Where(a => a.Parking != ParkingItems.NoParking);
+            }
+            if (request.capacity > 0)
+            {
+                advertises = advertises.Where(a => a.Capacity >= request.capacity ||
+                    a.Capacity + a.ExtraCapacity >= request.capacity);
+            }
+            if (request.roomCount > 0)
+            {
+                advertises = advertises.Where(w => w.RoomCount == request.roomCount);
+            }
+            if (request.bedCount > 0)
+            {
+                advertises = advertises.Where(x => x.SingleBedCount + (x.DoubleBedCount * 2) == request.bedCount);
+            }
+            if (request.elevator)
+            {
+                advertises = advertises.Where(a => a.Elevator == true);
+            }
+            if (request.pool)
+            {
+                advertises = advertises.Where(x => x.Pool == true);
+            }
+            if (request.wifi)
+            {
+                advertises = advertises.Where(x => x.Wifi == true);
+            }
+            if (request.washingMachine)
+            {
+                advertises = advertises.Where(a => a.WashingMachine == true);
+            }
+            if (request.jacuzzi)
+            {
+                advertises = advertises.Where(a => a.Jacuzzi == true);
+            }
+            if (request.poolTable)
+            {
+                advertises = advertises.Where(a => a.PoolTable == true);
+            }
+            if (request.foosball)
+            {
+                advertises = advertises.Where(a => a.Foosball == true);
+            }
+            if (request.teaMaker)
+            {
+                advertises = advertises.Where(a => a.TeaMaker == true);
+            }
+            if (request.pets)
+            {
+                advertises = advertises.Where(a => a.Pets == true);
+            }
+            if (request.party)
+            {
+                advertises = advertises.Where(a => a.Party == true);
+            }
+            if (request.smoking)
+            {
+                advertises = advertises.Where(a => a.Smoking == true);
+            }
+            if (request.wcType != WCItems.Unset)
+            {
+                if (request.wcType == WCItems.EuropianAndPersian)
+                {
+                    advertises = advertises.Where(a => a.WC == WCItems.EuropianAndPersian);
+                }
+                else if (request.wcType == WCItems.Europian)
+                {
+                    advertises = advertises.Where(a => a.WC == WCItems.Europian || a.WC == WCItems.EuropianAndPersian);
+                }
+                else
+                {
+                    advertises = advertises.Where(a => a.WC == WCItems.Persian || a.WC == WCItems.EuropianAndPersian);
+                }
+            }
+            if (request.norouz)
+            {
+                advertises = advertises.Where(a => a.NowruzPrice > 0);
+            }
+            if (request.instantReserve)
+            {
+                advertises = advertises.Where(a => a.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent);
+            }
+            if (request.minPrice > 0 || request.maxPrice > 0)
+            {
+                advertises = advertiseFilter.FilterPrice(advertises, request.priceType,
+                    request.minPrice, request.maxPrice);
+            }
+            if ((string.IsNullOrEmpty(request.fromDate) == false &&
+                string.IsNullOrEmpty(request.toDate) == false) || request.emptyTonight)
+            {
+                if (request.emptyTonight)
+                {
+                    request.fromDate = DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date);
+                    request.toDate = DateTimeUtility.GregorianToPersianDate(DateTime.Now.AddDays(1).Date);
+                }
+                var from = StringUtility.PersianNumberToEnglish(request.fromDate).Replace("/", ",");
+                var to = StringUtility.PersianNumberToEnglish(request.toDate).Replace("/", ",");
+                var range = DateTimeUtility.PersianDateRangeToList(from, to, true, false)
+                    .Select(s => DateTimeUtility.PersianDateToGregorian(s)).ToList();
+                advertises = advertises.Where(w => w.OccupiedTables.Any(a => range.Select(s => s).Contains(a.Date)) == false);
+            }
+
+            IOrderedQueryable<Advertise> orderedAdvertiseList = advertises.OrderBy(x => true);
+            if (request.emptyTonight)
+            {
+                orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(x => x.EmptyTonight);
+            }
+            if (request.residencyType != AdvertiseType.None && request.residencyType != AdvertiseType.All)
+            {
+                orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(x => x.TypeID == request.residencyType);
+            }
+            if (request.capacity > 0)
+            {
+                orderedAdvertiseList = orderedAdvertiseList.ThenBy(x => x.Capacity);
+            }
+            if (request.instantReserve)
+            {
+                orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(x => 
+                    x.InstantReserveStatus == InstantReserveStatusEnum.Permanent ||
+                    x.InstantReserveDates.Any(a => a.Date == DateTime.Now.Date));
+            }
+            switch (request.sort)
+            {
+                case SortOrder.MoreExpensive:
+                    switch (request.priceType)
+                    {
+                        case priceRangeTypes.Holiday:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.HolidayPrice);
+                            break;
+                        case priceRangeTypes.HolidayPeak:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.PeakHolidayPrice);
+                            break;
+                        case priceRangeTypes.Monthly:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.MonthlyPrice);
+                            break;
+                        case priceRangeTypes.Norouz:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.NowruzPrice);
+                            break;
+                        default:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.BasePrice);
+                            break;
+                    }
+                    break;
+                case SortOrder.Cheaper:
+                    switch (request.priceType)
+                    {
+                        case priceRangeTypes.Holiday:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenBy(a => a.HolidayPrice);
+                            break;
+                        case priceRangeTypes.HolidayPeak:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenBy(a => a.PeakHolidayPrice);
+                            break;
+                        case priceRangeTypes.Monthly:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenBy(a => a.MonthlyPrice);
+                            break;
+                        case priceRangeTypes.Norouz:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenBy(a => a.NowruzPrice);
+                            break;
+                        default:
+                            orderedAdvertiseList = orderedAdvertiseList.ThenBy(a => a.BasePrice);
+                            break;
+                    }
+                    break;
+                case SortOrder.UserRate:
+                    orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.AverageUsersScore);
+                    break;
+                case SortOrder.Clean:
+                    orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.CleaningScore);
+                    break;
+                default:
+                    orderedAdvertiseList = orderedAdvertiseList.ThenByDescending(a => a.ResidenceScore);
+                    break;
+            }
+
+            var pagedList = orderedAdvertiseList.ToPagedList(request.page, request.pageItemCount);
+            var user = Repository.Find<User, int>(request.userId);
+
+            AdvertiseListResponse response = new AdvertiseListResponse()
+            {
+                pagingInfo = pagedList.PagingInfo,
+                categoryTitle = AdvertiseSeoLocalization.GetTitle(category.MostAccType, (int)category.Type,
+                    category.Province == null ? "" : category.RegionProvince.PersianName,
+                    category.City == null ? "" : category.RegionCity.PersianName,
+                    category.Area == null ? "" : category.RegionArea.PersianName,
+                    Region.GetCountryDirectionString(category.CountryDirection))
+            };
+            foreach (var item in pagedList.List)
+            {
+                var itemResponse = (AdvertiseListItemResponse)item;
+                itemResponse.favourited = user?.Favorite.Any(x => x.AdvertiseID == item.Id) ?? false;
+                response.advertiseList.Add(itemResponse);
+            }
+            return response;
+        }
+
+        public IList<Advertise> Filter(string id)
+        {
+            return Repository.Query(q => q.Where(x => x.Id.ToString().Contains(id) &&
+                x.Status == AdvertiseStatus.Published && x.Active)).OrderByDescending(x => x.AmlakbashiScore).Take(5).ToList();
+        }
+
         public IList<Advertise> GetAdvertisesByUserId(int userId, bool includeCommentsAndReports = false)
         {
             if (includeCommentsAndReports)
             {
                 return Repository.Query(q => q.Include(i => i.Parent).Include(i => i.Comments).Include(i => i.ReportItems)
-                    .Where(w => w.UserID == userId && w.Comments.Any(a => a.Status == Comment.CommentStatus.publish)).ToList());
+                    .Where(w => w.UserId == userId && w.Comments.Any(a => a.Status == Comment.CommentStatus.publish)).ToList());
             }
-            return Repository.Query(q => q.Where(w => w.UserID == userId).ToList());
-        }
-
-        public IList<Advertise> GetNotChildAdvertisesByUserId(int userId)
-        {
-            return Repository.Query(q => q.Include(i => i.Childs).Where(w =>
-                w.Status != AdvertiseStatus.Deleted &&
-                w.Status != AdvertiseStatus.NotCompleted &&
-                w.UserID == userId && w.Mode != AdvertiseMode.Child).ToList());
+            return Repository.Query(q => q.Where(w => w.UserId == userId).ToList());
         }
 
         public IList<long> GetAdvertiseIdsByUserId(int userId)
         {
-            return Repository.Query(q => q.Where(w => w.UserID == userId).Select(s => s.Id).ToList());
+            return Repository.Query(q => q.Where(w => w.UserId == userId).Select(s => s.Id).ToList());
         }
 
         public IList<Advertise> GetAdvertisesByStatus(AdvertiseStatus status, bool haveSlug = false)
@@ -81,15 +298,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (haveSlug)
             {
                 return Repository.Query(q => q.Where(a => a.Status == AdvertiseStatus.Published &&
-                    !string.IsNullOrEmpty(a.Slug) && a.Province > 0).ToList());
+                    !string.IsNullOrEmpty(a.Slug) && a.ProvinceId > 0).ToList());
             }
             return Repository.Query(q => q.Where(w => w.Status == status).ToList());
-        }
-
-        public IList<Advertise> GetInstantReserveAdvertisesByUserId(int userId, InstantReserveStatusEnum instantStatus)
-        {
-            return Repository.Query(q => q.Where(x => x.UserID == userId &&
-                  x.InstantReserveStatus == instantStatus).ToList());
         }
 
         public IList<Advertise> GetAccListByIds(IList<long> ids, AdvertiseStatus status = AdvertiseStatus.Unset)
@@ -105,23 +316,43 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             if (beInstantReserve)
             {
-                return Repository.Query(q => q.Where(w => w.InstantReserveStatus == InstantReserveStatusEnum.Confirmed)
-                    .OrderByDescending(o => o.AverageUserRating).Take(count)).ToList();
+                return Repository.Query(q => q.Where(w => w.InstantReserveStatus == InstantReserveStatusEnum.Permanent)
+                    .OrderByDescending(o => o.AverageUsersScore).Take(count)).ToList();
             }
-            return Repository.Query(q => q.OrderByDescending(o => o.AverageUserRating).Take(count)).ToList();
+            return Repository.Query(q => q.OrderByDescending(o => o.AverageUsersScore).Take(count)).ToList();
         }
 
         public List<string> GetAdvertiseTags(Advertise advertise)
         {
             var tags = new List<string>();
-            tags.Add(AdvertiseMainLocalization.GetAdvertiseTypeUserString(advertise.TypeID));
-            if (advertise.Room > 0)
+            tags.Add(AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(advertise.TypeID));
+            if (advertise.RoomCount > 0)
             {
-                tags.Add($"{advertise.Room} خوابه");
+                tags.Add($"{advertise.RoomCount} خوابه");
             }
             tags.Add(advertise.RegionCity.PersianName);
             tags.Add(advertise.RegionProvince.PersianName);
             return tags;
+        }
+
+        public AdvertiseListResponse GetUserFavoriteAdvertises(int userId, int page = 1, int pageItemCount = 20)
+        {
+            var user = Repository.Find<User, int>(userId);
+            var pagedIdList = user.Favorite.OrderByDescending(x => x.SetDate)
+                .Select(x => x.AdvertiseID).ToPagedList(page, pageItemCount);
+            var advertises = GetAccListByIds(pagedIdList.List);
+            var response = new AdvertiseListResponse()
+            {
+                pagingInfo = pagedIdList.PagingInfo,
+                categoryTitle = "علاقه مندی ها"
+            };
+            foreach (var item in advertises)
+            {
+                var itemResponse = (AdvertiseListItemResponse)item;
+                itemResponse.favourited = true;
+                response.advertiseList.Add(itemResponse);
+            }
+            return response;
         }
 
         public void AddSupporterInfo(long id, string text, User supporter)
@@ -141,12 +372,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             return Repository.Query(q => q.FirstOrDefault(f => f.Id == id &&
             f.Status != AdvertiseStatus.Deleted));
-        }
-
-        public Advertise Find(long id, int statusLowerThan)
-        {
-            return Repository.Query(q => q.FirstOrDefault(f => f.Id == id && (int)f.Status < statusLowerThan &&
-                f.Count == 0));
         }
 
         public Advertise FindIncludingDeleted(long id)
@@ -194,7 +419,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public void FilterNew(AdvertiseIndexDTO dto)
         {
             IQueryable<Advertise> model = Repository.Query(q => q);
-            model = model.Where(w => w.Mode != AdvertiseMode.Child);
             if (dto.Status != AdvertiseStatus.Unset)
             {
                 model = model.Where(a => a.Status == dto.Status);
@@ -205,11 +429,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             if (dto.Id > 0)
             {
-                model = model.Where(w => w.Id == dto.Id || w.Childs.Any(x => x.Id == dto.Id));
+                model = model.Where(w => w.Id == dto.Id);
             }
             if (dto.UserId != -1)
             {
-                model = model.Where(w => w.UserID == dto.UserId);
+                model = model.Where(w => w.UserId == dto.UserId);
             }
             if (dto.Type != Advertise.AdvertiseType.All)
             {
@@ -220,28 +444,32 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 var st = (Advertise.HygieneProtocolStatus)dto.HygieneProtocolStatus;
                 model = model.Where(w => w.HygieneProtocol == st);
             }
-            if (dto.InstatntReserveStatus > -1)
+            if (dto.InstantReserveStatus > -1)
             {
-                model = model.Where(x => x.InstantReserveStatus == (Advertise.InstantReserveStatusEnum)dto.InstatntReserveStatus);
+                model = model.Where(x => x.InstantReserveStatus == (Advertise.InstantReserveStatusEnum)dto.InstantReserveStatus);
+            }
+            if (dto.VideoStatus > -1)
+            {
+                model = model.Where(x => x.VideoStatus == (Advertise.VideoStatusEnum)dto.VideoStatus);
             }
             if (string.IsNullOrEmpty(dto.MinReserveNorouzFromDate) == false)
             {
                 var gregorianDate = DateTimeUtility.PersianDateToGregorian(
                         StringUtility.PersianNumberToEnglish(dto.MinReserveNorouzFromDate).Replace('/', ','));
                 var minReserveNorouzDateUnix = DateTimeUtility.DateValueOfJS(gregorianDate);
-                model = model.Where(x => x.unixNorouzMinRequestDate >= minReserveNorouzDateUnix);
+                model = model.Where(x => x.MinReserveDateForNowruz >= minReserveNorouzDateUnix);
             }
             if (dto.Area > -1)
             {
-                model = model.Where(x => x.Area == dto.Area);
+                model = model.Where(x => x.AreaId == dto.Area);
             }
             else if (dto.City > -1)
             {
-                model = model.Where(x => x.City == dto.City);
+                model = model.Where(x => x.CityId == dto.City);
             }
             else if (dto.Province > -1)
             {
-                model = model.Where(x => x.Province == dto.Province);
+                model = model.Where(x => x.ProvinceId == dto.Province);
             }
             if (dto.ImageCountMin > 0)
             {
@@ -259,14 +487,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 model = model.Where(x => x.License == dto.License);
             }
-            if (dto.Sort == "contact")
-                model = model.OrderByDescending(a => a.ContactClick).ThenByDescending(a => a.WebVisit);
-            else if (dto.Sort == "modify")
-                model = model.OrderByDescending(a => a.LastModifyDate).ThenByDescending(a => a.CreateDate);
-            else if (dto.Sort == "click")
-                model = model.OrderByDescending(a => a.WebVisit).ThenByDescending(a => a.ContactClick);
+            if (dto.Sort == "modify")
+                model = model.OrderByDescending(a => a.LastModifiedDate).ThenByDescending(a => a.CreateDate);
+            else if (dto.Sort == "view")
+                model = model.OrderByDescending(a => a.View);
             else if (dto.Sort == "score")
-                model = model.OrderByDescending(a => a.AdvertiseScore);
+                model = model.OrderByDescending(a => a.ResidenceScore);
             else
                 model = model.OrderByDescending(a => a.CreateDate);
 
@@ -295,7 +521,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             model = model.Where(w => w.Mode != AdvertiseMode.Child);
             model = model.Where(w => w.Status != AdvertiseStatus.Deleted);
             if (userid != -1)
-                model = model.Where(w => w.UserID == userid);
+                model = model.Where(w => w.UserId == userid);
             if (statusString != null)
             {
                 switch (statusString)
@@ -324,22 +550,22 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public IList<Advertise> FilterAdmin(int province = 0, int city = 0,
             int area = 0, int adtype = 0, bool defaultProvince = false, int adStatus = -1)
         {
-            IQueryable<Advertise> query = Repository.Query(q => q.Where(x => x.UserID > 0));
+            IQueryable<Advertise> query = Repository.Query(q => q.Where(x => x.UserId > 0));
             if (defaultProvince)
             {
-                query = query.Where(x => x.Province == province);
+                query = query.Where(x => x.ProvinceId == province);
             }
             if (area > 0)
             {
-                query = query.Where(x => x.Area == area);
+                query = query.Where(x => x.AreaId == area);
             }
             else if (city > 0)
             {
-                query = query.Where(x => x.City == city);
+                query = query.Where(x => x.CityId == city);
             }
             else if (province > 0)
             {
-                query = query.Where(x => x.Province == province);
+                query = query.Where(x => x.ProvinceId == province);
             }
 
             if (adtype > 0)
@@ -357,7 +583,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public IList<Advertise> FilterAdmin(int province, int city, int area, int adtype,
             DateTime fromDate, DateTime toDate, int userId)
         {
-            IQueryable<Advertise> query = Repository.Query(q => q.Where(x => x.UserID > 0));
+            IQueryable<Advertise> query = Repository.Query(q => q.Where(x => x.UserId > 0));
             if (fromDate != null && toDate != null)
             {
                 query = query.Where(x => x.CreateDate >= fromDate && x.CreateDate <= toDate);
@@ -365,15 +591,15 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
             if (area > 0)
             {
-                query = query.Where(x => x.Area == area);
+                query = query.Where(x => x.AreaId == area);
             }
             else if (city > 0)
             {
-                query = query.Where(x => x.City == city);
+                query = query.Where(x => x.CityId == city);
             }
             else if (province > 0)
             {
-                query = query.Where(x => x.Province == province);
+                query = query.Where(x => x.ProvinceId == province);
             }
 
             if (adtype > 0 && adtype != (int)Advertise.AdvertiseType.All)
@@ -382,46 +608,52 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
 
             if (userId > 0)
-                query = query.Where(x => x.UserID == userId);
+                query = query.Where(x => x.UserId == userId);
 
             return query.ToList();
         }
 
-        public void Edit(Advertise editedAd)
+        public void Edit(Advertise editedAd, int adminId)
         {
-            var advertise = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedAd.Id));
+            var advertise = Repository.Find(editedAd.Id);
+            var shallowAdvertise = advertise.ShallowCopy();
+
             advertise.Title = editedAd.Title;
             advertise.MetaTitle = editedAd.MetaTitle;
             advertise.MetaDescription = editedAd.MetaDescription;
             advertise.Slug = editedAd.Slug;
-            advertise.UserID = editedAd.UserID;
+            advertise.UserId = editedAd.UserId;
             if (advertise.Childs != null && advertise.Childs.Any())
             {
                 foreach (var child in advertise.Childs)
                 {
-                    child.UserID = editedAd.UserID;
+                    child.UserId = editedAd.UserId;
                 }
             }
-            advertise.Overview = editedAd.Overview;
-            advertise.WebVisit = editedAd.WebVisit;
-            advertise.ContactClick = editedAd.ContactClick;
+            advertise.View = editedAd.View;
             if (advertise.AmlakbashiScore != editedAd.AmlakbashiScore)
             {
-                advertise.AdvertiseScore += (editedAd.AmlakbashiScore - advertise.AmlakbashiScore);
+                advertise.ResidenceScore += (editedAd.AmlakbashiScore - advertise.AmlakbashiScore);
                 advertise.AmlakbashiScore = editedAd.AmlakbashiScore;
             }
             advertise.Description = editedAd.Description;
+            advertise.LastModifiedDate = DateTime.Now;
+            advertise.MinReserveDuration = editedAd.MinReserveDuration;
+            advertise.MaxReserveDuration = editedAd.MaxReserveDuration;
             Repository.Update(advertise);
             Repository.Save();
+            mediator.Publish(new AdvertiseUpdateEvent(shallowAdvertise, advertise,
+                ActionLog.ActionSourceEnum.AdminPanel, adminId));
+            mediator.Publish(new ChangeStayDurationEvent(advertise.Id));
             mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
             mediator.Send(new RemoveCategoryItemCacheCommand(advertise.Id));
         }
 
         public void UpdateAccView(long accId)
         {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == accId));
-            acc.WebVisit += 1;
-            acc.Overview += 1;
+            var acc = Repository.Find(accId);
+            acc.View += 1;
+            //acc.Overview += 1;
             Repository.Update(acc);
             Repository.Save();
         }
@@ -433,7 +665,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var director = new AdvertiseDirector(acc, DirectorType.AdvertisePage);
             var hotelTypes = GetHotelTypes();
             childrenDirectors = new Dictionary<AdvertiseType, IList<AdvertiseDirector>>();
-            foreach (var item in acc.Childs.Where(w => w.Available == true))
+            foreach (var item in acc.Childs.Where(w => w.Active == true))
             {
                 var childDirector = new AdvertiseDirector(item, DirectorType.AdvertisePageChild);
                 var key = hotelTypes.Contains(childDirector.AdvertiseType) ? AdvertiseType.Hotel : childDirector.AdvertiseType;
@@ -449,6 +681,279 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return director;
         }
 
+        public async Task<ServiceResult<long>> CreateAsync(AdvertisePostCreateRequest request)
+        {
+            var serviceResult = new ServiceResult<long>();
+            Advertise residence = new Advertise()
+            {
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Status = AdvertiseStatus.NotCompleted,
+                UserId = request.userId,
+                Active = true,
+                TypeID = request.type,
+                LocationType = request.locationType,
+                Mode = Advertise.GetModeByType(request.type),
+                Floor = FloorItems.Unset,
+            };
+            Insert(residence);
+            await mediator.Publish(new CreateAdvertiseBasicEvent(residence.Id, request.userId));
+            serviceResult.Result = residence.Id;
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult<long>> UpdateBasicInfoAsync(AdvertisePostBasicInfoRequest request)
+        {
+            var serviceResult = new ServiceResult<long>();
+            var residence = Repository.Find(request.residenceId);
+            if (residence == null || request.userId != residence.UserId)
+            {
+                serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            residence.LocationType = request.locationType;
+            Repository.Update(residence);
+            Repository.Save();
+            await mediator.Publish(new ChangeAdvertisePositionEvent(residence.Id));
+            serviceResult.Result = residence.Id;
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> UpdateGeneralInfoAsync(AdvertisePostGeneralInfoRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var residence = Repository.Find(request.residenceId);
+            if (residence == null || residence.UserId != request.userId)
+            {
+                serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            if (request.mainPhotoId > 0 && residence.Photos.Any(x => x.Id == request.mainPhotoId) == false)
+            {
+                serviceResult.AddError("main image id is incorrect");
+                return serviceResult;
+            }
+            var shallowAdvertise = residence.ShallowCopy();
+            residence.ProvinceId = request.provinceId;
+            residence.CityId = request.cityId;
+            if (request.areaId > 0)
+            {
+                residence.AreaId = request.areaId;
+            }
+            else
+            {
+                residence.AreaId = null;
+            }
+            residence.Address = request.address;
+            residence.Title = request.title;
+            residence.Description = request.description;
+            residence.Longitude = request.longitude;
+            residence.Latitude = request.latitude;
+            residence.LastModifiedDate = DateTime.Now;
+            residence.MainPhotoId = request.mainPhotoId > 0 ? request.mainPhotoId : residence.MainPhotoId;
+            residence.UpdateStatusAfterChangeInfo(HasImportantChangeOnUpdate(shallowAdvertise, residence));
+            Repository.Update(residence);
+            Repository.Save();
+
+            if (residence.Status != shallowAdvertise.Status)
+            {
+                await mediator.Publish(new ChangeAdvertiseStatusEvent(residence.Id, shallowAdvertise.Status));
+                await mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAdvertise, residence));
+            }
+            await mediator.Publish(new CreateAdvertiseGeneralEvent(residence.Id));
+            await mediator.Publish(new ChangeAdvertiseAddressEvent(shallowAdvertise, residence));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> UpdateSupplementaryInfoAsync(AdvertisePostSupplementaryInfoRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var residence = Repository.Find(request.residenceId);
+            if (residence == null || residence.UserId != request.userId)
+            {
+                serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            if (request.license && residence.LicenseFileId is null)
+            {
+                serviceResult.AddError("license file not exist");
+                return serviceResult;
+            }
+            var shallowAdvertise = residence.ShallowCopy();
+            PropertyCopier<AdvertisePostSupplementaryInfoRequest, Advertise>.CopyInsensetive(request, residence);
+            residence.LastModifiedDate = DateTime.Now;
+            residence.PoolFeatures = Advertise.GetPoolFeatureFlag(request.poolHotWater,
+                request.poolFiltration, request.poolOpen, request.poolCovered);
+            residence.UpdateStatusAfterChangeInfo(HasImportantChangeOnUpdate(shallowAdvertise, residence));
+            Repository.Update(residence);
+            Repository.Save();
+
+            if (shallowAdvertise.Status != residence.Status)
+            {
+                await mediator.Publish(new ChangeAdvertiseStatusEvent(residence.Id, shallowAdvertise.Status));
+                await mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAdvertise, residence));
+            }
+            if (residence.Mode == AdvertiseMode.Parent)
+            {
+                await mediator.Publish(new ChangeAdvertiseRulesEvent(residence.Id));
+            }
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> UpdateFinalInfoAsync(AdvertisePostFinalInfoRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var residence = Repository.Find(request.residenceId);
+            if (residence == null || residence.UserId != request.userId)
+            {
+                serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            var shallowAdvertise = residence.ShallowCopy();
+            PropertyCopier<AdvertisePostFinalInfoRequest, Advertise>.CopyInsensetive(request, residence);
+            if (residence.Status == AdvertiseStatus.NotCompleted)
+            {
+                residence.Status = AdvertiseStatus.FirstReady;
+            }
+            else
+            {
+                residence.UpdateStatusAfterChangeInfo(HasImportantChangeOnUpdate(shallowAdvertise, residence));
+            }
+            Repository.Update(residence);
+            Repository.Save();
+
+            if (shallowAdvertise.Status != residence.Status)
+            {
+                await mediator.Publish(new ChangeAdvertiseStatusEvent(residence.Id, shallowAdvertise.Status));
+                await mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAdvertise, residence));
+            }
+            await mediator.Publish(new ChangeAdvertisePriceEvent(residence.Id, residence.NowruzPrice != shallowAdvertise.NowruzPrice));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> CreateHotelRoomAsync(AdvertisePostHotelRoomInfoRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var parentResidence = Repository.Find(request.parentId);
+            if (parentResidence == null || parentResidence.UserId != request.userId)
+            {
+                serviceResult.AddError("parent advertise not found");
+                return serviceResult;
+            }
+            if (parentResidence.Mode != AdvertiseMode.Parent)
+            {
+                serviceResult.AddError("parent is incorrect");
+                return serviceResult;
+            }
+            var shallowParentResidence = parentResidence.ShallowCopy();
+            var unit = new Advertise()
+            {
+                UserId = parentResidence.UserId,
+                TypeID = parentResidence.TypeID,
+                Mode = AdvertiseMode.Child,
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Status = parentResidence.Status,
+                Capacity = request.capacity,
+                ExtraCapacity = request.extraCapacity,
+                Title = request.title,
+                Description = request.description,
+                DailyPrice = request.dailyPrice,
+                PeakHolidayPrice = request.peakHolidayPrice,
+                HolidayPrice = request.holidayPrice,
+                MonthlyPrice = request.monthlyPrice,
+                NowruzPrice = request.nowruzPrice,
+                ExtraCapacityPrice = request.extraCapacityPrice,
+                NowruzExtraCapacityPrice = request.nowruzExtraCapacityPrice,
+                BuildingArea = request.buildingArea,
+                RoomCount = request.count,
+                SingleBedCount = request.singleBedCount,
+                DoubleBedCount = request.doubleBedCount,
+                BlanketAndMattressCount = request.blanketAndMattressCount,
+                ExtraBlanketCount = request.extraBlanketCount
+            };
+            parentResidence.Childs.Add(unit);
+            if (parentResidence.Status == AdvertiseStatus.NotCompleted)
+            {
+                parentResidence.Status = AdvertiseStatus.FirstReady;
+            }
+            else
+            {
+                parentResidence.UpdateStatusAfterChangeInfo(true);
+            }
+            Repository.Update(parentResidence);
+            Repository.Save();
+
+            if (parentResidence.Status != shallowParentResidence.Status)
+            {
+                await mediator.Publish(new ChangeAdvertiseStatusEvent(parentResidence.Id, shallowParentResidence.Status));
+                await mediator.Publish(new ChangeAdvertiseActiveEvent(shallowParentResidence, parentResidence));
+            }
+            await mediator.Publish(new AddHotelChildEvent(unit.Id, (long)unit.ParentId));
+            await mediator.Publish(new ChangeAdvertisePriceEvent(unit.Id, false));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(parentResidence.Id));
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> UpdateHotelRoomInfoAsync(AdvertisePostHotelRoomInfoRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var residence = Repository.Find(request.unitId);
+            if (residence == null || residence.Mode != AdvertiseMode.Child)
+            {
+                serviceResult.AddError("advertise not found");
+                return serviceResult;
+            }
+            var shallowAdvertise = residence.ShallowCopy();
+            var shallowParentAdvertise = residence.Parent.ShallowCopy();
+            PropertyCopier<AdvertisePostHotelRoomInfoRequest, Advertise>.CopyInsensetive(request, residence);
+            residence.ExtraCapacity = request.extraCapacity;
+            residence.ExtraCapacityPrice = request.extraCapacityPrice;
+            residence.MonthlyPrice = request.monthlyPrice;
+            residence.NowruzExtraCapacityPrice = request.nowruzExtraCapacityPrice;
+            residence.RoomCount = request.count;
+            residence.SingleBedCount = request.singleBedCount;
+            residence.DoubleBedCount = request.doubleBedCount;
+            residence.BlanketAndMattressCount = request.blanketAndMattressCount;
+            residence.Parent.UpdateStatusAfterChangeInfo(true);
+            Repository.Update(residence);
+            Repository.Save();
+
+            if (shallowAdvertise.Status != residence.Status)
+            {
+                await mediator.Publish(new ChangeAdvertiseStatusEvent(residence.ParentId.Value, shallowParentAdvertise.Status));
+                await mediator.Publish(new ChangeAdvertiseActiveEvent(shallowParentAdvertise, residence.Parent));
+            }
+            await mediator.Publish(new ChangeAdvertisePriceEvent(residence.Id, residence.NowruzPrice != shallowAdvertise.NowruzPrice));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residence.ParentId.Value));
+            return serviceResult;
+        }
+
+        private bool HasImportantChangeOnUpdate(Advertise residence, Advertise updatedResidence)
+        {
+            if (residence.Title != updatedResidence.Title ||
+                residence.Description != updatedResidence.Description ||
+                residence.ProvinceId != updatedResidence.ProvinceId ||
+                residence.CityId != updatedResidence.CityId ||
+                residence.AreaId != updatedResidence.AreaId ||
+                residence.Address != updatedResidence.Address ||
+                residence.TypeID != updatedResidence.TypeID ||
+                residence.License != updatedResidence.License ||
+                residence.LicenseNumber != updatedResidence.LicenseNumber ||
+                residence.OwnershipType != updatedResidence.OwnershipType ||
+                residence.AlbumPhoto != updatedResidence.AlbumPhoto ||
+                residence.LocationType != updatedResidence.LocationType ||
+                residence.RequiredEvidence != updatedResidence.RequiredEvidence ||
+                residence.OtherRules != updatedResidence.OtherRules)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public AdvertiseDirector GetBasicForm(long id, out bool isEdit, out int level)
         {
             Advertise acc = null;
@@ -456,7 +961,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (id > 0)
             {
                 acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-                level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : (acc.OwnershipType < 1 ? 3 : 4));
+                level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : ((int)acc.OwnershipType < 1 ? 3 : 4));
             }
             isEdit = acc != null && !(acc.Status == AdvertiseStatus.NotCompleted || acc.Status == AdvertiseStatus.Unset);
             if (acc == null)
@@ -472,12 +977,12 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             out List<string> groupErrors, out int level)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
-            data.LastModifyDate = DateTime.Now;
+            data.LastModifiedDate = DateTime.Now;
             level = 1;
 
             if (data.Id > 0)
             {
-                level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : (acc.OwnershipType < 1 ? 3 : 4));
+                level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : ((int)acc.OwnershipType < 1 ? 3 : 4));
                 switch (data.TypeID)
                 {
                     case AdvertiseType.Hotel:
@@ -497,8 +1002,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var director = new AdvertiseDirector(data, DirectorType.Basic);
             data.Status = AdvertiseStatus.NotCompleted;
             data.CreateDate = DateTime.Now;
-            data.UserID = userId;
-            data.Available = true;
+            data.UserId = userId;
+            data.Active = true;
             data.Floor = FloorItems.Unset;
             switch (data.TypeID)
             {
@@ -533,7 +1038,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     director.Submit(ref acc);
                     Repository.Update(acc);
                     Repository.Save();
-                    if (data.Position != acc.Position)
+                    if (data.LocationType != acc.LocationType)
                     {
                         mediator.Publish(new ChangeAdvertisePositionEvent(data.Id));
                     }
@@ -552,7 +1057,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
             isEdit = acc != null && !(acc.Status == AdvertiseStatus.NotCompleted || acc.Status == AdvertiseStatus.Unset);
-            level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : (acc.OwnershipType < 1 ? 3 : 4));
+            level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : ((int)acc.OwnershipType < 1 ? 3 : 4));
             var director = new AdvertiseDirector(acc, DirectorType.General);
             return director;
         }
@@ -567,7 +1072,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             data.MetaTitle = acc.MetaTitle;
             data.Slug = acc.Slug;
             data.Mode = acc.Mode;
-            level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : (acc.OwnershipType < 1 ? 3 : 4));
+            level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : ((int)acc.OwnershipType < 1 ? 3 : 4));
             var director = new AdvertiseDirector(data, DirectorType.General);
             if (director.Validate(out errors, out groupErrors) == false)
                 return director;
@@ -585,7 +1090,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var removedPhotoIds = new List<long>();
             var photoPart = director.GetAdvertisePart<PhotoPart>();
             var photoIds = photoPart.AlbumPhotosArray;
-            if (!acc.Photos.Select(s => s.Id).SequenceEqual(photoIds) || acc.PhotoID != photoPart.PhotoID)
+            if (!acc.Photos.Select(s => s.Id).SequenceEqual(photoIds) || acc.MainPhotoId != photoPart.MainPhotoId)
             {
                 if (photoIds != null && photoIds.Count() > 0)
                 {
@@ -622,7 +1127,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 }
                 mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
             }
-            acc.LastModifyDate = DateTime.Now;
+            acc.LastModifiedDate = DateTime.Now;
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id));
@@ -632,7 +1137,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 mediator.Send(new RemovePhotosByFileIdsCommand(acc.Id, removedPhotoIds)).Wait();
             }
             mediator.Send(new RenameAdvertisePhotosCommand(acc.Id)).Wait();
-            mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID,
+            mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.MainPhotoId,
                     acc.Photos.Select(s => s.Id).ToList())).Wait();
             return director;
         }
@@ -641,7 +1146,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
             isEdit = acc != null && !(acc.Status == AdvertiseStatus.NotCompleted || acc.Status == AdvertiseStatus.Unset);
-            level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : (acc.OwnershipType < 1 ? 3 : 4));
+            level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : ((int)acc.OwnershipType < 1 ? 3 : 4));
             var director = new AdvertiseDirector(acc, DirectorType.Extra);
             return director;
         }
@@ -653,7 +1158,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var oldAcc = acc.ShallowCopy();
             data.Mode = acc.Mode;
             data.TypeID = acc.TypeID;
-            level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : (acc.OwnershipType < 1 ? 3 : 4));
+            level = acc.Status != AdvertiseStatus.NotCompleted ? 4 : acc.TypeID == AdvertiseType.None ? 1 : (string.IsNullOrEmpty(acc.Title) ? 2 : ((int)acc.OwnershipType < 1 ? 3 : 4));
             bool hasImportantChange = false;
             var director = new AdvertiseDirector(data, DirectorType.Extra);
 
@@ -691,7 +1196,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             long? licenseFileId = null;
             if (uploadedLicenseFile != null)
             {
-                licenseFileId = mediator.Send(new UpdateAdvertiseLicenseFileCommand(uploadedLicenseFile, data.Id, acc.UserID, data.LicenseFileId)).Result;
+                licenseFileId = mediator.Send(new UpdateAdvertiseLicenseFileCommand(uploadedLicenseFile, data.Id, acc.UserId, data.LicenseFileId)).Result;
                 hasImportantChange = true;
             }
             director.Submit(ref acc);
@@ -739,20 +1244,15 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     mediator.Publish(new ChangeAdvertiseActiveEvent(oldAcc, acc));
                 }
             }
-            acc.LastModifyDate = DateTime.Now;
+            acc.LastModifiedDate = DateTime.Now;
             Repository.Update(acc);
             Repository.Save();
-            mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id, acc.NorouzPrice != oldAcc.NorouzPrice));
+            mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id, acc.NowruzPrice != oldAcc.NowruzPrice));
             if (acc.Mode == AdvertiseMode.Parent)
             {
                 mediator.Publish(new ChangeAdvertiseRulesEvent(acc.Id));
             }
             return director;
-        }
-
-        private void UpdateLicenseFile(IFormFile licenseFile, long advertiseId)
-        {
-
         }
 
         public AdvertiseDirector GetHotelForm(long id, long parentId, out bool isEdit)
@@ -768,7 +1268,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     parent.Childs.FirstOrDefault().ShallowCopy() : new Advertise();
                 hotel.TypeID = parent.TypeID;
                 hotel.Title = null;
-                hotel.Count = 0;
+                hotel.UnitCount = 0;
             }
             var director = new AdvertiseDirector(hotel, DirectorType.HotelUnit);
             return director;
@@ -790,8 +1290,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     var child = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
                     var oldChild = child.ShallowCopy();
                     director.Submit(ref child);
-                    changeNorouzPrice = child.NorouzPrice != oldChild.NorouzPrice;
-                    child.LastModifyDate = DateTime.Now;
+                    changeNorouzPrice = child.NowruzPrice != oldChild.NowruzPrice;
+                    child.LastModifiedDate = DateTime.Now;
                     Repository.Update(child);
                     if (parent.Status == AdvertiseStatus.NotCompleted || parent.Status == AdvertiseStatus.FirstReady)
                     {
@@ -818,8 +1318,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 else
                 {
                     data.CreateDate = DateTime.Now;
-                    data.LastModifyDate = DateTime.Now;
-                    data.UserID = userId;
+                    data.LastModifiedDate = DateTime.Now;
+                    data.UserId = userId;
                     if (parent.Status == AdvertiseStatus.NotCompleted || parent.Status == AdvertiseStatus.FirstReady)
                     {
                         if (save)
@@ -895,7 +1395,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     var child = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
                     var oldChild = child.ShallowCopy();
                     director.Submit(ref child);
-                    changeNorouzPrice = child.NorouzPrice != oldChild.NorouzPrice;
+                    changeNorouzPrice = child.NowruzPrice != oldChild.NowruzPrice;
                     var removedPhotoIds = new List<long>();
                     var photoPart = director.GetAdvertisePart<PhotoPart>();
                     var photoIds = photoPart.AlbumPhotosArray;
@@ -917,7 +1417,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                             child.Photos.Clear();
                         }
                     }
-                    child.LastModifyDate = DateTime.Now;
+                    child.LastModifiedDate = DateTime.Now;
                     Repository.Update(child);
                     if (parent.Status == AdvertiseStatus.NotCompleted || parent.Status == AdvertiseStatus.FirstReady)
                     {
@@ -948,18 +1448,18 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                             mediator.Send(new RemovePhotosByFileIdsCommand(child.Id, removedPhotoIds)).Wait();
                         }
                         mediator.Send(new RenameAdvertisePhotosCommand(child.Id)).Wait();
-                        mediator.Send(new GenerateThumbImageCommand(child.Id, child.PhotoID,
+                        mediator.Send(new GenerateThumbImageCommand(child.Id, child.MainPhotoId,
                             child.Photos.Select(s => s.Id).ToList())).Wait();
                     }
                 }
                 else
                 {
                     data.CreateDate = DateTime.Now;
-                    data.LastModifyDate = DateTime.Now;
-                    data.UserID = userId;
-                    data.Province = parent.Province;
-                    data.City = parent.City;
-                    data.Area = parent.Area;
+                    data.LastModifiedDate = DateTime.Now;
+                    data.UserId = userId;
+                    data.ProvinceId = parent.ProvinceId;
+                    data.CityId = parent.CityId;
+                    data.AreaId = parent.AreaId;
                     var photoIds = director.GetAdvertisePart<PhotoPart>().AlbumPhotosArray;
                     if (photoIds != null && photoIds.Count() > 0)
                     {
@@ -1001,7 +1501,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     if (photoIds != null && photoIds.Count() > 0)
                     {
                         mediator.Send(new RenameAdvertisePhotosCommand(data.Id)).Wait();
-                        mediator.Send(new GenerateThumbImageCommand(data.Id, data.PhotoID,
+                        mediator.Send(new GenerateThumbImageCommand(data.Id, data.MainPhotoId,
                             data.Photos.Select(s => s.Id).ToList())).Wait();
                     }
                     mediator.Publish(new AddComplexChildEvent(data.Id, (long)data.ParentId));
@@ -1118,7 +1618,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             long? licenseFileId = null;
             if (uploadedLicenseFile != null)
             {
-                licenseFileId = mediator.Send(new UpdateAdvertiseLicenseFileCommand(uploadedLicenseFile, data.Id, data.UserID, data.LicenseFileId)).Result;
+                licenseFileId = mediator.Send(new UpdateAdvertiseLicenseFileCommand(uploadedLicenseFile, data.Id, data.UserId, data.LicenseFileId)).Result;
             }
             director.Submit(ref acc);
             if (licenseFileId != null)
@@ -1153,7 +1653,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                         mediator.Send(new RemovePhotosByFileIdsCommand(acc.Id, removedPhotoIds)).Wait();
                     }
                     mediator.Send(new RenameAdvertisePhotosCommand(data.Id)).Wait();
-                    mediator.Send(new GenerateThumbImageCommand(data.Id, acc.PhotoID,
+                    mediator.Send(new GenerateThumbImageCommand(data.Id, acc.MainPhotoId,
                             acc.Photos.Select(s => s.Id).ToList())).Wait();
                 }
                 mediator.Publish(new CreateAdvertiseGeneralEvent(acc.Id, true));
@@ -1162,7 +1662,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (type == DirectorType.Extra || type == DirectorType.ComplexUnit ||
                 type == DirectorType.HotelUnit)
             {
-                mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id, acc.NorouzPrice != shallowData.NorouzPrice));
+                mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id, acc.NowruzPrice != shallowData.NowruzPrice));
             }
 
             Repository.Update(acc);
@@ -1191,6 +1691,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return childsDic;
         }
 
+        public Advertise Insert(Advertise advertise)
+        {
+            Repository.Insert(advertise);
+            Repository.Save();
+            return advertise;
+        }
+
         public IDictionary<string, DatePriceDTO> GetAccPriceDatesInfo(long id)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
@@ -1205,10 +1712,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
             var prevAcc = acc.ShallowCopy();
-            acc.unixNorouzMinRequestDate = dateUnix;
+            acc.MinReserveDateForNowruz = dateUnix;
             foreach (var child in acc.Childs)
             {
-                child.unixNorouzMinRequestDate = dateUnix;
+                child.MinReserveDateForNowruz = dateUnix;
             }
             if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady && dateUnix > 0)
                 acc.Status = (int)AdvertiseStatus.ReadyToPublish;
@@ -1225,7 +1732,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
             var prevAcc = acc.ShallowCopy();
-            acc.Available = isAvailable;
+            acc.Active = isAvailable;
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
@@ -1257,28 +1764,39 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
-        public AdvertiseStatus ToggleSuspension(long id)
+        public async Task<ServiceResult<AdvertiseStatus>> UpdateActivity(long residenceId)
         {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            var prevAcc = acc.ShallowCopy();
-            if (acc.Status == AdvertiseStatus.Archived)
+            var serviceResult = new ServiceResult<AdvertiseStatus>();
+            var residence = await Repository.FindAsync(residenceId);
+            if (residence == null ||
+                (residence.Status == AdvertiseStatus.Published || residence.Status == AdvertiseStatus.Archived) == false)
             {
-                acc.Status = AdvertiseStatus.Published;
-                Repository.Update(acc);
-                Repository.Save();
-                mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
-                mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
+                serviceResult.AddError("آگهی اشتباه است");
+                return serviceResult;
             }
-            else if (acc.Status == AdvertiseStatus.Published)
-            {
-                acc.Status = AdvertiseStatus.Archived;
-                Repository.Update(acc);
-                Repository.Save();
-                mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
-                mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, acc));
-            }
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-            return acc.Status;
+
+            serviceResult.Result = await UpdateStatus(residence.Id,
+                residence.Status == AdvertiseStatus.Published ? AdvertiseStatus.Archived : AdvertiseStatus.Published);
+            return serviceResult;
+
+            //if (residence.Status == AdvertiseStatus.Archived)
+            //{
+            //    residence.Status = AdvertiseStatus.Published;
+            //    Repository.Update(residence);
+            //    Repository.Save();
+            //    mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
+            //    mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, residence));
+            //}
+            //else if (residence.Status == AdvertiseStatus.Published)
+            //{
+            //    residence.Status = AdvertiseStatus.Archived;
+            //    Repository.Update(residence);
+            //    Repository.Save();
+            //    mediator.Publish(new ChangeAdvertiseStatusEvent(id, prevAcc.Status));
+            //    mediator.Publish(new ChangeAdvertiseActiveEvent(prevAcc, residence));
+            //}
+            //mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            //return residence.Status;
         }
 
         public void NotVerify(long id, int currentUserId)
@@ -1312,7 +1830,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public void SetAsTodayEmpty(long id)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            acc.TodayIsEmpty = true;
+            acc.EmptyTonight = true;
             Repository.Update(acc);
             Repository.Save();
             mediator.Send(new RemoveCategoryItemCacheCommand(acc.Id));
@@ -1321,7 +1839,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public void UnsetTodayEmpty(long id)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            acc.TodayIsEmpty = false;
+            acc.EmptyTonight = false;
             Repository.Update(acc);
             Repository.Save();
             mediator.Send(new RemoveCategoryItemCacheCommand(acc.Id));
@@ -1339,148 +1857,36 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return result;
         }
 
-        public void RequestInstantReserve(long id,
-            bool ignoreMsg, int userId,
-            int doerUserId, ActionLog.ActionSourceEnum actionSource,
-            User.InstantReserveAccessEnum currInstantReserveAccess,
-            out bool needMsg)
+        public void SetStayDuration(long residenceId, int min, int max)
         {
-            using (var tran = new TransactionScope())
-            {
-                needMsg = false;
-                var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-                if (currInstantReserveAccess == User.InstantReserveAccessEnum.Verified)
-                {
-                    if (acc.InstantReserveStatus != InstantReserveStatusEnum.Confirmed)
-                    {
-                        acc.InstantReserveStatus = InstantReserveStatusEnum.Confirmed;
-                        Repository.Update(acc);
-                        Repository.Save();
-                        mediator.Publish(new ChangeInstantReserveStatusEvent(id, acc.UserID,
-                                acc.InstantReserveStatus, actionSource, doerUserId));
-                    }
-                }
-                else
-                {
-                    if (ignoreMsg || currInstantReserveAccess == User.InstantReserveAccessEnum.Requested)
-                    {
-                        var currInstantReserveStatus = acc.InstantReserveStatus;
-                        if (currInstantReserveStatus != InstantReserveStatusEnum.Requested)
-                        {
-                            acc.InstantReserveStatus = InstantReserveStatusEnum.Requested;
-                            Repository.Update(acc);
-                            Repository.Save();
-                            mediator.Publish(new ChangeInstantReserveStatusEvent(id, acc.UserID,
-                                acc.InstantReserveStatus, actionSource, doerUserId));
-                        }
-                    }
-                    else
-                    {
-                        needMsg = true;
-                    }
-                }
-                tran.Complete();
-            }
-        }
-
-        public void CancelInstantReserve(long id, int userId, int doerUserId,
-            ActionLog.ActionSourceEnum actionSource)
-        {
-            using (var tran = new TransactionScope())
-            {
-                var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-                acc.InstantReserveStatus = InstantReserveStatusEnum.None;
-                Repository.Update(acc);
-                Repository.Save();
-                mediator.Publish(new ChangeInstantReserveStatusEvent(id,
-                    userId, acc.InstantReserveStatus, actionSource, doerUserId));
-                tran.Complete();
-            }
-        }
-
-        public int GetInstantReserveCancelCount(int userId)
-        {
-            var advertises = Repository.Query(q => q.Where(x => x.UserID == userId));
-            return advertises == null || advertises.Any() == false ? 0 :
-                advertises.Sum(x => x.InstantReserveCancels);
-        }
-
-        public string GetInstantReserveBanReason(long id)
-        {
-            var allAccs = Repository.Query(q => q);
-            var acc = allAccs.FirstOrDefault(x => x.Id == id);
-            var accs = allAccs.Where(x => x.UserID == acc.UserID);
-            var countCancel = accs.Sum(x => x.InstantReserveCancels);
-            return "شما " + countCancel + " مورد لغو رزرو داشته اید و نمیتوانید از این امکان استفاده کنید.";
-        }
-
-        public void SetStayDuration(long id, int min, int max)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            acc.MinReserveDays = min;
-            acc.MaxReserveDays = max;
-            Repository.Update(acc);
+            var residence = Repository.Find(residenceId);
+            residence.MinReserveDuration = min;
+            residence.MaxReserveDuration = max;
+            Repository.Update(residence);
             Repository.Save();
-            mediator.Publish(new ChangeStayDurationEvent(id));
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
+            mediator.Publish(new ChangeStayDurationEvent(residenceId));
+            mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
         }
 
         public void SetNorouzPrice(long id, int norouzPrice, int overCapacityPrice = 0)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            acc.NorouzPrice = norouzPrice;
-            acc.NorouzOverCapacityPrice = overCapacityPrice;
+            acc.NowruzPrice = norouzPrice;
+            acc.NowruzExtraCapacityPrice = overCapacityPrice;
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new ChangeNorouzPriceEvent(id));
             mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
-        public PriceInputDTO GetPrices(long id)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            var director = new AdvertiseDirector(acc, DirectorType.AdvertisePage);
-            PriceInputDTO result = director.GetAdvertisePart<PricePart>();
-            return result;
-        }
-
-        public bool SetPrices(long id, PriceInputDTO prices, out Dictionary<string, string> errors)
-        {
-            string msg;
-            PricePart part = new PricePart();
-            PropertyCopier<PriceInputDTO, PricePart>.CopyInsensetive(prices, part);
-            part.HolidayPikePrice = prices.pikeHolidayPrice;
-            if (part.Validate(out errors, out msg) == false)
-                return false;
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            PropertyCopier<PricePart, Advertise>.Copy(part, acc);
-            Repository.Update(acc);
-            Repository.Save();
-            if (acc.Id > 0)
-            {
-                mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-                mediator.Publish(new ChangeAdvertisePriceEvent(acc.Id));
-            }
-            return true;
-        }
-
         public void SetMaxInstantReserveStart(long id, int maxInstantReserveStart)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            acc.MaxInstantReserveStart = maxInstantReserveStart;
+            acc.MaxInstantReserveStartTimeInterval = maxInstantReserveStart;
             Repository.Update(acc);
             Repository.Save();
             mediator.Publish(new ChangeMaxInstantReserveStartEvent(id));
             mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-        }
-
-        public void AddToAdvertiseVisit(long id)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            acc.WebVisit += 1;
-            acc.Overview += 1;
-            Repository.Update(acc);
-            Repository.Save();
         }
 
         public IList<Advertise> GetAdvertiseRelatedItems(long id, int count = 4)
@@ -1488,383 +1894,23 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
             var publishedState = AdvertiseStatus.Published;
             var accs = Repository.Query(q => q.Where(w =>
-                w.Status == publishedState && w.Available &&
-                w.Count == 0 && w.UserID != acc.UserID));
+                w.Status == publishedState && w.Active &&
+                w.UnitCount == 0 && w.UserId != acc.UserId));
 
-            var price_max_difference = acc.DailyPrice * 0.25f;//25 percent of difference to the Advertise
+            var price_max_difference = acc.DailyPrice * 0.25f; //25 percent of difference to the Advertise
 
             var model = accs.
-                OrderByDescending(x => x.Area == acc.Area).
-                ThenByDescending(x => x.City == acc.City).
-                ThenByDescending(x => x.Province == acc.Province).
+                OrderByDescending(x => x.AreaId == acc.AreaId).
+                ThenByDescending(x => x.CityId == acc.CityId).
+                ThenByDescending(x => x.ProvinceId == acc.ProvinceId).
                 ThenByDescending(x => x.CountryDirection == acc.CountryDirection).
-                ThenByDescending(x => x.TypeID == acc.TypeID).//sort by advertise type
+                ThenByDescending(x => x.TypeID == acc.TypeID). //sort by advertise type
                 ThenByDescending(x => Math.Abs(x.DailyPrice - acc.DailyPrice) <= price_max_difference).
                 ThenByDescending(x => x.DailyPrice >= acc.DailyPrice).
                 ThenBy(x => Math.Abs(x.DailyPrice - acc.DailyPrice) <= price_max_difference ? 0 : x.DailyPrice).
-                ThenByDescending(x => x.AdvertiseScore).
+                ThenByDescending(x => x.ResidenceScore).
                 Take(count).ToList();
             return model;
-        }
-
-        public ApiAmenitiesGetDTO GetAmenitiesDTO(long id, out int userId)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            userId = acc.UserID;
-            ApiAmenitiesGetDTO dto = acc;
-            var parent = Repository.Query(q => q.FirstOrDefault(x => x.Childs.Any(y => y.Id == id)));
-            var parentAdvertiseType = parent == null ? AdvertiseType.None : parent.TypeID;
-
-            dto.heatingSystemSelectItem = new List<SelectItem>();
-            dto.coolingSystemSelectItem = new List<SelectItem>();
-            dto.wcSelectItem = new List<SelectItem>();
-            dto.extraBlanketSelectItem = new List<SelectItem>();
-
-            var heatingItems = Advertise.GetPropertyItems(Property.HeatingSystem, parentAdvertiseType) as HeatingSystemItems[];
-            dto.heatingSystemSelectItem.AddRange(heatingItems.Select(s => new SelectItem((int)s,
-                AdvertiseMainLocalization.GetPropertyValueTitle(s))));
-
-            var coolingItems = Advertise.GetPropertyItems(Property.CoolingSystem, parentAdvertiseType) as CoolingSystemItems[];
-            dto.coolingSystemSelectItem.AddRange(coolingItems.Select(s => new SelectItem((int)s,
-                AdvertiseMainLocalization.GetPropertyValueTitle(s))));
-
-            var wcItems = Advertise.GetPropertyItems(Property.WC, parentAdvertiseType) as WCItems[];
-            dto.wcSelectItem.AddRange(wcItems.Select(s => new SelectItem((int)s,
-                AdvertiseMainLocalization.GetPropertyValueTitle(s))));
-
-            var extraBlanketItems = Advertise.GetPropertyItems(Property.ExtraBlanketCount, parentAdvertiseType) as ExtraBlanketCountItems[];
-            dto.extraBlanketSelectItem.AddRange(extraBlanketItems.Select(s => new SelectItem((int)s,
-                AdvertiseMainLocalization.GetPropertyValueTitle(s))));
-
-            return dto;
-        }
-
-        public bool UpdateAmenities(ApiAmenitiesDTO editedData, out Dictionary<string, string> errors, out string msg)
-        {
-            AmenitiesPart part = new AmenitiesPart();
-            PropertyCopier<ApiAmenitiesDTO, AmenitiesPart>.CopyInsensetive(editedData, part);
-            if (part.Validate(out errors, out msg) == false)
-                return false;
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedData.id));
-            var previousPoolFeature = acc.PoolFeatures;//TODO : this is temporary to ignore updating pool feature since this property is not implemented in android and ios application
-            var shallowAcc = acc.ShallowCopy();
-            PropertyCopier<AmenitiesPart, Advertise>.Copy(part, acc);
-            acc.LastModifyDate = DateTime.Now;
-            var director = new AdvertiseDirector(acc, DirectorType.Extra);
-            var hasImportantChange = director.HasImpotantChange(shallowAcc);
-            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
-                (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified))
-            {
-                acc.Status = AdvertiseStatus.ReadyToPublish;
-            }
-            acc.PoolFeatures = previousPoolFeature;//TODO: this is temporary to ignore updating pool feature since this property is not implemented in android and ios application
-            Repository.Update(acc);
-            Repository.Save();
-            if (hasImportantChange)
-            {
-                mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
-                mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
-            }
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-            return true;
-        }
-
-        public void UpdateExtraBlanketCount(long id, ExtraBlanketCountItems data)
-        {
-            var advertise = Repository.Find(id);
-            advertise.ExtraBlanketCount = data;
-            Repository.Update(advertise);
-            Repository.Save();
-            mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
-        }
-
-        public void UpdateElevator(long id, bool data)
-        {
-            var advertise = Repository.Find(id);
-            advertise.Elevator = data;
-            Repository.Update(advertise);
-            Repository.Save();
-            mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
-        }
-
-        public ApiPhotoDTO GetPhotoDTO(long id, out int accUserId)
-        {
-            var advertise = Repository.Query(q => q.FirstOrDefault(x => x.Id == id));
-            if (advertise == null)
-            {
-                accUserId = 0;
-                return null;
-            }
-            ApiPhotoDTO dto = new ApiPhotoDTO();
-            accUserId = advertise.UserID;
-            dto.id = advertise.Id;
-            dto.mainPhoto = advertise.PhotoID == null ? 0 : (int)advertise.PhotoID;
-            dto.album = advertise.Photos.Select(s => s.Id).ToList();
-            if (advertise.PhotoID == null && advertise.Photos.Count > 0)
-            {
-                advertise.PhotoID = advertise.Photos.First().Id;
-                Repository.Update(advertise);
-                Repository.Save();
-                mediator.Send(new RemoveAdvertiseCacheCommand(advertise.Id));
-            }
-            return dto;
-        }
-
-        public bool UpdatePhotos(ApiPhotoDTO editedData, string rootPath)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(x => x.Id == editedData.id));
-            var shallowAcc = acc.ShallowCopy();
-            var albumString = editedData.ConvertAlbumToString();
-            if (acc.Photos.Select(s => s.Id).SequenceEqual(editedData.album) && acc.PhotoID == editedData.mainPhoto)
-            {
-                return true;
-            }
-            var removedPhotoIds = acc.Photos.Select(s => s.Id).Except(editedData.album).ToList();
-            acc.Photos.Clear();
-            foreach (var item in editedData.album)
-            {
-                var file = Repository.Find<File, long>(item);
-                acc.Photos.Add(file);
-            }
-            acc.PhotoID = editedData.mainPhoto;
-            acc.AlbumPhoto = editedData.ConvertAlbumToString();
-            acc.LastModifyDate = DateTime.Now;
-            var director = new AdvertiseDirector(acc, DirectorType.General);
-            var hasImportantChange = director.HasImpotantChange(shallowAcc);
-            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
-                (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified))
-            {
-                acc.Status = AdvertiseStatus.ReadyToPublish;
-            }
-            Repository.Update(acc);
-            Repository.Save();
-            if (hasImportantChange)
-            {
-                mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
-                mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
-            }
-            if (removedPhotoIds.Any())
-            {
-                mediator.Send(new RemovePhotosByFileIdsCommand(acc.Id, removedPhotoIds)).Wait();
-            }
-            mediator.Send(new RenameAdvertisePhotosCommand(acc.Id)).Wait();
-            mediator.Send(new GenerateThumbImageCommand(acc.Id, acc.PhotoID, editedData.album)).Wait();
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-            return true;
-        }
-
-        public ApiPositionDTO GetPositionDTO(long id, out int userId)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            userId = acc.UserID;
-            ApiPositionDTO dto = acc;
-            dto.positionSelectItem = new List<SelectItem>();
-            var positionItems = Advertise.GetPropertyItems(Property.Region) as PositionType[];
-            dto.positionSelectItem.AddRange(positionItems.Select(s => new SelectItem((int)s,
-                AdvertiseMainLocalization.GetPropertyValueTitle(s))));
-            return dto;
-        }
-
-        public bool UpdatePositionDTO(ApiPositionDTO editedData, out Dictionary<string, string> errors)
-        {
-            string msg;
-            PositionPart positionPart = new PositionPart();
-            PropertyCopier<ApiPositionDTO, PositionPart>.CopyInsensetive(editedData, positionPart);
-            if (positionPart.Validate(out errors, out msg) == false)
-                return false;
-            var addressPart = new AddressPart();
-            PropertyCopier<ApiPositionDTO, AddressPart>.CopyInsensetive(editedData, addressPart);
-            if (addressPart.Area != null && addressPart.Area < 1)
-            {
-                addressPart.Area = null;
-            }
-            if (addressPart.City != null && addressPart.City < 1)
-            {
-                addressPart.City = null;
-            }
-            if (addressPart.Province != null && addressPart.Province < 1)
-            {
-                addressPart.Province = null;
-            }
-            if (addressPart.Validate(out errors, out msg) == false)
-                return false;
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedData.id));
-            var shallowAcc = acc.ShallowCopy();
-            PropertyCopier<PositionPart, Advertise>.Copy(positionPart, acc);
-            PropertyCopier<AddressPart, Advertise>.Copy(addressPart, acc);
-            var director = new AdvertiseDirector(acc, DirectorType.General);
-            var hasImportantChange = director.HasImpotantChange(shallowAcc);
-            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
-                (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified))
-            {
-                acc.Status = AdvertiseStatus.ReadyToPublish;
-            }
-            acc.LastModifyDate = DateTime.Now;
-            Repository.Update(acc);
-            Repository.Save();
-            if (acc.Mode == AdvertiseMode.Parent)
-            {
-                mediator.Publish(new ChangeAdvertisePositionEvent(acc.Id));
-                mediator.Publish(new ChangeAdvertiseAddressEvent(shallowAcc, acc));
-            }
-            if (hasImportantChange)
-            {
-                mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
-                mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
-            }
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-            return true;
-        }
-
-        public ApiRulesDTO GetRulesDTO(long id, out int userId)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            userId = acc.UserID;
-            ApiRulesDTO dto = acc;
-            return dto;
-        }
-
-        public bool UpdateRulesDTO(ApiRulesDTO editedData)
-        {
-            RulesPart part = new RulesPart();
-            part.EvidenceRequired = editedData.evidenceRequired.value;
-            part.OtherRules = editedData.otherRules.value;
-            part.AllowParty = (bool)editedData.allowParty.value;
-            part.AllowPets = (bool)editedData.allowPets.value;
-            part.AllowSmoking = (bool)editedData.allowSmoking.value;
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedData.id));
-            var shallowAcc = acc.ShallowCopy();
-            PropertyCopier<RulesPart, Advertise>.Copy(part, acc);
-            var director = new AdvertiseDirector(acc, DirectorType.Extra);
-            var hasImportantChange = director.HasImpotantChange(shallowAcc);
-            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
-                (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified))
-            {
-                acc.Status = AdvertiseStatus.ReadyToPublish;
-            }
-            acc.LastModifyDate = DateTime.Now;
-            Repository.Update(acc);
-            Repository.Save();
-            if (acc.Mode == AdvertiseMode.Parent)
-            {
-                mediator.Publish(new ChangeAdvertiseRulesEvent(acc.Id));
-            }
-            if (hasImportantChange)
-            {
-                mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
-                mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
-            }
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-            return true;
-        }
-
-        public ApiSpecificDTO GetSpecificDTO(long id, out int userId)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            userId = acc.UserID;
-            ApiSpecificDTO dto = acc;
-            var parent = Repository.Query(q => q.FirstOrDefault(x => x.Childs.Any(y => y.Id == id)));
-            var parentAdvertiseType = parent == null ? AdvertiseType.None : parent.TypeID;
-
-            dto.parkingSelectItem = new List<SelectItem>();
-            dto.floorSelectItem = new List<SelectItem>();
-            var parkingItem = Advertise.GetPropertyItems(Property.Parking, parentAdvertiseType) as ParkingItems[];
-            dto.parkingSelectItem.AddRange(parkingItem.Select(s => new SelectItem((int)s,
-                AdvertiseMainLocalization.GetPropertyValueTitle(s))));
-            var floorItem = Advertise.GetPropertyItems(Property.Floor, parentAdvertiseType) as FloorItems[];
-            dto.floorSelectItem.AddRange(floorItem.Select(s => new SelectItem((int)s,
-                AdvertiseMainLocalization.GetPropertyValueTitle(s))));
-            return dto;
-        }
-
-        public bool UpdateSpecificDTO(ApiSpecificDTO editedData, bool hasChild, out List<string> errors)
-        {
-            if (editedData.Validate(hasChild, out errors) == false)
-            {
-                return false;
-            }
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedData.id));
-            var shallowAcc = acc.ShallowCopy();
-            ApiSpecificDTO.CopyToAdvertise(editedData, acc);
-            var director = new AdvertiseDirector(acc, DirectorType.General);
-            var hasImportantChange = director.HasImpotantChange(shallowAcc);
-            if (acc.Status != AdvertiseStatus.NotCompleted && acc.Status != AdvertiseStatus.FirstReady &&
-                (hasImportantChange || acc.Status == AdvertiseStatus.NotVerified))
-            {
-                acc.Status = AdvertiseStatus.ReadyToPublish;
-            }
-            acc.LastModifyDate = DateTime.Now;
-            acc.MoreThanCapacity = editedData.extraCapacity.value;
-            Repository.Update(acc);
-            Repository.Save();
-            if (hasImportantChange)
-            {
-                mediator.Publish(new ChangeAdvertiseStatusEvent(acc.Id, shallowAcc.Status));
-                mediator.Publish(new ChangeAdvertiseActiveEvent(shallowAcc, acc));
-            }
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-            return true;
-        }
-
-        public ApiHotelUnitDTO GetHotelUnitDTO(long id, out int userId)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            userId = acc.UserID;
-            ApiHotelUnitDTO dto = acc;
-            return dto;
-        }
-
-        public bool UpdateHotelUnitDTO(ApiHotelUnitDTO editedData, out List<string> errors)
-        {
-            if (editedData.Validate(out errors) == false)
-            {
-                return false;
-            }
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == editedData.id));
-            acc.TypeID = (Advertise.AdvertiseType)editedData.typeId;
-            acc.ParentAccType = (Advertise.AdvertiseType)Advertise.AdvertiseTypeToHeadType(editedData.typeId);
-            acc.Title = editedData.title.value;
-            acc.Capacity = editedData.capacity.value;
-            acc.MoreThanCapacity = editedData.extraCapacity.value;
-            acc.SingleBed = editedData.singleBed.value;
-            acc.DoublesBed = editedData.doubleBed.value;
-            acc.Count = editedData.count.value;
-            acc.BlanketsAndMattresses = editedData.blanketsAndMattresses.value;
-            acc.DailyPrice = editedData.dailyPrice.value;
-            acc.HolidayPrice = editedData.holidayPrice.value;
-            acc.HolidayPikePrice = editedData.pikeHolidayPrice.value;
-            acc.MoreThanCapacityPrice = editedData.moreThanCapacityPrice.value;
-            acc.LastModifyDate = DateTime.Now;
-            Repository.Update(acc);
-            Repository.Save();
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
-            return true;
-        }
-
-        public ApiNorouzPriceDTO GetNorouzPriceDTO(long id, out int userId)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            userId = acc.UserID;
-            ApiNorouzPriceDTO dto = new ApiNorouzPriceDTO();
-            dto.id = acc.Id;
-            dto.SetNorouzPrice(acc.NorouzPrice);
-            dto.SetNorouzOverCapacityPrice(acc.NorouzOverCapacityPrice);
-            return dto;
-        }
-
-        public void SetNorouzPrice(long id, int norouzPrice,
-            int overCapacityPrice = 0, int buildNumber = 0)
-        {
-            var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == id));
-            acc.NorouzPrice = norouzPrice;
-            if (buildNumber > 0)
-            {
-                acc.NorouzOverCapacityPrice = overCapacityPrice;
-            }
-            Repository.Update(acc);
-            Repository.Save();
-            mediator.Publish(new ChangeNorouzPriceEvent(id));
-            mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
         public IEnumerable<Advertise> GetMostViewedAdvertisesInCity(int city_id, int province_id, int type_id, int count)
@@ -1872,37 +1918,29 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             var advertises = Repository.Query(q => q);
             if (city_id > 0)
             {
-                advertises = advertises.Where(x => x.City == city_id && x.Status == AdvertiseStatus.Published &&
-                x.Available && x.Count == 0 && !x.HideInCategory);
+                advertises = advertises.Where(x => x.CityId == city_id && x.Status == AdvertiseStatus.Published &&
+                x.Active && x.UnitCount == 0 && !x.HideInSearch);
             }
             else if (province_id > 0)
             {
-                advertises = advertises.Where(x => x.Province == province_id && x.Status == AdvertiseStatus.Published &&
-                x.Available && x.Count == 0 && !x.HideInCategory);
+                advertises = advertises.Where(x => x.ProvinceId == province_id && x.Status == AdvertiseStatus.Published &&
+                x.Active && x.UnitCount == 0 && !x.HideInSearch);
             }
             if (type_id != (int)AdvertiseType.All)
             {
                 advertises = advertises.Where(x => x.TypeID == (AdvertiseType)type_id);
             }
-            return advertises.OrderByDescending(x => x.AdvertiseScore).Take(count).ToList();
-        }
-
-        public IEnumerable<Advertise> GetMostViewedAdvertisesByType(int type_id, int count)
-        {
-            var advertises = Repository.Query(q => q);
-            advertises = advertises.Where(x => x.TypeID == (AdvertiseType)type_id &&
-                x.Status == AdvertiseStatus.Published && x.Available && x.Count == 0 && !x.HideInCategory);
-            return advertises.OrderByDescending(x => x.AdvertiseScore).Take(count).ToList();
+            return advertises.OrderByDescending(x => x.ResidenceScore).Take(count).ToList();
         }
 
         // for Norouz - commented at AdvertiseApi.GetHomePageCarousels
         public IList<Advertise> GetMostViewedNorouzAdvertises(int count)
         {
             IQueryable<Advertise> advertises = Repository.Query(q => q.Where(
-                x => x.NorouzPrice > 0 &&
+                x => x.NowruzPrice > 0 &&
                 x.Status == AdvertiseStatus.Published &&
-                x.Available && x.Count == 0 && !x.HideInCategory));
-            return advertises.OrderByDescending(x => x.AdvertiseScore)
+                x.Active && x.UnitCount == 0 && !x.HideInSearch));
+            return advertises.OrderByDescending(x => x.ResidenceScore)
                 .Take(count).ToList();
         }
 
@@ -1915,7 +1953,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             occupiedDates = advertise.OccupiedDates().Select(
                 s => DateTimeUtility.GregorianToPersianDate(s)).Intersect(range).ToList();
             isOccupied = occupiedDates.Any();
-            guestsOutOfRange = numberOfGuests > advertise.Capacity + advertise.MoreThanCapacity;
+            guestsOutOfRange = numberOfGuests > advertise.Capacity + advertise.ExtraCapacity;
             return !isOccupied && !guestsOutOfRange;
         }
 
@@ -1928,31 +1966,21 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return intersects.ToList();
         }
 
-        public void UpdateInstantReserveStatus(int userId, InstantReserveStatusEnum status, bool forRequested = false)
+        public async Task<bool> UpdateInstantReserveStatus(long residenceId, InstantReserveStatusEnum status)
         {
-            var data = Repository.Query(q => q.Where(w => w.UserID == userId));
-            if (forRequested)
+            var data = await Repository.FindAsync(residenceId);
+            data.InstantReserveStatus = status;
+            if (data.Mode == AdvertiseMode.Parent)
             {
-                data = data.Where(w => w.InstantReserveStatus == InstantReserveStatusEnum.Requested);
-            }
-            foreach (var item in data)
-            {
-                item.InstantReserveStatus = status;
-                foreach (var child in item.Childs)
+                foreach (var item in data.Childs)
                 {
-                    child.InstantReserveStatus = status;
+                    item.InstantReserveStatus = status;
                 }
-                Repository.Update(item);
-                mediator.Send(new RemoveAdvertiseCacheCommand(item.Id));
             }
+            Repository.Update(data);
             Repository.Save();
-        }
-
-        public void UpdateInstantReserveStatus(long accId,
-            InstantReserveStatusEnum status, int doerUserId,
-            ActionSourceEnum actionSource)
-        {
-            mediator.Send(new UpdateInstantReserveStatusCommand(accId, status, doerUserId, actionSource));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residenceId));
+            return true;
         }
 
         public CheckUnsetOccupiedDTO CheckUnsetOccupiedDateRange(long advertiseId,
@@ -2023,8 +2051,9 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public bool CheckReserve(int currentUserId, long advertiseId, int guestCount,
-            string startDate, string endDate, out string msg)
+            string startDate, string endDate, out string msg, out bool isInstantReserve)
         {
+            isInstantReserve = false;
             var advertise = Repository.Find(advertiseId);
             var user = Repository.Find<User, int>(currentUserId);
             var haveReservedRequest = false;
@@ -2071,21 +2100,21 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 return false;
             }
             var days = DateTimeUtility.GetPersianDateRangeDays(startDate, endDate);
-            if (advertise.MinReserveDays > 0 && days < advertise.MinReserveDays)
+            if (advertise.MinReserveDuration > 0 && days < advertise.MinReserveDuration)
             {
-                msg = "برای رزرو این اقامتگاه باید حداقل " + advertise.MinReserveDays + "  شب اقامت کنید. برای اقامت " + days + " شبه میتوانید اقامتگاه های دیگر را رزرو کنید";
+                msg = "برای رزرو این اقامتگاه باید حداقل " + advertise.MinReserveDuration + "  شب اقامت کنید. برای اقامت " + days + " شبه میتوانید اقامتگاه های دیگر را رزرو کنید";
                 return false;
             }
-            if (advertise.MaxReserveDays > 0 && days > advertise.MaxReserveDays)
+            if (advertise.MaxReserveDuration > 0 && days > advertise.MaxReserveDuration)
             {
-                msg = "شما میتوانید حداکثر " + advertise.MaxReserveDays + "  شب در این اقامتگاه اقامت کنید. برای اقامت طولانی تر میتوانید اقامتگاه های دیگر را رزرو کنید";
+                msg = "شما میتوانید حداکثر " + advertise.MaxReserveDuration + "  شب در این اقامتگاه اقامت کنید. برای اقامت طولانی تر میتوانید اقامتگاه های دیگر را رزرو کنید";
                 return false;
             }
             var todayUnix = DateTimeUtility.DateValueOfJS(DateTime.Now.Date);
-            if (advertise.unixNorouzMinRequestDate > todayUnix &&
+            if (advertise.MinReserveDateForNowruz > todayUnix &&
                 DateTimeUtility.IsNorouz(DateTimeUtility.PersianDateRangeToList(startDate, endDate, true, false)))
             {
-                var minDateString = DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate));
+                var minDateString = DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.MinReserveDateForNowruz));
                 msg = "برای رزرو نوروزی این اقامتگاه میتوانید از تاریخ " + minDateString + " اقدام کنید و یا اقامتگاه های دیگر را رزرو کنید";
                 return false;
             }
@@ -2120,7 +2149,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 depositePrice = (long)(Math.Max(Math.Round(deposite / 1000f, 0), 1) * 1000);
             }
 
-            if (currentUserId > 0 && advertise.Count < 1 &&
+            if (currentUserId > 0 && advertise.UnitCount < 1 &&
                 Repository.Find<User, int>(currentUserId).
                 UserHasSimilarReserve(advertiseId,
                 startDateGregorian, endDateGregorian))
@@ -2128,6 +2157,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 msg = "شما یک درخواست مشابه برای این آگهی دارید، برای درخواست جدید درخواست قبلی را لغو کنید";
                 return false;
             }
+            isInstantReserve = advertise.IsReserveInstant(startDateGregorian, endDateGregorian);
             msg = "در صورت موافقت روی دکمه ثبت کلیک کنید";
             return true;
         }
@@ -2167,7 +2197,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     found_comment.LastModifyDate = DateTime.Now;
                     found_comment.LastModifyDatetick = DateTime.Now.Ticks;
                     found_comment.OperatorID = operatorId;
-                    advertise.LastModifyDate = DateTime.Now;
+                    advertise.LastModifiedDate = DateTime.Now;
                     Repository.Update(advertise);
                     Repository.Save();
                 }
@@ -2192,7 +2222,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                     comment.LastModifyDatetick = DateTime.Now.Ticks;
                     comment.OperatorID = operatorId;
                     advertise.Comments.Add(comment);
-                    advertise.LastModifyDate = DateTime.Now;
+                    advertise.LastModifiedDate = DateTime.Now;
                     Repository.Update(advertise);
                     Repository.Save();
                 }
@@ -2222,7 +2252,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 hostReply.LastModifyDate = DateTime.Now;
                 hostReply.LastModifyDatetick = DateTime.Now.Ticks;
                 hostReply.Operator = operatorUser;
-                advertise.LastModifyDate = DateTime.Now;
+                advertise.LastModifiedDate = DateTime.Now;
                 Repository.Update(advertise);
                 Repository.Save();
             }
@@ -2240,7 +2270,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 comment.Operator = operatorUser;
                 comment.Advertise = advertise;
                 guestComment.HostReply = comment;
-                advertise.LastModifyDate = DateTime.Now;
+                advertise.LastModifiedDate = DateTime.Now;
                 Repository.Update(advertise);
                 Repository.Save();
             }
@@ -2251,13 +2281,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
             var advertise = Repository.Find(id);
             var dictionary = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(advertise.EvidenceRequired))
+            if (!string.IsNullOrEmpty(advertise.RequiredEvidence))
             {
-                dictionary.Add("مدارک مورد نیاز", advertise.EvidenceRequired);
+                dictionary.Add("مدارک مورد نیاز", advertise.RequiredEvidence);
             }
-            dictionary.Add("استعمال دخانیات", (bool)advertise.AllowSmoking ? "مجاز" : "ممنوع");
-            dictionary.Add("گرفتن مهمانی", (bool)advertise.AllowParty ? "مجاز" : "ممنوع");
-            dictionary.Add("آوردن حیوانات خانگی", (bool)advertise.AllowPets ? "مجاز" : "ممنوع");
+            dictionary.Add("استعمال دخانیات", (bool)advertise.Smoking ? "مجاز" : "ممنوع");
+            dictionary.Add("گرفتن مهمانی", (bool)advertise.Party ? "مجاز" : "ممنوع");
+            dictionary.Add("آوردن حیوانات خانگی", (bool)advertise.Pets ? "مجاز" : "ممنوع");
             if (!string.IsNullOrEmpty(advertise.OtherRules))
             {
                 dictionary.Add("سایر شرایط و قوانین اقامتگاه", advertise.OtherRules);
@@ -2274,9 +2304,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 toGregorian = toGregorian.AddDays(1);
             }
-            //var idsToDelete = acc.ExtrinsicReserves.Where(
-            //    w => w.StartDate >= fromGregorian && w.StartDate <= toGregorian)
-            //    .Select(s => s.Id).ToList();
             Repository.RemoveChildren<ExtrinsicReserve, long,
                 IQueryable<ExtrinsicReserve>>(advertiseId, "ExtrinsicReserves",
                 q => q.Where(w => w.StartDate >= fromGregorian &&
@@ -2286,8 +2313,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public bool ReserveRequest(long advertiseId, int userId, string startDate,
-            string endDate, int guestCount, bool instantReserve, out string msg,
-            out long reserveId)
+            string endDate, int guestCount, out string msg, out long reserveId)
         {
             if (guestCount < 1)
             {
@@ -2309,15 +2335,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 reserveId = 0;
                 return false;
             }
-            if (instantReserve)
-            {
-                instantReserve = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Confirmed;
-            }
-            if (instantReserve)
-            {
-                var formDateGregortian = DateTimeUtility.PersianDateToGregorian(startDate);
-                instantReserve = formDateGregortian <= DateTime.Now.AddDays(advertise.MaxInstantReserveStart).Date;
-            }
+
             long without_discount_price, couponCalculationPrice;
             var days = DateTimeUtility.GetPersianDateRangeDays(startDate, endDate);
             var total_price = priceCalculator.CalculateReservePrice(advertise, startDate, endDate, guestCount,
@@ -2348,10 +2366,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 NumberOfGuests = guestCount,
                 TotalPrice = total_price,
                 DepositPrice = depositePrice,
-                InstantReserve = instantReserve,
                 CouponCalculationPrice = couponCalculationPrice
             };
-            reserve.Status = instantReserve ? Reserve.ReserveStatus.WaitForReserve :
+            reserve.InstantReserve = advertise.IsReserveInstant(reserve.StartDate, reserve.EndDate);
+            reserve.Status = reserve.InstantReserve ? Reserve.ReserveStatus.WaitForReserve :
                 Reserve.ReserveStatus.WaitForResponse;
             if (user.Reserves.Count(c => c.Status == ReserveStatus.WaitForResponse) >= 3)
             {
@@ -2359,7 +2377,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 reserveId = 0;
                 return false;
             }
-            if (advertise.Count < 1 &&
+            if (advertise.UnitCount < 1 &&
                 user.UserHasSimilarReserve(advertiseId,
                     reserve.StartDate, reserve.EndDate))
             {
@@ -2370,10 +2388,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             advertise.Reserves.Add(reserve);
             Repository.Update(advertise);
             Repository.Save();
-            var identityUser = userManager.FindByNameAsync(advertise.User.MainMobile).Result;
+            var identityUser = userManager.FindByNameAsync(advertise.User.PhoneNumber).Result;
             var contact = new UserContactDTO()
             {
-                UserMainMobile = advertise.User.MainMobile,
+                UserMainMobile = advertise.User.GetNoticesPhoneNumber(),
                 UserAppNotificationToken = advertise.User.AppNotificationToken,
                 UserEmail = identityUser.Email,
                 EmailConfirmed = identityUser.EmailConfirmed,
@@ -2392,7 +2410,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             mediator.Enqueue(new SendMessageCommand(contact));
             mediator.Publish(new ReserveRequestEvent(reserve.Id));
             mediator.Enqueue(new UpdateAdvertiseScoreCommand(advertiseId));
-            msg = instantReserve ?
+            msg = reserve.InstantReserve ?
                         "لطفا مبلغ رزرو را پرداخت نمایید تا رزرو شما نهایی شود"
                         : "درخواست رزرو شما با موفقیت انجام شد. نتیجه درخواست به اطلاع شما خواهد رسید.";
             reserveId = reserve.Id;
@@ -2402,10 +2420,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public IList<Advertise> GetNorouzAdvertises(int count)
         {
             var advertises = Repository.Query(q => q.Where(w =>
-                w.NorouzPrice > 0 && w.Available &&
+                w.NowruzPrice > 0 && w.Active &&
                 w.Status == Advertise.AdvertiseStatus.Published &&
-                w.HideInCategory == false && w.Count < 1));
-            return advertises.OrderByDescending(o => o.AdvertiseScore).Take(count).ToList();
+                w.HideInSearch == false && w.UnitCount < 1));
+            return advertises.OrderByDescending(o => o.ResidenceScore).Take(count).ToList();
         }
 
         public void SetHygieneProtocol(long id, HygieneProtocolStatus value)
@@ -2415,6 +2433,205 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(acc);
             Repository.Save();
             mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
+        }
+
+        public void UpdateAlbumPhoto(long advertiseId)
+        {
+            var residence = Repository.Find(advertiseId);
+            var photoIds = residence.Photos.Select(x => x.Id).ToList();
+            residence.AlbumPhoto = residence.Photos.Count == 0 ? "," : ("," + string.Join(",", photoIds) + ",");
+            Repository.Update(residence);
+            Repository.Save();
+        }
+
+        public async Task<ServiceResult> UpdateCalendarAsync(AdvertiseUpdateCalendarRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var advertise = Repository.Find(request.advertiseId);
+            if (advertise == null)
+            {
+                serviceResult.AddError("advertise id is incorrect");
+                return serviceResult;
+            }
+            if (request.userId > 0 && advertise.UserId != request.userId)
+            {
+                serviceResult.AddError("user id is incorrect");
+                return serviceResult;
+            }
+            if (DateTimeUtility.IsValidPersianDate(request.fromDate) == false ||
+                (string.IsNullOrEmpty(request.toDate) == false &&
+                DateTimeUtility.IsValidPersianDate(request.toDate) == false))
+            {
+                serviceResult.AddError("date format is incorrect");
+                return serviceResult;
+            }
+            if (string.IsNullOrEmpty(request.toDate) == false &&
+                DateTimeUtility.IsStartDateLowerThanEndDate(request.fromDate, request.toDate) == false)
+            {
+                serviceResult.AddError("date is incorrect");
+                return serviceResult;
+            }
+
+            var garegorianToDate = string.IsNullOrEmpty(request.toDate) ?
+                DateTimeUtility.PersianDateToGregorian(request.fromDate) :
+                DateTimeUtility.PersianDateToGregorian(request.toDate);
+            request.toDate = DateTimeUtility.GregorianToPersianDate(garegorianToDate.AddDays(1));
+
+            if (request.full)
+            {
+                if (request.userId == 0)
+                {
+                    request.userId = advertise.UserId;
+                }
+                return await InsertExtrinsicReserveDatesAsync(request, advertise.UnitCount);
+            }
+            else
+            {
+                return DeleteExtrinsicReserveDates(request);
+            }
+        }
+
+        public async Task<ServiceResult<List<long>>> AddInstantReserveDates(long residenceId, string fromDate, string toDate, int userId)
+        {
+            var serviceResult = new ServiceResult<List<long>>();
+            var residence = await Repository.FindAsync(residenceId);
+            //if (residence == null || residence.UserID != userId)
+            //{
+            //    serviceResult.AddError("user is incorrect");
+            //    return serviceResult;
+            //}
+            var selectedPersianDates = DateTimeUtility.PersianDateRangeToList(fromDate, toDate, true, false);
+            var instantReservePersianDates = residence.InstantReserveDates.Select(s => DateTimeUtility.GregorianToPersianDate(s.Date));
+            foreach (var item in selectedPersianDates)
+            {
+                if (instantReservePersianDates.Any(x => x == item) == false)
+                {
+                    residence.InstantReserveDates.Add(new InstantReserveDate()
+                    {
+                        Date = DateTimeUtility.PersianDateToGregorian(item)
+                    });
+                }
+            }
+            Repository.Update(residence);
+            Repository.Save();
+            serviceResult.Result = residence.InstantReserveDates.Select(x => DateTimeUtility.DateValueOfJS(x.Date)).ToList();
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult<List<long>>> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate, int userId)
+        {
+            var serviceResult = new ServiceResult<List<long>>();
+            var residence = await Repository.FindAsync(residenceId);
+            //if (residence == null || residence.UserID != userId)
+            //{
+            //    serviceResult.AddError("user is incorrect");
+            //    return serviceResult;
+            //}
+            var selectedPersianDates = DateTimeUtility.PersianDateRangeToList(fromDate, toDate, true, false);
+            foreach (var item in residence.InstantReserveDates.ToList())
+            {
+                var persianDate = DateTimeUtility.GregorianToPersianDate(item.Date);
+                if (selectedPersianDates.Any(x => x == persianDate))
+                {
+                    residence.InstantReserveDates.Remove(item);
+                }
+            }
+            Repository.Update(residence);
+            Repository.Save();
+            serviceResult.Result = residence.InstantReserveDates.Select(x => DateTimeUtility.DateValueOfJS(x.Date)).ToList();
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> UpdatePricesAsync(ResidenceMainPricesDTO request, int adminId = 0)
+        {
+            var serviceResult = new ServiceResult();
+            var residence = await Repository.FindAsync(request.residenceId);
+            if (residence == null)
+            {
+                serviceResult.AddError("اقامتگاه یافت نشد");
+                return serviceResult;
+            }
+            if (request.dailyPrice < 30000 || request.holidayPrice < 30000 || request.peakHolidayPrice < 30000 ||
+                request.norouzPrice < 0 || request.extraCapacityPrice < 0 || request.norouzExtraCapacityPrice < 0)
+            {
+                serviceResult.AddError("قیمت های وارد شده اشتباه است");
+                return serviceResult;
+            }
+            var clonedResidence = residence.ShallowCopy();
+            residence.DailyPrice = request.dailyPrice;
+            residence.HolidayPrice = request.holidayPrice;
+            residence.PeakHolidayPrice = request.peakHolidayPrice;
+            residence.MonthlyPrice = request.monthlyPrice;
+            residence.NowruzPrice = request.norouzPrice;
+            residence.ExtraCapacityPrice = request.extraCapacityPrice;
+            residence.NowruzExtraCapacityPrice = request.norouzExtraCapacityPrice;
+            Repository.Update(residence);
+            Repository.Save();
+            await mediator.Publish(new ChangeAdvertisePriceEvent(residence.Id, residence.NowruzPrice != clonedResidence.NowruzPrice));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            await mediator.Publish(new AdvertiseUpdateEvent(clonedResidence, residence,
+                ActionLog.ActionSourceEnum.AdminPanel, adminId));
+            return serviceResult;
+        }
+
+        public async Task UpdateVideoStatus(long residenceId, Advertise.VideoStatusEnum status)
+        {
+            var residence = await Repository.FindAsync(residenceId);
+            residence.VideoStatus = status;
+            Repository.Update(residence);
+            Repository.Save();
+        }
+
+        private async Task<Advertise.AdvertiseStatus> UpdateStatus(long residenceId, Advertise.AdvertiseStatus status)
+        {
+            var residence = await Repository.FindAsync(residenceId);
+            var clonedResidence = residence.ShallowCopy();
+            residence.Status = status;
+            Repository.Update(residence);
+            Repository.Save();
+            await mediator.Publish(new ChangeAdvertiseStatusEvent(residenceId, clonedResidence.Status));
+            await mediator.Publish(new ChangeAdvertiseActiveEvent(clonedResidence, residence));
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            return residence.Status;
+        }
+
+        private async Task<ServiceResult> InsertExtrinsicReserveDatesAsync(AdvertiseUpdateCalendarRequest request,
+            int advertiseCount)
+        {
+            var serviceResult = new ServiceResult();
+            var checkResult = CheckSetAsOccupiedDateRange(request.advertiseId, request.fromDate, request.toDate);
+            if (checkResult.Result != CheckSetOccupiedResult.OK &&
+                checkResult.Result != CheckSetOccupiedResult.ContainsReserveRequest)
+            {
+                serviceResult.AddError("date is incorrect");
+                return serviceResult;
+            }
+
+            await mediator.Send(new InsertExtrinsicReserveCommand(request.advertiseId,
+                request.fromDate, request.toDate, request.actionSource, request.userId, advertiseCount));
+            if (DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date) == request.fromDate)
+            {
+                UnsetTodayEmpty(request.advertiseId);
+            }
+            return serviceResult;
+        }
+
+        private ServiceResult DeleteExtrinsicReserveDates(AdvertiseUpdateCalendarRequest request)
+        {
+            var serviceResult = new ServiceResult();
+            var checkResult = CheckUnsetOccupiedDateRange(request.advertiseId, request.fromDate, request.toDate);
+            if (checkResult.Result != CheckUnsetOccupiedResult.OK)
+            {
+                serviceResult.AddError("date is incorrect");
+                return serviceResult;
+
+            }
+            DeleteExtrinsicReserves(request.advertiseId, request.fromDate, request.toDate);
+            if (DateTimeUtility.GregorianToPersianDate(DateTime.Now.Date) == request.fromDate)
+            {
+                SetAsTodayEmpty(request.advertiseId);
+            }
+            return serviceResult;
         }
     }
 }

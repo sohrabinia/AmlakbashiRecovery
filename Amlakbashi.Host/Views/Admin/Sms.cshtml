@@ -56,7 +56,7 @@
                     @{ var types2 = Advertise.GetAdvertiseTypes(Advertise.AdvertisePageType.Filter);}
                     @foreach (var item in types2)
                     {
-                        <option value="@((int)item)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypeUserString(item)</option>
+                        <option value="@((int)item)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(item)</option>
                     }
                 </select>
             </div>

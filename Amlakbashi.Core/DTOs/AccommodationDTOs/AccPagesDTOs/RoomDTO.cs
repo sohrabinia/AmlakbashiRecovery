@@ -4,6 +4,6 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
 {
     public class RoomDTO
     {
-        public int Room { get; set; }
+        public int RoomCount { get; set; }
     }
 }

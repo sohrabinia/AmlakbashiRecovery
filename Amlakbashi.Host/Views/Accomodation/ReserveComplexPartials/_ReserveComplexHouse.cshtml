@@ -43,8 +43,8 @@
 
                     <div class="reserve-complex__iconic-info-item">
                         @{
-                            var capacityString = child.Capacity.MoreThanCapacity > 0 ?
-                                child.Capacity.Capacity + " نفر مجاز + " + child.Capacity.MoreThanCapacity + " نفر اضافه" :
+                            var capacityString = child.Capacity.ExtraCapacity > 0 ?
+                                child.Capacity.Capacity + " نفر مجاز + " + child.Capacity.ExtraCapacity + " نفر اضافه" :
                                 child.Capacity.Capacity + " مهمان";
                         }
                         @if (!string.IsNullOrEmpty(capacityString))
@@ -54,7 +54,7 @@
                     </div>
 
                     <div class="reserve-complex__iconic-info-item">
-                        <i class="fa fa-columns"></i><span>@child.Room.Room اتاق</span>
+                        <i class="fa fa-columns"></i><span>@child.Room.RoomCount اتاق</span>
                     </div>
                 </div>
 
@@ -70,14 +70,14 @@
                         else
                         {
                             album_photos = Array.ConvertAll(child.Photo.AlbumPhoto.Trim(',').Split(','), x => long.Parse(x)).ToList();
-                            if (child.Photo.PhotoID != null)
+                            if (child.Photo.MainPhotoId != null)
                             {
-                                album_photos.Remove((long)child.Photo.PhotoID);
+                                album_photos.Remove((long)child.Photo.MainPhotoId);
                             }
                         }
-                        if (child.Photo.PhotoID != null)
+                        if (child.Photo.MainPhotoId != null)
                         {
-                            album_photos.Insert(0, (long)child.Photo.PhotoID);
+                            album_photos.Insert(0, (long)child.Photo.MainPhotoId);
                         }
                     }
                     @if (album_photos.Any())
@@ -113,18 +113,18 @@
                         Model.Amenities.CoolingSystem != Advertise.CoolingSystemItems.Unset ||
                         Model.Amenities.WC != Advertise.WCItems.Unset ||
                         Model.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset ||
-                        Model.Bed.BlanketsAndMattresses != 0)
+                        Model.Bed.BlanketAndMattressCount != 0)
                     {
                         <div class="advertise-page__basic-properties-container">
                             @await Html.PartialAsync("/Views/Accomodation/ReserveComplexPartials/_ReserveBasicInfo.cshtml", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()){
-                                {"BuildingSize",child.BuildingSize.Metrazh }, {"LandArea", null }, {"Pool", child.Amenities.Pool },
-                                {"Parking",child.Parking.Parking }, {"SingleBed",child.Bed.SingleBed },
-                                {"DoublesBed",child.Bed.DoublesBed }, {"Class","reserve-complex__iconic-info-item" }})
+                                {"BuildingSize",child.BuildingSize.BuildingArea }, {"LandArea", null }, {"Pool", child.Amenities.Pool },
+                                {"Parking",child.Parking.Parking }, {"SingleBed",child.Bed.SingleBedCount },
+                                {"DoublesBed",child.Bed.DoubleBedCount }, {"Class","reserve-complex__iconic-info-item" }})
                         </div>
                     }
 
-                    @if (child.Price.DailyPrice > 0 || child.Price.HolidayPrice > 0 || child.Price.HolidayPikePrice > 0 ||
-                        child.Price.RentPrice > 0 || child.Price.MoreThanCapacityPrice > 0)
+                    @if (child.Price.DailyPrice > 0 || child.Price.HolidayPrice > 0 || child.Price.PeakHolidayPrice > 0 ||
+                        child.Price.MonthlyPrice > 0 || child.Price.ExtraCapacityPrice > 0)
                     {
                 <div class="advertise-page__price-container">
                     @await Html.PartialAsync("/Views/Accomodation/ReserveComplexPartials/_ReservePrice.cshtml", child.Price, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()){
@@ -135,7 +135,7 @@
                     @if (child.Amenities.HeatingSystem != Advertise.HeatingSystemItems.Unset ||
                         child.Amenities.CoolingSystem != Advertise.CoolingSystemItems.Unset ||
                         child.Amenities.WC != Advertise.WCItems.Unset || child.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset ||
-                        child.Bed.BlanketsAndMattresses > 0)
+                        child.Bed.BlanketAndMattressCount > 0)
                     {
                 <div class="advertise-page__amenities-main-container">
                     @await Html.PartialAsync("/Views/Accomodation/ReserveComplexPartials/_ReserveMainAmenities.cshtml", new Tuple<AmenitiesDTO, BedDTO>(child.Amenities, child.Bed), new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()){

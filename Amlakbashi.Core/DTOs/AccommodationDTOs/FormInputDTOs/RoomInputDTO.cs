@@ -8,7 +8,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
     [Serializable]
     public class RoomInputDTO
     {
-        public int Room { get; set; }
+        public int RoomCount { get; set; }
         public bool mandatory { get; set; }
         public int minValue { get; set; }
         public bool allowZero { get; set; }

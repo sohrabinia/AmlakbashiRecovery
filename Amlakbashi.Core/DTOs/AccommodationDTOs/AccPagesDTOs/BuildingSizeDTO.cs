@@ -8,6 +8,6 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
 {
     public class BuildingSizeDTO
     {
-        public int Metrazh { get; set; }
+        public int BuildingArea { get; set; }
     }
 }

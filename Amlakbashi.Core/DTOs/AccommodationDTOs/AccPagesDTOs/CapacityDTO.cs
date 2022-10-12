@@ -9,6 +9,6 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
     public class CapacityDTO
     {
         public int Capacity { get; set; }
-        public int MoreThanCapacity { get; set; }
+        public int ExtraCapacity { get; set; }
     }
 }

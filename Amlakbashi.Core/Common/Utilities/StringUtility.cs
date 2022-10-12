@@ -34,6 +34,7 @@ namespace Amlakbashi.Core.Common.Utilities
             }
             return persian_number;
         }
+
         public static string EnglishNumberToPersian(string english_number)
         {
             if (string.IsNullOrEmpty(english_number))
@@ -41,13 +42,33 @@ namespace Amlakbashi.Core.Common.Utilities
                 return "";
             }
             string[] persian = new string[10] { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };
-            //string[] arabic = new string[10] { "٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩" };
             english_number = english_number.Trim();
             for (int i = 0; i < persian.Length; i++)
             {
                 english_number = english_number.Replace(i.ToString(), persian[i]);
             }
             return english_number;
+        }
+
+        public static string GenerateVerifyCode(int numberOfDigit = 4)
+        {
+            int minValue = 1, maxValue = 10;
+            for (int i = 1; i < numberOfDigit; i++)
+            {
+                minValue *= 10;
+                maxValue *= 10;
+            }
+            return new Random().Next(minValue, maxValue).ToString();
+        }
+
+        public static string VerifyEmailSubject()
+        {
+            return "تایید ایمیل";
+        }
+
+        public static string VerifyEmailContent(string code)
+        {
+            return $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{code}</b></div></div>";
         }
     }
 }

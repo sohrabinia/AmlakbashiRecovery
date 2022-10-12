@@ -24,7 +24,7 @@ using log4net;
 using Amlakbashi.Mediator.Commands.UserCommands;
 using Microsoft.AspNetCore.Identity;
 using Amlakbashi.Core.Identity.Entities;
-using Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs;
+using Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs;
 using Amlakbashi.Accounting.BankingContext;
 using Amlakbashi.Core.DTOs.PaymentDTOs;
 using Amlakbashi.Core.Common.BankingEngines.PodiumEngine.GeneralInfos;
@@ -35,6 +35,7 @@ using Microsoft.Extensions.Hosting;
 using Amlakbashi.Core.DTOs.PaymentDTOs.BankEPayDTOs;
 using Amlakbashi.Core.Common.StaticData;
 using System.Threading.Tasks;
+using Amlakbashi.Core.DTOs;
 
 namespace Amlakbashi.Accounting
 {
@@ -52,7 +53,6 @@ namespace Amlakbashi.Accounting
         private readonly IPaymentOperator paymentOperator;
         private readonly IBankingOperator bankingOperator;
         private readonly UserManager<AppUser> userManager;
-        private readonly ILog logger;
         private readonly IWebHostEnvironment env;
         public AccountingFacade(IReservePaymentAppService reservePaymentService,
             IDiscountCouponAppService discountCouponService,
@@ -66,7 +66,6 @@ namespace Amlakbashi.Accounting
             IPaymentOperator paymentOperator,
             IBankingOperator bankingOperator,
             UserManager<AppUser> userManager,
-            ILog logger,
             IWebHostEnvironment env)
         {
             this.reservePaymentService = reservePaymentService;
@@ -81,7 +80,6 @@ namespace Amlakbashi.Accounting
             this.paymentOperator = paymentOperator;
             this.bankingOperator = bankingOperator;
             this.userManager = userManager;
-            this.logger = logger;
             this.env = env;
         }
 
@@ -284,6 +282,11 @@ namespace Amlakbashi.Accounting
             return creditTransactionService.GetListByUserId(userId);
         }
 
+        public PagedList<CreditTransaction> GetUserWalletTransactions(int userId, int page, int pageItemCount)
+        {
+            return creditTransactionService.GetListByUserId(userId).ToPagedList(page, pageItemCount);
+        }
+
         public CreditTransaction GetCanselInstantReserveCreditTransaction(int userId, int tranCause, long id)
         {
             return creditTransactionService.GetCanselInstantReserve(userId, tranCause, id);
@@ -318,7 +321,7 @@ namespace Amlakbashi.Accounting
             ActionSourceEnum actionSource = ActionSourceEnum.Undefined)
         {
             var user = repository.FindUser(userId);
-            currentCredit = user.Credit + amount;
+            currentCredit = user.WalletAmount + amount;
             var newCreditTransaction = new CreditTransaction()
             {
                 UserID = userId,
@@ -331,7 +334,6 @@ namespace Amlakbashi.Accounting
                 TransactionCauseString = transactionCauseString,
                 Type = amount > 0 ? CreditTransaction.WalletTransactionType.Increase : CreditTransaction.WalletTransactionType.Decrease,
                 PaymentId = paymentId < 1 ? null : paymentId
-                //AdvertiseContactID = contactId
             };
             creditTransactionService.Insert(newCreditTransaction);
             mediator.Publish(new CreditTransactionUpdateEvent(userId, currentCredit, actionSource, doerUserId));
@@ -346,7 +348,7 @@ namespace Amlakbashi.Accounting
             {
                 var diffPrice = editedCreditTransaction.Price - creditTransaction.Price;
                 var user = repository.FindUser(creditTransaction.UserID);
-                var newCredit = user.Credit + diffPrice;
+                var newCredit = user.WalletAmount + diffPrice;
                 var newCreditTransaction = new CreditTransaction()
                 {
                     UserID = creditTransaction.UserID,
@@ -371,7 +373,7 @@ namespace Amlakbashi.Accounting
             ActionLog.ActionSourceEnum actionSource)
         {
             var user = repository.FindUser(userId);
-            var newPrizeCredit = user.PrizeCredit + amount;
+            var newPrizeCredit = user.GiftWalletAmount + amount;
             var prizeCreditId = prizeCreditTransactionService.Insert(userId, amount, newPrizeCredit, type, reserveId, customTitle);
             mediator.Publish(new PrizeCreditUpdateEvent(user.Id, actionSource, doerUserId));
             return prizeCreditId;
@@ -381,7 +383,7 @@ namespace Amlakbashi.Accounting
             long reserveId, string customTitle, int doerUserId, ActionLog.ActionSourceEnum actionSource)
         {
             var user = repository.FindUser(userId);
-            var newPrizeCredit = user.PrizeCredit - amount;
+            var newPrizeCredit = user.GiftWalletAmount - amount;
             var prizeCreditId = prizeCreditTransactionService.Insert(userId, amount, newPrizeCredit, type, reserveId, customTitle);
             mediator.Publish(new PrizeCreditUpdateEvent(user.Id, actionSource, doerUserId));
             return prizeCreditId;
@@ -395,7 +397,7 @@ namespace Amlakbashi.Accounting
                 return;
             }
             var user = repository.FindUser(reserve.UserID);
-            var newPrizeCredit = user.PrizeCredit + reserve.PrizePrice;
+            var newPrizeCredit = user.GiftWalletAmount + reserve.PrizePrice;
             prizeCreditTransactionService.Insert(reserve.UserID,
                 reserve.PrizePrice, newPrizeCredit,
                 PrizeTransactionType.IncreaseRefund, reserveId);
@@ -408,7 +410,7 @@ namespace Amlakbashi.Accounting
         {
             var reserve = repository.FindReserve(reserveId);
             var user = repository.FindUser(reserve.UserID);
-            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             if (user.PresentorUserID < 1 ||
                 user.PresentorPrizeGiven)
             {
@@ -421,7 +423,7 @@ namespace Amlakbashi.Accounting
             mediator.Publish(new PresentorPrizeGivenEvent(user.Id, actionSource, doerUserId));
             var contact = new UserContactDTO()
             {
-                UserMainMobile = user.MainMobile,
+                UserMainMobile = user.GetNoticesPhoneNumber(),
                 UserAppNotificationToken = user.AppNotificationToken,
                 UserEmail = identityUser.Email,
                 EmailConfirmed = identityUser.EmailConfirmed,
@@ -438,7 +440,7 @@ namespace Amlakbashi.Accounting
         {
             var reserve = repository.FindReserve(reserveId);
             var guestUser = reserve.GuestUser;
-            var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
+            var guestIdentityUser = userManager.FindByNameAsync(guestUser.PhoneNumber).Result;
             if (guestUser.RecieveAppreciateDiscount)
             {
                 return;
@@ -450,7 +452,7 @@ namespace Amlakbashi.Accounting
                 discountCouponService.Insert(guestUser.Id, DiscountCoupon.DiscountCouponType.Appreciate, 5);
                 var contact = new UserContactDTO()
                 {
-                    UserMainMobile = guestUser.MainMobile,
+                    UserMainMobile = guestUser.GetNoticesPhoneNumber(),
                     UserAppNotificationToken = guestUser.AppNotificationToken,
                     UserEmail = guestIdentityUser.Email,
                     EmailConfirmed = guestIdentityUser.EmailConfirmed,
@@ -478,17 +480,17 @@ namespace Amlakbashi.Accounting
             var reserve = repository.FindReserve(reserveId);
             var user = repository.FindUser(reserve.UserID);
             long amount = 0;
-            if (user.PrizeCredit > 0)
+            if (user.GiftWalletAmount > 0)
             {
                 var maxAmount = reserve.TotalPrice / 2;
-                amount = Math.Min(user.PrizeCredit, maxAmount);
+                amount = Math.Min(user.GiftWalletAmount, maxAmount);
             }
             if (amount < 1)
             {
                 return;
             }
 
-            var newPrizeCredit = user.PrizeCredit + reserve.PrizePrice;
+            var newPrizeCredit = user.GiftWalletAmount + reserve.PrizePrice;
             var prizeCreditId = prizeCreditTransactionService.Insert(reserve.UserID, reserve.PrizePrice, newPrizeCredit,
                 PrizeCreditTransaction.PrizeTransactionType.IncreaseRefund, reserveId);
 
@@ -503,9 +505,10 @@ namespace Amlakbashi.Accounting
         }
 
         // Payment Functions
-        public IList<Payment> FilterPayments(long refid, int status, int uid, long reserveId, DateTime fromDate, DateTime toDate)
+        public IList<Payment> FilterPayments(long refid, int status, int uid,
+            long reserveId, DateTime fromDate, DateTime toDate, BankEnum bank, int type)
         {
-            return paymentService.Filter(refid, status, uid, reserveId, fromDate, toDate);
+            return paymentService.Filter(refid, status, uid, reserveId, fromDate, toDate, bank, type);
         }
 
         public IList<Payment> GetPaymentRange(DateTime fromDate, DateTime toDate, int status, IList<int> userIds = null,
@@ -541,7 +544,7 @@ namespace Amlakbashi.Accounting
             {
                 return null;
             }
-            var response = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.Date);
+            var response = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.CreateDate);
             response.PaymentId = payment.Id.ToString();
             if ((response.Result && payment.Status == Payment.PaymentStatus.NotPaid) ||
                 (response.Result == false && payment.Status == Payment.PaymentStatus.Paid))
@@ -564,11 +567,11 @@ namespace Amlakbashi.Accounting
             {
                 return false;
             }
-            var result = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.Date);
+            var result = await paymentOperator.GetPasargadPaymentResult(payment.Id, payment.CreateDate);
             if (result.Result == true && payment.Status == Payment.PaymentStatus.NotPaid)
             {
-                payment.Authority = result.TransactionReferenceId;
-                payment.RefID = Convert.ToInt64(result.ReferenceNumber);
+                payment.TransactionId = result.TransactionReferenceId;
+                payment.ReferenceNumber = Convert.ToInt64(result.ReferenceNumber);
                 payment.TraceNumber = result.TraceNumber;
                 payment.PayDate = DateTime.Parse(result.TransactionDate);
                 payment.Status = Payment.PaymentStatus.Paid;
@@ -577,8 +580,8 @@ namespace Amlakbashi.Accounting
             }
             else if (result.Result == false && payment.Status == Payment.PaymentStatus.Paid)
             {
-                payment.Authority = null;
-                payment.RefID = 0;
+                payment.TransactionId = null;
+                payment.ReferenceNumber = 0;
                 payment.TraceNumber = null;
                 payment.PayDate = null;
                 payment.Status = Payment.PaymentStatus.NotPaid;
@@ -659,16 +662,13 @@ namespace Amlakbashi.Accounting
             excludingPayments = new List<Reserve>();
             foreach (var item in reserves)
             {
-                if (item.ExcludeGroupPayment)
-                {
-                    excludingPayments.Add(item);
-                    continue;
-                }
-                var advertise = item.Advertise;
-                var hostUser = repository.FindUser(advertise.UserID);
-                var bankCard = repository.FindBankCardByUserId(hostUser.Id);
-                if (bankCard == null || string.IsNullOrEmpty(bankCard.BankCardNumber) ||
-                    item.PaymentHasError)
+                //if (item.ExcludeGroupPayment)
+                //{
+                //    excludingPayments.Add(item);
+                //    continue;
+                //}
+                var bankCard = repository.FindBankCardByUserId(item.HostUserID);
+                if (bankCard == null || string.IsNullOrEmpty(bankCard.BankCardNumber) /*|| item.PaymentHasError*/)
                 {
                     paymentsWithError.Add(item);
                     continue;
@@ -822,9 +822,9 @@ namespace Amlakbashi.Accounting
                 case ReservePaymentMethod.EPay:
                     var objPay = new Payment();
                     objPay.ReserveID = (int)reserveId;
-                    objPay.Date = DateTime.Now;
+                    objPay.CreateDate = DateTime.Now;
                     objPay.ProductType = payment_string;
-                    objPay.TotalPrice = price * 10;
+                    objPay.Amount = price * 10;
                     objPay.UserID = doerUserId;
                     return paymentService.Insert(objPay);
                 case ReservePaymentMethod.AmlakbashiCredit:
@@ -918,14 +918,14 @@ namespace Amlakbashi.Accounting
                         Count(w => user_list.Contains(w.UserID));
                     payment_amount = paymentService.Filter(1, fromDate, toDate).
                         Where(w => user_list.Contains(w.UserID)).
-                        Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                        Select(p => (long?)p.Amount).Sum() ?? 0;
                 }
                 else
                 {
                     payment_count = paymentService.Filter(1, fromDate, toDate).Count();
                     payment_amount = paymentService.Filter(1, fromDate, toDate).
-                        Where(w => w.TotalPrice > 0).
-                        Select(p => (long?)p.TotalPrice).Sum() ?? 0;
+                        Where(w => w.Amount > 0).
+                        Select(p => (long?)p.Amount).Sum() ?? 0;
                 }
                 CountMonthValue.Add(payment_count);
                 AmountMonthValue.Add(payment_amount);
@@ -964,7 +964,7 @@ namespace Amlakbashi.Accounting
             }
             else if (usePrize)
             {
-                prizeAvailable = GetReservePrizeAvailable(reserve.TotalPrice, user.PrizeCredit);
+                prizeAvailable = GetReservePrizeAvailable(reserve.TotalPrice, user.GiftWalletAmount);
             }
 
             var price_to_pay = (payType == ReservePaymentType.GuestDeposite ?
@@ -988,13 +988,13 @@ namespace Amlakbashi.Accounting
                     objPay.ReserveID = (int)reserveId;
                     objPay.CouponID = coupon == null ? 0 : coupon.Id;
                     objPay.PrizePrice = prizeAvailable;
-                    objPay.Date = DateTime.Now;
+                    objPay.CreateDate = DateTime.Now;
                     objPay.ProductType = payment_string;
-                    objPay.TotalPrice = price_to_pay * 10;
+                    objPay.Amount = price_to_pay * 10;
                     objPay.UserID = userId;
                     return paymentService.Insert(objPay);
                 case ReservePaymentMethod.AmlakbashiCredit:
-                    if (user.Credit < price_to_pay)
+                    if (user.WalletAmount < price_to_pay)
                     {
                         return 0;
                     }
@@ -1041,9 +1041,9 @@ namespace Amlakbashi.Accounting
                     var request = new SamanRequestTokenDTO()
                     {
                         ResNum = payment.Id.ToString(),
-                        Amount = payment.TotalPrice,
+                        Amount = payment.Amount,
                         RedirectUrl = samanRedirectUrl,
-                        CellNumber = payment.User.MainMobile
+                        CellNumber = payment.User.PhoneNumber
                     };
                     epay = paymentOperator.GetSamanPaymentToken(request).Result;
                     break;
@@ -1054,7 +1054,7 @@ namespace Amlakbashi.Accounting
                         pasargadRedirectUrl += "?RedirectUrl=" + redirectUrl;
                     }
                     epay = paymentOperator.GetPasargadPaymentData(bank, paymentId,
-                        payment.TotalPrice, pasargadRedirectUrl);
+                        payment.Amount, pasargadRedirectUrl);
                     break;
                 default:
                     epay.HasError = true;
@@ -1062,8 +1062,8 @@ namespace Amlakbashi.Accounting
                     break;
             }
 
-            payment.BankId = bank;
-            payment.Date = epay.Date;
+            payment.Bank = bank;
+            payment.CreateDate = epay.Date;
             UpdatePayment(payment);
 
             return epay;
@@ -1080,7 +1080,7 @@ namespace Amlakbashi.Accounting
                     referenceNumber = checkPaymentResult.ReferenceNumber;
                     var payment = paymentService.Find(response.iN);
                     var verifyPaymentResult = paymentOperator.VerifyPasargadPayment(BankEnum.Pasargad,
-                        paymentResult, payment.Id, payment.TotalPrice);
+                        paymentResult, payment.Id, payment.Amount);
                     if (verifyPaymentResult)
                     {
                         DateTime transactionDate = DateTime.Parse(checkPaymentResult.TransactionDate);
@@ -1105,11 +1105,11 @@ namespace Amlakbashi.Accounting
             {
                 var verifyEpayResult = paymentOperator.VerifySamanEpay(response.RefNum).Result;
                 double verfiyEpayAmout = double.Parse(verifyEpayResult);
-                if (verfiyEpayAmout == payment.TotalPrice)
+                if (verfiyEpayAmout == payment.Amount)
                 {
                     return GiveProduct(response.ResNum, payment.UserID, response.RRN,
                             response.RefNum, response.TraceNo, DateTime.Now,
-                            out msg, response.ActionSource);
+                            out msg, response.ActionSource, response.SecurePan);
                 }
             }
             msg = "عملیات پرداخت با خطا مواجه شد";
@@ -1128,55 +1128,60 @@ namespace Amlakbashi.Accounting
 
         private bool GiveProduct(int paymentId, int userId, string referenceNumber,
             string transactionReferenceId, string traceNumber, DateTime transactionDate, out string msg,
-            ActionSourceEnum actionSource)
+            ActionSourceEnum actionSource, string creditCardNumber = null)
         {
             var payment = paymentService.Find(paymentId);
             if (payment.Status == Payment.PaymentStatus.Paid)
             {
-                msg = "این تراکنش تکراری میباشد";
+                msg = "این تراکنش تکراری می باشد";
                 return false;
             }
-            payment.RefID = long.Parse(referenceNumber);
-            payment.Authority = transactionReferenceId;
+            payment.ReferenceNumber = long.Parse(referenceNumber);
+            payment.TransactionId = transactionReferenceId;
             payment.TraceNumber = traceNumber;
             payment.Status = Payment.PaymentStatus.Paid;
             payment.PayDate = transactionDate;
+            if (string.IsNullOrEmpty(creditCardNumber) == false && creditCardNumber.Length <= 16)
+            {
+                payment.CreditCardNumber = creditCardNumber;
+            }
+            paymentService.Update(payment);
+
             var user = repository.FindUser(userId);
-            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+            var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             var contact = new UserContactDTO()
             {
-                UserMainMobile = user.MainMobile,
+                UserMainMobile = user.GetNoticesPhoneNumber(),
                 UserAppNotificationToken = user.AppNotificationToken,
                 UserEmail = identityUser.Email,
                 EmailConfirmed = identityUser.EmailConfirmed,
                 UserFcmAppNotificationToken = user.FcmAppNotificationToken,
                 UserNotificationToken = user.NotificationToken,
                 Type = UserContactType.payment,
-                TransactionId = payment.RefID.ToString()
+                TransactionId = payment.ReferenceNumber.ToString()
             };
             mediator.Enqueue(new SendMessageCommand(contact));
-            var price = payment.TotalPrice / 10;
-            msg = $"پرداخت شما با موفقیت انجام شد. شماره تراکنش پرداخت شما {payment.RefID} می باشد.";
+            var price = payment.Amount / 10;
+            msg = $"پرداخت شما با موفقیت انجام شد. شماره تراکنش پرداخت شما {payment.ReferenceNumber} می باشد.";
             long currentCredit;
             if (payment.ProductType.Contains("Reserve"))
             {
                 mediator.Send(new FinalizeReserveCommand(payment.ReserveID == null ? 0 : (long)payment.ReserveID,
-                    payment.RefID, price, ReservePaymentMethod.EPay, actionSource, payment.UserID, -1, payment.CouponID,
+                    payment.ReferenceNumber, price, ReservePaymentMethod.EPay, actionSource, payment.UserID, -1, payment.CouponID,
                     payment.PrizePrice, true));
                 if (payment.ReserveID != null)
                 {
-                    var hostPhoneNumber = payment.Reserve.HostUser.Mobile;
-                    msg = $"{msg} شماره تماس میزبان: {PhoneUtility.InternationalNumberToLocal(hostPhoneNumber)}";
+                    msg = $"{msg} شماره تماس میزبان: {payment.Reserve.HostUser.GetNormalizedNoticesPhoneNumber()}";
                 }
             }
             else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Increase.ToString())
             {
-                payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.RefID, 0, out currentCredit,
+                payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.ReferenceNumber, 0, out currentCredit,
                     CreditTransaction.WalletTransactionReason.Charge, null, paymentId, payment.UserID, actionSource);
             }
             else if (payment.ProductType == CreditTransaction.WalletTransactionTypeForPayment.Credit_Inc_Then_Res.ToString())
             {
-                payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.RefID, 0, out currentCredit,
+                payment.WalletTransactionId = IncreaseCredit(payment.UserID, price, payment.ReferenceNumber, 0, out currentCredit,
                     CreditTransaction.WalletTransactionReason.Charge, null, paymentId, payment.UserID, actionSource);
                 var creditTransactionId = DecreaseCredit(payment.UserID, payment.ReservePrice, 0, payment.ReserveID == null ? 0 : (long)payment.ReserveID,
                     out currentCredit, CreditTransaction.WalletTransactionReason.Reserve, null, null, payment.UserID, actionSource);
@@ -1188,8 +1193,7 @@ namespace Amlakbashi.Accounting
                 }
                 if (payment.ReserveID != null)
                 {
-                    var hostPhoneNumber = payment.Reserve.HostUser.Mobile;
-                    msg = $"{msg} شماره تماس میزبان: {PhoneUtility.InternationalNumberToLocal(hostPhoneNumber)}";
+                    msg = $"{msg} شماره تماس میزبان: {payment.Reserve.HostUser.GetNormalizedNoticesPhoneNumber()}";
                 }
             }
             paymentService.Update(payment);
@@ -1198,17 +1202,17 @@ namespace Amlakbashi.Accounting
 
         // Podium Services
 
-        public ShebaVerificationResultDTO VerifySheba(string sheba)
+        public ShebaVerificationResponseDTO VerifySheba(string sheba)
         {
             return bankingOperator.ShebaVerification(sheba);
         }
 
-        public ShebaPaymentResultDTO SiteClearingHostAutoPayment(long reserveId, int operatorId)
+        public PayaPaymentResponseDTO SiteClearingHostAutoPayment(long reserveId, int operatorId)
         {
             var reserve = repository.FindReserve(reserveId);
             if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePayment.ReservePaymentType.SiteClearingToHost))
             {
-                return new ShebaPaymentResultDTO()
+                return new PayaPaymentResponseDTO()
                 {
                     HasError = true,
                     ErrorMessage = "این رزرو قبلا تسویه شده است. برای ثبت، ابتدا تسویه قبلی را بیعانه کنید"
@@ -1219,7 +1223,7 @@ namespace Amlakbashi.Accounting
             var hostBankCard = repository.FindBankCardByUserId(hostUser.Id);
             if (hostBankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.NotVerified)
             {
-                return new ShebaPaymentResultDTO()
+                return new PayaPaymentResponseDTO()
                 {
                     HasError = true,
                     ErrorMessage = "شماره شبای کاربر تایید نشده است"
@@ -1237,7 +1241,7 @@ namespace Amlakbashi.Accounting
             }
             else
             {
-                return new ShebaPaymentResultDTO()
+                return new PayaPaymentResponseDTO()
                 {
                     HasError = true,
                     ErrorMessage = "مهمان پرداختی برای این رزرو انجام نداده است"
@@ -1258,81 +1262,68 @@ namespace Amlakbashi.Accounting
             var payment = new Payment()
             {
                 UserID = hostUser.Id,
-                Date = DateTime.Now,
-                TotalPrice = payablePrice * 10,
-                BankId = BankEnum.Pasargad,
+                CreateDate = DateTime.Now,
+                Amount = payablePrice * 10,
+                Bank = BankEnum.Pasargad,
                 Method = Payment.PaymentMethod.Podium,
                 Type = Payment.PaymentType.Expenditure,
                 Status = Payment.PaymentStatus.NotPaid,
-                ReserveID = reserveId
+                ReserveID = reserveId,
+                TransactionId = BankUtility.GeneratePodiumTransactionId()
             };
             paymentService.Insert(payment);
 
-            ShebaPaymentRequestDTO payDTO = new ShebaPaymentRequestDTO()
+            PayaPaymentRequestDTO request = new PayaPaymentRequestDTO()
             {
                 DestSheba = "IR" + hostBankCard.ShabaNumber,
                 DestFirstName = hostBankCard.FName,
                 DestLastName = hostBankCard.LName,
                 PaymentId = payment.Id,
-                Timestamp = payment.Date,
-                Amount = payablePrice * 10,
-                CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
+                Timestamp = payment.CreateDate,
+                Amount = payment.Amount,
+                CentralBankTransferDetailType = CentralBankTransferEnum.CCPA,
+                TransactionId = payment.TransactionId,
+                SourceComment = $"تسویه رزرو {reserve.Id}",
+                DestComment = $"تسویه رزرو {reserve.Id}"
             };
 
-            ShebaPaymentResultDTO result;
-            if (env.IsDevelopment())
-            {
-                result = new ShebaPaymentResultDTO()
-                {
-                    HasError = false,
-                    Message = "پرداخت با موفقیت انجام شد",
-                    ErrorMessage = "پرداخت انجام نشد",
-                    PayablePrice = payablePrice * 10,
-                    TraceNumber = "123456789"
-                };
-            }
-            else
-            {
-                result = bankingOperator.ShebaPayment(payDTO);
-            }
+            PayaPaymentResponseDTO response = SendPayaPaymentRequest(request);
 
-            if (result.HasError == false)
+            if (response.HasError == false)
             {
                 var reservePayment = new ReservePayment()
                 {
                     PaymentType = (int)reservePaymentType,
                     ReserveID = reserveId,
                     UserID = operatorId,
-                    Price = payablePrice,
+                    Price = payment.AmountAsToman,
                     PaymentMethod = (int)ReservePayment.ReservePaymentMethod.Podium,
                     CreateDate = DateTime.Now,
                     OperatorID = operatorId,
-                    TransactionID = long.Parse(result.TraceNumber),
+                    TransactionID = long.Parse(response.TraceNumber),
                     PaymentId = payment.Id
                 };
-                reservePaymentService.Insert(reservePayment);
-
+                payment.ReservePayment = reservePayment;
                 payment.PayDate = DateTime.Now;
-                payment.TraceNumber = result.TraceNumber;
-                payment.ReservePaymentId = reservePayment.Id;
+                payment.TraceNumber = response.TraceNumber;
                 payment.Status = Payment.PaymentStatus.Paid;
                 paymentService.Update(payment);
 
-                result.UserId = hostUser.Id;
-                result.PayablePrice = payablePrice;
-                result.AdvertiseId = reserve.AdvertiseID;
+                response.UserId = hostUser.Id;
+                response.PayablePrice = payment.AmountAsToman;
+                response.AdvertiseId = reserve.AdvertiseID;
             }
-            return result;
+            return response;
         }
 
-        public ShebaPaymentResultDTO WalletClearingAutoPayment(int userId, int operatorId)
+        public PayaPaymentResponseDTO WalletClearingAutoPayment(int userId, int operatorId)
         {
             var user = repository.FindUser(userId);
             var hostBankCard = repository.FindBankCardByUserId(user.Id);
 
             if (hostBankCard.ShabaStatus == (int)BankCard.BankCardStatusEnum.NotVerified)
             {
-                return new ShebaPaymentResultDTO()
+                return new PayaPaymentResponseDTO()
                 {
                     HasError = true,
                     ErrorMessage = "شماره شبای کاربر تایید نشده است"
@@ -1342,67 +1333,137 @@ namespace Amlakbashi.Accounting
             var payment = new Payment()
             {
                 UserID = user.Id,
-                Date = DateTime.Now,
-                TotalPrice = user.Credit * 10,
-                BankId = BankEnum.Pasargad,
+                CreateDate = DateTime.Now,
+                Amount = user.WalletAmount * 10,
+                Bank = BankEnum.Pasargad,
                 Method = Payment.PaymentMethod.Podium,
                 Type = Payment.PaymentType.Expenditure,
                 Status = Payment.PaymentStatus.NotPaid,
+                TransactionId = BankUtility.GeneratePodiumTransactionId()
             };
             paymentService.Insert(payment);
 
-            ShebaPaymentRequestDTO payDTO = new ShebaPaymentRequestDTO()
+            var transactionCause = "تسویه کیف پول";
+            var walletTransactionId = DecreaseCredit(user.Id, user.WalletAmount, 0, 0, out _,
+                CreditTransaction.WalletTransactionReason.Other, transactionCause, payment.Id,
+                operatorId, ActionSourceEnum.AdminPanel);
+
+            payment.WalletTransactionId = walletTransactionId;
+            paymentService.Update(payment);
+
+            PayaPaymentRequestDTO request = new PayaPaymentRequestDTO()
             {
                 DestSheba = "IR" + hostBankCard.ShabaNumber,
                 DestFirstName = hostBankCard.FName,
                 DestLastName = hostBankCard.LName,
                 PaymentId = payment.Id,
-                Timestamp = payment.Date,
-                Amount = user.Credit * 10,
-                CentralBankTransferDetailType = CentralBankTransferEnum.CCPA
+                Timestamp = payment.CreateDate,
+                Amount = payment.Amount,
+                CentralBankTransferDetailType = CentralBankTransferEnum.CCPA,
+                TransactionId = payment.TransactionId,
+                SourceComment = $"تسویه کیف پول با شناسه تراکنش {walletTransactionId}",
+                DestComment = $"تسویه کیف پول با شناسه تراکنش {walletTransactionId}"
             };
 
-            ShebaPaymentResultDTO result;
-            if (env.IsDevelopment())
-            {
-                result = new ShebaPaymentResultDTO()
-                {
-                    HasError = false,
-                    Message = "پرداخت با موفقیت انجام شد",
-                    ErrorMessage = "پرداخت انجام نشد",
-                    PayablePrice = user.Credit,
-                    TraceNumber = "123456789"
-                };
-            }
-            else
-            {
-                result = bankingOperator.ShebaPayment(payDTO);
-            }
+            PayaPaymentResponseDTO response = SendPayaPaymentRequest(request);
 
-            if (result.HasError == false)
+            if (response.HasError == false)
             {
-                result.PayablePrice = user.Credit;
-                long newCredit;
-                var transactionCause = "تسویه کیف پول";
-                var creditTransactionId = DecreaseCredit(user.Id, user.Credit, long.Parse(result.TraceNumber), 0, out newCredit,
-                    CreditTransaction.WalletTransactionReason.Other, transactionCause, payment.Id, operatorId, ActionSourceEnum.AdminPanel);
-                mediator.Publish(new CreditTransactionUpdateEvent(user.Id, newCredit, ActionSourceEnum.AdminPanel, operatorId));
+                response.PayablePrice = payment.AmountAsToman;
+                var walletTransaction = creditTransactionService.Find(walletTransactionId);
+                walletTransaction.BankTransactionID = long.Parse(response.TraceNumber);
+                creditTransactionService.Update(walletTransaction);
+
                 payment.PayDate = DateTime.Now;
-                payment.TraceNumber = result.TraceNumber;
-                payment.WalletTransactionId = creditTransactionId;
+                payment.TraceNumber = response.TraceNumber;
                 payment.Status = Payment.PaymentStatus.Paid;
                 paymentService.Update(payment);
             }
-            return result;
+            return response;
         }
 
-        public CheckShebaPaymentResultDTO CheckShebaPaymentStatus(long paymentId)
+        public PayaPaymentResponseDTO PodiumRepayment(int paymentId, int operatorId)
         {
-            var payment = paymentService.Find((int)paymentId);
-            string date = payment.Date.ToString("yyyy/MM/dd");
-            var result = bankingOperator.CheckShebaPaymentStatus(date, paymentId.ToString());
-            result.PaymentStatus = payment.Status;
-            result.PaymentId = payment.Id;
+            var payment = paymentService.Find(paymentId);
+            if (payment.Type == Payment.PaymentType.Income || payment.Status == Payment.PaymentStatus.Paid)
+            {
+                return new PayaPaymentResponseDTO()
+                {
+                    HasError = true,
+                    ErrorMessage = "پرداخت مورد نظر اشتباه است"
+                };
+            }
+
+            var checkTransactionStatusResponse = CheckTransactionStatus(payment.TransactionId);
+            if (checkTransactionStatusResponse.HasError)
+            {
+                return new PayaPaymentResponseDTO()
+                {
+                    HasError = true,
+                    ErrorCode = checkTransactionStatusResponse.ErrorCode,
+                    ErrorMessage = checkTransactionStatusResponse.ErrorMessage
+                };
+            }
+
+            var userBankCard = repository.FindBankCardByUserId(payment.UserID);
+            var comment = payment.ReserveID.HasValue ? $"تسویه رزرو {payment.Id}"
+                : $"تسویه کیف پول با شماره تراکنش {payment.WalletTransactionId}";
+
+            PayaPaymentRequestDTO request = new PayaPaymentRequestDTO()
+            {
+                DestSheba = "IR" + userBankCard.ShabaNumber,
+                DestFirstName = userBankCard.FName,
+                DestLastName = userBankCard.LName,
+                PaymentId = payment.Id,
+                Timestamp = payment.CreateDate,
+                Amount = payment.Amount,
+                CentralBankTransferDetailType = CentralBankTransferEnum.CCPA,
+                TransactionId = payment.TransactionId,
+                SourceComment = comment,
+                DestComment = comment
+            };
+
+            PayaPaymentResponseDTO result = SendPayaPaymentRequest(request);
+
+            if (result.HasError == false)
+            {
+                if (payment.ReserveID.HasValue)
+                {
+                    var reserve = repository.FindReserve((long)payment.ReserveID);
+                    ReservePaymentType reservePaymentType;
+                    if (reserve.ReservePayments.Any(a => a.PaymentType == (int)ReservePaymentType.GuestClearing))
+                    {
+                        reservePaymentType = ReservePaymentType.SiteClearingToHost;
+                    }
+                    else
+                    {
+                        reservePaymentType = ReservePaymentType.SiteDepositeToHost;
+                    }
+                    var reservePayment = new ReservePayment()
+                    {
+                        PaymentType = (int)reservePaymentType,
+                        ReserveID = (long)reserve.Id,
+                        UserID = operatorId,
+                        Price = payment.AmountAsToman,
+                        PaymentMethod = (int)ReservePayment.ReservePaymentMethod.Podium,
+                        CreateDate = DateTime.Now,
+                        OperatorID = operatorId,
+                        TransactionID = long.Parse(result.TraceNumber),
+                        PaymentId = payment.Id
+                    };
+                    payment.ReservePayment = reservePayment;
+                }
+                else
+                {
+                    var walletTransaction = creditTransactionService.Find(payment.WalletTransactionId.Value);
+                    walletTransaction.BankTransactionID = long.Parse(result.TraceNumber);
+                    creditTransactionService.Update(walletTransaction);
+                }
+                payment.PayDate = DateTime.Now;
+                payment.TraceNumber = result.TraceNumber;
+                payment.Status = Payment.PaymentStatus.Paid;
+                paymentService.Update(payment);
+            }
             return result;
         }
 
@@ -1413,8 +1474,8 @@ namespace Amlakbashi.Accounting
             {
                 return false;
             }
-            string date = payment.Date.ToString("yyyy/MM/dd");
-            var result = bankingOperator.CheckShebaPaymentStatus(date, paymentId.ToString());
+
+            var result = bankingOperator.CheckPayaPayment(payment.TransactionId, payment.TraceNumber);
             if (result.HasError)
             {
                 return false;
@@ -1438,36 +1499,80 @@ namespace Amlakbashi.Accounting
                         PaymentType = (int)reservePaymentType,
                         ReserveID = (long)reserve.Id,
                         UserID = operatorId,
-                        Price = payment.TotalPrice / 10,
+                        Price = payment.AmountAsToman,
                         PaymentMethod = (int)ReservePayment.ReservePaymentMethod.Podium,
                         CreateDate = DateTime.Now,
                         OperatorID = operatorId,
                         TransactionID = long.Parse(result.RefrenceNumber),
                         PaymentId = payment.Id
                     };
-                    reservePaymentService.Insert(reservePayment);
-                    payment.PayDate = DateTime.Now;
-                    payment.TraceNumber = result.RefrenceNumber;
-                    payment.ReservePaymentId = reservePayment.Id;
-                    payment.Status = Payment.PaymentStatus.Paid;
-                    paymentService.Update(payment);
+                    payment.ReservePayment = reservePayment;
                 }
                 else
                 {
                     var user = repository.FindUser(payment.UserID);
-                    long newCredit;
-                    var transactionCause = "تسویه کیف پول";
-                    var creditTransactionId = DecreaseCredit(user.Id, user.Credit, long.Parse(result.RefrenceNumber), 0, out newCredit,
-                        CreditTransaction.WalletTransactionReason.Other, transactionCause, payment.Id, operatorId, ActionSourceEnum.AdminPanel);
-                    mediator.Publish(new CreditTransactionUpdateEvent(user.Id, newCredit, ActionSourceEnum.AdminPanel, operatorId));
-                    payment.PayDate = DateTime.Now;
-                    payment.TraceNumber = result.RefrenceNumber;
-                    payment.WalletTransactionId = creditTransactionId;
-                    payment.Status = Payment.PaymentStatus.Paid;
-                    paymentService.Update(payment);
+                    var walletTransaction = creditTransactionService.Find((long)payment.WalletTransactionId);
+                    walletTransaction.BankTransactionID = long.Parse(result.RefrenceNumber);
+                    creditTransactionService.Update(walletTransaction);
                 }
+                payment.PayDate = DateTime.Now;
+                payment.TraceNumber = result.RefrenceNumber;
+                payment.Status = Payment.PaymentStatus.Paid;
+                paymentService.Update(payment);
                 return true;
             }
+        }
+
+        public CheckPayaPaymentResponseDTO CheckPayaPaymentStatus(long paymentId)
+        {
+            var payment = paymentService.Find((int)paymentId);
+            var result = bankingOperator.CheckPayaPayment(payment.TransactionId, payment.TraceNumber);
+            result.PaymentStatus = payment.Status;
+            result.PaymentId = payment.Id;
+            return result;
+        }
+
+        private PayaPaymentResponseDTO SendPayaPaymentRequest(PayaPaymentRequestDTO request)
+        {
+            if (env.IsDevelopment())
+            {
+                return new PayaPaymentResponseDTO()
+                {
+                    HasError = false,
+                    Message = "پرداخت با موفقیت انجام شد",
+                    ErrorMessage = "پرداخت انجام نشد",
+                    PayablePrice = request.Amount,
+                    TraceNumber = new Random().Next(1000000, 9999999).ToString()
+                };
+            }
+            else
+            {
+                return bankingOperator.PayaPayment(request);
+            }
+        }
+
+        private CheckTransactionStatusResponseDTO CheckTransactionStatus(string transactionId)
+        {
+            var response = bankingOperator.CheckTransactionStatus(transactionId);
+            if (response.HasError)
+            {
+                if (response.ErrorAgent == ExpenditurePaymentErrorAgent.PasargadBank && response.ErrorCode == 1108) // تراکنش یافت نشد
+                {
+                    response.HasError = false;
+                }
+                return response;
+            }
+            if (response.TransactionStatus == TransactionStatusEnum.InProgress)
+            {
+                response.HasError = true;
+                response.ErrorMessage = "پرداخت بانکی مورد نظر توسط بانک در حال پردازش است";
+            }
+            if (response.TransactionStatus == TransactionStatusEnum.Success)
+            {
+                response.HasError = true;
+                response.ErrorMessage = "پرداخت بانکی مورد نظر با موفقیت انجام شده است";
+            }
+            return response;
         }
     }
 }

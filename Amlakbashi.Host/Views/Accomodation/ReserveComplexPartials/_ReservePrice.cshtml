@@ -23,40 +23,40 @@
         </span>
     </div>
 }
-@if (Model.HolidayPikePrice != 0)
+@if (Model.PeakHolidayPrice != 0)
 {
     <div class="advertie-page__price-item">
         <span class="advertise-page__price-title">
             قیمت پیک تعطیلات
         </span>
         <span class="advertise-page__price-content">
-            @string.Format("{0:n0}", Model.HolidayPikePrice) تومان
+            @string.Format("{0:n0}", Model.PeakHolidayPrice) تومان
         </span>
     </div>
 }
-@if (Model.RentPrice != 0)
+@if (Model.MonthlyPrice != 0)
 {
     <div class="advertie-page__price-item">
         <span class="advertise-page__price-title">
             اجاره ماهیانه:
         </span>
         <span class="advertise-page__price-content">
-            @string.Format("{0:n0}", Model.RentPrice) تومان
+            @string.Format("{0:n0}", Model.MonthlyPrice) تومان
         </span>
     </div>
 }
-@if (Model.MoreThanCapacityPrice != 0)
+@if (Model.ExtraCapacityPrice != 0)
 {
     <div class="advertie-page__price-item">
         <span class="advertise-page__price-title">
             هزینه هر مهمان بیشتر:
         </span>
         <span class="advertise-page__price-content">
-            @string.Format("{0:n0}", Model.MoreThanCapacityPrice) تومان
+            @string.Format("{0:n0}", Model.ExtraCapacityPrice) تومان
         </span>
     </div>
 }
-@if (Model.NorouzPrice > 0)
+@*@if (Model.NorouzPrice > 0)
 {
     <div class="advertie-page__price-item js-NorouzPrice">
         <p class="advertise-page__price-title">
@@ -77,4 +77,4 @@
             @string.Format("{0:n0}", Model.NorouzOverCapacityPrice) تومان
         </span>
     </div>
-}
+}*@

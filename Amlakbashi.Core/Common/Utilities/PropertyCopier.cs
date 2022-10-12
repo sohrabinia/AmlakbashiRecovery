@@ -67,15 +67,24 @@ namespace Amlakbashi.Core.Common.Utilities
             {
                 foreach (var childProperty in targetProperties)
                 {
-                    var propertiesAreTheSame = parentProperty.Name.ToLower() == childProperty.Name.ToLower();
-                    if (propertiesAreTheSame)
-                    {
-                        propertiesAreTheSame = parentProperty.PropertyType == childProperty.PropertyType;
-                        propertiesAreTheSame = propertiesAreTheSame ||
-                            Nullable.GetUnderlyingType(parentProperty.PropertyType) == childProperty.PropertyType ||
-                            Nullable.GetUnderlyingType(childProperty.PropertyType) == parentProperty.PropertyType;
-                    }
-                    if (propertiesAreTheSame)
+                    //var propertiesAreTheSame = parentProperty.Name.ToLower() == childProperty.Name.ToLower();
+                    //if (propertiesAreTheSame)
+                    //{
+                    //    propertiesAreTheSame = parentProperty.PropertyType == childProperty.PropertyType;
+                    //    propertiesAreTheSame = propertiesAreTheSame ||
+                    //        Nullable.GetUnderlyingType(parentProperty.PropertyType) == childProperty.PropertyType ||
+                    //        Nullable.GetUnderlyingType(childProperty.PropertyType) == parentProperty.PropertyType;
+                    //}
+                    //if (propertiesAreTheSame)
+                    //{
+                    //    childProperty.SetValue(to, parentProperty.GetValue(from));
+                    //    break;
+                    //}
+
+                    if (parentProperty.Name.ToLower() == childProperty.Name.ToLower() &&
+                        (parentProperty.PropertyType == childProperty.PropertyType ||
+                        Nullable.GetUnderlyingType(parentProperty.PropertyType) == childProperty.PropertyType ||
+                        Nullable.GetUnderlyingType(childProperty.PropertyType) == parentProperty.PropertyType))
                     {
                         childProperty.SetValue(to, parentProperty.GetValue(from));
                         break;

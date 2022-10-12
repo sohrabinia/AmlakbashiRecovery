@@ -32,11 +32,11 @@ namespace Amlakbashi.Core.Infrastructure.StyleHelpers
         {
             switch (status)
             {
-                case InstantReserveStatusEnum.None:
+                case InstantReserveStatusEnum.Calendar:
                     return "#4485F2";
-                case InstantReserveStatusEnum.Requested:
+                case InstantReserveStatusEnum.Permanent:
                     return "#FF7F00";
-                case InstantReserveStatusEnum.Confirmed:
+                case InstantReserveStatusEnum.InActive:
                     return "#34A853";
                 default:
                     return "";

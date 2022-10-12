@@ -241,7 +241,7 @@ namespace MVC_RSS_Sitemap.Controllers
                                            {
                                                title = p.Title,
                                                //changefreq = "daily",
-                                               lastmod = p.LastModifyDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
+                                               lastmod = p.LastModifiedDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
                                                priority = "0.6",
                                                link = url_base + string.Format("/{0}/{1}", AdvertiseMainLocalization.CategoryTitle, p.Slug),
 
@@ -260,7 +260,7 @@ namespace MVC_RSS_Sitemap.Controllers
                                            {
                                                title = p.Title.Replace("-", " "),
                                                imagelink = url_base + string.Format("/عکس-آگهی-بزرگ/{0}", p.Slug),
-                                               geolocation = provinces.FirstOrDefault(x => x.Id == p.Province).EnglishName + ", Iran",
+                                               geolocation = provinces.FirstOrDefault(x => x.Id == p.ProvinceId).EnglishName + ", Iran",
                                                link = url_base + string.Format("/{0}/{1}", AdvertiseMainLocalization.CategoryTitle, p.Slug),
 
                                            }).ToList();

@@ -39,7 +39,7 @@
     </div>
     @using (Html.BeginForm("adminbasicform", "accomodation", new { Id = Model.Id }, FormMethod.Post, true, new { enctype = "multipart/form-data", id = "AccForm" }))
     {
-        <input type="hidden" value="@(Model.Available == true ? "true" : "false")" name="Available" />
+        <input type="hidden" value="@(Model.Active == true ? "true" : "false")" name="Active" />
         <input type="hidden" value="@(ViewBag.tab == null ? 0 : ViewBag.tab)" name="tab" id="tabInput" />
         <div id="form-container" class="advertise-form__container">
             <div class="form-step" id="_AccFormBasicElements" data-title="اطلاعات اولیه">

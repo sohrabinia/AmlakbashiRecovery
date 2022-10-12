@@ -47,23 +47,23 @@
 <div class="reserve-dashboard__stepBars">
     @foreach (var category in categories)
     {
-    <div class="reserve_stepbars @((int)category == ViewBag.category ? "isActive" : "")">
-        <span class="text-style-banner__reserve_stepbars">
-            @if (ViewBag.countDict[category] > 0)
+        <div class="reserve_stepbars @((int)category == ViewBag.category ? "isActive" : "")">
+            <span class="text-style-banner__reserve_stepbars">
+                @if (ViewBag.countDict[category] > 0)
                 {
-            <span class="reserve-setbars_box-number @((int)category == ViewBag.category ? "is_Active" : "")"> @ViewBag.countDict[category]</span>
+                    <span class="reserve-setbars_box-number @((int)category == ViewBag.category ? "is_Active" : "")"> @ViewBag.countDict[category]</span>
                 }
-            <a href="/app/reserve/list?category=@((int)category)&selectType=@((int)ViewBag.selectType)" style="color:@((int)category == ViewBag.category ?"#242424" : "#6d7179");">
-                <span>
-                    @if ((int)ViewBag.selectType == 1)
+                <a href="/app/reserve/list?category=@((int)category)&selectType=@((int)ViewBag.selectType)" style="color:@((int)category == ViewBag.category ?"#242424" : "#6d7179");">
+                    <span>
+                        @if ((int)ViewBag.selectType == 1)
                         {@ReserveLocalization.GetReserveCategoryTitle(category, ViewBag.selectType)}
-                    @if ((int)ViewBag.selectType == 2)
+                        @if ((int)ViewBag.selectType == 2)
                         {@ReserveLocalization.GetReserveCategoryTitle(category, ViewBag.selectType)}
-                    @ReserveLocalization.GetReserveCategoryTitle(category)
-                </span>
-            </a>
-        </span>
-    </div>
+                        @ReserveLocalization.GetReserveCategoryTitle(category)
+                    </span>
+                </a>
+            </span>
+        </div>
     }
 </div>
 
@@ -213,6 +213,46 @@
                     }
                 }
             });
+        }
+
+        function doCancel(reserveId) {
+            var tip_text = '';
+            var cancleText = `${tip_text}<div id="cancel_reason_container"><span id="cancel_reason_span" style="display:block;padding:5px;">لطفا دلیل لغو سفر را بنویسید:</span><textarea id="cancel_reason_input" style="width:100%" placeholder="لطفا فارسی تایپ کنید"></textarea></div>`
+            closeCancelingReserve = showNoYesMessage('لغو رزرو', `${cancleText}`, function () {
+                reasonDesc = $("#cancel_reason_input").val();
+                if (!reasonDesc) {
+                    alertify.error('لطفا دلیل لغو سفر را بنویسید');
+                } else {
+                    $.ajax({
+                        url: "/reserve/cancel",
+                        type: "post",
+                        data: {
+                            reserveId: reserveId,
+                            reason: 0,
+                            reasonDesc: reasonDesc
+                        },
+                        beforeSend: function () {
+
+                        },
+                        success: function (response) {
+                            if (response.status == 0) {
+                                alertify.error(response.msg);
+                            }
+                            else {
+                                alertify.success("رزرو مورد نظر با موفقیت لغو شد");
+                                closeCancelingReserve.close();
+                            }
+                        },
+                        error: function (ret) {
+                            alertify.error("عملیات با خطا مواجه شد");
+                        }
+                    });
+                }
+            }, undefined, { noText: 'انصراف', yesText: ' لغو رزرو', autoClose: false });
+        }
+
+        function showCancelDialog(reserveId) {
+            showInfoMessage('لغو رزرو ' + reserveId, '', { contentUrl: '/reserve/ShowCancelDialog?reserveId=' + reserveId });
         }
 
         function confirmCashPay(reserve_id, confirm_state) {
@@ -768,6 +808,55 @@
             });
         }
 
+        function requestEarlyCheckout(reserveId, isReserveStarted) {
+            if (isReserveStarted == false) {
+                showErrorMessage('تسویه', 'امکان تسویه رزرو پیش از شروع سفر وجود ندارد.');
+                return;
+            }
+            showNoYesMessage('درخواست تسویه پیش از موعد',
+                'میزبان گرامی، توجه فرمایید که برای تسویه پیش از موعد مقرر سایت، نیاز به تایید مهمان می باشد.' +
+                '<br/><br/>' +
+                'آیا درخواست تسویه پیش از موعد مقرر ثبت شود؟',
+                function () {
+                    myajax("reserve/updateearlycheckout", "reserveId=" + reserveId + "&earlycheckout=" + 1, function (ret) {
+                        if (ret.status == 1) {
+                            $("div[data-id='" + reserveId + "'] #request_early_checkout_btn").hide();
+                            alertify.success('درخواست شما ثبت شد');
+                        }
+                        else {
+                            alertify.error(ret.msg);
+                        }
+                    });
+                });
+        }
+
+        function confirmEarlyCheckout(reserveId, isReserveStarted, isRequestByHost) {
+            if (isReserveStarted === false) {
+                showErrorMessage('تسویه', 'امکان تسویه رزرو پیش از شروع سفر وجود ندارد.');
+                return;
+            }
+            if (isRequestByHost === false) {
+                showErrorMessage('تسویه', 'میزبان درخواست تسویه پیش از موعد نداده است.');
+                return;
+            }
+            showNoYesMessage('تسویه پیش از موعد با میزبان',
+                'مهمان گرامی، پیش از تایید این گزینه، لطفا از صحت اطلاعات مندرج در آگهی و محل اقامت خود اطمینان حاصل کنید. ' +
+                'زیرا پس از تایید شما، در صورت بروز مشکل، بازگردانی وجه پرداختی شما از جانب سایت امکانپذیر نمی باشد.' +
+                '<br/><br/>' +
+                'آیا از تسویه با میزبان، پیش از موعد مقرر مطمئن هستید؟',
+                function () {
+                    myajax("reserve/updateearlycheckout", "reserveId=" + reserveId + "&earlycheckout=" + 2, function (ret) {
+                        if (ret.status == 1) {
+                            $("div[data-id='" + reserveId + "'] #confirm_early_checkout_btn").hide();
+                            alertify.success('تسویه پیش از موعد رزرو مورد نظر فعال شد');
+                        }
+                        else {
+                            alertify.error(ret.msg);
+                        }
+                    });
+                });
+        }
+
         function confirmAndContactUser(user_id, onClose, extra_msg, reserve_id, is_guest)
         {
             $.confirm({
@@ -792,12 +881,12 @@
                 confirmAndContactUser(user_id, onClose, extra_msg, reserve_id, is_guest);
                 return;
             }
-            if (is_guest) {
-                myajax('Reserve/SetGuestCallDate','reserve_id='+ reserve_id ,null,false);
-            }
-            else {
-                myajax('Reserve/SetHostCallDate','reserve_id=' + reserve_id ,null,false);
-            }
+            //if (is_guest) {
+            //    myajax('Reserve/SetGuestCallDate','reserve_id='+ reserve_id ,null,false);
+            //}
+            //else {
+            //    myajax('Reserve/SetHostCallDate','reserve_id=' + reserve_id ,null,false);
+            //}
             showInfoMessage('  شماره تماس  ' ,'', {contentUrl:'/User/ContactUserPopup?user_id=' + user_id});
         }
 
@@ -838,7 +927,7 @@
                 gtag('event', 'purchase', {
                     "category": "ecommerce",
                     "transaction_id": payment_transaction_id,
-                    "affiliation": "@(advertise != null ? advertise.UserID.ToString() : "")",
+                    "affiliation": "@(advertise != null ? reserve.HostUserID.ToString() : "")",
                     "title": "@(advertise != null ? advertise.Title : "")",
                     "label": "@(advertise != null ? advertise.Title : "")",
                     "value": 0@(reserve != null ? reserve.TotalPrice : 0),

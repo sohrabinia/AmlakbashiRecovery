@@ -85,7 +85,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                 string title = "";
                 if (string.IsNullOrEmpty(accTitle))
                 {
-                    var tmpTitle = "اجاره روزانه " + AdvertiseMainLocalization.GetAdvertiseTypePersianString(accType);
+                    var tmpTitle = "اجاره روزانه " + AdvertiseMainLocalization.GetAdvertiseTypePersianName(accType);
                     title = tmpTitle;
                 }
                 else

@@ -3,6 +3,7 @@ using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,7 +57,10 @@ namespace Amlakbashi.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("AmlakbashiDB"));
+            //optionsBuilder.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("AmlakbashiDB"));
+            optionsBuilder.UseLazyLoadingProxies()
+                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.DetachedLazyLoadingWarning))
+                .UseSqlServer(configuration.GetConnectionString("AmlakbashiDB"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -86,7 +90,7 @@ namespace Amlakbashi.Data
                         .HasOne<Advertise>()
                         .WithMany()
                         .HasForeignKey("Advertise_Id")
-                        .HasConstraintName("FK_dbo.DynamicCategoryAdvertises_dbo.Advertises_Advertise_Id")
+                        .HasConstraintName("FK_DynamicCategoryAdvertises_Residences_Advertise_Id")
                         .OnDelete(DeleteBehavior.Cascade),
                     j => j
                         .HasOne<DynamicCategory>()
@@ -110,7 +114,7 @@ namespace Amlakbashi.Data
                         .HasOne<Advertise>()
                         .WithMany()
                         .HasForeignKey("Advertise_Id")
-                        .HasConstraintName("FK_dbo.FileAdvertises_dbo.Advertises_Advertise_Id")
+                        .HasConstraintName("FK_FileAdvertises_Residences_Advertise_Id")
                         .OnDelete(DeleteBehavior.Cascade));
         }
     }

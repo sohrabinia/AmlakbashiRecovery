@@ -152,6 +152,7 @@ function checkReserve(confirm_required) {
         "&from_date=" + from_date + "&to_date=" + to_date +
         "&number_of_guests=" + guestCount, function (ret) {
             if (ret.val == 1) {
+                isInstantReserve = ret.isInstantReserve;
                 var date_string = 'از ' + firstSelectedDay.date +
                     ' تا ' + secondSelectedDay.date +
                     ' به مدت ' + diffDaysMs(firstSelectedDay.value, secondSelectedDay.value) + ' شب';
@@ -203,8 +204,7 @@ function checkReserve(confirm_required) {
                     reserve_wait_for_login = false;
                     myajax("reserve/reserverequest", "advertise_id=" + advertise_id +
                         "&from_date=" + from_date + "&to_date=" + to_date +
-                        "&number_of_guests=" + $("#guest_count").val() +
-                        "&instant_reserve=" + (instantReserveAvailable && instantReserveActivated).toString(), function (ret) {
+                        "&number_of_guests=" + $("#guest_count").val(), function (ret) {
                             if (ret.val == 1) {
                                 //gtag('event', 'book', {
                                 //    "items": [
@@ -224,7 +224,8 @@ function checkReserve(confirm_required) {
                                 $("#from_date_label").hide();
                                 //$("#to_date_label").hide();
                                 $("#reserve_price_label").hide();
-                                window.location.href = (instantReserveAvailable && instantReserveActivated) ?
+                                //window.location.href = (instantReserveAvailable && instantReserveActivated) ?
+                                window.location.href = isInstantReserve ?
                                     '/app/reserve/list?selecttype=1&reserve_id=' + ret.reserveId + '&initialPayId=' + ret.reserveId
                                     : '/app/reserve/list?selecttype=1&msg=' + 'reserve_request';
                             }
@@ -273,8 +274,7 @@ function checkReserve(confirm_required) {
                         reserve_wait_for_login = false;
                         myajax("reserve/reserverequest", "advertise_id=" + advertise_id +
                             "&from_date=" + from_date + "&to_date=" + to_date +
-                            "&number_of_guests=" + $("#guest_count").val() +
-                            "&instant_reserve=" + (instantReserveAvailable && instantReserveActivated).toString(), function (ret) {
+                            "&number_of_guests=" + $("#guest_count").val(), function (ret) {
                                 if (ret.val == 1) {
                                     //gtag('event', 'book', {
                                     //    "items": [
@@ -294,7 +294,8 @@ function checkReserve(confirm_required) {
                                     $("#from_date_label").hide();
                                     //$("#to_date_label").hide();
                                     $("#reserve_price_label").hide();
-                                    window.location.href = (instantReserveAvailable && instantReserveActivated) ?
+                                    //window.location.href = (instantReserveAvailable && instantReserveActivated) ?
+                                    window.location.href = isInstantReserve ?
                                         '/app/reserve/list?selecttype=1&reserve_id=' + ret.reserveId + '&initialPayId=' + ret.reserveId
                                         : '/app/reserve/list?selecttype=1&msg=' + 'reserve_request';
                                 }
@@ -340,7 +341,7 @@ function checkReserve(confirm_required) {
 function onUpdateDate() {
     if (firstSelectedDay) {
         instantReserveActivated = firstSelectedDay.value <= maxInstantReserveStartUnix;
-        updateReserveRequestButton();
+        //updateReserveRequestButton();
     }
     updateReservePrice();
     updateReserveLabels();
@@ -509,6 +510,7 @@ function ToggleFavorite($this, $id) {
         }
     }, false);
 }
+
 function onClickFavouriteBtn(elem) {
     ToggleFavorite($(elem), $(elem).attr("advertise_id"));
 }

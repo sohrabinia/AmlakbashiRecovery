@@ -19,17 +19,17 @@
     var owner = Model.AccUser;
     var full_name = owner.FullName;
 
-    var haveBasicInfo = Model.Capacity.Capacity > 0 || Model.Room.Room > 0 || Model.BuildingSize.Metrazh > 0 ||
+    var haveBasicInfo = Model.Capacity.Capacity > 0 || Model.Room.RoomCount > 0 || Model.BuildingSize.BuildingArea > 0 ||
         Model.LandArea.LandArea > 0 || Model.Floor.Floor != Advertise.FloorItems.Unset || (Model.Parking.Parking != Advertise.ParkingItems.Unset &&
-        Model.Parking.Parking != Advertise.ParkingItems.Unset) || Model.Bed.SingleBed > 0 || Model.Bed.DoublesBed > 0 || Model.Amenities.Pool == true ? true : false;
+        Model.Parking.Parking != Advertise.ParkingItems.Unset) || Model.Bed.SingleBedCount > 0 || Model.Bed.DoubleBedCount > 0 || Model.Amenities.Pool == true ? true : false;
 
     var haveMainAmenities = Model.Amenities.HeatingSystem != Advertise.HeatingSystemItems.Unset ||
         Model.Amenities.CoolingSystem != Advertise.CoolingSystemItems.Unset || Model.Amenities.WC != Advertise.WCItems.Unset
-        || Model.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset || Model.Bed.BlanketsAndMattresses != 0
+        || Model.Bed.ExtraBlanketCount != Advertise.ExtraBlanketCountItems.Unset || Model.Bed.BlanketAndMattressCount != 0
         ? true : false;
 
-    var haveDetailedAmenities = Model.Elevator.Elevator || Model.Amenities.Bathroom || Model.Amenities.Pool ||
-        Model.Amenities.Sauna || Model.Amenities.Jacuzzi || Model.Amenities.TV || Model.Amenities.Wifi ||
+    var haveDetailedAmenities = Model.Elevator.Elevator || Model.Amenities.Bathroom || Model.Amenities.Pool || Model.Amenities.Balcony ||
+        Model.Amenities.Sauna || Model.Amenities.Jacuzzi || Model.Amenities.TV || Model.Amenities.Wifi || Model.Amenities.Filming ||
         Model.Amenities.WashingMachine || Model.Amenities.Refrigerator || Model.Amenities.Oven || Model.Amenities.MicrowaveOven ||
         Model.Amenities.KitchenHood || Model.Amenities.KitchenUtensils || Model.Amenities.Hairdryer || Model.Amenities.SoundSystem ||
         Model.Amenities.TeaMaker || Model.Amenities.Foosball || Model.Amenities.Golf || Model.Amenities.PoolTable ? true : false;
@@ -42,19 +42,19 @@
     else
     {
         album_photos = Array.ConvertAll(Model.Photo.AlbumPhoto.Trim(',').Split(','), x => long.Parse(x)).ToList();
-        if (Model.Photo.PhotoID != null)
+        if (Model.Photo.MainPhotoId != null)
         {
-            album_photos.Remove((long)Model.Photo.PhotoID);
+            album_photos.Remove((long)Model.Photo.MainPhotoId);
         }
     }
-    if (Model.Photo.PhotoID != null)
+    if (Model.Photo.MainPhotoId != null)
     {
-        album_photos.Insert(0, (long)Model.Photo.PhotoID);
+        album_photos.Insert(0, (long)Model.Photo.MainPhotoId);
     }
 
     var u_ = "https://www.amlakbashi.com" + Model.RawUrl;
     var t_ = ViewBag.Title;
-    var img_ = "https://www.amlakbashi.com" + (Model.Photo.PhotoID != null ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.Photo.PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394));
+    var img_ = "https://www.amlakbashi.com" + (Model.Photo.MainPhotoId != null ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.Photo.MainPhotoId, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394));
 }
 
 @section HeaderAddition
@@ -63,7 +63,7 @@
     {
         <link rel="canonical" href="https://www.amlakbashi.com@(Model.RawUrl)" />
         <meta property="og:url" content="https://www.amlakbashi.com@(Model.RawUrl)" />
-        <meta property="og:image" content='@("https://www.amlakbashi.com" + (Model.Photo.PhotoID != null ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.Photo.PhotoID, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
+        <meta property="og:image" content='@("https://www.amlakbashi.com" + (Model.Photo.MainPhotoId != null ? string.Format("/file/imgthumb?fileid={0}&w={1}&h={2}", Model.Photo.MainPhotoId, 700, 394) : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
     }
     else
     {
@@ -313,8 +313,6 @@
 
         @if (Model.CanPublish)
         {
-            @*<div class="advertise-page__detail-elements-parent">*@
-
             @* Amenities *@
             if (haveMainAmenities || haveDetailedAmenities)
             {
@@ -572,7 +570,8 @@
     var instantReserveActivated;
     var instantReserveMaxStart = 30;
     var maxInstantReserveStartUnix;
-    var maxReserveStartDate;
+        var maxReserveStartDate;
+        var isInstantReserve = false;
     jalaliShowLoading();
     $.ajax({
         type: "GET",
@@ -591,7 +590,7 @@
             instantReserveMaxStart = ret.instantReserveMaxStart;
             maxInstantReserveStartUnix = ret.maxInstantReserveStartUnix;
             maxReserveStartDate = ret.maxReserveStartDate;
-            updateReserveRequestButton();
+            //updateReserveRequestButton();
             var $elem = $('.master__favourite-button');
             if (ret.is_favourited) {
                 $elem.addClass("active");
@@ -657,8 +656,8 @@ function updateReserveRequestButton() {
             "@@type":"Place",
             "address":{
             "@@type":"PostalAddress",
-            "addressLocality":"@(Model.Address.Area > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
-            "addressRegion":"@(Model.Address.Area > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
+            "addressLocality":"@(Model.Address.AreaId > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
+            "addressRegion":"@(Model.Address.AreaId > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
             "streetAddress":"@(Model.FilteredAddress)"
             }
             },
@@ -666,7 +665,7 @@ function updateReserveRequestButton() {
             "@@type":"Hotel",
             "name":"@(Model.TitleDesc.Title)",
             "numberOfRooms":"@(Model.Room)",
-            "petsAllowed":"@(Model.Rules.AllowPets ? "Yes" : "No")",
+            "petsAllowed":"@(Model.Rules.Pets ? "Yes" : "No")",
             @*"floorsize":{
                 "@@type":"QuantitativeValue",
                 "value":"@(Model.Metrazh)",
@@ -691,8 +690,8 @@ function updateReserveRequestButton() {
             "priceRange" : "از شبی @(Model.Price.DailyPrice) تومان"
             ,
             "address" : {
-            "addressLocality" : "@(Model.Address.Area > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
-            "addressRegion" : "@(Model.Address.Area > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
+            "addressLocality" : "@(Model.Address.AreaId > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
+            "addressRegion" : "@(Model.Address.AreaId > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
             "addressCountry" : "Iran",
             "@@type" : "PostalAddress",
             "streetAddress" : "@Model.FilteredAddress",
@@ -757,8 +756,8 @@ function updateReserveRequestButton() {
                 "priceRange" : "از شبی @(Model.Price.DailyPrice) تومان"
                 ,
                 "address" : {
-                "addressLocality" : "@(Model.Address.Area > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
-                "addressRegion" : "@(Model.Address.Area > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
+                "addressLocality" : "@(Model.Address.AreaId > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
+                "addressRegion" : "@(Model.Address.AreaId > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
                 "addressCountry" : "Iran",
                 "@@type" : "PostalAddress",
                 "streetAddress" : "@Model.FilteredAddress",
@@ -794,7 +793,7 @@ function updateReserveRequestButton() {
             "@@type": "ListItem",
             "position": @pos,
             "name": "@Model.CityString",
-            "item": "https://www.amlakbashi.com/s/@(Model.Address.City)/@(Model.AccCategory.CityName)"
+            "item": "https://www.amlakbashi.com/s/@(Model.Address.CityId)/@(Model.AccCategory.CityName)"
             }
             @{
                 pos++;
@@ -809,7 +808,7 @@ function updateReserveRequestButton() {
             "name": "@typeUrlString",
             "item": "@("https://www.amlakbashi.com/s/" +
                     (
-                    (Model.Address.City + "/" + Model.AccCategory.CityName + "/" + typeUrlString)
+                    (Model.Address.CityId + "/" + Model.AccCategory.CityName + "/" + typeUrlString)
                     ))"
             }
             @{

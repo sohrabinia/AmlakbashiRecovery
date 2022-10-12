@@ -1,36 +1,36 @@
-﻿
-@model Amlakbashi.Core.Entities.File
+﻿@model int
 
 @{
     ViewBag.Title = "مدیریت فایل";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
 }
 
-<div class="title">ثبت و ویرایش  فایل</div>
+<div class="title">ویرایش  فایل</div>
 
 @using (Html.BeginForm("Edit", "File", FormMethod.Post, new { enctype = "multipart/form-data", id = "ManageForm" }))
 {
-
-    @Html.HiddenFor(model => model.Id)
+    <input type="hidden" name="fileId" value="@Model" />
     <table>
-        @if(Model.Id!=-1)
-        { 
-            <tr>
-                <td class="label">
-                    فایل قدیم :
-                </td>
-                <td style="width:300px;">
-                    <img src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=150",Model.Id)' />
-                </td>
-                <td></td>
-            </tr>
-        }
+        <tr>
+            <td class="label">شناسه فایل:</td>
+            <td>@Model</td>
+            <td></td>
+        </tr>
         <tr>
             <td class="label">
-                 فایل جدید :
+                فایل قدیم :
             </td>
             <td style="width:300px;">
-                 <input type="file" name="file"/>
+                <img src='@string.Format("/file/imgThumbOld?FileID={0}&w=200&h=150", Model)' />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="label">
+                فایل جدید :
+            </td>
+            <td style="width:300px;">
+                <input type="file" name="image" />
             </td>
             <td></td>
         </tr>
@@ -41,6 +41,5 @@
         <a class="cancel" href='@Url.Action("Index")'>انصراف</a>
     </div>
 }
-
 
 <div class="adminmsg">@ViewBag.msg</div>

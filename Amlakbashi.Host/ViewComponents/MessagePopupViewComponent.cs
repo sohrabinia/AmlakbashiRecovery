@@ -38,17 +38,6 @@ namespace Amlakbashi.Host.ViewComponents
                 var message = "کاربر گرامی، با توجه به حذف گزینه پارکینگ مشاع از آگهی ها، لطفا نسبت به آپدیت گزینه پارکینگ آگهی های مقابل اقدام فرمایید:";
                 foreach (var item in advertisesWithJoinlyParking)
                 {
-                    //if (item.Mode == Advertise.AdvertiseMode.Child)
-                    //{
-                    //    if (item.ParentAccType == Advertise.AdvertiseType.Complex || item.ParentAccType == Advertise.AdvertiseType.HotelApartment)
-                    //    {
-                    //        message = message + $"<a href='/accomodation/acccomplexform?parentid={item.ParentId}&id={item.Id}'>{item.Id}</a>";
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    message = message + $"<a href='/accomodation/accextraform?id={item.Id}'>{item.Id}</a>";
-                    //}
                     message = message + $" {item.Id}";
                 }
                 return message;

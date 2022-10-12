@@ -1,13 +1,16 @@
-﻿using Amlakbashi.Core.Entities;
+﻿using Amlakbashi.Core.DTOs.WebService;
+using Amlakbashi.Core.Entities;
+using System;
+using System.Collections.Generic;
 using static Amlakbashi.Core.Entities.Advertise;
 
 namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
 {
     public static class AdvertiseMainLocalization
     {
-        public static string GetPositionTypeString(int position_type)
+        public static string GetPositionTypePersianName(int position)
         {
-            switch ((PositionType)position_type)
+            switch ((PositionType)position)
             {
                 case PositionType.sahel:
                     return "ساحلی";
@@ -34,9 +37,9 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             }
         }
 
-        public static string GetAdvertiseTypeUserString(AdvertiseType advertiseType)
+        public static string GetAdvertiseTypePersianNameForUser(AdvertiseType advertiseType)
         {
-            switch ((AdvertiseType)advertiseType)
+            switch (advertiseType)
             {
                 case AdvertiseType.All:
                     return "اجاره روزانه";
@@ -104,92 +107,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             }
         }
 
-        public static string GetAdvertiseStatusString(int status, bool shortened = false)
-        {
-            switch ((AdvertiseStatus)status)
-            {
-                case AdvertiseStatus.ReadyToPublish:
-                    return "در انتظار تایید" + (shortened ? "" : " کارشناس");
-                case AdvertiseStatus.Published:
-                    return "تایید شده";
-                case AdvertiseStatus.Archived:
-                    return "غیر فعال";
-                case AdvertiseStatus.Deleted:
-                    return "پاک شده";
-                case AdvertiseStatus.NotVerified:
-                    return "تایید نشده";
-                case AdvertiseStatus.NotCompleted:
-                    return shortened ? "تکمیل نشده" : "اطلاعات آگهی را تکمیل کنید";
-                case AdvertiseStatus.FirstReady:
-                    return "در انتظار تایید" + (shortened ? "" : " کارشناس");
-                default:
-                    return "";
-            }
-        }
-
-        public static string GetInstantReserveStatusString(InstantReserveStatusEnum status)
-        {
-            switch (status)
-            {
-                case InstantReserveStatusEnum.None:
-                    return "غیرفعال";
-                case InstantReserveStatusEnum.Requested:
-                    return "در انتظار تایید";
-                case InstantReserveStatusEnum.Confirmed:
-                    return "فعال";
-                default:
-                    return "";
-            }
-        }
-
-        public static string GetInstantReserveButtonTitle(InstantReserveStatusEnum status, bool isBanned)
-        {
-            if (isBanned)
-                return "مشاهده دلیل ممنوعیت";
-            switch (status)
-            {
-                case InstantReserveStatusEnum.None:
-                    return "درخواست امکان رزرو آنی";
-                case InstantReserveStatusEnum.Requested:
-                    return "لغو رزرو آنی";
-                case InstantReserveStatusEnum.Confirmed:
-                    return "غیرفعال سازی";
-                default:
-                    return "";
-            }
-        }
-
-        public static string GetLocationString(string province, string city, string area,
-            string country_direction_string)
-        {
-            var location_string = "";
-            if (!string.IsNullOrEmpty(country_direction_string))
-            {
-                location_string = country_direction_string;
-            }
-            else if (!string.IsNullOrEmpty(area))
-            {
-                location_string = area;
-            }
-            else if (!string.IsNullOrEmpty(city))
-            {
-                location_string = city;
-            }
-            else
-            {
-                //if (province.Trim() == "گیلان" || province == "مازندران")
-                //{
-                //    location_string = "شمال " + province;
-                //}
-                //else
-                //{
-                location_string = "استان " + province;
-                //}
-            }
-            return location_string;
-        }
-
-        public static string GetAdvertiseTypePersianString(int advertiseType)
+        public static string GetAdvertiseTypePersianName(int advertiseType)
         {
             switch ((AdvertiseType)advertiseType)
             {
@@ -224,6 +142,67 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             }
         }
 
+        public static string GetAdvertiseStatusPersianName(int status, bool shortened = false)
+        {
+            switch ((AdvertiseStatus)status)
+            {
+                case AdvertiseStatus.ReadyToPublish:
+                    return "در انتظار تایید" + (shortened ? "" : " کارشناس");
+                case AdvertiseStatus.Published:
+                    return "تایید شده";
+                case AdvertiseStatus.Archived:
+                    return "غیر فعال";
+                case AdvertiseStatus.Deleted:
+                    return "پاک شده";
+                case AdvertiseStatus.NotVerified:
+                    return "تایید نشده";
+                case AdvertiseStatus.NotCompleted:
+                    return shortened ? "تکمیل نشده" : "اطلاعات آگهی را تکمیل کنید";
+                case AdvertiseStatus.FirstReady:
+                    return "در انتظار تایید" + (shortened ? "" : " کارشناس");
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetInstantReserveStatusPersianName(InstantReserveStatusEnum status)
+        {
+            switch (status)
+            {
+                case InstantReserveStatusEnum.Calendar:
+                    return "تقویمی";
+                case InstantReserveStatusEnum.Permanent:
+                    return "دائمی";
+                case InstantReserveStatusEnum.InActive:
+                    return "غیرفعال";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetLocationString(string province, string city, string area,
+            string country_direction_string)
+        {
+            var location_string = "";
+            if (!string.IsNullOrEmpty(country_direction_string))
+            {
+                location_string = country_direction_string;
+            }
+            else if (!string.IsNullOrEmpty(area))
+            {
+                location_string = area;
+            }
+            else if (!string.IsNullOrEmpty(city))
+            {
+                location_string = city;
+            }
+            else
+            {
+                location_string = "استان " + province;
+            }
+            return location_string;
+        }
+
         public static string GetPropertyTitle(Property property)
         {
             switch (property)
@@ -236,13 +215,13 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "عنوان";
                 case Property.Description:
                     return "توضیحات";
-                case Property.Count:
+                case Property.UnitCount:
                     return "تعداد اتاق";
-                case Property.Province:
+                case Property.ProvinceId:
                     return "استان";
-                case Property.City:
+                case Property.CityId:
                     return "شهر";
-                case Property.Area:
+                case Property.AreaId:
                     return "منطقه";
                 case Property.Address:
                     return "آدرس";
@@ -250,29 +229,29 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "قیمت پایه برای روزهای عادی";
                 case Property.HolidayPrice:
                     return "قیمت روزهای تعطیل";
-                case Property.HolidayPikePrice:
+                case Property.PeakHolidayPrice:
                     return "قیمت روزهای پیک تعطیلات";
-                case Property.NorouzPrice:
+                case Property.NowruzPrice:
                     return "قیمت روزهای نوروز";
-                case Property.RentPrice:
+                case Property.MonthlyPrice:
                     return "قیمت ماهیانه";
-                case Property.MoreThanCapacityPrice:
+                case Property.ExtraCapacityPrice:
                     return "قیمت به ازای هر مهمان بیشتر از ظرفیت";
-                case Property.Metrazh:
+                case Property.BuildingArea:
                     return "متراژ بنا";
                 case Property.LandArea:
                     return "متراژ زمین";
                 case Property.Capacity:
                     return "ظرفیت اقامتگاه";
-                case Property.MoreThanCapacity:
+                case Property.ExtraCapacity:
                     return "حداکثر مهمان اضافه";
-                case Property.Room:
+                case Property.RoomCount:
                     return "تعداد اتاق خواب";
                 case Property.Parking:
                     return "تعداد پارکینگ اقامتگاه";
-                case Property.SingleBed:
+                case Property.SingleBedCount:
                     return "تعداد تخت یک نفره";
-                case Property.DoublesBed:
+                case Property.DoubleBedCount:
                     return "تعداد تخت دو نفره";
                 case Property.Floor:
                     return "طبقه ملک";
@@ -316,6 +295,10 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "ظروف آشپرخانه";
                 case Property.TeaMaker:
                     return "چای ساز";
+                case Property.Balcony:
+                    return "بالکن";
+                case Property.Filming:
+                    return "لوکیشن فیلم برداری";
                 case Property.ExtraBlanketCount:
                     return "تعداد پتو اضافه";
                 case Property.HeatingSystem:
@@ -324,15 +307,15 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "سیستم سرمایشی";
                 case Property.WC:
                     return "سرویس بهداشتی";
-                case Property.BlanketsAndMattresses:
+                case Property.BlanketAndMattressCount:
                     return "تعداد تشک و پتو";
-                case Property.AllowSmoking:
+                case Property.Smoking:
                     return "استعمال دخانیات در داخل اقامتگاه";
-                case Property.AllowPets:
+                case Property.Pets:
                     return "آوردن حیوانات خانگی";
-                case Property.AllowParty:
+                case Property.Party:
                     return "گرفتن مهمانی در این اقامتگاه";
-                case Property.EvidenceRequired:
+                case Property.RequiredEvidence:
                     return "مدارک مورد نیاز";
                 case Property.OtherRules:
                     return "سایر شرایط و قوانین اقامتگاه";
@@ -341,7 +324,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             }
         }
 
-        public static string GetHotelUnitTitle(AdvertiseType type)
+        public static string GetHotelUnitPersianName(AdvertiseType type)
         {
             switch (type)
             {
@@ -358,170 +341,300 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             }
         }
 
-        public static string GetPropertyValueTitle(object item)
+        public static string GetParkingPersianName(Advertise.ParkingItems item)
         {
-            if (item.GetType() == typeof(AdvertiseType))
+            switch (item)
             {
-                return GetAdvertiseTypeUserString((AdvertiseType)item);
+                case ParkingItems.Unset:
+                    return "انتخاب تعداد پارکینگ";
+                case ParkingItems.One:
+                    return "1 پارکینگ";
+                case ParkingItems.Two:
+                    return "2 پارکینگ";
+                case ParkingItems.Three:
+                    return "3 پارکینگ";
+                case ParkingItems.MoreThanThree:
+                    return "بیشتر از 3";
+                case ParkingItems.Jointly:
+                    return "مشاع";
+                case ParkingItems.NoParking:
+                    return "بدون پارکینگ";
+                default:
+                    return "";
             }
-            if (item.GetType() == typeof(PositionType))
+        }
+
+        public static string GetParkingText(ParkingItems item)
+        {
+            switch (item)
             {
-                return GetPositionTypeString((int)(PositionType)item);
+                case ParkingItems.One:
+                    return "1 پارکینگ";
+                case ParkingItems.Two:
+                    return "2 پارکینگ";
+                case ParkingItems.Three:
+                    return "3 پارکینگ";
+                case ParkingItems.MoreThanThree:
+                    return "بیشتر از 3 پارکینگ";
+                case ParkingItems.Jointly:
+                    return "پارکینگ مشاع";
+                case ParkingItems.NoParking:
+                    return "بدون پارکینگ";
+                default:
+                    return "همه";
             }
-            if (item.GetType() == typeof(ParkingItems))
+        }
+
+        public static string GetExtraBlanketCountPersianName(Advertise.ExtraBlanketCountItems item)
+        {
+            switch (item)
             {
-                switch ((ParkingItems)item)
-                {
-                    case ParkingItems.Unset:
-                        return "انتخاب تعداد پارکینگ";
-                    case ParkingItems.One:
-                        return "1 پارکینگ";
-                    case ParkingItems.Two:
-                        return "2 پارکینگ";
-                    case ParkingItems.Three:
-                        return "3 پارکینگ";
-                    case ParkingItems.MoreThanThree:
-                        return "بیشتر از 3";
-                    case ParkingItems.Jointly:
-                        return "مشاع";
-                    case ParkingItems.NoParking:
-                        return "بدون پارکینگ";
-                    default:
-                        return "";
-                }
+                case ExtraBlanketCountItems.Unset:
+                    return "انتخاب کنید";
+                case ExtraBlanketCountItems.One:
+                    return "یک عدد";
+                case ExtraBlanketCountItems.Two:
+                    return "دو عدد";
+                case ExtraBlanketCountItems.Three:
+                    return "سه عدد";
+                case ExtraBlanketCountItems.Four:
+                    return "چهار عدد";
+                case ExtraBlanketCountItems.Five:
+                    return "پنج عدد";
+                case ExtraBlanketCountItems.MoreThanFive:
+                    return "بیشتر از پنج عدد";
+                default:
+                    return "";
             }
-            if (item.GetType() == typeof(BuildingDirectionItems))
+        }
+
+        public static string GetBuildingDirectionPersianName(Advertise.BuildingDirectionItems item)
+        {
+            switch (item)
             {
-                switch ((BuildingDirectionItems)item)
-                {
-                    case BuildingDirectionItems.Unset:
-                        return "انتخاب جهت ملک";
-                    case BuildingDirectionItems.Western:
-                        return "غربی";
-                    case BuildingDirectionItems.Eastern:
-                        return "شرقی";
-                    case BuildingDirectionItems.Northern:
-                        return "شمالی";
-                    case BuildingDirectionItems.Southern:
-                        return "جنوبی";
-                    case BuildingDirectionItems.TwoSided:
-                        return "دوبر";
-                    default:
-                        break;
-                }
+                case BuildingDirectionItems.Unset:
+                    return "انتخاب کنید";
+                case BuildingDirectionItems.Western:
+                    return "غربی";
+                case BuildingDirectionItems.Eastern:
+                    return "شرقی";
+                case BuildingDirectionItems.Northern:
+                    return "شمالی";
+                case BuildingDirectionItems.Southern:
+                    return "جنوبی";
+                case BuildingDirectionItems.TwoSided:
+                    return "دوبر";
+                default:
+                    return "";
             }
-            if (item.GetType() == typeof(ExtraBlanketCountItems))
+        }
+
+        public static string GetHeatingSystemPersianName(Advertise.HeatingSystemItems item)
+        {
+            switch (item)
             {
-                switch ((ExtraBlanketCountItems)item)
-                {
-                    case ExtraBlanketCountItems.Unset:
-                        return "انتخاب کنید";
-                    case ExtraBlanketCountItems.One:
-                        return "یک عدد";
-                    case ExtraBlanketCountItems.Two:
-                        return "دو عدد";
-                    case ExtraBlanketCountItems.Three:
-                        return "سه عدد";
-                    case ExtraBlanketCountItems.Four:
-                        return "چهار عدد";
-                    case ExtraBlanketCountItems.Five:
-                        return "پنج عدد";
-                    case ExtraBlanketCountItems.MoreThanFive:
-                        return "بیشتر از پنج عدد";
-                    default:
-                        return "";
-                }
+                case HeatingSystemItems.Unset:
+                    return "انتخاب کنید";
+                case HeatingSystemItems.Heater:
+                    return "بخاری";
+                case HeatingSystemItems.Package:
+                    return "پکیج";
+                case HeatingSystemItems.Radiator:
+                    return "شوفاژ";
+                case HeatingSystemItems.AirConditioner:
+                    return "هواساز";
+                case HeatingSystemItems.FirePlace:
+                    return "شومینه";
+                case HeatingSystemItems.Other:
+                    return "غیره";
+                case HeatingSystemItems.None:
+                    return "ندارد";
+                default:
+                    return "";
             }
-            if (item.GetType() == typeof(HeatingSystemItems))
+        }
+
+        public static string GetCoolingSystemPersianName(Advertise.CoolingSystemItems item)
+        {
+            switch (item)
             {
-                switch ((HeatingSystemItems)item)
-                {
-                    case HeatingSystemItems.Unset:
-                        return "انتخاب کنید";
-                    case HeatingSystemItems.Heater:
-                        return "بخاری";
-                    case HeatingSystemItems.Package:
-                        return "پکیج";
-                    case HeatingSystemItems.Radiator:
-                        return "شوفاژ";
-                    case HeatingSystemItems.AirConditioner:
-                        return "هواساز";
-                    case HeatingSystemItems.FirePlace:
-                        return "شومینه";
-                    case HeatingSystemItems.Other:
-                        return "غیره";
-                    case HeatingSystemItems.None:
-                        return "ندارد";
-                    default:
-                        return "";
-                }
+                case CoolingSystemItems.Unset:
+                    return "انتخاب کنید";
+                case CoolingSystemItems.Chiller:
+                    return "چیلر";
+                case CoolingSystemItems.Fancoel:
+                    return "فنکوئل";
+                case CoolingSystemItems.WaterCooler:
+                    return "کولر آبی";
+                case CoolingSystemItems.Splitter:
+                    return "کولر گازی";
+                case CoolingSystemItems.AirConditioner:
+                    return "هواساز";
+                case CoolingSystemItems.SplitterAndWaterCooler:
+                    return "کولر آبی و گازی";
+                case CoolingSystemItems.Fan:
+                    return "پنکه";
+                case CoolingSystemItems.Other:
+                    return "غیره";
+                case CoolingSystemItems.None:
+                    return "ندارد";
+                default:
+                    return "";
             }
-            if (item.GetType() == typeof(CoolingSystemItems))
+        }
+
+        public static string GetWCPersianName(Advertise.WCItems item)
+        {
+            switch (item)
             {
-                switch ((CoolingSystemItems)item)
-                {
-                    case CoolingSystemItems.Unset:
-                        return "انتخاب کنید";
-                    case CoolingSystemItems.Chiller:
-                        return "چیلر";
-                    case CoolingSystemItems.Fancoel:
-                        return "فنکوئل";
-                    case CoolingSystemItems.WaterCooler:
-                        return "کولر آبی";
-                    case CoolingSystemItems.Splitter:
-                        return "کولر گازی";
-                    case CoolingSystemItems.AirConditioner:
-                        return "هواساز";
-                    case CoolingSystemItems.SplitterAndWaterCooler:
-                        return "کولر آبی و گازی";
-                    case CoolingSystemItems.Fan:
-                        return "پنکه";
-                    case CoolingSystemItems.Other:
-                        return "غیره";
-                    case CoolingSystemItems.None:
-                        return "ندارد";
-                    default:
-                        return "";
-                }
+                case WCItems.Unset:
+                    return "انتخاب کنید";
+                case WCItems.Persian:
+                    return "ایرانی";
+                case WCItems.Europian:
+                    return "فرنگی";
+                case WCItems.EuropianAndPersian:
+                    return "ایرانی و فرنگی";
+                default:
+                    return "";
             }
-            if (item.GetType() == typeof(WCItems))
+        }
+
+        public static string GetEuropeanToiletTypePersianName(Advertise.EuropeanToiletTypeEnum item)
+        {
+            switch (item)
             {
-                switch ((WCItems)item)
-                {
-                    case WCItems.Unset:
-                        return "انتخاب کنید";
-                    case WCItems.Persian:
-                        return "ایرانی";
-                    case WCItems.Europian:
-                        return "فرنگی";
-                    case WCItems.EuropianAndPersian:
-                        return "ایرانی و فرنگی";
-                    default:
-                        return "";
-                }
+                case EuropeanToiletTypeEnum.Unset:
+                    return "انتخاب کنید";
+                case EuropeanToiletTypeEnum.Fixed:
+                    return "ثابت";
+                case EuropeanToiletTypeEnum.Portable:
+                    return "سیار";
+                case EuropeanToiletTypeEnum.FixedAndPortable:
+                    return "هر دو (ثابت و سیار)";
+                default:
+                    return "";
             }
-            if (item.GetType() == typeof(FloorItems))
+        }
+
+        public static string GetFloorPersianName(Advertise.FloorItems item)
+        {
+            switch (item)
             {
-                switch ((FloorItems)item)
-                {
-                    case FloorItems.Unset:
-                        return "انتخاب کنید";
-                    case FloorItems.Underground:
-                        return "زیرزمین";
-                    case FloorItems.Ground:
-                        return "همکف";
-                    case FloorItems.MoreThan10th:
-                        return "بالاتر از 10";
-                    default:
-                        return ((int)((FloorItems)item)).ToString();
-                }
+                case FloorItems.Unset:
+                    return "انتخاب کنید";
+                case FloorItems.Underground:
+                    return "زیرزمین";
+                case FloorItems.Ground:
+                    return "همکف";
+                case FloorItems.MoreThan10th:
+                    return "بالاتر از 10";
+                default:
+                    return ((int)(item)).ToString();
             }
-            return "";
+        }
+
+        public static string GetOwnershipPersianName(Advertise.OwnershipTypeEnum item)
+        {
+            switch (item)
+            {
+                case OwnershipTypeEnum.Unset:
+                    return "انتخاب کنید";
+                case OwnershipTypeEnum.Owner:
+                    return "مالک";
+                case OwnershipTypeEnum.Intermediary:
+                    return "واسطه";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetVillaTypePersianName(Advertise.VillaTypeEnum item)
+        {
+            switch (item)
+            {
+                case VillaTypeEnum.Unset:
+                    return "انتخاب کنید";
+                case VillaTypeEnum.Exclusive:
+                    return "دربست";
+                case VillaTypeEnum.Common:
+                    return "مشترک";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetVideoStatusPersianName(Advertise.VideoStatusEnum item)
+        {
+            switch (item)
+            {
+                case VideoStatusEnum.Unset:
+                    return "بدون ویدیو";
+                case VideoStatusEnum.Pending:
+                    return "در حال بررسی";
+                case VideoStatusEnum.Confirmed:
+                    return "تایید شده";
+                case VideoStatusEnum.NotConfirmed:
+                    return "تایید نشده";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetEnumTypePersianName(NameValueDTO.EnumType item)
+        {
+            switch (item)
+            {
+                case NameValueDTO.EnumType.keyValueType:
+                    return "انواع لیست ها";
+                case NameValueDTO.EnumType.residenceType:
+                    return "لیست نوع اقامتگاه";
+                case NameValueDTO.EnumType.residenceLocationType:
+                    return "لیست موقعیت اقامتگاه";
+                case NameValueDTO.EnumType.residenceCoolingSystem:
+                    return "لیست سیستم سرمایشی";
+                case NameValueDTO.EnumType.residenceHeatingSystem:
+                    return "لیست سیستم گرمایشی";
+                case NameValueDTO.EnumType.residenceWCType:
+                    return "لیست سرویس بهداشتی";
+                case NameValueDTO.EnumType.residenceOwnershipType:
+                    return "لیست نوع مالکیت";
+                case NameValueDTO.EnumType.residenceParking:
+                    return "لیست پارکینگ";
+                case NameValueDTO.EnumType.residenceFloor:
+                    return "لیست طبقات";
+                case NameValueDTO.EnumType.residenceExtraBlanket:
+                    return "لیست تعداد پتوی اضافه";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetEnumPersianName(object enumType)
+        {
+            return enumType switch
+            {
+                Advertise.AdvertiseType item => GetAdvertiseTypePersianNameForUser(item),
+                Advertise.PositionType item => GetPositionTypePersianName((int)item),
+                Advertise.ParkingItems item => GetParkingPersianName(item),
+                Advertise.BuildingDirectionItems item => GetBuildingDirectionPersianName(item),
+                Advertise.ExtraBlanketCountItems item => GetExtraBlanketCountPersianName(item),
+                Advertise.HeatingSystemItems item => GetHeatingSystemPersianName(item),
+                Advertise.CoolingSystemItems item => GetCoolingSystemPersianName(item),
+                Advertise.WCItems item => GetWCPersianName(item),
+                Advertise.EuropeanToiletTypeEnum item => GetEuropeanToiletTypePersianName(item),
+                Advertise.FloorItems item => GetFloorPersianName(item),
+                Advertise.OwnershipTypeEnum item => GetOwnershipPersianName(item),
+                Advertise.VillaTypeEnum item => GetVillaTypePersianName(item),
+                Advertise.VideoStatusEnum item => GetVideoStatusPersianName(item),
+                NameValueDTO.EnumType item => GetEnumTypePersianName(item),
+                _ => null
+            };
         }
 
         public static string CategoryTitle { get { return "اجاره-روزانه"; } }
 
-        public static string GetNotVerifyReasonTitle(int reason)
+        public static string GetNotVerifyReasonPersianDesc(int reason)
         {
             switch ((NotVerifyReasonsEnum)reason)
             {
@@ -615,7 +728,7 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             return address;
         }
 
-        public static string PhotoTitle(Advertise.AdvertiseType type, Advertise.AdvertiseMode mode)
+        public static string GetPhotoPersianTitle(Advertise.AdvertiseType type, Advertise.AdvertiseMode mode)
         {
             switch (mode)
             {
@@ -676,16 +789,25 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             }
         }
 
-        public static string GetRulesText(out string[] paragraphs)
+        public static IList<string> GetReserveCancelationRules()
         {
-            paragraphs = new string[4];
-            paragraphs[0] = "کنسل نمودن رزرو توسط مهمان تا ۷۲ ساعت مانده به شروع اقامت: کسر ۱۰٪ از مبلغ کل رزرو و بازگشت باقی‌مانده مبلغ.";
-            paragraphs[1] = "کنسل نمودن رزرو توسط مهمان کمتر از ۷۲ ساعت مانده به شروع اقامت: کسر مبلغ اولین شب رزرو و بازگشت باقی‌مانده مبلغ.";
-            paragraphs[2] = "کنسل نمودن رزرو توسط مهمان در روز شروع اقامت: کسر مبلغ ۲ شب اول رزرو و بازگشت باقی‌مانده مبلغ";
-            paragraphs[3] = "در ایام پیک تعطیلات، بازه‌ی ۷۲ ساعت، ۱ هفته محاسبه می‌شود و امکان کنسلی وجود ندارد";
-            return "قوانین کنسلی توسط مهمان:";
+            var rules = new List<string>();
+            rules.Add("کنسل نمودن رزرو توسط مهمان تا ۷۲ ساعت مانده به شروع اقامت: کسر ۱۰٪ از مبلغ کل رزرو و بازگشت باقی‌مانده مبلغ");
+            rules.Add("کنسل نمودن رزرو توسط مهمان کمتر از ۷۲ ساعت مانده به شروع اقامت: کسر ۱۰٪ از مبلغ کل و مبلغ اولین شب رزرو و بازگشت باقی‌مانده مبلغ");
+            rules.Add("کنسل نمودن رزرو توسط مهمان در روز شروع اقامت: کسر ۱۰٪ از مبلغ کل و مبلغ ۲ شب اول رزرو و بازگشت باقی‌مانده مبلغ");
+            rules.Add("در ایام پیک تعطیلات، بازه‌ی ۷۲ ساعت، ۱ هفته محاسبه شده و امکان کنسلی وجود ندارد");
+            return rules;
         }
-        public static string GetHygieneProtocolStatusText(HygieneProtocolStatus hygieneProtocolStatus)
+
+        public static IList<string> GetNowruzReserveCancelationRules()
+        {
+            var rules = new List<string>();
+            rules.Add("رزروهای مربوط به ایام نوروز فقط با رضایت میزبان قابل لغو می باشند");
+            rules.Add("همچنین در صورتی که به دستور مقامات و سازمان های دولتی و به دلیل همه گیری ویروس کرونا، امکان سفر به مقصد مورد نظر طی روز های نوروز میسر نباشد، کلیه مبلغ رزرو به مهمان عودت می گردد");
+            return rules;
+        }
+
+        public static string GetHygieneProtocolStatusPersianName(HygieneProtocolStatus hygieneProtocolStatus)
         {
             switch (hygieneProtocolStatus)
             {
@@ -699,27 +821,6 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                     return "عدم تایید";
                 default:
                     return "";
-            }
-        }
-
-        public static string GetParkingText(ParkingItems item)
-        {
-            switch (item)
-            {
-                case ParkingItems.One:
-                    return "1 پارکینگ";
-                case ParkingItems.Two:
-                    return "2 پارکینگ";
-                case ParkingItems.Three:
-                    return "3 پارکینگ";
-                case ParkingItems.MoreThanThree:
-                    return "بیشتر از 3 پارکینگ";
-                case ParkingItems.Jointly:
-                    return "پارکینگ مشاع";
-                case ParkingItems.NoParking:
-                    return "بدون پارکینگ";
-                default:
-                    return "همه";
             }
         }
     }

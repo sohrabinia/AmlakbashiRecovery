@@ -100,6 +100,14 @@
     {
         moreFilterCount++;
     }
+    if (Model.Filming == 1)
+    {
+        moreFilterCount++;
+    }
+    if (Model.Exclusive == 1)
+    {
+        moreFilterCount++;
+    }
 }
 
 @section StyleBlock {
@@ -247,7 +255,7 @@
                                 @foreach (var typeFilterItem in types)
                                 {
                                     <div onclick="changeAccTypeValue(this)" class="advertise-list__filter-select-item@(Model.T > 0 ? (Model.T == (int)typeFilterItem ? " filter-selected-item" : "") : (typeFilterItem == Model.Category.Type ? " filter-selected-item" : ""))" data-value="@((int)typeFilterItem)">
-                                        <span>@AdvertiseMainLocalization.GetAdvertiseTypeUserString(typeFilterItem)</span>
+                                        <span>@AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(typeFilterItem)</span>
                                         <i class="fa fa-check"></i>
                                     </div>
                                 }
@@ -268,7 +276,7 @@
                                         continue;
                                     }
                                     <div class="advertise-list__filter-select-item@((Model.Region != null && ((int)positionFilterItem).ToString() == Model.Region.ToString()) ? " filter-selected-item" : "")" data-value="@((int)positionFilterItem)">
-                                        <span>@AdvertiseMainLocalization.GetPositionTypeString((int)positionFilterItem)</span>
+                                        <span>@AdvertiseMainLocalization.GetPositionTypePersianName((int)positionFilterItem)</span>
                                         <i class="fa fa-check"></i>
                                     </div>
                                 }
@@ -435,6 +443,16 @@
                                         <span>چای ساز</span>
                                         <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.TeaMaker != 1 ? "unchecked-3" : "checked-3")" />
                                     </div>
+                                    <input type="hidden" id="js-filming-input" value="@(Model.Filming)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>لوکیشن فیلم برداری</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Filming != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
+                                    <input type="hidden" id="js-exclusive-input" value="@(Model.Exclusive)" />
+                                    <div class="advertise-category__today-empty_button" style="cursor:pointer" onclick="changeCheckLists(this)">
+                                        <span>دربست</span>
+                                        <img width="20" height="20" rel="checkbox" src="/file/resourceimagepng?file_name=@(Model.Exclusive != 1 ? "unchecked-3" : "checked-3")" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -488,7 +506,7 @@
                 if (Model.Region != null && Model.Region != "-1")
                 {
                     <div onclick="removePositionFilter()" class="advertise-list__pin-filter-list-item">
-                        <span>@AdvertiseMainLocalization.GetPositionTypeString(int.Parse(Model.Region))</span>
+                        <span>@AdvertiseMainLocalization.GetPositionTypePersianName(int.Parse(Model.Region))</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }
@@ -500,12 +518,12 @@
                     </div>
                 }
                 @*if (roomString != "")
-                    {
-                        <div onclick="removeRoomFilter()" class="advertise-list__pin-filter-list-item">
-                            <span>@roomString</span>
-                            <i class="fa fa-times"></i>
-                        </div>
-                    }*@
+            {
+                <div onclick="removeRoomFilter()" class="advertise-list__pin-filter-list-item">
+                    <span>@roomString</span>
+                    <i class="fa fa-times"></i>
+                </div>
+            }*@
                 if (Model.RoomListIds != null)
                 {
 
@@ -615,6 +633,20 @@
                 {
                     <div onclick="removeTeaMakerFilter()" class="advertise-list__pin-filter-list-item">
                         <span>چای ساز</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.Filming == 1)
+                {
+                    <div onclick="removeFilmingFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>لوکیشن فیلم برداری</span>
+                        <i class="fa fa-times"></i>
+                    </div>
+                }
+                if (Model.Exclusive == 1)
+                {
+                    <div onclick="removeExclusiveFilter()" class="advertise-list__pin-filter-list-item">
+                        <span>دربست</span>
                         <i class="fa fa-times"></i>
                     </div>
                 }

@@ -1,0 +1,83 @@
+﻿@model IList<Reserve.ReserveCancelReasons>
+
+<p>لطفا دلیل لغو رزرو را انتخاب کنید:</p>
+<div style="padding: 10px;">
+    @foreach (var item in Model)
+    {
+        <input type="radio" name="reason" value="@item" />
+        <label>@(ReserveLocalization.GetReserveCancelReasonsTitle(item))</label>
+        <br>
+    }
+    <input type="radio" name="reason" value="0" />
+    <label>سایر</label>
+    <br>
+    <textarea id="reasonDesc" placeholder="لطفا دلیل لغو رزرو را شرح دهید ..." style="display: none; width: 100%;"></textarea>
+</div>
+<div style="text-align: center;">
+    <button onclick="getCancelationInfo()" style="padding: 5px 10px; background-color: #fDc831; border: 1px solid darkgray; border-radius: 5px;">لغو رزرو</button>
+</div>
+
+<script>
+    $('input[type=radio][name=reason]').change(function () {
+        if (this.value == 0) {
+            $('textarea#reasonDesc').show();
+        }
+        else {
+            $('textarea#reasonDesc').hide();
+        }
+    });
+
+    var reserveId = @ViewBag.reserveId;
+    function getCancelationInfo() {
+        var reasonDesc = $('#reasonDesc').val();
+        var reason = $('input[name="reason"]:checked').val();
+        if (reason === undefined || (reason === "0" && !reasonDesc)) {
+            alertify.error('لطفا دلیل لغو رزرو را انتخاب کنید');
+            return;
+        }
+        $.ajax({
+            url: "/reserve/GetCancelationInfo",
+            type: "post",
+            data: {
+                reserveId: reserveId,
+                reason: reason,
+                reasonDesc: reasonDesc
+            },
+            beforeSend: function () {
+            },
+            success: function (response) {
+                showInfoMessage('تایید لغو رزرو ' + reserveId, response);
+            },
+            error: function (ret) {
+                alertify.error("عملیات با خطا مواجه شد");
+            }
+        });
+    }
+
+    function doCancel() {
+        $.ajax({
+            url: "/reserve/cancel",
+            type: "post",
+            data: {
+                reserveId: reserveId,
+                reason: $('input[name="reason"]:checked').val(),
+                reasonDesc: $('#reasonDesc').val()
+            },
+            beforeSend: function () {
+            },
+            success: function (response) {
+                if (response.status == 0) {
+                    alertify.error(response.msg);
+                }
+                else {
+                    alertify.success("رزرو مورد نظر با موفقیت لغو شد");
+                    popupMsgList[1].btnClick(0, true);
+                    popupMsgList[0].btnClick(0, true);
+                }
+            },
+            error: function (ret) {
+                alertify.error("عملیات با خطا مواجه شد");
+            }
+        });
+    }
+</script>

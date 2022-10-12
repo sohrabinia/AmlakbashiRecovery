@@ -64,6 +64,8 @@ function initializeFilterData() {
     filterInputData.poolTable = $('#js-pooltable-input-filter').attr('value');
     filterInputData.foosball = $('#js-foosball-input-filter').attr('value');
     filterInputData.teaMaker = $('#js-teamaker-input-filter').attr('value');
+    filterInputData.filming = $('#js-filming-input-filter').attr('value');
+    filterInputData.exclusive = $('#js-exclusive-input-filter').attr('value');
     filterInputData.pets = $('#js-pets-input-filter').attr('value');
     filterInputData.party = $('#js-party-input-filter').attr('value');
     filterInputData.smoking = $('#js-smoking-input-filter').attr('value');
@@ -72,9 +74,9 @@ function initializeFilterData() {
     if (filterInputData.sort != '0') {
         $('div#sort-filter-button').css("background-color", "#fdd835");
     }
-    if (window.history.state == null) {
-        window.history.replaceState({ filterData: filterInputData }, null, nowUrl);
-    }
+    //if (window.history.state == null) {
+    //    window.history.replaceState({ filterData: filterInputData }, null, nowUrl);
+    //}
     if ($('.advertise-list__pin-filter-list-bottom').html() == "") {
         $('.advertise-list__pin-filter-list-bottom').css('display', 'none');
     }
@@ -246,6 +248,8 @@ function doMoreFilter() {
     filterInputData.poolTable = $('#js-pooltable-input').val();
     filterInputData.foosball = $('#js-foosball-input').val();
     filterInputData.teaMaker = $('#js-teamaker-input').val();
+    filterInputData.filming = $('#js-filming-input').val();
+    filterInputData.exclusive = $('#js-exclusive-input').val();
     sendNewFilterData();
     $('#js-ajax-filter').val(true);
     $('#js-more-filter-item').hide(100);
@@ -278,6 +282,8 @@ function removeMoreFilter() {
     filterInputData.poolTable = '-1';
     filterInputData.foosball = '-1';
     filterInputData.teaMaker = '-1';
+    filterInputData.filming = '-1';
+    filterInputData.exclusive = '-1';
     sendNewFilterData();
 }
 
@@ -418,5 +424,19 @@ function removeTeaMakerFilter(dontSubmit) {
     filterInputData.page = 1;
     filterInputData.ajax = true;
     filterInputData.teaMaker = '-1';
+    sendNewFilterData();
+}
+
+function removeFilmingFilter(dontSubmit) {
+    filterInputData.page = 1;
+    filterInputData.ajax = true;
+    filterInputData.filming = '-1';
+    sendNewFilterData();
+}
+
+function removeExclusiveFilter(dontSubmit) {
+    filterInputData.page = 1;
+    filterInputData.ajax = true;
+    filterInputData.exclusive = '-1';
     sendNewFilterData();
 }

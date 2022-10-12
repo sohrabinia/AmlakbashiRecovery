@@ -10,8 +10,8 @@
     <input type="hidden" name="today_empty_homes" value="@(Model.TodayEmptyHomes.ToString())" />
     <input type="hidden" name="hygieneProtocol" value="@(Model.HygieneProtocol.ToString())" />
     <input type="hidden" name="country_direction" value="@((int)Model.Category.CountryDirection)" />
-    <input type="hidden" name="Province" value="@Model.Category.Province" />
-    <input type="hidden" name="City" value="@Model.Category.City" />
+    <input type="hidden" name="Province" value="@(Model.Category.Province ?? -1)" />
+    <input type="hidden" name="City" value="@(Model.Category.City ?? -1)" />
     <input type="hidden" name="Area" value="@Model.Area" />
     <input type="hidden" name="capacity" id="js-capacity-input-filter" value="@(Model.Capacity == null ? -1 : Model.Capacity)" />
     <input type="hidden" name="empty_range_from" id="from_date_date_picker-filter" value="@(string.IsNullOrEmpty(Model.EmptyRangeFrom) == false ? Model.EmptyRangeFrom : "")" />
@@ -35,6 +35,8 @@
     <input type="hidden" name="poolTable" id="js-pooltable-input-filter" value="@(Model.PoolTable)" />
     <input type="hidden" name="foosball" id="js-foosball-input-filter" value="@(Model.Foosball)" />
     <input type="hidden" name="teaMaker" id="js-teamaker-input-filter" value="@(Model.TeaMaker)" />
+    <input type="hidden" name="filming" id="js-filming-input-filter" value="@(Model.Filming)" />
+    <input type="hidden" name="exclusive" id="js-exclusive-input-filter" value="@(Model.Exclusive)" />
     <input type="hidden" name="rules_pets" id="js-pets-input-filter" value="@(Model.RulesPets)" />
     <input type="hidden" name="rules_party" id="js-party-input-filter" value="@(Model.RulesParty)" />
     <input type="hidden" name="rules_smoking" id="js-smoking-input-filter" value="@(Model.RulesSmoking)" />

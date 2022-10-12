@@ -6,7 +6,6 @@ using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Core.Infrastructure.UserContact;
-using Amlakbashi.Core.Infrastructure.UserContact.Interfaces;
 using Amlakbashi.Mediator.Commands.AdvertiseCommands;
 using Amlakbashi.Mediator.Commands.ReserveCommands;
 using Amlakbashi.Mediator.Commands.UserCommands;
@@ -63,16 +62,21 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             var isPaidCompletely = accounting.IsReservePaidCompletely(ReserveId);
             var remainedAmount = accounting.GetReserveRemainedAmount(ReserveId);
             var advertise = reserve.Advertise;
-            var hostlerUser = Repository.Find<User, int>(advertise.UserID);
+
+            var hostlerUser = Repository.Find<User, int>(reserve.HostUserID);
+            var hostIdentityUser = userManager.FindByNameAsync(hostlerUser.PhoneNumber).Result;
+            var hostPhoneNumber = hostlerUser.GetNormalizedNoticesPhoneNumber();
+
             var guestUser = reserve.GuestUser;
-            if (isPaidCompletely)
+            var guestIdentityUser = userManager.FindByNameAsync(guestUser.PhoneNumber).Result;
+            var guestPhoneNumber = guestUser.GetNormalizedNoticesPhoneNumber();
+            if (sendSms)
             {
-                if (sendSms)
+                if (isPaidCompletely)
                 {
-                    var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
-                    var guestContact = new UserContactDTO()
+                    mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                     {
-                        UserMainMobile = guestUser.MainMobile,
+                        UserMainMobile = guestUser.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = guestUser.AppNotificationToken,
                         UserEmail = guestIdentityUser.Email,
                         EmailConfirmed = guestIdentityUser.EmailConfirmed,
@@ -80,16 +84,12 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.GuestReservedTotalPayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(hostlerUser.GetPhoneNumber(User.PhoneType.OtherMobile1)) ?
-                            hostlerUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
-                            hostlerUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1)
-                    };
-                    mediator.Enqueue(new SendMessageCommand(guestContact));
+                        AudienceMobile = hostPhoneNumber
+                    }));
 
-                    var hostIdentityUser = userManager.FindByNameAsync(hostlerUser.MainMobile).Result;
-                    var hostContact = new UserContactDTO()
+                    mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                     {
-                        UserMainMobile = hostlerUser.MainMobile,
+                        UserMainMobile = hostlerUser.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = hostlerUser.AppNotificationToken,
                         UserEmail = hostIdentityUser.Email,
                         EmailConfirmed = hostIdentityUser.EmailConfirmed,
@@ -98,22 +98,14 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.HostReservedTotalPayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(guestUser.GetPhoneNumber(User.PhoneType.OtherMobile1)) ?
-                            guestUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
-                            guestUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1)
-                    };
-                    mediator.Enqueue(new SendMessageCommand(hostContact));
+                        AudienceMobile = guestPhoneNumber
+                    }));
                 }
-
-            }
-            else
-            {
-                if (sendSms)
+                else
                 {
-                    var guestIdentityUser = userManager.FindByNameAsync(guestUser.MainMobile).Result;
-                    var guestContact = new UserContactDTO()
+                    mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                     {
-                        UserMainMobile = guestUser.MainMobile,
+                        UserMainMobile = guestUser.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = guestUser.AppNotificationToken,
                         UserEmail = guestIdentityUser.Email,
                         EmailConfirmed = guestIdentityUser.EmailConfirmed,
@@ -121,19 +113,14 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.GuestReservedDepositePayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(hostlerUser.GetPhoneNumber(
-                            User.PhoneType.MainMobile)) ?
-                            hostlerUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
-                            hostlerUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1),
+                        AudienceMobile = hostPhoneNumber,
                         Price = paidPrice.ToString(),
                         RemainPrice = remainedAmount.ToString()
-                    };
-                    mediator.Enqueue(new SendMessageCommand(guestContact));
+                    }));
 
-                    var hostIdentityUser = userManager.FindByNameAsync(hostlerUser.MainMobile).Result;
-                    var hostContact = new UserContactDTO()
+                    mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
                     {
-                        UserMainMobile = hostlerUser.MainMobile,
+                        UserMainMobile = hostlerUser.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = hostlerUser.AppNotificationToken,
                         UserEmail = hostIdentityUser.Email,
                         EmailConfirmed = hostIdentityUser.EmailConfirmed,
@@ -142,17 +129,14 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
                         Type = UserContactType.HostReservedDepositePayed,
                         AdvertiseId = reserve.AdvertiseID.ToString(),
                         ReserveId = reserve.Id.ToString(),
-                        AudienceMobile = PhoneUtility.IsNumberForIran(guestUser.GetPhoneNumber(
-                            User.PhoneType.MainMobile)) ?
-                            guestUser.GetLocalPhoneNumber(User.PhoneType.OtherMobile1) :
-                            guestUser.GetCallablePhoneNumber(User.PhoneType.OtherMobile1),
+                        AudienceMobile = guestPhoneNumber,
                         Price = paidPrice.ToString(),
                         RemainPrice = remainedAmount.ToString()
-                    };
-                    mediator.Enqueue(new SendMessageCommand(hostContact));
+                    }));
                 }
             }
-            if (advertise.Count <= 1)
+
+            if (advertise.UnitCount <= 1)
             {
                 mediator.Send(new RejectRequestsInTimeCommand(reserve.AdvertiseID,
                     reserve.StartDate, reserve.EndDate, actionSource, doerUserId,
@@ -162,7 +146,7 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             }
             if (DateTimeUtility.DateRangesHaveOverlap(DateTime.Now.Date, DateTime.Now.Date.AddDays(1), reserve.StartDate, reserve.EndDate))
             {
-                advertise.TodayIsEmpty = false;
+                advertise.EmptyTonight = false;
             }
             var finishDelay = new DateTime(
                 reserve.EndDate.Year,

@@ -101,14 +101,14 @@
                 <i class="fas fa-bars js-berger-menu"></i>
             </div>
             <a class="header-logo-style" asp-area="app" asp-controller="home" asp-action="main">
-                <img srcset="~/Resource/img/amlakbashi-logo-900w.png 900w,
-                ~/Resource/img/amlakbashi-logo-680w.png 680w"
+                <img srcset="/Resource/img/amlakbashi-logo-900w.png 900w,
+                /Resource/img/amlakbashi-logo-680w.png 680w"
                      sizes="(max-width: 500px) 680px,
                     900px"
-                     src="~/Resource/img/amlakbashi-logo-900w.png"
+                     src="/Resource/img/amlakbashi-logo-900w.png"
                      alt="logo">
             </a>
-            <a href="@(userAccessor.CurrentUser.UserGeneralType != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? "/app/reserve/list?category=0&selectType=2" : "/app/reserve/list?category=1&selectType=1")" class="add-advertise-box">
+            <a href="@(userAccessor.CurrentUser.Type != (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Guest ? "/app/reserve/list?category=0&selectType=2" : "/app/reserve/list?category=1&selectType=1")" class="add-advertise-box">
                 <p class="add-advertise-style"> رزرو های من </p>
             </a>
         </header>
@@ -145,14 +145,14 @@
                     </li>
                     <li class="main-navigation_list-item"><a asp-area="app" asp-controller="home" asp-action="main"><i class="fa fa-home"></i>خانه</a></li>
                     <li class="main-navigation_list-item @(ViewBag.profile != null ? "menu__item--active " : "")"><a asp-area="app" asp-controller="user" asp-action="profile"><i class="fas fa-user"></i>پروفایل</a></li>
-                    @if (userAccessor.CurrentUser.UserGeneralType != (int)Entities.User.UserGeneralTypeEnum.Guest)
+                    @if (userAccessor.CurrentUser.Type != (int)Entities.User.UserGeneralTypeEnum.Guest)
                     {
                         <li class="main-navigation_list-item @(ViewBag.personal != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="list"><i class="fas fa-list-alt"></i>آگهی ها</a></li>
                         <li class="main-navigation_list-item @(ViewBag.advertise_comment != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="comment" asp-action="list"><i class="fa fa-th-list"></i>نظرات آگهی ها <vc:not-seen-comment-count></vc:not-seen-comment-count></a></li>
                     }
                     <li class="main-navigation_list-item @(ViewBag.advertise!=null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="updatebasic"><i class="fa fa-plus"></i>افزودن آگهی</a></li>
                     <li class="main-navigation_list-item @(ViewBag.favorite != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="advertise" asp-action="favorites"><i class="fas fa-heart"></i>علاقه مندی ها</a></li>
-                    @if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+                    @if (userAccessor.CurrentUser.Type == (int)Entities.User.UserGeneralTypeEnum.Guest)
                     {
                         <li class="main-navigation_list-item @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="list" asp-route-selecttype="1" asp-route-category="1"><i class="fa fa-book"></i>رزرو ها</a></li>
                     }
@@ -161,7 +161,7 @@
                         <li class="main-navigation_list-item @(ViewBag.reserveHost != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="list" asp-route-selecttype="2" asp-route-category="0"><i class="fa fa-book"></i>رزرو بعنوان میزبان</a></li>
                         <li class="main-navigation_list-item  @(ViewBag.reserveGuest != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="list" asp-route-selecttype="1" asp-route-category="1"><i class="fa fa-book"></i>رزرو به عنوان مهمان</a></li>
                     }
-                    @if (userAccessor.CurrentUser.UserGeneralType != (int)Entities.User.UserGeneralTypeEnum.Guest)
+                    @if (userAccessor.CurrentUser.Type != (int)Entities.User.UserGeneralTypeEnum.Guest)
                     {
                         <li class="main-navigation_list-item @(ViewBag.Invoice != null ? "menu__item--active" : "")"><a asp-area="app" asp-controller="reserve" asp-action="invoice"><i class="fa fa-list"></i>صورت حساب</a></li>
                     }
@@ -171,17 +171,16 @@
                 </ul>
             </nav>
             <main class="main">
-                @if (userAccessor.CurrentUser.UserGeneralType == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Host)
+                @*@if (userAccessor.CurrentUser.Type == (int)Amlakbashi.Core.Entities.User.UserGeneralTypeEnum.Host)
                 {
                     <div class="" style="width:100%; text-align: center; direction: rtl; font: 14px Miransans; padding: 10px 20px; margin-bottom: 10px; border: 1px solid darkgray; background-color: #eee; border-radius: 5px;">
                         <span style="color: red;">توجه: </span>
                         در صورتی که به دستور مقامات و سازمان های دولتی و به دلیل همه گیری ویروس کرونا، امکان سفر مهمان طی روز های نوروز میسر نباشد، کلیه مبلغ رزرو به مهمان عودت می گردد.
                     </div>
-                }
+                }*@
 
                 <div class="" style="width:100%; text-align: center; direction: rtl; font: 14px Miransans; padding: 10px 20px; margin-bottom: 20px; border: 1px solid darkgray; background-color: #eee; border-radius: 5px;">
-                    @*<span style="color: red;">توجه: </span>*@
-                    کاربر گرامی، شماره حساب پاسارگاد دارید؟ اگر شبا پاسارگاد را ثبت کنید حتی در ایام تعطیل و نوروز هم واریزی های سایت ما بلافاصله به حساب شما خواهد نشست.
+                    کاربر گرامی، شماره حساب پاسارگاد دارید؟ اگر شبا پاسارگاد را ثبت کنید حتی در ایام تعطیل هم واریزی های سایت ما بلافاصله به حساب شما خواهد نشست.
                 </div>
 
                 @RenderBody()
@@ -319,13 +318,6 @@
         }
 
         $(document).ready(function () {
-            @*@{
-                var reserveToRate = ReserveDepend.GetReserveToRate();
-                if (reserveToRate != null)
-                {
-                    @:ratingDialog(@(reserveToRate.ReserveID));
-                }
-            }*@
             setTimeout(getReserveToRate, 5000);
             setTimeout(initializePresentPrize, 1000);
         });

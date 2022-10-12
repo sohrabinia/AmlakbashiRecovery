@@ -1,4 +1,6 @@
-﻿@model Amlakbashi.Core.DTOs.PaymentDTOs.BankingDTOs.CheckShebaPaymentResultDTO
+﻿@using Amlakbashi.Core.DTOs.PaymentDTOs.PodiumDTOs;
+
+@model CheckPayaPaymentResponseDTO
 
 <style>
     .pay-btn {
@@ -12,44 +14,74 @@
 @if (Model == null)
 {
     <div>
-        <span>عملیات با خطا مواجه شد</span>
+        <span>عملیات با خطا مواجه شد (خطای داخلی)</span>
     </div>
 }
 else if (Model.HasError)
 {
     <div>
-        <span>@Model.ErrorMessage</span>
+        @if (Model.ErrorCode > 0)
+        {
+            <p>کد خطا: @Model.ErrorCode</p>
+        }
+        <p>@Model.ErrorMessage</p>
+    </div>
+    <br />
+    <div style="text-align: center;">
+        <button id="auto_payment_btn" class="pay-btn" onclick="repaymentPodiumTransaction()" type="button">پرداخت مجدد</button>
+    </div>
+    <div style="text-align: center;">
+        <span id="PaymentResultWaitingSpan" style="visibility:hidden; color: darkorange; margin-top: 5px;">لطفا منتظر بمانید ...</span>
     </div>
 }
 else
 {
     <div>
-        <span>شماره ارجاع درخواست:</span>
+        <span>شماره پیگیری:</span>
         <span>@Model.RefrenceNumber</span>
     </div>
     <div>
-        <span>کد وضعیت انتقال وجه:</span>
-        <span>@Model.Key</span>
+        <span>وضعیت:</span>
+        <span>@Model.Status</span>
     </div>
     <div>
-        <span>شرح وضعیت:</span>
-        <span>@Model.Value</span>
+        <span>تاریخ:</span>
+        <span>@Model.TransactionDate</span>
+    </div>
+    <div>
+        <span>زمان:</span>
+        <span>@Model.TransactionTime</span>
+    </div>
+    <div>
+        <span>مبلغ:</span>
+        <span>@Model.Amount</span>
     </div>
     <br />
     @if (Model.PaymentStatus == Payment.PaymentStatus.NotPaid)
     {
-        <div style="text-align: center;">
-            <p style="color: red;">پرداخت مورد نظر توسط بانک تایید شده، اما در پایگاه داده ثبت نشده است!</p>
-            <button class="pay-btn" onclick="RegisterNotPaidPayment()" type="button">ثبت پرداخت</button>
-        </div>
+        if (Model.Status == PayaPaymentStatusEnum.sent_recieved || Model.Status == PayaPaymentStatusEnum.registered)
+        {
+            <div style="text-align: center;">
+                <p style="color: red;">پرداخت مورد نظر توسط بانک تایید شده، اما در املاک باشی ثبت نشده است!</p>
+                <button class="pay-btn" onclick="registerPodiumNotPaidPayment()" type="button">ثبت پرداخت</button>
+            </div>
+        }
+        if (Model.Status == PayaPaymentStatusEnum.deleted || Model.Status == PayaPaymentStatusEnum.rejected ||
+            Model.Status == PayaPaymentStatusEnum.centralbank_rejected)
+        {
+            <div style="text-align: center;">
+                <p style="color: red;">پرداخت مورد نظر توسط بانک رد شد</p>
+                @*<button class="pay-btn" onclick="registerPodiumNotPaidPayment()" type="button">ثبت پرداخت</button>*@
+            </div>
+        }
     }
 }
 
 <script>
-    function RegisterNotPaidPayment() {
+    function registerPodiumNotPaidPayment() {
         $.ajax({
             type: "POST",
-            url: "/payment/RegisterNotPaidPayment",
+            url: "/payment/RegisterPodiumNotPaidPayment",
             data: {
                 paymentId: @Model.PaymentId
             },
@@ -61,6 +93,36 @@ else
                     alertify.success("پرداخت با موفقیت ثبت شد");
                     popupMsgList[0].btnClick(0, true);
                 }
+            }
+        });
+    }
+
+    function repaymentPodiumTransaction() {
+        $.ajax({
+            type: "POST",
+            url: "/payment/podiumrepayment",
+            data: {
+                paymentId: @Model.PaymentId
+            },
+            beforeSend: function () {
+                $('#PaymentResultWaitingSpan').css("visibility", "visible");
+                $('#auto_payment_btn').prop('disabled', true);
+            },
+            success: function (response) {
+                $('#PaymentResultWaitingSpan').css("visibility", "hidden");
+                $('#auto_payment_btn').prop('disabled', false);
+                if (response.status === 0) {
+                    showErrorMessage('پرداخت ناموفق', response.msg);
+                    popupMsgList[0].btnClick(0, true);
+                }
+                else {
+                    showInfoMessage('پرداخت موفق', response.msg);
+                    popupMsgList[0].btnClick(0, true);
+                }
+            },
+            error: function (ret) {
+                $('#PaymentResultWaitingSpan').css("visibility", "hidden");
+                alertify.error("عملیات با خطا مواجه شد");
             }
         });
     }

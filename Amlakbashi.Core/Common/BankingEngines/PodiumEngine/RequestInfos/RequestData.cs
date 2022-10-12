@@ -8,7 +8,6 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.RequestInfos
     {
         public string scProductId { get; set; }
         public string scApiKey { get; set; }
-        public string signature { get; set; }
         public string request { get; set; }
     }
 }

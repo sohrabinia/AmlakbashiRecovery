@@ -55,7 +55,8 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
                         .HasColumnType("int");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("VerifyCode");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -69,9 +70,13 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("EmailCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("EmailVerifyCode");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsForeigner")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -101,10 +106,16 @@ namespace Amlakbashi.Data.Migrations.IdentityDBMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("SendVerification")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("LastSentVerifyCodeDate");
 
                     b.Property<int>("State")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Status");
+
+                    b.Property<string>("Temp")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");

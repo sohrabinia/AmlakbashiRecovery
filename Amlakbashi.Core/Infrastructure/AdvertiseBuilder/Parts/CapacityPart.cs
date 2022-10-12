@@ -9,7 +9,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
     public class CapacityPart : IPart, IValidator
     {
         public int Capacity { get; set; }
-        public int MoreThanCapacity { get; set; }
+        public int ExtraCapacity { get; set; }
 
         public bool Validate(out Dictionary<string, string> errors, out string msg)
         {

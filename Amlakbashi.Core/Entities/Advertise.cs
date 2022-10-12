@@ -1,82 +1,100 @@
-﻿using Amlakbashi.Core.Common.Utilities;
+﻿using Amlakbashi.Core.Common.StaticData;
+using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using static Amlakbashi.Core.Entities.Region;
 
 namespace Amlakbashi.Core.Entities
 {
+    [Table("Residences")]
     public class Advertise : Entity<long>
     {
         #region Properties
-        [Column("AdvertiseID")]
         public override long Id { get; set; }
-        public string Title { get; set; }
-
-        [Column("Advertise_AdvertiseID")]
-        public long? ParentId { get; set; }
-        public string Description { get; set; }
         public DateTime CreateDate { get; set; }
-        public DateTime LastModifyDate { get; set; }
-        public int UserID { get; set; }
+        public DateTime LastModifiedDate { get; set; }
+        public long? ParentId { get; set; }
+        public int UserId { get; set; }
         public AdvertiseStatus Status { get; set; }
-        public long? PhotoID { get; set; }
-        public string AlbumPhoto { get; set; }
-        public int? Province { get; set; }
-        public int? City { get; set; }
-        public int? Area { get; set; }
-        public CountryDirection CountryDirection { get; set; }
-        public int WebVisit { get; set; }
-        public int Overview { get; set; }
-        public int ContactClick { get; set; }
-        public string MetaTitle { get; set; }
-        public string OldSlug { get; set; }
-        public string Slug { get; set; }
-        public string MetaDescription { get; set; }
-        public string Address { get; set; }
+        public bool Active { get; set; }
+        public bool HideInSearch { get; set; }
+
+        [Column("Type")]
         public AdvertiseType TypeID { get; set; }
-        public AdvertiseType ParentAccType { get; set; }
-
-        [Column("Region")]
-        public PositionType Position { get; set; }
-        public int OwnershipType { get; set; }
-        public int OwnerID { get; set; }
-        public string OwnerMobile { get; set; }
-        public string OwnerFullName { get; set; }
-        public string NotVerifyReasons { get; set; }
-        public long AdvertiseScore { get; set; }
-        public int AmlakbashiScore { get; set; }
-
-        [Column("AdvertiseMode")]
         public AdvertiseMode Mode { get; set; }
-        public bool IsContactAvailable { get; set; }
-        public bool AllowParty { get; set; }
-        public bool AllowPets { get; set; }
-        public bool AllowSmoking { get; set; }
-        public string EvidenceRequired { get; set; }
-        public string OtherRules { get; set; }
-        public bool TodayIsEmpty { get; set; }
-        public int Metrazh { get; set; }
-        public bool? Elevator { get; set; }
-        public ParkingItems Parking { get; set; }
-        public int Room { get; set; }
-        public bool? Pool { get; set; }
-        public PoolFeaturesEnum PoolFeatures { get; set; }
-        public int Capacity { get; set; }
-        public int MoreThanCapacity { get; set; }
-        public int DailyPrice { get; set; }
-        public int NorouzPrice { get; set; }
-        public long RentPrice { get; set; }
-        public int HolidayPrice { get; set; }
-        public int HolidayPikePrice { get; set; }
-        public int MoreThanCapacityPrice { get; set; }
+
+        // Location *************************************
+        public int? ProvinceId { get; set; }
+        public int? CityId { get; set; }
+        public int? AreaId { get; set; }
+        public Region.CountryDirection CountryDirection { get; set; }
+        public string Address { get; set; }
+        public string RegionsPersianTitle { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public PositionType LocationType { get; set; }
+
+        // Basic Info ****************************
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string MetaTitle { get; set; }
+        public string MetaDescription { get; set; }
+        public string Slug { get; set; }
+        public string OldSlug { get; set; }
+        public int BuildingArea { get; set; }
         public int LandArea { get; set; }
         public FloorItems Floor { get; set; }
-        public int SingleBed { get; set; }
-        public int DoublesBed { get; set; }
+        public VillaTypeEnum VillaType { get; set; }
+        public int RoomCount { get; set; }
+        public int UnitCount { get; set; }
+        public int SingleBedCount { get; set; }
+        public int DoubleBedCount { get; set; }
+        public int BlanketAndMattressCount { get; set; }
+        public ExtraBlanketCountItems ExtraBlanketCount { get; set; }
+        public int Capacity { get; set; }
+        public int ExtraCapacity { get; set; }
+        public long? MainPhotoId { get; set; }
+        public long? VideoId { get; set; }
+        public VideoStatusEnum VideoStatus { get; set; }
+        public string AlbumPhoto { get; set; }
+
+        // Ownership and Lisence ********************************
+        public OwnershipTypeEnum OwnershipType { get; set; }
+        public string OwnerPhoneNumber { get; set; }
+        public string OwnerFullName { get; set; }
+        public bool License { get; set; }
+        public string LicenseNumber { get; set; }
+        public long? LicenseFileId { get; set; }
+
+        // Rules ************************************
+        public bool Party { get; set; }
+        public bool Pets { get; set; }
+        public bool Smoking { get; set; }
+        public string RequiredEvidence { get; set; }
+        public string OtherRules { get; set; }
+
+        // Prices ***********************************
+        public int DailyPrice { get; set; }
+        public int HolidayPrice { get; set; }
+        public int PeakHolidayPrice { get; set; }
+        public long MonthlyPrice { get; set; }
+        public int NowruzPrice { get; set; }
+        public int ExtraCapacityPrice { get; set; }
+        public int NowruzExtraCapacityPrice { get; set; }
+        public int BasePrice { get; set; }
+
+        // Amenities ***********************************
+        public bool? Elevator { get; set; }
+        public ParkingItems Parking { get; set; }
+        public bool? Pool { get; set; }
+        public PoolFeaturesEnum PoolFeatures { get; set; }
+        public HeatingSystemItems HeatingSystem { get; set; }
+        public CoolingSystemItems CoolingSystem { get; set; }
+        public WCItems WC { get; set; }
+        public EuropeanToiletTypeEnum EuropeanToiletType { get; set; }
         public bool? Sauna { get; set; }
         public bool? Jacuzzi { get; set; }
         public bool? Bathroom { get; set; }
@@ -94,60 +112,58 @@ namespace Amlakbashi.Core.Entities
         public bool? KitchenHood { get; set; }
         public bool? KitchenUtensils { get; set; }
         public bool? TeaMaker { get; set; }
-        public int BlanketsAndMattresses { get; set; }
-        public ExtraBlanketCountItems ExtraBlanketCount { get; set; }
-        public HeatingSystemItems HeatingSystem { get; set; }
-        public CoolingSystemItems CoolingSystem { get; set; }
-        public WCItems WC { get; set; }
-        public int Count { get; set; }
-        public bool Available { get; set; }
-        public bool HideInCategory { get; set; }
-        public float AverageUserRating { get; set; }
-        public float TidinessUserRating { get; set; }
-        public string LocationString { get; set; }
-        public int BasePrice { get; set; }
-        public string SupportInfo { get; set; }
-        public int InstantReserveCancels { get; set; }
-        public InstantReserveStatusEnum InstantReserveStatus { get; set; }
-        public int MaxInstantReserveStart { get; set; }
-        public int MinReserveDays { get; set; }
-        public int MaxReserveDays { get; set; }
-        public long unixNorouzMinRequestDate { get; set; }
-        public int NorouzOverCapacityPrice { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
         public HygieneProtocolStatus? HygieneProtocol { get; set; }
-        public bool License { get; set; }
-        public long? LicenseFileId { get; set; }
-        public string LicenseNumber { get; set; }
+        public bool? Balcony { get; set; }
+        public bool? Filming { get; set; }
+
+        // Scores ************************************
+        public long ResidenceScore { get; set; }
+        public int AmlakbashiScore { get; set; }
+        public float AverageUsersScore { get; set; }
+        public float CleaningScore { get; set; }
+
+        // Others **********************************
+        public string SupportDescription { get; set; }
+        public InstantReserveStatusEnum InstantReserveStatus { get; set; }
+        public int MaxInstantReserveStartTimeInterval { get; set; } = 30;
+        public int MinReserveDuration { get; set; }
+        public int MaxReserveDuration { get; set; }
+        public long MinReserveDateForNowruz { get; set; }
+        public string NotVerifyReasons { get; set; }
+        public int View { get; set; }
+        public bool EmptyTonight { get; set; }
 
         [JsonIgnore]
-        [ForeignKey(nameof(Province))]
-        public virtual Region RegionProvince { get; set; }
-
-        [JsonIgnore]
-        [ForeignKey(nameof(City))]
-        public virtual Region RegionCity { get; set; }
-
-        [JsonIgnore]
-        [ForeignKey(nameof(Area))]
-        public virtual Region RegionArea { get; set; }
-
-        [JsonIgnore]
-        [ForeignKey(nameof(PhotoID))]
-        public virtual File MainPhoto { get; set; }
-
-        [JsonIgnore]
-        [ForeignKey(nameof(UserID))]
+        [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; }
 
         [JsonIgnore]
-        [ForeignKey(nameof(ParentId))]
-        public virtual Advertise Parent { get; set; }
+        [ForeignKey(nameof(ProvinceId))]
+        public virtual Region RegionProvince { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey(nameof(CityId))]
+        public virtual Region RegionCity { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey(nameof(AreaId))]
+        public virtual Region RegionArea { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey(nameof(MainPhotoId))]
+        public virtual File MainPhoto { get; set; }
 
         [JsonIgnore]
         [ForeignKey(nameof(LicenseFileId))]
         public virtual File LicenseFile { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey(nameof(VideoId))]
+        public virtual File Video { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey(nameof(ParentId))]
+        public virtual Advertise Parent { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<Advertise> Childs { get; set; }
@@ -184,13 +200,11 @@ namespace Amlakbashi.Core.Entities
 
         [JsonIgnore]
         public virtual ICollection<File> Photos { get; set; }
-        #endregion
 
-        public bool HasDiscount;
-        public Advertise()
-        {
-            MaxInstantReserveStart = 30;
-        }
+        [JsonIgnore]
+        public virtual ICollection<InstantReserveDate> InstantReserveDates { get; set; } = new List<InstantReserveDate>();
+
+        #endregion
 
         #region Functions
 
@@ -206,7 +220,7 @@ namespace Amlakbashi.Core.Entities
             get
             {
                 return (AdvertiseStatus)Status == AdvertiseStatus.Published
-                    && Available == true && HideInCategory == false;
+                    && Active == true && HideInSearch == false;
             }
         }
 
@@ -226,7 +240,16 @@ namespace Amlakbashi.Core.Entities
         {
             get
             {
-                return TodayIsEmpty || (Childs != null && Childs.Any(x => x.TodayIsEmpty));
+                return EmptyTonight || (Childs != null && Childs.Any(x => x.EmptyTonight));
+            }
+        }
+
+        [NotMapped]
+        [JsonIgnore]
+        public MainTypeEnum MainType { 
+            get {
+                return Mode == AdvertiseMode.Single ? MainTypeEnum.Single :
+                    (GetHotelTypes().Contains(TypeID) ? MainTypeEnum.Hotel : MainTypeEnum.Complex);
             }
         }
 
@@ -262,14 +285,14 @@ namespace Amlakbashi.Core.Entities
         {
             return Comments.Where(w => w.Status == Comment.CommentStatus.publish &&
                     w.type == Comment.CommentType.advertise)
-                    .OrderByDescending(o => o.Id);
+                    .OrderByDescending(o => o.CreateDate);
         }
 
         public Dictionary<int, List<ReportItem>> UserRatingDict()
         {
             var dict = new Dictionary<int, List<ReportItem>>();
-            var userRatingItems = ReportItems;
-            foreach (var rp in userRatingItems)
+            //var userRatingItems = ReportItems;
+            foreach (var rp in ReportItems)
             {
                 if (dict.ContainsKey(rp.UserID))
                 {
@@ -348,22 +371,22 @@ namespace Amlakbashi.Core.Entities
             var supporter_name = !string.IsNullOrEmpty(supporter.FullName) ?
                 supporter.FullName : supporter.Id.ToString();
             var info = string.Format("{0} - {1} : {2}", date, supporter_name, text);
-            if (string.IsNullOrEmpty(SupportInfo))
+            if (string.IsNullOrEmpty(SupportDescription))
             {
-                SupportInfo = info;
+                SupportDescription = info;
             }
             else
             {
-                SupportInfo += "," + info;
+                SupportDescription += "," + info;
             }
         }
 
         public string[] GetSupportInfoList()
         {
             var output = new List<string>();
-            if (!string.IsNullOrEmpty(SupportInfo))
+            if (!string.IsNullOrEmpty(SupportDescription))
             {
-                return SupportInfo.Split(',');
+                return SupportDescription.Split(',');
             }
             else
             {
@@ -373,28 +396,17 @@ namespace Amlakbashi.Core.Entities
 
         public bool CanPublish()
         {
-            return Status == AdvertiseStatus.Published && Available;
+            return Status == AdvertiseStatus.Published && Active;
         }
 
         public List<DateTime> OccupiedDates()
         {
-            //if (IsForbidden)
-            //{
-            //    var result = new List<DateTime>();
-            //    var d = DateTime.Now.Date;
-            //    for (int i = 0; i < 100; i++)
-            //    {
-            //        result.Add(d);
-            //        d = d.AddDays(1);
-            //    }
-            //    return result;
-            //}
             var yesterday = DateTime.Now.Date.AddDays(-1);
-            if (Count > 1)
+            if (UnitCount > 1)
             {
                 return OccupiedTables.Where(w => w.Date >= yesterday)
                     .GroupBy(g => g.Date)
-                    .Where(s => s.Count() >= Count)
+                    .Where(s => s.Count() >= UnitCount)
                     .Select(s => s.Key).Distinct().ToList();
             }
             return OccupiedTables.Where(w => w.Date >= yesterday)
@@ -425,6 +437,93 @@ namespace Amlakbashi.Core.Entities
             return list.Select(s => s.Date).Distinct().ToList();
         }
 
+        public List<Property> GetActiveAmeneties()
+        {
+            List<Property> activeAmenities = new List<Property>();
+
+            if (Pool == true)
+            {
+                activeAmenities.Add(Property.Pool);
+            }
+            if (Oven == true)
+            {
+                activeAmenities.Add(Property.Oven);
+            }
+            if (Refrigerator == true)
+            {
+                activeAmenities.Add(Property.Refrigerator);
+            }
+            if (KitchenHood == true)
+            {
+                activeAmenities.Add(Property.KitchenHood);
+            }
+            if (KitchenUtensils == true)
+            {
+                activeAmenities.Add(Property.KitchenUtensils);
+            }
+            if (TeaMaker == true)
+            {
+                activeAmenities.Add(Property.TeaMaker);
+            }
+            if (MicrowaveOven == true)
+            {
+                activeAmenities.Add(Property.MicrowaveOven);
+            }
+            if (Wifi == true)
+            {
+                activeAmenities.Add(Property.Wifi);
+            }
+            if (TV == true)
+            {
+                activeAmenities.Add(Property.TV);
+            }
+            if (SoundSystem == true)
+            {
+                activeAmenities.Add(Property.SoundSystem);
+            }
+            if (Golf == true)
+            {
+                activeAmenities.Add(Property.Golf);
+            }
+            if (Bathroom == true)
+            {
+                activeAmenities.Add(Property.Bathroom);
+            }
+            if (WashingMachine == true)
+            {
+                activeAmenities.Add(Property.WashingMachine);
+            }
+            if (Hairdryer == true)
+            {
+                activeAmenities.Add(Property.Hairdryer);
+            }
+            if (PoolTable == true)
+            {
+                activeAmenities.Add(Property.PoolTable);
+            }
+            if (Foosball == true)
+            {
+                activeAmenities.Add(Property.Foosball);
+            }
+            if (Sauna == true)
+            {
+                activeAmenities.Add(Property.Sauna);
+            }
+            if (Jacuzzi == true)
+            {
+                activeAmenities.Add(Property.Jacuzzi);
+            }
+            if (Balcony == true)
+            {
+                activeAmenities.Add(Property.Balcony);
+            }
+            if (Filming == true)
+            {
+                activeAmenities.Add(Property.Filming);
+            }
+            return activeAmenities;
+        }
+
         private static List<AdvertiseType> IsfahanForbiddenTypes =
             new List<AdvertiseType>() { AdvertiseType.Apartment,
                 AdvertiseType.SuitAndRoom, AdvertiseType.House,
@@ -434,9 +533,99 @@ namespace Amlakbashi.Core.Entities
         {
             get
             {
-                return City == 794 && IsfahanForbiddenTypes.Contains(ParentOrSelf.TypeID);
+                return CityId == 794 && IsfahanForbiddenTypes.Contains(ParentOrSelf.TypeID);
                 //return false;
             }
+        }
+
+        public void UpdateStatusAfterChangeInfo(bool hasImportantChange = false)
+        {
+            switch (Status)
+            {
+                case AdvertiseStatus.FirstReady:
+                case AdvertiseStatus.NotCompleted:
+                case AdvertiseStatus.ReadyToPublish:
+                case AdvertiseStatus.Deleted:
+                case AdvertiseStatus.Unset:
+                    break;
+                case AdvertiseStatus.NotVerified:
+                case AdvertiseStatus.Archived:
+                    Status = AdvertiseStatus.ReadyToPublish;
+                    break;
+                case AdvertiseStatus.Published:
+                    if (hasImportantChange)
+                    {
+                        Status = AdvertiseStatus.ReadyToPublish;
+                    }
+                    break;
+            }
+        }
+
+        public Comment GetCommentBySenderUser(long senderUserId, Comment.CommentType type, bool onlyPublished)
+        {
+            var comments = Comments.Where(f =>
+                f.SenderUserID == senderUserId && f.type == type);
+            if (onlyPublished)
+            {
+                comments = comments.Where(x => x.Status == Comment.CommentStatus.publish);
+            }
+            return comments.FirstOrDefault();
+        }
+
+        public float GetAverageUserRating(int user_id = 0)
+        {
+            var reportItems = ReportItems.AsQueryable();
+            if (user_id > 0)
+            {
+                reportItems = reportItems
+                    .Where(x => x.UserID == user_id);
+                return reportItems.Any() ? reportItems
+                    .Average(a => (float)a.Score) : 0;
+            }
+            return reportItems.Any() ? reportItems
+                .Average(x => (float)x.Score) : 0;
+        }
+
+        public string GetMainImageUrl()
+        {
+            return MainPhotoId == null ? null : $"{GeneralData.WebsiteUrl}/api/file/advertise/{Id}/{MainPhotoId}";
+        }
+
+        public List<string> GetImagesUrls()
+        {
+            var urls = new List<string>();
+            foreach (var item in Photos)
+            {
+                urls.Add($"{GeneralData.WebsiteUrl}/api/file/advertise/{Id}/{item.Id}");
+            }
+            return urls;
+        }
+
+        public Dictionary<long, string> GetImagesIdAndUrls()
+        {
+            var dic = new Dictionary<long, string>();
+            foreach (var item in Photos)
+            {
+                dic.Add(item.Id, $"{GeneralData.WebsiteUrl}/api/file/advertise/{Id}/{item.Id}");
+            }
+            return dic;
+        }
+
+        public bool IsReserveInstant(DateTime fromDate, DateTime toDate)
+        {
+            if (InstantReserveStatus != InstantReserveStatusEnum.Calendar)
+            {
+                return InstantReserveStatus == InstantReserveStatusEnum.InActive ? false : true;
+            }
+            var dateList = DateTimeUtility.DateRangeToList(fromDate, toDate);
+            foreach (var item in dateList)
+            {
+                if (InstantReserveDates.Any(x=> x.Date == item.Date) == false)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         #endregion
@@ -595,6 +784,25 @@ namespace Amlakbashi.Core.Entities
             };
         }
 
+        public static AdvertiseMode GetModeByType(AdvertiseType type)
+        {
+            switch (type)
+            {
+                case AdvertiseType.Hotel:
+                case AdvertiseType.Camp:
+                case AdvertiseType.TourismAccommodation:
+                case AdvertiseType.Inn:
+                case AdvertiseType.Pansion:
+                case AdvertiseType.HotelApartment:
+                case AdvertiseType.Complex:
+                    return AdvertiseMode.Parent;
+                    break;
+                default:
+                    return AdvertiseMode.Single;
+                    break;
+            }
+        }
+
         public static Array GetPropertyItems(Property property, AdvertiseType parent_type = AdvertiseType.None)
         {
             switch (property)
@@ -630,29 +838,60 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
-        public Comment GetCommentBySenderUser(long senderUserId, Comment.CommentType type, bool onlyPublished)
+        public static PoolFeaturesEnum GetPoolFeatureFlag(bool hotWater, bool filteration, bool open, bool covered)
         {
-            var comments = Comments.Where(f =>
-                f.SenderUserID == senderUserId && f.type == type);
-            if (onlyPublished)
+            PoolFeaturesEnum feature = new PoolFeaturesEnum();
+            if (hotWater == false && filteration == false && open == false && covered == false)
             {
-                comments = comments.Where(x => x.Status == Comment.CommentStatus.publish);
+                feature = PoolFeaturesEnum.None;
             }
-            return comments.FirstOrDefault();
+            else
+            {
+                if (hotWater)
+                {
+                    feature = PoolFeaturesEnum.HotWater;
+                }
+                if (filteration)
+                {
+                    feature = feature | PoolFeaturesEnum.Filtration;
+                }
+                if (open)
+                {
+                    feature = feature | PoolFeaturesEnum.Open;
+                }
+                if (covered)
+                {
+                    feature = feature | PoolFeaturesEnum.Covered;
+                }
+            }
+            return feature;
         }
 
-        public float GetAverageUserRating(int user_id = 0)
+        public static string GetImageFileAddress(long advertiseId, long fileId, ImageType type = ImageType.Orginal)
         {
-            var reportItems = ReportItems.AsQueryable();
-            if (user_id > 0)
+            switch (type)
             {
-                reportItems = reportItems
-                    .Where(x => x.UserID == user_id);
-                return reportItems.Any() ? reportItems
-                    .Average(a => (float)a.Score) : 0;
+                case ImageType.Orginal:
+                    return $"content/advertise/advertise_{advertiseId}_{fileId}.jpg";
+                case ImageType.Card:
+                    return $"content/accthumb/{advertiseId}/{fileId}/card.jpg";
+                case ImageType.Xsmall:
+                    return $"content/accthumb/{advertiseId}/{fileId}/xsmall.jpg";
+                case ImageType.Small:
+                    return $"content/accthumb/{advertiseId}/{fileId}/small.jpg";
+                case ImageType.Medium:
+                    return $"content/accthumb/{advertiseId}/{fileId}/medium.jpg";
+                case ImageType.Large:
+                    return $"content/accthumb/{advertiseId}/{fileId}/large.jpg";
+                case ImageType.Xlarge:
+                    return $"content/accthumb/{advertiseId}/{fileId}/xlarge.jpg";
+                case ImageType.Xxlarge:
+                    return $"content/accthumb/{advertiseId}/{fileId}/xxlarge.jpg";
+                case ImageType.Xxxlarge:
+                    return $"content/accthumb/{advertiseId}/{fileId}/xxxlarge.jpg";
+                default:
+                    return "";
             }
-            return reportItems.Any() ? reportItems
-                .Average(x => (float)x.Score) : 0;
         }
 
         #endregion
@@ -683,6 +922,13 @@ namespace Amlakbashi.Core.Entities
             Child = 2
         }
 
+        public enum MainTypeEnum
+        {
+            Single = 0,
+            Complex = 1,
+            Hotel = 2
+        }
+
         public enum AdvertiseStatus
         {
             Unset = -1,
@@ -695,11 +941,11 @@ namespace Amlakbashi.Core.Entities
             FirstReady = 6
         }
 
-        public enum AdvertisePageType 
+        public enum AdvertisePageType
         {
             Undefined,
             Filter,
-            Edit 
+            Edit
         }
 
         public enum PositionType
@@ -717,36 +963,43 @@ namespace Amlakbashi.Core.Entities
             SummerQuarter = 10
         }
 
+        public enum OwnershipTypeEnum
+        {
+            Unset = 0,
+            Owner = 1,
+            Intermediary = 2
+        }
+
         public enum Property
         {
             TypeID,
             Region,
-            Province,
-            City,
-            Area,
+            ProvinceId,
+            CityId,
+            AreaId,
             Address,
             Latitude,
             Longitude,
-            Count,
+            UnitCount,
             Title,
             Description,
 
 
             DailyPrice,
             HolidayPrice,
-            HolidayPikePrice,
-            NorouzPrice,
-            RentPrice,
-            MoreThanCapacityPrice,
+            PeakHolidayPrice,
+            NowruzPrice,
+            MonthlyPrice,
+            ExtraCapacityPrice,
 
-            Metrazh,
+            BuildingArea,
             LandArea,
             Capacity,
-            MoreThanCapacity,
-            Room,
+            ExtraCapacity,
+            RoomCount,
             Parking,
-            SingleBed,
-            DoublesBed,
+            SingleBedCount,
+            DoubleBedCount,
 
             Floor,
             BuildingDirection,
@@ -754,7 +1007,7 @@ namespace Amlakbashi.Core.Entities
             Elevator,
             Pool,
 
-            PhotoID,
+            MainPhotoId,
             AlbumPhoto,
 
             Sauna,
@@ -774,44 +1027,22 @@ namespace Amlakbashi.Core.Entities
             KitchenHood,
             KitchenUtensils,
             TeaMaker,
+            Balcony,
+            Filming,
 
-            BlanketsAndMattresses,
+            BlanketAndMattressCount,
             ExtraBlanketCount,
             HeatingSystem,
             CoolingSystem,
             WC,
 
-            AllowSmoking,
-            AllowPets,
-            AllowParty,
-            EvidenceRequired,
+            Smoking,
+            Pets,
+            Party,
+            RequiredEvidence,
             OtherRules,
 
-            OwnershipType,
-            OwnerID
-        }
-
-        public enum PropertyType
-        {
-            None = -1,
-            Number = 0,
-            Boolean = 1,
-            String = 2,
-            SelectOption = 3,
-            Location = 4,
-        }
-
-        public enum PropertyCategory
-        {
-            None = -1,
-            Main = 0,
-            Address = 1,
-            Price = 2,
-            Basic = 3,
-            Extra = 4,
-            Amenities_SelectOption = 5,
-            Aminities_Boolean = 6,
-            Rules = 7
+            OwnershipType
         }
 
         public enum ParkingItems
@@ -880,6 +1111,14 @@ namespace Amlakbashi.Core.Entities
             EuropianAndPersian = 128,
         }
 
+        public enum EuropeanToiletTypeEnum
+        {
+            Unset = 0,
+            Fixed = 1,
+            Portable = 2,
+            FixedAndPortable = 3
+        }
+
         public enum FloorItems
         {
             Unset = -2,
@@ -900,9 +1139,9 @@ namespace Amlakbashi.Core.Entities
 
         public enum InstantReserveStatusEnum
         {
-            None = 0,
-            Requested = 1,
-            Confirmed = 2
+            Calendar = 0,
+            Permanent = 1,
+            InActive = 2
         }
 
         public enum NotVerifyReasonsEnum
@@ -961,12 +1200,12 @@ namespace Amlakbashi.Core.Entities
             Clean = 4
         }
 
-        public enum HygieneProtocolStatus 
+        public enum HygieneProtocolStatus
         {
             NotConsider = 0,
             Consider = 1,
             Verified = 2,
-            NotVerified = 3 
+            NotVerified = 3
         }
 
         [Flags]
@@ -977,6 +1216,34 @@ namespace Amlakbashi.Core.Entities
             Filtration = 2,
             Open = 4,
             Covered = 8
+        }
+
+        public enum ImageType
+        {
+            Orginal = 0,
+            Card = 1,
+            Xsmall = 2,
+            Small = 3,
+            Medium = 4,
+            Large = 5,
+            Xlarge = 6,
+            Xxlarge = 7,
+            Xxxlarge = 8
+        }
+
+        public enum VillaTypeEnum
+        {
+            Unset = 0,
+            Exclusive = 1,
+            Common = 2
+        }
+
+        public enum VideoStatusEnum : byte
+        {
+            Unset = 0,
+            Pending = 1,
+            Confirmed = 2,
+            NotConfirmed = 3
         }
 
         #endregion

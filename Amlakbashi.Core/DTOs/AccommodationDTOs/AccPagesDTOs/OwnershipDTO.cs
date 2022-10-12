@@ -9,6 +9,6 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
     public class OwnershipDTO
     {
         public int OwnershipType { get; set; }
-        public int OwnerID { get; set; }
+        //public int OwnerID { get; set; }
     }
 }

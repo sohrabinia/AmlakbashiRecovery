@@ -1,0 +1,162 @@
+﻿@model Advertise
+
+@if (Model.InstantReserveStatus == Advertise.InstantReserveStatusEnum.InActive)
+{
+    <p>امکان استفاده از «رزرو آنی» برای شما وجود ندارد.</p>
+}
+else
+{
+    <p style="margin: 10px;">در صورت فعالسازی رزرو آنی، درخواست های رزرو به صورت خودکار پذیرفته شده و نیازی به تایید شما برای پرداخت مهمان نمی باشد.</p>
+    <div class="" style="margin: 5px 10px;">
+        <input id="permanent_instant_reserve" class="" type="checkbox" is-checked="@(Model.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent)" />
+        <label class="">رزرو آنی دائمی</label>
+    </div>
+
+    <div id="instant_reserve_calendar_container" style="overflow-y: auto; height: 400px; display: @(Model.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent ? "none" : "block")">
+        <div style="display: flex; flex-flow: row; justify-content: center;">
+            @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" }, { "noImageLazy", true } })
+        </div>
+        <div class="acc-set-date__input-container">
+            <div onclick="deleteInstantReserveDate(this)" class="acc-set-date__button acc-set-date__empty-btn acc-set-date__disabled-button">حذف</div>
+            <div onclick="addInstantReserveDate(this)" class="acc-set-date__button acc-set-date__occ-btn acc-set-date__disabled-button">افزودن</div>
+        </div>
+        <div class="acc-set-date__date-string"></div>
+    </div>
+}
+
+<script type="text/javascript">
+    firstSelectedDay = undefined;
+    secondSelectedDay = undefined;
+    updateDatePicker([$('#main-date-picker')[0]], jalaliCurrentMonth,
+    {
+        priceDict: {},
+        occupiedList: [],
+        instantReserveDateList: '@ViewBag.instantReserveDates',
+        monthOffset: 0,
+        selectionType: 'multi',
+        occupiedSelectEnabled: true,
+        onUpdateDate: onUpdateDate
+    });
+
+    function onUpdateDate () {
+        if (firstSelectedDay != undefined &&
+            secondSelectedDay != undefined) {
+            var fromDayString = firstSelectedDay.date.substring(2);
+            var toDayString = secondSelectedDay.date.substring(2);
+            $('.acc-set-date__date-string').html('از ' + fromDayString + ' تا ' + toDayString);
+        }
+        else {
+            $('.acc-set-date__date-string').html('');
+        }
+        updateInput();
+    }
+
+    function updateInput() {
+        if (firstSelectedDay == undefined) {
+            if (!($('.acc-set-date__button').hasClass('acc-set-date__disabled-button'))) {
+                $('.acc-set-date__button').addClass('acc-set-date__disabled-button');
+            }
+        }
+        else {
+            $('.acc-set-date__button').removeClass('acc-set-date__disabled-button');
+        }
+    }
+
+    var currentMonth;
+    var from_date;
+    var to_date;
+
+    function calculateSelectedRange() {
+        from_date = firstSelectedDay.date.replaceAll('/', ',');
+        if (secondSelectedDay != undefined) {
+            currentMonth = gregorianToJalaliDate(new Date(secondSelectedDay.value));
+            var nextDay = new Date(secondSelectedDay.value);
+            nextDay.setDate(nextDay.getDate() + 1);
+            nextDay = gregorianToJalaliDate(nextDay);
+            to_date = nextDay.dateString.replaceAll('/', ',');
+        }
+        else {
+            currentMonth = gregorianToJalaliDate(new Date(firstSelectedDay.value));
+            var nextDay = new Date(firstSelectedDay.value);
+            nextDay.setDate(nextDay.getDate() + 1);
+            nextDay = gregorianToJalaliDate(nextDay);
+            to_date = nextDay.dateString.replaceAll('/', ',');
+        }
+    }
+
+    function addInstantReserveDate(btn) {
+        if ($(btn).hasClass('acc-set-date__disabled-button')) {
+            return;
+        }
+        calculateSelectedRange();
+        myajax("accomodation/AddInstantReserveDates", "residenceId=" + @Model.Id +
+            "&fromDate=" + from_date + "&toDate=" + to_date, function (ret) {
+            if (ret.status == 0) {
+                showErrorMessage('خطا', ret.msg);
+                return;
+            }
+            alertify.success('محدوده انتخاب شده به روز های رزرو آنی اضافه شد');
+            firstSelectedDay = undefined;
+            secondSelectedDay = undefined;
+            updateInput();
+            updateDatePicker([$('#main-date-picker')[0]], currentMonth,
+                {
+                    priceDict: {},
+                    occupiedList: [],
+                    instantReserveDateList: ret.instantReserveDates,
+                    monthOffset: 0,
+                    selectionType: 'multi',
+                    occupiedSelectEnabled: true,
+                    onUpdateDate: onUpdateDate
+                });
+        });
+    }
+
+    function deleteInstantReserveDate(btn) {
+        if ($(btn).hasClass('acc-set-date__disabled-button')) {
+            return;
+        }
+        calculateSelectedRange();
+        myajax("accomodation/DeleteInstantReserveDates", "residenceId=" + @Model.Id +
+            "&fromDate=" + from_date + "&toDate=" + to_date, function (ret) {
+            if (ret.status == 0) {
+                showErrorMessage('خطا', ret.msg);
+                return;
+            }
+            alertify.success('محدوده انتخاب شده از روز های پر حذف شد');
+            firstSelectedDay = undefined;
+            secondSelectedDay = undefined;
+            updateInput();
+            updateDatePicker([$('#main-date-picker')[0]], currentMonth,
+                {
+                    priceDict: {},
+                    occupiedList: [],
+                    instantReserveDateList: ret.instantReserveDates,
+                    monthOffset: 0,
+                    selectionType: 'multi',
+                    occupiedSelectEnabled: true,
+                    onUpdateDate: onUpdateDate
+                });
+        });
+    }
+
+    $('#permanent_instant_reserve').click(function () {
+        var activePermanentInstantReserve = $(this).is(":checked");
+        myajax("accomodation/updatepermanentinstantreserve",
+            "residenceId=" + @Model.Id + "&active=" + activePermanentInstantReserve, function (ret) {
+                if (ret.status == 1) {
+                    alertify.success('رزرو آنی دائمی با موفقیت تغییر یافت');
+                    if (activePermanentInstantReserve) {
+                        $('#instant_reserve_calendar_container').hide();
+                    }
+                    else {
+                        $('#instant_reserve_calendar_container').show();
+                    }
+                }
+                else {
+                    alertify.error(ret.msg);
+                }
+        });
+        
+    });
+</script>

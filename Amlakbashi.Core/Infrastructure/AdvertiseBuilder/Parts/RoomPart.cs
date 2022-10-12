@@ -4,6 +4,6 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Parts
 {
     public class RoomPart : IPart
     {
-        public int Room { get; set; }
+        public int RoomCount { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
     [Serializable]
     public class PhotoInputDTO
     {
-        public long? PhotoID { get; set; }
+        public long? MainPhotoId { get; set; }
         public string AlbumPhoto { get; set; }
         public bool available { get; set; }
         public long accId { get; set; }

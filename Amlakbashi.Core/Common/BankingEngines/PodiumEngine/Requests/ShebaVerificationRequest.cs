@@ -8,17 +8,14 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
 {
     public class ShebaVerificationRequest : PodiumRequest<ShebaVerificationResult, ShebaVerificationResultInfo, ShebaVerificationRequestInfo>
     {
-        private const string productId = "437012";
-        private const string apiKey = "2dace115dfaa47f39ef03fbffb88b88d";
-
+        private const string productId = "1115396";
+        private const string apiKey = "1b9f9ab699f141e08dc82964c2ad16e5";
         private readonly ShebaVerificationRequestInfo request;
         public ShebaVerificationRequest(string sheba)
         {
             request = new ShebaVerificationRequestInfo()
             {
-                UserName = userName,
-                Sheba = sheba,
-                Timestamp = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss:FFF")
+                Iban = sheba
             };
         }
 
@@ -29,8 +26,7 @@ namespace Amlakbashi.Core.Common.BankingEngines.PodiumEngine.Requests
             {
                 scProductId = productId,
                 scApiKey = apiKey,
-                request = jsonRequest,
-                signature = GenerateSignature(jsonRequest)
+                request = jsonRequest
             };
         }
     }

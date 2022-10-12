@@ -90,6 +90,14 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/css/acc-manager.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/dashboard/host-panel.css",
+      "wwwroot/resource/css/dashboard/numberinput.css",
+      "wwwroot/resource/css/general/popup-calendar.css"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/css/master-admin.min.css",
     "inputFiles": [
       "wwwroot/resource/admin.css",
@@ -99,7 +107,7 @@
       "wwwroot/resource/alertify.js-0.3.11/themes/alertify.default.css",
       "wwwroot/resource/alertify.js-0.3.11/themes/alertify.core.css",
       "wwwroot/resource/resource/loader.min.css",
-      "wwwroot/Resource/persian-date-picker/persian-datepicker.min.css",
+      "wwwroot/resource/persian-date-picker/persian-datepicker.min.css",
       "wwwroot/resource/jquery-confirm/jquery-confirm.min.css",
       "wwwroot/resource/css/general/message-popup.css&v=2",
       "wwwroot/resource/star-rating/star-rating.css",
@@ -138,7 +146,10 @@
   {
     "outputFileName": "wwwroot/css/min/admin-advertise.min.css",
     "inputFiles": [
-      "wwwroot/css/admin/advertise/admin-advertise-index.css"
+      "wwwroot/css/admin/advertise/admin-advertise-index.css",
+      "wwwroot/css/admin/advertise/admin-residence-index-popup.css",
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/general/popup-calendar.css"
     ]
   },
   // ####################################################### Scripts
@@ -280,6 +291,15 @@
     ]
   },
   {
+    "outputFileName": "wwwroot/js/acc-manager.min.js",
+    "inputFiles": [
+      "wwwroot/resource/Scripts/dashboard/host-panel.js",
+      "wwwroot/resource/Scripts/dashboard/accDatePicker.js",
+      "wwwroot/resource/Scripts/dashboard/ajax-accomodation.js",
+      "wwwroot/resource/Scripts/dashboard/numberInput.js"
+    ]
+  },
+  {
     "outputFileName": "wwwroot/js/min/admin.min.js",
     "inputFiles": [
       "wwwroot/resource/scripts/jquery-2.1.1.min.js",
@@ -289,7 +309,6 @@
       "wwwroot/resource/jquery-confirm/jquery-confirm.min.js",
       "wwwroot/resource/persian-date-picker/persian-datepicker.js",
       "wwwroot/resource/persian-date-picker/persian-date.min.js",
-      //"wwwroot/resource/drop-zone-2019/dropzone.js",
       "wwwroot/resource/rating/jquery.barrating.min.js",
       "wwwroot/resource/scripts/general/accommodation-edit-form.js",
       "wwwroot/resource/scripts/general/ajax-helper.js",
@@ -324,7 +343,11 @@
   {
     "outputFileName": "wwwroot/js/min/admin-advertise.min.js",
     "inputFiles": [
-      "wwwroot/js/admin/advertise/admin-advertise-index.js"
+      "wwwroot/js/admin/advertise/admin-advertise-index.js",
+      "wwwroot/resource/Scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/Scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/Scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/Scripts/general/price-string-generator.js"
     ]
   },
   // App

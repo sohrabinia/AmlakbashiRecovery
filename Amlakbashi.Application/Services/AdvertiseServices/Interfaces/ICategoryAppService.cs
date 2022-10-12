@@ -34,6 +34,8 @@ namespace Amlakbashi.Application.Services.Category.Interfaces
           bool poolTable = false,
           bool foosball = false,
           bool teaMaker = false,
+          bool filming = false,
+          bool exclusive = false,
           bool rules_pets = false,
           bool rules_party = false,
           bool rules_smoking = false,
@@ -55,6 +57,8 @@ namespace Amlakbashi.Application.Services.Category.Interfaces
         DynamicCategory GetForItemAction(int regionType, AdvertiseType type,
             CountryDirection countryDirection = CountryDirection.Unset,
             int province = 0, int city = 0, int area = 0);
+        DynamicCategory GetByRegion(int regionId, AdvertiseType type, out bool isArea);
+        int GetAdvertiseCount(int regionId, Region.AdvertiseRegion type);
         DynamicCategory GetCategoryByCountryDirectionOrRegion(AdvertiseType type, CountryDirection countryDirection,
             int regionId, Region.AdvertiseRegion regionType);
         List<DynamicCategory> GetAccItemLinks(int? province,

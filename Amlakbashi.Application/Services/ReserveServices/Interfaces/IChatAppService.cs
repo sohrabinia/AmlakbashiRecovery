@@ -1,4 +1,5 @@
-﻿using Amlakbashi.Core.Common.AppService;
+﻿using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -19,8 +20,10 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         int GetCountByReserveId(long reserveId);
         int GetNotReadCountByReserveId(long reserveId, int userId);
         int GetNotReadSupportCountByReserveId(long reserveId);
+        ServiceResult<Chat> Insert(long reserveId, int userId, string message);
         Chat Insert(Chat chat);
         void UpdateChatListReadStatus(IList<Chat> chats);
+        void UpdateReserveChatsReadStatus(long reserveId, int userId);
         IList<Chat> UpdateSupportReadStatusByReserveId(long reserveId);
         void Update(Chat chat);
         void Delete(long chatId);

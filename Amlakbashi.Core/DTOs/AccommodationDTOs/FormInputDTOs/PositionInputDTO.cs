@@ -9,7 +9,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
     [Serializable]
     public class PositionInputDTO
     {
-        public PositionType Position { get; set; }
+        public PositionType LocationType { get; set; }
         public List<DTOSelectItem> positionSelectItems { get; set; }
         public PositionInputDTO()
         {

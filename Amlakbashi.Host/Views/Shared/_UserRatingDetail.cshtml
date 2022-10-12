@@ -3,7 +3,7 @@
     @foreach (var item in Model)
     {
         <div style="display:flex;flex-flow:row;justify-content:space-between">
-            <div>@Comment.GetUserRatingTypeString((Comment.UserRatingType)item.ReportID)</div>
+            <div>@ReportItem.GetUserRatingTypeString((Comment.UserRatingType)item.ReportID)</div>
             @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", (float)item.Score } })
         </div>
     }

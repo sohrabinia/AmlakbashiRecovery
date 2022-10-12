@@ -8,7 +8,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs
     public class CapacityInputDTO
     {
         public int Capacity { get; set; }
-        public int MoreThanCapacity { get; set; }
+        public int ExtraCapacity { get; set; }
 
         public static implicit operator CapacityInputDTO(CapacityPart part)
         {

@@ -65,7 +65,7 @@ namespace Amlakbashi.Host.Controllers
         public ActionResult HostCancelDiscussionPopup(long reserve_id)
         {
             var reserve = reserveService.Find(reserve_id);
-            if (userAccessor.CurrentUser.Id != reserve.Advertise.UserID)
+            if (userAccessor.CurrentUser.Id != reserve.HostUserID)
                 return null;
             return CancelDiscussionPopup(reserve_id);
         }
@@ -82,7 +82,7 @@ namespace Amlakbashi.Host.Controllers
                 var reserve = reserveService.Find(reserve_id);
                 var user_id = userAccessor.CurrentUser.Id;
                 var guest_user_id = reserve.UserID;
-                var host_user_id = reserve.Advertise.UserID;
+                var host_user_id = reserve.HostUserID;
                 var is_guest = user_id == guest_user_id;
 
                 if (user_id != guest_user_id && user_id != host_user_id)

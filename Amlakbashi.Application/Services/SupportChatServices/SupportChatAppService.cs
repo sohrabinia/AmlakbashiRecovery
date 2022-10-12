@@ -33,9 +33,9 @@ namespace Amlakbashi.Application.Services.SupportChatServices
 
         public SupportChat GetByUserId(int userId)
         {
-            var halfHourBefore = DateTime.Now.AddMinutes(-30);
+            var delayTime = DateTime.Now.AddMinutes(-120);
             return Repository.Query(q => q.FirstOrDefault(x => x.UserID == userId &&
-              x.CreateTime > halfHourBefore));
+              x.LastMessageTime > delayTime));
         }
 
         public SupportChat Insert(int userId)
@@ -47,6 +47,20 @@ namespace Amlakbashi.Application.Services.SupportChatServices
             Repository.Insert(supportChat);
             Repository.Save();
             return supportChat;
+        }
+
+        public IList<long> UpdateMessagesReadStatus(long id, SupportChatMessage.TypeEnum type = SupportChatMessage.TypeEnum.Supporter)
+        {
+            var supportChat = Repository.Find(id);
+            var notReadedMessages = supportChat.Messages.Where(x => x.ReadStatus == SupportChatMessage.ReadStatusEnum.NotRead &&
+                x.Type == type).ToList();
+            foreach (var item in notReadedMessages)
+            {
+                item.ReadStatus = SupportChatMessage.ReadStatusEnum.Read;
+            }
+            Repository.Update(supportChat);
+            Repository.Save();
+            return notReadedMessages.Select(x => x.Id).ToList();
         }
 
         public void ScheduleSendSupporterNewMsgNotif(int delay, long messageId, long supportChatId, string[] supportersNotifToken)

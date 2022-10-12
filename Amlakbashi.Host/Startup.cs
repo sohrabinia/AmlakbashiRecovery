@@ -1,6 +1,7 @@
 ﻿using Amlakbashi.Application;
 using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.DTOs;
 using Amlakbashi.Core.Identity.Entities;
 using Amlakbashi.Data;
 using Amlakbashi.Data.Identity;
@@ -24,8 +25,8 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using StackExchange.Redis;
 using System;
@@ -50,8 +51,8 @@ namespace Amlakbashi.Host
         }
 
         public IConfigurationRoot Configuration { get; private set; }
-
         public ILifetimeScope AutofacContainer { get; private set; }
+        private const string frontendCorsPolicyName = "frontendCorsPolicy";
 
         // ConfigureServices is where you register dependencies. This gets
         // called by the runtime before the ConfigureContainer method, below.
@@ -80,7 +81,7 @@ namespace Amlakbashi.Host
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
                     options.SaveToken = true;
-                    options.TokenValidationParameters = 
+                    options.TokenValidationParameters =
                         TokenUtility.GetTokenValidationParameters(Configuration["JwtConfig:Secret"]);
                 });
 
@@ -136,8 +137,8 @@ namespace Amlakbashi.Host
 
             services.Configure<FormOptions>(x =>
             {
-                x.ValueLengthLimit = 20971520;
-                x.MultipartBodyLengthLimit = 20971520;
+                x.ValueLengthLimit = 209715200;
+                x.MultipartBodyLengthLimit = 209715200;
             });
 
             var redisConfigString = $"{Configuration.GetValue<string>("Redis:Server")}:{Configuration.GetValue<int>("Redis:Port")},allowAdmin=true,abortConnect=false";
@@ -149,14 +150,24 @@ namespace Amlakbashi.Host
 
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowCrossOrigins", policy =>
+                options.AddPolicy(frontendCorsPolicyName, policyBuilder =>
                 {
                     var crossOrigins = new List<string>();
                     crossOrigins.Add("http://localhost:3000");
                     crossOrigins.Add("https://localhost:3000");
-                    crossOrigins.Add("http://next.amlakbashi.com");
-                    crossOrigins.Add("https://next.amlakbashi.com");
-                    policy.WithOrigins(crossOrigins.ToArray()).AllowAnyHeader().AllowAnyMethod();
+                    crossOrigins.Add("http://next.amlakbashi.com:3000");
+                    crossOrigins.Add("https://next.amlakbashi.com:3000");
+
+                    crossOrigins.Add("http://host.amlakbashi.com");
+                    crossOrigins.Add("https://host.amlakbashi.com");
+                    crossOrigins.Add("http://host.amlakbashi.com:3000");
+                    crossOrigins.Add("https://host.amlakbashi.com:3000");
+
+                    crossOrigins.Add("http://user.amlakbashi.com");
+                    crossOrigins.Add("https://user.amlakbashi.com");
+                    crossOrigins.Add("http://user.amlakbashi.com:3000");
+                    crossOrigins.Add("https://user.amlakbashi.com:3000");
+                    policyBuilder.WithOrigins(crossOrigins.ToArray()).AllowAnyHeader().AllowAnyMethod();
                 });
             });
         }
@@ -182,12 +193,35 @@ namespace Amlakbashi.Host
             }
             else
             {
-                app.UseExceptionHandler("/errors/http500");
-                app.UseStatusCodePagesWithReExecute("/errors/http404");
+                app.UseExceptionHandler(errorApp =>
+                {
+                    errorApp.Run(context =>
+                    {
+                        if (context.Request.Path.Value.StartsWith("/api/") == false)
+                        {
+                            context.Response.Redirect("/errors/http500");
+                        }
+                        return Task.CompletedTask;
+                    });
+                });
+                app.UseStatusCodePages(new StatusCodePagesOptions()
+                {
+                    HandleAsync = context =>
+                    {
+                        if (context.HttpContext.Request.Path.Value.StartsWith("/api/") == false &&
+                            context.HttpContext.Response.StatusCode == StatusCodes.Status404NotFound)
+                        {
+                            context.HttpContext.Response.Redirect("/errors/http404");
+                        }
+                        return Task.CompletedTask;
+                    }
+                });
             }
 
+#if !DEBUG
             app.UseAntiXssMiddleware();
-            app.UseCors("AllowCrossOrigins");
+#endif
+
             app.UseResponseCaching();
             app.UseStaticFiles(new StaticFileOptions
             {
@@ -199,6 +233,12 @@ namespace Amlakbashi.Host
                     }
                 }
             });
+            GeneralData.WebHostEnvironment = env;
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider($"{GeneralData.VideosDirectoryDrive}"),
+                RequestPath = "/video"
+            });
             app.UseStaticFiles(new StaticFileOptions
             {
                 ContentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>
@@ -208,7 +248,7 @@ namespace Amlakbashi.Host
             });
             app.UseRouting();
             UrlRewriteConfig.Config(app);
-
+            app.UseCors(frontendCorsPolicyName);
             app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -226,7 +266,6 @@ namespace Amlakbashi.Host
                 {
                     TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects
                 });
-
             backgroundStartup.Startup();
 
             FirebaseApp.Create(new AppOptions()
@@ -234,7 +273,7 @@ namespace Amlakbashi.Host
                 Credential = GoogleCredential.FromFile(env.ContentRootPath + "/amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json")
             });
 
-            //IdentityDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
+            IdentityDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
             AmlakbashiDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
         }
     }

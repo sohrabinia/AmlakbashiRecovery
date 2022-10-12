@@ -18,7 +18,7 @@ namespace Amlakbashi.Host.ViewComponents
 
         public IViewComponentResult Invoke()
         {
-            if (userAccessor.CurrentUser.UserGeneralType == (int)Entities.User.UserGeneralTypeEnum.Guest)
+            if (userAccessor.CurrentUser.Type == (int)Entities.User.UserGeneralTypeEnum.Guest)
             {
                 return View(model: 0);
             }

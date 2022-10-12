@@ -15,15 +15,39 @@ namespace Amlakbashi.Core.Common.Utilities
                                "1401,1,11", "1401,1,12", "1401,1,13"};
 
         public static List<string> persian_holidays = new List<string>() {
-                               "1400,12,10", "1400,12,29",
-                               "1401,1,1", "1401,1,2", "1401,1,3",
-                               "1401,1,4", "1401,1,13", "1401,2,12",
-                               "1401,2,13", "1401,3,5", "1401,3,14",
-                               "1401,3,15", "1401,4,18", "1401,4,26",
-                               "1401,5,16", "1401,5,17", "1401,7,2",
-                               "1401,7,4", "1401,7,12", "1401,7,21",
-                               "1401,10,6", "1401,11,15", "1401,11,22",
-                               "1401,11,29", "1401,12,16", "1401,12,29"};
+            "1401,1,1", "1401,1,2", "1401,1,3", "1401,1,4", "1401,1,13",
+            "1401,2,3", "1401,2,13", "1401,2,14",
+            "1401,3,14", "1401,3,15",
+            "1401,4,19", "1401,4,27",
+            "1401,5,16", "1401,5,17",
+            "1401,6,26",
+            "1401,7,3", "1401,7,5", "1401,7,13",
+            "1401,10,6",
+            "1401,11,15", "1401,11,22", "1401,11,29",
+            "1401,12,17", "1401,12,29",
+
+            "1402,1,1", "1402,1,2", "1402,1,3", "1402,1,4", "1402,1,12", "1402,1,13", "1402,1,24",
+            "1402,2,2", "1402,2,3", "1402,2,26",
+            "1402,3,14", "1402,3,15",
+            "1402,4,8", "1402,4,16",
+            "1402,5,6", "1402,5,7",
+            "1402,6,15", "1402,6,23", "1402,6,25",
+            "1402,7,2", "1402,7,11",
+            "1402,9,26",
+            "1402,11,6", "1402,11,20", "1402,11,22",
+            "1402,12,7", "1402,12,29",
+        };
+
+        public static List<string> ManualHolidayPeakPersianDates
+        {
+            get
+            {
+                return new List<string>()
+                {
+                    "1401,4,26"
+                };
+            }
+        }
 
         public static DateTime PersianDateToGregorian(string persian_date)
         {
@@ -48,6 +72,32 @@ namespace Amlakbashi.Core.Common.Utilities
                   persian_calendar.GetMonth(gregorian_date),
                   persian_calendar.GetDayOfMonth(gregorian_date));
             }
+        }
+
+        public static string GregorianToPersianDateWithSlash(DateTime gregorian_date)
+        {
+            PersianCalendar persian_calendar = new PersianCalendar();
+            return string.Format("{0}/{1}/{2}", persian_calendar.GetYear(gregorian_date),
+                  persian_calendar.GetMonth(gregorian_date).ToString("D2"),
+                  persian_calendar.GetDayOfMonth(gregorian_date).ToString("D2"));
+        }
+
+        public static bool IsValidPersianDate(string date)
+        {
+            var stringDateParts = date.Split(',');
+            if (stringDateParts.Length != 3)
+            {
+                return false;
+            }
+            int integerDateParts;
+            foreach (var item in stringDateParts)
+            {
+                if (int.TryParse(item, out integerDateParts) == false)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public static string PersianTodayString
@@ -157,11 +207,6 @@ namespace Amlakbashi.Core.Common.Utilities
                 datetime = datetime + " " + objPersianCalendar.GetHour(GDate) + ":" + objPersianCalendar.GetMinute(GDate);
             }
             return datetime;
-        }
-
-        public static int DiffDays(DateTime date)
-        {
-            return Convert.ToInt32((date - DateTime.Now).TotalDays);
         }
 
         public static DateTime ConvertDate(string JDateText)
@@ -306,20 +351,6 @@ namespace Amlakbashi.Core.Common.Utilities
             return delay;
         }
 
-        public static List<string> GetHolidaysInGregorian()
-        {
-            var result = new List<string>();
-            foreach (var item in persian_holidays)
-            {
-                var g_date = PersianDateToGregorian(item);
-                if (g_date.Date >= DateTime.Now.Date)
-                {
-                    result.Add(g_date.ToString("yyyy-MM-dd"));
-                }
-            }
-            return result;
-        }
-
         public static void GetCurrentPersianMonth(out int year, out int month)
         {
             var objPersianCalendar = new PersianCalendar();
@@ -345,52 +376,9 @@ namespace Amlakbashi.Core.Common.Utilities
             }
         }
 
-        public static void GetPersianDateHolidayStatus(string persian_date, out bool is_holiday_or_between, out bool is_holiday_pike, out bool is_norouz)
+        public static bool IsStartDateLowerThanEndDate(string persianStartDate, string persianEndDate)
         {
-            if (IsNorouz(persian_date))
-            {
-                is_norouz = true;
-                is_holiday_pike = true;
-                is_holiday_or_between = true;
-                return;
-            }
-            is_norouz = false;
-            is_holiday_or_between = IsPersianDateHolidayOrBetween(persian_date);
-            if (!is_holiday_or_between)
-            {
-                is_holiday_pike = false;
-                return;
-            }
-            int previous_holidays = 0;
-            int next_holidays = 0;
-            var reach_a_normal_day = false;
-            var gregorian_date = PersianDateToGregorian(persian_date);
-            while (!reach_a_normal_day)
-            {
-                var previous_persian_date = GregorianToPersianDate(gregorian_date.AddDays(-(previous_holidays + 1)));
-                if (IsPersianDateHolidayOrBetween(previous_persian_date))
-                {
-                    previous_holidays++;
-                }
-                else
-                {
-                    reach_a_normal_day = true;
-                }
-            }
-            reach_a_normal_day = false;
-            while (!reach_a_normal_day)
-            {
-                var next_persian_date = GregorianToPersianDate(gregorian_date.AddDays(next_holidays + 1));
-                if (IsPersianDateHolidayOrBetween(next_persian_date))
-                {
-                    next_holidays++;
-                }
-                else
-                {
-                    reach_a_normal_day = true;
-                }
-            }
-            is_holiday_pike = previous_holidays + next_holidays + 1 > 2;
+            return PersianDateToGregorian(persianStartDate) < PersianDateToGregorian(persianEndDate);
         }
     }
 }

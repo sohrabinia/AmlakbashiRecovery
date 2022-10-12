@@ -37,6 +37,7 @@ namespace Amlakbashi.Core.Entities
                 TypeInt = (int)value;
             }
         }
+
         public ReadStatusEnum ReadStatus
         {
             get
@@ -48,11 +49,13 @@ namespace Amlakbashi.Core.Entities
                 ReadStatusInt = (int)value;
             }
         }
+
         public enum TypeEnum
         {
             User = 0,
             Supporter = 1
         }
+
         public enum ReadStatusEnum
         {
             NotRead = 0,

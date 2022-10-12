@@ -48,7 +48,7 @@ else
                 <div class="bar-filter quick-filter">
                     <span><i class="fas fa-filter"></i>فیلتر :</span>
                     <input class="input-stlye" type="text" value="@(Model.ReserveId > 0 ? Model.ReserveId : "")" name="ReserveId" placeholder="کد رزرو">
-                    <input class="input-stlye" type="text" value="@(Model.AdvertiseId > 0 ? Model.AdvertiseId : "")" name="AdvertiseId" placeholder="کد آگهی">
+                    <input class="input-stlye" type="text" value="@(Model.AdvertiseId > 0 ? Model.AdvertiseId : "")" name="AdvertiseId" placeholder="کد اقامتگاه">
                     <input class="input-stlye" type="text" value="@(Model.HostUserId > 0 ? Model.HostUserId : "")" name="HostUserId" placeholder="کد میزبان">
                     <input class="input-stlye" type="text" value="@(Model.GuestUserId > 0 ? Model.GuestUserId : "")" name="GuestUserId" placeholder="کد مهمان">
                     <button class="fas fa-angle-double-left submit-btn"></button>
@@ -57,7 +57,7 @@ else
         </div>
         <aside class="admin-table-row admin-table-row-header">
             <p class="number-row">ردیف</p>
-            <p class="code-reserve">کد رزرو</p>
+            <p class="code-reserve">شناسه</p>
             <p class="information-travel">اطلاعات سفر</p>
             <p class="details-travel">جزئیات سفر</p>
             <p class="status">وضعیت</p>
@@ -85,7 +85,7 @@ else
                             <input class="input-stlye" type="text" value="@(Model.ReserveId > 0 ? Model.ReserveId : "")" name="ReserveId">
                         </div>
                         <div class="item-filter-box">
-                            <label class="title-filter">کد آگهی</label>
+                            <label class="title-filter">کد اقامتگاه</label>
                             <input class="input-stlye" type="text" value="@(Model.AdvertiseId > 0 ? Model.AdvertiseId : "")" name="AdvertiseId">
                         </div>
                         <div class="item-filter-box">

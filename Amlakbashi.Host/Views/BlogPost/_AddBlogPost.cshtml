@@ -55,7 +55,7 @@
                 <option value="0">هیچ کدام</option>
                 @foreach (var item in accItems)
                 {
-                    <option is-selected="@(Model != null && Model.AccommodationType == (int)item)" value="@((int)item)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianString((int)item)</option>
+                    <option is-selected="@(Model != null && Model.AccommodationType == (int)item)" value="@((int)item)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianName((int)item)</option>
                 }
             </select>
         </div>
@@ -65,7 +65,7 @@
                 <option value="0">هیچ کدام</option>
                 @foreach (var item in positionItems)
                 {
-                    <option is-selected="@(Model != null && Model.PositionType == (int)item)" value="@((int)item)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetPositionTypeString((int)item)</option>
+                    <option is-selected="@(Model != null && Model.PositionType == (int)item)" value="@((int)item)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetPositionTypePersianName((int)item)</option>
                 }
             </select>
         </div>

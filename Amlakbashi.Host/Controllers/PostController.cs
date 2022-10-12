@@ -288,17 +288,17 @@ namespace Amlakbashi.Host.Controllers
                 home_cat.AdvertiseItems = new List<AccommodationCardDTO>();
 
                 // Initial Advertises
-                advertises = category.Advertises.OrderByDescending(o => o.AdvertiseScore).Take(advertiseItemCount).ToList();
+                advertises = category.Advertises.OrderByDescending(o => o.ResidenceScore).Take(advertiseItemCount).ToList();
                 foreach (var adv in advertises)
                 {
-                    var rate = adv.AverageUserRating;
+                    var rate = adv.AverageUsersScore;
                     var review_count = adv.ReportItems.GroupBy(g => g.UserID).Count();
                     home_cat.Advertises.Add(new HomePageAdvertiseDTO()
                     {
                         Id = adv.Id,
                         Title = adv.Title,
                         Description = adv.Description,
-                        ImageSource = adv.PhotoID > 0 ? string.Format("/عکس-آگهی/{0}", adv.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144),
+                        ImageSource = adv.MainPhotoId > 0 ? string.Format("/عکس-آگهی/{0}", adv.Slug) : string.Format("/عکس-یافت-نشد-{0}-{1}", 240, 144),
                         Rate = rate,
                         ReviewCount = review_count
                     });
@@ -349,15 +349,15 @@ namespace Amlakbashi.Host.Controllers
                 itemDTOs.Add(dto);
             }
             ViewBag.mostDiscountAdvertise = itemDTOs;
+
             var norouzItemDTOs = new List<AccommodationCardDTO>();
-            var norouzAccs = advertiseService.GetNorouzAdvertises(5);
-            //var norouzAccs = new List<Advertise>();
-            foreach (var item in norouzAccs)
-            {
-                var dto = (AccommodationCardDTO)item;
-                dto.Favourited = user.Id > 0 && userFavorites.Any(x => x.AdvertiseID == item.Id);
-                norouzItemDTOs.Add(dto);
-            }
+            //var norouzAccs = advertiseService.GetNorouzAdvertises(5);
+            //foreach (var item in norouzAccs)
+            //{
+            //    var dto = (AccommodationCardDTO)item;
+            //    dto.Favourited = user.Id > 0 && userFavorites.Any(x => x.AdvertiseID == item.Id);
+            //    norouzItemDTOs.Add(dto);
+            //}
             ViewBag.norouzAdvertises = norouzItemDTOs;
 
             ViewBag.advertiseItemCount = advertiseItemCount;

@@ -27,7 +27,7 @@
                         <option value="@((int)Advertise.AdvertiseType.All)" is-selected="@((int)ViewBag.Type == (int)Advertise.AdvertiseType.All)">اجاره روزانه</option>
                         @foreach (var t in type_arr)
                         {
-                            <option value="@((int)t)" is-selected="@((int)ViewBag.Type == (int)t)">@(Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypeUserString(t))</option>
+                            <option value="@((int)t)" is-selected="@((int)ViewBag.Type == (int)t)">@(Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(t))</option>
                         }
                     </select>
                 </td>

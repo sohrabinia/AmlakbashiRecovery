@@ -40,7 +40,7 @@ namespace Amlakbashi.Accounting.Services
             string customTitle, int doerUserId, ActionLog.ActionSourceEnum actionSource)
         {
             var user = Repository.Find<User,int>(userId);
-            var newPrizeCredit = user.PrizeCredit + amount;
+            var newPrizeCredit = user.GiftWalletAmount + amount;
             var prizeCreditTran = new PrizeCreditTransaction()
             {
                 UserID = userId,

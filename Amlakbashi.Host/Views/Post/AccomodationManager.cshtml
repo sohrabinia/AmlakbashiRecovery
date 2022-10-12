@@ -1,44 +1,42 @@
 ﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs;
 @using Amlakbashi.Core.Common.Utilities;
 
+@inject IUserAccessor userAccessor
+
 @model AccommodationManagerDTO
 
 @{
-    ViewBag.Title = "آگهی های من";
+    ViewBag.Title = "اقامتگاه ها";
     ViewBag.personal = true;
     Layout = "~/Views/Shared/_Dashboard.cshtml";
 }
 
 @section StyleLink{
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/dashboard/host-panel.css&v=10">
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/dashboard/numberinput.css&v=1">
-    <link rel="stylesheet" type="text/css" href="/file/getcss?src=/resource/css/general/popup-calendar.css">
-}
-
-@section ScriptLink{
-    <script src="/file/getjs?src=/resource/Scripts/dashboard/host-panel.js&v=3"></script>
-    <script src="/file/getjs?src=/resource/Scripts/dashboard/accDatePicker.js&v=2"></script>
-    <script src="/file/getjs?src=/resource/Scripts/dashboard/ajax-accomodation.js&v=4"></script>
-    <script src="/file/getjs?src=/resource/Scripts/dashboard/numberInput.js&v=1"></script>
+    <environment include="Development">
+        <link rel="stylesheet" type="text/css" href="/resource/css/dashboard/host-panel.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/dashboard/numberinput.css" asp-append-version="true">
+        <link rel="stylesheet" type="text/css" href="/resource/css/general/popup-calendar.css" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" type="text/css" href="/css/acc-manager.min.css" asp-append-version="true" />
+    </environment>
 }
 
 <form id="filter-banner" action="/post/accomodationmanager" method="get" class="form-filter-banner">
     <input type="hidden" value=@ViewBag.UserID>
     <span class="filter-banner__item">
-        <span class="select-name">نوع آگهی </span>
+        <span class="select-name">نوع اقامتگاه </span>
         <span class="select-button">
             <select class="selectStyle" name="type">
-                <option value="all" is-selected="@((string)ViewBag.type == "all")">همه ی آگهی ها</option>
+                <option value="all" is-selected="@((string)ViewBag.type == "all")">همه</option>
                 <option value="enable" is-selected="@((string)ViewBag.type == "enable")">تایید شده</option>
                 <option value="disable" is-selected="@((string)ViewBag.type == "disable")">غیر فعال</option>
                 <option value="ready" is-selected="@((string)ViewBag.type == "ready")">در انتظار تایید</option>
-                @*<option value="ready" is-selected="@((string)ViewBag.type == "notcomplete")">تکمیل نشده</option>*@
-                @*<option value="ready" is-selected="@((string)ViewBag.type == "notready")">تایید نشده</option>*@
             </select>
         </span>
     </span>
     <span class="filter-banner__item">
-        <span>کد آگهی</span>
+        <span>کد اقامتگاه</span>
         <span><input placeholder="" type="tel" name="id" value="@((int)ViewBag.id>0 ? ViewBag.id : "")"></span>
     </span>
     <span class="filter-banner__item button-filter">
@@ -49,7 +47,6 @@
 @foreach (var item in Model.accList)
 {
     <!-- Start acclist -->
-
     <div class="container-host-panel-css" data-id="@item.id">
         <!-- Start-banner-single -->
         <section class="banner-main card-banner single-card">
@@ -57,15 +54,27 @@
             <div class="wrapper-right-banner div-unset">
                 <div class="avatar-item">
                     <a target="_blank" href="@item.previewUrl"><img src="@item.photoUrl" alt="عکس اتاق" /></a>
-                    @if (item.userRating <= 0)
+
+                    @if (userAccessor.CurrentUser.Id == 82119)
                     {
-                        <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
+                        @if (item.mainType != AccMainType.Complex && item.status != Advertise.AdvertiseStatus.NotCompleted)
+                        {
+                            <div style="width: 100%; text-align: center; padding: 2px 0;">
+                                <a href="/accomodation/accgeneralform?id=@item.id#residence_photos" target="_blank" style="font-size: small; border-left: 1px solid gray; padding-left: 5px; color: black;"><i class="fa fa-plus"></i> عکس</a>
+                                <span onclick="showVideoUploadPopup(@item.id)" style="font-size: small; cursor: pointer;"><i class="fa fa-plus"></i> ویدیو</span>
+                            </div>
+                        }
                     }
-                    <div>
-                        @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-                     new ModelStateDictionary()) { { "score", item.userRating } })
-                    </div>
-                    <a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="background:@( item.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>
+
+                    @*@if (item.userRating <= 0)
+                        {
+                            <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
+                        }
+                        <div>
+                            @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                         new ModelStateDictionary()) { { "score", item.userRating } })
+                        </div>*@
+                    @*<a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="background:@( item.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>*@
                 </div>
             </div>
             <!-- End-wrapper-right-banner -->
@@ -73,7 +82,7 @@
             <div id="banner-status-@item.id" class="wrapper-left-banner div-unset">
                 <div class="flex-style">
                     <div class="number-ticket">
-                        <span>کد آگهی :‌</span>
+                        <span>کد اقامتگاه :‌</span>
                         <span>@item.id</span>
                     </div>
                     <div class="location-banner" style="max-height:23px;">
@@ -87,7 +96,6 @@
                     </div>
                 </div>
                 <div class="flex-style quick-access-desktop" style="justify-content:@(item.mainType == AccMainType.Single ? "space-between" : item.status == Advertise.AdvertiseStatus.NotCompleted?"flex-start": "flex-end");">
-                    @*<button type="button" data-type='@item.mainType.ToString().ToLower()' class="button_fast-reserve" > رزرو آنی</button>*@
                     <a href="@item.editUrl" target="_blank" class="completed-advertise-button" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"flex":"none")">
                         <p>اطلاعات را تکمیل کنید</p>
                     </a>
@@ -99,11 +107,10 @@
         new ModelStateDictionary()) { { "title", " پر " }, { "Active", item.todayIsFull }, { "classActive", "full" }, { "onclick", String.Format("setTodayFull({0} ,this)", item.id) } })
                     </form>
                     <div class="icons-style quick-access-desktop" style="text-align:left;display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
-                        @*<a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>*@
                         @*<a style="opacity:@(item.mainType == AccMainType.Single ?  "1" : "0" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>*@
-                        <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item icons-desktop" @*onclick="showNorouzPopup(@item.id)"*@ href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img class="noroz-style-icon" width="30" height="30" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>
+                        @*<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item icons-desktop" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img class="noroz-style-icon" width="30" height="30" rel="نوروز" alt="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>*@
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon icons-desktop" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
-                        @*<a title="حذف" onclick="deleteButton(@item.id ,this)" class="icons-item trash-icon icons-desktop"><i class="fa fa-trash"></i></a>*@
+                        <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="رزرو آنی" class="icons-item calndar-icon icons-desktop" onclick="getInstantReserveDates(@item.id)"><i class="fas fa-bolt" style="font-size: 16px; padding: 6px 9px;"></i></a>
                         <a href="@item.editUrl" class="icons-item edit-icon-banner icons-desktop" target="_blank"><i class="fas fa-pencil-alt"></i></a>
                         <a title="تنظیمات " data-type='@item.mainType.ToString().ToLower()' class="icons-item setting-icon icons-desktop"><i class="fa fa-cog"></i></a>
                     </div>
@@ -125,9 +132,9 @@
                 <div class="icons div-unset" style="display:@(item.status == Advertise.AdvertiseStatus.NotCompleted?"none":"block")">
                     <div>
                         @*<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-s" href="/accomodation/accextraform?id=@(item.id)#price-input-section"><img width="30" height="30" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_30x30" /></a>*@
-                        <a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-xs" href="/accomodation/accextraform?id=@(item.id)#norouz-price-input-section"><img width="24" height="24" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_24x24" /></a>
+                        @*<a style="display:@(item.mainType == AccMainType.Complex ?  "none" : "inline-block")" title="نوروز" class="icons-item noroz-mobile-xs" href="/accomodation/accextraform?id=@(item.id)#norouz-price-input-section"><img width="24" height="24" rel="نوروز" alt="نوروز" class="noroz-style-icon" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_24x24" /></a>*@
                         <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@item.id,'@item.title')"><i class="fa fa-calendar-alt"></i></a>
-                        @*<a title="حذف " class="icons-item trash-icon" onclick="deleteButton(@item.id , this)"><i class="fa fa-trash"></i></a>*@
+                        <a style="display:@(item.mainType == AccMainType.Single ?  "inline-block;" : "none" )" title="رزرو آنی" class="icons-item calndar-icon icons-desktop" onclick="getInstantReserveDates(@item.id)"><i class="fas fa-bolt" style="font-size: 16px; padding: 6px 9px;"></i></a>
                         <a href="@item.editUrl" class="icons-item edit-icon-banner" target="_blank"><i class="fas fa-pencil-alt"></i></a>
                         <a title="تنظیمات " data-type='@item.mainType.ToString().ToLower()' class="icons-item setting-icon"><i class="fa fa-cog"></i></a>
                     </div>
@@ -151,20 +158,14 @@
                             @if (item.isVerified)
                             {
                                 @await Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "title", "نمایش آگهی " }, { "Active", item.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", item.id, "true") } })
+        new ModelStateDictionary()) { { "title", "فعال " }, { "Active", item.isActivated }, { "classActive", "show-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", item.id, "true") } })
                                 @await Html.PartialAsync("_RadioButtonForm", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "title", "عدم نمایش آگهی " }, { "Active", !item.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", item.id, "false") } })
+        new ModelStateDictionary()) { { "title", "غیرفعال " }, { "Active", !item.isActivated }, { "classActive", "hide-banner" }, { "onclick", String.Format("setAccActive({0},{1} ,this)", item.id, "false") } })
                             }
                             else if (!item.isVerified && item.notVerifyReasons.Count > 0)
                             {
                                 <div class="button_reason_not_verified" onclick="showReasons(@item.id)">دلیل عدم تایید<div></div></div>
                             }
-                        </div>
-                        @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "titleList", " رزرو آنی" } })
-                        <div class="instantReserve container-item">
-                            @await Html.PartialAsync("_InstantReserve", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "instantReserveAccess", (int)Model.instantReserveAccess }, { "UserID", ViewBag.UserID } })
                         </div>
                         @await Html.PartialAsync("_EditFast", item)
                         <div class="day-set-@item.id">
@@ -183,7 +184,7 @@
                 <!-- Start-room-type-list -->
                 <div class="room-type-list">
                     @await Html.PartialAsync("_TitleRoomsCard", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "UserID", ViewBag.UserID }, { "ReserveAccess", (int)Model.instantReserveAccess } })
+        new ModelStateDictionary()) { { "UserID", ViewBag.UserID } })
                     <div class="style_title-list">
                         @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", " تنظیم واحد ها " } })
@@ -193,8 +194,6 @@
                                 @if (item.apartmentUnits.Count > 0)
                                 {
                                     <div class="type-name-unit-complex">
-                                        @*@Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "آپارتمان ها" } })*@
-                                        @*class show-container  for none roomcard*@
                                         <p class="name-unit-complex"> آپارتمان ها </p>
                                         <div class="roomCard">
                                             @foreach (var apartmentUnit in item.apartmentUnits)
@@ -208,7 +207,6 @@
                                 @if (item.suitUnits.Count > 0)
                                 {
                                     <div class="type-name-unit-complex">
-                                        @*@Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "سوئیت ها" } })*@
                                         <p class="name-unit-complex"> سوئیت ها </p>
                                         <div class="roomCard">
                                             @foreach (var suitUnit in item.suitUnits)
@@ -222,7 +220,6 @@
                                 @if (item.villaUnits.Count > 0)
                                 {
                                     <div class="type-name-unit-complex">
-                                        @*@Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "ویلا ها " } })*@
                                         <p class="name-unit-complex"> ویلا ها </p>
                                         <div class="roomCard">
                                             @foreach (var villaUnit in item.villaUnits)
@@ -236,7 +233,6 @@
                                 @if (item.houseUnits.Count > 0)
                                 {
                                     <div class="type-name-unit-complex">
-                                        @*@Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "خانه های ویلایی" } })*@
                                         <p class="name-unit-complex"> خانه های ویلایی </p>
                                         <div class="roomCard">
                                             @foreach (var houseUnit in item.houseUnits)
@@ -250,7 +246,6 @@
                                 @if (item.hutUnits.Count > 0)
                                 {
                                     <div class="type-name-unit-complex">
-                                        @*@Html.Partial("_TitleList", new ViewDataDictionary() { { "titleList", "کلبه ها" } })*@
                                         <p class="name-unit-complex"> کلبه ها </p>
                                         <div class="roomCard">
                                             @foreach (var hutUnit in item.hutUnits)
@@ -271,7 +266,7 @@
                 <!-- Start-list-room-card  -->
                 <div class="list-room-card">
                     @await Html.PartialAsync("_TitleRoomsCard", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "UserID", ViewBag.UserID }, { "ReserveAccess", (int)Model.instantReserveAccess } })
+        new ModelStateDictionary()) { { "UserID", ViewBag.UserID } })
                     <div class="style_title-list">
                         @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", " تنظیم واحد ها " } })
@@ -284,7 +279,7 @@
                                         <div class="avatar-room">
                                             <img src="@hotelRoom.photoUrl" />
                                         </div>
-                                        <span class="details-room-complex">@hotelRoom.roomUnitString @hotelRoom.title  </span>
+                                        <span class="details-room-complex">@hotelRoom.title  </span>
                                     </div>
                                     <!-- End-wrapper-right-banner -->
                                     <!-- Start-wrapper-left-banner div-unset-->
@@ -298,6 +293,8 @@
                                         </form>
                                         <div class="div-unset ">
                                             <a style="display:@( hotelRoom.newCommentCount == 0 ? "none" : "inline-block");" href="/comment/advertisecommentdetail?id=@hotelRoom.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i class="fa fa-envelope"><span class="newCommentBanner">@hotelRoom.newCommentCount</span></i></a>
+                                            <a title="تقویم" class="icons-item calndar-icon" onclick="showOccupiedPopup(@hotelRoom.id,'@hotelRoom.title')"><i class="fa fa-calendar-alt"></i></a>
+                                            <a title="رزرو آنی" class="icons-item calndar-icon" onclick="getInstantReserveDates(@hotelRoom.id)"><i class="fas fa-bolt" style="font-size: inherit;"></i></a>
                                             <button title="تنظیمات " class="icons-item setting-icon-room"><i class="fa fa-cog"></i></button>
                                         </div>
                                     </div>
@@ -332,6 +329,18 @@
     </div>
 </div>
 
+@section ScriptLink{
+    <environment include="Development">
+        <script src="/resource/Scripts/dashboard/host-panel.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/accDatePicker.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/ajax-accomodation.js" asp-append-version="true"></script>
+        <script src="/resource/Scripts/dashboard/numberInput.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/acc-manager.min.js" asp-append-version="true"></script>
+    </environment>
+}
+
 @section ScriptBlock{
     <script type="text/javascript">
         function DeserializeOccupiedList(str) {
@@ -349,7 +358,6 @@
             {
                 @: reasonList.push('@reason');
             }
-            @*@:var showReasonsStr = DeserializeOccupiedList('@Amlakbashi.Core.Common.Utilities.SerializeUtility.SerializeToJS(item.notVerifyReasons)');*@
             @: showReasonsDic[@item.id]=reasonList;
          }
 

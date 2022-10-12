@@ -12,7 +12,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
         public long Id { get; set; }
         public long ParentId { get; set; }
         public Advertise.AdvertiseType Type { get; set; }
-        public bool Available { get; set; }
+        public bool Active { get; set; }
         public HotelUnitSpecificDTO hotelUnitSpecific { get; set; }
         public TitleDescInputDTO titleAndDesc { get; set; }
         public CapacityInputDTO capacity { get; set; }
@@ -35,7 +35,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
                 Id = id,
                 ParentId = parentId,
                 Type = director.AdvertiseType,
-                Available = director.GetAdvertisePart<IdPart>().Available
+                Active = director.GetAdvertisePart<IdPart>().Active
             };
             model.hotelUnitSpecific = director.GetAdvertisePart<HotelUnitSpecificPart>();
             model.capacity = director.GetAdvertisePart<CapacityPart>();

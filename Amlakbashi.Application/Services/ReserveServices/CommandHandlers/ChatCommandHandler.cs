@@ -34,14 +34,14 @@ namespace Amlakbashi.Application.Services.ReserveServices.CommandHandlers
             if (chat.ReadStatus == (int)ReadStatusEnum.NotRead)
             {
                 var user = repository.Find<User, int>(request.TargetUserId);
-                var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
+                var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
                 if (!string.IsNullOrEmpty(user.FcmAppNotificationToken) ||
                     !string.IsNullOrEmpty(user.AppNotificationToken) ||
                     !string.IsNullOrEmpty(user.NotificationToken))
                 {
                     mediator.Enqueue(new SendMessageCommand(new Core.Infrastructure.UserContact.UserContactDTO()
                     {
-                        UserMainMobile = user.MainMobile,
+                        UserMainMobile = user.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = identityUser.Email,
                         EmailConfirmed = identityUser.EmailConfirmed,

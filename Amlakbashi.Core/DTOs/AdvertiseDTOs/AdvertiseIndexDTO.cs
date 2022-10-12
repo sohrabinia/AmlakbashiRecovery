@@ -15,7 +15,7 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public Advertise.AdvertiseType Type { get; set; } = Advertise.AdvertiseType.All;
         public int UserId { get; set; } = -1;
         public string Sort { get; set; } = "score";
-        public int InstatntReserveStatus { get; set; } = -1;
+        public int InstantReserveStatus { get; set; } = -1;
         public string MinReserveNorouzFromDate { get; set; } = "";
         public int ImageCountMin { get; set; } = 0;
         public int ImageCountMax { get; set; } = 0;
@@ -25,5 +25,6 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public int HygieneProtocolStatus { get; set; } = -1;
         public Advertise.ParkingItems Parking { get; set; } = Advertise.ParkingItems.Unset;
         public bool? License { get; set; } = null;
+        public int VideoStatus { get; set; } = -1;
     }
 }

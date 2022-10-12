@@ -10,7 +10,11 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
     public class AdvertiseIndexDetailDTO
     {
         public long Id { get; set; }
+        public Advertise.AdvertiseMode Mode { get; set; }
+        public Advertise.MainTypeEnum MainType { get; set; }
+        public long? ParentId { get; set; }
         public Advertise.AdvertiseStatus Status { get; set; }
+        public bool Available { get; set; }
         public string CreateDate { get; set; }
         public int DailyPrice { get; set; }
         public long AdvertiseScore { get; set; }
@@ -18,24 +22,29 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public string NorouzMinReserveDate { get; set; }
         public int SupportInfoCount { get; set; }
         public string UserFullName { get; set; } = "کاربر حذف شده";
-        public long UserScore { get; set; } = 0;
         public string CityPersianName { get; set; }
         public int UserId { get; set; }
+        public Advertise.VideoStatusEnum VideoStatus { get; set; }
 
         public static implicit operator AdvertiseIndexDetailDTO(Advertise advertise)
         {
             return new AdvertiseIndexDetailDTO()
             {
                 Id = advertise.Id,
-                UserId = advertise.UserID,
+                Mode = advertise.Mode,
+                MainType = advertise.MainType,
+                ParentId = advertise.ParentId,
+                UserId = advertise.UserId,
                 CreateDate = DateTimeUtility.ConvertDate(advertise.CreateDate).ToString(),
                 DailyPrice = advertise.DailyPrice,
-                AdvertiseScore = advertise.AdvertiseScore,
-                WebVisit = advertise.WebVisit,
-                NorouzMinReserveDate = advertise.unixNorouzMinRequestDate < 1 ? "-" :
-                    DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.unixNorouzMinRequestDate)).Replace(",", "/"),
+                AdvertiseScore = advertise.ResidenceScore,
+                WebVisit = advertise.View,
+                NorouzMinReserveDate = advertise.MinReserveDateForNowruz < 1 ? "-" :
+                    DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.MinReserveDateForNowruz)).Replace(",", "/"),
                 Status = advertise.Status,
-                SupportInfoCount = advertise.GetSupportInfoList().Length
+                Available = advertise.Active,
+                SupportInfoCount = advertise.GetSupportInfoList().Length,
+                VideoStatus = advertise.VideoStatus
             };
         }
     }

@@ -16,7 +16,6 @@ using Autofac;
 using log4net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,10 +36,7 @@ namespace Amlakbashi.Host.Configurations
                 As(typeof(ILocalization));
             builder.RegisterType(typeof(PriceCalculator)).
                 As(typeof(IPriceCalculator));
-            //builder.RegisterModule<LoggingModule>();
             builder.RegisterModule<ApplicationModule>();
-            //builder.RegisterAssemblyTypes(typeof(MvcApplication).Assembly)
-            //    .AsImplementedInterfaces();
             builder.RegisterModule(new AutoMapperModule(
                 typeof(AutoMapperModule).Assembly));
             builder.RegisterType<MediatorHangfireBridge>()

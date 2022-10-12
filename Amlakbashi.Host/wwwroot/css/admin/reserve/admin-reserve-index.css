@@ -44,7 +44,7 @@ aside.admin-table-row .information-travel .box-codes {
 
 aside.admin-table-row .information-travel .box-codes p {
   display: inline-block;
-  width: 70px;
+  /*width: 70px;*/
 }
 
 aside.admin-table-row .information-travel .box-codes a {
@@ -61,7 +61,7 @@ aside.admin-table-row .information-travel .box-codes i {
 
 aside.admin-table-row .information-travel p {
   line-height: 2;
-  width: 59%;
+  /*width: 59%;*/
   text-align: right;
 }
 
@@ -363,7 +363,7 @@ aside.admin-table-row .box-more-options .status-support .accept-support {
 
 @media (max-width: 1280px) {
     aside.admin-table-row .information-travel p, aside.admin-table-row .information-travel .box-codes {
-        width: 85%;
+        /*width: 85%;*/
     }
 }
 
@@ -432,7 +432,7 @@ aside.admin-table-row .box-more-options .status-support .accept-support {
     width: 97% !important;
   }
   aside.admin-table-row .information-travel .box-codes p {
-    width: 50px;
+    /*width: 50px;*/
   }
   aside.admin-table-row .force-options {
     display: none;

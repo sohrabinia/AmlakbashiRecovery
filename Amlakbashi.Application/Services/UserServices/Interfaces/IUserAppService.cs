@@ -1,5 +1,7 @@
-﻿using Amlakbashi.Core.Common.AppService;
+﻿using Amlakbashi.Application.DTOs;
+using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.DTOs.UserDTOs;
+using Amlakbashi.Core.DTOs.WebService.Requests.Accounts;
 using Amlakbashi.Core.DTOs.WebService.Requests.User;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Identity.Entities;
@@ -27,10 +29,13 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         User GetActivatedUserByEmail(string email, bool includeFavorite = false);
         void Insert(User user, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         Task<AppUser> RegisterAsync(LoginRequest request);
-        void SendVerifyCode(AppUser identityUser);
-        bool Update(UserEditDTO editedUser, int adminId);
+        Task SendVerifyCode(AppUser identityUser);
+        Task<bool> Update(UserEditDTO editedUser, int adminId);
         bool Update(UserDTO dto, int currentUserId, bool userHasRefunedInProgress,
             ActionLog.ActionSourceEnum source, out List<string> errors);
+        Task<ServiceResult> UpdateAsync(UserPostProfileRequest request);
+        Task<ServiceResult<bool>> UpdateMainPhoneNumberAsync(int userId, string newMainPhoneNumber);
+        Task<ServiceResult> VerifyNewMainPhoneNumber(int userId, string verifyCode);
         void UpdateState(int userId, bool state, int currentUserId = 0,
             ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         Task UpdatePhoneNumberConfirmedAsync(string guid, bool confirm);
@@ -41,21 +46,21 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
             ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         void UpdateCreateDate(int userId, DateTime time);
         void UpdateSendVerification(int userId, DateTime time, string code = null);
-        Task<string> UpdateVerifyCodeAsync(string guid);
+        Task<ServiceResult> UpdateVerifyCodeAsync(string guid);
         void UpdatePresentorUser(int userId, int pid);
         void UpdateFNameLName(int userId, string newFName, string newLName);
         void UpdateDesc(int userId, string desc);
         Task UpdateEmailAsync(string guid, string email, bool confirm);
         void UpdateLastNotifPermetionTicks(int userId, long ticks);
-        void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
-            int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
+        //void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
+        //    int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         void UpdateUserNotificationToken(int userId, string token);
         void UpdateFcmNotificationToken(int userId, string token);
         void UpdateAppNotificationToken(int userId, string token);
         void UpdateUserGeneralType(int userId, User.UserGeneralTypeEnum userGeneralType);
         void Delete(int userId, int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         void AddFavorite(int userId, long advertiseId);
-        void DeleteFavorite(int userId, long advertiseId);
+        bool DeleteFavorite(int userId, long advertiseId);
         void SendCustomSms(int delay, string mobile, string template);
         void SendNotificationApplication(string token, string title, string body, string targetAction, string targetId);
         void SendGroupNotification(List<string> tokens, string title, string body, string clickAction);
@@ -65,7 +70,8 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void SendSms(UserContactDTO userContact);
         IList<string> GetAllIdentityUsernamesByState(User.UserState state = User.UserState.Acticved);
         AppUser GetIdentityUser(string phrase, bool isEmail = false);
-        Task<AppUser> GetIdentityUserByIdAsync(string id);
+        Task<AppUser> FindIdentityByIdAsync(string id);
+        Task<AppUser> FindIdentityByUsernameAsync(string username);
         void AddIdentityUser(AppUser user);
         bool AddClaimsToUser(string username, IList<Claim> claims);
         void RemoveClaimsFromUser(string username, IList<Claim> claims);
@@ -73,6 +79,7 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         IdentityResult ChangeIdentityUserPassword(string username, string currentPassword, string newPassword);
         IdentityResult ChangePassword(string username, string currentPassword, string newPassword);
         void UpdateIdentityUser(AppUser user);
+        Task<bool> UpdateIdentityAsync(AppUser user);
         IList<AppRole> GetAllRoles();
         IList<string> GetAllRoleNames();
         IList<string> GetUserRoles(string username);
@@ -83,7 +90,8 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         bool SignInRegisterOld(int user_id, string fname, string lname,
             string password, string confirmPassword, out Dictionary<string, string> errors);
         JwtSecurityToken JwtSignIn(AppUser identityUser, byte[] key, int userGeneralType = 0);
-        Task<string> GenerateJwtTokenAsync(string guid, string jwtSecret);
+        Task<string> GenerateJwtTokenAsync(string guid, string jwtSecret,
+            User.UserGeneralTypeEnum? panel = null);
         ClaimsPrincipal GetPrincipalFromJwtToken(string token, string jwtSecret);
         IEnumerable<User> IdentityUsersToUsers(IEnumerable<AppUser> identityUsers);
         IEnumerable<AppUser> GetAllSupportEmployees();

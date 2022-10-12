@@ -29,16 +29,6 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
         public override bool CanTransitTo(ReserveStatus status)
         {
             return false;
-            //switch (status)
-            //{
-            //    case ReserveStatus.Started:
-            //    case ReserveStatus.Reserved:
-            //    case ReserveStatus.CashPay:
-            //    case ReserveStatus.CanceledByGuest:
-            //        return true;
-            //    default:
-            //        return false;
-            //}
         }
 
         public override void OnTransition(ReserveStatus prevStatus, bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId)
@@ -53,22 +43,21 @@ namespace Amlakbashi.Application.Services.ReserveServices.ReserveState.ReserveSt
             Repository.Update(reserve);
             Repository.Save();
             var user = Repository.Find<User, int>(reserve.HostUserID);
-            var identityUser = userManager.FindByNameAsync(user.MainMobile).Result;
-            var contact = new UserContactDTO()
-            {
-                UserMainMobile = user.MainMobile,
-                UserAppNotificationToken = user.AppNotificationToken,
-                UserEmail = identityUser.Email,
-                EmailConfirmed = identityUser.EmailConfirmed,
-                UserFcmAppNotificationToken = user.FcmAppNotificationToken,
-                UserNotificationToken = user.NotificationToken,
-                Type = UserContactType.HostCancelRequestSent,
-                ReserveId = reserve.Id.ToString(),
-                AdvertiseId = reserve.AdvertiseID.ToString()
-            };
+            var identityUser = userManager.FindByNameAsync(user.PhoneNumber).Result;
             if (sendSms)
             {
-                mediator.Enqueue(new SendMessageCommand(contact));
+                mediator.Enqueue(new SendMessageCommand(new UserContactDTO()
+                {
+                    UserMainMobile = user.GetNoticesPhoneNumber(),
+                    UserAppNotificationToken = user.AppNotificationToken,
+                    UserEmail = identityUser.Email,
+                    EmailConfirmed = identityUser.EmailConfirmed,
+                    UserFcmAppNotificationToken = user.FcmAppNotificationToken,
+                    UserNotificationToken = user.NotificationToken,
+                    Type = UserContactType.HostCancelRequestSent,
+                    ReserveId = reserve.Id.ToString(),
+                    AdvertiseId = reserve.AdvertiseID.ToString()
+                }));
             }
             reserveSupportManager.ReserveCancelAfterDoneHandler(ReserveId);
         }

@@ -29,6 +29,8 @@ using Amlakbashi.Host.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
 using static Amlakbashi.Core.Entities.ReservePayment;
+using System.Threading.Tasks;
+using Amlakbashi.Core.DTOs.WebService.Requests.Reserves;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -97,192 +99,12 @@ namespace Amlakbashi.Host.Controllers
             return View();
         }
 
-        //[Authorize(Policy = Policies.Reserve_View)]
-        //public ActionResult Index(int? page, long reserve_id = -1, long advertise_id = -1,
-        //    int host_user_id = -1, int guest_user_id = -1, int reserve_status = -1,
-        //    int host_response_status = -1, int general_status = -1,
-        //    string site_clearing_date = "", int site_cleared_status = -1,
-        //    string reserve_from_date = "", string reserve_to_date = "",
-        //    string reserve_end_date = "",
-        //    int stay_duration_from = -1, int stay_duration_to = -1,
-        //    int reserve_support_status = 0, bool shouldFollow = false,
-        //    int supporter_id = -1, int host_card_status = -1,
-        //    int mainFilter = 0, int instantReserveFilter = 2,
-        //    bool disableAutoCancel = false, bool accVisited = false)
-        //{
-        //    try
-        //    {
-        //        var itemPerPage = 20;
-        //        var model = reserveService.Filter(reserve_id, advertise_id, host_user_id, guest_user_id,
-        //            reserve_status, host_response_status, general_status, site_clearing_date, site_cleared_status,
-        //            reserve_from_date, reserve_to_date, reserve_end_date, stay_duration_from, stay_duration_to,
-        //            reserve_support_status, shouldFollow, supporter_id, host_card_status, mainFilter,
-        //            instantReserveFilter, disableAutoCancel, accVisited).AsQueryable();
-
-        //        if (reserve_support_status > 0)
-        //        {
-        //            var st = (ReserveSupport.SupporterStatus)reserve_support_status;
-        //            if (st == ReserveSupport.SupporterStatus.SupportingByYou)
-        //            {
-        //                supporter_id = userAccessor.CurrentUser.Id;
-        //            }
-        //            else
-        //            {
-        //                if (st != ReserveSupport.SupporterStatus.Done)
-        //                {
-        //                    supporter_id = -1;
-        //                }
-        //                var now = DateTime.Now.Date;
-        //                model = model.Where(x => x.EndDate > now);
-        //                model = model.Where(x => x.Status != Reserve.ReserveStatus.Deleted);
-        //                model = reserveSupportManager.FilterBySupporterStatus(
-        //                    userAccessor.CurrentUser.Id, model, st);
-        //            }
-        //        }
-        //        if (supporter_id > 0)
-        //        {
-        //            IList<ReserveSupport> reserveSupports = reserveSupportService.GetListBySupporterId(supporter_id);
-        //            var reserve_ids = new List<long>();
-        //            foreach (var reserveSupport in reserveSupports)
-        //            {
-        //                reserve_ids.AddRange(reserveSupport.GetAllReserveIds());
-        //            }
-        //            reserve_ids = reserve_ids.Distinct().ToList();
-        //            model = model.Where(x => x.Status != Reserve.ReserveStatus.Deleted);
-        //            model = model.Where(x => reserve_ids.Contains(x.Id));
-        //        }
-
-        //        List<Reserve> finalModel;
-        //        if (host_card_status > -1)
-        //        {
-        //            IQueryable<BankCard> bankCards = bankCardService.GetAll();
-        //            var filteredIds = new List<long>();
-        //            BankCard bankCard;
-        //            if (host_card_status == 0) //shaba
-        //            {
-        //                foreach (var item in model)
-        //                {
-        //                    bankCard = bankCards.FirstOrDefault(x => x.UserID == item.Advertise.UserID);
-        //                    if (bankCard != null &&
-        //                        !string.IsNullOrEmpty(bankCard.ShabaNumber))
-        //                    {
-        //                        filteredIds.Add(item.Id);
-        //                    }
-        //                }
-        //            }
-        //            else if (host_card_status == 1) // bank card
-        //            {
-        //                foreach (var item in model)
-        //                {
-        //                    bankCard = bankCards.FirstOrDefault(x => x.UserID == item.Advertise.UserID);
-        //                    if (bankCard != null &&
-        //                        string.IsNullOrEmpty(bankCard.ShabaNumber) &&
-        //                        !string.IsNullOrEmpty(bankCard.BankCardNumber))
-        //                    {
-        //                        filteredIds.Add(item.Id);
-        //                    }
-        //                }
-        //            }
-        //            else if (host_card_status == 2) // none
-        //            {
-        //                foreach (var item in model)
-        //                {
-        //                    bankCard = bankCards.FirstOrDefault(x => x.UserID == item.Advertise.UserID);
-        //                    if (bankCard == null ||
-        //                        (string.IsNullOrEmpty(bankCard.ShabaNumber) &&
-        //                        string.IsNullOrEmpty(bankCard.BankCardNumber)))
-        //                    {
-        //                        filteredIds.Add(item.Id);
-        //                    }
-        //                }
-        //            }
-        //            model = model.Where(x => filteredIds.Contains(x.Id));
-        //            finalModel = model.ToList();
-        //            foreach (var item in finalModel)
-        //            {
-        //                item.Temp_HostPayablePrice = PriceUtility.CalculateHostPayablePrice(item.TotalPrice,
-        //                    accounting.GetReservePaidAmount(item.ReservePayments.ToList(),
-        //                        StatusStringType.Guest),
-        //                    item.CouponPrice, item.PrizePrice);
-        //            }
-        //            finalModel = finalModel.OrderByDescending(x => x.Temp_HostPayablePrice).ToList();
-        //        }
-        //        else
-        //        {
-        //            model = model.OrderByDescending(x => x.Id);
-        //            finalModel = model.ToList();
-        //        }
-
-        //        var PageNumber = page ?? 1;
-        //        var onePageOfModel = finalModel.ToPagedList(PageNumber, itemPerPage);
-
-        //        var supporterList = new List<UserFullNameDTO>();
-        //        var supporters = userService.GetAllEmployees().Select(s => s.PhoneNumber);
-        //        foreach (var item in supporters)
-        //        {
-        //            var supporter = userService.GetByMainMobile(item);
-
-        //            if (supporter != null)
-        //                supporterList.Add(new UserFullNameDTO() { id = supporter.Id, fullName = supporter.FullName });
-        //        }
-        //        ViewBag.reserve_id = reserve_id;
-        //        ViewBag.advertise_id = advertise_id;
-        //        ViewBag.host_user_id = host_user_id;
-        //        ViewBag.guest_user_id = guest_user_id;
-        //        ViewBag.reserve_status = reserve_status;
-        //        ViewBag.host_response_status = host_response_status;
-        //        ViewBag.general_status = general_status;
-        //        ViewBag.site_clearing_date = site_clearing_date;
-        //        ViewBag.reserve_from_date = reserve_from_date;
-        //        ViewBag.reserve_to_date = reserve_to_date;
-        //        ViewBag.reserve_end_date = reserve_end_date;
-        //        ViewBag.site_cleared_status = site_cleared_status;
-        //        ViewBag.stay_duration_from = stay_duration_from;
-        //        ViewBag.stay_duration_to = stay_duration_to;
-        //        ViewBag.reserve_support_status = reserve_support_status;
-        //        ViewBag.shouldFollow = shouldFollow;
-        //        ViewBag.supporter_id = supporter_id;
-        //        ViewBag.supporterList = supporterList;
-        //        ViewBag.host_card_status = host_card_status;
-        //        ViewBag.mainFilter = mainFilter;
-        //        ViewBag.instantReserveFilter = instantReserveFilter;
-        //        ViewBag.disableAutoCancel = disableAutoCancel;
-        //        ViewBag.accVisited = accVisited;
-        //        var dto = new ReserveAdminDTO();
-        //        dto.reserveList = new List<ReserveAdminItemDTO>();
-        //        var list = onePageOfModel.ToList();
-        //        ReserveSupport tempCurrentReserveSupport;
-        //        bool refundDone;
-        //        var currentUserId = userAccessor.CurrentUser.Id;
-        //        var reserveToCheck = reserveService.GetReservesIncludingSupport(list.Select(s => s.Id).ToList()).ToList();
-        //        var resIndex = 0;
-        //        foreach (var checkItem in reserveToCheck)
-        //        {
-        //            var item = list[resIndex];
-        //            dto.reserveList.Add(ReserveAdminItemDTO.Generate(item,
-        //                reserveSupportManager.Analyze(checkItem, out tempCurrentReserveSupport, currentUserId),
-        //                accounting.GetReservePaidAmount(item.ReservePayments.ToList(), StatusStringType.Guest),
-        //                accounting.ReserveCanClear(item.Id),
-        //                accounting.ReserveShouldRefund(item.Id, item.Status, out refundDone), refundDone));
-        //            resIndex++;
-        //        }
-        //        ViewBag.reserveAdmin = dto;
-        //        ViewBag.RowIndexStart = (PageNumber * itemPerPage) - itemPerPage;
-        //        return View(onePageOfModel);
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("Reserve.Index", exc);
-        //        return Redirect(Request.Headers["referer"].ToString());
-        //    }
-        //}
-
         [Authorize(Policy = Policies.Reserve_View)]
         public ActionResult NewIndex(ReserveIndexDTO dto)
         {
             try
             {
-                var reserves = reserveService.NewFilter(dto, userAccessor.CurrentUser.Id);
+                var reserves = reserveService.Filter(dto, userAccessor.CurrentUser.Id);
 
                 var supporterList = new List<UserFullNameDTO>();
                 var supporters = userService.GetAllEmployees().Select(s => s.PhoneNumber);
@@ -341,8 +163,9 @@ namespace Amlakbashi.Host.Controllers
                 model.SupportStateColor = ReserveSupport.GetSupportStatusColor(supportStatus);
                 model.SupportStateString = ReserveSupport.GetSupportStatusString(supportStatus);
                 model.CanGrantSupport = canGrantSupport;
-                model.CanDoClearing = accounting.ReserveCanClear(reserve.Id);
-                model.MustDoClearing = model.CanDoClearing &&
+                model.canBeDoneCheckout = accounting.ReserveCanClear(reserve.Id);
+                model.canBeDoneEarlyCheckout = model.canBeDoneCheckout && reserve.EarlyCheckoutStatus == EarlyCheckoutEnum.ConfirmedByGuest;
+                model.mustBeDoneCheckout = model.canBeDoneCheckout &&
                     DateTimeUtility.GetSiteClearingDate(reserve.StartDate, reserve.EndDate) <= DateTime.Now;
                 bool refundDone;
                 model.MustRefund = accounting.ReserveShouldRefund(reserve.Id, reserve.Status, out refundDone) && !refundDone;
@@ -376,9 +199,8 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.Id = reserve_id;
                 ViewBag.GuestUserID = reserve.UserID;
                 ViewBag.GuestPhotoID = reserve.GuestUser.PhotoID;
-                var acc = reserve.Advertise;
-                ViewBag.HostUserID = acc.UserID;
-                ViewBag.HostPhotoID = userService.Find(acc.UserID).PhotoID;
+                ViewBag.HostUserID = reserve.HostUserID;
+                ViewBag.HostPhotoID = reserve.HostUser.PhotoID;
                 var model = chatService.UpdateSupportReadStatusByReserveId(reserve_id);
                 reserveAdminHubServer.ChatReadFromServer(reserve_id, model.Count());
                 return View(model.OrderByDescending(x => x.Id));
@@ -386,87 +208,6 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.Chat", exc);
-                return Redirect(Request.Headers["referer"].ToString());
-            }
-        }
-
-        [Authorize(Policy = Policies.Reserve_View)]
-        [HttpGet]
-        public ActionResult Edit(int reserve_id = -1)
-        {
-            try
-            {
-                ViewBag.msg = TempData["msg"];
-                var model = reserveService.Find(reserve_id);
-                return View(model);
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Reserve.Edit(get)", exc);
-                return Redirect(Request.Headers["referer"].ToString());
-            }
-        }
-
-        [Authorize(Policy = Policies.Reserve_Edit_Normal)]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(Reserve reserve,
-            string start_date = null, string end_date = null)
-        {
-            try
-            {
-                var objReserve = reserveService.Find(reserve.Id);
-                var currentIdentityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
-                var userAllowEdit = objReserve.Status < ReserveStatus.Reserved ||
-                    userService.UserAllowPolicy(currentIdentityUser, Policies.Reserve_Edit_Reserved);
-                if (userAllowEdit == false)
-                {
-                    ViewBag.errorMsg = "شما مجوز ویرایش ندارید";
-                    return View(objReserve);
-                }
-                var originalReserve = reserveService.Find(reserve.Id);
-                if (originalReserve.TotalPrice != reserve.TotalPrice ||
-                    originalReserve.DepositPrice != reserve.DepositPrice)
-                {
-                    if (reserve.DepositPrice < 1 || reserve.TotalPrice < 1)
-                    {
-                        userAllowEdit = userService.UserAllowPolicy(currentIdentityUser, Policies.Reserve_Payment_Actions);
-                        if (userAllowEdit == false)
-                        {
-                            ViewBag.errorMsg = "شما مجوز صفر کردن مبلغ را ندارید";
-                            return View(objReserve);
-                        }
-                    }
-                    userAllowEdit = userService.UserAllowPolicy(currentIdentityUser, Policies.Reserve_Edit_Price);
-                    if (userAllowEdit == false)
-                    {
-                        ViewBag.errorMsg = "شما مجوز ویرایش مبلغ ندارید";
-                        return View(objReserve);
-                    }
-                }
-                string msg;
-                if (reserveService.Update(reserve, start_date,
-                    end_date, out msg, userAccessor.CurrentUser.Id,
-                    ActionLog.ActionSourceEnum.AdminPanel) == false)
-                {
-                    ViewBag.errorMsg = msg;
-                    return View(objReserve);
-                }
-                if (reserveService.SetHostResponse(reserve.Id, reserve.HostResponse, true,
-                    ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id, true) == false)
-                {
-                    reserveService.SetStatus(reserve.Id, reserve.Status, true,
-                        ActionLog.ActionSourceEnum.AdminPanel, userAccessor.CurrentUser.Id, true);
-                }
-                if (reserve.HostResponse == HostResponseEnum.Accepted)
-                {
-                    advertiseService.DeleteExtrinsicReserves(objReserve.AdvertiseID, start_date, end_date);
-                }
-                return RedirectToAction("Index");
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Reserve.Edit(post)", exc);
                 return Redirect(Request.Headers["referer"].ToString());
             }
         }
@@ -496,7 +237,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(dto.Id);
-                var currentIdentityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+                var currentIdentityUser = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
                 var userAllowEdit = reserve.Status < ReserveStatus.Reserved ||
                     userService.UserAllowPolicy(currentIdentityUser, Policies.Reserve_Edit_Reserved);
                 if (userAllowEdit == false)
@@ -584,22 +325,6 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        //[Authorize(Roles = Roles.SuperAdmin)]
-        //public JsonResult Delete(long reserve_id)
-        //{
-        //    try
-        //    {
-        //        string msg;
-        //        var done = reserveService.Delete(reserve_id, out msg);
-        //        return GenerateJsonResult(new { status = done ? 1 : 0, val = msg });
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("Reserve.Delete", exc);
-        //        return GenerateJsonResult(new { status = 0, val = "" });
-        //    }
-        //}
-
         [HttpGet]
         [Authorize]
         public ActionResult ReserveDashboardFiltered(int user_id = -1, string reserve_id = "", int status = -1, int category = -1)
@@ -628,7 +353,7 @@ namespace Amlakbashi.Host.Controllers
                     reserve_id = StringUtility.PersianNumberToEnglish(reserve_id);
                 if (selectType == ReserveManagerSelectType.All)
                 {
-                    selectType = currentUser.UserGeneralType > 0 ?
+                    selectType = currentUser.Type > 0 ?
                         ReserveManagerSelectType.Host : ReserveManagerSelectType.Guest;
                 }
                 Dictionary<ReserveCategory, int> countDict;
@@ -651,10 +376,9 @@ namespace Amlakbashi.Host.Controllers
                 }
                 foreach (var reserve in reserves)
                 {
-                    var advertise = reserve.Advertise;
                     var paidAmount = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest);
                     var unreadChatCount = chatService.GetNotReadCountByReserveId(reserve.Id, currentUser.Id);
-                    var rulesDict = advertiseService.GetRulesDictionary(advertise.Id);
+                    var rulesDict = advertiseService.GetRulesDictionary(reserve.AdvertiseID);
                     var item = ReserveDashboardItemDTO.Generate(
                         reserve, index, isGuest, isHost, userAccessor.CurrentUser.Id,
                         paidAmount + reserve.CouponPrice + reserve.PrizePrice,
@@ -744,13 +468,15 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 string msg;
+                bool isInstantReserve = false;
                 var ok = advertiseService.CheckReserve(userAccessor.CurrentUser.Id, advertise_id,
-                    number_of_guests, from_date, to_date, out msg);
+                    number_of_guests, from_date, to_date, out msg, out isInstantReserve);
 
                 return GenerateJsonResult(new
                 {
                     val = ok ? 1 : 0,
-                    msg = msg
+                    msg = msg,
+                    isInstantReserve
                 });
             }
             catch (Exception exc)
@@ -760,8 +486,7 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        public JsonResult ReserveRequest(int advertise_id, string from_date, string to_date,
-            int number_of_guests, bool instant_reserve = false)
+        public JsonResult ReserveRequest(int advertise_id, string from_date, string to_date, int number_of_guests)
         {
             try
             {
@@ -770,15 +495,14 @@ namespace Amlakbashi.Host.Controllers
                     return GenerateJsonResult(new { val = 2 });
                 }
                 var identityUser = userService.GetIdentityUser(User.Identity.Name);
-                if (identityUser.State != Entities.User.UserState.Acticved)
+                if (identityUser.Status != Entities.User.UserState.Acticved)
                 {
                     return GenerateJsonResult(new { val = 3 });
                 }
                 string msg;
                 long reserveId;
                 var done = advertiseService.ReserveRequest(advertise_id,
-                    userAccessor.CurrentUser.Id, from_date, to_date, number_of_guests,
-                    instant_reserve, out msg, out reserveId);
+                    userAccessor.CurrentUser.Id, from_date, to_date, number_of_guests, out msg, out reserveId);
                 return GenerateJsonResult(new
                 {
                     val = done ? 1 : 0,
@@ -798,9 +522,8 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
                 var currentUser = userAccessor.CurrentUser;
-                if (!(is_host && advertise.UserID == currentUser.Id) &&
+                if (!(is_host && reserve.HostUserID == currentUser.Id) &&
                     !(!is_host && reserve.UserID == currentUser.Id))
                 {
                     return GenerateJsonResult(new
@@ -828,14 +551,57 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
+        [Authorize]
+        public IActionResult ShowCancelDialog(long reserveId)
+        {
+            var reserve = reserveService.Find(reserveId);
+            var userType = reserve.UserID == userAccessor.CurrentUser.Id ?
+                Entities.User.UserGeneralTypeEnum.Guest : Entities.User.UserGeneralTypeEnum.Host;
+            ViewBag.reserveId = reserveId;
+            return PartialView("_CancelDialog", Reserve.GetReserveCancelReasonsByUserType(userType));
+        }
+
+        [Authorize]
+        public IActionResult GetCancelationInfo(ReservePostCancelRequest request)
+        {
+            request.userId = userAccessor.CurrentUser.Id;
+            request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
+            var result = reserveService.GetCancelationInfo(request);
+            if (result.HasError())
+            {
+                ViewBag.hasError = true;
+                ViewBag.errorMessage = result.GetErrors().First();
+            }
+            return PartialView("_CancelationInfo", result.Result);
+        }
+
+        [Authorize]
+        public async Task<JsonResult> Cancel(ReservePostCancelRequest request)
+        {
+            request.userId = userAccessor.CurrentUser.Id;
+            request.actionSource = ActionLog.ActionSourceEnum.WebsiteDashboard;
+            var result = await reserveService.CancelAsync(request);
+            if (result.HasError())
+            {
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = result.GetErrors().First()
+                });
+            }
+            return GenerateJsonResult(new
+            {
+                status = 1
+            });
+        }
+
         public JsonResult RefuseCancelReserve(long reserve_id, bool is_host)
         {
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertsie = reserve.Advertise;
                 var currentUser = userAccessor.CurrentUser;
-                if ((is_host ? advertsie.UserID != currentUser.Id :
+                if ((is_host ? reserve.HostUserID != currentUser.Id :
                     reserve.UserID != currentUser.Id) ||
                     reserve.Status != (is_host ? ReserveStatus.CancelRequestByHost :
                     ReserveStatus.CancelRequestByGuest))
@@ -910,8 +676,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                if ((advertise.UserID != userAccessor.CurrentUser.Id || reserve.Status != Reserve.ReserveStatus.CashPay))
+                if ((reserve.HostUserID != userAccessor.CurrentUser.Id || reserve.Status != Reserve.ReserveStatus.CashPay))
                 {
                     return Redirect("/");
                 }
@@ -933,9 +698,8 @@ namespace Amlakbashi.Host.Controllers
                     msg = "شما پراخت نقدی مهمان را تایید نکردید";
                 }
                 ViewBag.msg = msg;
-                ViewBag.user_id = advertise.UserID;
+                ViewBag.user_id = reserve.HostUserID;
                 ViewBag.selectType = Reserve.ReserveManagerSelectType.Host;
-
                 return View("ReserveItemManager");
             }
             catch (Exception exc)
@@ -944,8 +708,7 @@ namespace Amlakbashi.Host.Controllers
                 ViewBag.msg = "متاسفانه عملیات با خطا مواجه شد. مجددا تلاش کنید";
                 ViewBag.user_id = userAccessor.CurrentUser.Id;
                 ViewBag.selectType = Reserve.ReserveManagerSelectType.Host;
-                return View("ReserveItemManager", reserveService.GetListByUserId(userAccessor.CurrentUser.Id,
-                    Reserve.ReserveManagerSelectType.Host));
+                return View("ReserveItemManager");
             }
         }
 
@@ -980,8 +743,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                if (advertise.UserID != userAccessor.CurrentUser.Id)
+                if (reserve.HostUserID != userAccessor.CurrentUser.Id)
                 {
                     return GenerateJsonResult(new { val = 0 });
                 }
@@ -1034,21 +796,18 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                var userId = userAccessor.CurrentUser.Id;
-                if (advertise.UserID != userId)
+                if (reserve.HostUserID != userAccessor.CurrentUser.Id)
                 {
                     return RedirectToAction("PublicLogin", "User",
                         new
                         {
                             returnUrl = "/reserve/reserveresponsebynotif?reserve_id=" +
-                        reserve_id + "&host_response=" + host_response
+                                reserve_id + "&host_response=" + host_response
                         });
                 }
                 reserveService.SetHostResponse(reserve_id, (Reserve.HostResponseEnum)host_response,
                     true, ActionLog.ActionSourceEnum.WebsiteDashboard, userAccessor.DoerUser.Id);
                 var msg = "جواب شما ثبت شد";
-                var rejectReason = "";
                 switch ((Reserve.HostResponseEnum)host_response)
                 {
                     case Reserve.HostResponseEnum.Accepted:
@@ -1059,24 +818,14 @@ namespace Amlakbashi.Host.Controllers
                         break;
                     case Reserve.HostResponseEnum.RejectedPrice:
                         msg = "درخواست رزرو رد شد. شما مینوانید از بخش آگهی های من قیمت هر روز را جداگانه تعریف کنید و یا قیمت آگهی خود را ویرایش کنید";
-                        rejectReason = "price";
                         break;
                     case Reserve.HostResponseEnum.RejectedHomeFull:
                         msg = "درخواست رزرو رد شد. شما میتوانید از بخش آگهی های من و با کلیک بر روی دکمه تعیین روز های پر، روزهایی که پر هستند را تعیین کنید";
-                        rejectReason = "home_full";
                         break;
                 }
-                //ViewBag.host_response_status = 1;
-                //ViewBag.host_response = host_response;
-                //ViewBag.host_response_msg = msg;
-                //ViewBag.reject_reason = rejectReason;
-                //ViewBag.host_response_reserve_id = reserve_id;
-                //ViewBag.user_id = advertise.UserID;
-                //ViewBag.selectType = Reserve.ReserveManagerSelectType.Host;
-                //ViewBag.msg = "";
 
                 return Redirect("/reserve/reserveitemmanager?reserve_id=" + reserve_id +
-                    "&user_id=" + advertise.UserID +
+                    "&user_id=" + reserve.HostUserID +
                     "&selecttype=" + (int)Reserve.ReserveManagerSelectType.Host);
             }
             catch (Exception exc)
@@ -1229,17 +978,8 @@ namespace Amlakbashi.Host.Controllers
                         long price;
                         var reserve = reserveService.Find(reserve_id);
                         current_reserve_status = (int)reserve.Status;
-                        var advertise = reserve.Advertise;
-                        //if (advertise.UserID != userAccessor.CurrentUser.Id)
-                        //{
-                        //    return new JsonResult()
-                        //    {
-                        //        Data = new { status = 0, msg = "شما مجوز این عملیات را ندارید" },
-                        //        JsonRequestBehavior = JsonRequestBehavior.AllowGet
-                        //    };
-                        //}
                         var payment_id = accounting.PayAmlakbashiPortion(reserve_id, pay_type, out already_payed,
-                            out price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit, advertise.UserID, userAccessor.DoerUser.Id);
+                            out price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit, reserve.HostUserID, userAccessor.DoerUser.Id);
                         if (already_payed)
                         {
                             if (reserve.Status == Reserve.ReserveStatus.WaitForReserve)
@@ -1267,7 +1007,7 @@ namespace Amlakbashi.Host.Controllers
                         }
                         else
                         {
-                            current_reserve_status = (int)reserveService.FinalizeReserve(reserve_id, payment_id, price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit, ActionLog.ActionSourceEnum.AdminPanel, userAccessor.DoerUser.Id, advertise.UserID, 0, 0, false);
+                            current_reserve_status = (int)reserveService.FinalizeReserve(reserve_id, payment_id, price, ReservePayment.ReservePaymentMethod.AmlakbashiCredit, ActionLog.ActionSourceEnum.AdminPanel, userAccessor.DoerUser.Id, reserve.HostUserID, 0, 0, false);
                             var msg = " پرداخت شما با موفقیت انجام شد . شماره تراکنش پرداخت شما " + payment_id + "می باشد .";
                             return GenerateJsonResult(new
                             {
@@ -1380,7 +1120,6 @@ namespace Amlakbashi.Host.Controllers
                     return PartialView("_SiteClearingHostInfo");
                 }
 
-                var advertise = reserve.Advertise;
                 var hostUser = reserve.HostUser;
 
                 var guestPaidAmount = accounting.GetReservePaidAmount(reserveId, StatusStringType.Guest);
@@ -1426,7 +1165,8 @@ namespace Amlakbashi.Host.Controllers
                             hostBankCard.ShabaNumber : "",
                     UserName = hostName,
                     UserId = hostUser.Id,
-                    UserCredit = hostUser.Credit
+                    UserCredit = hostUser.WalletAmount,
+                    HasFailureExpenditurePayment = reserve.HasFailureExpenditurePayment()
                 };
                 return PartialView("_SiteClearingHostInfo", model);
             }
@@ -1487,6 +1227,7 @@ namespace Amlakbashi.Host.Controllers
         {
             try
             {
+                ViewBag.hasFailureExpenditurePayment = reserveService.Find(reserveId).HasFailureExpenditurePayment();
                 ViewBag.reserveId = reserveId;
                 ViewBag.userId = userAccessor.CurrentUser.Id;
                 ViewBag.price = price;
@@ -1585,10 +1326,10 @@ namespace Amlakbashi.Host.Controllers
 
                 if (sendSms)
                 {
-                    var identityUser = userService.GetIdentityUser(reserve.HostUser.MainMobile);
+                    var identityUser = userService.GetIdentityUser(reserve.HostUser.PhoneNumber);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserMainMobile = reserve.HostUser.MainMobile,
+                        UserMainMobile = reserve.HostUser.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = reserve.HostUser.AppNotificationToken,
                         UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = reserve.HostUser.FcmAppNotificationToken,
@@ -1677,10 +1418,10 @@ namespace Amlakbashi.Host.Controllers
                 if (result.HasError == false && sendSms)
                 {
                     var user = userService.Find(result.UserId);
-                    var identityUser = userService.GetIdentityUser(user.MainMobile);
+                    var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserMainMobile = user.MainMobile,
+                        UserMainMobile = user.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
@@ -1695,7 +1436,9 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new
                 {
                     status = result.HasError ? 0 : 1,
-                    msg = result.HasError ? result.ErrorMessage : result.Message
+                    msg = result.HasError ? result.ErrorMessage : result.Message,
+                    traceNumber = result.TraceNumber,
+                    recieverFullName = result.RecieverFullName
                 });
             }
             catch (Exception exc)
@@ -1794,15 +1537,13 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                var host_user = userService.Find(advertise.UserID);
                 var guestPaidAmount = accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(),
                     StatusStringType.Guest);
                 var payable_price = PriceUtility.CalculateHostPayablePrice(reserve.TotalPrice, guestPaidAmount,
                     reserve.CouponPrice, reserve.PrizePrice);
                 var days = (int)(reserve.EndDate - reserve.StartDate).TotalDays;
                 long newCredit;
-                var transaction_id = accounting.IncreaseCredit(advertise.UserID, payable_price, 0, reserve_id,
+                var transaction_id = accounting.IncreaseCredit(reserve.HostUserID, payable_price, 0, reserve_id,
                     out newCredit, CreditTransaction.WalletTransactionReason.Clearing);
                 if (accounting.InsertReservePayment(userAccessor.CurrentUser.Id,
                     reserve_id, transaction_id, 0,
@@ -1841,15 +1582,14 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var user = userService.Find(reserve.Advertise.UserID);
-                var identityUser = userService.GetIdentityUser(user.MainMobile);
+                var identityUser = userService.GetIdentityUser(reserve.HostUser.PhoneNumber);
                 userService.SendMessage(new UserContactDTO()
                 {
-                    UserMainMobile = user.MainMobile,
-                    UserAppNotificationToken = user.AppNotificationToken,
+                    UserMainMobile = reserve.HostUser.GetNoticesPhoneNumber(),
+                    UserAppNotificationToken = reserve.HostUser.AppNotificationToken,
                     UserEmail = identityUser.Email,
-                    UserFcmAppNotificationToken = user.FcmAppNotificationToken,
-                    UserNotificationToken = user.NotificationToken,
+                    UserFcmAppNotificationToken = reserve.HostUser.FcmAppNotificationToken,
+                    UserNotificationToken = reserve.HostUser.NotificationToken,
                     Type = UserContactType.SiteClearingHostWithCredit,
                     TransactionId = transaction_id.ToString(),
                     Price = payable_price.ToString(),
@@ -1871,8 +1611,6 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(reserve_id);
-                var advertise = reserve.Advertise;
-                var guest_user = userService.Find(reserve.UserID);
                 var guest_payed_price = accounting.GetReservePaidAmount(reserve.ReservePayments.ToList(),
                     Reserve.StatusStringType.Guest);
                 long newCredit;
@@ -1921,36 +1659,6 @@ namespace Amlakbashi.Host.Controllers
             queryString = HtmlUtility.AddToQueryString(queryString, "category", "0");
             var url = "/reserve/reserveitemmanager" + queryString;
             return Redirect(url);
-        }
-
-        [Authorize]
-        public JsonResult SetHostCallDate(long reserve_id)
-        {
-            try
-            {
-                reserveService.UpdateHostCallDate(reserve_id, DateTime.Now);
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Reserve.SetHostCallDate", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
-        }
-
-        [Authorize]
-        public JsonResult SetGuestCallDate(long reserve_id)
-        {
-            try
-            {
-                reserveService.UpdateGuestCallDate(reserve_id, DateTime.Now);
-                return GenerateJsonResult(new { status = 1 });
-            }
-            catch (Exception exc)
-            {
-                logger.Error("Reserve.SetGuestCallDate", exc);
-                return GenerateJsonResult(new { status = 0 });
-            }
         }
 
         [HttpGet]
@@ -2012,7 +1720,7 @@ namespace Amlakbashi.Host.Controllers
                 ((long)((allRefundsOfReserve == null || allRefundsOfReserve.Any() == false) ? 0 : allRefundsOfReserve.Sum(x => x.Price)));
 
                 long _guestPaidPrice = 0;
-                var hostUserId = item.Advertise.UserID;
+                var hostUserId = item.HostUserID;
                 var _hostPaidPrice = accounting.GetReservePaymentPrice(
                     item.Id, ReservePayment.ReservePaymentType.GuestDeposite,
                     out _host_site_portion_pay_date, out _host_site_portion_transaction_id, hostUserId);
@@ -2153,7 +1861,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if (reserve.shouldFollow)
                 {
-                    var currentUserIdentity = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+                    var currentUserIdentity = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
                     var editAllowed = userService.UserAllowPolicy(currentUserIdentity, Policies.Reserve_Edit_Reserved);
                     if (editAllowed == false)
                     {
@@ -2292,27 +2000,29 @@ namespace Amlakbashi.Host.Controllers
         public ActionResult GetReserveItemPartial(long reserve_id, int index,
             bool is_guest, bool is_host)
         {
-            int user_id = userAccessor.CurrentUser.Id;
-            var reserve = reserveService.Find(reserve_id);
-            var advertise = reserve.Advertise;
-            if (reserve.UserID != user_id &&
-                advertise.UserID != user_id)
+            try
             {
-                return RedirectToAction("AccessDenied", "Errors");
+                int user_id = userAccessor.CurrentUser.Id;
+                var reserve = reserveService.Find(reserve_id);
+                if (reserve.UserID != user_id &&
+                    reserve.HostUserID != user_id)
+                {
+                    return RedirectToAction("AccessDenied", "Errors");
+                }
+                var paidAmount = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest);
+                var unreadChatCount = chatService.GetNotReadCountByReserveId(reserve.Id, user_id);
+                var rulesDict = advertiseService.GetRulesDictionary(reserve.AdvertiseID);
+                var model = ReserveDashboardItemDTO.Generate(
+                    reserve, index, is_guest, is_host, user_id,
+                    paidAmount + reserve.CouponPrice + reserve.PrizePrice,
+                    unreadChatCount, rulesDict);
+                return PartialView("_ReserveItem", model);
             }
-            //ViewBag.index = index.ToString();
-            //ViewBag.is_guest = is_guest.ToString();
-            //ViewBag.is_host = is_host.ToString();
-            //ViewBag.user_id = user_id;
-            //ViewBag.chatCount = chatService.GetNotReadCountByReserveId(reserve_id, user_id);
-            var paidAmount = accounting.GetReservePaidAmount(reserve.Id, StatusStringType.Guest);
-            var unreadChatCount = chatService.GetNotReadCountByReserveId(reserve.Id, user_id);
-            var rulesDict = advertiseService.GetRulesDictionary(advertise.Id);
-            var model = ReserveDashboardItemDTO.Generate(
-                reserve, index, is_guest, is_host, user_id,
-                paidAmount + reserve.CouponPrice + reserve.PrizePrice,
-                unreadChatCount, rulesDict);
-            return PartialView("_ReserveItem", model);
+            catch (Exception exc)
+            {
+                logger.Error("Reserve.GetReserveItemPartial", exc);
+                return BadRequest();
+            }
         }
 
         [Authorize]
@@ -2430,14 +2140,14 @@ namespace Amlakbashi.Host.Controllers
             {
                 reserveService.UpdateRatingShownToGuest(reserveid, true);
             }
-            var acc = reserve.Advertise;
             var user_id = userid > 0 ? userid : reserve.UserID;
             ViewBag.user_id = user_id;
             ViewBag.comment = commentService.GetByAccSenderUser(reserve.AdvertiseID,
                 user_id > 0 ? user_id : userAccessor.CurrentUser.Id);
             var model = UserRatingDTO.Generate(reportItemService.GetAccUserRatings(
-                reserve.AdvertiseID, user_id) as List<ReportItem>, acc.Id,
-                acc.Title, regionService.Find(acc.City == null ? 0 : (int)acc.City).PersianName);
+                reserve.AdvertiseID, user_id) as List<ReportItem>, reserve.AdvertiseID,
+                reserve.Advertise.Title, regionService.Find(reserve.Advertise.CityId == null ? 0 :
+                (int)reserve.Advertise.CityId).PersianName);
             return PartialView("_Rating", model);
         }
 
@@ -2495,7 +2205,7 @@ namespace Amlakbashi.Host.Controllers
             var guestUser = reserve.GuestUser;
             var coupon = accounting.GetMostValuableDiscountCouponIfAny(guestUser.Id);
             var model = ReservePaymentDTO.Generate(reserve,
-                accounting.GetReservePrizeAvailable(reserve.TotalPrice, guestUser.PrizeCredit),
+                accounting.GetReservePrizeAvailable(reserve.TotalPrice, guestUser.GiftWalletAmount),
                 coupon == null ? 0 : accounting.CalculateDiscountCouponPrice(coupon.Percent, reserve.CouponCalculationPrice),
                 coupon == null ? 0 : coupon.Id,
                 accounting.GetReservePaidAmount(reserve.Id, Reserve.StatusStringType.Guest));
@@ -2527,8 +2237,7 @@ namespace Amlakbashi.Host.Controllers
         public IActionResult InvoiceItemPopup(long id)
         {
             var reserve = reserveService.Find(id);
-            var acc = reserve.Advertise;
-            if (acc.UserID != userAccessor.CurrentUser.Id)
+            if (reserve.HostUserID != userAccessor.CurrentUser.Id)
             {
                 return null;
             }
@@ -2557,7 +2266,7 @@ namespace Amlakbashi.Host.Controllers
             ((long)((allRefundsOfReserve == null || allRefundsOfReserve.Any() == false) ? 0 : allReservePayments.Sum(x => x.Price)));
 
             long _guestPaidPrice = 0;
-            var hostUserId = reserve.Advertise.UserID;
+            var hostUserId = reserve.HostUserID;
             var _hostPaidPrice = accounting.GetReservePaymentPrice(
                 reserve.Id, ReservePayment.ReservePaymentType.GuestDeposite,
                 out _host_site_portion_pay_date, out _host_site_portion_transaction_id, hostUserId);
@@ -2636,7 +2345,7 @@ namespace Amlakbashi.Host.Controllers
             try
             {
                 var reserve = reserveService.Find(id);
-                
+
                 var reservePayment = new ReservePayment()
                 {
                     CreateDate = DateTime.Now,
@@ -2650,7 +2359,7 @@ namespace Amlakbashi.Host.Controllers
                 };
                 var invalidData = false;
                 var errorMessage = "";
-                
+
                 if (reservePayment.Price <= 0)
                 {
                     invalidData = true;
@@ -2668,7 +2377,7 @@ namespace Amlakbashi.Host.Controllers
                     errorMessage = "شماره تراکنش تکراری می باشد";
                 }
                 else if ((ReservePayment.ReservePaymentMethod)method == ReservePayment.ReservePaymentMethod.AmlakbashiCredit &&
-                    reserve.GuestUser.Credit < price)
+                    reserve.GuestUser.WalletAmount < price)
                 {
                     invalidData = true;
                     errorMessage = "موجودی کیف پول کافی نمی باشد";
@@ -2729,14 +2438,14 @@ namespace Amlakbashi.Host.Controllers
                 lowerCode == "inst8" ? DiscountCoupon.DiscountCouponType.Instagram :
                 lowerCode == "pedar1400" ? DiscountCoupon.DiscountCouponType.Pedar1400 :
                 DiscountCoupon.DiscountCouponType.Unset;
-            
+
             if (discountCodeType == DiscountCoupon.DiscountCouponType.Unset)
             {
                 return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
             }
 
             var startDate = DateTime.Parse("01/01/2021");
-            var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.MainMobile);
+            var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
             if ((discountCodeType == DiscountCoupon.DiscountCouponType.Moupon ||
                 discountCodeType == DiscountCoupon.DiscountCouponType.Instagram) &&
                 identityUser.CreateDate.Value.Date < startDate.Date)
@@ -2749,7 +2458,7 @@ namespace Amlakbashi.Host.Controllers
             {
                 return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
             }
-            
+
             var coupon = accounting.FindDiscountCoupon(userAccessor.CurrentUser.Id, discountCodeType);
             if (coupon == null)
             {
@@ -2789,6 +2498,29 @@ namespace Amlakbashi.Host.Controllers
             catch (Exception exc)
             {
                 logger.Error("Reserve.ReserveByPaymentReinquiry", exc);
+                return GenerateJsonResult(new
+                {
+                    status = 0,
+                    msg = "عملیات با خطا مواجه شد."
+                });
+            }
+        }
+
+        [Authorize]
+        public IActionResult UpdateEarlyCheckout(long reserveId, Reserve.EarlyCheckoutEnum earlyCheckout)
+        {
+            try
+            {
+                var result = reserveService.UpdateEarlyCheckout(reserveId, userAccessor.CurrentUser.Id, earlyCheckout);
+                return GenerateJsonResult(new
+                {
+                    status = result.HasError() ? 0 : 1,
+                    msg = result.GetErrors().FirstOrDefault()
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Reserve.ConfirmEarlyCheckout", exc);
                 return GenerateJsonResult(new
                 {
                     status = 0,

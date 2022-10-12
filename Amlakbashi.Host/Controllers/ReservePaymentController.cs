@@ -137,7 +137,7 @@ namespace Amlakbashi.Host.Controllers
                     case ReservePayment.ReservePaymentType.GuestClearing:
                     case ReservePayment.ReservePaymentType.SiteRefundToGuest:
                         var guest = userService.Find(reserve.UserID);
-                        var guest_name = guest.FName + " " + guest.LName;
+                        var guest_name = guest.FirstName + " " + guest.LastName;
                         if (string.IsNullOrEmpty(guest_name))
                             guest_name = guest.GetPhoneNumber(Entities.User.PhoneType.MainMobile);
                         return GenerateJsonResult(new { status = 1, guest_name = guest_name, askBeforeSubmit = true });
@@ -146,10 +146,10 @@ namespace Amlakbashi.Host.Controllers
                 {
                     return GenerateJsonResult(new { status = 1, askBeforeSubmit = false });
                 }
-                var user = userService.Find(reserve.Advertise.UserID);
+                var user = userService.Find(reserve.HostUserID);
                 if (!confirmed)
                 {
-                    var host_name = user.FName + " " + user.LName;
+                    var host_name = user.FirstName + " " + user.LastName;
                     if (string.IsNullOrEmpty(host_name))
                         host_name = user.GetPhoneNumber(Entities.User.PhoneType.MainMobile);
                     return GenerateJsonResult(new { status = 2, host_name = host_name,
@@ -161,10 +161,10 @@ namespace Amlakbashi.Host.Controllers
                 }
                 if ((bool)send_sms)
                 {
-                    var identityUser = userService.GetIdentityUser(user.MainMobile);
+                    var identityUser = userService.GetIdentityUser(user.PhoneNumber);
                     userService.SendMessage(new UserContactDTO()
                     {
-                        UserMainMobile = user.MainMobile,
+                        UserMainMobile = user.GetNoticesPhoneNumber(),
                         UserAppNotificationToken = user.AppNotificationToken,
                         UserEmail = identityUser.Email,
                         UserFcmAppNotificationToken = user.FcmAppNotificationToken,
@@ -280,25 +280,16 @@ namespace Amlakbashi.Host.Controllers
             }
         }
 
-        //public IActionResult CheckPodiumPaymentStatus(long reservePaymentId)
-        //{
-        //    try
-        //    {
-        //        var result = accounting.CheckShebaPaymentStatus(reservePaymentId, true);
-        //        return PartialView("_CheckPodiumPaymentStatus", result);
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        logger.Error("ReservePayment.CheckPodiumPaymentStatus", exc);
-        //        return PartialView("_CheckPodiumPaymentStatus");
-        //    }
-        //}
-
         [Authorize(Policy = Policies.Reserve_Payment_Edit)]
         public JsonResult Delete(long reservePaymentId)
         {
             try
             {
+                var reservePayment = accounting.FindReservePayment(reservePaymentId);
+                if (reservePayment.PaymentId.HasValue)
+                {
+                    return GenerateJsonResult(new { status = 0 });
+                }
                 accounting.DeleteReservePayment(reservePaymentId);
                 return GenerateJsonResult(new { status = 1 });
             }
