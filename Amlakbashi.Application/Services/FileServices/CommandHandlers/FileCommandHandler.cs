@@ -490,7 +490,7 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                 return Task.FromResult((long)0);
             }
 
-            string filepath = $"{Entities.File.AdvertiseLicenseImagesDirectory}/license_{request.AdvertiseId}.jpg";
+            string filepath = $"{Entities.File.ResidenceLicenseImagesDirectory}/license_{request.AdvertiseId}.jpg";
             if (request.LicenseFileId != null && request.LicenseFileId > 0)
             {
                 var oldFile = fileRepository.Find(request.LicenseFileId.Value);
@@ -505,7 +505,8 @@ namespace Amlakbashi.Application.Services.FileServices.CommandHandlers
                     PostDate = DateTime.Now,
                     LastModifyDate = DateTime.Now,
                     UserID = request.UserId,
-                    FilePath = filepath
+                    FilePath = filepath,
+                    Type = Entities.File.FileTypeEnum.ResidenceLicense
                 };
                 fileRepository.Insert(newLicenseFile);
                 fileRepository.Save();

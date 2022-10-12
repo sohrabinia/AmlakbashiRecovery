@@ -301,6 +301,7 @@
     <Folder Include="wwwroot\Content\ErrorLog\" />
     <Folder Include="wwwroot\Content\files\" />
     <Folder Include="wwwroot\Content\imgcache\" />
+    <Folder Include="wwwroot\Content\videos\" />
     <Folder Include="wwwroot\css\min\" />
     <Folder Include="wwwroot\font\" />
     <Folder Include="wwwroot\js\min\" />

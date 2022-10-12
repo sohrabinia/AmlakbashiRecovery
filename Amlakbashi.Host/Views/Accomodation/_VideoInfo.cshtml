@@ -1,0 +1,103 @@
+﻿@model Amlakbashi.Core.Entities.Advertise
+
+@if (Model.VideoStatus == Advertise.VideoStatusEnum.Unset)
+{
+}
+else if (Model.VideoStatus == Advertise.VideoStatusEnum.Pending)
+{
+    <p>ویدیوی ارسال شده شما در حال بررسی است</p>
+}
+else
+{
+    <p>وضعیت ویدیو: <span style="color:@(Model.VideoStatus == Advertise.VideoStatusEnum.Confirmed ? "limegreen" : "red");">@AdvertiseMainLocalization.GetVideoStatusPersianName(Model.VideoStatus)</span></p>
+    <div style="text-align:center; margin-bottom: 10px;">
+        <video style="max-width:100%; max-height: 280px;" controls id="video_play_container" src="/video/residences/residenceVideo_@(Model.Id).mp4?t=@(DateTime.Now.Ticks)"></video>
+    </div>
+}
+
+@if (Model.VideoStatus != Advertise.VideoStatusEnum.Pending)
+{
+    @*<hr />*@
+    <p>برای آپلود ویدیو جدید از اقامتگاه خود، ابتدا با کلیک روی دکمه Browse، فایل ویدیو مورد نظر خود را انتخاب کرده و سپس روی دکمه «ارسال ویدیو» کلیک کنید:</p>
+    <p>ویدیو شما باید با فرمت <b>MP4</b> بوده و حجم آن کمتر از <b>200 مگابایت</b> باشد.</p>
+    <form id="video_upload_form" enctype="multipart/form-data">
+        <input type="hidden" name="residenceId" value="@Model.Id" id="residenceId_input" />
+        <input type="file" name="formFile" id="video_upload_input" accept="video/mp4" />
+        <div style="text-align: center;" id="upload_button_container">
+            <button type="submit" class="acc-set-date__button">ارسال ویدیو</button>
+        </div>
+        <div style="text-align: center; display: none;" id="upload_progress_container">
+            <span>لطفا تا اتمام فرآیند آپلود منتظر بمانید: </span>
+            <span id="upload_progress_percent" style="font-size: large; color: red;">0</span>
+            <span style="font-size: large; color: red;">%</span>
+        </div>
+    </form>
+}
+
+<script>
+    $('#video_upload_form').submit(function (e) {
+        e.preventDefault();
+        var file = $("#video_upload_input")[0].files[0];
+        if (file.size > 209715200) { // 200 MB
+            showErrorMessage('خطا', 'حجم فایل انتخاب شده شما بیشتر از حد مجاز است');
+            return;
+        }
+        var formData = new FormData();
+        formData.append("formFile", file);
+        formData.append("residenceId", $('#residenceId_input').val());
+
+        var video = document.getElementById('video_play_container');
+        if (video) {
+            video.srcObject = null;
+        }
+
+        $.ajax({
+            type: "POST",
+            cache: false,
+            contentType: false,
+            processData: false,
+            url: "/accomodation/UploadResidenceVideo",
+            data: formData,
+            beforeSend: function () {
+                $('#upload_progress_container').show();
+                $('#upload_button_container').hide();
+                $('.message-popup__message-button-container').hide();
+            },
+            xhr: function () {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function (evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        percentComplete = parseInt(percentComplete * 100);
+                        $('#upload_progress_percent').html(percentComplete);
+                        if (percentComplete === 100) {
+
+                        }
+                    }
+                }, false);
+                return xhr;
+            },
+            success: function (response) {
+                if (response.status === 0) {
+                    showErrorMessage('خطا', response.msg);
+                }
+                else {
+                    showSuccessMessage('', 'ویدیو با موفقیت آپلود شده و در انتظار تایید کارشناسان املاک باشی می باشد.');
+                }
+                popupMsgList[0].btnClick(0, true);
+            },
+            error: function (error) {
+                if (error.status === 401) {
+                    showErrorMessage('خطا', 'شما مجوز دسترسی به این قسمت را ندارید');
+                }
+                else if (error.status === 404 || error.status === 413) {
+                    showErrorMessage('خطا', 'حجم فایل انتخاب شده شما بیشتر از حد مجاز است');
+                }
+                else {
+                    showErrorMessage('خطا', 'عملیات با خطا مواجه شد');
+                }
+                popupMsgList[0].btnClick(0, true);
+            }
+        });
+    });
+</script>

@@ -34,6 +34,7 @@ using Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs;
 using Amlakbashi.Core.Common.Caching;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
+using Amlakbashi.Application.Services.FileServices.Interfaces;
 
 namespace Amlakbashi.Host.Controllers
 {
@@ -2913,6 +2914,66 @@ namespace Amlakbashi.Host.Controllers
                 status = discount is null ? 0 : 1,
                 priceDict = advertiseService.GetAccPriceDatesInfo(discount.AdvertiseID)
             });
+        }
+
+        [Authorize]
+        public IActionResult GetVideoInfo(int residenceId)
+        {
+            return PartialView("_VideoInfo", advertiseService.Find(residenceId));
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<JsonResult> UploadResidenceVideo(long residenceId, IFormFile formFile, 
+            [FromServices] IFileAppService fileService)
+        {
+            try
+            {
+                var result = await fileService.AddResidenceVideoAsync(userAccessor.CurrentUser.Id, residenceId, formFile);
+                if (result.HasError())
+                {
+                    return GenerateJsonResult(new { status = 0, msg = result.GetErrors() });
+                }
+                await advertiseService.UpdateVideoStatus(residenceId, VideoStatusEnum.Pending);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Accomodation.UploadResidenceVideo", exc);
+                return GenerateJsonResult(new { status = 0, msg = "عملیات با خطا مواجه شد" });
+            }
+        }
+
+        [Authorize(policy: Policies.Advertise_Edit)]
+        public IActionResult GetAdminVideoInfo(int residenceId)
+        {
+            return PartialView("_AdminVideoInfo", advertiseService.Find(residenceId));
+        }
+
+        [Authorize(policy: Policies.Advertise_Edit)]
+        [HttpPost]
+        public async Task<IActionResult> SetVideoStatus(int residenceId, VideoStatusEnum status,
+            [FromServices] IFileAppService fileService)
+        {
+            try
+            {
+                var residence = advertiseService.Find(residenceId);
+                if (residence.VideoStatus == VideoStatusEnum.Pending)
+                {
+                    var result = await fileService.MoveResidenceVideoToMainDirectoryAsync(residence.VideoId.Value);
+                    if (result.HasError())
+                    {
+                        return GenerateJsonResult(new { status = 0, msg = result.GetErrors() });
+                    }
+                }
+                await advertiseService.UpdateVideoStatus(residenceId, status);
+                return GenerateJsonResult(new { status = 1 });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Accomodation.SetVideoStatus", exc);
+                return GenerateJsonResult(new { status = 0 });
+            }
         }
     }
 }

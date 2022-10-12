@@ -89,6 +89,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                             _hotelRooms.Add(new DashboardHotelRoomDTO()
                             {
                                 id = child.Id,
+                                parentId = child.ParentId.Value,
                                 title = child.Title,
                                 todayIsEmpty = child.EmptyTonight,
                                 todayIsFull = !child.EmptyTonight && _ud.Contains(todayUnix),
@@ -115,6 +116,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
                             var childData = new DashboardComplexUnitDTO()
                             {
                                 id = child.Id,
+                                parentId = child.ParentId.Value,
                                 title = child.Title,
                                 todayIsEmpty = child.EmptyTonight,
                                 todayIsFull = !child.EmptyTonight && _ud.Contains(todayUnix),

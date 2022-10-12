@@ -5,6 +5,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs
     public abstract class BaseDashboardAccDTO
     {
         public long id { get; set; }
+        public long parentId { get; set; }
         public string title { get; set; }
         public bool isVerified { get; set; }
         public bool isActivated { get; set; }

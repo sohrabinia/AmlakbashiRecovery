@@ -1,4 +1,6 @@
-﻿@model Amlakbashi.Core.DTOs.AdvertiseDTOs.AdvertiseIndexDTO
+﻿@using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+
+@model Amlakbashi.Core.DTOs.AdvertiseDTOs.AdvertiseIndexDTO
 
 @{
     ViewBag.Title = "مدیریت اقامتگاه ها";
@@ -83,10 +85,10 @@ else
                                     advertiseTypesList.Remove(Advertise.AdvertiseType.None);
                                     advertiseTypesList.Remove(Advertise.AdvertiseType.All);
                                 }
-                                <option is-selected="Model.Type == Advertise.AdvertiseType.All" value="@Advertise.AdvertiseType.All">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(Advertise.AdvertiseType.All)</option>
+                                <option is-selected="Model.Type == Advertise.AdvertiseType.All" value="@Advertise.AdvertiseType.All">@AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(Advertise.AdvertiseType.All)</option>
                                 @foreach (var item in advertiseTypesList)
                                 {
-                                    <option is-selected="@(item == Model.Type)" value="@((int)item)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(item)</option>
+                                    <option is-selected="@(item == Model.Type)" value="@((int)item)">@AdvertiseMainLocalization.GetAdvertiseTypePersianNameForAdminPanel(item)</option>
                                 }
                             </select>
                         </div>
@@ -115,7 +117,7 @@ else
                                 }
                                 @foreach (var st in instantReserveStatusArr)
                                 {
-                                    <option is-selected="@((int)st == Model.InstantReserveStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetInstantReserveStatusPersianName(st)</option>
+                                    <option is-selected="@((int)st == Model.InstantReserveStatus)" value="@((int)st)">@AdvertiseMainLocalization.GetInstantReserveStatusPersianName(st)</option>
                                 }
                             </select>
                         </div>
@@ -126,7 +128,6 @@ else
                                 <option value="date" is-selected="@("date" == Model.Sort)">تاریخ ثبت</option>
                                 <option value="modify" is-selected="@("modify" == Model.Sort)">تاریخ ویرایش</option>
                                 <option value="click" is-selected="@("view" == Model.Sort)">بازدید</option>
-                                @*<option value="contact" is-selected="@("contact" == Model.Sort)">نمایش تماس</option>*@
                             </select>
                         </div>
                         <div class="item-filter-box">
@@ -151,7 +152,7 @@ else
                                 }
                                 @foreach (var st in parkingOptions)
                                 {
-                                    <option is-selected="@(st == Model.Parking)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetParkingText(st)</option>
+                                    <option is-selected="@(st == Model.Parking)" value="@((int)st)">@AdvertiseMainLocalization.GetParkingText(st)</option>
                                 }
                             </select>
                         </div>
@@ -164,7 +165,7 @@ else
                                 }
                                 @foreach (var st in hygieneProtocolStatusArr)
                                 {
-                                    <option is-selected="@((int)st == Model.HygieneProtocolStatus)" value="@((int)st)">@Amlakbashi.Core.Infrastructure.LocalizationHelpers.AdvertiseMainLocalization.GetHygieneProtocolStatusPersianName(st)</option>
+                                    <option is-selected="@((int)st == Model.HygieneProtocolStatus)" value="@((int)st)">@AdvertiseMainLocalization.GetHygieneProtocolStatusPersianName(st)</option>
                                 }
                             </select>
                         </div>
@@ -174,6 +175,21 @@ else
                                 <option is-selected="@(Model.License == null)" value="">همه</option>
                                 <option is-selected="@(Model.License == true)" value="true">با مجوز</option>
                                 <option is-selected="@(Model.License == false)" value="false">بدون مجوز</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="more-filter-row">
+                        <div class="item-filter-box">
+                            <label class="title-filter">وضعیت ویدیو</label>
+                            <select class="input-stlye" name="VideoStatus">
+                                @{
+                                    var videoStatus = (Advertise.VideoStatusEnum[])Enum.GetValues(typeof(Advertise.VideoStatusEnum));
+                                }
+                                <option value="-1">همه</option>
+                                @foreach (var st in videoStatus)
+                                {
+                                    <option is-selected="@((int)st == Model.VideoStatus)" value="@((int)st)">@AdvertiseMainLocalization.GetVideoStatusPersianName(st)</option>
+                                }
                             </select>
                         </div>
                     </div>

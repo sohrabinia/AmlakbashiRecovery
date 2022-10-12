@@ -25,5 +25,6 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public int HygieneProtocolStatus { get; set; } = -1;
         public Advertise.ParkingItems Parking { get; set; } = Advertise.ParkingItems.Unset;
         public bool? License { get; set; } = null;
+        public int VideoStatus { get; set; } = -1;
     }
 }

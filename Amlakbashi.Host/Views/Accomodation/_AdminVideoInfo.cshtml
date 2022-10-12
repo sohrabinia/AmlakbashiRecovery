@@ -1,0 +1,34 @@
+﻿@model Amlakbashi.Core.Entities.Advertise
+
+@if (Model.VideoStatus == Advertise.VideoStatusEnum.Unset)
+{
+    <p>برای این اقامتگاه ویدیویی آپلود نشده است</p>
+}
+else
+{
+    <div class="video-container">
+        <p>وضعیت ویدیو:  @AdvertiseMainLocalization.GetVideoStatusPersianName(Model.VideoStatus)</p>
+        <div class="video-box">
+            <video controls id="video_play_container">
+                @if (Model.VideoStatus == Advertise.VideoStatusEnum.Pending)
+                {
+                    <source type="video/mp4" src="/video/residences/pending/pendingResidenceVideo_@(Model.Id).mp4?t=@(DateTime.Now.Ticks)" />
+                }
+                else
+                {
+                    <source type="video/mp4" src="/video/residences/residenceVideo_@(Model.Id).mp4?t=@(DateTime.Now.Ticks)" />
+                }
+            </video>
+        </div>
+        <div class="box-button">
+            @if (Model.VideoStatus != Advertise.VideoStatusEnum.Confirmed)
+            {
+                <button type="button" onclick="setVideoStatus(@Model.Id, 2)">تایید</button>
+            }
+            @if (Model.VideoStatus != Advertise.VideoStatusEnum.NotConfirmed)
+            {
+                <button type="button" onclick="setVideoStatus(@Model.Id, 3)">عدم تایید</button>
+            }
+        </div>
+    </div>
+}

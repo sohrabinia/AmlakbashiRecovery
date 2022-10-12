@@ -55,6 +55,10 @@ else
                     <i class="fa fa-bolt" onclick="showInstantReservePopup(@Model.Id)" title="رزرو آنی"></i>
                     <i class="fas fa-dollar-sign" onclick="showPricePopup(@Model.Id)" title="قیمت"></i>
                     <i class="fas fa-percent" onclick="showDiscountPopup(@Model.Id)" title="تخفیف"></i>
+                    @if (Model.VideoStatus != Advertise.VideoStatusEnum.Unset)
+                    {
+                        <i class="fas fa-video" onclick="showVideoPopup(@Model.Id)" title="ویدیو" style="color: @(Model.VideoStatus == Advertise.VideoStatusEnum.NotConfirmed ? "red" : (Model.VideoStatus == Advertise.VideoStatusEnum.Confirmed ? "limegreen" : "#fdd835"));"></i>
+                    }
                     <i class="fa fa-power-off" onclick="ToggleActivity(@Model.Id,this)" data-value="@(Model.Status == Advertise.AdvertiseStatus.Archived ? "false" : "true")" title="فعال/غیرفعال" style="color: @(Model.Status == Advertise.AdvertiseStatus.Archived ? "red" : "limegreen");"></i>
                 }
                 @if (Model.Status != Advertise.AdvertiseStatus.NotVerified
@@ -68,6 +72,10 @@ else
             {
                 <a href="/accomodation/adminbasicform?id=@Model.Id" class="fa fa-user-plus" title="کارشناسی آگهی" target="_blank"></a>
                 <a href="/advertise/edit?id=@Model.Id" class="fa fa-edit" target="_blank" title="ویرایش"></a>
+                @if (Model.MainType == Advertise.MainTypeEnum.Hotel && Model.VideoStatus != Advertise.VideoStatusEnum.Unset)
+                {
+                    <i class="fas fa-video" onclick="showVideoPopup(@Model.Id)" title="ویدیو"  style="color: @(Model.VideoStatus == Advertise.VideoStatusEnum.NotConfirmed ? "red" : (Model.VideoStatus == Advertise.VideoStatusEnum.Confirmed ? "limegreen" : "#fdd835"));"></i>
+                }
                 @if (Model.Status == Advertise.AdvertiseStatus.FirstReady ||
                     Model.Status == Advertise.AdvertiseStatus.ReadyToPublish ||
                     Model.Status == Advertise.AdvertiseStatus.NotVerified ||
@@ -96,6 +104,10 @@ else
                     <i class="fa fa-bolt" onclick="showInstantReservePopup(@Model.Id)" title="رزرو آنی"></i>
                     <i class="fas fa-dollar-sign" onclick="showPricePopup(@Model.Id)" title="قیمت"></i>
                     <i class="fas fa-percent" onclick="showDiscountPopup(@Model.Id)" title="تخفیف"></i>
+                    @if (Model.MainType == Advertise.MainTypeEnum.Complex && Model.VideoStatus != Advertise.VideoStatusEnum.Unset)
+                    {
+                        <i class="fas fa-video" onclick="showVideoPopup(@Model.Id)" title="ویدیو" style="color: @(Model.VideoStatus == Advertise.VideoStatusEnum.NotConfirmed ? "red" : (Model.VideoStatus == Advertise.VideoStatusEnum.Confirmed ? "limegreen" : "#fdd835"));"></i>
+                    }
                     <i class="fa fa-power-off" onclick="ToggleAvailable(@Model.Id,this)" data-value="@(Model.Available ? "true" : "false")" title="فعال/غیرفعال" style="color: @(Model.Available ? "limegreen" : "red");"></i>
                 }
             }

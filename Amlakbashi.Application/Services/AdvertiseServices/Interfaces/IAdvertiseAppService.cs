@@ -113,5 +113,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         Task<ServiceResult> UpdateCalendarAsync(AdvertiseUpdateCalendarRequest request);
         Task<ServiceResult<List<long>>> AddInstantReserveDates(long residenceId, string fromDate, string toDate, int userId);
         Task<ServiceResult<List<long>>> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate, int userId);
+        Task UpdateVideoStatus(long residenceId, Advertise.VideoStatusEnum status);
     }
 }

@@ -260,3 +260,21 @@ function addDiscount(residenceId) {
 function deleteDiscount(discountId) {
     sendPostAjax("/accomodation/deletediscount", { discountId }, null, null, hidePopup);
 }
+
+// *********** Video Popup **************
+
+function showVideoPopup(id) {
+    loadPopup('/accomodation/GetAdminVideoInfo?residenceId=' + id);
+}
+
+function setVideoStatus(residenceId, status) {
+    showDarkBackground();
+    var video = document.getElementById('video_play_container');
+    if (video) {
+        video.srcObject = null;
+    }
+    setTimeout(function () {
+        sendPostAjax("/accomodation/SetVideoStatus", { residenceId, status }, null, null, hidePopup);
+    }, 1500);
+
+}

@@ -419,7 +419,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         public void FilterNew(AdvertiseIndexDTO dto)
         {
             IQueryable<Advertise> model = Repository.Query(q => q);
-            //model = model.Where(w => w.Mode != AdvertiseMode.Child);
             if (dto.Status != AdvertiseStatus.Unset)
             {
                 model = model.Where(a => a.Status == dto.Status);
@@ -430,7 +429,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
             if (dto.Id > 0)
             {
-                //model = model.Where(w => w.Id == dto.Id || w.Childs.Any(x => x.Id == dto.Id));
                 model = model.Where(w => w.Id == dto.Id);
             }
             if (dto.UserId != -1)
@@ -449,6 +447,10 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (dto.InstantReserveStatus > -1)
             {
                 model = model.Where(x => x.InstantReserveStatus == (Advertise.InstantReserveStatusEnum)dto.InstantReserveStatus);
+            }
+            if (dto.VideoStatus > -1)
+            {
+                model = model.Where(x => x.VideoStatus == (Advertise.VideoStatusEnum)dto.VideoStatus);
             }
             if (string.IsNullOrEmpty(dto.MinReserveNorouzFromDate) == false)
             {
@@ -2570,6 +2572,14 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             await mediator.Publish(new AdvertiseUpdateEvent(clonedResidence, residence,
                 ActionLog.ActionSourceEnum.AdminPanel, adminId));
             return serviceResult;
+        }
+
+        public async Task UpdateVideoStatus(long residenceId, Advertise.VideoStatusEnum status)
+        {
+            var residence = await Repository.FindAsync(residenceId);
+            residence.VideoStatus = status;
+            Repository.Update(residence);
+            Repository.Save();
         }
 
         private async Task<Advertise.AdvertiseStatus> UpdateStatus(long residenceId, Advertise.AdvertiseStatus status)

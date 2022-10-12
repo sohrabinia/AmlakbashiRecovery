@@ -564,6 +564,23 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
             }
         }
 
+        public static string GetVideoStatusPersianName(Advertise.VideoStatusEnum item)
+        {
+            switch (item)
+            {
+                case VideoStatusEnum.Unset:
+                    return "بدون ویدیو";
+                case VideoStatusEnum.Pending:
+                    return "در حال بررسی";
+                case VideoStatusEnum.Confirmed:
+                    return "تایید شده";
+                case VideoStatusEnum.NotConfirmed:
+                    return "تایید نشده";
+                default:
+                    return "";
+            }
+        }
+
         public static string GetEnumTypePersianName(NameValueDTO.EnumType item)
         {
             switch (item)
@@ -609,63 +626,10 @@ namespace Amlakbashi.Core.Infrastructure.LocalizationHelpers
                 Advertise.FloorItems item => GetFloorPersianName(item),
                 Advertise.OwnershipTypeEnum item => GetOwnershipPersianName(item),
                 Advertise.VillaTypeEnum item => GetVillaTypePersianName(item),
+                Advertise.VideoStatusEnum item => GetVideoStatusPersianName(item),
                 NameValueDTO.EnumType item => GetEnumTypePersianName(item),
                 _ => null
             };
-
-            //if (enumType.GetType() == typeof(Advertise.AdvertiseType))
-            //{
-            //    return GetAdvertiseTypePersianNameForUser((AdvertiseType)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.PositionType))
-            //{
-            //    return GetPositionTypePersianName((int)(PositionType)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.ParkingItems))
-            //{
-            //    return GetParkingPersianName((Advertise.ParkingItems)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.BuildingDirectionItems))
-            //{
-            //    return GetBuildingDirectionPersianName((Advertise.BuildingDirectionItems)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.ExtraBlanketCountItems))
-            //{
-            //    return GetExtraBlanketCountPersianName((Advertise.ExtraBlanketCountItems)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.HeatingSystemItems))
-            //{
-            //    return GetHeatingSystemPersianName((Advertise.HeatingSystemItems)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.CoolingSystemItems))
-            //{
-            //    return GetCoolingSystemPersianName((Advertise.CoolingSystemItems)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.WCItems))
-            //{
-            //    return GetWCPersianName((Advertise.WCItems)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.EuropeanToiletTypeEnum))
-            //{
-            //    return GetEuropeanToiletTypePersianName((Advertise.EuropeanToiletTypeEnum)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.FloorItems))
-            //{
-            //    return GetFloorPersianName((Advertise.FloorItems)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.OwnershipTypeEnum))
-            //{
-            //    return GetOwnershipPersianName((Advertise.OwnershipTypeEnum)enumType);
-            //}
-            //if (enumType.GetType() == typeof(Advertise.VillaTypeEnum))
-            //{
-            //    return GetVillaTypePersianName((Advertise.VillaTypeEnum)enumType);
-            //}
-            //if (enumType.GetType() == typeof(NameValueDTO.EnumType))
-            //{
-            //    return GetEnumTypePersianName((NameValueDTO.EnumType)enumType);
-            //}
-            //return null;
         }
 
         public static string CategoryTitle { get { return "اجاره-روزانه"; } }

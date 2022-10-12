@@ -22,26 +22,35 @@ namespace Amlakbashi.Data
 
         private static void SeedData(AmlakbashiDB context)
         {
-            var instantReserveList = context.Advertises.Where(x => (int)x.InstantReserveStatus == 1);
-            foreach (var item in instantReserveList)
-            {
-                item.InstantReserveStatus = Core.Entities.Advertise.InstantReserveStatusEnum.Calendar;
-            }
-
-            instantReserveList = context.Advertises.Where(x => (int)x.InstantReserveStatus == 2);
-            foreach (var item in instantReserveList)
-            {
-                if (item.Status == Core.Entities.Advertise.AdvertiseStatus.Published)
-                {
-                    item.InstantReserveStatus = Core.Entities.Advertise.InstantReserveStatusEnum.Permanent;
-                }
-                else
-                {
-                    item.InstantReserveStatus = Core.Entities.Advertise.InstantReserveStatusEnum.Calendar;
-                }
-            }
-
-            context.SaveChanges();
+            //foreach (var item in context.Files)
+            //{
+            //    if (item.FilePath is null)
+            //    {
+            //        item.Type = Core.Entities.File.FileTypeEnum.Unset;
+            //    }
+            //    else if (item.FilePath.Contains("content/users/"))
+            //    {
+            //        item.Type = Core.Entities.File.FileTypeEnum.UserImage;
+            //    }
+            //    else if (item.FilePath.Contains("content/licenses/"))
+            //    {
+            //        item.Type = Core.Entities.File.FileTypeEnum.ResidenceLicense;
+            //    }
+            //    else if (item.FilePath.Contains("content/advertise/"))
+            //    {
+            //        item.Type = Core.Entities.File.FileTypeEnum.ResidenceImage;
+            //    }
+            //    else if (item.FilePath.Contains("content/blogpost/"))
+            //    {
+            //        item.Type = Core.Entities.File.FileTypeEnum.BlogPostImage;
+            //    }
+            //    else
+            //    {
+            //        item.Type = Core.Entities.File.FileTypeEnum.Unset;
+            //    }
+            //}
+            //context.UpdateRange(context.Files);
+            //context.SaveChanges();
         }
     }
 }

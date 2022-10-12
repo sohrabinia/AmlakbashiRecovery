@@ -46,7 +46,7 @@
     }
     @if (Model.photo != null)
     {
-        <div class="static-advertise__item-gallery">
+        <div class="static-advertise__item-gallery" id="residence_photos">
             @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccPhotoInput.cshtml", Model.photo)
         </div>
     }

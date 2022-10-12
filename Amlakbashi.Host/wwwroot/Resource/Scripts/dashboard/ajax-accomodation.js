@@ -433,3 +433,7 @@ function getInstantReserveDates(id) {
 function showNorouzPopup(id) {
     showInfoMessage('  کد آگهی: ' + id, '', { contentUrl: '/accomodation/getsetminnorouzreservepopup?id=' + id, fullScreen: screen.width < 781 });
 }
+
+function showVideoUploadPopup(id) {
+    showInfoMessage('کد آگهی: ' + id, '', { contentUrl: '/accomodation/getVideoInfo?residenceId=' + id, fullScreen: screen.width < 781 });
+}

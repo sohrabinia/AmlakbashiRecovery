@@ -57,6 +57,8 @@ namespace Amlakbashi.Core.Entities
         public int Capacity { get; set; }
         public int ExtraCapacity { get; set; }
         public long? MainPhotoId { get; set; }
+        public long? VideoId { get; set; }
+        public VideoStatusEnum VideoStatus { get; set; }
         public string AlbumPhoto { get; set; }
 
         // Ownership and Lisence ********************************
@@ -132,6 +134,10 @@ namespace Amlakbashi.Core.Entities
         public bool EmptyTonight { get; set; }
 
         [JsonIgnore]
+        [ForeignKey(nameof(UserId))]
+        public virtual User User { get; set; }
+
+        [JsonIgnore]
         [ForeignKey(nameof(ProvinceId))]
         public virtual Region RegionProvince { get; set; }
 
@@ -148,12 +154,12 @@ namespace Amlakbashi.Core.Entities
         public virtual File MainPhoto { get; set; }
 
         [JsonIgnore]
-        [ForeignKey(nameof(UserId))]
-        public virtual User User { get; set; }
-
-        [JsonIgnore]
         [ForeignKey(nameof(LicenseFileId))]
         public virtual File LicenseFile { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey(nameof(VideoId))]
+        public virtual File Video { get; set; }
 
         [JsonIgnore]
         [ForeignKey(nameof(ParentId))]
@@ -235,6 +241,15 @@ namespace Amlakbashi.Core.Entities
             get
             {
                 return EmptyTonight || (Childs != null && Childs.Any(x => x.EmptyTonight));
+            }
+        }
+
+        [NotMapped]
+        [JsonIgnore]
+        public MainTypeEnum MainType { 
+            get {
+                return Mode == AdvertiseMode.Single ? MainTypeEnum.Single :
+                    (GetHotelTypes().Contains(TypeID) ? MainTypeEnum.Hotel : MainTypeEnum.Complex);
             }
         }
 
@@ -907,6 +922,13 @@ namespace Amlakbashi.Core.Entities
             Child = 2
         }
 
+        public enum MainTypeEnum
+        {
+            Single = 0,
+            Complex = 1,
+            Hotel = 2
+        }
+
         public enum AdvertiseStatus
         {
             Unset = -1,
@@ -1214,6 +1236,14 @@ namespace Amlakbashi.Core.Entities
             Unset = 0,
             Exclusive = 1,
             Common = 2
+        }
+
+        public enum VideoStatusEnum : byte
+        {
+            Unset = 0,
+            Pending = 1,
+            Confirmed = 2,
+            NotConfirmed = 3
         }
 
         #endregion

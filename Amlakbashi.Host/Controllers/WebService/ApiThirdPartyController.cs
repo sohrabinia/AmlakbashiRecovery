@@ -15,7 +15,6 @@ namespace Amlakbashi.Host.Controllers.WebService
     [ApiController]
     [Route("api/tp")]
     [AuthorizeThirdPartyApp]
-    [EnableCors("thirdPartyCorsPolicy")]
     public class ApiThirdPartyController : ApiBaseController
     {
         private readonly IAdvertiseAppService advertiseService;

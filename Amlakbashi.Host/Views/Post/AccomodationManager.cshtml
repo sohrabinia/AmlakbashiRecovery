@@ -1,6 +1,8 @@
 ﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs;
 @using Amlakbashi.Core.Common.Utilities;
 
+@inject IUserAccessor userAccessor
+
 @model AccommodationManagerDTO
 
 @{
@@ -45,7 +47,6 @@
 @foreach (var item in Model.accList)
 {
     <!-- Start acclist -->
-
     <div class="container-host-panel-css" data-id="@item.id">
         <!-- Start-banner-single -->
         <section class="banner-main card-banner single-card">
@@ -53,15 +54,27 @@
             <div class="wrapper-right-banner div-unset">
                 <div class="avatar-item">
                     <a target="_blank" href="@item.previewUrl"><img src="@item.photoUrl" alt="عکس اتاق" /></a>
-                    @if (item.userRating <= 0)
+
+                    @if (userAccessor.CurrentUser.Id == 82119)
                     {
-                        <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
+                        @if (item.mainType != AccMainType.Complex && item.status != Advertise.AdvertiseStatus.NotCompleted)
+                        {
+                            <div style="width: 100%; text-align: center; padding: 2px 0;">
+                                <a href="/accomodation/accgeneralform?id=@item.id#residence_photos" target="_blank" style="font-size: small; border-left: 1px solid gray; padding-left: 5px; color: black;"><i class="fa fa-plus"></i> عکس</a>
+                                <span onclick="showVideoUploadPopup(@item.id)" style="font-size: small; cursor: pointer;"><i class="fa fa-plus"></i> ویدیو</span>
+                            </div>
+                        }
                     }
-                    <div>
-                        @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-                     new ModelStateDictionary()) { { "score", item.userRating } })
-                    </div>
-                    <a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="background:@( item.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>
+
+                    @*@if (item.userRating <= 0)
+                        {
+                            <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
+                        }
+                        <div>
+                            @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                         new ModelStateDictionary()) { { "score", item.userRating } })
+                        </div>*@
+                    @*<a style="display:@( item.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@item.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="background:@( item.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@item.newCommentCount</span></i></a>*@
                 </div>
             </div>
             <!-- End-wrapper-right-banner -->
@@ -171,7 +184,7 @@
                 <!-- Start-room-type-list -->
                 <div class="room-type-list">
                     @await Html.PartialAsync("_TitleRoomsCard", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "UserID", ViewBag.UserID }})
+        new ModelStateDictionary()) { { "UserID", ViewBag.UserID } })
                     <div class="style_title-list">
                         @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", " تنظیم واحد ها " } })
@@ -253,7 +266,7 @@
                 <!-- Start-list-room-card  -->
                 <div class="list-room-card">
                     @await Html.PartialAsync("_TitleRoomsCard", item, new ViewDataDictionary(new EmptyModelMetadataProvider(),
-        new ModelStateDictionary()) { { "UserID", ViewBag.UserID }})
+        new ModelStateDictionary()) { { "UserID", ViewBag.UserID } })
                     <div class="style_title-list">
                         @await Html.PartialAsync("_TitleList", new ViewDataDictionary(new EmptyModelMetadataProvider(),
         new ModelStateDictionary()) { { "titleList", " تنظیم واحد ها " } })

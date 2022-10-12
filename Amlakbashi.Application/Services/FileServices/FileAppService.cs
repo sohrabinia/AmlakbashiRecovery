@@ -62,7 +62,7 @@ namespace Amlakbashi.Application.Services.FileServices
                 return serviceResult;
             }
 
-            CheckExistDirectory(File.AdvertiseImageDirectory);
+            CheckExistDirectory(File.ResidenceImagesDirectory);
             var quality = 80;
             var maxWidth = 1024;
             var newFileIds = new List<long>();
@@ -75,7 +75,8 @@ namespace Amlakbashi.Application.Services.FileServices
                     UserID = request.userId,
                     MinifyStatus = File.MinifyStatusEnum.Done,
                     MinifyQualityPercent = quality,
-                    MinifyMaxWidth = maxWidth
+                    MinifyMaxWidth = maxWidth,
+                    Type = File.FileTypeEnum.ResidenceImage
                 };
                 file.Advertises = new List<Advertise>();
                 file.Advertises.Add(advertise);
@@ -88,8 +89,9 @@ namespace Amlakbashi.Application.Services.FileServices
                 var image = Image.FromStream(item.OpenReadStream(), true, true);
                 image = ImageUtility.MinifyImage(image, maxWidth);
                 image.Save(System.IO.Path.Combine(webHostEnvironment.WebRootPath,
-                    File.AdvertiseImageDirectory, fileName), format, encoderParameters);
-                UpdateFilePath(file.Id, $"{File.AdvertiseImageDirectory}/{fileName}");
+                    File.ResidenceImagesDirectory, fileName), format, encoderParameters);
+                image.Dispose();
+                UpdateFilePath(file.Id, $"{File.ResidenceImagesDirectory}/{fileName}");
                 newFileIds.Add(file.Id);
             }
             await mediator.Send(new GenerateThumbImageCommand(advertise.Id, null, newFileIds));
@@ -101,7 +103,7 @@ namespace Amlakbashi.Application.Services.FileServices
             var file = Repository.Find(editedFile.Id);
             if (string.IsNullOrEmpty(editedFile.FilePath) == false && editedFile.FilePath != file.FilePath)
             {
-                DeleteFile(file.CorrectedFilePath);
+                DeleteFile(GetFullPath(file.CorrectedFilePath));
                 file.FilePath = editedFile.FilePath;
             }
             file.LastModifyDate = editedFile.LastModifyDate;
@@ -149,6 +151,7 @@ namespace Amlakbashi.Application.Services.FileServices
                     PostDate = DateTime.Now,
                     LastModifyDate = DateTime.Now,
                     UserID = user.Id,
+                    Type = File.FileTypeEnum.UserImage,
                     FilePath = filepath
                 });
             }
@@ -179,7 +182,7 @@ namespace Amlakbashi.Application.Services.FileServices
                 return serviceResult;
             }
 
-            string filepath = $"{File.AdvertiseLicenseImagesDirectory}/license_{request.advertiseId}.jpg";
+            string filepath = $"{File.ResidenceLicenseImagesDirectory}/license_{request.advertiseId}.jpg";
             if (advertise.LicenseFileId != null)
             {
                 advertise.LicenseFile.FilePath = filepath;
@@ -195,19 +198,83 @@ namespace Amlakbashi.Application.Services.FileServices
                     LastModifyDate = DateTime.Now,
                     UserID = request.userId,
                     FilePath = filepath,
+                    Type = File.FileTypeEnum.ResidenceLicense,
                     AdvertiseLicense = advertise
                 };
                 Insert(newLicenseFile);
             }
-            CheckExistDirectory(File.AdvertiseLicenseImagesDirectory);
+            CheckExistDirectory(File.ResidenceLicenseImagesDirectory);
             await SaveFile(request.image, filepath);
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> AddResidenceVideoAsync(int userId, long residenceId, IFormFile video)
+        {
+            var serviceResult = new ServiceResult();
+            var residence = Repository.Find<Advertise, long>(residenceId);
+            if (video == null || video.Length == 0 || File.IsValidVideoContentType(video.ContentType) == false)
+            {
+                serviceResult.AddError("فایل انتخاب شده اشتباه است");
+            }
+            if (residence == null)
+            {
+                serviceResult.AddError("شناسه اقامتگاه اشتباه است");
+            }
+            if (residence != null && residence.UserId != userId)
+            {
+                serviceResult.AddError("شما مجوز افزودن ویدیو به این اقامتگاه را ندارید");
+            }
+            if (serviceResult.HasError())
+            {
+                return serviceResult;
+            }
+
+            string filepath = $"{File.PendingResidenceVideosDirectory}/pendingResidenceVideo_{residenceId}.mp4";
+            if (residence.VideoId.HasValue)
+            {
+                residence.Video.FilePath = filepath;
+                residence.Video.LastModifyDate = DateTime.Now;
+                Repository.Update(residence.Video);
+                Repository.Save();
+            }
+            else
+            {
+                var newVideoFile = new File()
+                {
+                    PostDate = DateTime.Now,
+                    LastModifyDate = DateTime.Now,
+                    UserID = userId,
+                    FilePath = filepath,
+                    Type = File.FileTypeEnum.ResidenceVideo,
+                    ResidenceVideo = residence
+                };
+                Insert(newVideoFile);
+            }
+            CheckExistDirectory(File.PendingResidenceVideosDirectory);
+            await SaveFile(video, filepath);
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult> MoveResidenceVideoToMainDirectoryAsync(long videoFileId)
+        {
+            ServiceResult serviceResult = new ServiceResult();
+            var videoFile = await Repository.FindAsync(videoFileId);
+            string filepath = $"{File.ResidenceVideosDirectory}/residenceVideo_{videoFile.ResidenceVideo.Id}.mp4";
+            if (MoveFile(videoFile.FilePath, filepath) == false)
+            {
+                serviceResult.AddError("در حال حاضر امکان دسترسی به فایل وجود ندارد. لطفا بعدا امتحان کنید.");
+                return serviceResult;
+            }
+            videoFile.FilePath = filepath;
+            Repository.Update(videoFile);
+            Repository.Save();
             return serviceResult;
         }
 
         public void Delete(int fileId, string serverPath)
         {
-            var file = Repository.Query(q => q.FirstOrDefault(f => f.Id == fileId));
-            DeleteFile(file.CorrectedFilePath);
+            var file = Repository.Find(fileId);
+            DeleteFile(GetFullPath(file.CorrectedFilePath));
             Repository.Delete(fileId);
             Repository.Save();
         }
@@ -247,8 +314,7 @@ namespace Amlakbashi.Application.Services.FileServices
 
         private void ClearImagesCache()
         {
-            System.IO.DirectoryInfo imageCacheDir = new System.IO.DirectoryInfo(
-                System.IO.Path.Combine(webHostEnvironment.WebRootPath, File.ImageChacheDerectory));
+            System.IO.DirectoryInfo imageCacheDir = new System.IO.DirectoryInfo(GetFullPath(File.ImageCacheDirectory));
             foreach (System.IO.FileInfo item in imageCacheDir.GetFiles())
             {
                 item.Delete();
@@ -257,31 +323,63 @@ namespace Amlakbashi.Application.Services.FileServices
 
         private async Task SaveFile(IFormFile file, string path)
         {
-            path = System.IO.Path.Combine(webHostEnvironment.WebRootPath, path);
-            if (System.IO.File.Exists(path))
-            {
-                System.IO.File.Delete(path);
-            }
-            using (var stream = System.IO.File.Create(path))
+            DeleteFile(GetFullPath(path));
+            using (var stream = System.IO.File.Create(GetFullPath(path)))
             {
                 await file.CopyToAsync(stream);
+                stream.Close();
             }
         }
 
-        private void DeleteFile(string path)
+        private bool MoveFile(string sourceFullPath, string destinationFullPath)
         {
-            path = System.IO.Path.Combine(webHostEnvironment.WebRootPath, path);
-            if (System.IO.File.Exists(path))
+            if (IsLockedFile(sourceFullPath) || IsLockedFile(destinationFullPath))
             {
-                System.IO.File.Delete(path);
+                return false;
+            }
+            System.IO.File.Move(sourceFullPath, destinationFullPath, true);
+            return true;
+        }
+
+        private void DeleteFile(string fullPath)
+        {
+            if (System.IO.File.Exists(fullPath))
+            {
+                System.IO.File.Delete(fullPath);
             }
         }
 
         private void CheckExistDirectory(string path)
         {
-            path = System.IO.Path.Combine(webHostEnvironment.WebRootPath, path);
+            path = GetFullPath(path);
             if (System.IO.Directory.Exists(path) == false)
                 System.IO.Directory.CreateDirectory(path);
+        }
+
+        private string GetFullPath(string path)
+        {
+            return System.IO.Path.Combine(webHostEnvironment.WebRootPath, path);
+        }
+
+        private bool IsLockedFile(string fullPath)
+        {
+            try
+            {
+                System.IO.FileInfo fileInfo = new System.IO.FileInfo(fullPath);
+                if (fileInfo.Exists)
+                {
+                    using (System.IO.FileStream stream = fileInfo.Open(System.IO.FileMode.Open,
+                    System.IO.FileAccess.Read, System.IO.FileShare.None))
+                    {
+                        stream.Close();
+                    }
+                }
+                return false;
+            }
+            catch
+            {
+                return true;
+            }
         }
     }
 }

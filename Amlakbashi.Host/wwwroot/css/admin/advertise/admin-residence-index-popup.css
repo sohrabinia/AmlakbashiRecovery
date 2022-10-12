@@ -27,7 +27,7 @@
     margin-bottom: 20px;
 }
 
-.main-prices-container .box-button {
+.main-prices-container .box-button, .video-container .box-button {
     text-align: center;
 }
 
@@ -38,7 +38,7 @@
     border-radius: 5px;
 }
 
-.main-prices-container button, .calendar-prices-container button{
+.main-prices-container button, .calendar-prices-container button, .video-container button{
     background: #fdd835;
     border: 1px solid #dcdcde;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
@@ -77,4 +77,15 @@
 
 .discount-item i{
     cursor: pointer;
+}
+
+.video-box {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.video-box video{
+    max-width:100%;
+    max-height: 350px;
 }

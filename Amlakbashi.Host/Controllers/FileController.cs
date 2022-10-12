@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Portal.Controllers
 {
@@ -848,18 +849,20 @@ namespace Portal.Controllers
                     ObjFile.MinifyStatus = Entities.File.MinifyStatusEnum.Done;
                     ObjFile.MinifyQualityPercent = quality;
                     ObjFile.MinifyMaxWidth = maxWidth;
+                    ObjFile.Type = Entities.File.FileTypeEnum.ResidenceImage;
                     var photoID = fileService.Insert(ObjFile);
 
                     if (Directory.Exists(host.WebRootPath + "/content/advertise") == false)
                         Directory.CreateDirectory(host.WebRootPath + "/content/advertise");
 
-                    var filepath = $"{Entities.File.AdvertiseImageDirectory}/advertise_{accId}_{photoID}.jpg";
+                    var filepath = $"{Entities.File.ResidenceImagesDirectory}/advertise_{accId}_{photoID}.jpg";
                     ImageCodecInfo format = ImageUtility.GetEncoder(ImageFormat.Jpeg);
                     EncoderParameters encoderParameters = new EncoderParameters(1);
                     encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, quality);
                     var image = Image.FromStream(uploadfile.OpenReadStream(), true, true);
                     image = ImageUtility.MinifyImage(image, maxWidth);
                     image.Save(Path.Combine(host.WebRootPath, filepath), format, encoderParameters);
+                    image.Dispose();
 
                     fileService.UpdateFilePath(photoID, filepath);
                     return GenerateJsonResult(new { Status = 1, id = photoID });
@@ -868,7 +871,7 @@ namespace Portal.Controllers
             }
             catch (Exception exc)
             {
-                logger.Error("Post.SaveUploadedFile", exc);
+                logger.Error("File.SaveUploadedFile", exc);
                 return GenerateJsonResult(new { Status = 0, Message = "عملیات با خطا مواجه شد" });
             }
         }

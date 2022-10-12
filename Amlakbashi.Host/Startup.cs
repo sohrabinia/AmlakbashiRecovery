@@ -1,4 +1,5 @@
 ﻿using Amlakbashi.Application;
+using Amlakbashi.Core.Common.StaticData;
 using Amlakbashi.Core.Common.Utilities;
 using Amlakbashi.Core.DTOs;
 using Amlakbashi.Core.Identity.Entities;
@@ -24,6 +25,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using StackExchange.Redis;
@@ -51,7 +53,6 @@ namespace Amlakbashi.Host
         public IConfigurationRoot Configuration { get; private set; }
         public ILifetimeScope AutofacContainer { get; private set; }
         private const string frontendCorsPolicyName = "frontendCorsPolicy";
-        private const string mediatorsCorsPolicyName = "thirdPartyCorsPolicy";
 
         // ConfigureServices is where you register dependencies. This gets
         // called by the runtime before the ConfigureContainer method, below.
@@ -136,8 +137,8 @@ namespace Amlakbashi.Host
 
             services.Configure<FormOptions>(x =>
             {
-                x.ValueLengthLimit = 20971520;
-                x.MultipartBodyLengthLimit = 20971520;
+                x.ValueLengthLimit = 209715200;
+                x.MultipartBodyLengthLimit = 209715200;
             });
 
             var redisConfigString = $"{Configuration.GetValue<string>("Redis:Server")}:{Configuration.GetValue<int>("Redis:Port")},allowAdmin=true,abortConnect=false";
@@ -168,16 +169,7 @@ namespace Amlakbashi.Host
                     crossOrigins.Add("https://user.amlakbashi.com:3000");
                     policyBuilder.WithOrigins(crossOrigins.ToArray()).AllowAnyHeader().AllowAnyMethod();
                 });
-                options.AddPolicy(mediatorsCorsPolicyName, policyBuiler =>
-                {
-                    policyBuiler.WithOrigins("https://adminvila.com/").AllowAnyHeader().AllowAnyMethod();
-                });
             });
-
-            //var emailConfig = Configuration
-            //    .GetSection("EmailConfiguration")
-            //    .Get<EmailConfiguration>();
-            //services.AddSingleton(emailConfig);
         }
 
         // ConfigureContainer is where you can register things directly
@@ -240,6 +232,12 @@ namespace Amlakbashi.Host
                         ctx.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + 60 * 60 * 24 * 365;
                     }
                 }
+            });
+            GeneralData.WebHostEnvironment = env;
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider($"{GeneralData.VideosDirectoryDrive}"),
+                RequestPath = "/video"
             });
             app.UseStaticFiles(new StaticFileOptions
             {

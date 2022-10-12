@@ -1929,17 +1929,17 @@ namespace Amlakbashi.Host.Controllers
                         return RedirectToAction("profilemanager");
                     }
 
-                    string filepath = $"~/content/users/user_{user.id}.jpg";
+                    string filepath = $"{Entities.File.UserImagesDirectory}/user_{user.id}.jpg";
                     long PhotoID = 0;
                     if (userAccessor.CurrentUser.Photo != null)
                     {
                         PhotoID = userAccessor.CurrentUser.Photo.Id;
-                        var oldFilePath = host.WebRootPath + userAccessor.CurrentUser.Photo.FilePath.Replace("~", "");
+                        //var oldFilePath = host.WebRootPath + userAccessor.CurrentUser.Photo.CorrectedFilePath;
                         fileService.UpdateFilePath(PhotoID, filepath);
-                        if (System.IO.File.Exists(oldFilePath))
-                        {
-                            System.IO.File.Delete(oldFilePath);
-                        }
+                        //if (System.IO.File.Exists(oldFilePath))
+                        //{
+                        //    System.IO.File.Delete(oldFilePath);
+                        //}
                     }
                     else
                     {
@@ -1948,7 +1948,8 @@ namespace Amlakbashi.Host.Controllers
                             PostDate = DateTime.Now,
                             LastModifyDate = DateTime.Now,
                             UserID = user.id,
-                            FilePath = filepath
+                            FilePath = filepath,
+                            Type = Entities.File.FileTypeEnum.UserImage
                         };
                         PhotoID = fileService.Insert(newProfilePhoto);
                     }
@@ -1956,7 +1957,7 @@ namespace Amlakbashi.Host.Controllers
                     if (!System.IO.Directory.Exists(host.WebRootPath + "/content/users"))
                         System.IO.Directory.CreateDirectory(host.WebRootPath + "/content/users");
 
-                    using (var stream = System.IO.File.Create(host.WebRootPath + filepath.Replace("~", "")))
+                    using (var stream = System.IO.File.Create(host.WebRootPath + "/" + filepath))
                     {
                         uploadfile.CopyTo(stream);
                     }

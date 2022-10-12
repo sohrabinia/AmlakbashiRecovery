@@ -11,6 +11,7 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
     {
         public long Id { get; set; }
         public Advertise.AdvertiseMode Mode { get; set; }
+        public Advertise.MainTypeEnum MainType { get; set; }
         public long? ParentId { get; set; }
         public Advertise.AdvertiseStatus Status { get; set; }
         public bool Available { get; set; }
@@ -23,6 +24,7 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
         public string UserFullName { get; set; } = "کاربر حذف شده";
         public string CityPersianName { get; set; }
         public int UserId { get; set; }
+        public Advertise.VideoStatusEnum VideoStatus { get; set; }
 
         public static implicit operator AdvertiseIndexDetailDTO(Advertise advertise)
         {
@@ -30,6 +32,7 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
             {
                 Id = advertise.Id,
                 Mode = advertise.Mode,
+                MainType = advertise.MainType,
                 ParentId = advertise.ParentId,
                 UserId = advertise.UserId,
                 CreateDate = DateTimeUtility.ConvertDate(advertise.CreateDate).ToString(),
@@ -40,7 +43,8 @@ namespace Amlakbashi.Core.DTOs.AdvertiseDTOs
                     DateTimeUtility.GregorianToPersianDate(DateTimeUtility.JSValueToDate(advertise.MinReserveDateForNowruz)).Replace(",", "/"),
                 Status = advertise.Status,
                 Available = advertise.Active,
-                SupportInfoCount = advertise.GetSupportInfoList().Length
+                SupportInfoCount = advertise.GetSupportInfoList().Length,
+                VideoStatus = advertise.VideoStatus
             };
         }
     }

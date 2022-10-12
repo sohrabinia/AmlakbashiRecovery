@@ -17,10 +17,12 @@ namespace Amlakbashi.Application.Services.FileServices.Interfaces
         File Find(long id);
         long Insert(File newFile);
         Task<ServiceResult> AddAdvertiseImagesAsync(FilePostAdvertiseImagesRequest request);
+        Task<ServiceResult> MoveResidenceVideoToMainDirectoryAsync(long videoFileId);
         void Update(File editedFile, string wwwrootPath);
         void UpdateFilePath(long fileId, string filePath);
         Task<ServiceResult<long>> UpdateUserProfileImageAsync(int userId, IFormFile newImage);
         Task<ServiceResult> UpdateAdvertiseLicenseImageAsync(FilePostAdvertiseLicenseImageRequest request);
+        Task<ServiceResult> AddResidenceVideoAsync(int userId, long residenceId, IFormFile video);
         void Delete(int fileId, string serverPath);
         Task<ServiceResult> DeleteAdvertiseImage(long advertiseId, long fileId, int userId);
         void GenerateThumbImage(long accId, long fileId);
