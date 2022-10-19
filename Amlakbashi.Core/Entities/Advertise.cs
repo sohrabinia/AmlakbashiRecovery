@@ -253,6 +253,19 @@ namespace Amlakbashi.Core.Entities
             }
         }
 
+        [NotMapped]
+        [JsonIgnore]
+        public string VideoUrl { 
+            get {
+                return VideoStatus switch
+                {
+                    VideoStatusEnum.Unset => string.Empty,
+                    VideoStatusEnum.Pending => $"/video/residences/pending/pendingResidenceVideo_{Id}.mp4?t={DateTime.Now.Ticks}",
+                    _ => $"/video/residences/residenceVideo_{Id}.mp4?t={DateTime.Now.Ticks}"
+                };
+            }
+        }
+
         public void SetNotVerifyReasons(IList<NotVerifyReasonsEnum> list)
         {
             this.NotVerifyReasons = string.Join(",", list.Cast<int>().ToArray());

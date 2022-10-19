@@ -193,7 +193,16 @@
                 @* Title and Acc Code *@
                 <div class="advertise-page_title_item">
                     <h1>@Model.TitleDesc.Title</h1>
-                    <p>کد آگهی : @Model.Id</p>
+                    <div style="display: flex; justify-content: space-between;">
+                        <p>کد اقامتگاه: @Model.Id</p>
+                        @if (Model.HasVideo)
+                        {
+                            <div class="" style="height: 37px; width: 100px; font: 14px Miransans; border: 1px solid lightgray; padding: 3px 5px; border-radius: 5px; cursor: pointer; background-color: #fdd835; margin-right: 20px; text-align:center;" onclick="showVideo(@Model.Id)">
+                                <span style="">ویدیو</span>
+                                <i class="fas fa-video" style=""></i>
+                            </div>
+                        }
+                    </div>
                 </div>
 
                 @* Acc Owner and Socials & Favorite *@
@@ -634,7 +643,11 @@ function updateReserveRequestButton() {
             $('.js-reserve-req-icon').removeClass("fa-bolt");
             $('.js-reserve-req-icon').addClass("fa-calendar-check");
     }
-}
+        }
+
+        function showVideo(residenceId) {
+            showInfoMessage('ویدیو اقامتگاه ' + residenceId, '', { contentUrl: '/accomodation/ShowVideo?residenceId=' + residenceId, fullScreen: screen.width < 781 });
+        }
     </script>
 
     @if (!Model.IsPreview)

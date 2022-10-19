@@ -1,8 +1,6 @@
 ﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccDashboardDTOs;
 @using Amlakbashi.Core.Common.Utilities;
 
-@inject IUserAccessor userAccessor
-
 @model AccommodationManagerDTO
 
 @{
@@ -54,18 +52,13 @@
             <div class="wrapper-right-banner div-unset">
                 <div class="avatar-item">
                     <a target="_blank" href="@item.previewUrl"><img src="@item.photoUrl" alt="عکس اتاق" /></a>
-
-                    @if (userAccessor.CurrentUser.Id == 82119)
+                    @if (item.mainType != AccMainType.Complex && item.status != Advertise.AdvertiseStatus.NotCompleted)
                     {
-                        @if (item.mainType != AccMainType.Complex && item.status != Advertise.AdvertiseStatus.NotCompleted)
-                        {
-                            <div style="width: 100%; text-align: center; padding: 2px 0;">
-                                <a href="/accomodation/accgeneralform?id=@item.id#residence_photos" target="_blank" style="font-size: small; border-left: 1px solid gray; padding-left: 5px; color: black;"><i class="fa fa-plus"></i> عکس</a>
-                                <span onclick="showVideoUploadPopup(@item.id)" style="font-size: small; cursor: pointer;"><i class="fa fa-plus"></i> ویدیو</span>
-                            </div>
-                        }
+                        <div style="width: 100%; text-align: center; padding: 2px 0;">
+                            <a href="/accomodation/accgeneralform?id=@item.id#residence_photos" target="_blank" style="font-size: small; border-left: 1px solid gray; padding-left: 5px; color: black;"><i class="fa fa-plus"></i> عکس</a>
+                            <span onclick="showVideoUploadPopup(@item.id)" style="font-size: small; cursor: pointer;"><i class="fa fa-plus"></i> ویدیو</span>
+                        </div>
                     }
-
                     @*@if (item.userRating <= 0)
                         {
                             <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>

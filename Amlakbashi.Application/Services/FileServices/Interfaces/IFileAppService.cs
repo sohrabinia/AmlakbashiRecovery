@@ -17,7 +17,7 @@ namespace Amlakbashi.Application.Services.FileServices.Interfaces
         File Find(long id);
         long Insert(File newFile);
         Task<ServiceResult> AddAdvertiseImagesAsync(FilePostAdvertiseImagesRequest request);
-        Task<ServiceResult> MoveResidenceVideoToMainDirectoryAsync(long videoFileId);
+        Task<ServiceResult> ConversionResidenceVideoAsync(long videoFileId);
         void Update(File editedFile, string wwwrootPath);
         void UpdateFilePath(long fileId, string filePath);
         Task<ServiceResult<long>> UpdateUserProfileImageAsync(int userId, IFormFile newImage);

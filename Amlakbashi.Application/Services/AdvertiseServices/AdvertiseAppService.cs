@@ -2580,6 +2580,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             residence.VideoStatus = status;
             Repository.Update(residence);
             Repository.Save();
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
         }
 
         private async Task<Advertise.AdvertiseStatus> UpdateStatus(long residenceId, Advertise.AdvertiseStatus status)

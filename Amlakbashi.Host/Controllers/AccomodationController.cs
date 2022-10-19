@@ -2916,6 +2916,11 @@ namespace Amlakbashi.Host.Controllers
             });
         }
 
+        public IActionResult ShowVideo(int residenceId)
+        {
+            return PartialView("_ShowVideo", advertiseService.Find(residenceId).VideoUrl);
+        }
+
         [Authorize]
         public IActionResult GetVideoInfo(int residenceId)
         {
@@ -2960,7 +2965,7 @@ namespace Amlakbashi.Host.Controllers
                 var residence = advertiseService.Find(residenceId);
                 if (residence.VideoStatus == VideoStatusEnum.Pending)
                 {
-                    var result = await fileService.MoveResidenceVideoToMainDirectoryAsync(residence.VideoId.Value);
+                    var result = await fileService.ConversionResidenceVideoAsync(residence.VideoId.Value);
                     if (result.HasError())
                     {
                         return GenerateJsonResult(new { status = 0, msg = result.GetErrors() });

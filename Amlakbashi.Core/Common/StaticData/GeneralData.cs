@@ -20,7 +20,7 @@ namespace Amlakbashi.Core.Common.StaticData
         {
             get
             {
-                return WebHostEnvironment.EnvironmentName == "Production" ? "F:/videos" :
+                return WebHostEnvironment.EnvironmentName == "Production" ? "E:/videos" :
                     $"{WebHostEnvironment.WebRootPath}/content/videos";
             }
         }
