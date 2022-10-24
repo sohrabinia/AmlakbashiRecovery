@@ -4,14 +4,16 @@ using Amlakbashi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Amlakbashi.Data.Migrations
 {
     [DbContext(typeof(AmlakbashiDB))]
-    partial class AmlakbashiDBModelSnapshot : ModelSnapshot
+    [Migration("20221023085632_add-reason-for-notconfirming-video")]
+    partial class addreasonfornotconfirmingvideo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

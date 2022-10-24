@@ -22,7 +22,7 @@ namespace Amlakbashi.Application.Services.FileServices.Interfaces
         void UpdateFilePath(long fileId, string filePath);
         Task<ServiceResult<long>> UpdateUserProfileImageAsync(int userId, IFormFile newImage);
         Task<ServiceResult> UpdateAdvertiseLicenseImageAsync(FilePostAdvertiseLicenseImageRequest request);
-        Task<ServiceResult> AddResidenceVideoAsync(int userId, long residenceId, IFormFile video);
+        Task<ServiceResult> UpdateResidenceVideoAsync(int userId, long residenceId, IFormFile video);
         void Delete(int fileId, string serverPath);
         Task<ServiceResult> DeleteAdvertiseImage(long advertiseId, long fileId, int userId);
         void GenerateThumbImage(long accId, long fileId);

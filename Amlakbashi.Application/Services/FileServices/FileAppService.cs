@@ -212,7 +212,7 @@ namespace Amlakbashi.Application.Services.FileServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult> AddResidenceVideoAsync(int userId, long residenceId, IFormFile video)
+        public async Task<ServiceResult> UpdateResidenceVideoAsync(int userId, long residenceId, IFormFile video)
         {
             var serviceResult = new ServiceResult();
             var residence = Repository.Find<Advertise, long>(residenceId);

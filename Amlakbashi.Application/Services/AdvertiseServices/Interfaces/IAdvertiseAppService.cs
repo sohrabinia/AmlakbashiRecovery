@@ -75,7 +75,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void SetAvailable(long id, bool isAvailable);
         void Publish(long id, int doerUserId, ActionSourceEnum actionSource);
         void Suspend(long id);
-        Task<ServiceResult<AdvertiseStatus>> UpdateActivity(long residenceId);
+        Task<ServiceResult<AdvertiseStatus>> UpdateActivityAsync(long residenceId);
         void NotVerify(long id, int currentUserId = 0);
         void SetNotVerifyReasons(long id, List<Advertise.NotVerifyReasonsEnum> reasons);
         void SetAsTodayEmpty(long id);
@@ -85,7 +85,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void SetNorouzPrice(long id, int norouzPrice, int overCapacityPrice = 0);
         void SetMaxInstantReserveStart(long id, int maxInstantReserveStart);
         IList<Advertise> GetAdvertiseRelatedItems(long id, int count = 4);
-        Task<bool> UpdateInstantReserveStatus(long residenceId, InstantReserveStatusEnum status);
+        Task<bool> UpdateInstantReserveStatusAsync(long residenceId, InstantReserveStatusEnum status);
         IEnumerable<Advertise> GetMostViewedAdvertisesInCity(int city_id, int province_id, int type_id, int count);
         IList<Advertise> GetMostViewedNorouzAdvertises(int count);
         IList<Advertise> GetAccListByIds(IList<long> ids, AdvertiseStatus status = AdvertiseStatus.Unset);
@@ -111,8 +111,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
         void UpdateAlbumPhoto(long advertiseId);
         Task<ServiceResult> UpdatePricesAsync(ResidenceMainPricesDTO request, int adminId = 0);
         Task<ServiceResult> UpdateCalendarAsync(AdvertiseUpdateCalendarRequest request);
-        Task<ServiceResult<List<long>>> AddInstantReserveDates(long residenceId, string fromDate, string toDate, int userId);
-        Task<ServiceResult<List<long>>> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate, int userId);
-        Task UpdateVideoStatus(long residenceId, Advertise.VideoStatusEnum status);
+        Task<ServiceResult<List<long>>> AddInstantReserveDatesAsync(long residenceId, string fromDate, string toDate, int userId);
+        Task<ServiceResult<List<long>>> DeleteInstantReserveDatesAsync(long residenceId, string fromDate, string toDate, int userId);
+        Task UpdateVideoStatusAsync(long residenceId, Advertise.VideoStatusEnum status, string notConfirmReason = null);
     }
 }

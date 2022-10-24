@@ -193,11 +193,11 @@ function showConfirm(content, acceptCallback) {
 }
 function confirmReject(acceptCallback) {
     confirmContainer.fadeOut(100, function () {
-        confirmMain.empty();
-        confirmAcceptCallback = undefined;
         if (typeof acceptCallback === 'function') {
             acceptCallback();
         }
+        confirmMain.empty();
+        confirmAcceptCallback = undefined;
     });
 }
 function confirmAccept() {
@@ -256,6 +256,7 @@ function sendAjaxRequest(url, data, type, successCallback, beforeSendCallback, c
         type: type,
         data: data,
         cache: false,
+        timeout: 0,
         beforeSend: function () {
             if (typeof beforeSendCallback === 'function') {
                 beforeSendCallback();

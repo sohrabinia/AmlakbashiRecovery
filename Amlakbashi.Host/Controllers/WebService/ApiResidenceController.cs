@@ -426,7 +426,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> AddInstantReserveDates(UpdateInstantReserveDatesRequest request)
         {
-            var result = await residenceService.AddInstantReserveDates(request.residenceId, request.fromDate, request.toDate, User.GetId());
+            var result = await residenceService.AddInstantReserveDatesAsync(request.residenceId, request.fromDate, request.toDate, User.GetId());
             return result.HasError() ? BadRequest(result.GetErrors()) : Ok(SerializeUtility.SerializeToJS(result.Result));
         }
 
@@ -434,7 +434,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> DeleteInstantReserveDates(UpdateInstantReserveDatesRequest request)
         {
-            var result = await residenceService.DeleteInstantReserveDates(request.residenceId, request.fromDate, request.toDate, User.GetId());
+            var result = await residenceService.DeleteInstantReserveDatesAsync(request.residenceId, request.fromDate, request.toDate, User.GetId());
             return result.HasError() ? BadRequest(result.GetErrors()) : Ok(SerializeUtility.SerializeToJS(result.Result));
         }
 
@@ -442,7 +442,7 @@ namespace Amlakbashi.Host.Controllers.WebService
         [Panel(Core.Entities.User.UserGeneralTypeEnum.Host)]
         public async Task<IActionResult> UpdatePermanentInstantReserve(UpdatePermanentInstantReserveRequest request)
         {
-            var result = await residenceService.UpdateInstantReserveStatus(request.residenceId,
+            var result = await residenceService.UpdateInstantReserveStatusAsync(request.residenceId,
                 request.active ? Advertise.InstantReserveStatusEnum.Permanent : Advertise.InstantReserveStatusEnum.Calendar);
             return result ? Ok() : BadRequest();
         }

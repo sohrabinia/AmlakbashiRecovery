@@ -4,6 +4,7 @@ using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
@@ -59,6 +60,9 @@ namespace Amlakbashi.Core.Entities
         public long? MainPhotoId { get; set; }
         public long? VideoId { get; set; }
         public VideoStatusEnum VideoStatus { get; set; }
+
+        [MaxLength(1000)]
+        public string ReasonForNotConfirmingVideo { get; set; }
         public string AlbumPhoto { get; set; }
 
         // Ownership and Lisence ********************************

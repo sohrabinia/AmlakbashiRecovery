@@ -267,14 +267,39 @@ function showVideoPopup(id) {
     loadPopup('/accomodation/GetAdminVideoInfo?residenceId=' + id);
 }
 
-function setVideoStatus(residenceId, status) {
-    showDarkBackground();
+//function setVideoStatus(residenceId, status) {
+//    showDarkBackground();
+//    var video = document.getElementById('video_play_container');
+//    if (video) {
+//        video.srcObject = null;
+//    }
+//    setTimeout(function () {
+//        sendPostAjax("/accomodation/SetVideoStatus", { residenceId, status }, null, null, hidePopup);
+//    }, 1500);
+//}
+
+function confirmVideo(residenceId) {
     var video = document.getElementById('video_play_container');
     if (video) {
         video.srcObject = null;
     }
-    setTimeout(function () {
-        sendPostAjax("/accomodation/SetVideoStatus", { residenceId, status }, null, null, hidePopup);
-    }, 1500);
+    showConfirm("آیا از تایید این ویدیو مطمئنید؟", function () {
+        sendPostAjax("/accomodation/SetVideoStatus", { residenceId, status: 2 }, null, null, hidePopup);
+    });
+}
 
+function notConfirmVideo(residenceId) {
+    var video = document.getElementById('video_play_container');
+    if (video) {
+        video.srcObject = null;
+    }
+    showConfirm("دلیل عدم تایید ویدیو: <br/><textarea id='not_confirm_reason' style='width: 95%;'></textarea><br/><br/>" + 
+        "آیا از عدم تایید این ویدیو مطمئنید؟", function () {
+        let notConfirmReason = $('#not_confirm_reason').val();
+        if (!notConfirmReason) {
+            errorAlert("لطفا دلیل عدم تایید را وارد کنید");
+            return;
+        }
+        sendPostAjax("/accomodation/SetVideoStatus", { residenceId, status: 3, notConfirmReason }, null, null, hidePopup);
+    });
 }

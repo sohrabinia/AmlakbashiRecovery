@@ -1771,7 +1771,7 @@ namespace Amlakbashi.Host.Controllers
                 }
                 else
                 {
-                    var result = await advertiseService.UpdateActivity(id);
+                    var result = await advertiseService.UpdateActivityAsync(id);
                     newStatus = (int)result.Result;
                 }
                 return GenerateJsonResult(new
@@ -2639,7 +2639,7 @@ namespace Amlakbashi.Host.Controllers
         [Authorize]
         public async Task<IActionResult> UpdatePermanentInstantReserve(long residenceId, bool active)
         {
-            var result = await advertiseService.UpdateInstantReserveStatus(residenceId,
+            var result = await advertiseService.UpdateInstantReserveStatusAsync(residenceId,
                 active ? InstantReserveStatusEnum.Permanent : InstantReserveStatusEnum.Calendar);
             return GenerateJsonResult(new
             {
@@ -2664,7 +2664,7 @@ namespace Amlakbashi.Host.Controllers
         [Authorize]
         public async Task<IActionResult> AddInstantReserveDates(long residenceId, string fromDate, string toDate)
         {
-            var result = await advertiseService.AddInstantReserveDates(residenceId, fromDate, toDate, userAccessor.CurrentUser.Id);
+            var result = await advertiseService.AddInstantReserveDatesAsync(residenceId, fromDate, toDate, userAccessor.CurrentUser.Id);
             return GenerateJsonResult(new
             {
                 status = result.HasError() ? 0 : 1,
@@ -2676,7 +2676,7 @@ namespace Amlakbashi.Host.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate)
         {
-            var result = await advertiseService.DeleteInstantReserveDates(residenceId, fromDate, toDate, userAccessor.CurrentUser.Id);
+            var result = await advertiseService.DeleteInstantReserveDatesAsync(residenceId, fromDate, toDate, userAccessor.CurrentUser.Id);
             return GenerateJsonResult(new
             {
                 status = result.HasError() ? 0 : 1,
@@ -2929,17 +2929,17 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<JsonResult> UploadResidenceVideo(long residenceId, IFormFile formFile, 
+        public async Task<JsonResult> UploadResidenceVideo(long residenceId, IFormFile formFile,
             [FromServices] IFileAppService fileService)
         {
             try
             {
-                var result = await fileService.AddResidenceVideoAsync(userAccessor.CurrentUser.Id, residenceId, formFile);
+                var result = await fileService.UpdateResidenceVideoAsync(userAccessor.CurrentUser.Id, residenceId, formFile);
                 if (result.HasError())
                 {
                     return GenerateJsonResult(new { status = 0, msg = result.GetErrors() });
                 }
-                await advertiseService.UpdateVideoStatus(residenceId, VideoStatusEnum.Pending);
+                await advertiseService.UpdateVideoStatusAsync(residenceId, VideoStatusEnum.Pending);
                 return GenerateJsonResult(new { status = 1 });
             }
             catch (Exception exc)
@@ -2957,7 +2957,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize(policy: Policies.Advertise_Edit)]
         [HttpPost]
-        public async Task<IActionResult> SetVideoStatus(int residenceId, VideoStatusEnum status,
+        public async Task<IActionResult> SetVideoStatus(int residenceId, VideoStatusEnum status, string notConfirmReason,
             [FromServices] IFileAppService fileService)
         {
             try
@@ -2971,7 +2971,7 @@ namespace Amlakbashi.Host.Controllers
                         return GenerateJsonResult(new { status = 0, msg = result.GetErrors() });
                     }
                 }
-                await advertiseService.UpdateVideoStatus(residenceId, status);
+                await advertiseService.UpdateVideoStatusAsync(residenceId, status, notConfirmReason);
                 return GenerateJsonResult(new { status = 1 });
             }
             catch (Exception exc)

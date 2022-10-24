@@ -186,7 +186,7 @@ namespace Amlakbashi.Host.Controllers
         [Authorize(Policy = Policies.Advertise_Publish)]
         public async Task<IActionResult> UpdateActivity(long residenceId)
         {
-            var result = await advertiseService.UpdateActivity(residenceId);
+            var result = await advertiseService.UpdateActivityAsync(residenceId);
             return GenerateJsonResult(new
             {
                 status = result.HasError() ? 0 : 1,

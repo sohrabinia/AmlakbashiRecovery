@@ -1764,7 +1764,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
-        public async Task<ServiceResult<AdvertiseStatus>> UpdateActivity(long residenceId)
+        public async Task<ServiceResult<AdvertiseStatus>> UpdateActivityAsync(long residenceId)
         {
             var serviceResult = new ServiceResult<AdvertiseStatus>();
             var residence = await Repository.FindAsync(residenceId);
@@ -1775,7 +1775,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 return serviceResult;
             }
 
-            serviceResult.Result = await UpdateStatus(residence.Id,
+            serviceResult.Result = await UpdateStatusAsync(residence.Id,
                 residence.Status == AdvertiseStatus.Published ? AdvertiseStatus.Archived : AdvertiseStatus.Published);
             return serviceResult;
 
@@ -1966,7 +1966,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return intersects.ToList();
         }
 
-        public async Task<bool> UpdateInstantReserveStatus(long residenceId, InstantReserveStatusEnum status)
+        public async Task<bool> UpdateInstantReserveStatusAsync(long residenceId, InstantReserveStatusEnum status)
         {
             var data = await Repository.FindAsync(residenceId);
             data.InstantReserveStatus = status;
@@ -2491,7 +2491,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
         }
 
-        public async Task<ServiceResult<List<long>>> AddInstantReserveDates(long residenceId, string fromDate, string toDate, int userId)
+        public async Task<ServiceResult<List<long>>> AddInstantReserveDatesAsync(long residenceId, string fromDate, string toDate, int userId)
         {
             var serviceResult = new ServiceResult<List<long>>();
             var residence = await Repository.FindAsync(residenceId);
@@ -2518,7 +2518,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult<List<long>>> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate, int userId)
+        public async Task<ServiceResult<List<long>>> DeleteInstantReserveDatesAsync(long residenceId, string fromDate, string toDate, int userId)
         {
             var serviceResult = new ServiceResult<List<long>>();
             var residence = await Repository.FindAsync(residenceId);
@@ -2574,16 +2574,20 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
-        public async Task UpdateVideoStatus(long residenceId, Advertise.VideoStatusEnum status)
+        public async Task UpdateVideoStatusAsync(long residenceId, Advertise.VideoStatusEnum status, string notConfirmReason = null)
         {
             var residence = await Repository.FindAsync(residenceId);
             residence.VideoStatus = status;
+            if (status == VideoStatusEnum.NotConfirmed)
+            {
+                residence.ReasonForNotConfirmingVideo = notConfirmReason;
+            }
             Repository.Update(residence);
             Repository.Save();
             await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
         }
 
-        private async Task<Advertise.AdvertiseStatus> UpdateStatus(long residenceId, Advertise.AdvertiseStatus status)
+        private async Task<Advertise.AdvertiseStatus> UpdateStatusAsync(long residenceId, Advertise.AdvertiseStatus status)
         {
             var residence = await Repository.FindAsync(residenceId);
             var clonedResidence = residence.ShallowCopy();
