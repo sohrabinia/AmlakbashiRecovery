@@ -1,5 +1,4 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Entities;
+﻿using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Accounting.Services.Interfaces
 {
-    internal interface IDiscountCouponAppService : IAppService<ReservePayment, long>
+    internal interface IDiscountCouponAppService
     {
         DiscountCoupon Find(long id);
         DiscountCoupon Find(int userId, DiscountCoupon.DiscountCouponType type);

@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Amlakbashi.Application.Services.Category
 {
-    internal class CategoryAppService : AppServiceBase<DynamicCategory, int>, ICategoryAppService
+    internal class CategoryAppService : BaseAppService<DynamicCategory, int>, ICategoryAppService
     {
         private readonly IAdvertiseFilterHelper advertiseFilter;
         private readonly IMediator mediator;

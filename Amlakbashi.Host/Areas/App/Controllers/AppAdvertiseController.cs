@@ -414,7 +414,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult UpdateExtra(Advertise data, PoolInputDTO poolDTO, bool isEdit = false, int tab = 0)
+        public ActionResult UpdateExtra(Advertise data, PoolInputDTO poolDTO, IList<int> tags, bool isEdit = false, int tab = 0)
         {
             try
             {
@@ -435,7 +435,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                     uploadedLicenseFile = Request.Form.Files[0];
                 }
                 var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors,
-                    out level, uploadedLicenseFile, isEdit);
+                    out level, uploadedLicenseFile, tags, isEdit);
                 if (errors.Any())
                 {
                     ModelState.Clear();

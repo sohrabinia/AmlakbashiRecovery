@@ -30,7 +30,7 @@ using Amlakbashi.Core.Infrastructure.UserContact;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
-    internal class ReserveAppService : AppServiceBase<Reserve, long>, IReserveAppService
+    internal class ReserveAppService : BaseAppService<Reserve, long>, IReserveAppService
     {
         private readonly IMediator mediator;
         private readonly IAccountingFacade accounting;

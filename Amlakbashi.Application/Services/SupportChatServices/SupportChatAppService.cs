@@ -12,7 +12,7 @@ using Amlakbashi.Mediator.Commands.SupportChatCommands;
 
 namespace Amlakbashi.Application.Services.SupportChatServices
 {
-    internal class SupportChatAppService : AppServiceBase<SupportChat, long>, ISupportChatAppService
+    internal class SupportChatAppService : BaseAppService<SupportChat, long>, ISupportChatAppService
     {
         private readonly IMediator mediator;
         public SupportChatAppService(IRepository<SupportChat, long> repository, IMediator mediator) : base(repository)

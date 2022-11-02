@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -69,6 +70,20 @@ namespace Amlakbashi.Core.Common.Utilities
         public static string VerifyEmailContent(string code)
         {
             return $"<div style='direction:rtl;text-align:right;font-size:16px;'><div>کد تایید شما در املاک باشی: <b>{code}</b></div></div>";
+        }
+
+        public static bool VerifyTagTitle(string tagTitle)
+        {
+            if (string.IsNullOrEmpty(tagTitle))
+            {
+                return false;
+            }
+            return tagTitle.Any(x => Char.IsLetterOrDigit(x) == false && char.IsWhiteSpace(x) == false) ? false : true;
+        }
+
+        public static string GetTagUrlTitle(string tagTitle)
+        {
+            return tagTitle.Replace(' ', '-');
         }
     }
 }

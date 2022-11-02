@@ -24,7 +24,7 @@ $(".main-navigation_list-item").click(function (event) {
 });
 
 if ($(window).width() < 960) {
-        $('p.dashboard-left-account').html("خروج");
+    $('p.dashboard-left-account').html("خروج");
 }
 
 $(".main-navigation_list-item").click(function () {
@@ -40,7 +40,7 @@ $(".submenu-child-item").click(function () {
     closeNavigation();
 });
 
-function closeNavigation(){
+function closeNavigation() {
     $('nav.dashboard__navigatoin').addClass("js-show-menu");
     $('.js-bg').removeClass("bg-show-menu");
     $(".main-navigation_list-item").removeClass("active-item");
@@ -152,6 +152,10 @@ function loadPopup(url) {
 }
 function showPopup(content) {
     popupMain.html(content);
+    popupContainer.fadeIn(100);
+}
+function showContainerInPopup(containerClassName) {
+    popupMain.html($('.' + containerClassName).html());
     popupContainer.fadeIn(100);
 }
 function hidePopup() {
@@ -270,17 +274,31 @@ function sendAjaxRequest(url, data, type, successCallback, beforeSendCallback, c
                 successCallback(response);
             }
             else {
-                if (response.status === 1) {
-                    successAlert('عملیات با موفقیت انجام شد');
+                if (response) {
+                    if (response.status) {
+                        if (response.status === 1) {
+                            successAlert('عملیات با موفقیت انجام شد');
+                        }
+                        else {
+                            errorAlert(response.msg);
+                        }
+                    }
+                    else {
+                        successAlert(response);
+                    }
                 }
                 else {
-                    errorAlert(response.msg);
+                    successAlert('عملیات با موفقیت انجام شد');
                 }
             }
         },
         error: function (error) {
+            debugger;
             if (error.status === 401) {
                 errorAlert('شما مجوز دسترسی به این قسمت را ندارید');
+            }
+            else if (error.status === 400) {
+                errorAlert(error.responseText);
             }
             else {
                 errorAlert('عملیات با خطا مواجه شد<br/>' + error.status + ' - ' + error.statusText + '<br/>' + error.responseText);

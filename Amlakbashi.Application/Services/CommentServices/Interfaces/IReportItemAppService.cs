@@ -1,15 +1,11 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.DTOs.WebService.Requests.Comments;
+﻿using Amlakbashi.Core.DTOs.WebService.Requests.Comments;
 using Amlakbashi.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.CommentServices.Interfaces
 {
-    public interface IReportItemAppService : IAppService<ReportItem, long>
+    public interface IReportItemAppService
     {
         IQueryable<ReportItem> GetAllAsIQueriable();
         IList<ReportItem> GetAccUserRatings(long accId, int userId);

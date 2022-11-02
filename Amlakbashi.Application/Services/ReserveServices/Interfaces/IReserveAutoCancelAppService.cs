@@ -1,14 +1,8 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
 {
-    public interface IReserveAutoCancelAppService : IAppService<ReserveAutoCancel, long>
+    public interface IReserveAutoCancelAppService
     {
         DateTime? GetReserveExpireTime(long reserveId);
         void UpdateScheduledTime(long reserveId, int delayInMinute = 30);

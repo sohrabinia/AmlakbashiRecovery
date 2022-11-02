@@ -1,0 +1,67 @@
+﻿aside.admin-table-row .column-row {
+    width: 10%;
+}
+aside.admin-table-row .column-id {
+    width: 10%;
+}
+aside.admin-table-row .column-title {
+    width: 30%;
+}
+aside.admin-table-row .column-urltitle {
+    width: 30%;
+}
+aside.admin-table-row .column-operation {
+    width: 19%;
+}
+aside.admin-table-row .column-operation i {
+    font-size: 20px;
+    margin-left: 10px;
+    padding: 0;
+    cursor: pointer;
+}
+.add-tag-btn {
+    height: 30px;
+}
+.add-tag-operation{
+    text-align: center;
+    margin: 20px 0;
+}
+.add-tag-operation button{
+    margin-right: 10px;
+}
+
+@media (max-width: 960px) {
+    aside .admin-table-row .column-row {
+        width: 10%;
+    }
+    aside.admin-table-row .column-id {
+        width: 10%;
+    }
+    aside.admin-table-row .column-title {
+        width: 30%;
+    }
+    aside.admin-table-row .column-urltitle {
+        width: 30%;
+    }
+    aside.admin-table-row .column-operation {
+        width: 19%;
+    }
+}
+
+@media (max-width: 680px) {
+    aside .admin-table-row .column-row {
+        width: 15%;
+    }
+    aside.admin-table-row .column-id {
+        width: 15%;
+    }
+    aside.admin-table-row .column-title {
+        width: 40%;
+    }
+    aside.admin-table-row .column-urltitle{
+        display: none;
+    }
+    aside.admin-table-row .column-operation {
+        width: 29%;
+    }
+}

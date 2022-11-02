@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="~/Resource/css/dashboard/numberInput.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Resource/css/dashboard/acc-public-style-form.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Resource/css/dashboard/acc-extra-form.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Resource/css/dashboard/acc-extra-form-tag.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Resource/css/dashboard/admin-extra-admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Resource/css/dashboard/admin-complex-from.css" asp-append-version="true" />
 }
@@ -127,6 +128,10 @@
                     @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccRulesInput.cshtml", Model.rules)
                 </div>
             }
+            <div class="static-advertise advetise-form__part advertise-form__part-low">
+                <p class="static-advertise__title"><i class="fas fa-tag"></i>تگ ها</p>
+                @await Html.PartialAsync("~/Views/Accomodation/AddEditFormInputs/_AccTagsInput.cshtml", Model.tags)
+            </div>
             @if (Model.ownership != null)
             {
                 <div class="static-advertise advetise-form__part advertise-form__part-more">
@@ -152,6 +157,7 @@
 
 @section ScriptLink{
     <script src="~/Resource/Scripts/general/accommodation-edit-form.js" asp-append-version="true"></script>
+    <script src="~/Resource/Scripts/general/accommodation-search-tag.js" asp-append-version="true"></script>
     <script src="~/Resource/Scripts/dashboard/numberInput.js" asp-append-version="true"></script>
     <script src="~/Resource/Scripts/dashboard/acc-public-form.js" asp-append-version="true"></script>
 }

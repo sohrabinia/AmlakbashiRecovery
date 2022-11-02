@@ -307,7 +307,7 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize(Policy = Policies.Advertise_Edit)]
         [HttpPost]
-        public ActionResult AdminExtraForm(Advertise data, PoolInputDTO poolDTO, bool forceSave = false, int tab = 0)
+        public ActionResult AdminExtraForm(Advertise data, PoolInputDTO poolDTO, IList<int> tags, bool forceSave = false, int tab = 0)
         {
             try
             {
@@ -329,7 +329,7 @@ namespace Amlakbashi.Host.Controllers
                     uploadedLicenseFile = Request.Form.Files[0];
                 }
                 var director = advertiseService.SubmitAdminForm(data, out errors, out groupErrors, forceSave,
-                    DirectorType.Extra, userAccessor.CurrentUser.Id, out parentType, out status, uploadedLicenseFile);
+                    DirectorType.Extra, userAccessor.CurrentUser.Id, out parentType, out status, tags, uploadedLicenseFile);
                 if (forceSave == false && groupErrors.Any())
                 {
                     ModelState.Clear();
@@ -960,7 +960,8 @@ namespace Amlakbashi.Host.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult AccExtraForm(Advertise data, PoolInputDTO poolDTO, bool isEdit = false, int tab = 0)
+        public ActionResult AccExtraForm(Advertise data, PoolInputDTO poolDTO, IList<int> tags,
+            bool isEdit = false, int tab = 0)
         {
             try
             {
@@ -981,7 +982,7 @@ namespace Amlakbashi.Host.Controllers
                     uploadedLicenseFile = Request.Form.Files[0];
                 }
                 var director = advertiseService.SubmitExtraForm(data, out errors, out groupErrors,
-                    out level, uploadedLicenseFile, isEdit);
+                    out level, uploadedLicenseFile, tags, isEdit);
                 if (errors.Any())
                 {
                     ModelState.Clear();

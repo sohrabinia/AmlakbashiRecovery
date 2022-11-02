@@ -1,0 +1,29 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs.TagInputDTO
+
+<div class="static-advertise__item advertise-form__low-item">
+    <p class="static-advertise__label">عنوان تگ مورد نظر خود را بنویسید <small>(مثلا نزدیک حرم امام رضا)</small></p>
+    <input id="search_tag_input" class="changed-input-target" type="text" title="تگ ها" onpaste="searchTag()" onkeyup="searchTag()" onchange="searchTag()" autocomplete="false">
+</div>
+<div class="tag-search-result-popup">
+    <div class="tag-search-result-container">
+        <div class="tag-search-result-box">
+        </div>
+        <div class="tag-search-button-box">
+            <button type="button" onclick="addNewTag()">افزودن تگ</button>
+        </div>
+    </div>
+</div>
+<div class="selected-tag-container">
+    <select name="tags" multiple>
+        @foreach (var item in Model.TagsDic)
+        {
+            <option value="@item.Key" selected></option>
+        }
+    </select>
+    <div class="selected-tag-box">
+        @foreach (var item in Model.TagsDic)
+        {
+            <span data-tagid="@item.Key">@item.Value<i class="fa fa-times" onclick="deleteTag(@item.Key)"></i></span>
+        }
+    </div>
+</div>

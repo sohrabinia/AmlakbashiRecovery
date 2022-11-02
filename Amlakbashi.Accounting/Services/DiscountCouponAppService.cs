@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Accounting.Services
 {
-    internal class DiscountCouponAppService : AppServiceBase<DiscountCoupon, long>, IDiscountCouponAppService
+    internal class DiscountCouponAppService : BaseAppService<DiscountCoupon, long>, IDiscountCouponAppService
     {
         public DiscountCouponAppService(IRepository<DiscountCoupon, long> repository) : base(repository)
         {

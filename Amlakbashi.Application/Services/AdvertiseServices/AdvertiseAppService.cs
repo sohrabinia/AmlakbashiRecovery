@@ -37,10 +37,12 @@ using Amlakbashi.Application.DTOs;
 using System.Threading.Tasks;
 using static Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs.CheckSetOccupiedDTO;
 using static Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs.CheckUnsetOccupiedDTO;
+using Amlakbashi.Data.Repositories;
+using System.Security.Policy;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
-    internal class AdvertiseAppService : AppServiceBase<Advertise, long>, IAdvertiseAppService
+    internal class AdvertiseAppService : BaseAppService<Advertise, long>, IAdvertiseAppService
     {
         private readonly IPriceCalculator priceCalculator;
         private readonly IAdvertiseFilterHelper advertiseFilter;
@@ -1152,7 +1154,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public AdvertiseDirector SubmitExtraForm(Advertise data, out Dictionary<string, string> errors,
-            out List<string> groupErrors, out int level, IFormFile uploadedLicenseFile, bool isEdit = false)
+            out List<string> groupErrors, out int level, IFormFile uploadedLicenseFile,
+            IList<int> tagsId, bool isEdit = false)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
             var oldAcc = acc.ShallowCopy();
@@ -1203,6 +1206,19 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (licenseFileId != null)
             {
                 acc.LicenseFileId = licenseFileId;
+            }
+            if (tagsId.SequenceEqual(acc.Tags.Select(x => x.Id)) == false)
+            {
+                acc.Tags.Clear();
+                foreach (var item in tagsId)
+                {
+                    var tag = Repository.Find<Tag, int>(item);
+                    if (tag != null)
+                    {
+                        acc.Tags.Add(tag);
+                    }
+                }
+                hasImportantChange = true;
             }
             var prevStatus = acc.Status;
             if (isEdit)
@@ -1565,7 +1581,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
         public AdvertiseDirector SubmitAdminForm(Advertise data, out Dictionary<string, string> errors,
             out List<string> groupErrors, bool forceSave, DirectorType type, int currentUserId,
-            out AdvertiseType parentType, out AdvertiseStatus status, IFormFile uploadedLicenseFile = null)
+            out AdvertiseType parentType, out AdvertiseStatus status, IList<int> tagsId = null, IFormFile uploadedLicenseFile = null)
         {
             var acc = Repository.Find(data.Id);
             status = acc.Status;
@@ -1625,7 +1641,18 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 acc.LicenseFileId = licenseFileId;
             }
-
+            if (tagsId != null && tagsId.SequenceEqual(acc.Tags.Select(x => x.Id)) == false)
+            {
+                acc.Tags.Clear();
+                foreach (var item in tagsId)
+                {
+                    var tag = Repository.Find<Tag, int>(item);
+                    if (tag != null)
+                    {
+                        acc.Tags.Add(tag);
+                    }
+                }
+            }
             if (type == DirectorType.General || type == DirectorType.ComplexUnit)
             {
                 var removedPhotoIds = new List<long>();

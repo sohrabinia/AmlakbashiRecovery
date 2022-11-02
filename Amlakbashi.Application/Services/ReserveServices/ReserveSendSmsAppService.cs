@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
-    public class ReserveSendSmsAppService : AppServiceBase<ReserveSendSms, long>, IReserveSendSmsAppService
+    public class ReserveSendSmsAppService : BaseAppService<ReserveSendSms, long>, IReserveSendSmsAppService
     {
         public ReserveSendSmsAppService(IRepository<ReserveSendSms, long> repository) : base(repository)
         {

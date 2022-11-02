@@ -10,7 +10,7 @@ using Amlakbashi.Core.Common.Utilities;
 
 namespace Amlakbashi.Application.Services.BlogPostServices
 {
-    internal class BlogPostAppService : AppServiceBase<BlogPost, int>, IBlogPostAppService
+    internal class BlogPostAppService : BaseAppService<BlogPost, int>, IBlogPostAppService
     {
         public BlogPostAppService(IRepository<BlogPost, int> repository) : base(repository)
         {

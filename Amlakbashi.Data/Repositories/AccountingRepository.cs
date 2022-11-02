@@ -7,14 +7,14 @@ namespace Amlakbashi.Data.Repositories
 {
     public class AccountingRepository : IAccountingRepository
     {
-        private AmlakbashiDB _context;
+        private AmlakbashiDB context;
         private DbSet<User> userDbSet;
         private DbSet<BankCard> bankCardDbSet;
         private DbSet<Reserve> reserveDbSet;
 
         public AccountingRepository(AmlakbashiDB _context)
         {
-            this._context = _context;
+            this.context = _context;
             userDbSet = _context.Set<User>();
             bankCardDbSet = _context.Set<BankCard>();
             reserveDbSet = _context.Set<Reserve>();

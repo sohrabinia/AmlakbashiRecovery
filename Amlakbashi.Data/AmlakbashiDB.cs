@@ -47,6 +47,7 @@ namespace Amlakbashi.Data
         public DbSet<ReserveAutoCancel> ReserveAutoCancels{ get; set; }
         public DbSet<InstantReserveAutoCancel> InstantReserveAutoCancels{ get; set; }
         public DbSet<ReserveSendSms> ReserveSendSms{ get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
         private readonly IConfiguration configuration;
 
@@ -67,7 +68,6 @@ namespace Amlakbashi.Data
         {
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
-                //other automated configurations left out
                 if (typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))
                 {
                     entityType.AddSoftDeleteQueryFilter();
@@ -115,6 +115,24 @@ namespace Amlakbashi.Data
                         .WithMany()
                         .HasForeignKey("Advertise_Id")
                         .HasConstraintName("FK_FileAdvertises_Residences_Advertise_Id")
+                        .OnDelete(DeleteBehavior.Cascade));
+
+            modelBuilder.Entity<Advertise>()
+                .HasMany(p => p.Tags)
+                .WithMany(p => p.Residences)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ResidenceTags",
+                    j => j
+                        .HasOne<Tag>()
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .HasConstraintName("FK_ResidenceTags_Tags_TagId")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne<Advertise>()
+                        .WithMany()
+                        .HasForeignKey("ResidenceId")
+                        .HasConstraintName("FK_ResidenceTags_Residences_ResidenceId")
                         .OnDelete(DeleteBehavior.Cascade));
         }
     }

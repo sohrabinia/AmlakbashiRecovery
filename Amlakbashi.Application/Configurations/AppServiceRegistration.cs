@@ -48,16 +48,12 @@ namespace Amlakbashi.Application.Configurations
                 .As<IReserveSupportAppService>();
             builder.RegisterType<UserAppService>()
                 .As<IUserAppService>();
-            builder.RegisterType<UserFavoriteAppService>()
-                .As<IUserFavoriteAppService>();
             builder.RegisterType<RegionAppService>()
                 .As<IRegionAppService>();
             builder.RegisterType<DiscountTableAppService>()
                 .As<IDiscountTableAppService>();
             builder.RegisterType<PriceTableAppService>()
                 .As<IPriceTableAppService>();
-            builder.RegisterType<OccupiedTableAppService>()
-                .As<IOccupiedTableAppService>();
             builder.RegisterType<AdvertiseReportAppService>()
                 .As<IAdvertiseReportAppService>();
             builder.RegisterType<AdvertiseAppService>()
@@ -76,12 +72,12 @@ namespace Amlakbashi.Application.Configurations
                 .As<IChatAppService>();
             builder.RegisterType<ReserveAutoCancelAppService>()
                 .As<IReserveAutoCancelAppService>();
-            builder.RegisterType<InstantReserveAutoCancelAppService>()
-                .As<IInstantReserveAutoCancelAppService>();
             builder.RegisterType<ReserveSendSmsAppService>()
                 .As<IReserveSendSmsAppService>();
             builder.RegisterType<SettingAppService>()
                 .As<ISettingAppService>();
+            builder.RegisterType<TagAppService>()
+                .As<ITagAppService>();
         }
     }
 }

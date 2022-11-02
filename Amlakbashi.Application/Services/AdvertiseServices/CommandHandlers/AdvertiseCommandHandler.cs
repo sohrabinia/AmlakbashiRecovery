@@ -27,8 +27,6 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.CommandHandlers
         IRequestHandler<UpdateAccTidinessRatingCommand>,
         IRequestHandler<UpdateAdvertiseOccupiedCommand>,
         IRequestHandler<InsertExtrinsicReserveCommand>,
-        //IRequestHandler<UpdateInstantReserveStatusCommand>,
-        //IRequestHandler<IncreaseInstantReserveCancelCommand>,
         IRequestHandler<SetExtrinsicReserveForWaitForResponseCommand>,
         IRequestHandler<InsertExtrinsicReserveByDateListCommand>,
         IRequestHandler<RemoveCategoryItemCacheCommand>,

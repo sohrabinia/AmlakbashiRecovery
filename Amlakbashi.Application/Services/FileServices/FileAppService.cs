@@ -20,7 +20,7 @@ using log4net;
 
 namespace Amlakbashi.Application.Services.FileServices
 {
-    internal class FileAppService : AppServiceBase<File, long>, IFileAppService
+    internal class FileAppService : BaseAppService<File, long>, IFileAppService
     {
         private readonly IMediator mediator;
         private readonly IWebHostEnvironment webHostEnvironment;

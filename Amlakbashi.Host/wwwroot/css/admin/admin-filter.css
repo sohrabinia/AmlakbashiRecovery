@@ -53,7 +53,7 @@
 .admin-filter-container .box-filter {
   width: 100%;
   display: flex;
-  flex-flow: row-reverse wrap;
+  flex-flow: row wrap;
   align-items: center;
   justify-content: space-between;
   font: 12px Miransans;

@@ -1,0 +1,12 @@
+﻿@model IEnumerable<Tag>
+
+@if (Model is null || Model.Any() == false)
+{
+    <p>موردی یافت نشد</p>
+}
+else{
+    foreach (var item in Model)
+    {
+        <p onclick="selectTag(@item.Id, '@item.Title')" data-tagid="@item.Id">@item.Title</p>
+    }
+}

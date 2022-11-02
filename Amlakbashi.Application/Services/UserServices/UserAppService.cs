@@ -32,7 +32,7 @@ using Amlakbashi.Core.Services.Interfaces;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
-    internal class UserAppService : AppServiceBase<User, int>, Interfaces.IUserAppService
+    internal class UserAppService : BaseAppService<User, int>, Interfaces.IUserAppService
     {
         private readonly IMediator mediator;
         private readonly IUserContactFacade userContact;

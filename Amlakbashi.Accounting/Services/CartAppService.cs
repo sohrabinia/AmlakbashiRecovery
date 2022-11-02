@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Accounting.Services
 {
-    internal class CartAppService : AppServiceBase<Cart, long>, ICartAppService
+    internal class CartAppService : BaseAppService<Cart, long>, ICartAppService
     {
         public CartAppService(IRepository<Cart, long> repository) : base(repository)
         {

@@ -1,18 +1,15 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Entities;
+﻿using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Amlakbashi.Core.Entities.Advertise;
-using static Amlakbashi.Core.Entities.Region;
 
 namespace Amlakbashi.Application.Services.Category.Interfaces
 {
-    public interface ICategoryAppService : IAppService<DynamicCategory, int>
+    public interface ICategoryAppService
     {
-        IList<DynamicCategory> Filter(AdvertiseType Type, int Province, int City, int Area, string sort, string query);
+        IList<DynamicCategory> Filter(Advertise.AdvertiseType Type, int Province, int City, int Area, string sort, string query);
         IQueryable<Advertise> GetFilteredAdvertises(int categoryId,
           int area = 0,
           string frompaypernight = null, string topaypernight = null,
@@ -26,7 +23,7 @@ namespace Amlakbashi.Application.Services.Category.Interfaces
           string discount_homes = null,
           string instant_reserve = null,
           int priorType = -1,
-          priceRangeTypes priceRangeType = priceRangeTypes.Daily,
+          Advertise.priceRangeTypes priceRangeType = Advertise.priceRangeTypes.Daily,
           int wcType = -1,
           bool wifi = false,
           bool washingMachine = false,
@@ -52,22 +49,22 @@ namespace Amlakbashi.Application.Services.Category.Interfaces
         IList<DynamicCategory> GetAreasForXML(bool old);
         DynamicCategory GetByUrl(string url);
         DynamicCategory Find(int id);
-        DynamicCategory Find(AdvertiseType type, CountryDirection countryDirection, int province, int city, int area);
-        DynamicCategory GetByProvinceCity(AdvertiseType type, int province, int city);
-        DynamicCategory GetForItemAction(int regionType, AdvertiseType type,
-            CountryDirection countryDirection = CountryDirection.Unset,
+        DynamicCategory Find(Advertise.AdvertiseType type, Region.CountryDirection countryDirection, int province, int city, int area);
+        DynamicCategory GetByProvinceCity(Advertise.AdvertiseType type, int province, int city);
+        DynamicCategory GetForItemAction(int regionType, Advertise.AdvertiseType type,
+            Region.CountryDirection countryDirection = Region.CountryDirection.Unset,
             int province = 0, int city = 0, int area = 0);
-        DynamicCategory GetByRegion(int regionId, AdvertiseType type, out bool isArea);
+        DynamicCategory GetByRegion(int regionId, Advertise.AdvertiseType type, out bool isArea);
         int GetAdvertiseCount(int regionId, Region.AdvertiseRegion type);
-        DynamicCategory GetCategoryByCountryDirectionOrRegion(AdvertiseType type, CountryDirection countryDirection,
+        DynamicCategory GetCategoryByCountryDirectionOrRegion(Advertise.AdvertiseType type, Region.CountryDirection countryDirection,
             int regionId, Region.AdvertiseRegion regionType);
         List<DynamicCategory> GetAccItemLinks(int? province,
-            int? city, int? area, AdvertiseType Type = AdvertiseType.None);
+            int? city, int? area, Advertise.AdvertiseType Type = Advertise.AdvertiseType.None);
         void Insert(DynamicCategory newCategory);
         void Update(DynamicCategory editedCategory);
         void UpdateVisited(int id);
         void Delete(int id);
-        IList<DynamicCategory> GetLinks(AdvertiseType Type = AdvertiseType.None, int City = -1, int Area = -1, int count = 20);
+        IList<DynamicCategory> GetLinks(Advertise.AdvertiseType Type = Advertise.AdvertiseType.None, int City = -1, int Area = -1, int count = 20);
         IList<DynamicCategory> GetRelatedCategories(int id, int[] relatedRegionIds, int found_count, int count = 6);
         IList<DynamicCategory> GetListByIds(IList<int> ids);
     }

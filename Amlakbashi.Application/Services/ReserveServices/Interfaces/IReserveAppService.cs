@@ -1,12 +1,7 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Entities;
+﻿using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Amlakbashi.Core.DTOs.ReserveDTOs;
-using static Amlakbashi.Core.Entities.ActionLog;
-using static Amlakbashi.Core.Entities.Reserve;
-using static Amlakbashi.Core.Entities.ReservePayment;
 using Amlakbashi.Core.DTOs.WebService.Responses.Reserves;
 using Amlakbashi.Core.DTOs.WebService.Requests.Reserves;
 using System.Threading.Tasks;
@@ -14,7 +9,7 @@ using Amlakbashi.Application.DTOs;
 
 namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
 {
-    public interface IReserveAppService : IAppService<Reserve, long>
+    public interface IReserveAppService
     {
         IList<Reserve> Filter(ReserveIndexDTO dto, int currentUserId);
         ReserveListResponse Filter(ReserveGetListRequest request);
@@ -31,29 +26,29 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         Reserve GetRelatedReserveByUser(int userId, out bool isHost);
         ServiceResult<bool> Validate(ReservePostRequest request);
         Task<ServiceResult<long>> SubmitAsync(ReservePostRequest request);
-        bool UpdateNew(ReserveIndexEditDTO dto, out string msg, int doerUserId, ActionSourceEnum actionSource);
-        void SetStatus(long reserveId, ReserveStatus status, bool sendSms,
+        bool UpdateNew(ReserveIndexEditDTO dto, out string msg, int doerUserId, ActionLog.ActionSourceEnum actionSource);
+        void SetStatus(long reserveId, Reserve.ReserveStatus status, bool sendSms,
             ActionLog.ActionSourceEnum actionSource, int doerUserId, bool force = false);
-        bool SetHostResponse(long reserveId, HostResponseEnum response,
+        bool SetHostResponse(long reserveId, Reserve.HostResponseEnum response,
             bool sendSms, ActionLog.ActionSourceEnum actionSource, int doerUserId, bool force = false);
         bool CashPay(long reserveId, out string msg,
-            int userId, ActionSourceEnum actionSource, int doerUserId);
+            int userId, ActionLog.ActionSourceEnum actionSource, int doerUserId);
         bool ConfirmCashPay(long reserveId, bool paid, out string msg,
-            int userId, ActionSourceEnum actionSource, int doerUserId);
+            int userId, ActionLog.ActionSourceEnum actionSource, int doerUserId);
         void CancelReserve(User user, long reserve_id, int cancel_reason_code,
             string cancel_reason_string, bool is_host, out string msg,
-            out bool isPending, ActionSourceEnum actionSource, int doerUserId);
+            out bool isPending, ActionLog.ActionSourceEnum actionSource, int doerUserId);
         ServiceResult<ReserveCancelationLossDTO> GetCancelationInfo(ReservePostCancelRequest request);
         Task<ServiceResult> CancelAsync(ReservePostCancelRequest request);
         void RefuseCancelReserve(User user, long reserve_id, bool is_host, out string msg,
-            ActionSourceEnum actionLog, int doerUserId);
+            ActionLog.ActionSourceEnum actionLog, int doerUserId);
         void UpdateShouldFollow(long id, string text, User user);
         void UpdateSupporterInfo(long id, string text, User user);
         void UpdateRatingShownToGuest(long id, bool showRate);
         void UpdatePaymentGTAGRegistered(long id, bool value);
         int UpdateCallState(long id, string hostOrGuest);
         bool StartStay(long reserveId, int user_id, out string msg,
-            ActionSourceEnum actionSource, int doerUserId);
+            ActionLog.ActionSourceEnum actionSource, int doerUserId);
         Task<ServiceResult> StartAsync(ReservePostStartRequest request);
         void UpdateAccVisitedByGuest(long id, bool value);
         void UpdateDisableAutoCancel(long id, bool value);
@@ -63,18 +58,18 @@ namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
         void UpdateCanselDiscussion(long id, string text, User user);
         bool UserHasRefundInProgress(int userId);
         bool CanReserveStarted(long reserveId, out DateTime canStartTime);
-        bool FinishStay(long reserveId, int userId, out string msg, ActionSourceEnum actionSource,
+        bool FinishStay(long reserveId, int userId, out string msg, ActionLog.ActionSourceEnum actionSource,
             int doerUserId, bool sendSms = true);
-        ReserveStatus FinalizeReserve(long reserveId, long transactionId,
-            long paidAmount, ReservePaymentMethod paymentMethod,
-            ActionSourceEnum actionSource, int doerUserId,
+        Reserve.ReserveStatus FinalizeReserve(long reserveId, long transactionId,
+            long paidAmount, ReservePayment.ReservePaymentMethod paymentMethod,
+            ActionLog.ActionSourceEnum actionSource, int doerUserId,
             int payerUserId = -1, long couponId = 0, long prizePrice = 0,
             bool sendSms = true);
         bool SystemCancelReserve(long reserveId);
         IList<Reserve> GetReserveDashboardItems(
-            User currentUser, ReserveManagerSelectType selectType,
+            User currentUser, Reserve.ReserveManagerSelectType selectType,
             int category, string reserve_id, int status,
-            out Dictionary<ReserveCategory, int> countDict);
+            out Dictionary<Reserve.ReserveCategory, int> countDict);
         VoucherDTO GenerateVoucher(long reserveId, int currentUserId);
         ReserveInvoiceResponse GetInvoice(long reserveId, int currentUserId);
         void SendReserveRequestCall(long reserveId);

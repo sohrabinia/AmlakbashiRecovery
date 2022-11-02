@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
-    public class ReserveAutoCancelAppService : AppServiceBase<ReserveAutoCancel, long>, IReserveAutoCancelAppService
+    public class ReserveAutoCancelAppService : BaseAppService<ReserveAutoCancel, long>, IReserveAutoCancelAppService
     {
         public ReserveAutoCancelAppService(IRepository<ReserveAutoCancel, long> repository) : base(repository)
         {

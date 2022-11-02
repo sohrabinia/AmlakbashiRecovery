@@ -1,18 +1,11 @@
-﻿using Amlakbashi.Core.Common.Repository;
-using Amlakbashi.Core.Entities;
-using System;
-using ServiceStack;
-using ServiceStack.Text;
-using ServiceStack.Redis;
-using ServiceStack.DataAnnotations;
+﻿using Amlakbashi.Core.Entities;
 
 namespace Amlakbashi.Data.Repositories
 {
     public class BlogPostRepository : GenericRepository<BlogPost, int>
     {
-        public BlogPostRepository(AmlakbashiDB _context) : base(_context)
+        public BlogPostRepository(AmlakbashiDB context) : base(context)
         {
-
         }
     }
 }

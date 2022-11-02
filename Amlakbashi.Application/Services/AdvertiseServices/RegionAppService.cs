@@ -11,7 +11,7 @@ using Amlakbashi.Core.DTOs.WebService.Responses.Regions;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
-    internal class RegionAppService : AppServiceBase<Region, int>, IRegionAppService
+    internal class RegionAppService : BaseAppService<Region, int>, IRegionAppService
     {
         public RegionAppService(IRepository<Region, int> repository) : base(repository)
         {

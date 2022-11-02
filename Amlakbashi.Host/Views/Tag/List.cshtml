@@ -1,0 +1,84 @@
+﻿@model Amlakbashi.Core.DTOs.TagDTOs.TagListDTO
+
+@{
+    ViewBag.Title = "مدیریت تگ ها";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section StyleLink
+    {
+    <environment include="Development">
+        <link rel="stylesheet" href="/css/admin/tag/list.css" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="/css/min/admin-tag.min.css" asp-append-version="true">
+    </environment>
+}
+
+@if (Model == null)
+{
+    <p>عملیات با خطا مواجه شد</p>
+}
+else
+{
+    <div class="admin-top-pin-container">
+        <div class="admin-filter-container">
+            <div class="box-filter">
+                <div class="bar-filter quick-filter">
+                    <span><i class="fas fa-filter"></i>فیلتر :</span>
+                    <input class="input-stlye" type="text" value="@Model.title" name="title" placeholder="عنوان">
+                    <button class="fas fa-angle-double-left submit-btn"></button>
+                </div>
+                <button class="btn add-tag-btn" onclick="showAddTagPopup()"><i class="fa fa-plus"></i> افزودن تگ جدید</button>
+            </div>
+        </div>
+        <aside class="admin-table-row admin-table-row-header">
+            <p class="column-row">ردیف</p>
+            <p class="column-id">شناسه</p>
+            <p class="column-title">عنوان</p>
+            <p class="column-urltitle">عنوان url</p>
+            <p class="column-operation">عملیات</p>
+        </aside>
+    </div>
+
+    <div class="admin-table">
+        @await Html.PartialAsync("_ListTable", Model.pagedList)
+
+        @if (Model.pagedList.List.Any() != false)
+        {
+            <section action="list" paging-info="@Model.pagedList.PagingInfo" parameters="new
+             {
+                 title = Model.title
+             }"></section>
+        }
+    </div>
+
+    <div class="more-filter-container">
+        <div class="more-filter-content">
+            <form id="more_filter_form" class="more-filter-form" asp-controller="tag" asp-action="list" method="get">
+                <div class="options-filter-box">
+                    <div class="more-filter-row">
+                        <div class="item-filter-box">
+                            <label class="title-filter">عنوان</label>
+                            <input class="input-stlye" type="text" value="@Model.title" name="title">
+                        </div>
+                    </div>
+                </div>
+                <div class="button-box">
+                    <button type="button" class="button-exit">بستن</button>
+                    <button type="submit" class="button-filter">فیلتر</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section ScriptLink
+{
+    <environment include="Development">
+        <script src="/js/admin/tag/list.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/js/min/admin-tag.min.js" asp-append-version="true"></script>
+    </environment>
+}

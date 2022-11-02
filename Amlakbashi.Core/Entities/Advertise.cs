@@ -208,14 +208,12 @@ namespace Amlakbashi.Core.Entities
         [JsonIgnore]
         public virtual ICollection<InstantReserveDate> InstantReserveDates { get; set; } = new List<InstantReserveDate>();
 
+        [JsonIgnore]
+        public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
         #endregion
 
         #region Functions
-
-        public Advertise ShallowCopy()
-        {
-            return (Advertise)this.MemberwiseClone();
-        }
 
         [NotMapped]
         [JsonIgnore]
@@ -223,7 +221,7 @@ namespace Amlakbashi.Core.Entities
         {
             get
             {
-                return (AdvertiseStatus)Status == AdvertiseStatus.Published
+                return Status == AdvertiseStatus.Published
                     && Active == true && HideInSearch == false;
             }
         }
@@ -269,6 +267,8 @@ namespace Amlakbashi.Core.Entities
                 };
             }
         }
+
+        public Advertise ShallowCopy() => (Advertise)this.MemberwiseClone();
 
         public void SetNotVerifyReasons(IList<NotVerifyReasonsEnum> list)
         {

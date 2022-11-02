@@ -46,8 +46,6 @@ namespace Amlakbashi.Host.Controllers
         private readonly IChatAppService chatService;
         private readonly IAccountingFacade accounting;
         private readonly IReserveAppService reserveService;
-        private readonly IOccupiedTableAppService occupiedTableService;
-        private readonly IInstantReserveAutoCancelAppService instantReserveAutoCancelService;
         private readonly IUserContactFacade userContact;
         private readonly IReserveSupportManager reserveSupportManager;
         private readonly IReserveAutoCancelAppService reserveAutoCancelService;
@@ -66,8 +64,6 @@ namespace Amlakbashi.Host.Controllers
             IUserContactFacade userContact,
             IReserveSupportManager reserveSupportManager,
             IReserveAppService reserveService,
-            IOccupiedTableAppService occupiedTableService,
-            IInstantReserveAutoCancelAppService instantReserveAutoCancelService,
             IReserveAutoCancelAppService reserveAutoCancelService,
             IUserAccessor userAccessor,
             IReserveAdminHubServer reserveAdminHubServer,
@@ -83,9 +79,7 @@ namespace Amlakbashi.Host.Controllers
             this.userService = userService;
             this.chatService = chatService;
             this.reserveService = reserveService;
-            this.occupiedTableService = occupiedTableService;
             this.reserveAutoCancelService = reserveAutoCancelService;
-            this.instantReserveAutoCancelService = instantReserveAutoCancelService;
             this.userContact = userContact;
             this.reserveSupportManager = reserveSupportManager;
             this.logger = logger;

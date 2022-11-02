@@ -1,14 +1,9 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Entities;
-using System;
+﻿using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.SupportChatServices.Interfaces
 {
-    public interface ISupportChatAppService : IAppService<SupportChat, long>
+    public interface ISupportChatAppService
     {
         IList<SupportChat> GetLastItems(int count, int currentItemCount = 0);
         SupportChat Find(long id);

@@ -23,6 +23,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
         public RulesInputDTO rules { get; set; }
         public OwnershipInputDTO ownership { get; set; }
         public LicenseInputDTO license { get; set; }
+        public TagInputDTO tags { get; set; }
         public AdvertiseMode advertiseMode { get; set; }
 
         public static ExtraFormDTO Generate(AdvertiseDirector director, long id)
@@ -45,6 +46,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             model.rules = director.GetAdvertisePart<RulesPart>();
             model.elevator = director.GetAdvertisePart<ElevatorPart>();
             model.license = director.GetAdvertisePart<LicensePart>();
+            model.tags = director.GetAdvertisePart<TagPart>();
             return model;
         }
     }

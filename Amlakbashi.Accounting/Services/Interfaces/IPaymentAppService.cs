@@ -1,5 +1,4 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Common.Enums;
+﻿using Amlakbashi.Core.Common.Enums;
 using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,7 +6,7 @@ using System.Linq;
 
 namespace Amlakbashi.Accounting.Services.Interfaces
 {
-    internal interface IPaymentAppService : IAppService<Payment, int>
+    internal interface IPaymentAppService
     {
         IList<Payment> Filter(long referenceNumber, int status, int userId,
             long reserveId, DateTime fromDate, DateTime toDate, BankEnum bank, int type);

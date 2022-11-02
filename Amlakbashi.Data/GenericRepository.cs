@@ -11,56 +11,13 @@ namespace Amlakbashi.Data
 {
     public class GenericRepository<T, K> : IRepository<T, K> where T : Entity<K>
     {
-        private AmlakbashiDB _context = null;
+        private AmlakbashiDB context = null;
         private DbSet<T> dbSet = null;
 
-        public GenericRepository(AmlakbashiDB _context)
+        public GenericRepository(AmlakbashiDB context)
         {
-            this._context = _context;
-            dbSet = _context.Set<T>();
-        }
-
-        public void Insert(T obj)
-        {
-            dbSet.Add(obj);
-        }
-
-        public void Insert(IEnumerable<T> entities)
-        {
-            dbSet.AddRange(entities);
-        }
-
-        public void Update(T obj)
-        {
-            dbSet.Attach(obj);
-            _context.Entry(obj).State = EntityState.Modified;
-        }
-
-        public void Attach(T obj)
-        {
-            dbSet.Attach(obj);
-        }
-
-        public void Delete(K id)
-        {
-            T existing = dbSet.Find(id);
-            dbSet.Remove(existing);
-        }
-
-        public void Delete(Expression<Func<T, bool>> query)
-        {
-            var data = dbSet.Where(query);
-            dbSet.RemoveRange(data);
-        }
-
-        public void Save()
-        {
-            _context.SaveChanges();
-        }
-
-        public R Query<R>(Func<IQueryable<T>, R> query)
-        {
-            return query(dbSet);
+            this.context = context;
+            dbSet = context.Set<T>();
         }
 
         public T Find(K id)
@@ -75,18 +32,82 @@ namespace Amlakbashi.Data
 
         public TEntity Find<TEntity, TKey>(TKey id) where TEntity : Entity<TKey>, new()
         {
-            return _context.Set<TEntity>().Find(id);
+            return context.Set<TEntity>().Find(id);
         }
 
         public void Reload(T entity)
         {
-            _context.Entry(entity).Reload();
+            context.Entry(entity).Reload();
+        }
+
+        public async Task ReloadAsync(T entity)
+        {
+            await context.Entry(entity).ReloadAsync();
+        }
+
+        public R Query<R>(Func<IQueryable<T>, R> query)
+        {
+            return query(dbSet);
         }
 
         public IQueryable<TEntity> Query<TEntity, TKey>(Func<IQueryable<TEntity>, IQueryable<TEntity>> query) where TEntity : Entity<TKey>
         {
-            var childrenDbSet = _context.Set<TEntity>();
+            var childrenDbSet = context.Set<TEntity>();
             return query(childrenDbSet);
+        }
+
+        public void Insert(T obj)
+        {
+            dbSet.Add(obj);
+        }
+
+        public async Task InsertAsync(T obj)
+        {
+            await dbSet.AddAsync(obj);
+        }
+
+        public void Insert(IEnumerable<T> entities)
+        {
+            dbSet.AddRange(entities);
+        }
+
+        public async Task InsertAsync(IEnumerable<T> entities)
+        {
+            await dbSet.AddRangeAsync(entities);
+        }
+
+        public void Update(T obj)
+        {
+            dbSet.Attach(obj);
+            context.Entry(obj).State = EntityState.Modified;
+        }
+
+        public void Delete(K id)
+        {
+            T existing = dbSet.Find(id);
+            dbSet.Remove(existing);
+        }
+
+        public async Task DeleteAsync(K id)
+        {
+            T existing = await dbSet.FindAsync(id);
+            dbSet.Remove(existing);
+        }
+
+        public void Delete(Expression<Func<T, bool>> query)
+        {
+            var data = dbSet.Where(query);
+            dbSet.RemoveRange(data);
+        }
+
+        public void Save()
+        {
+            context.SaveChanges();
+        }
+
+        public async Task SaveAsync()
+        {
+            await context.SaveChangesAsync();
         }
 
         public void RemoveChildren<TChild, TChildKey, R>(K id, string collectionName,Func<IEnumerable<TChild>, R> query) where TChild : Entity<TChildKey>, new()
@@ -95,7 +116,7 @@ namespace Amlakbashi.Data
             var childrenCollection = (typeof(T).GetProperty(collectionName)
                 .GetValue(parent) as ICollection<TChild>);
             var children = query(childrenCollection) as IQueryable<TChild>;
-            var childDbSet = _context.Set<TChild>();
+            var childDbSet = context.Set<TChild>();
             foreach (var child in children.ToList())
             {
                 childDbSet.Remove(child);
