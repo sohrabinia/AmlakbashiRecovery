@@ -4,8 +4,10 @@ using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Common.Extensions;
 using Amlakbashi.Core.Common.Repository;
 using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.DTOs.AccommodationDTOs;
 using Amlakbashi.Core.DTOs.TagDTOs;
 using Amlakbashi.Core.Entities;
+using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -46,12 +48,37 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 .ToPagedListAsync(dto.page, dto.pageItemCount);
         }
 
-        public async Task<IList<Tag>> GetListAsync(string title)
+        public async Task<IList<Tag>> GetListAsync(string title = null, 
+            Tag.TagStatusEnum? status = null)
         {
-            return await Repository.Query(q => q.Where(x => x.Title.Contains(title))).ToListAsync();
+            var tags = Repository.Query(q => q);
+            if (string.IsNullOrEmpty(title) == false)
+            {
+                tags = tags.Where(x => x.Title.Contains(title));
+            }
+            if (status.HasValue)
+            {
+                tags = tags.Where(x => x.Status == status.Value);
+            }
+            return await tags.ToListAsync();
         }
 
-        public async Task<ServiceResult<Tag>> AddAsync(string title,
+        public async Task<ServiceResult> GetTagResidences(TagResidencesDTO dto)
+        {
+            var serviceResult = new ServiceResult();
+            var tag = await FindAsync(dto.title);
+            if (tag is null || tag.Status != Tag.TagStatusEnum.Active)
+            {
+                serviceResult.AddError("تگ مورد نظر یافت نشد");
+                return serviceResult;
+            }
+            dto.pagedList = tag.Residences.Where(x=>x.Status == Advertise.AdvertiseStatus.Published)
+                .Select(x => (AccommodationCardDTO)x)
+                .ToPagedList(dto.page, dto.pageItemCount);
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult<Tag>> AddByAdminAsync(string title,
             Tag.TagStatusEnum status = Tag.TagStatusEnum.Unset)
         {
             var serviceResult = new ServiceResult<Tag>();
@@ -67,8 +94,39 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 serviceResult.AddError("عنوان وارد شده تکراری است");
                 return serviceResult;
             }
+            serviceResult.Result = await AddAsync(title, status);
+            return serviceResult;
+        }
 
-            tag = new Tag()
+        public async Task<ServiceResult<Tag>> AddByUserAsync(long residenceId, string title)
+        {
+            var serviceResult = new ServiceResult<Tag>();
+            if (StringUtility.VerifyTagTitle(title) == false)
+            {
+                serviceResult.AddError("عنوان وارد شده اشتباه است");
+                return serviceResult;
+            }
+            var residence = Repository.Find<Advertise, long>(residenceId);
+            if (residence == null)
+            {
+                serviceResult.AddError("اقامتگاه یافت نشد");
+                return serviceResult;
+            }
+            title = title.Trim();
+            title = $"{AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(residence.TypeID)} {title} در {residence.RegionCity.PersianName}";
+            var tag = await FindAsync(title);
+            if (tag != null)
+            {
+                serviceResult.AddError("عنوان وارد شده تکراری است");
+                return serviceResult;
+            }
+            serviceResult.Result = await AddAsync(title);
+            return serviceResult;
+        }
+
+        private async Task<Tag> AddAsync(string title, Tag.TagStatusEnum status = Tag.TagStatusEnum.Unset)
+        {
+            var tag = new Tag()
             {
                 Title = title,
                 Status = status,
@@ -76,8 +134,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             };
             await Repository.InsertAsync(tag);
             await Repository.SaveAsync();
-            serviceResult.Result = tag;
-            return serviceResult;
+            return tag;
         }
 
         public async Task<ServiceResult> UpdateStatusAsync(int id, Tag.TagStatusEnum status)

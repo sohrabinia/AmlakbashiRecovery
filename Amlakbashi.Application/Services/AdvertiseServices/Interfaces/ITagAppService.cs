@@ -10,9 +10,13 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
 {
     public interface ITagAppService
     {
+        Task<Tag> FindAsync(string title);
         Task GetListAsync(TagListDTO dto);
-        Task<IList<Tag>> GetListAsync(string title);
-        Task<ServiceResult<Tag>> AddAsync(string title, Tag.TagStatusEnum status = Tag.TagStatusEnum.Unset);
+        Task<IList<Tag>> GetListAsync(string title = null, Tag.TagStatusEnum? status = null);
+        Task<ServiceResult> GetTagResidences(TagResidencesDTO dto);
+        Task<ServiceResult<Tag>> AddByAdminAsync(string title, 
+            Tag.TagStatusEnum status = Tag.TagStatusEnum.Unset);
+        Task<ServiceResult<Tag>> AddByUserAsync(long residenceId, string title);
         Task<ServiceResult> UpdateStatusAsync(int id, Tag.TagStatusEnum status);
         Task<ServiceResult> UpdateTitleAsync(int id, string newTitle);
         Task<ServiceResult> DeleteAsync(int id);

@@ -1,0 +1,17 @@
+﻿@using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
+
+@model AccommodationItemDTO
+
+<div class="advertise-page__description-container">
+    <div class="advertise-page__related-link-header">
+        <p><i class="fas fa-tag"></i>برچسب ها</p>
+    </div>
+    <div class="advertise-page__related-links-container">
+        @foreach (var item in Model.Tags.TagsDic)
+        {
+            <a title="@item.Value" asp-controller="tag" asp-action="getresidences" asp-route-urltitle="@(Amlakbashi.Core.Common.Utilities.StringUtility.GetTagUrlTitle(item.Value))" target="_blank">
+                @item.Value
+            </a>
+        }
+    </div>
+</div>

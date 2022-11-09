@@ -3,14 +3,18 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConfigurations
 {
-    public class AdminControllerRoutes
+    public class TagControllerRoutes
     {
         public static void Config(IEndpointRouteBuilder endpointRouteBuilder)
         {
             endpointRouteBuilder.MapControllerRoute(
-                "Admin",
-                "admin",
-                new { controller = "Admin", action = "Home" }
+                "تگ",
+                "residences/tag/{urlTitle}",
+                new
+                {
+                    controller = "Tag",
+                    action = "GetResidences"
+                }
             );
         }
     }

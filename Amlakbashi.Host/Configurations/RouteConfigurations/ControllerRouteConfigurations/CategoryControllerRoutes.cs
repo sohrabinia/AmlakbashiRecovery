@@ -11,7 +11,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
             endpointRouteBuilder.MapControllerRoute(
               "RSS", "rss",
                new { controller = "XML", action = "RSS" }
-               //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
                );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -23,7 +22,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     action = "Item",
                     regionType = -2,
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -35,7 +33,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     action = "Item",
                     regionType = -2,
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -47,7 +44,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     action = "Item",
                     regionType = -2,
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
 
@@ -60,7 +56,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     action = "Item",
                     regionType = -2,
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -73,7 +68,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     regionType = -1,
                     countryDirection = 1
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -86,7 +80,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     regionType = -1,
                     countryDirection = 1
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -98,7 +91,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     action = "Item",
                     regionType = 0,
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -110,70 +102,62 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     action = "Item",
                     regionType = 0,
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
                 "نقشه-سایت",
                 "نقشه-سایت/{city}/{TradeID}",
                 new { controller = "Category", action = "SiteMap", city = 0, TradeId = 0 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
                 "سوالات-متداول",
                 "سوالات-متداول",
                 new { controller = "Post", action = "FrequentlyQuestions" }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
                 );
 
             endpointRouteBuilder.MapControllerRoute(
                 "درباره-ما",
                 "درباره-ما",
                 new { controller = "post", action = "public", sid = 4 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
                 );
 
             endpointRouteBuilder.MapControllerRoute(
                 "سوالات-متداول-amp",
                 "amp/سوالات-متداول",
                 new { controller = "Post", action = "FrequentlyQuestions", amp_version = true }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
                 );
 
             endpointRouteBuilder.MapControllerRoute(
                 "download-app-amp",
                 "amp/downloadapp",
                 new { controller = "Post", action = "DownloadApp", amp_version = true }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
                 );
 
             endpointRouteBuilder.MapControllerRoute(
                 "اخبار-و-مقالات",
                 "اخبار-و-مقالات/{title}-{id}",
                 defaults: new { controller = "post", action = "newsitem" },
-                constraints: new { id = new PostNewsConstraint()/*, subdomain = new SubdomainRouteConstraint("www")*/ }
+                constraints: new { id = new PostNewsConstraint()}
             );
 
             endpointRouteBuilder.MapControllerRoute(
                 "اخبار-و-مقالات-amp",
                 "amp/اخبار-و-مقالات/{title}-{id}",
                 defaults: new { controller = "post", action = "newsitem", amp_version = true },
-                constraints: new { id = new PostNewsConstraint()/*, subdomain = new SubdomainRouteConstraint("www")*/ }
+                constraints: new { id = new PostNewsConstraint()}
             );
 
             endpointRouteBuilder.MapControllerRoute(
                 "اخبار-و-مقالات-لیست",
                 "اخبار-و-مقالات",
                 new { controller = "post", action = "news" }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
                 "اخبار-و-مقالات-لیست-amp",
                 "amp/اخبار-و-مقالات",
                 new { controller = "post", action = "news", amp_version = true }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -185,7 +169,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     action = "Page",
                     amp_version = true
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -197,7 +180,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     action = "DownloadApp",
                     fromApp = true
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
         }
     }

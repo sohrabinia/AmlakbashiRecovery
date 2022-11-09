@@ -275,7 +275,7 @@ function sendAjaxRequest(url, data, type, successCallback, beforeSendCallback, c
             }
             else {
                 if (response) {
-                    if (response.status) {
+                    if (response.status !== undefined) {
                         if (response.status === 1) {
                             successAlert('عملیات با موفقیت انجام شد');
                         }
@@ -293,7 +293,6 @@ function sendAjaxRequest(url, data, type, successCallback, beforeSendCallback, c
             }
         },
         error: function (error) {
-            debugger;
             if (error.status === 401) {
                 errorAlert('شما مجوز دسترسی به این قسمت را ندارید');
             }

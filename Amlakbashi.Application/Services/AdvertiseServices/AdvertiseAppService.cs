@@ -2612,6 +2612,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             Repository.Update(residence);
             Repository.Save();
             await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            await mediator.Send(new RemoveCategoryItemCacheCommand(residence.Id));
         }
 
         private async Task<Advertise.AdvertiseStatus> UpdateStatusAsync(long residenceId, Advertise.AdvertiseStatus status)

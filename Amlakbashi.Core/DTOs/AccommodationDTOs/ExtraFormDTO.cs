@@ -47,6 +47,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             model.elevator = director.GetAdvertisePart<ElevatorPart>();
             model.license = director.GetAdvertisePart<LicensePart>();
             model.tags = director.GetAdvertisePart<TagPart>();
+            model.tags.residenceId = id;
             return model;
         }
     }

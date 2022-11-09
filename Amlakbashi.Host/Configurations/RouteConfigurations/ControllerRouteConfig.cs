@@ -13,6 +13,7 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations
             AdminControllerRoutes.Config(endpointRouteBuilder);
             AdvertiseControllerRoutes.Config(endpointRouteBuilder);
             CategoryControllerRoutes.Config(endpointRouteBuilder);
+            TagControllerRoutes.Config(endpointRouteBuilder);
             FileControllerRoutes.Config(endpointRouteBuilder);
             PostControllerRoutes.Config(endpointRouteBuilder);
             XmlControllerRoutes.Config(endpointRouteBuilder);

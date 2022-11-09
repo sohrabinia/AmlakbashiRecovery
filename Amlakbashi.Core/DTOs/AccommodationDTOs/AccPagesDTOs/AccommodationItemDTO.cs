@@ -42,6 +42,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             this.MetaTitleDesc = this.MetaTitleDesc == null ? new MetaTitleDescDTO() : this.MetaTitleDesc;
             this.Pool = this.Pool == null ? new PoolDTO() : this.Pool;
             this.License = this.License == null ? new LicenseDTO() : this.License;
+            this.Tags = this.Tags == null ? new TagsDTO() : this.Tags;
         }
 
         public static implicit operator AccommodationItemDTO(AdvertiseDirector director)
@@ -95,6 +96,15 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
 
             var room = director.GetAdvertisePart<RoomPart>();
             PropertyCopier<RoomPart, RoomDTO>.Copy(room == null ? new RoomPart() : room, dto.Room);
+
+            var tags = director.GetAdvertisePart<TagPart>();
+            foreach (var item in tags.Tags)
+            {
+                if (item.Status == Tag.TagStatusEnum.Active)
+                {
+                    dto.Tags.TagsDic.Add(item.Id, item.Title);
+                }
+            }
 
             dto.Norouz = new NorouzDTO();//PropertyCopier<NorouzPart, NorouzDTO>.Copy(director.GetAdvertisePart<NorouzPart>(), dto.Norouz);
             PropertyCopier<PositionPart, PositionDTO>.Copy(director.GetAdvertisePart<PositionPart>(), dto.Position);
@@ -318,6 +328,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
         public TitleDescDTO TitleDesc { get; set; }
         public MetaTitleDescDTO MetaTitleDesc { get; set; }
         public LicenseDTO License { get; set; }
+        public TagsDTO Tags { get; set; }
         public List<AccommodationHotelItemDTO> HotelChildren { get; set; }
         public List<AccommodationApartmentItemDTO> ApartmentChildren { get; set; }
         public List<AccommodationSuitItemDTO> SuitChildren { get; set; }

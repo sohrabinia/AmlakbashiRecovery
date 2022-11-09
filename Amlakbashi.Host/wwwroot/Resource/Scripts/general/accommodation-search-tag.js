@@ -13,21 +13,23 @@ function searchTag() {
 }
 
 function selectTag(id, title) {
+    if (checkSelectedTagCount() === false) {
+        return;
+    }
     selectedTagsBox.append(`<span data-tagid="${id}">${title}<i class="fa fa-times" onclick="deleteTag(${id})"></i></span>`);
     tagsSelect.append(`<option value="${id}" selected></option>`);
     searchResultContainer.hide();
     searchTagInput.val('');
 }
 
-function addNewTag() {
+function addNewTag(residenceId) {
+    if (checkSelectedTagCount() === false) {
+        return;
+    }
     let searchedTag = searchTagInput.val();
-    //$.post('/tag/addinresidence', { title: searchedTag }, function (response) {
-    //    selectTag(response.id, searchedTag);
-    //    alertify.success('تگ مورد نظر با موفقیت افزوده شد');
-    //});
-    $.post('/tag/addinresidence', { title: searchedTag })
+    $.post('/tag/addinresidence', { residenceId, title: searchedTag })
         .done(function (response) {
-            selectTag(response.id, searchedTag);
+            selectTag(response.id, response.title);
             alertify.success('تگ مورد نظر با موفقیت افزوده شد');
         })
         .fail(function (xhr, status, error) {
@@ -45,3 +47,12 @@ $(document).click(function (e) {
         searchResultContainer.hide();
     }
 });
+
+function checkSelectedTagCount() {
+    debugger;
+    var test = $('.selected-tag-container select option').length;
+    if (test >= 5) {
+        showErrorMessage('خطا', 'تنها مجاز به انتخاب 5 تگ می باشید');
+        return false;
+    }
+}

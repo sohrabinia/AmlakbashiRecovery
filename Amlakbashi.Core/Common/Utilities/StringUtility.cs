@@ -85,5 +85,10 @@ namespace Amlakbashi.Core.Common.Utilities
         {
             return tagTitle.Replace(' ', '-');
         }
+
+        public static string GetTagTitle(string urlTitle)
+        {
+            return urlTitle.Replace('-', ' ');
+        }
     }
 }

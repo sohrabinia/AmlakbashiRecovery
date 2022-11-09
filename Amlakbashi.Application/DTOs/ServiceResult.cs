@@ -9,7 +9,8 @@ namespace Amlakbashi.Application.DTOs
     {
         private IList<string> ErrorMessages = new List<string>();
         public bool CheckHasError => ErrorMessages.Any();
-        public IList<string> Errors => ErrorMessages;
+        public IList<string> AllErrors => ErrorMessages;
+        public string FirstError => ErrorMessages.Any() ? ErrorMessages.First() : null;
 
         public void AddError(string error)
         {

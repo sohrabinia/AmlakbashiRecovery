@@ -11,12 +11,8 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
             endpointRouteBuilder.MapControllerRoute(
                 "اقامتگاه",
                 "اجاره-روزانه/{slug}",
-                new
-                {
-                    controller = "Accomodation",
-                    action = "Item"
-                }
-                , constraints: new { url = new AdvertiseItemConstraint()/*, subdomain = new SubdomainRouteConstraint("www")*/ }
+                new { controller = "Accomodation", action = "Item" }
+                , constraints: new { url = new AdvertiseItemConstraint() }
             );
         }
     }

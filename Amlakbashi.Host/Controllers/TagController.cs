@@ -1,4 +1,7 @@
 ﻿using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
+using Amlakbashi.Core.Common.Extensions;
+using Amlakbashi.Core.Common.Utilities;
+using Amlakbashi.Core.DTOs.AccommodationDTOs;
 using Amlakbashi.Core.DTOs.TagDTOs;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Controllers.Base;
@@ -28,7 +31,7 @@ namespace Amlakbashi.Host.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(string title)
         {
-            var result = await tagService.AddAsync(title, Core.Entities.Tag.TagStatusEnum.Active);
+            var result = await tagService.AddByAdminAsync(title, Core.Entities.Tag.TagStatusEnum.Active);
             return GenerateResult(result);
         }
 
@@ -62,10 +65,24 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddInResidence(string title)
+        public async Task<IActionResult> AddInResidence(int residenceId, string title)
         {
-            var result = await tagService.AddAsync(title);
-            return GenerateResult(result, new { id = result.Result?.Id });
+            var result = await tagService.AddByUserAsync(residenceId, title);
+            return GenerateResult(result, new { id = result.Result?.Id, title = result.Result?.Title });
+        }
+
+        public async Task<IActionResult> GetResidences(TagResidencesDTO dto, bool ajax)
+        {
+            var result = await tagService.GetTagResidences(dto);
+            if (result.CheckHasError)
+            {
+                return NotFound(result.FirstError);
+            }
+            if (ajax)
+            {
+                return PartialView("_TagResidencesList", dto);
+            }
+            return View(dto);
         }
     }
 }

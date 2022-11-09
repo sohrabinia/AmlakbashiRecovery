@@ -1,4 +1,8 @@
-﻿.tag-search-result-popup{
+﻿.tag-small {
+    direction: rtl;
+}
+
+.tag-search-result-popup{
     position: relative;
     width: 100%;
 }

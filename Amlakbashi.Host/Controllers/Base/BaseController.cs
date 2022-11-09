@@ -32,7 +32,7 @@ namespace Amlakbashi.Host.Controllers.Base
         {
             if (result.CheckHasError)
             {
-                return BadRequest(result.Errors);
+                return BadRequest(result.AllErrors);
             }
             return okResponse is null ? Ok() : Ok(okResponse);
         }

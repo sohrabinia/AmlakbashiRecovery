@@ -16,7 +16,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     action = "AdvertisePage",
                     cat = "اجاره-روزانه"
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -29,7 +28,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     cat = "اجاره-روزانه",
                     area_str = ""
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -40,7 +38,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     controller = "Advertise",
                     action = "DailyRentPage",
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -53,7 +50,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     cat = "اجاره-روزانه",
                     amp_version = true
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -67,7 +63,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     area_str = "",
                     amp_version = true
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -79,7 +74,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                     action = "DailyRentPage",
                     amp_version = true
                 }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
         }
     }

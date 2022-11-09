@@ -39,7 +39,6 @@ function initializeFilterData() {
     else {
         filterInputData.hygieneProtocol = false;
     }
-    debugger;
     filterInputData.countryDirection = $('#advertise-filter-form input[name="country_direction"]').attr('value');
     filterInputData.province = $('#advertise-filter-form input[name="Province"]').attr('value');
     filterInputData.city = $('#advertise-filter-form input[name="City"]').attr('value');

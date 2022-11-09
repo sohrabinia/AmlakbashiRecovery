@@ -228,7 +228,10 @@ namespace Amlakbashi.Host
             {
                 OnPrepareResponse = ctx =>
                 {
-                    if (ctx.File.Name.EndsWith(".css") || ctx.File.Name.EndsWith(".js"))
+                    //if (ctx.File.Name.EndsWith(".css") || ctx.File.Name.EndsWith(".js"))
+                    if (ctx.File.Name.EndsWith(".css") || ctx.File.Name.EndsWith(".js") ||
+                        ctx.File.Name.EndsWith(".woff") || ctx.File.Name.EndsWith(".woff2") ||
+                        ctx.File.Name.EndsWith(".svg"))
                     {
                         ctx.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + 60 * 60 * 24 * 365;
                     }

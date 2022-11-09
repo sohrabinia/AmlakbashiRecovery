@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using log4net;
 using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
 using static Amlakbashi.Core.Entities.Region;
 using Amlakbashi.Application.Services.Category.Interfaces;
@@ -10,21 +9,20 @@ using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
 using Amlakbashi.Host.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Amlakbashi.Core.Common.Utilities;
 
 namespace MVC_RSS_Sitemap.Controllers
 {
     public class XMLController : BaseController
     {
-        private readonly ILog logger;
         private readonly IRegionAppService regionService;
         private readonly ICategoryAppService dynamicCategoryService;
         private readonly IAdvertiseAppService advertiseService;
-        public XMLController(ILog logger,
-            IRegionAppService regionService,
+        public XMLController(IRegionAppService regionService,
             ICategoryAppService dynamicCategoryService,
             IAdvertiseAppService advertiseService)
         {
-            this.logger = logger;
             this.dynamicCategoryService = dynamicCategoryService;
             this.regionService = regionService;
             this.advertiseService = advertiseService;
@@ -86,7 +84,6 @@ namespace MVC_RSS_Sitemap.Controllers
                   );
 
             string str = sitemap.ToString().Replace("xmlns=\"\"", "");
-            //str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + str;
             return Content(str, "text/xml");
         }
 
@@ -103,14 +100,12 @@ namespace MVC_RSS_Sitemap.Controllers
                     new XElement("url",
                       new XElement("loc", item.link),
                       new XElement("lastmod", item.lastmod),
-                      //new XElement("changefreq", item.changefreq),
                       new XElement("priority", item.priority)
                       )
                     )
                   );
 
             string str = sitemap.ToString().Replace("xmlns=\"\"", "");
-            //str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + str;
             return Content(str, "text/xml");
         }
 
@@ -137,7 +132,6 @@ namespace MVC_RSS_Sitemap.Controllers
                   );
 
             string str = sitemap.ToString().Replace("xmlns=\"\"", "");
-            //str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + str;
             return Content(str, "text/xml");
         }
 
@@ -153,14 +147,12 @@ namespace MVC_RSS_Sitemap.Controllers
                     new XElement("url",
                       new XElement("loc", item.link),
                       new XElement("lastmod", item.lastmod),
-                      //new XElement("changefreq", item.changefreq),
                       new XElement("priority", item.priority)
                       )
                     )
                   );
 
             string str = sitemap.ToString().Replace("xmlns=\"\"", "");
-            //str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + str;
             return Content(str, "text/xml");
         }
 
@@ -176,14 +168,12 @@ namespace MVC_RSS_Sitemap.Controllers
                     new XElement("url",
                       new XElement("loc", item.link),
                       new XElement("lastmod", item.lastmod),
-                      //new XElement("changefreq", item.changefreq),
                       new XElement("priority", item.priority)
                       )
                     )
                   );
 
             string str = sitemap.ToString().Replace("xmlns=\"\"", "");
-            //str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + str;
             return Content(str, "text/xml");
         }
 
@@ -199,14 +189,12 @@ namespace MVC_RSS_Sitemap.Controllers
                     new XElement("url",
                       new XElement("loc", item.link),
                       new XElement("lastmod", item.lastmod),
-                      //new XElement("changefreq", item.changefreq),
                       new XElement("priority", item.priority)
                       )
                     )
                   );
 
             string str = sitemap.ToString().Replace("xmlns=\"\"", "");
-            //str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + str;
             return Content(str, "text/xml");
         }
 
@@ -226,10 +214,41 @@ namespace MVC_RSS_Sitemap.Controllers
                   );
 
             string str = sitemap.ToString().Replace("xmlns=\"\"", "");
-            //str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + str;
             return Content(str, "text/xml");
         }
 
+        public async Task<ContentResult> TagSitemap([FromServices] ITagAppService tagService)
+        {
+            string url_base = Request.Scheme + "://" + Request.Host;
+            var tags = await tagService.GetListAsync(status: Tag.TagStatusEnum.Active);
+            var items = tags.Select(x => new PostToXML()
+            {
+                title = x.Title,
+                lastmod = x.CreateDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
+                priority = "0.7",
+                link = $"{url_base}/tag/{StringUtility.GetTagUrlTitle(x.Title)}"
+            }).ToList();
+            return GenerateSitemap(items);
+        }
+
+        private ContentResult GenerateSitemap(IEnumerable<PostToXML> items)
+        {
+            XNamespace ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
+            var sitemap = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
+                new XElement(ns + "urlset",
+                    from item in items
+                    select
+                      new XElement("url",
+                      new XElement("loc", item.link),
+                      new XElement("lastmod", item.lastmod),
+                      new XElement("priority", item.priority)
+                      )
+                    )
+                  );
+
+            string str = sitemap.ToString().Replace("xmlns=\"\"", "");
+            return Content(str, "text/xml");
+        }
 
         public IEnumerable<PostToXML> GetLinks()
         {
@@ -240,7 +259,6 @@ namespace MVC_RSS_Sitemap.Controllers
                                            select new PostToXML()
                                            {
                                                title = p.Title,
-                                               //changefreq = "daily",
                                                lastmod = p.LastModifiedDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
                                                priority = "0.6",
                                                link = url_base + string.Format("/{0}/{1}", AdvertiseMainLocalization.CategoryTitle, p.Slug),
@@ -276,9 +294,8 @@ namespace MVC_RSS_Sitemap.Controllers
                                            select new PostToXML()
                                            {
                                                title = cat.Title,
-                                               //changefreq = "daily",
                                                lastmod = cat.LastModifyDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
-                                               priority = "0.7",
+                                               priority = "0.8",
                                                link = url_base + CategoryUrlLocalization.CategoryToUrl(cat)
                                            }).ToList();
 
@@ -293,7 +310,6 @@ namespace MVC_RSS_Sitemap.Controllers
                                            select new PostToXML()
                                            {
                                                title = cat.Title,
-                                               //changefreq = "daily",
                                                lastmod = cat.LastModifyDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
                                                priority = cat.CountAdvertise > 60 ? "1.0" : "0.9",
                                                link = url_base + CategoryUrlLocalization.CategoryToUrl(cat)
@@ -310,7 +326,6 @@ namespace MVC_RSS_Sitemap.Controllers
                                            select new PostToXML()
                                            {
                                                title = cat.Title,
-                                               //changefreq = "daily",
                                                lastmod = cat.LastModifyDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
                                                priority = cat.CountAdvertise > 30 ? "0.9" : "0.8",
                                                link = url_base + CategoryUrlLocalization.CategoryToUrl(cat)
@@ -365,21 +380,14 @@ namespace MVC_RSS_Sitemap.Controllers
         }
 
     }
+
     public class PostToXML
     {
-        public int PostId { get; set; }
-
         public string title { get; set; }
-
         public string link { get; set; }
-
         public string lastmod { get; set; }
-        public string changefreq { get; set; }
         public string priority { get; set; }
-        public string description { get; set; }
         public string imagelink { get; set; }
         public string geolocation { get; set; }
-
-        public Nullable<DateTime> pubDate { get; set; }
     }
 }
