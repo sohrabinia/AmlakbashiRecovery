@@ -1,5 +1,6 @@
 ﻿function quickFilterProcess() {
     $('#more_filter_form [name="title"]').val($('.box-filter .bar-filter [name="title"]').val());
+    $('#more_filter_form [name="status"]').val($('.box-filter .bar-filter [name="status"').val());
     $('#more_filter_form').submit();
 }
 
@@ -17,15 +18,15 @@ function addNewTag() {
         errorAlert('لطفا عنوان تگ جدید را وارد کنید');
         return;
     }
-    sendPostAjax('/tag/add', { title }, function () {
+    sendPostAjax('/tags/add', { title }, function () {
         location.reload();
     }, null, hidePopup);
 }
 
 function activeTag(id, elem) {
     showConfirm("آیا از تایید این تگ مطمئنید؟", function () {
-        sendPostAjax("/tag/activate", { id }, function () {
-            $(elem).remove();
+        sendPostAjax("/tags/activate", { id }, function () {
+            $(elem).css('color', 'limegreen');
             successAlert('تگ مورد نظر با موفقیت تایید شد');
         });
     });
@@ -47,7 +48,7 @@ function editTagTitle() {
         errorAlert('لطفا عنوان تگ جدید را وارد کنید');
         return;
     }
-    sendPostAjax('/tag/edittitle', { id, title }, function () {
+    sendPostAjax('/tags/edittitle', { id, title }, function () {
         $(`#js-${id} .column-title`).html(title);
         $(`#js-${id} .column-urltitle`).html(title);
         successAlert('تگ مورد نظر با موفقیت ویرایش شد');
@@ -56,7 +57,7 @@ function editTagTitle() {
 
 function deleteTag(id) {
     showConfirm("آیا از حذف این تگ مطمئنید؟", function () {
-        sendPostAjax("/tag/delete", { id }, function () {
+        sendPostAjax("/tags/delete", { id }, function () {
             $('#js-' + id).remove();
             successAlert('تگ مورد نظر با موفقیت حذف شد');
         });

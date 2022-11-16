@@ -14,21 +14,9 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
             );
 
             endpointRouteBuilder.MapControllerRoute(
-                name: "OldSitemap",
-                pattern: "old-sitemap.xml",
-                defaults: new { controller = "xml", action = "oldsitemap" }
-            );
-
-            endpointRouteBuilder.MapControllerRoute(
                 name: "AdvertiseSitemap",
                 pattern: "advertises-sitemap.xml",
                 defaults: new { controller = "xml", action = "adsitemap" }
-            );
-
-            endpointRouteBuilder.MapControllerRoute(
-                name: "ImageSitemap",
-                pattern: "image-sitemap.xml",
-                defaults: new { controller = "xml", action = "ImageSitemap" }
             );
 
             endpointRouteBuilder.MapControllerRoute(
@@ -44,21 +32,15 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
             );
 
             endpointRouteBuilder.MapControllerRoute(
-                name: "AreaSitemap",
-                pattern: "area-sitemap.xml",
-                defaults: new { controller = "xml", action = "AreaSitemap" }
-            );
-
-            endpointRouteBuilder.MapControllerRoute(
                 name: "TagSitemap",
                 pattern: "tag-sitemap.xml",
                 defaults: new { controller = "xml", action = "TagSitemap" }
             );
 
-            endpointRouteBuilder.MapControllerRoute(
-              "RSS", "rss",
-               new { controller = "XML", action = "RSS" }
-            );
+            //endpointRouteBuilder.MapControllerRoute(
+            //  "RSS", "rss",
+            //   new { controller = "XML", action = "RSS" }
+            //);
         }
     }
 }

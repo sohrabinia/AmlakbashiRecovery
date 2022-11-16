@@ -87,7 +87,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 serviceResult.AddError("عنوان وارد شده اشتباه است");
                 return serviceResult;
             }
-            title = title.Trim();
+            StringUtility.ModifySentence(ref title);
             var tag = await FindAsync(title);
             if (tag != null)
             {
@@ -112,7 +112,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 serviceResult.AddError("اقامتگاه یافت نشد");
                 return serviceResult;
             }
-            title = title.Trim();
+            StringUtility.ModifySentence(ref title);
             title = $"{AdvertiseMainLocalization.GetAdvertiseTypePersianNameForUser(residence.TypeID)} {title} در {residence.RegionCity.PersianName}";
             var tag = await FindAsync(title);
             if (tag != null)
@@ -161,7 +161,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 serviceResult.AddError("عنوان وارد شده اشتباه است");
                 return serviceResult;
             }
-            newTitle = newTitle.Trim();
+            StringUtility.ModifySentence(ref newTitle);
             var tag = await FindAsync(id);
             if (tag is null)
             {

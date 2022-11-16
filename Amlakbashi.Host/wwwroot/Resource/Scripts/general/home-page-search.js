@@ -372,3 +372,8 @@ for (i = 0; i < $('.home-page__search-container').length; i++) {
 }
 
 var isMobileDevice = $('.body').width() < 681;
+
+function searchTag(urlTitle) {
+    console.log('test');
+    window.location.href = `/tag/${urlTitle}`;
+}

@@ -6,7 +6,10 @@ let tagsSelect = $('.selected-tag-container select');
 
 function searchTag() {
     let searchedTag = searchTagInput.val();
-    $.get(`/tag/search?title=${searchedTag}`, function (data) {
+    if (searchedTag.length < 3) {
+        return;
+    }
+    $.get(`/tags/search?title=${searchedTag}`, function (data) {
         searchResultBox.html(data);
     });
     searchResultContainer.show();
@@ -27,7 +30,11 @@ function addNewTag(residenceId) {
         return;
     }
     let searchedTag = searchTagInput.val();
-    $.post('/tag/addinresidence', { residenceId, title: searchedTag })
+    if (searchedTag.length < 3) {
+        showErrorMessage('خطا', 'عنوان وارد شده کوتاه است');
+        return;
+    }
+    $.post('/tags/addinresidence', { residenceId, title: searchedTag })
         .done(function (response) {
             selectTag(response.id, response.title);
             alertify.success('تگ مورد نظر با موفقیت افزوده شد');
@@ -49,7 +56,6 @@ $(document).click(function (e) {
 });
 
 function checkSelectedTagCount() {
-    debugger;
     var test = $('.selected-tag-container select option').length;
     if (test >= 5) {
         showErrorMessage('خطا', 'تنها مجاز به انتخاب 5 تگ می باشید');

@@ -5,8 +5,7 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-@section StyleLink
-    {
+@section StyleLink {
     <environment include="Development">
         <link rel="stylesheet" href="/css/admin/tag/list.css" asp-append-version="true">
     </environment>
@@ -27,6 +26,11 @@ else
                 <div class="bar-filter quick-filter">
                     <span><i class="fas fa-filter"></i>فیلتر :</span>
                     <input class="input-stlye" type="text" value="@Model.title" name="title" placeholder="عنوان">
+                    <select class="input-stlye" name="status">
+                        <option value="">همه وضعیت ها</option>
+                        <option is-selected="@(Model.status == Tag.TagStatusEnum.Unset)" value="0">در حال بررسی</option>
+                        <option is-selected="@(Model.status == Tag.TagStatusEnum.Active)" value="1">تایید شده</option>
+                    </select>
                     <button class="fas fa-angle-double-left submit-btn"></button>
                 </div>
                 <button class="btn add-tag-btn" onclick="showAddTagPopup()"><i class="fa fa-plus"></i> افزودن تگ جدید</button>
@@ -48,19 +52,28 @@ else
         {
             <section action="list" paging-info="@Model.pagedList.PagingInfo" parameters="new
              {
-                 title = Model.title
+                title = Model.title,
+                status = Model.status.HasValue ? (byte?)Model.status : null
              }"></section>
         }
     </div>
 
     <div class="more-filter-container">
         <div class="more-filter-content">
-            <form id="more_filter_form" class="more-filter-form" asp-controller="tag" asp-action="list" method="get">
+            <form id="more_filter_form" class="more-filter-form" asp-controller="tags" asp-action="list" method="get">
                 <div class="options-filter-box">
                     <div class="more-filter-row">
                         <div class="item-filter-box">
                             <label class="title-filter">عنوان</label>
                             <input class="input-stlye" type="text" value="@Model.title" name="title">
+                        </div>
+                        <div class="item-filter-box">
+                            <label class="title-filter">وضعیت</label>
+                            <select class="input-stlye" name="status">
+                                <option value="">همه وضعیت ها</option>
+                                <option is-selected="@(Model.status == Tag.TagStatusEnum.Unset)" value="0">در حال بررسی</option>
+                                <option is-selected="@(Model.status == Tag.TagStatusEnum.Active)" value="1">تایید شده</option>
+                            </select>
                         </div>
                     </div>
                 </div>

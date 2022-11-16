@@ -9,10 +9,10 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
         {
             endpointRouteBuilder.MapControllerRoute(
                 "تگ",
-                "residences/tag/{urlTitle}",
+                "tag/{urlTitle}",
                 new
                 {
-                    controller = "Tag",
+                    controller = "Tags",
                     action = "GetResidences"
                 }
             );

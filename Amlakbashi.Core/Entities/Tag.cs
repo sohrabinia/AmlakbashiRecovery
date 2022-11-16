@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Amlakbashi.Core.Common.Utilities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Amlakbashi.Core.Entities
@@ -16,6 +18,9 @@ namespace Amlakbashi.Core.Entities
         public TagStatusEnum Status { get; set; }
 
         public virtual ICollection<Advertise> Residences { get; set; } = new List<Advertise>();
+
+        [NotMapped]
+        public string UrlTitle { get { return StringUtility.GetTagUrlTitle(Title); } }
 
         public enum TagStatusEnum : byte
         {

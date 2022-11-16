@@ -236,3 +236,8 @@ var isMobileDevice = $('.body').width() < 681;
 //if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
 //    isMobileDevice = true;
 //}
+
+function searchTag(urlTitle) {
+    debugger;
+    window.location.href = `/app/tags/getresidences/${urlTitle}`;
+}

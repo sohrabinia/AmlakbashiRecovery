@@ -1,7 +1,4 @@
 ﻿using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
-using Amlakbashi.Core.Common.Extensions;
-using Amlakbashi.Core.Common.Utilities;
-using Amlakbashi.Core.DTOs.AccommodationDTOs;
 using Amlakbashi.Core.DTOs.TagDTOs;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Host.Controllers.Base;
@@ -12,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Host.Controllers
 {
-    public class TagController : BaseController
+    public class TagsController : BaseController
     {
         private readonly ITagAppService tagService;
-        public TagController(ITagAppService tagService)
+        public TagsController(ITagAppService tagService)
         {
             this.tagService = tagService;
         }

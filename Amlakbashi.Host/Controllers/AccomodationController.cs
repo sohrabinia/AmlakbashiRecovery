@@ -339,7 +339,8 @@ namespace Amlakbashi.Host.Controllers
                     }
                     ViewBag.errors = groupErrors;
                     ViewBag.tab = tab;
-                    return View(ExtraFormDTO.Generate(director, data.Id));
+                    var residence = advertiseService.Find(data.Id);
+                    return View(ExtraFormDTO.Generate(director, data.Id, residence.RegionCity.PersianName));
                 }
                 if (tab > 0)
                 {
@@ -998,7 +999,8 @@ namespace Amlakbashi.Host.Controllers
                     ViewBag.errors = groupErrors;
                     ViewBag.type = director.AdvertiseType;
                     ViewBag.level = level;
-                    return View(ExtraFormDTO.Generate(director, data.Id));
+                    var residence = advertiseService.Find(data.Id);
+                    return View(ExtraFormDTO.Generate(director, data.Id, residence.RegionCity.PersianName));
                 }
                 var isAdd = data.Status == AdvertiseStatus.NotCompleted;
                 if (tab > 0)

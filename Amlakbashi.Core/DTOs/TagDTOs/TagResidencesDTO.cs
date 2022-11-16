@@ -11,8 +11,7 @@ namespace Amlakbashi.Core.DTOs.TagDTOs
         public PagedList<AccommodationCardDTO> pagedList { get; set; } = new PagedList<AccommodationCardDTO>();
         public string urlTitle { get; set; }
         public string title { get { return StringUtility.GetTagTitle(urlTitle); } }
-        public bool isActiveTag { get; set; } = true;
         public int page { get; set; } = 1;
-        public byte pageItemCount { get; set; } = 2;
+        public byte pageItemCount { get; set; } = 20;
     }
 }

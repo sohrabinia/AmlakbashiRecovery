@@ -26,7 +26,7 @@ else
 {
     <form id="video_upload_form" enctype="multipart/form-data">
         <p>برای آپلود ویدیو جدید از اقامتگاه خود، ابتدا فایل ویدیو مورد نظر خود را انتخاب کرده و سپس روی دکمه «ارسال ویدیو» کلیک کنید:</p>
-        <p>ویدیو شما باید با فرمت <b>MP4</b> و به صورت <b>افقی</b> بوده و حجم آن کمتر از <b>500 مگابایت</b> باشد.</p>
+        <p>ویدیو شما باید با فرمت <b>MP4</b> و نسبت ابعاد <b>16:9</b> (مثلا HD یا FullHD) بوده و حجم آن کمتر از <b>500 مگابایت</b> باشد.</p>
         <input type="hidden" name="residenceId" value="@Model.Id" id="residenceId_input" />
         <input type="file" name="formFile" id="video_upload_input" accept="video/mp4" />
         <div style="text-align: center;" id="upload_button_container">
@@ -36,8 +36,6 @@ else
     <div style="text-align: center; display: none;" id="upload_progress_container">
         <span>لطفا تا اتمام فرآیند آپلود منتظر بمانید</span>
         <img width="40" height="40" src="/file/resourceimagegif?file_name=spinner" />
-        @*<span id="upload_progress_percent" style="font-size: large; color: red;">0</span>
-            <span style="font-size: large; color: red;">%</span>*@
     </div>
 }
 
@@ -64,8 +62,9 @@ else
             showErrorMessage('خطا', 'حجم فایل انتخاب شده شما بیشتر از حد مجاز است');
             return false;
         }
-        if ((videoWidth / videoHeight) < (4 / 3)) {
-            showErrorMessage('خطا', 'ویدیو انتخاب شده شما به صورت افقی نمی باشد');
+        var aspectRatio = videoWidth / videoHeight;
+        if (aspectRatio < 1.7 || aspectRatio > 1.8) {
+            showErrorMessage('خطا', 'نسبت ابعاد ویدیو انتخاب شده شما صحیح نمی باشد.');
             return false;
         }
     }
@@ -96,17 +95,6 @@ else
                     return "فایل ویدیو در حال آپلود است. لطفا منتظر بمانید.";
                 }
             },
-            //xhr: function () {
-            //    var xhr = new window.XMLHttpRequest();
-            //    xhr.upload.addEventListener("progress", function (evt) {
-            //        if (evt.lengthComputable) {
-            //            var percentComplete = evt.loaded / evt.total;
-            //            percentComplete = parseInt(percentComplete * 100);
-            //            $('#upload_progress_percent').html(percentComplete);
-            //        }
-            //    }, false);
-            //    return xhr;
-            //},
             success: function (response) {
                 if (response.status === 0) {
                     showErrorMessage('خطا', response.msg);

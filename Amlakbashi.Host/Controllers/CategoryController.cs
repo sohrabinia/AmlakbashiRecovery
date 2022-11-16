@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using X.PagedList;
 using static Amlakbashi.Core.Entities.Advertise;
 using static Amlakbashi.Core.Entities.Region;
@@ -174,8 +175,9 @@ namespace Amlakbashi.Host.Controllers
         }
 
         [ResponseCache(Duration = 60 * 15, VaryByQueryKeys = new string[] { "*" })]
-        public ActionResult SearchCategory(string search_string = "",
-            string Province = "-1", string City = "-1", string Area = "-1")
+        public async Task<IActionResult> SearchCategory([FromServices] ITagAppService tagService, 
+            string search_string = "", string Province = "-1",
+            string City = "-1", string Area = "-1")
         {
             ViewBag.Province = Province;
             ViewBag.City = City;
@@ -191,6 +193,8 @@ namespace Amlakbashi.Host.Controllers
                 {
                     model.Add(SearchTableDTO.Generate(item, regionService.GetRegionName(item.Type != 2 ? 0 : (int)item.ParentID)));
                 }
+                var tags = await tagService.GetListAsync(search_string, Tag.TagStatusEnum.Active);
+                ViewBag.tags = tags.Take(5 - regions.Count);
                 return PartialView("_SearchTable", model);
             }
             catch (Exception exc)

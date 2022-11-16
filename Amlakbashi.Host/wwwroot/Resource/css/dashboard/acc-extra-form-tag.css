@@ -2,7 +2,18 @@
     direction: rtl;
 }
 
-.tag-search-result-popup{
+#search_tag_input{
+    max-width: 300px;
+}
+
+.tag-input-box {
+    display: flex;
+    width: 100%;
+    flex-flow: row wrap;
+    align-items: baseline;
+}
+
+.tag-search-result-popup {
     position: relative;
     width: 100%;
 }
@@ -62,4 +73,10 @@
     background-color: #fdc831;
     border-radius: 5px;
     padding: 5px;
+}
+
+@media (max-width: 600px) {
+    #search_tag_input {
+        max-width: 200px;
+    }
 }

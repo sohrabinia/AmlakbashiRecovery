@@ -451,7 +451,8 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                     ViewBag.errors = groupErrors;
                     ViewBag.type = director.AdvertiseType;
                     ViewBag.level = level;
-                    return View(ExtraFormDTO.Generate(director, data.Id));
+                    var residence = advertiseService.Find(data.Id);
+                    return View(ExtraFormDTO.Generate(director, data.Id, residence.RegionCity.PersianName));
                 }
 
                 var isAdd = data.Status == Advertise.AdvertiseStatus.NotCompleted;

@@ -58,7 +58,7 @@
 }
 
 @section HeaderAddition
-{
+    {
     @if (!Model.IsPreview)
     {
         <link rel="canonical" href="https://www.amlakbashi.com@(Model.RawUrl)" />
@@ -71,7 +71,7 @@
     }
 }
 
-@section StyleLink {
+    @section StyleLink {
     <environment include="Development">
         <link rel="stylesheet" href="/resource/css/general/jalali-date-picker.css" />
         <link rel="stylesheet" href="/resource/lightbox/lightbox.css" />
@@ -88,11 +88,11 @@
     </environment>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-          crossorigin="" />
+      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+      crossorigin="" />
 }
 
-@*<div class="share-post__container" style="flex-flow: row;left: 0;bottom: 0;right: 0;overflow: auto;background-color: white;width: fit-content;height: 70px;align-items: center;position: fixed;max-width: 100%;">
+    @*<div class="share-post__container" style="flex-flow: row;left: 0;bottom: 0;right: 0;overflow: auto;background-color: white;width: fit-content;height: 70px;align-items: center;position: fixed;max-width: 100%;">
         <a class="share-post__item" href="https://t.me/share/url?url=@(u_)&text=@(t_)" rel="noreferrer" title="اشتراک گذاری در تلگرام" style="background-color: #259DCF;width: 40px;height: 40px;">
             <img class="share-post__icon" width="40" height="40" alt="telegram" src="/file/resourceimagepng?file_name=socialnetwork/telegram">
         </a>
@@ -112,7 +112,7 @@
             <i class="fa fa-envelope share-post__icon style-custom-email"></i>
         </a>
     </div>*@
-<div class="advertise-page__bottom-pin" style="@(Model.AdvertiseMode == Advertise.AdvertiseMode.Parent || !Model.CanPublish ? "background-color:transparent;border:none;" : "")">
+    <div class="advertise-page__bottom-pin" style="@(Model.AdvertiseMode == Advertise.AdvertiseMode.Parent || !Model.CanPublish ? "background-color:transparent;border:none;" : "")">
     @if (Model.AdvertiseMode != Advertise.AdvertiseMode.Parent && Model.CanPublish)
     {
         <div onclick="showReserveContainer()" class="advertise-page__bottom-pin-button">
@@ -143,43 +143,43 @@
 
                             <a href="@string.Format("/file/getimage?fileid={0}", photo_id)" data-lightbox="advertise-gallery-set" class="advertise-page__slider-image-container" data-alt="@(Model.TitleDesc.Title)-@(i+1)" data-title="@(Model.TitleDesc.Title)-@(i+1)">
                                 @*<img data-srcset="@img_small 213w,
-                                    @img_medium 249w,
-                                    @img_large 331w,
-                                    @img_xlarge 450w,
-                                    @img_xxlarge 600w,
-                                    @img_xxxlarge 700w"
+                    @img_medium 249w,
+                    @img_large 331w,
+                    @img_xlarge 450w,
+                    @img_xxlarge 600w,
+                    @img_xxxlarge 700w"
 
-                                     srcset='@(i == 0 ? img_small + " 213w," +
-                                        img_medium + " 249w," +
-                                        img_large + " 331w," +
-                                        img_xlarge + " 450w," +
-                                        img_xxlarge + " 600w," +
-                                        img_xxxlarge + " 700w" : "")'
+                    srcset='@(i == 0 ? img_small + " 213w," +
+                    img_medium + " 249w," +
+                    img_large + " 331w," +
+                    img_xlarge + " 450w," +
+                    img_xxlarge + " 600w," +
+                    img_xxxlarge + " 700w" : "")'
 
-                                     sizes="(max-width: 312px) 213px,
-                                     (max-width: 320px) 249px,
-                                     (max-width: 400px) 249px,
-                                     (max-width: 550px) 331px,
-                                     (max-width: 680px) 450px,
-                                     (max-width: 780px) 600px,
-                                     (max-width: 900px) 450px,
-                                     (max-width: 1100px) 450px,
-                                     (max-width: 1200px) 700px,
-                                     700px"
-                                     @(i == 0 ? "" : "data-lazy=/file/resourceimagepng?file_name=lazy-16_9")
-                                     data-src="@img_small" @(i > 0 ? "data-" : "") alt="@(Model.TitleDesc.Title)-@(i+1)" @(i > 0 ? "data-" : "") title="@(Model.TitleDesc.Title)-@(i+1)"
-                                     class="advertise-page__slider-image lazy" style="@(i > 0 ? "display:none;" : "")">*@
+                    sizes="(max-width: 312px) 213px,
+                    (max-width: 320px) 249px,
+                    (max-width: 400px) 249px,
+                    (max-width: 550px) 331px,
+                    (max-width: 680px) 450px,
+                    (max-width: 780px) 600px,
+                    (max-width: 900px) 450px,
+                    (max-width: 1100px) 450px,
+                    (max-width: 1200px) 700px,
+                    700px"
+                    @(i == 0 ? "" : "data-lazy=/file/resourceimagepng?file_name=lazy-16_9")
+                    data-src="@img_small" @(i > 0 ? "data-" : "") alt="@(Model.TitleDesc.Title)-@(i+1)" @(i > 0 ? "data-" : "") title="@(Model.TitleDesc.Title)-@(i+1)"
+                    class="advertise-page__slider-image lazy" style="@(i > 0 ? "display:none;" : "")">*@
 
                                 <img width="213" height="120" src="@img_small"
-                                     srcset='@(img_small + " 213w," +
+                             srcset='@(img_small + " 213w," +
                                         img_medium + " 249w," +
                                         img_large + " 331w," +
                                         img_xlarge + " 450w," +
                                         img_xxlarge + " 600w," +
                                         img_xxxlarge + " 700w")'
-                                     @(i == 0 ? "" : "data-lazy=/file/resourceimagepng?file_name=lazy-16_9")
-                                     data-src="@img_small" @(i > 0 ? "data-" : "") alt="@(Model.TitleDesc.Title)-@(i+1)" @(i > 0 ? "data-" : "") title="@(Model.TitleDesc.Title)-@(i+1)"
-                                     class="advertise-page__slider-image lazy" style="@(i > 0 ? "display:none; " : "")width: 90%; height:auto;">
+                             @(i == 0 ? "" : "data-lazy=/file/resourceimagepng?file_name=lazy-16_9")
+                             data-src="@img_small" @(i > 0 ? "data-" : "") alt="@(Model.TitleDesc.Title)-@(i+1)" @(i > 0 ? "data-" : "") title="@(Model.TitleDesc.Title)-@(i+1)"
+                             class="advertise-page__slider-image lazy" style="@(i > 0 ? "display:none; " : "")width: 90%; height:auto;">
                             </a>
                         }
                     }
@@ -294,16 +294,16 @@
                         @await Html.PartialAsync("/Views/Accomodation/AccPagePartials/_AccPagePrice.cshtml", Model.Price)
 
                         @*@if (Model.Price.NorouzOverCapacityPrice > 0)
-                            {
-                                <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
-                                    <span class="advertise-page__price-title">
-                                        قیمت هر مهمان اضافه نوروز <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
-                                    </span>
-                                    <span class="advertise-page__price-content">
-                                        @string.Format("{0:n0}", Model.Price.NorouzOverCapacityPrice) تومان
-                                    </span>
-                                </div>
-                            }*@
+                    {
+                    <div class="advertie-page__price-item js-NorouzOverCapacityPrice">
+                    <span class="advertise-page__price-title">
+                    قیمت هر مهمان اضافه نوروز <img width="16" height="16" rel="ویژه نوروز" alt="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />
+                    </span>
+                    <span class="advertise-page__price-content">
+                    @string.Format("{0:n0}", Model.Price.NorouzOverCapacityPrice) تومان
+                    </span>
+                    </div>
+                    }*@
                     </div>
                 }
 
@@ -342,7 +342,9 @@
                     {
                         <span class="fa fa-certificate"></span>
                         @:دارای مجوز از سازمان گردشگری با شماره ثبت @Model.License.LicenseNumber
-                        <br /><br />
+                        <br />
+
+                        <br />
                     }
                     <span class="fa fa-calendar-check"></span>
                     تاریخ آخرین ویرایش آگهی: @StringUtility.EnglishNumberToPersian(Model.LastModifyDate)
@@ -376,9 +378,9 @@
         }
 
         @* Related Links *@
-        @*<div class="advertise-page__property-box advertise-page__comment-box">
-                @await Html.PartialAsync("/Views/Accomodation/AccPagePartials/_AccPageRelatedLinks.cshtml", Model)
-            </div>*@
+        <div class="advertise-page__property-box advertise-page__comment-box">
+            @await Html.PartialAsync("_ResidencePageTags", Model)
+        </div>
 
         <div class="advertise-page__stick-reserve">
         </div>
@@ -410,12 +412,12 @@
         <div onclick="hideReservePopup()" class="item__contact-bg"></div>
         <div style="margin:auto;background:white;border:1px solid #ccc;max-width:400px;">
             @*<div class="item__contact-header">
-                    <div onclick="hideReservePopup()" class="item__contact-close-button">
-                        <i class="fa fa-times"></i>
-                        <span>بستن</span>
-                    </div>
-                    <span class="js-reserve-req-title">رزرو</span>
-                </div>*@
+        <div onclick="hideReservePopup()" class="item__contact-close-button">
+        <i class="fa fa-times"></i>
+        <span>بستن</span>
+        </div>
+        <span class="js-reserve-req-title">رزرو</span>
+        </div>*@
             <div id="reserve_popup_container">
                 @await Html.PartialAsync("/views/accomodation/_Reserve.cshtml", Model.ReservePopupData)
             </div>
@@ -449,8 +451,8 @@
 
 @section ScriptLink {
     <script defer="defer" src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-            crossorigin=""></script>
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
     <environment include="Development">
         <script src="/resource/Scripts/jquery.plugin.min.js" asp-append-version="true"></script>
         <script src="/resource/slick/slick.js" asp-append-version="true"></script>
@@ -473,8 +475,8 @@
     </environment>
 }
 
-@section ScriptBlock
-{
+    @section ScriptBlock
+    {
     @{
         var rnd = new Random();
         var OldRange = (1 - 0);
@@ -486,163 +488,164 @@
         var lng = NewValue;
     }
     <script defer="defer" type="text/javascript">
-            @if (Model.Address.Latitude != 0 && Model.Address.Longitude != 0)
+        @if (Model.Address.Latitude != 0 && Model.Address.Longitude != 0)
+        {
+            @:$(document).ready(function () {
+            @:var lat = @lat;
+            @:var lng = @lng;
+            @:mymap = L.map('mapid').setView([@(Model.IsPreview ? Model.Address.Latitude.ToString() : "lat"), @(Model.IsPreview ? Model.Address.Longitude.ToString() : "lng")], @(Model.IsPreview ? 18 : 14));
+            @:L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            @:attribution: '',
+            @:maxZoom: 18,
+            @:id: 'mapbox/streets-v11',
+            @:tileSize: 512,
+            @:zoomOffset: -1,
+            @:accessToken: 'REMOVED_MAPBOX_TOKEN'
+            @:}).addTo(mymap);
+            if (Model.IsPreview)
             {
-                @:$(document).ready(function(){
-                    @:var lat = @lat;
-                    @:var lng = @lng;
-                    @:mymap = L.map('mapid').setView([@(Model.IsPreview ? Model.Address.Latitude.ToString() : "lat"), @(Model.IsPreview ? Model.Address.Longitude.ToString() : "lng")], @(Model.IsPreview ? 18 : 14));
-                    @:L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-                    @:attribution: '',
-                    @:maxZoom: 18,
-                    @:id: 'mapbox/streets-v11',
-                    @:tileSize: 512,
-                    @:zoomOffset: -1,
-                    @:accessToken: 'REMOVED_MAPBOX_TOKEN'
-                    @:}).addTo(mymap);
-                    if (Model.IsPreview)
-                    {
-                        @:var circle = L.circle([@Model.Address.Latitude, @Model.Address.Longitude], {
-                            @:color: '#fdd835',
-                            @:fillColor: '#fff4d3',
-                            @:fillOpacity: 0.5,
-                            @:radius: 20
-                        @:}).addTo(mymap);
-                    }
-                    else {
-                        @:var circle = L.circle([lat, lng], {
-                            @:color: '#fdd835',
-                            @:fillColor: '#fff4d3',
-                            @:fillOpacity: 0.5,
-                            @:radius: @(Model.AdvertiseType.TypeID == Advertise.AdvertiseType.Villa ? 1000 : 700)
-                        @:}).addTo(mymap);
-                    }
-                    //mymap.on('click', onMapClick);
+                @:var circle = L.circle([@Model.Address.Latitude, @Model.Address.Longitude], {
+                @:color: '#fdd835',
+                @:fillColor: '#fff4d3',
+                @:fillOpacity: 0.5,
+                @:radius: 20
+                @:}).addTo(mymap);
+            }
+            else
+            {
+                @:var circle = L.circle([lat, lng], {
+                @:color: '#fdd835',
+                @:fillColor: '#fff4d3',
+                @:fillOpacity: 0.5,
+                @:radius: @(Model.AdvertiseType.TypeID == Advertise.AdvertiseType.Villa ? 1000 : 700)
+                @:}).addTo(mymap);
+            }
+            //mymap.on('click', onMapClick);
             @:});
-    }
+        }
 
-            //var popup = L.popup();
+                            //var popup = L.popup();
 
-            //function onMapClick(e) {
-            //    if (typeof marker != 'undefined')
-            //        marker.remove();
-            //    marker = L.marker(e.latlng).addTo(mymap);
-            //    marker.bindPopup("تست").openPopup();
-            //}
+                            //function onMapClick(e) {
+                            //    if (typeof marker != 'undefined')
+                            //        marker.remove();
+                            //    marker = L.marker(e.latlng).addTo(mymap);
+                            //    marker.bindPopup("تست").openPopup();
+                            //}
 
-            if ($(".body").width() > 780) {
-                $("#reserve-mobile-container").remove();
-            }
-            else {
-                $("#reserve-desktop-container").remove();
-            }
+                            if ($(".body").width() > 780) {
+            $("#reserve-mobile-container").remove();
+        }
+        else {
+            $("#reserve-desktop-container").remove();
+        }
     </script>
     <script defer="defer" type="text/javascript">
-    var reserve_wait_for_login = false;
-    var show_contact_wait_for_login = false;
-    var show_contact_id = null;
-    var show_contact_element = null;
-    var rules_string = '';
-    var short_rules_string = '';
-    var advertise_id = @(Model.Id);
-    const advertiseTitle = '@Model.TitleDesc.Title';
-    const commentsCount = @Model.Comments.Count;
-    var shownCommentsCount = @(Math.Min(Model.Comments.Count, 3));
-    var provinceName = '@(Model.AccCategory.ProvinceName)';
-    var cityName = '@(Model.AccCategory.CityName)';
-    var hostUserRating = @(Model.HostUserRating);
-    var fromDateValue = @(string.IsNullOrEmpty(Model.EmptyRangeFrom) ? "undefined" :
+        var reserve_wait_for_login = false;
+        var show_contact_wait_for_login = false;
+        var show_contact_id = null;
+        var show_contact_element = null;
+        var rules_string = '';
+        var short_rules_string = '';
+        var advertise_id = @(Model.Id);
+        const advertiseTitle = '@Model.TitleDesc.Title';
+        const commentsCount = @Model.Comments.Count;
+        var shownCommentsCount = @(Math.Min(Model.Comments.Count, 3));
+        var provinceName = '@(Model.AccCategory.ProvinceName)';
+        var cityName = '@(Model.AccCategory.CityName)';
+        var hostUserRating = @(Model.HostUserRating);
+        var fromDateValue = @(string.IsNullOrEmpty(Model.EmptyRangeFrom) ? "undefined" :
         (DateTimeUtility.DateValueOfJS(DateTimeUtility.PersianDateToGregorian(StringUtility.PersianNumberToEnglish(Model.EmptyRangeFrom.Replace("/", ","))))).ToString());
-    var toDateValue = @(string.IsNullOrEmpty(Model.EmptyRangeTo) ? "undefined" :
+        var toDateValue = @(string.IsNullOrEmpty(Model.EmptyRangeTo) ? "undefined" :
         (DateTimeUtility.DateValueOfJS(DateTimeUtility.PersianDateToGregorian(StringUtility.PersianNumberToEnglish(Model.EmptyRangeTo.Replace("/", ","))))).ToString());
-    var initialGuestCount =  @(string.IsNullOrEmpty(Model.RelatedLinkCapacity) ? "0" : Model.RelatedLinkCapacity);
-    @if (string.IsNullOrEmpty(Model.EmptyRangeFrom))
-    {
-        @:var empty_range_from = undefined;
-    }
-    else
-    {
-        @:var empty_range_from = "@Model.EmptyRangeFrom";
-    }
-    @if (string.IsNullOrEmpty(Model.EmptyRangeTo))
-    {
-        @:var empty_range_to = undefined;
-    }
-    else
-    {
-        @:var empty_range_to = "@Model.EmptyRangeTo";
-    }
-    currentGuestCount = parseInt(initialGuestCount);
+        var initialGuestCount = @(string.IsNullOrEmpty(Model.RelatedLinkCapacity) ? "0" : Model.RelatedLinkCapacity);
+        @if (string.IsNullOrEmpty(Model.EmptyRangeFrom))
+        {
+            @:var empty_range_from = undefined;
+        }
+        else
+        {
+            @:var empty_range_from = "@Model.EmptyRangeFrom";
+        }
+        @if (string.IsNullOrEmpty(Model.EmptyRangeTo))
+        {
+            @:var empty_range_to = undefined;
+        }
+        else
+        {
+            @:var empty_range_to = "@Model.EmptyRangeTo";
+        }
+            currentGuestCount = parseInt(initialGuestCount);
 
-    var instantReserveAvailable;
+        var instantReserveAvailable;
 
-    var instantReserveActivated;
-    var instantReserveMaxStart = 30;
-    var maxInstantReserveStartUnix;
+        var instantReserveActivated;
+        var instantReserveMaxStart = 30;
+        var maxInstantReserveStartUnix;
         var maxReserveStartDate;
         var isInstantReserve = false;
-    jalaliShowLoading();
-    $.ajax({
-        type: "GET",
-        url: "/accomodation/getaccommodationdynamicviewBag",
-        contentType: "application/json; charset=utf-8",
-        data: "id=" + advertise_id,
-        cache: false,
-        success: function (ret) {
-            jalaliHideLoading();
-            user_is_autenticated = ret.user_is_autenticated;
-            isNumberForIran = ret.isNumberForIran;
-            verifyEmail = ret.verifyEmail;
-            userEmailAddress = ret.userEmailAddress;
-            instantReserveAvailable = ret.instantReserveAvailable;
-            instantReserveActivated = ret.instantReserveAvailable;
-            instantReserveMaxStart = ret.instantReserveMaxStart;
-            maxInstantReserveStartUnix = ret.maxInstantReserveStartUnix;
-            maxReserveStartDate = ret.maxReserveStartDate;
-            //updateReserveRequestButton();
-            var $elem = $('.master__favourite-button');
-            if (ret.is_favourited) {
-                $elem.addClass("active");
-                //$elem.children('span').html('حذف از علاقه مندی ها');
-    }
-    else {
-                $elem.removeClass("active");
-        //$elem.children('span').html('افزودن به علاقه مندی ها');
-    }
-            $elem.children('i').css('opacity', '1');
+        jalaliShowLoading();
+        $.ajax({
+            type: "GET",
+            url: "/accomodation/getaccommodationdynamicviewBag",
+            contentType: "application/json; charset=utf-8",
+            data: "id=" + advertise_id,
+            cache: false,
+            success: function (ret) {
+                jalaliHideLoading();
+                user_is_autenticated = ret.user_is_autenticated;
+                isNumberForIran = ret.isNumberForIran;
+                verifyEmail = ret.verifyEmail;
+                userEmailAddress = ret.userEmailAddress;
+                instantReserveAvailable = ret.instantReserveAvailable;
+                instantReserveActivated = ret.instantReserveAvailable;
+                instantReserveMaxStart = ret.instantReserveMaxStart;
+                maxInstantReserveStartUnix = ret.maxInstantReserveStartUnix;
+                maxReserveStartDate = ret.maxReserveStartDate;
+                //updateReserveRequestButton();
+                var $elem = $('.master__favourite-button');
+                if (ret.is_favourited) {
+                    $elem.addClass("active");
+                    //$elem.children('span').html('حذف از علاقه مندی ها');
+                }
+                else {
+                    $elem.removeClass("active");
+                    //$elem.children('span').html('افزودن به علاقه مندی ها');
+                }
+                $elem.children('i').css('opacity', '1');
 
-    fillReserveInfo(advertise_id, ret.occupiedList,
-        ret.priceDict, ret.rules_string);
-    short_rules_string = ret.short_rules_string;
-            //date_price_dict = ret.price_dict;
-            for (var key in ret.price_property_dict) {
-        // check if the property/key is defined in the object itself, not in parent
-        if (ret.price_property_dict.hasOwnProperty(key)) {
-                    $(".js-" + key).find('.advertise-page__price-content').html(ret.price_property_dict[key]);
-        }
-    }
-    //if (ret.price_property_dict.hasOwnProperty("NorouzOverCapacityPrice")) {
-    //            $(".js-" + "NorouzOverCapacityPrice").find('.advertise-page__price-content').html(ret.price_property_dict["NorouzOverCapacityPrice"]);
-    //}
-},
-        error: function (result) {},
-        complete: function (result) {}
-});
+                fillReserveInfo(advertise_id, ret.occupiedList,
+                    ret.priceDict, ret.rules_string);
+                short_rules_string = ret.short_rules_string;
+                //date_price_dict = ret.price_dict;
+                for (var key in ret.price_property_dict) {
+                    // check if the property/key is defined in the object itself, not in parent
+                    if (ret.price_property_dict.hasOwnProperty(key)) {
+                        $(".js-" + key).find('.advertise-page__price-content').html(ret.price_property_dict[key]);
+                    }
+                }
+                //if (ret.price_property_dict.hasOwnProperty("NorouzOverCapacityPrice")) {
+                //            $(".js-" + "NorouzOverCapacityPrice").find('.advertise-page__price-content').html(ret.price_property_dict["NorouzOverCapacityPrice"]);
+                //}
+            },
+            error: function (result) { },
+            complete: function (result) { }
+        });
 
-function updateReserveRequestButton() {
-    if (instantReserveAvailable && instantReserveActivated) {
-            $('#js-instant-reserve-info').css('display', 'flex');
-            $('.js-reserve-req-title').html('رزرو آنی');
-            $('.js-reserve-req-icon').removeClass("fa-calendar-check");
-            $('.js-reserve-req-icon').addClass("fa-bolt");
-            $('#js-mxrsrvstart-label').html(maxReserveStartDate);
-    }
-    else {
-            $('#js-normal-reserve-info').show();
-        $('.js-reserve-req-title').html(' <i class="js-reserve-req-icon fa fa-calendar-check"></i>درخواست رزرو');
-            $('.js-reserve-req-icon').removeClass("fa-bolt");
-            $('.js-reserve-req-icon').addClass("fa-calendar-check");
-    }
+        function updateReserveRequestButton() {
+            if (instantReserveAvailable && instantReserveActivated) {
+                $('#js-instant-reserve-info').css('display', 'flex');
+                $('.js-reserve-req-title').html('رزرو آنی');
+                $('.js-reserve-req-icon').removeClass("fa-calendar-check");
+                $('.js-reserve-req-icon').addClass("fa-bolt");
+                $('#js-mxrsrvstart-label').html(maxReserveStartDate);
+            }
+            else {
+                $('#js-normal-reserve-info').show();
+                $('.js-reserve-req-title').html(' <i class="js-reserve-req-icon fa fa-calendar-check"></i>درخواست رزرو');
+                $('.js-reserve-req-icon').removeClass("fa-bolt");
+                $('.js-reserve-req-icon').addClass("fa-calendar-check");
+            }
         }
 
         function showVideo(residenceId) {
@@ -653,41 +656,41 @@ function updateReserveRequestButton() {
     @if (!Model.IsPreview)
     {
         <script defer="defer" type="application/ld+json">
-            {
-            "@@context":"https://schema.org",
-            "@@type":"RentAction",
-            "agent":{
-            "@@type":"Organization",
-            "name":"املاک باشی"
-            },
-            "landlord":{
-            "@@type":"Person",
-            "name":"@(owner.FullName)"
-            },
-            "price":"@(Model.Price.DailyPrice).00",
-            "location":{
-            "@@type":"Place",
-            "address":{
-            "@@type":"PostalAddress",
-            "addressLocality":"@(Model.Address.AreaId > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
-            "addressRegion":"@(Model.Address.AreaId > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
-            "streetAddress":"@(Model.FilteredAddress)"
-            }
-            },
-            "object":{
-            "@@type":"Hotel",
-            "name":"@(Model.TitleDesc.Title)",
-            "numberOfRooms":"@(Model.Room)",
-            "petsAllowed":"@(Model.Rules.Pets ? "Yes" : "No")",
+                {
+                "@@context":"https://schema.org",
+                "@@type":"RentAction",
+                "agent":{
+                "@@type":"Organization",
+                "name":"املاک باشی"
+                },
+                "landlord":{
+                "@@type":"Person",
+                "name":"@(owner.FullName)"
+                },
+                "price":"@(Model.Price.DailyPrice).00",
+                "location":{
+                "@@type":"Place",
+                "address":{
+                "@@type":"PostalAddress",
+                "addressLocality":"@(Model.Address.AreaId > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
+                "addressRegion":"@(Model.Address.AreaId > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
+                "streetAddress":"@(Model.FilteredAddress)"
+                }
+                },
+                "object":{
+                "@@type":"Hotel",
+                "name":"@(Model.TitleDesc.Title)",
+                "numberOfRooms":"@(Model.Room)",
+                "petsAllowed":"@(Model.Rules.Pets ? "Yes" : "No")",
             @*"floorsize":{
-                "@@type":"QuantitativeValue",
-                "value":"@(Model.Metrazh)",
-                "unitCode":"MTK",
-                "unitText":"متر مربع"
-                },*@
-            "description":"@(Model.TitleDesc.Description)",
-            "image":"https://www.amlakbashi.com@(string.Format("/عکس-آگهی-بزرگ/{0}", Model.Slug))",
-            "url":"https://www.amlakbashi.com@(Model.RawUrl)"
+    "@@type":"QuantitativeValue",
+    "value":"@(Model.Metrazh)",
+    "unitCode":"MTK",
+    "unitText":"متر مربع"
+    },*@
+                "description":"@(Model.TitleDesc.Description)",
+                "image":"https://www.amlakbashi.com@(string.Format("/عکس-آگهی-بزرگ/{0}", Model.Slug))",
+                "url":"https://www.amlakbashi.com@(Model.RawUrl)"
             @if (Model.ReportItems.CountReport > 0)
             {
                 @:,
@@ -699,23 +702,23 @@ function updateReserveRequestButton() {
                 @:"worstRating": "0"
                 @:}
             }
-            ,
-            "priceRange" : "از شبی @(Model.Price.DailyPrice) تومان"
-            ,
-            "address" : {
-            "addressLocality" : "@(Model.Address.AreaId > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
-            "addressRegion" : "@(Model.Address.AreaId > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
-            "addressCountry" : "Iran",
-            "@@type" : "PostalAddress",
-            "streetAddress" : "@Model.FilteredAddress",
-            "postalCode" : "14717"
-            }
-            ,
-            "telephone" : "026-32565304"
+                ,
+                "priceRange" : "از شبی @(Model.Price.DailyPrice) تومان"
+                ,
+                "address" : {
+                "addressLocality" : "@(Model.Address.AreaId > 0 ? Model.AccCategory.CityName : Model.AccCategory.ProvinceName)",
+                "addressRegion" : "@(Model.Address.AreaId > 0 ? Model.AccCategory.AreaName : Model.AccCategory.CityName)",
+                "addressCountry" : "Iran",
+                "@@type" : "PostalAddress",
+                "streetAddress" : "@Model.FilteredAddress",
+                "postalCode" : "14717"
+                }
+                ,
+                "telephone" : "026-32565304"
 
-            }
-            }
-            }
+                }
+                }
+                }
         </script>
         if (Model.ReportItems.CountReport > 0)
         {
@@ -801,7 +804,7 @@ function updateReserveRequestButton() {
             "name": "اجاره روزانه",
             "item": "https://www.amlakbashi.com/ایران"
             }
-            @(pos > 1 ? "," : "" )
+            @(pos > 1 ? "," : "")
             {
             "@@type": "ListItem",
             "position": @pos,
@@ -820,9 +823,9 @@ function updateReserveRequestButton() {
             "position": @pos,
             "name": "@typeUrlString",
             "item": "@("https://www.amlakbashi.com/s/" +
-                    (
-                    (Model.Address.CityId + "/" + Model.AccCategory.CityName + "/" + typeUrlString)
-                    ))"
+          (
+          (Model.Address.CityId + "/" + Model.AccCategory.CityName + "/" + typeUrlString)
+          ))"
             }
             @{
                 pos++;

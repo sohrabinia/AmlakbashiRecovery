@@ -11,6 +11,18 @@
             </div>
         </div>
     }
+    var tags = (IEnumerable<Tag>)ViewBag.tags;
+    if (tags != null && tags.Any())
+    {
+        foreach (var item in tags)
+        {
+            <div onclick="searchTag('@item.UrlTitle')" style="color:#242424">
+                <div>
+                    <span><i class="fas fa-tag"></i>@item.Title</span>
+                </div>
+            </div>
+        }
+    }
 }
 @if (ViewBag.showNotFound != null && ViewBag.showNotFound)
 {

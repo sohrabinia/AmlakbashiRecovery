@@ -154,7 +154,7 @@
     <div class="advertise-category__paging-container">
         @if (isPreviousPageAvailable)
         {
-            <button onclick="ChangePage(@(Model.pagedList.PagingInfo.page - 1))" id="prevButton" class="advertise-category__page-button advertise-category__prev-page">« قبلی</button>
+            <button onclick="changePage(@(Model.pagedList.PagingInfo.page - 1))" id="prevButton" class="advertise-category__page-button advertise-category__prev-page">« قبلی</button>
         }
         else
         {
@@ -163,7 +163,7 @@
         <div class="advertise-category__paging-label">صفحه @(Model.pagedList.PagingInfo.page) از @(Model.pagedList.PagingInfo.pageCount)</div>
         @if (isNextPageAvailable)
         {
-            <button onclick="ChangePage(@(Model.pagedList.PagingInfo.page + 1))" id="prevButton" class="advertise-category__page-button advertise-category__prev-page">بعدی »</button>
+            <button onclick="changePage(@(Model.pagedList.PagingInfo.page + 1))" id="prevButton" class="advertise-category__page-button advertise-category__prev-page">بعدی »</button>
         }
         else
         {

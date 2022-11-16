@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Amlakbashi.Application.Services.AdvertiseServices.Interfaces;
-using static Amlakbashi.Core.Entities.Region;
 using Amlakbashi.Application.Services.Category.Interfaces;
 using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
@@ -16,21 +14,17 @@ namespace MVC_RSS_Sitemap.Controllers
 {
     public class XMLController : BaseController
     {
-        private readonly IRegionAppService regionService;
         private readonly ICategoryAppService dynamicCategoryService;
         private readonly IAdvertiseAppService advertiseService;
-        public XMLController(IRegionAppService regionService,
-            ICategoryAppService dynamicCategoryService,
+        public XMLController(ICategoryAppService dynamicCategoryService,
             IAdvertiseAppService advertiseService)
         {
             this.dynamicCategoryService = dynamicCategoryService;
-            this.regionService = regionService;
             this.advertiseService = advertiseService;
         }
 
         //public ContentResult RSS()
         //{
-
         //    var items = GetRssFeed();
         //    var rss = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
         //      new XElement("rss",
@@ -47,14 +41,12 @@ namespace MVC_RSS_Sitemap.Controllers
         //            new XElement("description", item.description),
         //            new XElement("link", item.link),
         //            new XElement("pubDate", item.pubDate)
-
         //          )
         //        )
         //      )
         //    );
         //    return Content(rss.ToString(), "text/xml");
         //}
-
 
         public ContentResult Sitemap()
         {
@@ -70,23 +62,16 @@ namespace MVC_RSS_Sitemap.Controllers
                       ),
                     new XElement("sitemap",
                       new XElement("loc", url_base + "/city-sitemap.xml")
+                      ),
+                    new XElement("sitemap",
+                      new XElement("loc", url_base + "/tag-sitemap.xml")
                       )
-                    //new XElement("sitemap",
-                    //  new XElement("loc", url_base + "/old-sitemap.xml")
-                    //  )
-                    //new XElement("sitemap",
-                    //  new XElement("loc", url_base + "/area-sitemap.xml")
-                    //  ),
-                    //new XElement("sitemap",
-                    //  new XElement("loc", url_base + "/image-sitemap.xml")
-                    //  )
                     )
                   );
 
             string str = sitemap.ToString().Replace("xmlns=\"\"", "");
             return Content(str, "text/xml");
         }
-
 
         public ContentResult AdSitemap()
         {
@@ -109,33 +94,6 @@ namespace MVC_RSS_Sitemap.Controllers
             return Content(str, "text/xml");
         }
 
-        public ContentResult ImageSitemap()
-        {
-            XNamespace ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
-            XNamespace nsImage = "http://www.google.com/schemas/sitemap-image/1.1";
-            string url_base = Request.Scheme + "://" + Request.Host;
-            var items = GetImageLinks();
-            var sitemap = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
-                new XElement(ns + "urlset",
-                new XAttribute(XNamespace.Xmlns + "image", nsImage.NamespaceName),
-                    from item in items
-                    select
-                    new XElement("url",
-                      new XElement("loc", item.link),
-                      new XElement(nsImage + "image",
-                              new XElement(nsImage + "loc", item.imagelink),
-                              new XElement(nsImage + "geo_location", item.geolocation),
-                              new XElement(nsImage + "title", item.title)
-                          )
-                      )
-                    )
-                  );
-
-            string str = sitemap.ToString().Replace("xmlns=\"\"", "");
-            return Content(str, "text/xml");
-        }
-
-
         public ContentResult ProvinceSitemap()
         {
             XNamespace ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
@@ -156,7 +114,6 @@ namespace MVC_RSS_Sitemap.Controllers
             return Content(str, "text/xml");
         }
 
-
         public ContentResult CitySitemap()
         {
             XNamespace ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
@@ -169,46 +126,6 @@ namespace MVC_RSS_Sitemap.Controllers
                       new XElement("loc", item.link),
                       new XElement("lastmod", item.lastmod),
                       new XElement("priority", item.priority)
-                      )
-                    )
-                  );
-
-            string str = sitemap.ToString().Replace("xmlns=\"\"", "");
-            return Content(str, "text/xml");
-        }
-
-
-        public ContentResult AreaSitemap()
-        {
-            XNamespace ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
-            var items = GetArea();
-            var sitemap = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
-                new XElement(ns + "urlset",
-                    from item in items
-                    select
-                    new XElement("url",
-                      new XElement("loc", item.link),
-                      new XElement("lastmod", item.lastmod),
-                      new XElement("priority", item.priority)
-                      )
-                    )
-                  );
-
-            string str = sitemap.ToString().Replace("xmlns=\"\"", "");
-            return Content(str, "text/xml");
-        }
-
-        public ContentResult OldSiteMap()
-        {
-            XNamespace ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
-            var items = OldGetProvinces().Concat(OldGetCities()).Concat(OldGetArea());
-            var sitemap = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
-                new XElement(ns + "urlset",
-                    from item in items
-                    select
-                    new XElement("url",
-                      new XElement("loc", item.link),
-                      new XElement("lastmod", item.lastmod)
                       )
                     )
                   );
@@ -268,24 +185,6 @@ namespace MVC_RSS_Sitemap.Controllers
             return sampleposts;
         }
 
-        public IEnumerable<PostToXML> GetImageLinks()
-        {
-            string url_base = Request.Scheme + "://" + Request.Host;
-            var PostsFromDb = advertiseService.GetAdvertisesByStatus(Advertise.AdvertiseStatus.Published, true);
-            var provinces = regionService.Filter(AdvertiseRegion.Province);
-            List<PostToXML> sampleposts = (from p in PostsFromDb
-                                           select new PostToXML()
-                                           {
-                                               title = p.Title.Replace("-", " "),
-                                               imagelink = url_base + string.Format("/عکس-آگهی-بزرگ/{0}", p.Slug),
-                                               geolocation = provinces.FirstOrDefault(x => x.Id == p.ProvinceId).EnglishName + ", Iran",
-                                               link = url_base + string.Format("/{0}/{1}", AdvertiseMainLocalization.CategoryTitle, p.Slug),
-
-                                           }).ToList();
-
-            return sampleposts;
-        }
-
         public IEnumerable<PostToXML> GetProvinces()
         {
             string url_base = Request.Scheme + "://" + Request.Host;
@@ -317,68 +216,6 @@ namespace MVC_RSS_Sitemap.Controllers
 
             return sampleposts;
         }
-
-        public IEnumerable<PostToXML> GetArea()
-        {
-            string url_base = Request.Scheme + "://" + Request.Host;
-            var cats = dynamicCategoryService.GetAreasForXML(true);
-            List<PostToXML> sampleposts = (from cat in cats
-                                           select new PostToXML()
-                                           {
-                                               title = cat.Title,
-                                               lastmod = cat.LastModifyDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
-                                               priority = cat.CountAdvertise > 30 ? "0.9" : "0.8",
-                                               link = url_base + CategoryUrlLocalization.CategoryToUrl(cat)
-                                           }).ToList();
-
-            return sampleposts;
-        }
-
-        public IEnumerable<PostToXML> OldGetProvinces()
-        {
-            string url_base = Request.Scheme + "://" + Request.Host;
-            var cats = dynamicCategoryService.GetProvincesForXML(true);
-            List<PostToXML> sampleposts = (from cat in cats
-                                           select new PostToXML()
-                                           {
-                                               title = cat.Title,
-                                               lastmod = cat.LastModifyDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
-                                               link = url_base + string.Format("/{0}/{1}", AdvertiseMainLocalization.CategoryTitle, cat.URL)
-                                           }).ToList();
-
-            return sampleposts;
-        }
-
-        public IEnumerable<PostToXML> OldGetCities()
-        {
-            string url_base = Request.Scheme + "://" + Request.Host;
-            var cats = dynamicCategoryService.GetCitiesForXML(true);
-            List<PostToXML> sampleposts = (from cat in cats
-                                           select new PostToXML()
-                                           {
-                                               title = cat.Title,
-                                               lastmod = cat.LastModifyDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
-                                               link = url_base + string.Format("/{0}/{1}", AdvertiseMainLocalization.CategoryTitle, cat.URL)
-                                           }).ToList();
-
-            return sampleposts;
-        }
-
-        public IEnumerable<PostToXML> OldGetArea()
-        {
-            string url_base = Request.Scheme + "://" + Request.Host;
-            var cats = dynamicCategoryService.GetAreasForXML(true);
-            List<PostToXML> sampleposts = (from cat in cats
-                                           select new PostToXML()
-                                           {
-                                               title = cat.Title,
-                                               lastmod = cat.LastModifyDate.ToString("yyyy-MM-ddTHH:mm:sszzz"),
-                                               link = url_base + string.Format("/{0}/{1}{2}", AdvertiseMainLocalization.CategoryTitle, cat.URL, string.IsNullOrEmpty(cat.AreaStr) ? "" : "/" + cat.AreaStr)
-                                           }).ToList();
-
-            return sampleposts;
-        }
-
     }
 
     public class PostToXML

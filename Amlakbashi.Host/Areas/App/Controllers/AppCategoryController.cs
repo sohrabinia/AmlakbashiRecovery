@@ -838,9 +838,10 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             //return Redirect(redirectURI.AbsoluteUri);
         }
 
-        [ResponseCache(Duration = 60 * 15, VaryByQueryKeys = new string[] { "*" })]
-        public ActionResult Search(string phrase = "",
-            string province = "-1", string city = "-1", string area = "-1")
+        //[ResponseCache(Duration = 60 * 15, VaryByQueryKeys = new string[] { "*" })]
+        public async Task<IActionResult> Search([FromServices] ITagAppService tagService,
+            string phrase = "", string province = "-1",
+            string city = "-1", string area = "-1")
         {
             ViewBag.Province = province;
             ViewBag.City = city;
@@ -856,6 +857,8 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                 {
                     model.Add(SearchTableDTO.GenerateForApp(item, regionService.GetRegionName(item.Type != 2 ? 0 : (int)item.ParentID)));
                 }
+                var tags = await tagService.GetListAsync(phrase, Tag.TagStatusEnum.Active);
+                ViewBag.tags = tags.Take(5 - regions.Count);
                 return PartialView("_Search", model);
             }
             catch (Exception exc)

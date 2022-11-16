@@ -19,19 +19,30 @@ else
             </div>
 
             <div class="column-title">
-                @item.Title
+                @if (item.Status == Tag.TagStatusEnum.Active)
+                {
+                    <a asp-action="GetResidences" asp-route-urlTitle="@item.UrlTitle" target="_blank">@item.Title</a>
+                }
+                else
+                {
+                    @:@item.Title
+                }
             </div>
 
             <div class="column-urltitle">
-                @Amlakbashi.Core.Common.Utilities.StringUtility.GetTagUrlTitle(item.Title)
+                @item.UrlTitle
             </div>
 
             <div class="column-operation">
                 <div>
                     <i class="fa fa-edit" onclick="showEditPopup(@item.Id, '@item.Title')" title="ویرایش عنوان"></i>
-                    @if (item.Status == Tag.TagStatusEnum.Unset)
+                    @if (item.Status == Tag.TagStatusEnum.Active)
                     {
-                        <i class="fa fa-check-circle" onclick="activeTag(@item.Id, this)" title="تایید"></i>
+                        <i class="fa fa-check-circle actived" title="تایید شده"></i>
+                    }
+                    else
+                    {
+                        <i class="fa fa-check-circle unset" onclick="activeTag(@item.Id, this)" title="تایید"></i>
                     }
                     <i class="fa fa-trash" onclick="deleteTag(@item.Id)" title="حذف"></i>
                 </div>

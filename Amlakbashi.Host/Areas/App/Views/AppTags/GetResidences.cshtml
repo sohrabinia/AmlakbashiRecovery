@@ -1,0 +1,59 @@
+﻿@model Amlakbashi.Core.DTOs.TagDTOs.TagResidencesDTO
+
+@{
+    //Layout = "~/Views/Shared/_Master.cshtml";
+    ViewBag.CurrentPage = "AdvertiseCategory";
+    ViewBag.Title = Model.title + " | املاک باشی";
+
+    var websiteUrl = Amlakbashi.Core.Common.StaticData.GeneralData.WebsiteUrl;
+    var previous_page_available = Model.pagedList.PagingInfo.page > 1;
+    var next_page_available = Model.pagedList.PagingInfo.pageCount > Model.pagedList.PagingInfo.page;
+}
+
+@section HeaderAddition{
+    <link rel="canonical" href="@($"{websiteUrl}/app/tags/getresidences/{Model.urlTitle}")" />
+    <meta property="og:url" content="@($"{websiteUrl}/app/tags/getresidences/{Model.urlTitle}")" />
+    <meta property="og:image" content='@(websiteUrl + (Model.pagedList.List.Any() && Model.pagedList.List.First().PhotoID > 0 ? $"/file/imgthumb?fileid={Model.pagedList.List.First().PhotoID}&w={700}&h={394}" : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
+}
+
+    @section StyleBlock {
+    .body{
+        margin-top: 90px !important;
+    }
+}
+
+    @section StyleLink {
+    <link rel="stylesheet" href="/css/cat-item.min.css" asp-append-version="true" />
+}
+
+    <div class="container" style="max-width:1100px">
+        <div class="dynamic__header-container">
+            <div class="dynamic-title">
+                <div class="dynamic-text" style="width: 100%;">
+                    <h1 style="text-align: center;width: 100%;">@Model.title</h1>
+                </div>
+            </div>
+        </div>
+        <div id="accListContainer">
+        @if (Model.pagedList.List.Any())
+        {
+            @await Html.PartialAsync("_TagResidencesList", Model)
+        }
+        else
+        {
+            <p>اقامتگاهی با این تگ یافت نشد!</p>
+        }
+    </div>
+</div>
+
+@section ScriptLink{
+    <script src="/js/app/master-search.js" asp-append-version="true"></script>
+    <script src="/js/app/search-by-region.js" asp-append-version="true"></script>
+}
+
+    @section ScriptBlock{
+    <script>
+        let empty_range_from = undefined;
+        let empty_range_to = undefined;
+    </script>
+}

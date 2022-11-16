@@ -19,12 +19,23 @@ aside.admin-table-row .column-operation i {
     padding: 0;
     cursor: pointer;
 }
+aside.admin-table-row .column-operation i.unset {
+    color: #fdd835;
+}
+aside.admin-table-row .column-operation i.actived {
+    color: limegreen;
+    cursor: default;
+}
 .add-tag-btn {
     height: 30px;
 }
 .add-tag-operation{
     text-align: center;
     margin: 20px 0;
+}
+.add-tag-operation input {
+    width: 400px;
+    margin-bottom: 10px;
 }
 .add-tag-operation button{
     margin-right: 10px;
@@ -53,15 +64,18 @@ aside.admin-table-row .column-operation i {
         width: 15%;
     }
     aside.admin-table-row .column-id {
-        width: 15%;
+        display: none;
     }
     aside.admin-table-row .column-title {
-        width: 40%;
+        width: 55%;
     }
     aside.admin-table-row .column-urltitle{
         display: none;
     }
     aside.admin-table-row .column-operation {
         width: 29%;
+    }
+    .add-tag-operation input {
+        width: 250px;
     }
 }

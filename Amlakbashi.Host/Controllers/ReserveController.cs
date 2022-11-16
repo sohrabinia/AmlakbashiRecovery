@@ -2428,9 +2428,8 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new { status = 0, msg = "لطفا کد را وارد کنید" });
             }
             var lowerCode = code.ToLower();
-            var discountCodeType = lowerCode == "amb5" ? DiscountCoupon.DiscountCouponType.Moupon :
+            var discountCodeType = lowerCode == "trip5off" ? DiscountCoupon.DiscountCouponType.Moupon :
                 lowerCode == "inst8" ? DiscountCoupon.DiscountCouponType.Instagram :
-                lowerCode == "pedar1400" ? DiscountCoupon.DiscountCouponType.Pedar1400 :
                 DiscountCoupon.DiscountCouponType.Unset;
 
             if (discountCodeType == DiscountCoupon.DiscountCouponType.Unset)
@@ -2438,19 +2437,11 @@ namespace Amlakbashi.Host.Controllers
                 return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
             }
 
-            var startDate = DateTime.Parse("01/01/2021");
-            var identityUser = userService.GetIdentityUser(userAccessor.CurrentUser.PhoneNumber);
             if ((discountCodeType == DiscountCoupon.DiscountCouponType.Moupon ||
                 discountCodeType == DiscountCoupon.DiscountCouponType.Instagram) &&
-                identityUser.CreateDate.Value.Date < startDate.Date)
+                userAccessor.CurrentUser.HasSuccessfulReserve())
             {
                 return GenerateJsonResult(new { status = 0, msg = "شما مجوز استفاده از این کد تخفیف را ندارید" });
-            }
-
-            if (discountCodeType == DiscountCoupon.DiscountCouponType.Pedar1400 &&
-                DateTime.Now.Date > DateTime.Parse("02/15/2022"))
-            {
-                return GenerateJsonResult(new { status = 0, msg = "کد وارد شده اشتباه است" });
             }
 
             var coupon = accounting.FindDiscountCoupon(userAccessor.CurrentUser.Id, discountCodeType);

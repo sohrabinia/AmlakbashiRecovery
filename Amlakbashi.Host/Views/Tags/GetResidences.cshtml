@@ -5,14 +5,15 @@
     ViewBag.CurrentPage = "AdvertiseCategory";
     ViewBag.Title = Model.title + " | املاک باشی";
 
+    var websiteUrl = Amlakbashi.Core.Common.StaticData.GeneralData.WebsiteUrl;
     var previous_page_available = Model.pagedList.PagingInfo.page > 1;
     var next_page_available = Model.pagedList.PagingInfo.pageCount > Model.pagedList.PagingInfo.page;
 }
 
 @section HeaderAddition{
-    <link rel="canonical" href="@($"https://www.amlakbashi.com/tag/{Model.urlTitle}")" />
-    <meta property="og:url" content="@($"https://www.amlakbashi.com/tag/{Model.urlTitle}")" />
-    <meta property="og:image" content='@("https://www.amlakbashi.com" + (Model.pagedList.List.Any() && Model.pagedList.List.First().PhotoID > 0 ? $"/file/imgthumb?fileid={Model.pagedList.List.First().PhotoID}&w={700}&h={394}" : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
+    <link rel="canonical" href="@($"{websiteUrl}/tag/{Model.urlTitle}")" />
+    <meta property="og:url" content="@($"{websiteUrl}/tag/{Model.urlTitle}")" />
+    <meta property="og:image" content='@(websiteUrl + (Model.pagedList.List.Any() && Model.pagedList.List.First().PhotoID > 0 ? $"/file/imgthumb?fileid={Model.pagedList.List.First().PhotoID}&w={700}&h={394}" : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
 }
 
 @section StyleBlock {
@@ -58,17 +59,17 @@
         let currentPageNumber = @Model.page;
 
         let url = currentPageNumber == 1 ?
-            `/residences/tag/${tagUrlTitle}` :
-            `/residences/tag/${tagUrlTitle}?page=${currentPageNumber}`;
+            `/tag/${tagUrlTitle}` :
+            `/tag/${tagUrlTitle}?page=${currentPageNumber}`;
         window.history.replaceState({ pageNumber: currentPageNumber }, null, url);
 
-        function ChangePage(pageNumber, isBack){
+        function changePage(pageNumber, isBack){
             let requestUrl = pageNumber === 1 ?
-                `/residences/tag/${tagUrlTitle}` :
-                `/residences/tag/${tagUrlTitle}?page=${pageNumber}`;
+                `/tag/${tagUrlTitle}` :
+                `/tag/${tagUrlTitle}?page=${pageNumber}`;
 
             $('img.home-page__advertise-image').attr('src', '/file/resourceimagegif?file_name=lazy-16_9');
-            $.post(`/residences/tag/${tagUrlTitle}`, { ajax: true, page: pageNumber })
+            $.post(`/tag/${tagUrlTitle}`, { ajax: true, page: pageNumber })
                 .done(function (response) {
                     $("#accListContainer").html(response);
                     if(!isBack){
@@ -83,7 +84,7 @@
         window.onpopstate = function (event) {
             if (event.state != null) {
                 var previousPageNumber = event.state.pageNumber;
-                ChangePage(previousPageNumber, true);
+                changePage(previousPageNumber, true);
             }
         };
     </script>

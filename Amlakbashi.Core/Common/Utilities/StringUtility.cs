@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Amlakbashi.Core.Common.Utilities
@@ -89,6 +90,12 @@ namespace Amlakbashi.Core.Common.Utilities
         public static string GetTagTitle(string urlTitle)
         {
             return urlTitle.Replace('-', ' ');
+        }
+
+        public static void ModifySentence(ref string sentence)
+        {
+            sentence = sentence.Trim();
+            sentence = Regex.Replace(sentence, @"\s+", " ");
         }
     }
 }

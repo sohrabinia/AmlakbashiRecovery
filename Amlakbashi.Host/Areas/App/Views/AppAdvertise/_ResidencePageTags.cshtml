@@ -9,7 +9,7 @@
     <div class="advertise-page__related-links-container">
         @foreach (var item in Model.Tags.TagsDic)
         {
-            <a title="@item.Value" asp-controller="tags" asp-action="getresidences" asp-route-urltitle="@(Amlakbashi.Core.Common.Utilities.StringUtility.GetTagUrlTitle(item.Value))" target="_blank">
+            <a title="@item.Value" href="/app/tags/getresidences/@(Amlakbashi.Core.Common.Utilities.StringUtility.GetTagUrlTitle(item.Value))">
                 @item.Value
             </a>
         }

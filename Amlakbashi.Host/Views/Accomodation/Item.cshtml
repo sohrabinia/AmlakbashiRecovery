@@ -301,7 +301,10 @@
 
         @* Tags and Related Links *@
         <div class="advertise-page__property-box advertise-page__comment-box">
-            @await Html.PartialAsync("AccPagePartials/_AccPageTags", Model)
+            @if (Model.Tags.TagsDic.Any())
+            {
+                @await Html.PartialAsync("AccPagePartials/_AccPageTags", Model)
+            }
             @await Html.PartialAsync("AccPagePartials/_AccPageRelatedLinks", Model)
         </div>
 

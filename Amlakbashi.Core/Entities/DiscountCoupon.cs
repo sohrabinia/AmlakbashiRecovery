@@ -47,7 +47,7 @@ namespace Amlakbashi.Core.Entities
         {
             switch (discountCode.ToLower())
             {
-                case "amb5":
+                case "trip5off":
                     return DiscountCouponType.Moupon;
                 case "inst8":
                     return DiscountCouponType.Instagram;

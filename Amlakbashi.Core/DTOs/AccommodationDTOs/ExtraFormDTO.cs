@@ -26,7 +26,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
         public TagInputDTO tags { get; set; }
         public AdvertiseMode advertiseMode { get; set; }
 
-        public static ExtraFormDTO Generate(AdvertiseDirector director, long id)
+        public static ExtraFormDTO Generate(AdvertiseDirector director, long id, string cityPersianName = null)
         {
             var model = new ExtraFormDTO()
             {
@@ -47,7 +47,10 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             model.elevator = director.GetAdvertisePart<ElevatorPart>();
             model.license = director.GetAdvertisePart<LicensePart>();
             model.tags = director.GetAdvertisePart<TagPart>();
-            model.tags.residenceId = id;
+            if (string.IsNullOrEmpty(cityPersianName) == false)
+            {
+                model.tags.cityPersianName = cityPersianName;
+            }
             return model;
         }
     }
