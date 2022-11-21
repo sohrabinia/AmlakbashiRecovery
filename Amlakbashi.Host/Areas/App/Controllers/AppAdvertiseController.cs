@@ -31,6 +31,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
         private readonly ICategoryAppService categoryService;
         private readonly IRegionAppService regionService;
         private readonly IReportItemAppService reportItemService;
+        private readonly ITagAppService tagService;
         private readonly IUserAccessor userAccessor;
         private readonly ICacheManager cacheManager;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -39,6 +40,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             ICategoryAppService categoryService,
             IRegionAppService regionService,
             IReportItemAppService reportItemService,
+            ITagAppService tagService,
             IUserAccessor userAccessor,
             ICacheManager cacheManager,
             IWebHostEnvironment webHostEnvironment,
@@ -48,6 +50,7 @@ namespace Amlakbashi.Host.Areas.App.Controllers
             this.categoryService = categoryService;
             this.regionService = regionService;
             this.reportItemService = reportItemService;
+            this.tagService = tagService;
             this.userAccessor = userAccessor;
             this.cacheManager = cacheManager;
             this.webHostEnvironment = webHostEnvironment;
@@ -414,7 +417,8 @@ namespace Amlakbashi.Host.Areas.App.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult UpdateExtra(Advertise data, PoolInputDTO poolDTO, IList<int> tags, bool isEdit = false, int tab = 0)
+        public ActionResult UpdateExtra(Advertise data, PoolInputDTO poolDTO, IList<int> tags,
+            bool isEdit = false, int tab = 0)
         {
             try
             {
@@ -452,7 +456,16 @@ namespace Amlakbashi.Host.Areas.App.Controllers
                     ViewBag.type = director.AdvertiseType;
                     ViewBag.level = level;
                     var residence = advertiseService.Find(data.Id);
-                    return View(ExtraFormDTO.Generate(director, data.Id, residence.RegionCity.PersianName));
+                    var dto = ExtraFormDTO.Generate(director, data.Id, residence.RegionCity.PersianName);
+                    if (tags.Any())
+                    {
+                        foreach (var item in tags)
+                        {
+                            var tag = tagService.Find(item);
+                            dto.tags.TagsDic.Add(tag.Id, tag.Title);
+                        }
+                    }
+                    return View(dto);
                 }
 
                 var isAdd = data.Status == Advertise.AdvertiseStatus.NotCompleted;

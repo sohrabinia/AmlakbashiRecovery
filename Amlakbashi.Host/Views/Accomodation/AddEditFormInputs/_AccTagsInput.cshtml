@@ -6,6 +6,7 @@
     <p class="static-advertise__label">عنوان تگ مورد نظر خود را بنویسید <small>(مثلا نزدیک حرم امام رضا)</small></p>
     <div class="tag-input-box">
         <span>@Model.typePersianTitle &nbsp;</span>
+        <input id="city_name_input" type="hidden" value="@Model.cityPersianName" />
         <input id="search_tag_input" class="changed-input-target" type="text" title="تگ ها" onpaste="searchTag()" onkeyup="searchTag()" onchange="searchTag()" autocomplete="false">
         <span>&nbsp; در @Model.cityPersianName</span>
     </div>

@@ -1,4 +1,5 @@
 ﻿let searchTagInput = $('#search_tag_input');
+let cityNameInput = $('#city_name_input');
 let searchResultContainer = $('.tag-search-result-container');
 let searchResultBox = $('.tag-search-result-box');
 let selectedTagsBox = $('.selected-tag-box');
@@ -9,7 +10,8 @@ function searchTag() {
     if (searchedTag.length < 3) {
         return;
     }
-    $.get(`/tags/search?title=${searchedTag}`, function (data) {
+    let cityName = cityNameInput.val();
+    $.get(`/tags/search?title=${searchedTag}&cityName=${cityName}`, function (data) {
         searchResultBox.html(data);
     });
     searchResultContainer.show();

@@ -17,7 +17,7 @@
     margin:10px 10px;
     max-width:90%;
     flex-flow:row;
-    float:right;
+    /*float:right;*/
 }
 
 .chat-popup__sender-name {

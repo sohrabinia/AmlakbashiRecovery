@@ -50,6 +50,7 @@ namespace Amlakbashi.Host.Controllers
         private readonly IExtrinsicReserveAppService extrinsicReserveService;
         private readonly IReserveAppService reserveService;
         private readonly IUserAppService userService;
+        private readonly ITagAppService tagService;
         private readonly ILog logger;
         private readonly IUserAccessor userAccessor;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -65,6 +66,7 @@ namespace Amlakbashi.Host.Controllers
             IPriceTableAppService priceTableService,
             IReserveAppService reserveService,
             IUserAppService userService,
+            ITagAppService tagService,
             IUserAccessor userAccessor,
             IWebHostEnvironment webHostEnvironment,
             ICacheManager cacheManager)
@@ -80,6 +82,7 @@ namespace Amlakbashi.Host.Controllers
             this.priceTableService = priceTableService;
             this.reserveService = reserveService;
             this.userService = userService;
+            this.tagService = tagService;
             this.userAccessor = userAccessor;
             this.webHostEnvironment = webHostEnvironment;
             this.cacheManager = cacheManager;
@@ -340,7 +343,16 @@ namespace Amlakbashi.Host.Controllers
                     ViewBag.errors = groupErrors;
                     ViewBag.tab = tab;
                     var residence = advertiseService.Find(data.Id);
-                    return View(ExtraFormDTO.Generate(director, data.Id, residence.RegionCity.PersianName));
+                    var dto = ExtraFormDTO.Generate(director, data.Id, residence.RegionCity.PersianName);
+                    if (tags.Any())
+                    {
+                        foreach (var item in tags)
+                        {
+                            var tag = tagService.Find(item);
+                            dto.tags.TagsDic.Add(tag.Id, tag.Title);
+                        }
+                    }
+                    return View(dto);
                 }
                 if (tab > 0)
                 {
@@ -1000,7 +1012,16 @@ namespace Amlakbashi.Host.Controllers
                     ViewBag.type = director.AdvertiseType;
                     ViewBag.level = level;
                     var residence = advertiseService.Find(data.Id);
-                    return View(ExtraFormDTO.Generate(director, data.Id, residence.RegionCity.PersianName));
+                    var dto = ExtraFormDTO.Generate(director, data.Id, residence.RegionCity.PersianName);
+                    if (tags.Any())
+                    {
+                        foreach (var item in tags)
+                        {
+                            var tag = tagService.Find(item);
+                            dto.tags.TagsDic.Add(tag.Id, tag.Title);
+                        }
+                    }
+                    return View(dto);
                 }
                 var isAdd = data.Status == AdvertiseStatus.NotCompleted;
                 if (tab > 0)

@@ -56,9 +56,15 @@ namespace Amlakbashi.Host.Controllers
             return GenerateResult(result);
         }
 
-        public async Task<IActionResult> Search(string title)
+        public async Task<IActionResult> Search(string title, string cityName = null)
         {
-            return View("_Search", await tagService.GetListAsync(title));
+            var searchedTags = await tagService.GetListAsync(title);
+            if (string.IsNullOrEmpty(cityName) == false)
+            {
+                searchedTags = searchedTags.OrderByDescending(x => x.Title.Contains(cityName)).ToList();
+            }
+            searchedTags = searchedTags.Take(10).ToList();
+            return View("_Search", searchedTags);
         }
 
         [HttpPost]

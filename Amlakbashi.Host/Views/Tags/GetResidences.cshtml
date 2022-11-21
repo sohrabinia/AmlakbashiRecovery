@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="/css/cat-item.min.css" asp-append-version="true" />
 }
 
-<div class="container" style="max-width:1100px">
+<div class="container" style="margin-bottom: 30px; max-width: 1100px;">
     <div class="dynamic__header-container">
         <div class="dynamic-title">
             <div class="dynamic-text" style="width: 100%;">
@@ -44,6 +44,16 @@
             <p>اقامتگاهی با این تگ یافت نشد!</p>
         }
     </div>
+    @if (Model.similarTags.Any())
+    {
+        <div class="advertise-category-link__title">موارد مشابه</div>
+        <div class="advertise-category-link__container">
+            @foreach (var item in Model.similarTags)
+            {
+                <a asp-action="getresidences" asp-route-urlTitle="@item.UrlTitle" class="advertise-category-link__link">@item.Title</a>
+            }
+        </div>
+    }
 </div>
 
 @section ScriptLink{

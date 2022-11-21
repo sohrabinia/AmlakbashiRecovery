@@ -23,6 +23,11 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         {
         }
 
+        public Tag Find(int id)
+        {
+            return Repository.Find(id);
+        }
+
         public async Task<Tag> FindAsync(int id)
         {
             return await Repository.FindAsync(id);
@@ -75,7 +80,16 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             dto.pagedList = tag.Residences.Where(x=>x.Status == Advertise.AdvertiseStatus.Published)
                 .Select(x => (AccommodationCardDTO)x)
                 .ToPagedList(dto.page, dto.pageItemCount);
+
+            dto.similarTags = await GetSimilarTags(tag, 4);
             return serviceResult;
+        }
+
+        private async Task<IList<Tag>> GetSimilarTags(Tag tag, int count)
+        {
+            var similarTags = await GetListAsync(tag.Title.Split(' ').Last(), Tag.TagStatusEnum.Active);
+            similarTags.Remove(tag);
+            return similarTags.OrderBy(x => new Random().Next()).Take(count).ToList();
         }
 
         public async Task<ServiceResult<Tag>> AddByAdminAsync(string title,

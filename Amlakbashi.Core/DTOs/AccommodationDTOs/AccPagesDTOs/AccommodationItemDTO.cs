@@ -189,6 +189,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
             dto.SuspendedComment = suspendeComment;
             dto.SuspendedCommentReserveId = scReserveId;
             dto.HasVideo = advertise.VideoStatus == VideoStatusEnum.Confirmed;
+            dto.VideoUrl = advertise.VideoUrl;
             var accUser = advertise.User;
             dto.AccUser = accUser != null ? advertise.User : new User() { FirstName = "", LastName = "" };
             dto.TypeUrlString = AdvertiseUrlLocalization.GetAdvertiseTypeUrlString((AdvertiseType)advertise.TypeID);
@@ -303,6 +304,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs
         public double HostUserRating { get; set; }
         public bool CanPublish { get; set; }
         public bool HasVideo { get; set; }
+        public string VideoUrl { get; set; }
         public AccommodationCategoryDTO AccCategory { get; set; }
         public AdvertiseMode AdvertiseMode { get; set; }
         public AdvertiseTypeDTO AdvertiseType { get; set; }

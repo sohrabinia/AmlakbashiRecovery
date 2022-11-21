@@ -379,7 +379,10 @@
 
         @* Related Links *@
         <div class="advertise-page__property-box advertise-page__comment-box">
-            @await Html.PartialAsync("_ResidencePageTags", Model)
+            @if (Model.Tags.TagsDic.Any())
+            {
+                @await Html.PartialAsync("_ResidencePageTags", Model)
+            }
         </div>
 
         <div class="advertise-page__stick-reserve">

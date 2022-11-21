@@ -290,6 +290,19 @@
                 </div>
             }
 
+            @* show video *@
+            @if (Model.HasVideo)
+            {
+                <div class="advertise-page__property-box advertise-page__description-box">
+                    <P class="advertise-page__description-header">
+                        <i class="fas fa-video"></i> ویدیو از محیط اقامتگاه
+                    </P>
+                    <div style="text-align: center;">
+                        <video style="max-width:80%;" controls src="@Model.VideoUrl"></video>
+                    </div>
+                </div>
+            }
+
             @* Comments *@
             @if (Model.Comments != null && Model.Comments.Count > 0)
             {
@@ -318,13 +331,9 @@
 @* Related Acc *@
 @{
     var relatedUrl = "/accomodation/getrelatedaccommodations?id=" + Model.Id;
-    //relatedUrl += (!string.IsNullOrEmpty(Model.RelatedLinkCapacity) && int.Parse(Model.RelatedLinkCapacity) > 0 ? "&capacity=" + Model.RelatedLinkCapacity : "");
-    //relatedUrl += (!string.IsNullOrEmpty(Model.EmptyRangeFrom) ? "&empty_range_from=" + Model.EmptyRangeFrom : "");
-    //relatedUrl += (!string.IsNullOrEmpty(Model.EmptyRangeTo) ? "&empty_range_to=" + Model.EmptyRangeTo : "");
 }
 
 <p class="item__related-title">اقامتگاه های مرتبط:</p>
-
 <div style="min-height: 381.56px;" class="advertise-page__related-container partialContents" data-url="@relatedUrl" data-onload="findLazyImages">
 </div>
 

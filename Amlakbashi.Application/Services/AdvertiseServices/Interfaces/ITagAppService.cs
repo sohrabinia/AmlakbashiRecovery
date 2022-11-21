@@ -10,6 +10,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
 {
     public interface ITagAppService
     {
+        Tag Find(int id);
         Task<Tag> FindAsync(string title);
         Task GetListAsync(TagListDTO dto);
         Task<IList<Tag>> GetListAsync(string title = null, Tag.TagStatusEnum? status = null);
