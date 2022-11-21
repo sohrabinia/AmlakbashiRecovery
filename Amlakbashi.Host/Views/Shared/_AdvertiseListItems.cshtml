@@ -65,9 +65,9 @@
 <div class="accommodationList">
     @{
         @*if (!for_advertise_page)
-            {
-                @:<div class="advertise-list-container">
-            }*@
+    {
+    @:<div class="advertise-list-container">
+    }*@
 
         if (Model.AdvertiseItems.Count() > 0)
         {
@@ -87,12 +87,12 @@
                 int queryStringIndex = 0;
                 var url = AdvertiseUrlLocalization.SlugToAdvertiseUrl(item.Slug);
                 bool isParent = item.AdvertiseType == Advertise.AdvertiseType.HotelApartment ||
-                        item.AdvertiseType == Advertise.AdvertiseType.Complex ||
-                        item.AdvertiseType == Advertise.AdvertiseType.Hotel ||
-                        item.AdvertiseType == Advertise.AdvertiseType.Pansion ||
-                        item.AdvertiseType == Advertise.AdvertiseType.Inn ||
-                        item.AdvertiseType == Advertise.AdvertiseType.TourismAccommodation ||
-                        item.AdvertiseType == Advertise.AdvertiseType.Camp ? true : false;
+                item.AdvertiseType == Advertise.AdvertiseType.Complex ||
+                item.AdvertiseType == Advertise.AdvertiseType.Hotel ||
+                item.AdvertiseType == Advertise.AdvertiseType.Pansion ||
+                item.AdvertiseType == Advertise.AdvertiseType.Inn ||
+                item.AdvertiseType == Advertise.AdvertiseType.TourismAccommodation ||
+                item.AdvertiseType == Advertise.AdvertiseType.Camp ? true : false;
                 if (string.IsNullOrEmpty(Model.Capacity) == false && int.Parse(Model.Capacity) > 0)
                 {
                     if (queryStringIndex < 1)
@@ -138,13 +138,17 @@
                         string date_string = item.DiscountDateString;
 
                         @*if (item.NorouzPrice > 0)
-                        {
-                            <p class="advertise-item__norouz-label home-page_discount-style"><img width="21" height="21" rel="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" /> @(string.Format("{0:n0}", item.NorouzPrice)) تومان</p>
-                        }*@
+        {
+        <p class="advertise-item__norouz-label home-page_discount-style"><img width="21" height="21" rel="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" /> @(string.Format("{0:n0}", item.NorouzPrice)) تومان</p>
+        }*@
                         if (discount > 0)
                         {
-                            <p class="advertise-item__discount-label home-page_discount-style"><i class="fa fa-percent"></i>@(discount) تخفیف @date_string</p>
+                            <p class="advertise-item__discount-label home-page_discount-style"><i style="font-size: 12px; margin-top: 7px;" class="fa fa-percent"></i>@(discount) تخفیف @date_string</p>
                         }
+                    }
+                    @if (item.hasVideo)
+                    {
+                        <span class="fas fa-video" style="flex-flow: row; position: absolute; display: flex; left: 10px; top: 110px; padding: 5px; background-color: #fdd835; color: #484848; border-radius: 3px;"></span>
                     }
                     <img class="home-page__advertise-image @(initial_loaded_img ? "" : "lazy")" src="@img_src_to_show" @img_data_source width="240" height="144" alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")' />
                     @if (!initial_loaded_img)
@@ -156,23 +160,27 @@
                     <div class="home-page__advertise-item-container">
                         <div class="style-box-status-room">
                             @if (item.instantReserveAvailable)
-                            {<p style="color:white;font-size:11px"><i style="font-size:13px;" class="fa fa-bolt"></i> رزرو آنی</p>}
+                            {
+                                <p style="color:white;font-size:11px"><i style="font-size:13px;" class="fa fa-bolt"></i> رزرو آنی</p>
+                            }
                             @if (item.TodayIsEmpty)
-                            {<p style="color:white;font-size:11px;background-color:#6b6767;"><i class="fa fa-home" style="font-size: 13px;"></i>خالی امشب</p>}
+                            {
+                                <p style="color:white;font-size:11px;background-color:#6b6767;"><i class="fa fa-home" style="font-size: 13px;"></i>خالی امشب</p>
+                            }
                             @*@if (item.NorouzPrice >= 30000)
-                                {<p style="color:white;font-size:11px;background-color:#6b6767;"><img width="16" height="16" rel="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />نوروزی</p> }*@
+                {<p style="color:white;font-size:11px;background-color:#6b6767;"><img width="16" height="16" rel="نوروز" title="نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />نوروزی</p> }*@
                             @*@if (item.NorouzPrice > 0)
-                                {
-                                    <div style="margin:1px 2px;background-color:white;border: 1px solid #898888;width:max-content;border-radius:5px;padding:5px;">
-                                        <div style="color:#242424;font-size:11px"><img style="margin-left:2px" width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />نوروزی</div>
-                                    </div>
-                                }*@
+                {
+                <div style="margin:1px 2px;background-color:white;border: 1px solid #898888;width:max-content;border-radius:5px;padding:5px;">
+                <div style="color:#242424;font-size:11px"><img style="margin-left:2px" width="16" height="16" rel="ویژه نوروز" title="ویژه نوروز" src="/file/resourceimagepng?file_name=norouz_icon_16x16" />نوروزی</div>
+                </div>
+                }*@
                         </div>
                         <p class="home-page__advertise-city"><i class="fa fa-map-marker-alt"></i> @(city_name)</p>
                         @*@if (contact_available)
-                            {
-                                <i class="fa fa-phone fa-rotate-90 home-page__advertise-contact-icon"></i>
-                            }*@
+            {
+            <i class="fa fa-phone fa-rotate-90 home-page__advertise-contact-icon"></i>
+            }*@
                         <h2 class="home-page__advertise-title">@item.Title</h2>
                         <p class="home-page__advertise-price">کد آگهی: @(item.AdvertiseID)</p>
                         <p id="js-daily-price" class="home-page__advertise-price">شروع قیمت: @(string.Format("{0:n0}", item.DailyPrice)) تومان</p>
@@ -190,22 +198,26 @@
                         </p>
                         @*<span class="home-page__advertise-price">قیمت نوروز: @(item.NorouzPrice > 0 ? string.Format("{0:n0} تومان", item.NorouzPrice) : "تعیین نشده") </span>*@
                         <!--<p class="home-page__advertise-price">کد آگهی: @(item.AdvertiseID)</p>
-                        <div class="home-page_details-advertise">
-                            @if (item.HasChild)
-                            {
-                                <p class="home-page__advertise-price"> @(item.AdvertiseTypeString)</p>
-                            }
-                            else
-                            {
-                                <p><i class="fa fa-bed"></i> @(item.Room > 0 ? item.Room + " خوابه" : "بدون اتاق")&nbsp;&nbsp;&nbsp;</p>
-                                <p><i class="fa fa-users"></i> ظرفیت @capacity</p>
-                            }-->
+                                                    <div class="home-page_details-advertise">
+                        @if (item.HasChild)
+                        {
+                                        <p class="home-page__advertise-price"> @(item.AdvertiseTypeString)</p>
+                        }
+                        else
+                        {
+                                        <p><i class="fa fa-bed"></i> @(item.Room > 0 ? item.Room + " خوابه" : "بدون اتاق")&nbsp;&nbsp;&nbsp;</p>
+                                        <p><i class="fa fa-users"></i> ظرفیت @capacity</p>
+                        }-->
                         @*</div>*@
                         <div class="box-min-max-night home-page__advertise-bottom-container">
                             @if (item.minReserveDays > 0)
-                            {<p>حداقل @item.minReserveDays شب</p>}
+                            {
+                                <p>حداقل @item.minReserveDays شب</p>
+                            }
                             @if (item.maxReserveDays > 0)
-                            {<p>حداکثر @item.maxReserveDays شب</p>}
+                            {
+                                <p>حداکثر @item.maxReserveDays شب</p>
+                            }
                         </div>
                         <div class="home-page__advertise-bottom-container  home-page-rating-style">
                             @if (rating == 0)
@@ -216,19 +228,20 @@
                             {
                                 @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "score", rating } })
                                 @*<select class="average-rating">
-                                        <option @IsSelected(rating == 1) value="1">خیلی ضعیف</option>
-                                        <option @IsSelected(rating == 2) value="2">ضعیف</option>
-                                        <option @IsSelected(rating == 3) value="3">متوسط</option>
-                                        <option @IsSelected(rating == 4) value="4">خوب</option>
-                                        <option @IsSelected(rating == 5) value="5">خیلی خوب</option>
-                                    </select>*@
+                <option @IsSelected(rating == 1) value="1">خیلی ضعیف</option>
+                <option @IsSelected(rating == 2) value="2">ضعیف</option>
+                <option @IsSelected(rating == 3) value="3">متوسط</option>
+                <option @IsSelected(rating == 4) value="4">خوب</option>
+                <option @IsSelected(rating == 5) value="5">خیلی خوب</option>
+                </select>*@
                             }
                             <div class="home-page__favourite-button" advertise_id="@item.AdvertiseID">
                                 <i class="fa fa-heart"></i>
                             </div>
                         </div>
                     </div>
-                </a>}
+                </a>
+            }
         }
         else
         {
@@ -239,9 +252,9 @@
         }
 
         @*if (!for_advertise_page)
-            {
-            @:</div>
-            }*@
+    {
+    @:</div>
+    }*@
     }
 </div>
 
@@ -266,17 +279,16 @@
         else
         {
             <div class="advertise-category__page-button advertise-category__next-page disabled">بعدی »</div>
-
         }
     </div>
 }
 
 @if (Model.CurrentPageNumber == 1 && Model.AdvertiseItems.Count() < 5 &&
-    (Model.DiscountHomes || Model.TodayEmptyHomes || Model.InstantReserve || Model.NorouzSpecial || Model.HygieneProtocol))
+(Model.DiscountHomes || Model.TodayEmptyHomes || Model.InstantReserve || Model.NorouzSpecial || Model.HygieneProtocol))
 {
     <div class="advertise-category-link__container">
         @await Html.PartialAsync("_AdvertiseCategoryLink", Model.Category,
-            new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "queryString", queryString } })
+    new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "queryString", queryString } })
     </div>
 }
 
@@ -287,7 +299,7 @@
         @foreach (var related_category in related_categories)
         {
             @await Html.PartialAsync("_AdvertiseCategoryLink", related_category,
-                new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "queryString", queryString } })
+    new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "queryString", queryString } })
         }
     </div>
 }

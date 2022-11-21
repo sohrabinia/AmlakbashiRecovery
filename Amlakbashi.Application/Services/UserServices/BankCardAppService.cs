@@ -11,7 +11,7 @@ using Amlakbashi.Mediator.Events.UserEvents;
 
 namespace Amlakbashi.Application.Services.UserServices
 {
-    internal class BankCardAppService : AppServiceBase<BankCard, int>, IBankCardAppService
+    internal class BankCardAppService : BaseAppService<BankCard, int>, IBankCardAppService
     {
         private readonly IMediator mediator;
         public BankCardAppService(IRepository<BankCard, int> repository, IMediator mediator) : base(repository)

@@ -9,7 +9,7 @@ using static Amlakbashi.Core.Entities.PrizeCreditTransaction;
 
 namespace Amlakbashi.Accounting.Services
 {
-    internal class PrizeCreditTransactionAppService : AppServiceBase<PrizeCreditTransaction, long>, IPrizeCreditTransactionAppService
+    internal class PrizeCreditTransactionAppService : BaseAppService<PrizeCreditTransaction, long>, IPrizeCreditTransactionAppService
     {
         private readonly IMediator mediator;
         public PrizeCreditTransactionAppService(IRepository<PrizeCreditTransaction, long> repository,

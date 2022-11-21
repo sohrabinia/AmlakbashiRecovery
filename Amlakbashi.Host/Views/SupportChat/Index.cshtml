@@ -344,6 +344,7 @@
 
         // Create a function that the hub can call to broadcast messages.
         supportChatAdminHubConnection.on('addChatMessage', (supportChatId, messageId) => {
+            debugger;
             if (isChangingChat) {
                 return;
             }
@@ -392,6 +393,7 @@
         });
 
         supportChatAdminHubConnection.on('updateChatMessage', (supportChatId, messageId) => {
+            debugger;
             if (isChangingChat) {
                 return;
             }

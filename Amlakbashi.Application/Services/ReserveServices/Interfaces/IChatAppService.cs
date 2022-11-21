@@ -1,15 +1,10 @@
 ﻿using Amlakbashi.Application.DTOs;
-using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.Entities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.ReserveServices.Interfaces
 {
-    public interface IChatAppService : IAppService<Chat, long>
+    public interface IChatAppService
     {
         IList<Chat> Filter(long chat_id = -1, long reserve_id = -1,
             int user_id = -1, int chat_status = -1);

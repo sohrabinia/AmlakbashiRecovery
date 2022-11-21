@@ -10,7 +10,7 @@ using Amlakbashi.Mediator.Events.PostEvents;
 
 namespace Amlakbashi.Application.Services.PostServices
 {
-    internal class ServiceAppService : AppServiceBase<Service, int>, IServiceAppService
+    internal class ServiceAppService : BaseAppService<Service, int>, IServiceAppService
     {
         private readonly IMediator mediator;
         public ServiceAppService(IRepository<Service, int> repository,

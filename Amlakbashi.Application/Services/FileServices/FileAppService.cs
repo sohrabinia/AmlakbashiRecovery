@@ -16,19 +16,23 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using Amlakbashi.Application.DTOs;
 using Amlakbashi.Mediator.Commands.FileCommands;
+using log4net;
 
 namespace Amlakbashi.Application.Services.FileServices
 {
-    internal class FileAppService : AppServiceBase<File, long>, IFileAppService
+    internal class FileAppService : BaseAppService<File, long>, IFileAppService
     {
         private readonly IMediator mediator;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ILog logger;
         public FileAppService(IRepository<File, long> repository,
             IMediator mediator,
-            IWebHostEnvironment webHostEnvironment) : base(repository)
+            IWebHostEnvironment webHostEnvironment,
+            ILog logger) : base(repository)
         {
             this.mediator = mediator;
             this.webHostEnvironment = webHostEnvironment;
+            this.logger = logger;
         }
 
         public IList<File> GetAllDescendingByLastModifyDate(int count = 0)
@@ -208,7 +212,7 @@ namespace Amlakbashi.Application.Services.FileServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult> AddResidenceVideoAsync(int userId, long residenceId, IFormFile video)
+        public async Task<ServiceResult> UpdateResidenceVideoAsync(int userId, long residenceId, IFormFile video)
         {
             var serviceResult = new ServiceResult();
             var residence = Repository.Find<Advertise, long>(residenceId);
@@ -255,17 +259,43 @@ namespace Amlakbashi.Application.Services.FileServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult> MoveResidenceVideoToMainDirectoryAsync(long videoFileId)
+        //public async Task<ServiceResult> MoveResidenceVideoToMainDirectoryAsync(long videoFileId)
+        //{
+        //    ServiceResult serviceResult = new ServiceResult();
+        //    var videoFile = await Repository.FindAsync(videoFileId);
+        //    string filepath = $"{File.ResidenceVideosDirectory}/residenceVideo_{videoFile.ResidenceVideo.Id}.mp4";
+        //    if (MoveFile(videoFile.FilePath, filepath) == false)
+        //    {
+        //        serviceResult.AddError("در حال حاضر امکان دسترسی به فایل وجود ندارد. لطفا بعدا امتحان کنید.");
+        //        return serviceResult;
+        //    }
+        //    videoFile.FilePath = filepath;
+        //    Repository.Update(videoFile);
+        //    Repository.Save();
+        //    return serviceResult;
+        //}
+
+        public async Task<ServiceResult> ConversionResidenceVideoAsync(long videoFileId)
         {
             ServiceResult serviceResult = new ServiceResult();
             var videoFile = await Repository.FindAsync(videoFileId);
-            string filepath = $"{File.ResidenceVideosDirectory}/residenceVideo_{videoFile.ResidenceVideo.Id}.mp4";
-            if (MoveFile(videoFile.FilePath, filepath) == false)
+
+            if (IsLockedFile(videoFile.FilePath))
             {
                 serviceResult.AddError("در حال حاضر امکان دسترسی به فایل وجود ندارد. لطفا بعدا امتحان کنید.");
                 return serviceResult;
             }
-            videoFile.FilePath = filepath;
+
+            string newFilePath = $"{File.ResidenceVideosDirectory}/residenceVideo_{videoFile.ResidenceVideo.Id}.mp4";
+            var conversionResult = await VideoUtility.ConversionAsync(videoFile.FilePath, newFilePath);
+            if (conversionResult.result == false)
+            {
+                serviceResult.AddError("عملیات پردازش ویدیو با خطا مواجه شد.");
+                logger.Error(conversionResult.errorMessage);
+                return serviceResult;
+            }
+            DeleteFile(videoFile.FilePath);
+            videoFile.FilePath = newFilePath;
             Repository.Update(videoFile);
             Repository.Save();
             return serviceResult;

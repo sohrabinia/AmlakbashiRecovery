@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
-    internal class DiscountTableAppService : AppServiceBase<DiscountTable, int>, IDiscountTableAppService
+    internal class DiscountTableAppService : BaseAppService<DiscountTable, int>, IDiscountTableAppService
     {
         public DiscountTableAppService(IRepository<DiscountTable, int> repository) : base(repository)
         {

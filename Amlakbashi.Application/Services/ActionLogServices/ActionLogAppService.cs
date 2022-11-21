@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.ActionLogServices
 {
-    internal class ActionLogAppService : AppServiceBase<ActionLog, long>, IActionLogAppService
+    internal class ActionLogAppService : BaseAppService<ActionLog, long>, IActionLogAppService
     {
         public ActionLogAppService(IRepository<ActionLog, long> repository) : base(repository)
         {

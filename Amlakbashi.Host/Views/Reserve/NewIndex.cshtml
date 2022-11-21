@@ -44,7 +44,6 @@ else
                 <span class="bar-filter-item" onclick="toggleMyReserves(4)" style="background-color:@(Model.ReserveSupportStatus == 4 ? "#fdd835" : "")">انجام شده</span>
             </div>*@
             <div class="box-filter">
-                <button class="more-filter">فیلتر بیشتر</button>
                 <div class="bar-filter quick-filter">
                     <span><i class="fas fa-filter"></i>فیلتر :</span>
                     <input class="input-stlye" type="text" value="@(Model.ReserveId > 0 ? Model.ReserveId : "")" name="ReserveId" placeholder="کد رزرو">
@@ -53,6 +52,7 @@ else
                     <input class="input-stlye" type="text" value="@(Model.GuestUserId > 0 ? Model.GuestUserId : "")" name="GuestUserId" placeholder="کد مهمان">
                     <button class="fas fa-angle-double-left submit-btn"></button>
                 </div>
+                <button class="more-filter">فیلتر بیشتر</button>
             </div>
         </div>
         <aside class="admin-table-row admin-table-row-header">

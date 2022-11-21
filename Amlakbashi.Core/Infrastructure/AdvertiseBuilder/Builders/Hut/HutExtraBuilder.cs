@@ -26,6 +26,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Hut
             BuildAdvertisePart<RulesPart>();
             BuildAdvertisePart<OwnershipPart>();
             BuildAdvertisePart<LicensePart>();
+            BuildAdvertisePart<TagPart>();
         }
     }
 }

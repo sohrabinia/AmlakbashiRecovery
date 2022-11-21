@@ -287,6 +287,10 @@ namespace Amlakbashi.Data.Migrations
                     b.Property<int?>("ProvinceId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ReasonForNotConfirmingVideo")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
                     b.Property<bool?>("Refrigerator")
                         .HasColumnType("bit");
 
@@ -1889,6 +1893,32 @@ namespace Amlakbashi.Data.Migrations
                     b.ToTable("SupportChatMessages");
                 });
 
+            modelBuilder.Entity("Amlakbashi.Core.Entities.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Title")
+                        .IsUnique()
+                        .HasFilter("[Title] IS NOT NULL");
+
+                    b.ToTable("Tags");
+                });
+
             modelBuilder.Entity("Amlakbashi.Core.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -2040,6 +2070,21 @@ namespace Amlakbashi.Data.Migrations
                     b.HasIndex("File_Id");
 
                     b.ToTable("FileAdvertises");
+                });
+
+            modelBuilder.Entity("ResidenceTags", b =>
+                {
+                    b.Property<long>("ResidenceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ResidenceId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ResidenceTags");
                 });
 
             modelBuilder.Entity("Amlakbashi.Core.Entities.ActionLog", b =>
@@ -2599,6 +2644,23 @@ namespace Amlakbashi.Data.Migrations
                         .WithMany()
                         .HasForeignKey("File_Id")
                         .HasConstraintName("FK_dbo.FileAdvertises_dbo.Files_File_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ResidenceTags", b =>
+                {
+                    b.HasOne("Amlakbashi.Core.Entities.Advertise", null)
+                        .WithMany()
+                        .HasForeignKey("ResidenceId")
+                        .HasConstraintName("FK_ResidenceTags_Residences_ResidenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Amlakbashi.Core.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .HasConstraintName("FK_ResidenceTags_Tags_TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

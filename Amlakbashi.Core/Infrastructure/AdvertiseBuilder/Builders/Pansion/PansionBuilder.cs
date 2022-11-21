@@ -31,6 +31,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.Pansion
             BuildAdvertisePart<ElevatorPart>();
             BuildAdvertisePart<PhotoPart>();
             BuildAdvertisePart<LicensePart>();
+            BuildAdvertisePart<TagPart>();
         }
     }
 }

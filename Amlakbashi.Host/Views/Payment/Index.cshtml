@@ -189,7 +189,7 @@
                     }
                 </td>
                 <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                    <span style="overflow-y: hidden;">@item.Payment.TransactionId</span>
+                    <span style="overflow-y: hidden; cursor: pointer;" onclick="copyStringToClipboard('@(item.Payment.TransactionId)', '')">@item.Payment.TransactionId</span>
                 </td>
                 <td>
                     @if (item.Payment.ReferenceNumber > 0)
@@ -255,6 +255,24 @@
             showInfoMessage('وضعیت انتقال وجه', '',
                 { contentUrl: '/payment/CheckPodiumPaymentStatus?paymentId=' + id, fullScreen: screen.width < 781 }
             );
+        }
+
+        function copyStringToClipboard(str, name) {
+            // Create new element
+            var el = document.createElement('textarea');
+            // Set value (string to be copied)
+            el.value = str;
+            // Set non-editable to avoid focus and move outside of view
+            el.setAttribute('readonly', '');
+            el.style = { position: 'absolute', left: '-9999px' };
+            document.body.appendChild(el);
+            // Select text inside element
+            el.select();
+            // Copy text to clipboard
+            document.execCommand('copy');
+            // Remove temporary element
+            document.body.removeChild(el);
+            alertify.success(name + " کپی شد");
         }
     </script>
 }

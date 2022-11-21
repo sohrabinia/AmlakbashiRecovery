@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Amlakbashi.Accounting.Services
 {
-    internal class CreditTransactionAppService : AppServiceBase<CreditTransaction, long>, ICreditTransactionAppService
+    internal class CreditTransactionAppService : BaseAppService<CreditTransaction, long>, ICreditTransactionAppService
     {
         public CreditTransactionAppService(IRepository<CreditTransaction, long> repository) : base(repository)
         {

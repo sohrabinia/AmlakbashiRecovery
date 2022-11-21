@@ -27,8 +27,6 @@ namespace Amlakbashi.Core.Entities
         public int OwnerShip { get; set; }
         public int AmlakbashiScore { get; set; }
         public long UserScore { get; set; }
-        //public int CancelInstantReserveLimit { get; set; } = 3;
-        //public InstantReserveAccessEnum InstantReserveAccess { get; set; }
         public bool DisableInstantReserve { get; set; }
         public long? PhotoID { get; set; }
         public int PhotoStatus { get; set; }
@@ -210,6 +208,14 @@ namespace Amlakbashi.Core.Entities
         public string GetUserImageApiUrl()
         {
             return PhotoID == null ? null : $"{GeneralData.WebsiteUrl}/api/file/user/{Id}";
+        }
+
+        public bool HasSuccessfulReserve()
+        {
+            return Reserves.Any(x => x.Status == Reserve.ReserveStatus.Reserved || 
+                x.Status == Reserve.ReserveStatus.Started ||
+                x.Status == Reserve.ReserveStatus.CashPay ||
+                x.Status == Reserve.ReserveStatus.Completed);
         }
 
         #endregion

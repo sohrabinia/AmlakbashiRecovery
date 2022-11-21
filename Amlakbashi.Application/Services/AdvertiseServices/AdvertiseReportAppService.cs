@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
-    internal class AdvertiseReportAppService : AppServiceBase<AdvertiseReport, int>, IAdvertiseReportAppService
+    internal class AdvertiseReportAppService : BaseAppService<AdvertiseReport, int>, IAdvertiseReportAppService
     {
         public AdvertiseReportAppService(IRepository<AdvertiseReport, int> repository) : base(repository)
         {

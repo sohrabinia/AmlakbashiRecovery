@@ -13,7 +13,7 @@ using Amlakbashi.Application.DTOs;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
-    internal class ChatAppService : AppServiceBase<Chat, long>, IChatAppService
+    internal class ChatAppService : BaseAppService<Chat, long>, IChatAppService
     {
         private readonly IMediator mediator;
         public ChatAppService(IRepository<Chat, long> repository, IMediator mediator) : base(repository)

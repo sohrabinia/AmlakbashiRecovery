@@ -7,13 +7,17 @@
     <div class="wrapper-top">
         <div class="avatar-room">
             <a target="_blank" href="@Model.photoUrl"><img src="@Model.photoUrl" /></a>
-            @if (Model.userRating <= 0)
-            {
-                <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
-            }
-            @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
-                new ModelStateDictionary()) { { "score", Model.userRating } })
-            <a style="display:@( Model.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@Model.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="backgorund:@( Model.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@Model.newCommentCount</span></i></a>
+            <div style="width: 100%; text-align: center; padding: 2px 0;">
+                <a href="/accomodation/acccomplexform?parentid=@(Model.parentId)&id=@(Model.id)#residence_photos" target="_blank" style="font-size: small; border-left: 1px solid gray; padding-left: 5px; color: black;"><i class="fa fa-plus"></i> عکس</a>
+                <span onclick="showVideoUploadPopup(@Model.id)" style="font-size: small; cursor: pointer;"><i class="fa fa-plus"></i> ویدیو</span>
+            </div>
+            @*@if (Model.userRating <= 0)
+                {
+                    <div class="background-rating js-helper-rating"><span>امتیاز بگیرید</span><span><i class="fas fa-question-circle"></i></span></div>
+                }
+                @await Html.PartialAsync("_StarRating", new ViewDataDictionary(new EmptyModelMetadataProvider(),
+                    new ModelStateDictionary()) { { "score", Model.userRating } })
+                <a style="display:@( Model.newCommentCount == 0 ? "none" : "block");" href="/comment/advertisecommentdetail?id=@Model.id" title="بازدید نظرات " class="icons-item comment-icon comment-complex"><i style="backgorund:@( Model.newCommentCount == 0 ? "#d2d2d2" : "#878787");" class="fa fa-envelope"><span class="newCommentBanner">@Model.newCommentCount</span></i></a>*@
         </div>
         <div class="details-room-complex">
             <span> @Model.title </span>

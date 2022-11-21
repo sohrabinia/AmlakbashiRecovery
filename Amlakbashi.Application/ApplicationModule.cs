@@ -25,7 +25,6 @@ namespace Amlakbashi.Application
             builder.RegisterType<ReserveSupportManager>().As<IReserveSupportManager>();
             builder.RegisterType<SettingManager>().As<ISettingManager>();
             builder.RegisterType(typeof(AdvertiseFilterHelper)).As(typeof(IAdvertiseFilterHelper));
-
             base.Load(builder);
         }
     }

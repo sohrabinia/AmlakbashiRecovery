@@ -18,20 +18,12 @@ namespace Amlakbashi.Data.Identity
                 return;
             }
             context.Database.Migrate();
-            //SeedData(context);
+            SeedData(context);
         }
 
         private static void SeedData(IdentityDB context)
         {
-            foreach (var item in context.Users)
-            {
-                if (PhoneUtility.IsNumberForIran(item.UserName) == false)
-                {
-                    item.IsForeigner = true;
-                    context.Update(item);
-                }
-            }
-            context.SaveChanges();
+
         }
     }
 }

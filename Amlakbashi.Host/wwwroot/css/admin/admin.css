@@ -84,6 +84,24 @@ input, select {
   outline: none;
 }
 
+.btn {
+    padding: 3px 20px;
+    border: 1px solid gainsboro;
+    border-radius: 5px;
+    font: 12px Liransans;
+    background: #fdd835;
+    cursor: pointer;
+    box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.06);
+}
+
+.text-input {
+    width: 150px;
+    padding: 5px 0;
+    text-align: center;
+    border: 1px solid #b9b9b9;
+    border-radius: 5px;
+}
+
 .bg-show-menu {
   background: #0000005c;
   position: fixed;

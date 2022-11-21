@@ -238,3 +238,8 @@ var isMobileDevice = $('.body').width() < 681;
 //if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
 //    isMobileDevice = true;
 //}
+
+function searchTag(urlTitle) {
+    console.log('test');
+    window.location.href = `/tag/${urlTitle}`;
+}

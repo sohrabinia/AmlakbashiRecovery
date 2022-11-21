@@ -9,7 +9,7 @@ using static Amlakbashi.Core.Entities.ReservePayment;
 
 namespace Amlakbashi.Accounting.Services
 {
-    internal class ReservePaymentAppService : AppServiceBase<ReservePayment, long>, IReservePaymentAppService
+    internal class ReservePaymentAppService : BaseAppService<ReservePayment, long>, IReservePaymentAppService
     {
         public ReservePaymentAppService(IRepository<ReservePayment, long> repository) : base(repository)
         {

@@ -11,7 +11,7 @@ using Amlakbashi.Mediator.Events.SupportChatEvents;
 
 namespace Amlakbashi.Application.Services.SupportChatServices
 {
-    internal class SupportChatMessageAppService : AppServiceBase<SupportChatMessage, long>, ISupportChatMessageAppService
+    internal class SupportChatMessageAppService : BaseAppService<SupportChatMessage, long>, ISupportChatMessageAppService
     {
         private readonly IMediator mediator;
         public SupportChatMessageAppService(IRepository<SupportChatMessage, long> repository,

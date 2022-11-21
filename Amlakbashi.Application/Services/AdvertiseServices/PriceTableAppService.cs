@@ -11,7 +11,7 @@ using Amlakbashi.Core.DTOs.WebService.Requests.Advertises;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
-    internal class PriceTableAppService : AppServiceBase<PriceTable, int>, IPriceTableAppService
+    internal class PriceTableAppService : BaseAppService<PriceTable, int>, IPriceTableAppService
     {
         public PriceTableAppService(IRepository<PriceTable, int> repository) : base(repository)
         {

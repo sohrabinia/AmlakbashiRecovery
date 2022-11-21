@@ -1,5 +1,6 @@
 ﻿using Amlakbashi.Core.Entities;
 using Amlakbashi.Core.Infrastructure.LocalizationHelpers;
+using System.Collections.Generic;
 
 namespace Amlakbashi.Core.DTOs.CategoryDTOs
 {
@@ -13,6 +14,7 @@ namespace Amlakbashi.Core.DTOs.CategoryDTOs
         public string cityString { get; set; }
         public int countAdvertise { get; set; }
         public string link { get; set; }
+        public IEnumerable<Tag> tags { get; set; }
 
         public static SearchTableDTO GenerateForApp(Region region, string cityName)
         {

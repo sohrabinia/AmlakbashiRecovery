@@ -1,20 +1,18 @@
 ﻿using Amlakbashi.Application.DTOs;
-using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.DTOs.WebService.Responses.Regions;
 using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
-using static Amlakbashi.Core.Entities.Region;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices.Interfaces
 {
-    public interface IRegionAppService : IAppService<Region, int>
+    public interface IRegionAppService
     {
         Region Find(int id);
         IList<RegionListDTO> GetList(int regionId, int type, bool withSubRegions);
-        IList<Region> Filter(AdvertiseRegion type, int parentId = 0,
-            RegionStatus status = RegionStatus.All, RegionSortOrder sortOrder = RegionSortOrder.Default);
-        IList<Region> GetByType(AdvertiseRegion type);
-        IList<Region> GetChildren(int id, Region.RegionStatus status = RegionStatus.All);
+        IList<Region> Filter(Region.AdvertiseRegion type, int parentId = 0,
+            Region.RegionStatus status = Region.RegionStatus.All, Region.RegionSortOrder sortOrder = Region.RegionSortOrder.Default);
+        IList<Region> GetByType(Region.AdvertiseRegion type);
+        IList<Region> GetChildren(int id, Region.RegionStatus status = Region.RegionStatus.All);
         IList<int> GetParentIdsByCityId(int city);
         string GetRegionName(int id);
         Dictionary<DynamicCategory, string[]> GetRegionPersianNamesByCategoryList(IList<DynamicCategory> categoryList);

@@ -10,7 +10,7 @@ using static Amlakbashi.Core.Entities.ActionLog;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
-    public class ExtrinsicReserveAppService : AppServiceBase<ExtrinsicReserve, long>, IExtrinsicReserveAppService
+    public class ExtrinsicReserveAppService : BaseAppService<ExtrinsicReserve, long>, IExtrinsicReserveAppService
     {
         private readonly IMediator mediator;
         public ExtrinsicReserveAppService(IRepository<ExtrinsicReserve, long> repository,

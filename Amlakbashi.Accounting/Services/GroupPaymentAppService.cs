@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Accounting.Services
 {
-    internal class GroupPaymentAppService : AppServiceBase<GroupPayment, int>, IGroupPaymentAppService
+    internal class GroupPaymentAppService : BaseAppService<GroupPayment, int>, IGroupPaymentAppService
     {
         public GroupPaymentAppService(IRepository<GroupPayment, int> repository) : base(repository)
         {

@@ -1,11 +1,10 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Entities;
+﻿using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
 using static Amlakbashi.Core.Entities.Post;
 
 namespace Amlakbashi.Application.Services.PostServices.Interfaces
 {
-    public interface IPostAppService : IAppService<Post, long>
+    public interface IPostAppService
     {
         Post Find(long id);
         void Update(Post item, List<int> serviceIds);

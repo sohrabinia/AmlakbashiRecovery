@@ -35,6 +35,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using System.Threading.Tasks;
+using Xabe.FFmpeg;
 
 namespace Amlakbashi.Host
 {
@@ -137,8 +138,8 @@ namespace Amlakbashi.Host
 
             services.Configure<FormOptions>(x =>
             {
-                x.ValueLengthLimit = 209715200;
-                x.MultipartBodyLengthLimit = 209715200;
+                x.ValueLengthLimit = 524288000;
+                x.MultipartBodyLengthLimit = 524288000;
             });
 
             var redisConfigString = $"{Configuration.GetValue<string>("Redis:Server")}:{Configuration.GetValue<int>("Redis:Port")},allowAdmin=true,abortConnect=false";
@@ -227,7 +228,10 @@ namespace Amlakbashi.Host
             {
                 OnPrepareResponse = ctx =>
                 {
-                    if (ctx.File.Name.EndsWith(".css") || ctx.File.Name.EndsWith(".js"))
+                    //if (ctx.File.Name.EndsWith(".css") || ctx.File.Name.EndsWith(".js"))
+                    if (ctx.File.Name.EndsWith(".css") || ctx.File.Name.EndsWith(".js") ||
+                        ctx.File.Name.EndsWith(".woff") || ctx.File.Name.EndsWith(".woff2") ||
+                        ctx.File.Name.EndsWith(".svg"))
                     {
                         ctx.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + 60 * 60 * 24 * 365;
                     }
@@ -275,6 +279,7 @@ namespace Amlakbashi.Host
 
             IdentityDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
             AmlakbashiDbInitializer.Initialize(app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope());
+            FFmpeg.SetExecutablesPath("D:\\FFMpeg", "ffmpeg.exe", "ffprobe.exe");
         }
     }
 }

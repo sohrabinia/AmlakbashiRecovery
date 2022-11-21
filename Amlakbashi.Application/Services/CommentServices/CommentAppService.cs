@@ -13,7 +13,7 @@ using Amlakbashi.Core.DTOs;
 
 namespace Amlakbashi.Application.Services.CommentServices
 {
-    internal class CommentAppService : AppServiceBase<Comment, long>, ICommentAppService
+    internal class CommentAppService : BaseAppService<Comment, long>, ICommentAppService
     {
         public CommentAppService(IRepository<Comment, long> repository) : base(repository)
         {

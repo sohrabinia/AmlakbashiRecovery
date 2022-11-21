@@ -33,6 +33,7 @@ namespace Amlakbashi.Core.Infrastructure.AdvertiseBuilder.Builders.House
             BuildAdvertisePart<FloorPart>();
             BuildAdvertisePart<LicensePart>();
             BuildAdvertisePart<VillaTypePart>();
+            BuildAdvertisePart<TagPart>();
         }
     }
 }

@@ -7,7 +7,10 @@ namespace Amlakbashi.Application.DTOs
 {
     public class ServiceResult
     {
-        private IList<string> ErrorMessages { get; set; } = new List<string>();
+        private IList<string> ErrorMessages = new List<string>();
+        public bool CheckHasError => ErrorMessages.Any();
+        public IList<string> AllErrors => ErrorMessages;
+        public string FirstError => ErrorMessages.Any() ? ErrorMessages.First() : null;
 
         public void AddError(string error)
         {

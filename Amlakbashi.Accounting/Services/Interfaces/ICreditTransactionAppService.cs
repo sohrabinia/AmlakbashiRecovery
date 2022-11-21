@@ -1,11 +1,10 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.DTOs.WalletDTOs;
+﻿using Amlakbashi.Core.DTOs.WalletDTOs;
 using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
 
 namespace Amlakbashi.Accounting.Services.Interfaces
 {
-    internal interface ICreditTransactionAppService : IAppService<CreditTransaction, long>
+    internal interface ICreditTransactionAppService
     {
         void Filter(CreditTransactionIndexDTO dto);
         IList<CreditTransaction> GetListByUserId(int userId);

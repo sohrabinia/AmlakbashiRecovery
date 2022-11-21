@@ -41,7 +41,8 @@ namespace Amlakbashi.Core.Common.Utilities
         {
             var orgCode = "4321";
             var randomString = "27184910";
-            var timestamp = DateTimeUtility.DateValueOfJS(DateTime.Now);
+            //var timestamp = DateTimeUtility.DateValueOfJS(DateTime.Now);
+            var timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             var asciiValue = Encoding.ASCII.GetBytes($"{orgCode}{randomString}{timestamp}").Sum(x => x);
             return $"{orgCode}-{randomString}-{timestamp}-{asciiValue}";
         }

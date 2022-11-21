@@ -9,47 +9,76 @@ else if (Model.VideoStatus == Advertise.VideoStatusEnum.Pending)
 }
 else
 {
-    <p>وضعیت ویدیو: <span style="color:@(Model.VideoStatus == Advertise.VideoStatusEnum.Confirmed ? "limegreen" : "red");">@AdvertiseMainLocalization.GetVideoStatusPersianName(Model.VideoStatus)</span></p>
+    <p>
+        وضعیت ویدیو:
+        <span style="color:@(Model.VideoStatus == Advertise.VideoStatusEnum.Confirmed ? "limegreen" : "red");">@AdvertiseMainLocalization.GetVideoStatusPersianName(Model.VideoStatus)</span>
+        @if (Model.VideoStatus == Advertise.VideoStatusEnum.NotConfirmed)
+        {
+            <span style="font-size: x-small; cursor: pointer; color: blue;" onclick="showInfoMessage('', '@Model.ReasonForNotConfirmingVideo')">(مشاهده دلیل)</span>
+        }
+    </p>
     <div style="text-align:center; margin-bottom: 10px;">
-        <video style="max-width:100%; max-height: 280px;" controls id="video_play_container" src="/video/residences/residenceVideo_@(Model.Id).mp4?t=@(DateTime.Now.Ticks)"></video>
+        <video style="max-width:100%; max-height: 280px;" controls id="video_play_container" src="@Model.VideoUrl"></video>
     </div>
 }
 
 @if (Model.VideoStatus != Advertise.VideoStatusEnum.Pending)
 {
-    @*<hr />*@
-    <p>برای آپلود ویدیو جدید از اقامتگاه خود، ابتدا با کلیک روی دکمه Browse، فایل ویدیو مورد نظر خود را انتخاب کرده و سپس روی دکمه «ارسال ویدیو» کلیک کنید:</p>
-    <p>ویدیو شما باید با فرمت <b>MP4</b> بوده و حجم آن کمتر از <b>200 مگابایت</b> باشد.</p>
     <form id="video_upload_form" enctype="multipart/form-data">
+        <p>برای آپلود ویدیو جدید از اقامتگاه خود، ابتدا فایل ویدیو مورد نظر خود را انتخاب کرده و سپس روی دکمه «ارسال ویدیو» کلیک کنید:</p>
+        <p>ویدیو شما باید با فرمت <b>MP4</b> و نسبت ابعاد <b>16:9</b> (مثلا HD یا FullHD) بوده و حجم آن کمتر از <b>500 مگابایت</b> باشد.</p>
         <input type="hidden" name="residenceId" value="@Model.Id" id="residenceId_input" />
         <input type="file" name="formFile" id="video_upload_input" accept="video/mp4" />
         <div style="text-align: center;" id="upload_button_container">
             <button type="submit" class="acc-set-date__button">ارسال ویدیو</button>
         </div>
-        <div style="text-align: center; display: none;" id="upload_progress_container">
-            <span>لطفا تا اتمام فرآیند آپلود منتظر بمانید: </span>
-            <span id="upload_progress_percent" style="font-size: large; color: red;">0</span>
-            <span style="font-size: large; color: red;">%</span>
-        </div>
     </form>
+    <div style="text-align: center; display: none;" id="upload_progress_container">
+        <span>لطفا تا اتمام فرآیند آپلود منتظر بمانید</span>
+        <img width="40" height="40" src="/file/resourceimagegif?file_name=spinner" />
+    </div>
 }
 
 <script>
+    videoWidth = 0;
+    videoHeight = 0;
+    $(document).on("change", "#video_upload_input", function (evt) {
+        videoWidth = 0;
+        videoHeight = 0;
+        const videoElem = document.createElement('video');
+        videoElem.addEventListener('loadedmetadata', event => {
+            videoWidth = videoElem.videoWidth;
+            videoHeight = videoElem.videoHeight;
+        });
+        videoElem.src = URL.createObjectURL(this.files[0]);
+    });
+
+    function checkVideoFile(file) {
+        if (!file || file.size < 1048576) { // 1 MB
+            showErrorMessage('خطا', 'فایل انتخاب شده اشتباه است');
+            return false;
+        }
+        if (file.size > 524288000) { // 500 MB
+            showErrorMessage('خطا', 'حجم فایل انتخاب شده شما بیشتر از حد مجاز است');
+            return false;
+        }
+        var aspectRatio = videoWidth / videoHeight;
+        if (aspectRatio < 1.7 || aspectRatio > 1.8) {
+            showErrorMessage('خطا', 'نسبت ابعاد ویدیو انتخاب شده شما صحیح نمی باشد.');
+            return false;
+        }
+    }
+
     $('#video_upload_form').submit(function (e) {
         e.preventDefault();
         var file = $("#video_upload_input")[0].files[0];
-        if (file.size > 209715200) { // 200 MB
-            showErrorMessage('خطا', 'حجم فایل انتخاب شده شما بیشتر از حد مجاز است');
+        if (checkVideoFile(file) === false) {
             return;
         }
+
         var formData = new FormData();
         formData.append("formFile", file);
         formData.append("residenceId", $('#residenceId_input').val());
-
-        var video = document.getElementById('video_play_container');
-        if (video) {
-            video.srcObject = null;
-        }
 
         $.ajax({
             type: "POST",
@@ -60,22 +89,11 @@ else
             data: formData,
             beforeSend: function () {
                 $('#upload_progress_container').show();
-                $('#upload_button_container').hide();
+                $('#video_upload_form').hide();
                 $('.message-popup__message-button-container').hide();
-            },
-            xhr: function () {
-                var xhr = new window.XMLHttpRequest();
-                xhr.upload.addEventListener("progress", function (evt) {
-                    if (evt.lengthComputable) {
-                        var percentComplete = evt.loaded / evt.total;
-                        percentComplete = parseInt(percentComplete * 100);
-                        $('#upload_progress_percent').html(percentComplete);
-                        if (percentComplete === 100) {
-
-                        }
-                    }
-                }, false);
-                return xhr;
+                window.onbeforeunload = function () {
+                    return "فایل ویدیو در حال آپلود است. لطفا منتظر بمانید.";
+                }
             },
             success: function (response) {
                 if (response.status === 0) {
@@ -85,6 +103,7 @@ else
                     showSuccessMessage('', 'ویدیو با موفقیت آپلود شده و در انتظار تایید کارشناسان املاک باشی می باشد.');
                 }
                 popupMsgList[0].btnClick(0, true);
+                window.onbeforeunload = null;
             },
             error: function (error) {
                 if (error.status === 401) {
@@ -97,6 +116,7 @@ else
                     showErrorMessage('خطا', 'عملیات با خطا مواجه شد');
                 }
                 popupMsgList[0].btnClick(0, true);
+                window.onbeforeunload = null;
             }
         });
     });

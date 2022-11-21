@@ -15,7 +15,7 @@ using Amlakbashi.Core.Common.Extensions;
 
 namespace Amlakbashi.Application.Services.ReserveServices
 {
-    internal class ReserveSupportAppService : AppServiceBase<ReserveSupport, int>, IReserveSupportAppService
+    internal class ReserveSupportAppService : BaseAppService<ReserveSupport, int>, IReserveSupportAppService
     {
         private readonly IMediator mediator;
         public ReserveSupportAppService(IRepository<ReserveSupport, int> repository, IMediator mediator) : base(repository)

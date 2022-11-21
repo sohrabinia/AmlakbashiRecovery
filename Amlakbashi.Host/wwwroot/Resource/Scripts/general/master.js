@@ -624,6 +624,7 @@ function refreshChatBox(id, newCount) {
         var url = "/supportchat/getchatpopup?id=" + id +
             "&questionlist=" + JSON.stringify(messageQuestionList);
         $(".support-chat__chat-box").load(url);
+        $(".support-chat__chat-box").stop().animate({ scrollTop: $(".support-chat__chat-box")[0].scrollHeight }, 1000);
     }
     newCount = parseInt(newCount);
     if (newCount > 0) {

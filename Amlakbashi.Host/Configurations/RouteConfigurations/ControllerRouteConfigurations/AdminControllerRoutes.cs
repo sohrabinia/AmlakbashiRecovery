@@ -11,7 +11,6 @@ namespace Amlakbashi.Host.Configurations.RouteConfigurations.ControllerRouteConf
                 "Admin",
                 "admin",
                 new { controller = "Admin", action = "Home" }
-                //,constraints: new { subdomain = new SubdomainRouteConstraint("www") }
             );
         }
     }

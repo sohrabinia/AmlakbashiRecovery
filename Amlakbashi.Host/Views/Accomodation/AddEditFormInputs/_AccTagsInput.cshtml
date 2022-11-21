@@ -1,0 +1,36 @@
+﻿@model Amlakbashi.Core.DTOs.AccommodationDTOs.FormInputDTOs.TagInputDTO
+
+<div class="static-advertise__item advertise-form__low-item">
+    <p class="static-advertise__label">شما می توانید حداکثر 5 تگ برای اقامتگاه خود تعیین کنید.</p>
+    <p class="static-advertise__label">لطفا توجه فرمایید که به ابتدای تگ وارد شده نوع اقامتگاه و به انتهای آن، شهر انتخاب شده به طور خودکار اضافه خواهد شد. به عنوان مثال، برای یک ویلا در شهر رامسر، تگ «استخردار» به «ویلا استخردار در رامسر» تبدیل خواهد شد.</p>
+    <p class="static-advertise__label">عنوان تگ مورد نظر خود را بنویسید <small>(مثلا نزدیک حرم امام رضا)</small></p>
+    <div class="tag-input-box">
+        <span>@Model.typePersianTitle &nbsp;</span>
+        <input id="city_name_input" type="hidden" value="@Model.cityPersianName" />
+        <input id="search_tag_input" class="changed-input-target" type="text" title="تگ ها" onpaste="searchTag()" onkeyup="searchTag()" onchange="searchTag()" autocomplete="false">
+        <span>&nbsp; در @Model.cityPersianName</span>
+    </div>
+</div>
+<div class="tag-search-result-popup">
+    <div class="tag-search-result-container">
+        <div class="tag-search-result-box">
+        </div>
+        <div class="tag-search-button-box">
+            <button type="button" onclick="addNewTag(@Model.residenceId)">افزودن تگ جدید</button>
+        </div>
+    </div>
+</div>
+<div class="selected-tag-container">
+    <select name="tags" multiple>
+        @foreach (var item in Model.TagsDic)
+        {
+            <option value="@item.Key" selected></option>
+        }
+    </select>
+    <div class="selected-tag-box">
+        @foreach (var item in Model.TagsDic)
+        {
+            <span data-tagid="@item.Key">@item.Value<i class="fa fa-times" onclick="deleteTag(@item.Key)"></i></span>
+        }
+    </div>
+</div>

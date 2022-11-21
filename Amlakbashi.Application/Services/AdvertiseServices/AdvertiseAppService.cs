@@ -37,10 +37,12 @@ using Amlakbashi.Application.DTOs;
 using System.Threading.Tasks;
 using static Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs.CheckSetOccupiedDTO;
 using static Amlakbashi.Core.DTOs.AccommodationDTOs.CheckDTOs.CheckUnsetOccupiedDTO;
+using Amlakbashi.Data.Repositories;
+using System.Security.Policy;
 
 namespace Amlakbashi.Application.Services.AdvertiseServices
 {
-    internal class AdvertiseAppService : AppServiceBase<Advertise, long>, IAdvertiseAppService
+    internal class AdvertiseAppService : BaseAppService<Advertise, long>, IAdvertiseAppService
     {
         private readonly IPriceCalculator priceCalculator;
         private readonly IAdvertiseFilterHelper advertiseFilter;
@@ -1152,7 +1154,8 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
         }
 
         public AdvertiseDirector SubmitExtraForm(Advertise data, out Dictionary<string, string> errors,
-            out List<string> groupErrors, out int level, IFormFile uploadedLicenseFile, bool isEdit = false)
+            out List<string> groupErrors, out int level, IFormFile uploadedLicenseFile,
+            IList<int> tagsId, bool isEdit = false)
         {
             var acc = Repository.Query(q => q.FirstOrDefault(f => f.Id == data.Id));
             var oldAcc = acc.ShallowCopy();
@@ -1203,6 +1206,19 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             if (licenseFileId != null)
             {
                 acc.LicenseFileId = licenseFileId;
+            }
+            if (tagsId.SequenceEqual(acc.Tags.Select(x => x.Id)) == false)
+            {
+                acc.Tags.Clear();
+                foreach (var item in tagsId)
+                {
+                    var tag = Repository.Find<Tag, int>(item);
+                    if (tag != null)
+                    {
+                        acc.Tags.Add(tag);
+                    }
+                }
+                hasImportantChange = true;
             }
             var prevStatus = acc.Status;
             if (isEdit)
@@ -1565,7 +1581,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
 
         public AdvertiseDirector SubmitAdminForm(Advertise data, out Dictionary<string, string> errors,
             out List<string> groupErrors, bool forceSave, DirectorType type, int currentUserId,
-            out AdvertiseType parentType, out AdvertiseStatus status, IFormFile uploadedLicenseFile = null)
+            out AdvertiseType parentType, out AdvertiseStatus status, IList<int> tagsId = null, IFormFile uploadedLicenseFile = null)
         {
             var acc = Repository.Find(data.Id);
             status = acc.Status;
@@ -1625,7 +1641,18 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             {
                 acc.LicenseFileId = licenseFileId;
             }
-
+            if (tagsId != null && tagsId.SequenceEqual(acc.Tags.Select(x => x.Id)) == false)
+            {
+                acc.Tags.Clear();
+                foreach (var item in tagsId)
+                {
+                    var tag = Repository.Find<Tag, int>(item);
+                    if (tag != null)
+                    {
+                        acc.Tags.Add(tag);
+                    }
+                }
+            }
             if (type == DirectorType.General || type == DirectorType.ComplexUnit)
             {
                 var removedPhotoIds = new List<long>();
@@ -1764,7 +1791,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             mediator.Send(new RemoveAdvertiseCacheCommand(acc.Id));
         }
 
-        public async Task<ServiceResult<AdvertiseStatus>> UpdateActivity(long residenceId)
+        public async Task<ServiceResult<AdvertiseStatus>> UpdateActivityAsync(long residenceId)
         {
             var serviceResult = new ServiceResult<AdvertiseStatus>();
             var residence = await Repository.FindAsync(residenceId);
@@ -1775,7 +1802,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
                 return serviceResult;
             }
 
-            serviceResult.Result = await UpdateStatus(residence.Id,
+            serviceResult.Result = await UpdateStatusAsync(residence.Id,
                 residence.Status == AdvertiseStatus.Published ? AdvertiseStatus.Archived : AdvertiseStatus.Published);
             return serviceResult;
 
@@ -1966,7 +1993,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return intersects.ToList();
         }
 
-        public async Task<bool> UpdateInstantReserveStatus(long residenceId, InstantReserveStatusEnum status)
+        public async Task<bool> UpdateInstantReserveStatusAsync(long residenceId, InstantReserveStatusEnum status)
         {
             var data = await Repository.FindAsync(residenceId);
             data.InstantReserveStatus = status;
@@ -2491,7 +2518,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             }
         }
 
-        public async Task<ServiceResult<List<long>>> AddInstantReserveDates(long residenceId, string fromDate, string toDate, int userId)
+        public async Task<ServiceResult<List<long>>> AddInstantReserveDatesAsync(long residenceId, string fromDate, string toDate, int userId)
         {
             var serviceResult = new ServiceResult<List<long>>();
             var residence = await Repository.FindAsync(residenceId);
@@ -2518,7 +2545,7 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
-        public async Task<ServiceResult<List<long>>> DeleteInstantReserveDates(long residenceId, string fromDate, string toDate, int userId)
+        public async Task<ServiceResult<List<long>>> DeleteInstantReserveDatesAsync(long residenceId, string fromDate, string toDate, int userId)
         {
             var serviceResult = new ServiceResult<List<long>>();
             var residence = await Repository.FindAsync(residenceId);
@@ -2574,15 +2601,21 @@ namespace Amlakbashi.Application.Services.AdvertiseServices
             return serviceResult;
         }
 
-        public async Task UpdateVideoStatus(long residenceId, Advertise.VideoStatusEnum status)
+        public async Task UpdateVideoStatusAsync(long residenceId, Advertise.VideoStatusEnum status, string notConfirmReason = null)
         {
             var residence = await Repository.FindAsync(residenceId);
             residence.VideoStatus = status;
+            if (status == VideoStatusEnum.NotConfirmed)
+            {
+                residence.ReasonForNotConfirmingVideo = notConfirmReason;
+            }
             Repository.Update(residence);
             Repository.Save();
+            await mediator.Send(new RemoveAdvertiseCacheCommand(residence.Id));
+            await mediator.Send(new RemoveCategoryItemCacheCommand(residence.Id));
         }
 
-        private async Task<Advertise.AdvertiseStatus> UpdateStatus(long residenceId, Advertise.AdvertiseStatus status)
+        private async Task<Advertise.AdvertiseStatus> UpdateStatusAsync(long residenceId, Advertise.AdvertiseStatus status)
         {
             var residence = await Repository.FindAsync(residenceId);
             var clonedResidence = residence.ShallowCopy();

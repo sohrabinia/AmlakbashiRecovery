@@ -34,6 +34,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
         public string provinceName { get; set; }
         public string cityName { get; set; }
         public string areaName { get; set; }
+        public bool hasVideo { get; set; }
 
         public static implicit operator AccommodationCardDTO(Advertise advertise)
         {
@@ -66,6 +67,7 @@ namespace Amlakbashi.Core.DTOs.AccommodationDTOs
             dto.PhotoID = advertise.MainPhotoId == null ? 0 : (int)advertise.MainPhotoId;
             dto.HasChild = has_child;
             dto.instantReserveAvailable = advertise.InstantReserveStatus == Advertise.InstantReserveStatusEnum.Permanent;
+            dto.hasVideo = advertise.VideoStatus == Advertise.VideoStatusEnum.Confirmed;
             dto.minReserveDays = advertise.MinReserveDuration;
             dto.maxReserveDays = advertise.MaxReserveDuration;
             dto.address = advertise.Address;

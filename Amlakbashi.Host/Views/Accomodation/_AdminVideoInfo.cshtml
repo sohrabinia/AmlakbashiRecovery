@@ -8,6 +8,10 @@ else
 {
     <div class="video-container">
         <p>وضعیت ویدیو:  @AdvertiseMainLocalization.GetVideoStatusPersianName(Model.VideoStatus)</p>
+        @if (Model.VideoStatus == Advertise.VideoStatusEnum.NotConfirmed)
+        {
+            <p>دلیل عدم تایید: @Model.ReasonForNotConfirmingVideo</p>
+        }
         <div class="video-box">
             <video controls id="video_play_container">
                 @if (Model.VideoStatus == Advertise.VideoStatusEnum.Pending)
@@ -23,11 +27,11 @@ else
         <div class="box-button">
             @if (Model.VideoStatus != Advertise.VideoStatusEnum.Confirmed)
             {
-                <button type="button" onclick="setVideoStatus(@Model.Id, 2)">تایید</button>
+                <button type="button" onclick="confirmVideo(@Model.Id)">تایید</button>
             }
             @if (Model.VideoStatus != Advertise.VideoStatusEnum.NotConfirmed)
             {
-                <button type="button" onclick="setVideoStatus(@Model.Id, 3)">عدم تایید</button>
+                <button type="button" onclick="notConfirmVideo(@Model.Id)">عدم تایید</button>
             }
         </div>
     </div>

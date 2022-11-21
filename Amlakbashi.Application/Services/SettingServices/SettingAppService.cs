@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Amlakbashi.Application.Services.SettingServices
 {
-    public class SettingAppService : AppServiceBase<Setting, int>, ISettingAppService
+    public class SettingAppService : BaseAppService<Setting, int>, ISettingAppService
     {
         public SettingAppService(IRepository<Setting, int> repository) : base(repository)
         {

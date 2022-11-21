@@ -1,0 +1,101 @@
+﻿@model Amlakbashi.Core.DTOs.TagDTOs.TagResidencesDTO
+
+@{
+    Layout = "~/Views/Shared/_Master.cshtml";
+    ViewBag.CurrentPage = "AdvertiseCategory";
+    ViewBag.Title = Model.title + " | املاک باشی";
+
+    var websiteUrl = Amlakbashi.Core.Common.StaticData.GeneralData.WebsiteUrl;
+    var previous_page_available = Model.pagedList.PagingInfo.page > 1;
+    var next_page_available = Model.pagedList.PagingInfo.pageCount > Model.pagedList.PagingInfo.page;
+}
+
+@section HeaderAddition{
+    <link rel="canonical" href="@($"{websiteUrl}/tag/{Model.urlTitle}")" />
+    <meta property="og:url" content="@($"{websiteUrl}/tag/{Model.urlTitle}")" />
+    <meta property="og:image" content='@(websiteUrl + (Model.pagedList.List.Any() && Model.pagedList.List.First().PhotoID > 0 ? $"/file/imgthumb?fileid={Model.pagedList.List.First().PhotoID}&w={700}&h={394}" : string.Format("/عکس-یافت-نشد-{0}-{1}", 700, 394)))' />
+}
+
+@section StyleBlock {
+    .body{
+        margin-top: 90px !important;
+    }
+}
+
+@section StyleLink {
+    <link rel="stylesheet" href="/css/cat-item.min.css" asp-append-version="true" />
+}
+
+<div class="container" style="margin-bottom: 30px; max-width: 1100px;">
+    <div class="dynamic__header-container">
+        <div class="dynamic-title">
+            <div class="dynamic-text" style="width: 100%;">
+                <h1 style="text-align: center;width: 100%;">@Model.title</h1>
+            </div>
+        </div>
+    </div>
+    <div id="accListContainer">
+        @if (Model.pagedList.List.Any())
+        {
+            @await Html.PartialAsync("_TagResidencesList", Model)
+        }
+        else
+        {
+            <p>اقامتگاهی با این تگ یافت نشد!</p>
+        }
+    </div>
+    @if (Model.similarTags.Any())
+    {
+        <div class="advertise-category-link__title">موارد مشابه</div>
+        <div class="advertise-category-link__container">
+            @foreach (var item in Model.similarTags)
+            {
+                <a asp-action="getresidences" asp-route-urlTitle="@item.UrlTitle" class="advertise-category-link__link">@item.Title</a>
+            }
+        </div>
+    }
+</div>
+
+@section ScriptLink{
+    <script src="/resource/scripts/general/search-by-region.js" asp-append-version="true"></script>
+    <script src="/resource/scripts/general/master-search.js" asp-append-version="true"></script>
+}
+
+@section ScriptBlock{
+    <script>
+        let empty_range_from = undefined;
+        let empty_range_to = undefined;
+        let tagUrlTitle = '@Model.urlTitle';
+        let currentPageNumber = @Model.page;
+
+        let url = currentPageNumber == 1 ?
+            `/tag/${tagUrlTitle}` :
+            `/tag/${tagUrlTitle}?page=${currentPageNumber}`;
+        window.history.replaceState({ pageNumber: currentPageNumber }, null, url);
+
+        function changePage(pageNumber, isBack){
+            let requestUrl = pageNumber === 1 ?
+                `/tag/${tagUrlTitle}` :
+                `/tag/${tagUrlTitle}?page=${pageNumber}`;
+
+            $('img.home-page__advertise-image').attr('src', '/file/resourceimagegif?file_name=lazy-16_9');
+            $.post(`/tag/${tagUrlTitle}`, { ajax: true, page: pageNumber })
+                .done(function (response) {
+                    $("#accListContainer").html(response);
+                    if(!isBack){
+                        window.history.pushState({ pageNumber: pageNumber }, null, requestUrl);
+                    }
+                })
+                .fail(function (xhr, status, error) {
+                    showErrorMessage('خطا', xhr.responseText);
+                });
+        }
+
+        window.onpopstate = function (event) {
+            if (event.state != null) {
+                var previousPageNumber = event.state.pageNumber;
+                changePage(previousPageNumber, true);
+            }
+        };
+    </script>
+}

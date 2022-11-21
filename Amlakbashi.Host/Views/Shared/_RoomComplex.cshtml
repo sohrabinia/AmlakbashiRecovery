@@ -10,14 +10,10 @@
     <div class="wrapper-top">
         <div class="avatar-room">
             <a target="_blank" href="@Model.photoUrl"><img src="@Model.photoUrl" /></a>
-
-            @if (userAccessor.CurrentUser.Id == 82119)
-            {
-                <div style="width: 100%; text-align: center; padding: 2px 0;">
-                    <a href="/accomodation/acccomplexform?parentid=@(Model.parentId)&id=@(Model.id)#residence_photos" target="_blank" style="font-size: small; border-left: 1px solid gray; padding-left: 5px; color: black;"><i class="fa fa-plus"></i> عکس</a>
-                    <span onclick="showVideoUploadPopup(@Model.id)" style="font-size: small; cursor: pointer;"><i class="fa fa-plus"></i> ویدیو</span>
-                </div>
-            }
+            <div style="width: 100%; text-align: center; padding: 2px 0;">
+                <a href="/accomodation/acccomplexform?parentid=@(Model.parentId)&id=@(Model.id)#residence_photos" target="_blank" style="font-size: small; border-left: 1px solid gray; padding-left: 5px; color: black;"><i class="fa fa-plus"></i> عکس</a>
+                <span onclick="showVideoUploadPopup(@Model.id)" style="font-size: small; cursor: pointer;"><i class="fa fa-plus"></i> ویدیو</span>
+            </div>
 
             @*@if (Model.userRating <= 0)
                 {
@@ -32,15 +28,15 @@
             <span class="idBanner"> کد آگهی : @Model.id</span>
             @if (Model.floor != Advertise.FloorItems.Unset)
             {
-                <div>طبقه: @AdvertiseMainLocalization.GetEnumPersianName(Model.floor)</div>
+            <div>طبقه: @AdvertiseMainLocalization.GetEnumPersianName(Model.floor)</div>
             }
             @if (Model.roomCount <= 0)
             {
-                <span>  بدون اتاق</span>
+            <span>  بدون اتاق</span>
             }
             else
             {
-                <span>@Model.roomCount خوابه </span>
+            <span>@Model.roomCount خوابه </span>
             }
         </div>
     </div>

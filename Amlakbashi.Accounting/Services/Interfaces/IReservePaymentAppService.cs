@@ -1,5 +1,4 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Entities;
+﻿using Amlakbashi.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using static Amlakbashi.Core.Entities.ReservePayment;
 
 namespace Amlakbashi.Accounting.Services.Interfaces
 {
-    internal interface IReservePaymentAppService : IAppService<ReservePayment, long>
+    internal interface IReservePaymentAppService
     {
         IList<ReservePayment> GetAll();
         IQueryable<ReservePayment> GetAllAsIQueriable();

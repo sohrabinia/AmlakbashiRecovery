@@ -1,18 +1,16 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Entities;
+﻿using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
-using static Amlakbashi.Core.Entities.BlogPost;
 
 namespace Amlakbashi.Application.Services.BlogPostServices.Interfaces
 {
-    public interface IBlogPostAppService : IAppService<BlogPost, int>
+    public interface IBlogPostAppService
     {
         BlogPost Find(int id);
         IList<BlogPost> Filter(
             int id,
-            SortOrdersEnum sortOrder,
-            BlogPostStatus status,
-            PlaceEnum showingPlace,
+            BlogPost.SortOrdersEnum sortOrder,
+            BlogPost.BlogPostStatus status,
+            BlogPost.PlaceEnum showingPlace,
             string postTitle,
             int Province,
             int City,
@@ -23,7 +21,7 @@ namespace Amlakbashi.Application.Services.BlogPostServices.Interfaces
         void Update(BlogPost item, int userId);
         void Scrap(int id);
         void Recycle(int id);
-        IList<BlogPost> GetNewItems(PlaceEnum showingPlace, int count);
+        IList<BlogPost> GetNewItems(BlogPost.PlaceEnum showingPlace, int count);
         IList<BlogPost> GetAccommodationNewItems(int city, int area,
             int accommodationType, int positionType, bool hasPool, int count);
         void Delete(int id);

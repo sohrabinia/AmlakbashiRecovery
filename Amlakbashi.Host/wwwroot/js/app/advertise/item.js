@@ -202,9 +202,13 @@ function checkReserve(confirm_required) {
                         return false;
                     }
                     reserve_wait_for_login = false;
+                    $('.message-popup__message-button-container').hide();
+                    $('.message-popup__loading').show();
                     myajax("reserve/reserverequest", "advertise_id=" + advertise_id +
                         "&from_date=" + from_date + "&to_date=" + to_date +
                         "&number_of_guests=" + $("#guest_count").val(), function (ret) {
+                            $('.message-popup__message-button-container').show();
+                            $('.message-popup__loading').hide();
                             if (ret.val == 1) {
                                 //gtag('event', 'book', {
                                 //    "items": [
@@ -272,9 +276,13 @@ function checkReserve(confirm_required) {
                             return false;
                         }
                         reserve_wait_for_login = false;
+                        $('.message-popup__message-button-container').hide();
+                        $('.message-popup__loading').show();
                         myajax("reserve/reserverequest", "advertise_id=" + advertise_id +
                             "&from_date=" + from_date + "&to_date=" + to_date +
                             "&number_of_guests=" + $("#guest_count").val(), function (ret) {
+                                $('.message-popup__message-button-container').show();
+                                $('.message-popup__loading').hide();
                                 if (ret.val == 1) {
                                     //gtag('event', 'book', {
                                     //    "items": [

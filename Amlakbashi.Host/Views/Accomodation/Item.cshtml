@@ -145,7 +145,16 @@
                 @* Title and Acc Code *@
                 <div class="advertise-page_title_item">
                     <h1>@Model.TitleDesc.Title</h1>
-                    <p>کد اقامتگاه : @Model.Id</p>
+                    <div style="display: flex; justify-content: space-between;">
+                        <p>کد اقامتگاه: @Model.Id</p>
+                        @if (Model.HasVideo)
+                        {
+                            <div class="" style="height: 37px; width: 100px; font: 14px Miransans; border: 1px solid lightgray; padding: 3px 5px; border-radius: 5px; cursor: pointer; background-color: #fdd835; margin-right: 20px; text-align:center;" onclick="showVideo(@Model.Id)">
+                                <span style="">ویدیو</span>
+                                <i class="fas fa-video" style=""></i>
+                            </div>
+                        }
+                    </div>
                 </div>
 
                 @* Acc Owner and Socials & Favorite *@
@@ -161,11 +170,11 @@
                         }
                         @if (owner != null && !string.IsNullOrEmpty(full_name))
                         {
-                            <p title="@full_name">@full_name</p>
+                            <p title="@full_name">&nbsp; @full_name</p>
                         }
                         else
                         {
-                            <p>مالک اقامتگاه</p>
+                            <p>&nbsp; اقامتگاه</p>
                         }
                     </div>
                     <div class="master__favourite-button" onclick="onClickFavouriteBtn(this)" advertise_id="@Model.Id">
@@ -200,7 +209,6 @@
 
                 @* Address *@
                 <div class="advertise-page__main-properties-container">
-
                     @await Html.PartialAsync("AccPagePartials/_AccPageAddress", Model)
                 </div>
 
@@ -282,6 +290,19 @@
                 </div>
             }
 
+            @* show video *@
+            @if (Model.HasVideo)
+            {
+                <div class="advertise-page__property-box advertise-page__description-box">
+                    <P class="advertise-page__description-header">
+                        <i class="fas fa-video"></i> ویدیو از محیط اقامتگاه
+                    </P>
+                    <div style="text-align: center;">
+                        <video style="max-width:80%;" controls src="@Model.VideoUrl"></video>
+                    </div>
+                </div>
+            }
+
             @* Comments *@
             @if (Model.Comments != null && Model.Comments.Count > 0)
             {
@@ -291,8 +312,12 @@
             }
         }
 
-        @* Related Links *@
+        @* Tags and Related Links *@
         <div class="advertise-page__property-box advertise-page__comment-box">
+            @if (Model.Tags.TagsDic.Any())
+            {
+                @await Html.PartialAsync("AccPagePartials/_AccPageTags", Model)
+            }
             @await Html.PartialAsync("AccPagePartials/_AccPageRelatedLinks", Model)
         </div>
 
@@ -306,13 +331,9 @@
 @* Related Acc *@
 @{
     var relatedUrl = "/accomodation/getrelatedaccommodations?id=" + Model.Id;
-    //relatedUrl += (!string.IsNullOrEmpty(Model.RelatedLinkCapacity) && int.Parse(Model.RelatedLinkCapacity) > 0 ? "&capacity=" + Model.RelatedLinkCapacity : "");
-    //relatedUrl += (!string.IsNullOrEmpty(Model.EmptyRangeFrom) ? "&empty_range_from=" + Model.EmptyRangeFrom : "");
-    //relatedUrl += (!string.IsNullOrEmpty(Model.EmptyRangeTo) ? "&empty_range_to=" + Model.EmptyRangeTo : "");
 }
 
 <p class="item__related-title">اقامتگاه های مرتبط:</p>
-
 <div style="min-height: 381.56px;" class="advertise-page__related-container partialContents" data-url="@relatedUrl" data-onload="findLazyImages">
 </div>
 
@@ -558,7 +579,11 @@ function updateReserveRequestButton() {
             $('.js-reserve-req-icon').removeClass("fa-bolt");
             $('.js-reserve-req-icon').addClass("fa-calendar-check");
     }
-}
+        }
+
+        function showVideo(residenceId) {
+            showInfoMessage('ویدیو اقامتگاه ' + residenceId, '', { contentUrl: '/accomodation/ShowVideo?residenceId=' + residenceId, fullScreen: screen.width < 781 });
+        }
     </script>
 
     @if (!Model.IsPreview)

@@ -152,6 +152,13 @@
       "wwwroot/resource/css/general/popup-calendar.css"
     ]
   },
+  {
+    "outputFileName": "wwwroot/css/min/admin-tag.min.css",
+    "inputFiles": [
+      "wwwroot/css/admin/tag/list.css",
+      "wwwroot/css/admin/tag/popup.css"
+    ]
+  },
   // ####################################################### Scripts
   {
     "outputFileName": "wwwroot/js/dashboard.min.js",
@@ -348,6 +355,12 @@
       "wwwroot/resource/Scripts/general/jalali-date-handler.js",
       "wwwroot/resource/Scripts/general/jalali-date-picker.js",
       "wwwroot/resource/Scripts/general/price-string-generator.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/min/admin-tag.min.js",
+    "inputFiles": [
+      "wwwroot/js/admin/tag/list.js"
     ]
   },
   // App

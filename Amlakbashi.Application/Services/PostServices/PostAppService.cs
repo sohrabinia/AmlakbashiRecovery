@@ -10,7 +10,7 @@ using System.Transactions;
 
 namespace Amlakbashi.Application.Services.PostServices
 {
-    internal class PostAppService : AppServiceBase<Post, long>, IPostAppService
+    internal class PostAppService : BaseAppService<Post, long>, IPostAppService
     {
         private readonly IRepository<ServicePost, int> servicePostRepository;
         public PostAppService(

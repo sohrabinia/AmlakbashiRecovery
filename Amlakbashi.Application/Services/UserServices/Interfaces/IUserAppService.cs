@@ -1,5 +1,4 @@
 ﻿using Amlakbashi.Application.DTOs;
-using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.DTOs.UserDTOs;
 using Amlakbashi.Core.DTOs.WebService.Requests.Accounts;
 using Amlakbashi.Core.DTOs.WebService.Requests.User;
@@ -16,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.UserServices.Interfaces
 {
-    public interface IUserAppService : IAppService<User, int>
+    public interface IUserAppService
     {
         IList<User> GetAll();
         IQueryable<User> GetAllAsIQueryable();
@@ -52,8 +51,6 @@ namespace Amlakbashi.Application.Services.UserServices.Interfaces
         void UpdateDesc(int userId, string desc);
         Task UpdateEmailAsync(string guid, string email, bool confirm);
         void UpdateLastNotifPermetionTicks(int userId, long ticks);
-        //void UpdateInstantReserveAccess(int userId, User.InstantReserveAccessEnum instantReserveAccess,
-        //    int currentUserId = 0, ActionLog.ActionSourceEnum source = ActionLog.ActionSourceEnum.AdminPanel);
         void UpdateUserNotificationToken(int userId, string token);
         void UpdateFcmNotificationToken(int userId, string token);
         void UpdateAppNotificationToken(int userId, string token);

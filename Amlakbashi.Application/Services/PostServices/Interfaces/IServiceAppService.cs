@@ -1,10 +1,9 @@
-﻿using Amlakbashi.Core.Common.AppService;
-using Amlakbashi.Core.Entities;
+﻿using Amlakbashi.Core.Entities;
 using System.Collections.Generic;
 
 namespace Amlakbashi.Application.Services.PostServices.Interfaces
 {
-    public interface IServiceAppService : IAppService<Service, int>
+    public interface IServiceAppService
     {
         Service Find(int id);
         IList<Service> GetAll();

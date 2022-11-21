@@ -13,7 +13,7 @@ using Amlakbashi.Core.DTOs.WebService.Requests.Comments;
 
 namespace Amlakbashi.Application.Services.CommentServices
 {
-    internal class ReportItemAppService : AppServiceBase<ReportItem, long>, IReportItemAppService
+    internal class ReportItemAppService : BaseAppService<ReportItem, long>, IReportItemAppService
     {
         private readonly IMediator mediator;
         public ReportItemAppService(IRepository<ReportItem, long> repository,

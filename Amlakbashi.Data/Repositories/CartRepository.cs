@@ -1,16 +1,10 @@
-﻿using Amlakbashi.Core.Common.Repository;
-using Amlakbashi.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Amlakbashi.Core.Entities;
 
 namespace Amlakbashi.Data.Repositories
 {
     public class CartRepository : GenericRepository<Cart, long>
     {
-        public CartRepository(AmlakbashiDB _context) : base(_context)
+        public CartRepository(AmlakbashiDB context) : base(context)
         {
         }
     }

@@ -1,17 +1,13 @@
 ﻿using Amlakbashi.Application.DTOs;
-using Amlakbashi.Core.Common.AppService;
 using Amlakbashi.Core.DTOs.WebService.Requests.Comments;
 using Amlakbashi.Core.DTOs.WebService.Responses.Comments;
 using Amlakbashi.Core.Entities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Amlakbashi.Application.Services.CommentServices.Interfaces
 {
-    public interface ICommentAppService : IAppService<Comment, long>
+    public interface ICommentAppService
     {
         IQueryable<Comment> GetAllAsIQueryable();
         IList<Comment> GetListBySenderUserId(int userId);

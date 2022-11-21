@@ -152,6 +152,10 @@
                             <i class="fa fa-home" style="color: white;font-size: 24px;margin: 3px;text-shadow: 0px 2px 5px #333;"></i>
                         }*@
                     @*</div>*@
+                    @if (item.hasVideo)
+                    {
+                        <span class="fas fa-video" style="flex-flow: row; position: absolute; display: flex; left: 10px; top: 110px; padding: 5px; background-color: #fdd835; color: #484848; border-radius: 3px;"></span>
+                    }
                     <img class="home-page__advertise-image @(initial_loaded_img ? "" : "lazy")" src="@img_src_to_show" @img_data_source width="240" height="144" alt='@(item.PhotoID > 0 ? item.Title : "عکس یافت نشد")' />
                     @if (!initial_loaded_img)
                     {

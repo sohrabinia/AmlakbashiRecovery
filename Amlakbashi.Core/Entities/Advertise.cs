@@ -4,6 +4,7 @@ using Amlakbashi.Core.DTOs.AccommodationDTOs.AccPagesDTOs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
@@ -59,6 +60,9 @@ namespace Amlakbashi.Core.Entities
         public long? MainPhotoId { get; set; }
         public long? VideoId { get; set; }
         public VideoStatusEnum VideoStatus { get; set; }
+
+        [MaxLength(1000)]
+        public string ReasonForNotConfirmingVideo { get; set; }
         public string AlbumPhoto { get; set; }
 
         // Ownership and Lisence ********************************
@@ -204,14 +208,12 @@ namespace Amlakbashi.Core.Entities
         [JsonIgnore]
         public virtual ICollection<InstantReserveDate> InstantReserveDates { get; set; } = new List<InstantReserveDate>();
 
+        [JsonIgnore]
+        public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
         #endregion
 
         #region Functions
-
-        public Advertise ShallowCopy()
-        {
-            return (Advertise)this.MemberwiseClone();
-        }
 
         [NotMapped]
         [JsonIgnore]
@@ -219,7 +221,7 @@ namespace Amlakbashi.Core.Entities
         {
             get
             {
-                return (AdvertiseStatus)Status == AdvertiseStatus.Published
+                return Status == AdvertiseStatus.Published
                     && Active == true && HideInSearch == false;
             }
         }
@@ -252,6 +254,21 @@ namespace Amlakbashi.Core.Entities
                     (GetHotelTypes().Contains(TypeID) ? MainTypeEnum.Hotel : MainTypeEnum.Complex);
             }
         }
+
+        [NotMapped]
+        [JsonIgnore]
+        public string VideoUrl { 
+            get {
+                return VideoStatus switch
+                {
+                    VideoStatusEnum.Unset => string.Empty,
+                    VideoStatusEnum.Pending => $"/video/residences/pending/pendingResidenceVideo_{Id}.mp4?t={DateTime.Now.Ticks}",
+                    _ => $"/video/residences/residenceVideo_{Id}.mp4?t={DateTime.Now.Ticks}"
+                };
+            }
+        }
+
+        public Advertise ShallowCopy() => (Advertise)this.MemberwiseClone();
 
         public void SetNotVerifyReasons(IList<NotVerifyReasonsEnum> list)
         {

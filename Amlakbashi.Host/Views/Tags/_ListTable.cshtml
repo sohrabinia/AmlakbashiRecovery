@@ -1,0 +1,55 @@
+﻿@model Amlakbashi.Core.DTOs.PagedList<Tag>
+
+@if (Model.List.Any() == false)
+{
+    <p style="margin: 30px;">موردی برای نمایش وجود ندارد</p>
+}
+else
+{
+    var index = Model.PagingInfo.rowStart;
+    @foreach (var item in Model.List)
+    {
+        <aside class="admin-table-row" id="js-@item.Id">
+            <div class="column-row">
+                @index
+            </div>
+
+            <div class="column-id">
+                @item.Id
+            </div>
+
+            <div class="column-title">
+                @if (item.Status == Tag.TagStatusEnum.Active)
+                {
+                    <a asp-action="GetResidences" asp-route-urlTitle="@item.UrlTitle" target="_blank">@item.Title</a>
+                }
+                else
+                {
+                    @:@item.Title
+                }
+            </div>
+
+            <div class="column-urltitle">
+                @item.UrlTitle
+            </div>
+
+            <div class="column-operation">
+                <div>
+                    <i class="fa fa-edit" onclick="showEditPopup(@item.Id, '@item.Title')" title="ویرایش عنوان"></i>
+                    @if (item.Status == Tag.TagStatusEnum.Active)
+                    {
+                        <i class="fa fa-check-circle actived" title="تایید شده"></i>
+                    }
+                    else
+                    {
+                        <i class="fa fa-check-circle unset" onclick="activeTag(@item.Id, this)" title="تایید"></i>
+                    }
+                    <i class="fa fa-trash" onclick="deleteTag(@item.Id)" title="حذف"></i>
+                </div>
+            </div>
+        </aside>
+        index++;
+    }
+}
+
+
