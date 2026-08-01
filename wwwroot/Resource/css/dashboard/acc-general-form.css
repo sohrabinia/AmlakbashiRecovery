@@ -1,0 +1,369 @@
+﻿.advetise-form__part{
+    background-color: transparent;
+    border: none;
+}
+.dynamic-filter_box-items.form-step .dynamic-filter__item {
+    width: 32%;
+}
+.static-advertise__item-textarea{
+    margin: 10px 0;
+}
+
+.leaflet-control-zoom.leaflet-bar.leaflet-control {
+    display: flex;
+    flex-flow: column wrap;
+    width: auto;
+    border-radius: 5px;
+}
+div#mapid {
+    border-radius: 5px;
+    margin: 10px 0;
+    border: 1px solid #cacaca;
+}
+.leaflet-control-attribution.leaflet-control{
+    display:none;
+}
+.static-advertise__item-floor {
+    padding: 0 8px;
+}
+
+.static-advertise__item-floor .static-advertise__property {
+    width: 260px;
+}
+.static-advertise__item-floor p, .static-advertise__item-floor p {
+    font: 18px Biransans;
+    color: #242424;
+}
+.static-advertise__item-floor select{
+    margin-top: 15px;
+    margin-bottom: 30px;
+}
+#tpl{
+    display : none;
+}
+
+
+/*start-dropzon*/
+.dropzone {
+    width: 100%;
+    min-height: 100px;
+    display: flex;
+    direction: ltr;
+    align-items: flex-start;
+    padding-bottom: 15px;
+    flex-flow: row wrap;
+    justify-content: FLEX-END;
+    background-color: transparent;
+}
+
+.dropzone .dz-default {
+    width: 100%;
+    background: transparent;
+    margin-bottom: 15px;
+    text-align: right;
+    justify-content: start;
+    align-items: self-end;
+    height: 85px; 
+}
+
+.dropzone .dz-default p {
+    height: 50px;
+    width: 175px;
+    font: 14px Miransans;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 10%), 0 2px 6px 0 rgba(0,0,0,.1);
+    border: 1px solid #d6d6d6;
+    border-radius: 5px;
+    background: #ddd;
+    cursor: pointer;
+    margin: 15px 0 0 0;
+}
+.dropzone .dz-default i.fa {
+    font-size: 28px;
+    color: #777;
+}
+
+.dropzone .dz-default span {
+    font: 14px Miransans;
+    color: #444;
+    margin-top: 15px;
+}
+
+
+.dz-preview {
+    width: 135px;
+    height: 120px;
+    margin: 15px 15px 0 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.dz-preview.edit-content {
+    width: 250px;
+    height: 200px;
+}
+
+.dz-preview img {
+    width: 135px;
+    height: 120px;
+    border-radius: 5px;
+}
+
+.dz-preview img.edit-content {
+    width: 250px;
+    height: 200px;
+}
+
+.dz-preview .dz-remove {
+    background-color: rgba(0, 0, 0, 0.7);
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 26px;
+    height: 40px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: distribute;
+    justify-content: space-around;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    font: 10px Liransans;
+    color: #fff;
+}
+
+.dz-preview .dz-remove i.fa {
+    font-size: 16px;
+    color: #fff;
+}
+
+.dz-preview .dz-edit {
+    background-color: rgba(0, 0, 0, 0.7);
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-block;
+    font: 11px Liransans;
+    color: #fff;
+    padding: 5px 10px;
+    text-decoration: none;
+}
+
+.dz-preview .dz-upload {
+    display: none;
+}
+
+.dz-preview .dz-progress {
+    bottom: 0;
+    width: 100%;
+    position: absolute;
+    height: 26px;
+    text-align: center;
+    font: 13px Miransans;
+    padding: 4px 0;
+    line-height: 24px;
+}
+
+.dz-preview .empty-progress {
+    background-color: #cdcdcd;
+    z-index: 1;
+}
+
+.dz-preview .progress-text {
+    background-color: #4CAF50;
+    z-index: 2;
+    color: #fff;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+.dz-preview .dz-finish {
+    font-size: 18px;
+    display: none;
+}
+
+.dz-preview.dz-preview-active {
+    border: 2px solid #55d34c;
+}
+
+.dz-preview .dz-main-photo {
+    font: 11px Liransans;
+    color: #fff;
+    display: none;
+    margin-right: 7px;
+}
+
+.dropzone-style {
+    direction: rtl;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    background-color: transparent;
+}
+.dz-preview{
+    border-radius:5px;
+}
+p.dz-default.dz-message {
+    font: 14px Miransans;
+}
+p.dz-default.dz-message i{
+    margin-bottom: 10px;
+}
+.static-advertise__extra-footer{
+    margin-top: 6px;
+}
+.dz-main-photo {
+    background: #4caf50;
+    margin: 0 !important;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 4px 0;
+}
+.dz-preview img{
+    object-fit:cover;
+}
+.dz-preview .progress-text, .dz-preview .empty-progress {
+    background-color: transparent;
+}
+
+.dz-preview.dz-processing.dz-image-preview.dz-success.dz-complete {
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,.2), 0 1px 8px 0 rgba(0,0,0,.1);
+}
+
+p.dz-remove {
+    padding: 20px;
+    background-color: rgb(0 0 0 / 52%);
+}
+input.static-advertise__property.static-advertise__it{
+    height:45px;
+}
+.empty-progress.dz-progress.dz-progress_loader{
+    height: 100%;
+}
+.empty-progress.dz-progress.dz-progress_loader .progress-text.dz-progress{
+    width:100%;
+    height:100%;
+}
+.static-advertise__select-location span{
+    color:red;
+}
+.dz-progress_loader .progress-text.dz-progress p.dz-percent {
+    position: absolute;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    background: #000000a1;
+    bottom: -9px;
+}
+.static-advertise__Introduction-title{
+    width: 100% !important;
+}
+p.dz-default.dz-message {
+    height: 50px;
+    width: 175px;
+    display: flex;
+    flex-flow: row wrap;
+    flex-direction: row;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 10%), 0 2px 6px 0 rgba(0,0,0,.1);
+    border: 1px solid #d6d6d6;
+    border-radius:5px;
+}
+.dropzone .dz-default i.fa {
+    margin-left: 10px;
+    font-size: 22px;
+    color: #777;
+    margin-bottom: 0;
+}
+
+.edit-advertise-container {
+    width: 80%;
+    margin: 20px auto;
+}
+
+.edit-advertise__title {
+    font: 14px Miransans;
+    text-align: right;
+    color: #242424;
+    padding: 10px;
+}
+
+.edit-advertise__detail {
+    font: 13px Miransans;
+    text-align: right;
+    color: #fff;
+    padding: 10px;
+}
+
+.dz-progress-loading .progress-text.dz-progress .dz-perecent-style {
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    font-size: 2rem;
+    background:black;
+}
+/*responsive */
+@media screen and (max-width: 760px) {
+    .dz-preview {
+        width: 115px;
+        height: 100px;
+    }
+
+    .dropzone .dz-default {
+        height: 70px;
+    }
+    .static-advertise__item-floor p, .static-advertise__item-floor p{
+        font-size:15px;
+    }
+}
+@media screen and (max-width: 500px) {
+    .static-advertise__item-floor p, .static-advertise__item-floor p {
+        font-size: 13px;
+        margin-top: 15px;
+    }
+
+    .static-advertise__item-floor .static-advertise__property {
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .static-advertise__select-location span {
+        display: block;
+        margin-top: 10px;
+        font-size: 12px;
+    }
+
+    .static-advertise__item-floor select {
+        text-align: center;
+        width: 65%;
+    }
+
+    .dropzone .dz-default p {
+        margin: 10px auto !important;
+    }
+}

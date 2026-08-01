@@ -1,0 +1,50 @@
+﻿.message-popup__message-child.message-popup__message-content .jalali-calendar { 
+    width : 100%;
+}
+.message-popup__message-container{
+    bottom: 0;
+}
+.message-popup__message-child {
+    max-width: 530px;
+}
+.acc-set-date__input-container {
+    display: flex;
+    justify-content: center;
+    flex-flow: row wrap;
+    /*margin:20px auto 0 auto;*/
+}
+.acc-set-date__button.acc-set-date__occ-btn ,.acc-set-date__button.acc-set-date__empty-btn, .acc-set-date__button.acc-set-date__occ-btn.acc-set-date__disabled-button , .acc-set-date__button.acc-set-date__empty-btn.acc-set-date__disabled-button {
+    width: 100px;
+    background: #f4f4f4;
+    box-shadow:1px 2px 3px 0 rgba(0,0,0,.1);
+    margin: 15px 10px 0px 10px;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 2.5;
+}
+.acc-set-date__button.acc-set-date__occ-btn ,.acc-set-date__button.acc-set-date__empty-btn{
+    background:#fDc831;
+}
+
+.message-popup__message-button-container {
+    padding: 0 5px 5px 5px;
+}
+.message-popup__message-content {
+    overflow-y: unset;
+}
+/*.message-popup__message-child.message-popup__message-content .acc-set-date__date-string {*/
+.acc-set-date__date-string {
+    /* margin: 0 auto; */
+    text-align: center;
+    color: #EA4335;
+    font: 11px Liransans;
+    margin-top: 7px;
+}
+/*.message-popup__message-child.message-popup__message-content {
+    margin-top: -100px;
+}*/
+/*.message-popup__message-container {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}*/

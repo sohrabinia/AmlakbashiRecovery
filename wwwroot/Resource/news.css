@@ -1,0 +1,42 @@
+﻿.mainnews {
+    direction:rtl;
+    text-align:right ;
+    margin:50px auto ;
+}
+
+.mainnews .newsitem {
+    padding:10px;
+    margin:10px 0 ;
+}
+
+.mainnews .newsitem .title {
+    font:20px Biransans ;
+    color:#e6c11e ;
+    padding:10px 5px; 
+}
+.mainnews .newsitem .devider {
+    width:200px;
+    height:2px;
+    background:#FDD835 ;
+    margin-bottom:20px;
+}
+
+.mainnews .newsitem .content {
+    border:1px solid #ccc ;
+    padding:5px;
+    background:#f3f3f3 ;
+    margin:20px 0 ;
+}
+.mainnews .newsitem .content .titr {
+    font:16px Miransans ;
+    color:#333 ;
+    padding:10px ;
+    display:block ;
+    cursor:pointer ;
+    text-decoration :none ;
+}
+.mainnews .newsitem .content .lead {
+    font:14px Liransans ;
+    color:#666 ;
+    padding:10px;
+}

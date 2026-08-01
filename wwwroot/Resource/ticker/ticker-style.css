@@ -1,0 +1,56 @@
+
+.ticker-wrapper.has-js {
+    display: block;
+    float: right;
+}
+.ticker {
+    display: block;
+    height: 36px;
+    margin: 2px 0;
+    overflow: hidden;
+    position: relative;
+    width: 686px;
+}
+.ticker-content {
+    overflow: hidden;
+    position: absolute;
+}
+.ticker-content:focus {
+}
+.ticker-content a {
+    color: #ED1C24;
+    font: 15px bnassim;
+    text-decoration: none;
+}
+.ticker-swipe {
+    background-color: #fff;
+    display: block;
+    height: 50px;
+    position: absolute;
+    top: 0;
+    width: 600px;
+}
+.ticker-swipe span {
+    display: block;
+    height: 15px;
+    width: 7px;
+}
+.ticker-controls {
+    float: right;
+    list-style-type: none;
+}
+.ticker-controls li {
+    display: none;
+}
+.js-hidden {
+    display: none;
+}
+.ticker-title {
+    display: none;
+}
+.left .ticker-controls, .left .ticker-content, .left .ticker-title, .left .ticker {
+    float: right;
+}
+.right .ticker-controls, .right .ticker-content, .right .ticker-title, .right .ticker {
+    float: right;
+}

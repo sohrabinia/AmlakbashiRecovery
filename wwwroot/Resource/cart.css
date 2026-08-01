@@ -1,0 +1,165 @@
+﻿.filtercart {
+    direction:rtl ;
+    font:16px Miransans;
+    padding:30px 20px;
+}
+
+.filtercart select{
+    border:1px solid #cdcdcd ;
+    width:150px;
+}
+
+.filtercart td{
+    padding:0 20px ;
+    vertical-align:middle ;
+}
+
+.filtercart option{
+    padding:15px;
+    color:#999 ;
+}
+
+.filtercart .submit{
+    padding:10px;
+    background-color:#d7d7d7 ;
+    color:#0b486b ;
+    border-radius:20px; 
+    border:0 ;
+    cursor:pointer ;
+    width:80px; 
+    font:20px bnassim ;
+}
+
+.cart {
+    margin:10px auto ;
+    background-color:#eee ;
+    direction:rtl ;
+}
+
+.cart .item div{
+    padding:20px 0px;
+    font:15px Miransans ;
+    color:#555 ;
+    text-align:center ;    
+}
+.cart .item td{
+    vertical-align:middle ;
+}
+
+.cart .delete {
+    background:url('img/close16_2.png') no-repeat ;
+    width:16px;
+    height:16px;
+    display:inline-block ;
+}
+.cart .tddelete {
+    background-color: #ffedee;
+    text-align: center;
+    vertical-align: middle;
+    width: 30px;
+    cursor:pointer ;
+}
+
+.cart table {
+    width:100% ;
+    height:100% ;
+}
+
+.cart th {
+    white-space:nowrap ;
+    padding:30px 10px;
+    font:18px Miransans ;
+    color:#222 ;
+    text-align:center ;
+}
+
+.cart td {
+    white-space:nowrap ;
+    padding:20px 10px;
+    font:15px Miransans ;
+    color:#555 ;
+    text-align:center ;    
+}
+
+.cart .totalprice {
+    background-color:#ddd ;
+    padding:20px;
+    font:18px bnassim ;
+    color:#fd8431 ;
+    border-bottom:2px solid #fff ;
+}
+.cart .discountprice {
+    background-color:#ddd ;
+    padding:20px;
+    font:18px bnassim ;
+    color:#fe4e50 ;
+    border-bottom:2px solid #fff ;
+}
+.cart .payprice {
+    background-color:#ddd ;
+    padding:20px;
+    font:18px bnassim ;
+    color:#00ab93 ;
+    border-bottom:2px solid #fff ;
+}
+
+.type .title {
+    font:20px bnassim ;
+    color:#333 ;
+    padding:30px 20px; 
+}
+
+.type .titem{
+    text-align:right ;
+    font:16px bnassim ;
+    color:#999 ;
+    padding:15px 20px;
+}
+
+.cart .operator {
+    height:2px;
+    width:100% ;
+    background-color:#FDD835 ;
+    position:relative ;
+}
+.cart .operator .cancel {
+    background-color:#fe4e50 ;
+    position:absolute;
+    left:153px;
+    top:-23px;
+    padding:10px ;
+    border-radius:20px;
+    color:#fff ;
+    font:16px bnassim ;
+    text-decoration:none ;
+    display:block ;
+    width:70px ;
+    text-align:center ;
+    cursor:pointer ;
+}
+.cart .operator .pay {
+    background-color:#00ab93 ;
+    position:absolute ;
+    left:30px;
+    top:-23px;
+    padding:10px 35px 10px 10px;
+    border-radius:20px;
+    color:#fff ;
+    font:16px bnassim ;
+    background:url(img/sabad.png) center right 5px no-repeat #00ab93;
+    text-decoration:none ;
+    display:block ;
+    width:100px;
+    text-align:center ;
+    cursor:pointer ;
+
+}
+
+
+@media (max-width: 680px) {
+    .cart .item div{
+        padding:10px 0px;
+        font:12px Miransans ;
+    }
+}
+

@@ -1,0 +1,18 @@
+project_info 
+project_number "937079534215"
+project_id "comamlakbashiapp"
+storage_bucket "comamlakbashiapp.firebasestorage.app"
+client 
+0 
+client_info 
+mobilesdk_app_id "1:937079534215:android:460341106125af9744fe22"
+android_client_info 
+package_name "com.amlakbashi.app"
+oauth_client []
+api_key 
+0 
+current_key "AIzaSyDMgu7O_X8LcXsq5BwAmXU-U1EBkEc8AQ0"
+services 
+appinvite_service 
+other_platform_oauth_client []
+configuration_version "1"

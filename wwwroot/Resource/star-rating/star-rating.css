@@ -1,0 +1,35 @@
+﻿.star-rating__parent, .home-page__advertise-no-comment {
+    display:flex;
+    flex-flow:row;
+    align-items:center;
+    height: 23px;
+    width:unset;
+    color:#5d5d5d;
+}
+.star-rating__star {
+}
+.star-rating__label {
+    color: #4f4f4f;
+    margin: 0 5px;
+    width: 25px;
+    text-align: center;
+    font: 13px Miransans;
+}
+.star-rating__container {
+  font-size: 1em;
+  position: relative;
+  display: flex;
+  width: unset;
+}
+.star-rating__star-under {
+  color: #d2d2d2;
+  vertical-align: top;
+}
+.star-rating__star-over {
+  color: #edb867;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 0%;
+  overflow: hidden;
+}

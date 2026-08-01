@@ -1,0 +1,52 @@
+﻿.advertise-comment-manager__parent {
+    padding: 10px;
+}
+.advertise-comment-manager__no-item-msg {
+    font: 18px Miransans;
+    text-align:center;
+    padding: 10px;
+    background-color: #FBFBFB;
+    color:#EA4335;
+}
+.advertise-comment-manager__container {
+    display:flex;
+    flex-flow:row;
+    flex-wrap: wrap;
+    justify-content:center;
+}
+.advertise-comment-manager__item {
+    border: thin solid #bcbcbc;
+    margin: 10px;
+    width:242px;
+}
+
+.advertise-comment-manager__image{
+    cursor:pointer;
+}
+.advertise-comment-manager__label-container {
+    cursor:pointer;
+    padding:10px;
+    height: 220px;
+    display:flex;
+    flex-flow:column;
+    justify-content:space-between;
+    text-decoration:none;
+    color:#242424;
+}
+.advertise-comment-manager__label {
+    font: 13px Miransans;
+    width: unset;
+}
+.advertise-comment-manager__button-area {
+    display:flex;
+    flex-flow:column;
+    height:100px;
+    justify-content:space-between;
+}
+.advertise-comment-manager__button {
+    padding:10px;
+    text-align:center;
+    background-color:#fdd835;
+    border-radius:5px;
+    font: 13px Miransans;
+}

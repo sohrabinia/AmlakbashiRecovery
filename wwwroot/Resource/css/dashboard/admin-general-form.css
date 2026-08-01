@@ -1,0 +1,22 @@
+﻿.static-advertise{
+    display:block;
+}
+.static-advertise__item-textarea textarea, .static-advertise__property textarea{
+    width:99%;
+    background:white;
+}
+.advertise-form__low-item input, .static-advertise__property input, select, input.static-advertise__property.static-advertise__it{
+    background:white;
+}
+.dropzone .dz-default {
+    align-items: flex-end;
+}
+/*.dz-preview.dz-processing.dz-image-preview.dz-success.dz-complete {
+    width: 250px;
+    height: 200px;
+}
+*/
+.dz-preview img.edit-content, .dz-preview.edit-content {
+    width: 135px;
+    height: 120px;
+}

@@ -1,0 +1,29 @@
+﻿@font-face {
+  font-family: bnassim;
+  src: url('fonts/nassim-bold.eot?#') format('eot'),  
+       url('fonts/nassim-bold.woff') format('woff'),  
+       url('fonts/nassim-bold.ttf') format('truetype'); 
+}
+@font-face {
+  font-family: rnassim;
+  src: url('fonts/nassim-regular.eot?#') format('eot'),  
+       url('fonts/nassim-regular.woff') format('woff'),  
+       url('fonts/nassim-regular.ttf') format('truetype'); 
+}
+
+* {
+    border:none ;
+    padding:0px;
+    margin:0px ;
+}
+
+.page {
+    width:980px;
+    margin:0 auto ;
+    min-height:600px;
+}
+
+.header {
+    height:125px;
+    margin:0 auto ;
+}

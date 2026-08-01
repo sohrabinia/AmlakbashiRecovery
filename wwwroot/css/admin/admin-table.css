@@ -1,0 +1,171 @@
+﻿/* Table */
+.admin-table {
+    width: 92%;
+    display: flex;
+    background: white;
+    margin: 0 auto;
+    border-radius: 0 0 5px 5px;
+    flex-flow: column;
+    box-shadow: 0 7px 8px 0 rgba(0, 0, 0, 0.04);
+}
+
+.admin-table-row-header {
+  background: gainsboro;
+  margin: 20px 12px 0 12px;
+  border-top: 1px solid #dedede;
+}
+
+aside.admin-table-row {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  margin: 0;
+  border-bottom: 1px solid #dedede;
+}
+
+aside.admin-table-row > p, aside.admin-table-row > div {
+  font: 13px Liransans;
+  text-align: center;
+  display: flex;
+  padding: 10px 0;
+  border-left: 1px solid #dedede;
+  overflow: hidden;
+  flex-flow: column wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+aside.admin-table-row > p:first-child, aside.admin-table-row > div:first-child {
+  border-right: 1px solid #dedede;
+}
+
+aside.admin-table-row .box-more-options-container {
+    padding: 0;
+    width: 100%;
+}
+
+aside.admin-table-row .js-more-option{
+    display: none;
+}
+
+aside.admin-table-row .box-more-options {
+  background: #f6f7f7;
+  border: 1px solid #dedede;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px 0;
+  width: 100%;
+}
+
+aside.admin-table-row .box-more-options .more-option-row {
+    width: 100%;
+    text-align: right;
+    margin: 0 10px;
+    border-bottom: 1px solid #dedede;
+    line-height: 3;
+    font: 13px Liransans;
+    padding: 15px;
+}
+
+aside.admin-table-row .box-more-options .function-buttons {
+    border-bottom: 0px !important;
+}
+
+aside.admin-table-row .box-more-options .function-buttons i, aside.admin-table-row .box-more-options .function-buttons a {
+  font-size: 20px;
+  color: #50575e;
+  line-height: 1;
+  font-size: 22px;
+  text-align: center;
+  text-shadow: none;
+  padding: 0;
+  margin: 0 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+aside.admin-table-row .box-more-options .function-buttons i:hover, aside.admin-table-row .box-more-options .function-buttons a:hover {
+  /*font-size: 23px;*/
+  color: #dab200;
+}
+
+aside.admin-table-row .box-more-options .mobile {
+  display: none;
+}
+
+aside.admin-table-row .box-more-options .tablet {
+  display: none;
+}
+
+aside.admin-table-row .more-options-btn {
+  font-size: 20px;
+}
+
+/* Pagination */
+.pagination-container {
+  width: 100%;
+  text-align: center;
+}
+
+.pagination-container .pagination {
+  display: inline-block;
+  padding-right: 0;
+  margin: 20px 0;
+  border-radius: 4px;
+}
+
+.pagination-container .pagination li {
+  display: inline-grid;
+  margin: 5px 10px;
+  text-align: center;
+}
+
+.pagination-container .pagination li a,
+.pagination-container .pagination li span {
+  position: relative;
+  display: block;
+  float: right;
+  margin-right: -1px;
+  color: #337ab7;
+  text-decoration: none;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  font: 12px Miransans;
+  padding: 0;
+  line-height: 2.5;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination-container .pagination .active span {
+  background-color: #fdd835;
+  color: #242424;
+  border: 1px solid #dddddd;
+  transform: scale(1.03);
+}
+
+@media (max-width: 1400px) {
+    .admin-table {
+        width: 97%;
+    }
+}
+
+@media (max-width: 960px){
+    aside.admin-table-row .box-more-options .tablet {
+        display: block;
+    }
+}
+
+@media (max-width: 680px){
+    aside.admin-table-row .box-more-options .mobile {
+        display: block;
+    }
+
+    aside.admin-table-row .box-more-options .function-buttons i, aside.admin-table-row .box-more-options .function-buttons a {
+        margin: 0 0 20px 7%;
+    }
+}

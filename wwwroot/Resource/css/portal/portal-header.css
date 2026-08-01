@@ -1,0 +1,472 @@
+﻿.header {
+    direction:rtl ;
+}
+.master__header{
+    width:100% !important;
+    display:flex;
+    height: 70px;
+    /*border-bottom: 1px solid #e0e0e0;*/
+    position: fixed;
+    background-color: #242424;
+    top: 0 !important;
+    z-index: 3;
+}
+
+.master_header-child {
+    /*width: 33.33%;*/
+    margin: auto 10px;
+}
+
+.master_header-logo {
+    margin: auto;
+    text-align:right;
+    margin-right: 4%;
+    display:flex;
+}
+
+.master_header-logo a{
+    width: 130px;
+    margin-left: 30px;
+}
+
+.master_header-account {
+    background-color:transparent;
+    font: 14px Miransans;
+    padding: 5px;
+    float:left;
+    width:125px;
+    color:white;
+    border-radius: 4px;
+    display:flex;
+    text-decoration: none;
+}
+
+.master_header-account:hover {
+    color: #FDD835;
+}
+
+.master_header-account * {
+    margin: auto 5px;
+}
+
+.master__header-menu {    
+    font: 14px Miransans;
+    padding: 5px;
+    float: right;
+    width:100px;
+    color: white;
+    border-radius: 4px;
+    display:flex;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.master__header-menu * {
+    margin: auto 5px;
+}
+
+/*.master__header-menu:hover , .master__header-menu-open {
+   color: #FDD835;
+}*/
+
+.master__header-menu:hover {
+   color: #FDD835;
+}
+
+.master__header-menu i, .master_header-account i {
+    font-size: 20px;
+}
+
+.master__menu {
+    display: flex;
+    flex-flow: column;
+    display: none;
+    position: fixed;
+    left: 1px;
+    top: 70px;
+    z-index: 900;
+    min-width: 150px;
+    border: 1px solid lightgray;
+    background-color: white;
+}
+
+.master__menu-item {
+    width: 150px;
+    margin: 5px 10px;
+    color: #242424;
+    font: 14px Miransans;
+    text-decoration: none;
+    display: flex;
+    padding: 2px 5px;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.master__menu-item * {
+    margin: 0 8px 0 0;
+}
+
+.master__menu-item:hover {
+   background-color:#FDD835;
+   color: #242424;
+}
+
+.master__header-search-box {
+    background-color: white;
+    color: #242424;
+    width: 400px;
+    height: 40px;
+    margin: auto 10px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+}
+
+.master__header-search-box i {
+    font-size:16px;
+    margin-right:10px;
+}
+
+.master__header-search-box input {
+    border: none;
+    font: 15px Liransans;
+    height: 30px;
+    text-align: right;
+    margin-right:10px;
+    width:340px;
+}
+
+@media (max-width: 900px) {
+    .master__header {
+        height: 60px;
+    }
+
+    .master__menu {
+        top: 60px;
+    }
+
+    .master_header-child {
+        /*margin: auto 15px;*/
+    }
+    a#dashboard_button p {
+        margin: 0 !important;
+    }
+    .master_header-account {
+        font: 13px Miransans;
+        padding: 4px;
+        width: 110px;
+    }
+
+    .master__header-menu {
+        font: 13px Miransans;
+        padding: 4px;
+        width: 90px;
+    }
+
+    .master__header-search-box {
+        width: 270px;
+        height: 32px;
+        margin: auto 10px;
+    }
+
+    .master__header-search-box i {
+        font-size:15px;
+        margin-right:8px;
+    }
+
+    .master__header-search-box input {
+        font: 14px Liransans;
+        height: 27px;
+        margin-right:8px;
+        width:215px;
+    }
+
+    .master_header-logo a {
+        width: 110px;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 680px) {
+    .master__header {
+        height: 52px;
+    }
+    p.master_header-child.master__header-menu {
+        margin-left: 40px;
+    }
+    .master__menu {
+        top: 52px;
+    }
+    .master__header {
+        width: 95%;
+    }
+    .master_header-child {
+        /*margin: auto 10px;*/
+    }
+
+    .master_header-account {
+        font: 13px Miransans;
+        padding: 3px;
+        width: 106px;
+    }
+
+    .master__header-menu {
+        font: 13px Miransans;
+        padding: 3px;
+        width: 30px;
+    }
+
+    .master__header-menu span {
+        display: none;
+    }
+
+    .master__header-search-box {
+        width: 220px;
+        height: 28px;
+        margin: auto 10px;
+        border-radius: 6px;
+    }
+
+    .master__header-search-box i {
+        font-size:14px;
+        margin-right:6px;
+    }
+
+    .master__header-search-box input {
+        font: 13px Liransans;
+        height: 25px;
+        margin-right:6px;
+        width:170px;
+    }
+
+    .master_header-logo a {
+        width: 90px;
+        margin-left: 0;
+    }
+}
+@media (max-width: 550px) {
+    p.master_header-child.master__header-menu {
+        width: 29px;
+        overflow: hidden;
+    }
+    .master_header-account {
+        font: 13px Miransans;
+        padding: 3px;
+        width: 40px;
+    }
+
+    .master_header-account p  {
+        color:transparent;
+        height:21px;
+
+    }
+    .master_header-account p i {
+        color:white;
+    }
+}
+
+@media (max-width: 500px) {
+    .master_header-account {
+        width: 35px;
+    }
+
+    .master__header-search-box {
+        width: 165px;
+        height: 28px;
+        margin: auto 10px;
+    }
+    .master__header-search-box i {
+        font-size:13px;
+        margin-right:4px;
+    }
+
+    .master__header-search-box input {
+        font: 13px Liransans;
+        height: 22px;
+        margin-right:4px;
+        width:130px;
+    }
+}
+
+@media (max-width: 450px) {
+    .master_header-account {
+        width: 32px;
+    }
+    p.master_header-child.master__header-menu {
+        margin-left: 10px;
+    }
+}
+
+@media (max-width: 400px) {
+    .master__header {
+        height: 48px;
+    }
+
+    .master__menu {
+        top: 48px;
+    }
+
+    .master_header-child {
+        /*margin: auto 5px;*/
+    }
+
+    .master__header-menu {
+        font: 13px Miransans;
+        padding: 2px;
+        width: 25px;
+    }
+
+    .master__menu-item {
+        font: 13px Liransans;
+    }
+
+    .master__header-menu i, .master_header-account i {
+        font-size: 5vw;
+    }
+
+    .master__header-search-box {
+        width: 140px;
+        height: 25px;
+        margin: auto 4px;
+    }
+
+    .master__header-search-box i {
+        font-size:13px;
+        margin-right:4px;
+    }
+
+    .master__header-search-box input {
+        font: 13px Liransans;
+        height: 22px;
+        margin-right:4px;
+        width:108px;
+        padding-left: 0;
+    }
+}
+
+@media(max-width: 350px) {
+    p.master_header-child.master__header-menu {
+        margin-left: 8px;
+        width: 24px;
+    }
+    .master__header-search-box {
+        width: 121px;
+    }
+
+    .master__header-search-box input {
+        font: 12px Liransans;
+        height: 22px;
+        margin-right:4px;
+        width:91px;
+        padding-left: 0;
+    }
+
+    .master_header-logo a {
+        width: 75px;
+        margin-left: 0;
+    }
+}
+
+@media(max-width: 319px) {
+
+    .master_header-account * {
+        margin: auto 2px;
+    }
+    .master_header-account {
+        font: 0.8em Miransans;
+        padding: 2%;
+        /*width: 70px;*/
+    }
+    .master_header-child {
+        /*margin: auto 2px;*/
+        width: 5%;
+    }
+    /*.master_header-account span {
+        font-size: 9px;
+        padding: 0 1px;
+    }*/
+    .master__header-menu {
+        width: 12%;
+        margin-top: 5px;
+        margin-left: 0;
+        flex-flow: row-reverse;
+    }
+    .master__header .master_header-child:nth-child(2) {
+        margin-top: 11px;
+    }
+    .master__header-search-box {
+        width: 118px;
+        height: 25px;
+        margin: auto 4px auto 8px;
+    }
+
+    .master__header-search-box i {
+        font-size:13px;
+        margin-right:2px;
+    }
+
+    .master__header-search-box input {
+        font: 12px Liransans;
+        height: 22px;
+        margin-right:4px;
+        width:91px;
+    }
+}
+
+@media (max-width: 290px) {
+    /*****master*****/
+
+    /*.master_header-account {
+        width:5px;
+    }*/
+    /*.master_header-account span {
+        display: none;
+    }*/
+
+    /*.master_header-logo {
+        width: 80%;
+    }*/
+
+    /*.master_header-logo img {
+        width: 80%;
+    }*/
+
+    .master_header-child {
+        width: 3%;
+    }
+
+    .master__header-search-box {
+        width: 55%;
+        min-width: 55%;
+        height: 25px;
+        margin: auto 5px auto 20px;
+    }
+
+    .master__header-search-box i {
+        font-size:11px;
+        margin-right:2px;
+    }
+
+    .master__header-search-box input {
+        font: 3vw Liransans;
+        height: 22px;
+        margin-right:2px;
+        width: 125%;
+        min-width: 125%;
+    }
+
+    .master_header-child {
+        width:3%;
+    }
+
+    .master_header-logo {
+        width:60%;
+    }
+}
+
+@media (max-width:120px) {
+    .master_header-child {
+        /*margin: auto 1%;*/
+        /*width: 30%;*/
+    }
+}
