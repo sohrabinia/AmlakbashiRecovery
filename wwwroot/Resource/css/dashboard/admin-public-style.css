@@ -1,0 +1,79 @@
+﻿.disable-input .static-advertise__property input {
+    background: #cecece;
+}
+.advertise__watermark, .watermark-style {
+    cursor: pointer;
+    width: 125px;
+    text-align: center;
+    border-radius: 5px;
+    padding: 8px;
+    margin: 15px 0 10px 0;
+    background-color: #fdd835;
+    font: 13px Miransans;
+}
+.advertise__watermark{
+    width: 165px;
+}
+.static-advertise__item.half-col .static-advertise__property div{
+    padding: 7px 0;
+}
+.static-advertise__submit{
+    width : 125px;
+    margin:3px 0 0 8px;
+}
+.admin-status_button-box {
+    text-align: center;
+    display: flex;
+    margin: 10px auto;
+    justify-content: start;
+    width: 95%;
+    flex-flow: row wrap;
+}
+.df-file-box-image {
+    width: 250px;
+    position: relative;
+    height: 200px;
+    margin: 0 10px;
+}
+a.dz-edit {
+    color: white;
+    position: relative;
+    top: 17px;
+    z-index: 3333;
+    right: 150px;
+    background: #000000ba;
+    padding: 1px;
+    text-decoration: none;
+    border-radius: 5px;
+    outline: none;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+}
+a.dz-edit .fas {
+    font-size: 16px;
+    color: white;
+}
+.dz-preview .dz-remove {
+    top: 2px;
+    padding: 0px 5px;
+}
+p.static-advertise__btn-item.static-advertise__btn-next{
+    margin-right:auto !important;
+}
+div#not_verify_dp_chosen {
+    background: transparent !important;
+}
+
+@media screen and (max-width: 500px) {
+    div #_AccFormComplexElements {
+        text-align: right !important;
+        justify-content: start;
+    }
+}
+@media (max-width: 450px){
+    .static-advertise__submit{
+        width: 92px;
+    }
+}

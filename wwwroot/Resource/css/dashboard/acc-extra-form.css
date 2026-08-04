@@ -1,0 +1,499 @@
+﻿.static-advertie__price-box .static-advertise__item .static-advertise__label {
+    font-size:12px;
+    text-align:right;
+}
+.static-advertie__price-box .static-advertise__item .static-advertise__property{
+    text-align:right;
+}
+.advertise-form__unit-count-container.no-background i {
+    border-radius: 50%;
+    background-color: #ffffff;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    display: flex;
+    box-shadow: 1px 2px 3px 0 rgba(0,0,0,.1);
+    justify-content: center;
+    font-size: 15px;
+    align-items: center;
+    color: #242424;
+}
+.advertise-form__unit-count-container.no-background input.inc_dec_number {
+    height: 40px;
+    width: 65px;
+    text-align: center;
+    margin: 0;
+    font-size: 15px;
+    border: none;
+    background-color: transparent;
+}
+.static-advertise_details-item{
+     text-align: center;
+}
+.static-advertise_details-item .advertise-form__unit-count-container{
+    justify-content:center;
+}
+.static-advertise__label.check label {
+    margin-bottom: 0;
+    font: 12px Miransans;
+    color: #242424;
+    margin-top: 3px;
+}
+.static-advertise__label.check input {
+    margin-top: 0;
+}
+.static-advertise__label.check {
+    border-radius: 5px;
+    border: 1px solid #e2e2e2;
+    padding: 8px 5px;
+    box-shadow: 0 1px 0px 0 rgba(0, 0, 0 , 0.08), 0 7px 2px 0 rgba(204, 204 ,204 , 0.1);
+}
+.static-advertise__item{
+    width : 30%;
+}
+select#ExtraBlanketCount, select#Parking {
+    width: 87%;
+    margin: 0 auto;
+}
+.advertise-form_welfare-amenities , .advertise-form_part-details{
+    display:flex;
+    justify-content:space-between;
+}
+.advertise-form_welfare-amenities select{
+    width:100%;
+}
+.static-advertise__item{
+    text-align:center;
+}
+.static-advertise__item.advertise-form__low-item {
+    width: 100%;
+    text-align: right;
+    align-items: self-end;
+}
+.advertise-form__low-item input {
+    width: 100%;
+}
+.advertise-form__part-more .static-advertise__item {
+    text-align: right;
+    align-items: flex-start;
+}
+.advertise-form__unit-count-container.no-background {
+    height: 45px;
+}
+button#form-submit-button {
+    margin-left: auto;
+}
+.advertise-form_part-details .static-advertise__item.static-advertise_details-item {
+    width: 32%;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 34px;
+    text-align: center;
+}
+.advertise-form_part-details .static-advertise__item.static-advertise_details-item p.static-advertise__label{
+    margin-top: 0;
+    margin-bottom: 13px;
+    color:#333;
+
+}
+.static-advertise__label {
+    text-align: right;
+}
+/*----------------------------------------------*/
+.static-advertise.advetise-form__part.advertise-form__part-low > p {
+    margin-bottom: 22px;
+}
+.button-rules-acc{
+    margin-bottom:10px;
+}
+.static-advertise__title-rules {
+    display: inline-block;
+    width: 255px;
+    font: 13px Miransans;
+    vertical-align: bottom;
+    margin: 0 12px 0 0;
+}
+.button-rules-acc{
+    margin: 15px 0;
+}
+.box-input-acc-rules {
+    margin: 0 75px 0 18px;
+    background: transparent;
+    border-radius: 40px;
+    position: relative;
+    cursor: pointer;
+}
+.box-input-acc-rules input {
+    display: none;
+}
+
+.box-input-acc-rules .on-or-off-box {
+    display: block;
+    width: 0;
+    height: 32px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 25px;
+}
+
+.box-input-acc-rules .on-or-off-box:after {
+    content: "";
+    position: absolute;
+    display: block;
+    height: 2.5rem;
+    width: 5.5rem;
+    left: 0px;
+    top: 2px;
+    border-radius: 23px;
+    background: #a33128;
+    transition: .20s;
+}
+
+.box-input-acc-rules i {
+    display: block;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    background: linear-gradient(to top, #9e9e9e 20%, #f4f4f4);
+    border-radius: 50%;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.7);
+    top: -12px;
+    left: 3px;
+    transition: .25s;
+}
+
+.box-input-acc-rules input:checked ~ i {
+    left: 33px;
+}
+
+.box-input-acc-rules input:checked + .on-or-off-box:after {
+    background: #17746C;
+}
+
+.box-input-acc-rules input:checked + .on-or-off-box > .off {
+    color: transparent;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0);
+}
+
+.box-input-acc-rules input:checked + .on-or-off-box > .on {
+    color: white;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.box-input-acc-rules:focus, label:active {
+    outline: 0;
+}
+.button-rules-acc {
+    margin: 15px 0;
+    color: #676767;
+}
+/* radio button  */
+.acc-amenities__box-button {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-end;
+    width: 32%;
+    background: white;
+    margin: 10px 0px;
+    border-radius: 5px;
+    text-align: center;
+    align-items: center;
+    padding: 10px;
+}
+.acc-amenities__pool-button{
+    width: 100% !important;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+}
+.acc-amenities__pool-main {
+    display: flex;
+    flex-flow: row;
+    justify-content: flex-start;
+    width: 30%;
+}
+.acc-amenities__pool-features {
+    width: 70%;
+    height: 23px;
+}
+.acc-amenities__pool-features input {
+    height: auto !important;
+}
+.acc-amenities__pool-features label {
+    margin-left: 30px;
+}
+.acc-amenities__box-button p {
+    font: 14px Miransans;
+    margin-left: auto;
+    margin-bottom: 0;
+}
+.acc-amenities__box-button .acc-amenities__label-style {
+    position: relative;
+    padding-left: 27px;
+    cursor: pointer;
+    user-select: none;
+    margin:0 3px;
+    font-size:12px;
+}
+.acc-amenities__box-button .acc-amenities__label-style input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+.acc-amenities__box-button .acc-amenities__label-style .checkmark {
+    position: absolute;
+    top: 0;
+    border: 1px solid #c2c2c2;
+    box-shadow: 2px 1px 3px 0 rgba(0,0,0,0.15) inset, 0px 1px 2px 0 rgba(0,0,0,0.1);
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #fbfafa;
+    border-radius: 50%;
+}
+.acc-amenities__box-button .acc-amenities__label-style:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+.acc-amenities__box-button .acc-amenities__label-style input:checked ~ .checkmark {
+    background-color: white;
+}
+.acc-amenities__box-button .acc-amenities__label-style .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+.acc-amenities__box-button .acc-amenities__label-style input:checked ~ .checkmark:after {
+  display: block;
+}
+.acc-amenities__box-button .acc-amenities__label-style input:checked ~ .checkmark:before {
+    content: "";
+    position: absolute;
+    border-radius: 100px;
+    width: 14px;
+    height: 14px;
+    background-image:  -webkit-linear-gradient(top, rgb(145 255 124) 0%, rgba(3, 123, 40, 0.7) 30%, rgb(27 152 48) 100%);
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+    -moz-transform: scale(0.75, 0.5);
+    -webkit-transform: scale(0.75, 0.5);
+}
+
+/*.acc-amenities__box-button .acc-amenities__label-style .checkmark-acc:after{*/
+/*    background: #17746C;*/
+    /*background: #17746C;
+
+}*/
+/*.acc-amenities__box-button .acc-amenities__label-style .checkmark-faild:after {
+    background: #a33128;
+}*/
+    .acc-amenities__box-button .acc-amenities__label-style .checkmark-faild:before {
+        background-image: -webkit-linear-gradient(top, rgb(255 0 0 / 34%) 0%, rgb(214 31 31 / 77%) 30%, rgb(160 3 3) 100%)!important;
+    }
+.static-advertise.advetise-form__part.advertise-form_part-details .static-advertise__item.static-advertise_details-item p{
+    text-align:center;
+}
+.static-advertise.advetise-form__part.static-advertie__price-box .static-advertise__extra-footer.strtoman {
+    /* margin: 0; */
+    margin-top: -12px;
+    margin-right: 3px;
+    padding: 0;
+    height: 20px;
+}
+/*address rooms*/
+.addAccommodation_button-creat-new-room {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    position: relative;
+    top: -18px;
+    cursor: pointer;
+}
+.addAccommodation_button-creat-new-room i.fa.fa-plus {
+    background: #fdc831;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color:#242424;
+}
+.static-advertise__btns-box.static-advertise__btn-add {
+    text-align: center;
+    font: 16px Miransans;
+    padding: 20px 0;
+    text-align: center;
+    justify-content: center;
+    margin-bottom:0;
+}
+.static-advertise__btns-box.static-advertise__btn-add p {
+    cursor:pointer;
+}
+
+/*responsive*/
+@media screen and ( max-width : 1252px ) {
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style {
+        margin: 0 3px;
+        padding-left: 18px;
+    }
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button p {
+        font-size: 13px;
+    }
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button .acc-amenities__label-style .checkmark{
+        width:15px;
+        height:15px;
+    }
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style {
+        margin: 0 10px;
+        padding-left: 22px;
+    }
+
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button{
+        width:49%;
+    }
+}
+@media screen and ( max-width : 1120px ) {
+    .static-advertie__price-box .static-advertise__item .static-advertise__label {
+    height: 33px;
+    }
+    .advertise-form_part-details .static-advertise_details-item p {
+        height: 45px;
+        font-size: 12px;
+    }
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style {
+        margin: 0 3px;
+        padding-left: 18px;
+    }
+
+}
+@media screen and ( max-width : 960px) {
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button {
+        width: 32%;
+    }
+
+/*    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style {
+        margin: 0 10px;
+        padding-left: 22px;
+    }
+*/
+    .static-advertise__label {
+        font: 12px Miransans;
+    }
+}
+@media screen and ( max-width : 900px){
+    .static-advertise__item {
+        width: 49%;
+    }
+    .static-advertise__servise{
+        margin-left:10%;
+    }
+}
+@media (min-width:681px) and (max-width: 900px) {
+    .form-step-button-container.static-advertise.advetise-form__part .btn-view-rooms {
+        margin-top: 15px;
+    }
+}
+
+@media screen and (max-width: 820px) {
+    .set_off-button.div-unset.style-min-max-input {
+        width: 50%;
+    }
+
+    .static-advertise.advetise-form__part.advertise-form_part-details .static-advertise__item.static-advertise_details-item {
+        width: 49%;
+    }
+}
+@media screen and (max-width : 760px){
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style {
+        margin: 0 10px;
+        padding-left: 22px;
+    }
+
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button {
+        width: 49%;
+    }
+}
+@media screen and (max-width: 730px) {
+    .acc-amenities__box-button {
+        padding: 10px 3px;
+    }
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities label.acc-amenities__label-style
+    {
+        margin: 0 4px;
+        padding-left: 17px;
+    }
+}
+@media screen and (max-width: 680px) {
+    .acc-amenities__pool-main {
+        width: 100%;
+    }
+
+    .acc-amenities__pool-features {
+        margin-top: 20px;
+        width: 100%;
+    }
+    .form-step-button-container.static-advertise.advetise-form__part {
+        font-size: 13px;
+    }
+
+    .form-step-button-container.static-advertise.advetise-form__part i {
+        font-size: 18px;
+    }
+}
+@media screen and ( max-width : 500px) {
+    .acc-amenities__pool-button {
+        width: 90% !important;
+    }
+    .acc-amenities__pool-features label {
+        margin-left: 7px;
+    }
+    .static-advertise__item {
+        width: 100%;
+        margin: 0 auto !important;
+    }
+    .advertise-form_welfare-amenities select {
+        width: 92%;
+        margin: 0 auto;
+    }
+    .static-advertie__price-box .static-advertise__item .static-advertise__property , .advertise-form__part-more .static-advertise__item, .static-advertise.advetise-form__part, .static-advertise__label, .static-advertise__item.advertise-form__low-item, .static-advertie__price-box .static-advertise__item .static-advertise__label {
+        text-align: center;
+    }
+    .advertise-form_welfare-amenities .static-advertise__check-box{
+        width:48%;
+    }
+    .advertise-form__part-more select.js-mandatory {
+        margin: 0 auto 15px auto;
+    }
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button , .static-advertise.advetise-form__part.advertise-form_part-details .static-advertise__item.static-advertise_details-item, .set_off-button.div-unset.style-min-max-input {
+        width: 90%;
+        margin: 8px auto;
+    }
+    .acc-amenities__box-button{
+        width:57%;
+    }
+    .static-advertise__item.advertise-form__low-item p {
+        margin-top: 15px;
+    }
+    .button-rules-acc label {
+        font-size: 13px;
+    }
+    .static-advertise__btns-box.static-advertise__btn-add p {
+        font-size: 13px;
+    }
+    .set_off-button.div-unset.style-min-max-input {
+        border-bottom: 1px solid gainsboro;
+        align-items: center;
+        padding-bottom: 10px;
+        margin-bottom: 0;
+    }
+    .static-advertise.advetise-form__part.static-advertie__price-box .static-advertise__extra-footer.strtoman{
+        width:88%;
+        margin:0 auto;
+    }
+}

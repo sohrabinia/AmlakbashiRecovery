@@ -1,0 +1,49 @@
+﻿
+a {
+    text-decoration: none;
+}
+.acc-hotel__title-box{
+    width:100%;
+}
+.advertise-form__low-item input, .static-advertise__property input, select, input.static-advertise__property.static-advertise__it{
+    background-color:white;
+}
+.set_off-button.div-unset.style-min-max-input label{
+    font-size:14px;
+}
+.set_off-button .add{
+    background:white;
+    color:#242424;
+    font-size:14px;
+    display:inline-block;
+}
+p.static-advertise__btn-item.static-advertise__btn-next {
+    margin-right: auto !important;
+}
+.dropzone .dz-default {
+    align-items: flex-end;
+}
+.acc-amenities__box-button{
+    width:31%;
+}
+.form-step-child-button {
+    height: 23px !important;
+}
+.dz-preview{
+    margin:15px 0 0 0 ;
+}
+.static-advertise__property:hover{
+    border:none;
+}
+@media screen and (max-width: 1252px) {
+    .static-advertise.advetise-form__part.advertise-form_welfare-amenities .acc-amenities__box-button {
+        width: 30%;
+    }
+    .set_off-button.div-unset.style-min-max-input label {
+        font-size: 13px;
+    }
+    .static-advertise__item {
+        width: 32%;
+    }
+}
+

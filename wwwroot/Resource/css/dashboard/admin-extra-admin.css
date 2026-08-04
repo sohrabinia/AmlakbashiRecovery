@@ -1,0 +1,17 @@
+﻿.box-input-acc-rules .on-or-off-box:after {
+    height: 1.5rem;
+    width: 3.5rem;
+}
+
+.button-rules-acc{
+    width:100%;
+}
+.box-input-acc-rules i{
+    top:1px;
+}
+.advertise-form__low-item input{
+    width:90%;
+}
+.advertise-form__low-item input, .static-advertise__property input, select, input.static-advertise__property.static-advertise__it {
+    background: white;
+}

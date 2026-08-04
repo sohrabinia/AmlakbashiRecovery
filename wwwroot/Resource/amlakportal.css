@@ -1,0 +1,553 @@
+﻿@font-face {
+  font-family: bnassim;
+  src: url('fonts/nassim-bold.eot?#') format('eot'),  
+       url('fonts/nassim-bold.woff') format('woff'),  
+       url('fonts/nassim-bold.ttf') format('truetype'); 
+}
+@font-face {
+  font-family: rnassim;
+  src: url('fonts/nassim-regular.eot?#') format('eot'),  
+       url('fonts/nassim-regular.woff') format('woff'),  
+       url('fonts/nassim-regular.ttf') format('truetype'); 
+}
+@font-face {
+    font-family: "yekan";
+    font-style: normal;
+    font-weight: normal;
+    src: local("☺"), local("yekan"), url("fonts/B Yekan.woff") format("woff"), url("fonts/B Yekan.ttf") format("truetype"), url("fonts/B Yekan.svg") format("svg");
+}
+
+@font-face {
+    font-family: "Biransans";
+    src: url("fonts/IRANSans-Bold-web.eot") format("eot"), url("fonts/IRANSans-Bold-web.woff") format("woff"), url("fonts/IRANSans-Bold-web.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Liransans";
+    src: url("fonts/IRANSans-Light-web.eot") format("eot"), url("fonts/IRANSans-Light-web.woff") format("woff"), url("fonts/IRANSans-Light-web.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Miransans";
+    src: url("fonts/IRANSans-Medium-web.eot") format("eot"), url("fonts/IRANSans-Medium-web.woff") format("woff"), url("fonts/IRANSans-Medium-web.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "ULiransans";
+    src: url("fonts/IRANSans-UltraLight-web.eot") format("eot"), url("fonts/IRANSans-UltraLight-web.woff") format("woff"), url("fonts/IRANSans-UltraLight-web.ttf") format("truetype");
+}
+
+/*@font-face {
+    font-family: "FontAwesome";
+    src: url("fonts/fontawesome-webfont862f.eot") format("eot"), url("fonts/fontawesome-webfont862f.woff") format("woff"), url("fontawesome-webfont862f.ttf") format("truetype");
+}*/
+
+.body {
+    min-height:450px;
+}
+
+#header_logo {
+}
+
+.header .htop .citem {
+  
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 20px auto;
+    border-radius: 22px;
+    color: #232323;
+    cursor: pointer;
+    display: block;
+    float: left;
+    font: 13px Miransans;
+    height: 44px;
+    margin-left: 6px;
+    padding-top: 9px;
+    text-align: center;
+    text-decoration: none;
+    width: 44px;
+    margin-top:10px;
+}
+.theme5 .header .htop .citem {
+    background-color: #CFB2DB;
+}
+.theme4 .header .htop .citem {
+    background-color: #4BF0DB;
+}
+.theme3 .header .htop .citem {
+    background-color: #fdd835;
+}
+.theme2 .header .htop .citem {
+    background-color: #8FDC61;
+}
+.theme1 .header .htop .citem {
+    background-color: #B3E5FC;
+}
+
+.header .amlaktitle {
+    color: #fdd835;
+    display: block;
+    font: 28px Biransans;
+    margin: 35px 0;
+    text-align: center;
+    text-decoration: none;
+}
+
+
+.theme5 .header .amlaktitle {
+    color: #CFB2DB;
+}
+.theme4 .header .amlaktitle {
+    color: #4BF0DB;
+}
+.theme3 .header .amlaktitle {
+    color: #fdd835;
+}
+.theme2 .header .amlaktitle {
+    color: #8FDC61;
+}
+.theme1 .header .amlaktitle {
+    color: #B3E5FC;
+}
+
+.submenu-title {
+    font:16px Biransans !important;
+    color:#000 !important;
+}
+
+.header .logo {
+    height: 120px; 
+    display: block; 
+    background-repeat:no-repeat ;
+    background-position:center ;
+    background-size: auto 77px;
+}
+
+.loginpopup {
+    background: #fff none repeat scroll 0 0;
+    box-shadow: 0 1px 18px 5px rgba(0, 0, 0, 0.08);
+    color: #fff;
+    margin: 0;
+    position: absolute;
+    right: -60px;
+    top: 71px;
+    width: 260px;
+    z-index: 2;
+    height:360px;
+    transition:height ease-in 0.4s ;
+    overflow:hidden ;
+}
+
+.loginpopup.lghide {
+    height:0 !important;
+}
+
+.loginpopup .lglabel {
+    text-align:right ;
+    font:14px Miransans ;
+    color:#222 !important;
+    margin-bottom:5px;
+    direction:rtl ;
+}
+
+.loginpopup input[type=text] {
+    text-align:left ;
+    font:16px Miransans ;
+    color:#222 ;
+    margin-bottom:15px;
+    border:1px solid #ccc ;
+    padding:10px;
+    width:100% ;
+    display:block ;
+    border-radius:20px;
+    background:#fff ;
+}
+
+.loginpopup input[type=password] {
+    text-align:left ;
+    font:14px Miransans ;
+    color:#222 ;
+    margin-bottom:15px;
+    border:1px solid #ccc ;
+    padding:10px;
+    width:100% ;
+    display:block ;
+    border-radius:20px ;
+    background:#fff ;
+}
+
+.loginpopup input[type=submit] {
+    text-align:center ;
+    font:16px Miransans ;
+    color:#000 ;
+    margin:5px auto ;
+    border:1px solid #555 ;
+    padding:10px 20px;
+    border-radius:15px;
+    background:#fff ;
+    display:block ;
+}
+
+.loginpopup .create {
+    text-align:right ;
+    font:14px Miransans ;
+    color:#333 ;
+    width:100%;
+    padding:5px 10px;
+    display:block ;
+}
+
+.search {
+    height:80px;
+    width:64px;
+    background:url(img/search.png) center center no-repeat;
+    background-size:40px auto ;
+    overflow:hidden; 
+    position:absolute ;
+    left:0px;
+    top:0px;
+}
+
+.search:hover {
+    background-color:#fff ;
+    cursor:pointer;
+}
+
+.searchbox {
+    background: #fff none repeat scroll 0 0;
+    box-shadow: 0 1px 18px 5px rgba(0, 0, 0, 0.08);
+    color: #fff;
+    margin: 0;
+    position: absolute;
+    left: 0px;
+    top: 80px;
+    width: 260px;
+    z-index: 2;
+    height:200px;
+    transition:height ease-in 0.4s ;
+    overflow:hidden ;
+    border-radius:4px;
+}
+
+.searchbox input[type=text] {
+    background:url(img/leftarow.png) no-repeat left 10px center ;
+    background-size:15px auto ;
+    text-align:right ;
+    font:16px Miransans ;
+    color:#222 ;
+    margin-bottom:15px;
+    border:1px solid #ccc ;
+    padding:10px;
+    padding-left:30px;
+    width:100% ;
+    display:block ;
+    border-radius:5px;
+}
+.searchbox select {
+    background:none ;
+    text-align:right ;
+    font:14px Liransans ;
+    color:#222 ;
+    border:1px solid #ccc ;
+    width:100% ;
+    display:block ;
+}
+.searchbox .slabel {
+    text-align:right ;
+    font:13px Liransans ;
+    color:#555 ;
+    margin-top:25px;
+}
+.searchbox.shide {
+    height:0 !important;
+}
+
+.theme5 .hbottom{
+    background-color: #CFB2DB;
+}
+.theme4 .hbottom{
+    background-color: #4BF0DB;
+}
+.theme3  .hbottom {
+    background-color: #fdd835;
+}
+.theme2 .hbottom  {
+    background-color: #8FDC61;
+}
+.theme1 .hbottom {
+    background-color: #B3E5FC;
+}
+
+.back-to-top {
+    background: #fdd835 none repeat scroll 0 0;
+    border-radius: 60px;
+    color: #242424;
+    font-size:40px;
+    display: none ;
+    width: 50px;
+    height: 50px;
+    line-height: 46px;
+    position: fixed;
+    z-index: 999;
+    right: 30px;
+    bottom: 30px;
+    transition: color 0.3s ease 0s;
+    cursor:pointer ;
+    text-align:center ;
+    text-decoration:none ;
+}
+
+.back-to-top:after {
+    content: "";
+    font-family: "FontAwesome";    
+}
+
+.theme1 .back-to-top{
+    background:#B3E5FC ;
+}
+.theme2 .back-to-top{
+    background:#8FDC61 ;
+}
+.theme3 .back-to-top{
+    background:#fdd835 ;
+}
+.theme4 .back-to-top{
+    background:#4BF0DB ;
+}
+.theme5 .back-to-top{
+    background: #CFB2DB;
+}
+.back-to-top:hover {
+    color:#fff ;
+    background:#000 ;
+    text-decoration:none ;
+}
+
+
+.footer {
+    background-color:#242424; 
+    margin-top:80px;
+}
+
+
+.footer .block {
+    padding:20px;
+}
+
+.footer .block .title {
+    font:16px Miransans ;
+    text-align:right ;
+    margin:15px 0 ;
+}
+.theme5 .footer .block .title {
+    color: #CFB2DB;
+}
+.theme4 .footer .block .title {
+    color:#4BF0DB ;
+}
+.theme3 .footer .block .title {
+    color: #fdd835;
+}
+.theme2 .footer .block .title {
+    color: #8FDC61;
+}
+.theme1 .footer .block .title {
+    color: #B3E5FC;
+}
+
+.footer .block li{
+    list-style:none;
+    padding:8px ;
+
+}
+.footer .block li a{
+    font:14px Liransans ;
+    text-align:right ;
+    color:#fff ;
+    text-decoration:none ;
+}
+
+.footer .ficon {
+    background-repeat:no-repeat ;
+    background-position:right center ;
+    background-size:20px auto ;
+    padding:10px;
+    padding-right:35px;
+    font:12px Liransans ;
+    color:#fff ;
+}
+.footer .adres {
+    background-image:url(img/location.png) ;
+}
+.footer .tell {
+    background-image:url(img/tell.png) ;
+}
+.footer .email {
+    background-image:url(img/email.png) ;
+}
+.footer .social {
+    text-align:center ;
+    padding:30px 0 ;
+    width:180px;
+    margin:0 auto ;
+}
+.footer .sicon {
+    background-repeat:no-repeat ;
+    background-position:center ;
+    background-size:auto 30px;
+    margin:5px 2px;
+    display:inline-block ;
+    width:40px; 
+    height:40px;
+    cursor:pointer ;
+}
+
+.usermenu {
+    box-shadow: 0 1px 18px 5px rgba(0, 0, 0, 0.08);
+    color: #232323;
+    margin: 0;
+    position: absolute;
+    right: -60px;
+    top: 71px;
+    width: 180px;
+    z-index: 2;
+    height:auto ;
+    transition:height ease-in 0.4s ;
+    overflow:hidden ;
+}
+.theme5 .usermenu {
+    background-color: #CFB2DB;
+}
+.theme4 .usermenu {
+    background-color: #4BF0DB;
+}
+.theme3 .usermenu {
+    background-color: #fdd835;
+}
+.theme2 .usermenu{
+    background-color: #8FDC61;
+}
+.theme1 .usermenu {
+    background-color: #B3E5FC;
+}
+
+.usermenu.umhide {
+    height:0 !important;
+}
+
+.usermenu .umitem {
+    display:block;
+    text-align:right;
+    font:14px Miransans ;
+    color:#232323 ;
+    text-decoration:none ;
+    padding:5px 10px;
+}
+
+.notifbazar {
+    background-color: #185e00;
+    color: #fff;
+    margin-bottom: 5px;
+    padding: 20px 10px;
+    font:13px Liransans ;
+}
+
+a.bazaarlink {
+    background-image: url("img/bazar.png") ;
+    background-position: center ;
+    background-repeat: no-repeat ;
+    background-size:138px 45px ;
+    cursor: pointer;
+    display: inline-block;
+    height: 45px;
+    margin-right: 5px;
+    width: 138px;
+}
+
+
+/****************/
+.mypagelist {
+    margin-top:20px;
+    text-align:center ;
+}
+.mypagelist ul {
+    text-align:center ;
+    direction:rtl ;
+}
+.mypagelist li {
+    list-style:none ;
+    margin-right:5px;
+    display:inline-block ;
+}
+.mypagelist li a {
+    text-decoration:none ;
+    font:16px bnassim ;
+    width:22px;
+    height:22px;
+    border-radius:4px;
+    background-color:#eee ;
+    border:1px solid #ccc  ;
+    display:block ;
+    cursor:pointer ;
+    color:#444 ;
+}
+.mypagelist li a:hover {
+    background-color:#fff ;
+    color:#000 ;
+}
+.mypagelist li.active a {
+    background-color: #e5e5e5 !important;
+    color: #5bb1d8 !important;
+}
+.mypagelist .PagedList-skipToNext a {
+    color:#555 ;
+    width:30px;
+    border:none ;
+    background:none ;
+}
+.mypagelist .PagedList-skipToPrevious a {
+    color:#555 ;
+    width:30px;
+    border:none ;
+    background:none ;
+}
+.mypagelist .PagedList-skipToFirst a {
+    color:#555 ;
+    width:30px;
+    border:none ;
+    background:none ;
+}
+.mypagelist .PagedList-skipToLast a {
+    color:#555 ;
+    width:30px;
+    border:none ;
+    background:none ;
+}
+
+@media (max-width: 450px) {
+    .header .htop .citem {
+        float: none;
+        display:inline-block;
+        margin-top:0;
+        margin-bottom:15px; 
+    }    
+    .header .logo {
+        height: 65px; 
+        background-position: center right 70%; 
+        background-size:auto 50px;
+    }
+    .header .amlaktitle {
+        margin: 18px 0; 
+        text-align: right; 
+        font: 18px Biransans; 
+    }
+    .navmenu {
+        padding-bottom:12px;
+    }
+
+    .back-to-top {
+        display: none !important;
+    }
+
+}
+

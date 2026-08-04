@@ -1,0 +1,2191 @@
+﻿/******ajax*******/
+
+function myajax(url, data, State, show_loading) {
+    show_loading = typeof show_loading !== 'undefined' ? show_loading : true;
+    if (show_loading)
+        show_loading_icon();
+    $.ajax({
+        type: "GET",
+        url: "/" + url,
+        contentType: "application/json; charset=utf-8",
+        data: data,
+        cache: false,
+        success: function (result) {
+            hide_loading_icon();
+            if (typeof State == 'function')
+            {
+                State(result);
+            }            
+        },
+        error: function (result) { hide_loading_icon(); alert("خطایی رخ داده است."); },
+        complete: function (result) { hide_loading_icon(); }
+    });
+}
+
+/******end ajax*******/
+
+/******date and time*******/
+
+var day_milliseconds = 86400000;
+
+function datediff(date_from, date_to) {
+    return Math.round((date_to - date_from) / day_milliseconds);
+}
+
+function persianDateIsFriday(persian_date) {
+    try {
+        var date = persian_date.split(",");
+        var d = $.calendars.newDate(date[0], date[1], date[2], 'persian', 'fa');
+        var js_date = d._calendar.toJSDate(parseInt(date[0]), parseInt(date[1]), parseInt(date[2]));
+        return js_date.getDay() == 5;
+    }
+    catch (err) {
+        return false;
+    }
+}
+
+var persian_holidays = ["1397,6,8", "1397,6,28", "1397,6,29",
+                       "1397,8,8", "1397,8,16", "1397,8,17",
+                       "1397,9,4", "1397,11,20", "1397,11,22",
+                       "1397,12,29", "1398,1,1", "1398,1,3",
+                       "1398,1,4", "1398,1,12", "1398,1,13",
+                       "1398,1,14", "1398,1,31", "1398,3,5",
+                       "1398,3,14", "1398,3,15", "1398,5,20",
+                       "1398,5,28", "1398,6,17", "1398,6,18",
+                       "1398,7,27", "1398,8,5", "1398,8,6",
+                       "1398,8,14", "1398,8,23", "1398,11,8",
+                       "1398,11,22", "1398,12,18", "1398,12,29",
+                       "1399,1,2", "1399,1,3", "1399,1,4",
+                       "1399,1,12", "1399,1,13", "1399,1,20",
+                       "1399,2,25", "1399,3,4", "1399,3,5",
+                       "1399,3,14", "1399,3,15", "1399,3,28",
+                       "1399,5,18", "1399,6,8", "1399,7,16",
+                       "1399,7,24", "1399,7,26", "1399,8,4",
+                       "1399,8,13", "1399,10,27", "1399,11,22",
+                       "1399,12,7", "1399,12,21", "1399,12,30",
+                       "1400,1,1", "1400,1,2", "1400,1,3",
+                       "1400,1,4", "1400,1,8", "1400,1,12",
+                       "1400,2,13", "1400,2,23", "1400,3,15",
+                       "1400,3,16", "1400,4,29", "1400,5,6",
+                       "1400,5,26", "1400,5,27", "1400,7,5",
+                       "1400,7,13", "1400,7,14", "1400,7,22",
+                       "1400,8,1", "1400,10,16", "1400,11,25",
+                       "1400,12,9", "1400,12,29"];
+
+function dateIsHoliday(persian_date) {
+    return persianDateIsFriday(persian_date) || persian_holidays.includes(persian_date);
+}
+
+function unixToPersianDate(unix) {
+    var date = new persianDate(unix);
+    date.toLocale('en').toCalendar('persian');
+    return date.format("YYYY,M,D");
+    //return date.year() + "," + date.month() + "," + date.days();
+}
+function persianDateToUnix(persian_date) {
+    var split_str = persian_date.split(',');
+    return date = new persianDate([parseInt(split_str[0]), parseInt(split_str[1]), parseInt(split_str[2])]);
+    return date.unix();
+}
+function getDayArrayBetweenUnixes(unix_from, unix_to) {
+    var current_persian_date = new persianDate(unix_from);
+    var last_persian_date = new persianDate(unix_to);
+    var day_array = [];
+    while (current_persian_date.unix() < last_persian_date.unix()) {
+        day_array.push(unixToPersianDate(current_persian_date));
+        current_persian_date = current_persian_date.add("days", 1);
+    }
+    return day_array;
+}
+
+/******end date and time*******/
+
+/******validation*******/
+
+function validateEmail(elementValue) {
+    var emailPattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    return emailPattern.test(elementValue);
+}
+
+function validateMobile(mobile) {
+    return (mobile.match(/[0][9][0-9]{9}/) && mobile.length == 11) ||
+        (mobile.substring(0, 2) == "00" && mobile.length > 12);
+}
+
+function validateVerificationCode(code) {
+    if (!code.match(/\d{4}/)) {
+        return false
+    }
+    else {
+        if (code.length != 4)
+            return false;
+        return true;
+
+    }
+}
+
+function persianNumberToEnglish(persian_number) {
+    var persian = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    var arabic = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+    persian_number = persian_number.trim();
+    for (var i = 0; i < persian.length; i++) {
+        persian_number = persian_number.replaceAll(persian[i], i.toString());
+        persian_number = persian_number.replaceAll(arabic[i], i.toString());
+    }
+    return persian_number;
+}
+
+function validateTell(tell) {
+    if (!tell.match(/0+[1-8]+\d{9}/)) {
+        return false
+    }
+    else {
+        if (tell.length != 11)
+            return false;
+        return true;
+
+    }
+}
+
+function isNumberKey(evt, element) {
+    var charCode = (evt.which) ? evt.which : event.keyCode
+    if (charCode > 31 && (charCode < 48 || charCode > 57))
+        return false;
+    element.value = persianNumberToEnglish(element.value);
+    return true;
+}
+
+function validateNumber(element) {
+    var value = element.value;
+    value = persianNumberToEnglish(value);
+    if (!value.match(/^\d+$/)) {
+        value = value.replace(/\D/g, '');
+    }
+    element.value = value;
+}
+
+function validateNaturalNumber(element) {
+    var value = element.value;
+    value = persianNumberToEnglish(value);
+    if (!value.match(/^\d+$/)) {
+        value = value.replace(/\D/g, '');
+    }
+    if (!value.match(/^\d+$/) || value < 1) {
+        value = 1;
+    }
+    element.value = value;
+}
+
+/******end validation*******/
+
+/******advertise*******/
+
+function ToggleFavorite($this, $id) {
+    myajax("Advertise/TggleFavorite", "id=" + $id + "&flag=" + $($this).hasClass("active"), function (ret) {
+        //'status == 2' means login required
+        if (ret.status == 2) {
+            window.location.href = "../user/publiclogin?returnUrl=" + window.location.href;
+        }
+        else if (ret.status == 1) {
+            if ($($this).hasClass("active")) {
+                $($this).removeClass("active");
+                alertify.error('از علاقه مندی ها حذف شد.');
+            }
+            else {
+                $($this).addClass("active");
+                alertify.success('به علاقه مندی ها  اضافه شد .');
+            }
+        }
+    });
+}
+
+function FillRegionChild($this, $childID, $status) {
+    myajax("Advertise/GetRegionChildrenItems", "region_type=" + $childID + "&parent_id=" + $($this).val() + "&status=" + $status, function (ret) {
+        if (ret.status == 1) {
+            $("select[pid='" + $childID + "']").html(ret.val);
+            var city_region_type = 1;
+            var area_region_type = 2;
+            if ($childID == city_region_type) {
+                $("select[pid='" + area_region_type + "']").html("<option value='-1'>ابتدا شهر را انتخاب کنید</option>");
+            }
+        }
+    });
+}
+
+/******end advertise*******/
+
+/******loading*******/
+
+function show_loading_icon() {
+    $("#loading-icon").fadeIn();
+}
+
+function hide_loading_icon() {
+    $("#loading-icon").fadeOut();
+}
+
+$(window).focus(function () {
+    hide_loading_icon();
+});
+
+$(document).ajaxComplete(function () {
+    hide_loading_icon();
+});
+
+/******end loading*******/
+
+/******lazy loading*******/
+var lazyImages;
+//var active = false;
+findLazyImages();
+function findLazyImages() {
+    lazyImages = [].slice.call(document.querySelectorAll("img.lazy"));
+    if (lazyImages.length) {
+        document.addEventListener("scroll", lazyLoad);
+        window.addEventListener("resize", lazyLoad);
+        window.addEventListener("orientationchange", lazyLoad);
+    }
+    else {
+        document.removeEventListener("scroll", lazyLoad);
+        window.removeEventListener("resize", lazyLoad);
+        window.removeEventListener("orientationchange", lazyLoad);
+    }
+    //active = false;
+    lazyLoad();
+}
+
+elementInViewport
+function asyncPartialLoad() {
+    $(".partialContents").each(function (index, item) {
+        if (elementInViewport(item))
+        {
+            $(item).removeClass("partialContents");
+            var url = $(item).data("url");
+            if (url && url.length > 0) {
+                $(item).load(url);
+            }
+        }
+    });
+}
+
+function lazyLoad() {
+    //if (active === false) {
+    if (lazyImages != null &&lazyImages.length) {
+        //active = true;
+        lazyImages.forEach(function (lazyImage) {
+            setTimeout(function () {
+                if ((lazyImage.getBoundingClientRect().top <= window.innerHeight && lazyImage.getBoundingClientRect().bottom >= 0) && getComputedStyle(lazyImage).display !== "none") {
+                    lazyImage.src = lazyImage.dataset.srcset;
+                    //lazyImage.srcset = lazyImage.dataset.srcset;
+                    lazyImage.classList.remove("lazy");
+
+                    lazyImages = lazyImages.filter(function (image) {
+                        return image !== lazyImage;
+                    });
+
+                    //if (lazyImages.length === 0) {
+                    //    document.removeEventListener("scroll", lazyLoad);
+                    //    window.removeEventListener("resize", lazyLoad);
+                    //    window.removeEventListener("orientationchange", lazyLoad);
+                    //}
+                }
+                active = false;
+            }, 200);
+        });
+    }
+}
+
+$(".initialPartialContents").each(function (index, item) {
+    $(item).removeClass("initialPartialContents");
+    var url = $(item).data("url");
+    if (url && url.length > 0) {
+        $(item).load(url);
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("scroll", asyncPartialLoad);
+    window.addEventListener("resize", asyncPartialLoad);
+    window.addEventListener("orientationchange", asyncPartialLoad);
+});
+
+/******end lazy loading*******/
+
+/******persian string*******/
+
+function getPriceString(price_val) {
+    str_toman = "";
+    if (price_val >= 1000000000) {
+        str_toman += Math.floor(price_val / 1000000000) + " میلیارد";
+        price_val = price_val % 1000000000;
+    }
+    if (price_val >= 1000000) {
+        if (str_toman.length > 3) {
+            str_toman += " و " + Math.floor(price_val / 1000000) + " میلیون";
+        }
+        else {
+            str_toman += Math.floor(price_val / 1000000) + " میلیون";
+        }
+        price_val = price_val % 1000000;
+    }
+    if (price_val >= 1000) {
+        if (str_toman.length > 3) {
+            str_toman += " و " + Math.floor(price_val / 1000) + " هزار";
+        }
+        else {
+            str_toman += Math.floor(price_val / 1000) + " هزار";
+        }
+        price_val = price_val % 1000;
+
+    }
+    if (price_val > 0) {
+
+        if (str_toman.length > 3) {
+            str_toman += " و " + price_val;
+        }
+        else {
+            str_toman += price_val;
+        }
+    }
+
+    return str_toman + " تومان";
+}
+
+/******end persian string*******/
+
+/******date picker*******/
+
+var from_occupied_dates = [];
+var to_occupied_dates = [];
+var to_date_object, from_date_object;
+updateToFromDatePickers();
+function updateToFromDatePickers(onDone) {
+    if ($('#to_date_date_picker').length && $('#from_date_date_picker').length) {
+        to_date_object = $("#to_date_date_picker").persianDatepicker({
+            altField: '#to_date-alt',
+            format: 'YYYY/MM/DD',
+            minDate: new persianDate() + day_milliseconds,
+            altFormat: 'YYYY/MM/DD',
+            autoClose: true,
+            toolbox: {
+                calendarSwitch: { enabled: false },
+                todayButton: { enabled: false },
+                submitButton: { enabled: true, text: { fa: "بستن", en: close } }
+            },
+            monthPicker: {
+                onSelect: function () { update_datetime_table(to_occupied_dates); }
+            },
+            navigator: {
+                onNext: function () { update_datetime_table(to_occupied_dates); },
+                onPrev: function () { update_datetime_table(to_occupied_dates); },
+                onSwitch: function () { update_datetime_table(to_occupied_dates); },
+                scroll: { enabled: false },
+                text: { btnNextText: '>', btnPrevText: '<' },
+            },
+            yearPicker: {
+                onSelect: function () { update_datetime_table(to_occupied_dates); }
+            },
+            onShow: function () { update_datetime_table(to_occupied_dates); },
+            initialValue: true,
+            onSelect: function (unix) {
+                to_date_object.touched = true;
+                if (from_date_object && from_date_object.options && from_date_object.options.maxDate != unix) {
+                    var cachedValue = from_date_object.getState().selected.unixDate;
+                    if (from_date_object.touched) {
+                        from_date_object.setDate(cachedValue);
+                    }
+                }
+                if (IsDateRangeIncludeOccupiedDays(from_date_object.getState().selected.unixDate, to_date_object.getState().selected.unixDate)) {
+                    alertify.error("محدوده زمانی انتخاب شده شامل روز های رزرو شده میباشد");
+                }
+                updateReservePrice();
+                updateReserveLabels();
+            }
+        });
+        from_date_object = $("#from_date_date_picker").persianDatepicker({
+            altField: '#from_date-alt',
+            minDate: new persianDate(),
+            format: 'YYYY/MM/DD',
+            altFormat: 'YYYY/MM/DD',
+            autoClose: true,
+            toolbox: {
+                calendarSwitch: { enabled: false },
+                todayButton: { enabled: false },
+                submitButton: { enabled: true, text: { fa: "بستن", en: close } }
+            },
+            monthPicker: {
+                onSelect: function () { update_datetime_table(from_occupied_dates); }
+            },
+            navigator: {
+                onNext: function () { update_datetime_table(from_occupied_dates); },
+                onPrev: function () { update_datetime_table(from_occupied_dates); },
+                onSwitch: function () { update_datetime_table(from_occupied_dates); },
+                scroll: { enabled: false },
+                text: { btnNextText: '>', btnPrevText: '<' },
+            },
+            yearPicker: {
+                onSelect: function () { update_datetime_table(from_occupied_dates); }
+            },
+            onShow: function () { update_datetime_table(from_occupied_dates); },
+            onSelect: function (unix) {
+                from_date_object.touched = true;
+                if (to_date_object && to_date_object.options && to_date_object.options.minDate != unix) {
+                    var cachedValue = to_date_object.getState().selected.unixDate;
+                    to_date_object.options = { minDate: unix + day_milliseconds };
+                    if (to_date_object.touched) {
+                        to_date_object.setDate(cachedValue);
+                    }
+                    if (cachedValue < unix + day_milliseconds) {
+                        to_date_object.setDate(unix + day_milliseconds);
+                    }
+                }
+                if (IsDateRangeIncludeOccupiedDays(from_date_object.getState().selected.unixDate, to_date_object.getState().selected.unixDate)) {
+                    alertify.error("محدوده زمانی انتخاب شده شامل روز های رزرو شده میباشد");
+                }
+                updateReservePrice();
+                updateReserveLabels();
+            }
+        });
+    }
+    if (onDone != undefined && onDone != null) {
+        onDone();
+    }
+}
+function update_datetime_table(occupiedDays, $element) {
+    var $all_labels;
+    if ($element != null) {
+        $all_labels = $element.children();
+    }
+    else {
+        var $all_labels = $(".datepicker-container").children();
+    }
+    $all_labels.each(function () {
+        if ($.trim($(this).html())) {
+            $(this).css("font", "12px Miransans");
+        }
+    });
+    var $date_time;
+    if ($element != null) {
+        $date_time = $element.find("[data-unix]");
+    }
+    else {
+        $date_time = $("[data-unix]");
+    }
+    $date_time.each(function () {
+        var persian_date = $(this).attr("data-date");
+        $label = $(this).children();
+        var is_other_month = $label.hasClass("other-month");
+        //$label.css("font", "12px Miransans");
+        if ($(this).attr("data-unix") < new Date().getTime()) {
+        }
+        else if (occupiedDays.includes(persian_date)) {
+            $(this).addClass("disabled");
+            $label.addClass("occupied_day_label");
+            $label.css("background-color", is_other_month ? "#f2f2f2" : "lightgray");
+            $label.css("color", is_other_month ? "#727272" : "#242424");
+        }
+        else {
+            $(this).removeClass("disabled");
+            $label.removeClass("occupied_day_label");
+            $label.css("background-color", "white");
+            $label.css("color", is_other_month ? "#c1c1c1" : "#242424");
+        }
+        if (dateIsHoliday(persian_date)) {
+            $label.css("color", is_other_month ? "#ffadad" : "red");
+        }
+        if (is_other_month) {
+            //alertify.error($(this).attr("data-date"));
+            //$(this).removeAttr("data-date");
+            //$(this).removeAttr("data-unix");
+            $(this).addClass("disabled");
+        }
+        debugger;
+        var $next_elem = $(this).next();
+        if ($next_elem.length > 0 && persian_date == '1398,1,1' && $next_elem.attr('data-date') == '1397,12,2')
+        {
+            $(this).attr('data-date', '1397,12,1');
+            $(this).attr('data-unix', persianDateToUnix('1397,12,1'));
+        }
+    });
+}
+function IsDateRangeIncludeOccupiedDays(unix_from, unix_to) {
+    var from_day_array = getDayArrayBetweenUnixes(unix_from, unix_to - day_milliseconds);
+    var to_day_array = getDayArrayBetweenUnixes(unix_from + day_milliseconds, unix_to);
+    for (var i = 0; i < from_day_array.length; i++) {
+        if (from_occupied_dates.includes(from_day_array[i])) {
+            return true;
+        }
+    }
+    for (var i = 0; i < to_day_array.length; i++) {
+        if (to_occupied_dates.includes(to_day_array[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/******end date picker*******/
+
+/******rating*******/
+
+function add_comment($this) {
+
+    if ($('#UserId').val() == 2) {
+
+        if ($(".js-cm-text").val() == "") {
+            alertify.error("لطفا نظر خود را وارد کنید");
+            $(".js-cm-text").focus();
+            return false;
+        }
+
+        myajax("Advertise/AddComment", "advertiseID=" + $("#AdvertiseID").val()
+            + "&text=" + $(".js-cm-text").val(), function (ret) {
+                if (ret.status == 1) {
+                    alertify.success("نظر شما با موفقیت ثبت شد. پس از تایید کارشناس بر روی سایت قرار میگیرد");
+                }
+                else {
+                    alertify.error(ret.val);
+                }
+            });
+    }
+
+    if ($('#UserId').val() == 0) {
+        alertify.error("ابتدا شماره موبایل خود را به درستی وارد کنید");
+    }
+
+    if ($('#UserId').val() == 1) {
+        alertify.error("ابتدا کد فعال سازی ارسال شده به موبایل خود را وارد کنید.");
+    }
+
+}
+
+bar_rating();
+
+function bar_rating(){
+    $('.score-rating').barrating({
+        theme: 'fontawesome-stars',
+        readonly: false,
+        deselectable: false,
+        onSelect: function (value, text, event) {
+            if (typeof (event) !== 'undefined') {
+                // rating was selected by a user
+                var report_elem = $($(this)[0].$elem);
+                if ($('#UserId').val() == 2) {
+                    myajax("Advertise/AddScore", "advertiseID=" + $("#AdvertiseID").val()
+                        + "&ReportID=" + report_elem.attr("report_id") + "&value=" + value, function (ret) {
+                            if (ret.status == 1) {
+                                alertify.success("امتیاز شما با موفقیت ثبت شد");
+                            }
+                            else {
+                                alertify.error(ret.val);
+                            }
+                        });
+                }
+            } else {
+                alertify.error("خطایی رخ داد، لطفا بعدا امتحان کنید.");
+            }
+        }
+    });
+}
+
+/******end rating*******/
+
+/******animation******/
+
+jQuery.fn.shake = function () {
+    this.each(function (i) {
+        $(this).css({
+            "position": "relative"
+        });
+        for (var x = 1; x <= 3; x++) {
+            $(this).animate({
+                right: 0.5
+            }, 20).animate({
+                right: 1
+            }, 20).animate({
+                right: 0.5
+            }, 20).animate({
+                right: 0
+            }, 20).animate({
+                right: -0.5
+            }, 20).animate({
+                right: -1
+            }, 20).animate({
+                right: -0.5
+            }, 20).animate({
+                right: 0
+            }, 20);
+        }
+    });
+    return this;
+}
+
+/******end animation******/
+
+/******client******/
+
+function clientIsInIran(callback) {
+    $.ajax('https://www.extreme-ip-lookup.com/json/')
+    .then(
+        function success(response) {
+            callback(response.countryCode == "IR");
+        }
+    );
+}
+
+/******end client******/
+
+/******advertise form******/
+function advertiseSelectOwner($this) {
+    if ($($this).val() == "2") {
+        $(".js-owner").removeClass("hide-aditem");
+    }
+    else {
+        $(".js-owner").addClass("hide-aditem");
+    }
+}
+
+function onAdvertisedigitschange($this) {
+
+    if ($($this).hasClass("toman")) {
+
+        var str_toman = "";
+        var price_val = parseInt($($this).val())
+        if (price_val >= 1000000000) {
+            str_toman += Math.floor(price_val / 1000000000) + " میلیارد";
+            price_val = price_val % 1000000000;
+        }
+        if (price_val >= 1000000) {
+            if (str_toman.length > 3) {
+                str_toman += " و " + Math.floor(price_val / 1000000) + " میلیون";
+            }
+            else {
+                str_toman += Math.floor(price_val / 1000000) + " میلیون";
+            }
+            price_val = price_val % 1000000;
+        }
+        if (price_val >= 1000) {
+            if (str_toman.length > 3) {
+                str_toman += " و " + Math.floor(price_val / 1000) + " هزار";
+            }
+            else {
+                str_toman += Math.floor(price_val / 1000) + " هزار";
+            }
+            price_val = price_val % 1000;
+
+        }
+        if (price_val > 0) {
+
+            if (str_toman.length > 3) {
+                str_toman += " و " + price_val;
+            }
+            else {
+                str_toman += price_val;
+            }
+        }
+
+        $($this).parent().next().text(str_toman + " تومان");
+
+        //$($this).val($($this).val().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+    }
+}
+
+function send_advertise_form(admin, status_content) {
+    if (validateAdvertiseForm(admin, document)) {
+        if (admin)
+        {
+            $("#status-content").val(status_content);
+            $("#not-verify").val($("#not-verify-dp").val());
+        }
+        document.getElementById("ManageForm").submit();
+    }
+}
+
+function validateAdvertiseForm(admin, rootElement) {
+    admin = typeof admin !== 'undefined' ? admin : false;
+    status_content = typeof status_content !== 'undefined' ? status_content : '';
+
+    var flag = true;
+
+    $(rootElement).find('.unit_count_input').removeClass("mandatory");
+    if ($(rootElement).find('.unit_count_input').length > 0) {
+        if ($(rootElement).find('.unit_count_input').filter(function () {
+            return $(this).val() > 0;
+        }).length == 0) {
+            flag = false;
+            var error_string = $(rootElement).find('.unit_count_input[data-type-id]').length > 0 ?
+                'لطفا تعداد واحد های مجتمع را مشخص کنید' :
+                'لطفا تعداد اتاق ها را مشخص کنید';
+            alertify.error(error_string, 11000);
+            $(rootElement).find('.unit_count_input').addClass("mandatory");
+        }
+    }
+
+    $(rootElement).find("select.js-mandatory").removeClass("mandatory");
+    $(rootElement).find("select.js-mandatory").each(function () {
+        if ($(this).find('option').length > 1) {
+            var min_value_ = 1;
+            var min_value_attr = $(this).attr("data-min-value");
+            if (min_value_attr != null && min_value_attr != undefined) {
+                min_value_ = parseInt(min_value_attr);
+            }
+            if ($(this).val() < min_value_) {
+                flag = false;
+                alertify.error($(this).parent().prev().text(), 11000);
+                $(this).addClass("mandatory");
+            }
+        }
+    });
+
+    $(rootElement).find("input.js-mandatory").removeClass("mandatory");
+    $(rootElement).find("input.js-mandatory").each(function () {
+        if ($(this).hasClass("digit")) {
+            var min_value = 1;
+            if ($(this).attr("allowzero") === '1')
+                min_value = 0;
+            if ($(this).val() == "" || $(this).val() < min_value) {
+                flag = false;
+                alertify.error($(this).parent().prev().text(), 11000);
+                $(this).addClass("mandatory");
+            }
+            var min_value_attr = $(this).attr('data-min_value');
+            if (typeof min_value_attr !== undefined && min_value_attr !== false) {
+                if ($(this).val() == "" || $(this).val() < parseInt(min_value_attr)) {
+                    flag = false;
+                    alertify.error($(this).parent().prev().text() + ". حداقل مبلغ " + string.format('{0:n0}', min_value_attr) + " تومان", 11000);
+                    $(this).addClass("mandatory");
+                }
+            }
+        }
+        else {
+            if ($(this).attr("type") == "number") {
+                var allow_zero = $(this).attr('data-allow-zero');
+                if (allow_zero !== 'True' && ($(this).val() == '' || parseInt($(this).val()) < 1)) {
+                    flag = false;
+                    var error_msg_;
+                    if ($(this).hasClass("Room_input")) {
+                        error_msg_ = "تعداد اتاق خواب را وارد کنید. در صورتی که واحد شما اتاق خواب ندارد آگهی را در دسته اتاق و سوئیت ثبت کنید";
+                    }
+                    else {
+                        error_msg_ = $(this).parent().parent().prev().text();
+                    }
+                    alertify.error(error_msg_, 11000);
+                    $(this).addClass("mandatory");
+                }
+            }
+            else {
+                if ($(this).val() == "") {
+                    flag = false;
+                    alertify.error($(this).parent().prev().text(), 11000);
+                    $(this).addClass("mandatory");
+                }
+            }
+        }
+    });
+
+    $(rootElement).find("input.js-mandatory-depend").removeClass("mandatory");
+    $(rootElement).find("input.js-mandatory-depend").each(function () {
+        if ($(this).hasClass("digit") &&
+            $(this).attr('mandatory-depend') == $("#TypeID").val()) {
+            if ($(this).val() == "" || $(this).val() < 1) {
+                flag = false;
+                alertify.error($(this).parent().prev().text(), 11000);
+                $(this).addClass("mandatory");
+            }
+        }
+    });
+
+    //if ($("#tmp-title").val().length < 5) {
+    //    flag = false;
+    //    alertify.error("لطفا عنوانی مناسب برای اقامتگاه انتخاب کنید", 11000);
+    //    $("input[name='Title']").addClass("mandatory");
+    //}
+
+    $(rootElement).find("textarea.js-mandatory").removeClass("mandatory");
+    $(rootElement).find("textarea.js-mandatory").each(function () {
+        if ($(this).val() == "") {
+            flag = false;
+            alertify.error($(this).parent().prev().text(), 11000);
+            $(this).addClass("mandatory");
+        }
+    });
+    if (admin) {
+        if ($("#mandatory-check").val() != "check") {
+            flag = true;
+        }
+    }
+    return flag;
+}
+
+function custom_show_alert(msg) {
+    alertify.error(msg, 11000);
+}
+var $removingAlbumPhoto;
+var $removingPhotoID;
+var currentDropZoneIndex = 0;
+
+function setAsRemovingPhoto(elem) {
+    $removingAlbumPhoto = $(elem).parent().parent().parent().parent().find('.AlbumPhoto');
+    $removingPhotoID = $(elem).parent().parent().parent().parent().find('.PhotoID');
+}
+function RemoveOldPhoto(obj, $id) {
+    if (confirm("آیا عکس مورد نظر پاک شود؟"))
+    {
+        setAsRemovingPhoto(obj);
+        $(obj).parent().remove();
+        var myString = $removingAlbumPhoto.val();
+        var subString = "," + $id;
+        if (myString.indexOf(subString) >= 0) {
+            var myString = myString.replace(subString, '');
+            $removingAlbumPhoto.val(myString);
+            if (myString == ',') {
+                $removingPhotoID.val(0);
+            }
+            else if ($removingPhotoID.val() == $id) {
+                $removingAlbumPhoto.parent().find('.dz-preview:first').click();
+            }
+        }
+    }
+    event.stopPropagation();
+}
+function initializeNewDropZone(elem) {
+    $(elem).attr("id", "dropzone_" + currentDropZoneIndex);
+    var myDropzone = new Dropzone("#dropzone_" + currentDropZoneIndex, {
+        url: "/Post/SaveUploadedFile",
+        previewTemplate: $("#tpl").html(),
+        addRemoveLinks: false,
+        paramName: "file", // The name that will be used to transfer the file
+        maxFilesize: 10000,  // MB
+        timeout: 380000, // mili second
+        dictRemoveFileConfirmation: "آیا عکس مورد نظر پاک شود؟"
+    });
+
+    myDropzone.on("uploadprogress", function (file, progress, bytesSent) {
+        var $progress = file.previewElement.querySelector(".progress-text");
+        $progress.style.width = Math.floor(progress) + "%";
+        $progress.querySelector(".dz-percent").textContent = Math.floor(progress) + "%";
+        // Display the progress
+    });
+
+    myDropzone.on("addedfile", function (file) {
+        if (this.files.length > 20) {
+            alertify.error("حداکثر 20 عکس مجاز می باشد .");
+            myDropzone.removeFile(file);
+        }
+    });
+
+    myDropzone.on("complete", function (data) {
+        if (data.xhr) {
+            var ret = jQuery.parseJSON(data.xhr.responseText);
+            if (ret.Status == 1) {
+                var $album_photo = $(data.previewElement).parent().parent().parent().find('.AlbumPhoto');
+                $album_photo.val($album_photo.val() + ret.id + ",");
+                var $progress = data.previewElement.querySelector(".progress-text");
+                $($progress.querySelector(".dz-percent")).hide();
+                $($progress.querySelector(".dz-finish")).show();
+
+                var $js_id = data.previewElement.querySelector(".js-id");
+                $($js_id).val(ret.id);
+                if ($(data.previewElement).parent().children(".dz-preview-active").length == 0) {
+                    $(data.previewElement).parent().find('.dz-preview:first').click();;
+                }
+            }
+            else {
+                alertify.error(ret.Message);
+                myDropzone.removeFile(data);
+            }
+        }
+        else {
+            myDropzone.removeFile(data);
+        }
+    });
+
+    myDropzone.on("removedfile", function (data) {
+        if (data.xhr) {
+            var ret = jQuery.parseJSON(data.xhr.responseText);
+            if (ret.Status == 1) {
+                var myString = $removingAlbumPhoto.val();
+                var subString = "," + ret.id;
+                if (myString.indexOf(subString) >= 0) {
+                    var myString = myString.replace(subString, '');
+                    $removingAlbumPhoto.val(myString);
+                    if (myString == ',') {
+                        $removingPhotoID.val(0);
+                    }
+                    else if ($removingPhotoID.val() == ret.id) {
+                        $removingAlbumPhoto.parent().find('.dz-preview:first').click();
+                    }
+                }
+            }
+        }
+    });
+
+    myDropzone.on("error", function (file, message) {
+        if (message.indexOf("Max filesize") >= 0)
+            custom_show_alert("حداکثر سایز فایل 10 مگابایت میتواند باشد .");
+        else {
+            custom_show_alert("فایل انتخابی مورد قبول نیست .");
+        }
+        myDropzone.removeFile(file);
+    });
+    currentDropZoneIndex++;
+}
+function setupDropZone() {
+    // script for imgaes upload dropzone
+    Dropzone.autoDiscover = false;
+    $(document).off("click", ".dz-preview").on("click", ".dz-preview", function () {
+        var $photo_id = $(this).parent().parent().parent().children('.PhotoID');
+        $(this).parent().children(".dz-preview").removeClass("dz-preview-active");
+        $(this).parent().children(".dz-preview").find(".dz-main-photo").hide();
+        $photo_id.val($(this).find(".js-id").val());
+        $(this).addClass("dz-preview-active");
+        $(this).find(".dz-main-photo").show();
+    });
+}
+
+var refreshing_form_elements = false;
+
+function refreshAdvertiseFormElements() {
+    refreshing_form_elements = true;
+    var typeID = parseInt($('#TypeID').val());
+    resetChildrenCount();
+    var myData = $('#ManageForm').serialize();
+    refresh_form_elements('_AdvertiseFormBasicElements', myData, function () {
+        refresh_form_elements('_AdvertiseFormGeneralElements', myData, function () {
+            refresh_form_elements('_AdvertiseFormElements', myData, function () {
+                $('#form-container').children('.form-step').each(function () {
+                    var elem_id = $(this).attr('id');
+                    if (elem_id != '_AdvertiseFormBasicElements' &&
+                        elem_id != '_AdvertiseFormGeneralElements' &&
+                        elem_id != '_AdvertiseFormElements' &&
+                        elem_id != 'confirmation-form-step') {
+                        $(this).remove();
+                    }
+                });
+                refreshing_form_elements = false;
+                if (typeID == 87 || typeID == 3 || typeID == 4 || typeID == 6 || typeID == 7) {
+                    increaseHotelUnitCount(typeID, 1);
+                }
+            });
+        });
+    });
+}
+
+function refresh_form_elements(partial_string, newData, onDone) {
+    newData += '&partial_view=' + partial_string;
+    $.ajax({
+        type: "POST",
+        url: "/advertise/getadvertiseformpartialview",
+        data: newData,
+        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+        success: function (data) {
+            $('#' + partial_string).html(data);
+            onRefreshFormElements(function () {
+                if (onDone != undefined && onDone != null) {
+                    onDone();
+                }
+            });
+        }
+    });
+}
+
+var currentChildUnitIndex = -1;
+var currentApartmentIndex = -1;
+var currentSuitIndex = -1;
+var currentHouseIndex = -1;
+var currentVillaIndex = -1;
+var currentHutIndex = -1;
+
+function resetChildrenCount() {
+    currentChildUnitIndex = -1;
+    currentApartmentIndex = -1;
+    currentSuitIndex = -1;
+    currentHouseIndex = -1;
+    currentVillaIndex = -1;
+    currentHutIndex = -1;
+}
+
+function getComplexChildrenCount(advertise_type) {
+    switch (advertise_type) {
+        case 82:
+            return currentApartmentIndex + 1;
+        case 1:
+            return currentSuitIndex + 1;
+        case 2:
+            return currentHouseIndex + 1;
+        case 83:
+            return currentVillaIndex + 1;
+        case 9:
+            return currentHutIndex + 1;
+        default:
+            return 0;
+    }
+}
+
+function newHotelUnit(parent_type) {
+    currentChildUnitIndex++;
+    var number = currentChildUnitIndex + 1;
+    var unit_title;
+    var parent_title;
+    switch (parent_type) {
+        case 87:
+            unit_title = "اتاق نوع";
+            parent_title = "اتاق های هتل";
+            break;
+        case 3:
+            unit_title = "چادر نوع";
+            parent_title = "چادر های کمپ";
+            break;
+        case 4:
+            unit_title = "اتاق نوع";
+            parent_title = "اتاق های اقامتگاه";
+            break;
+        case 6:
+            unit_title = "اتاق نوع";
+            parent_title = "اتاق های مسافرخانه";
+            break;
+        case 7:
+            unit_title = "اتاق نوع";
+            parent_title = "اتاق های پانسیون";
+            break;
+    }
+    var parent_id = parent_type + "_units";
+    //if ($('#' + parent_id).length == 0) {
+    //    $('#form-container').append('<div class="form-step" id="' + parent_type + '_units" data-title="' + parent_title + '"><div class="form-step-button-container"></div></div>');
+    //}
+    //$('#' + parent_id).append('<div class="advertise-form__hotel-unit-container form-step" id="unit_' + currentChildUnitIndex + '" data-title="' + unit_title + ' ' + number + '"></div>');
+    if ($('#' + parent_id).length == 0) {
+        $('#hotel-add-remove-container').before('<div id="' + parent_type + '_units"></div>');
+    }
+    $('#' + parent_id).append('<div class="advertise-form__hotel-unit-container advetise-form__part" id="unit_' + currentChildUnitIndex + '"></div>');
+    $("#unit_" + currentChildUnitIndex).load('/advertise/gethotelunititem?index=' + currentChildUnitIndex + '&type_id=' + parent_type + '&unit_title=' + unit_title.replace(' نوع', ''), null, function () {
+        if (onHotelUnitCountUpdated != null) {
+            onHotelUnitCountUpdated();
+        }
+    });
+}
+
+function removeLastHotelUnit(parent_type) {
+    var parent_id = parent_type + "_units";
+    if ($('#' + parent_id).length == 0) {
+        return;
+    }
+    $('#' + parent_id).children('.advertise-form__hotel-unit-container').last().remove();
+    currentChildUnitIndex--;
+    if ($('#' + parent_id).children('.advertise-form__hotel-unit-container').length == 0) {
+        $('#' + parent_id).remove();
+    }
+    if (onHotelUnitCountUpdated != null) {
+        onHotelUnitCountUpdated();
+    }
+}
+
+function newComplexUnit(advertise_type, parent_type, advertise_id) {
+    advertise_id == undefined || advertise_id == null ? 0 : advertise_id;
+    currentChildUnitIndex++;
+    var number;
+    var unit_title;
+    var parent_title;
+    switch (advertise_type) {
+        case 82:
+            currentApartmentIndex++;
+            number = currentApartmentIndex + 1;
+            unit_title = "واحد";
+            parent_title = "واحد های آپارتمان";
+            break;
+        case 1:
+            currentSuitIndex++;
+            number = currentSuitIndex + 1;
+            unit_title = "اتاق سوئیت";
+            parent_title = "واحد های اتاق و سوئیت";
+            break;
+        case 2:
+            currentHouseIndex++;
+            number = currentHouseIndex + 1;
+            unit_title = "خانه";
+            parent_title = "خانه های ویلایی";
+            break;
+        case 83:
+            currentVillaIndex++;
+            number = currentVillaIndex + 1;
+            unit_title = "ویلا";
+            parent_title = "ویلا ها";
+            break;
+        case 9:
+            currentHutIndex++;
+            number = currentHutIndex + 1;
+            unit_title = "کلبه";
+            parent_title = "کلبه ها";
+            break;
+    }
+    var parent_id = advertise_type + "_units";
+    if ($('#' + parent_id).length == 0) {
+        var $confirm_step = $('#confirmation-form-step');
+        if ($confirm_step.length > 0) {
+            $confirm_step.before('<div class="form-step" id="' + advertise_type + '_units" data-title="' + parent_title + '"><div class="form-step-button-container"></div></div>');
+        }
+        else {
+            $('#form-container').append('<div class="form-step" id="' + advertise_type + '_units" data-title="' + parent_title + '"><div class="form-step-button-container"></div></div>');
+        }
+    }
+    $('#' + parent_id).append('<div class="advertise-form__hotel-unit-container form-step" id="unit_' + currentChildUnitIndex + '" data-title="' + unit_title + ' ' + number + '"></div>');
+    $("#unit_" + currentChildUnitIndex).load('/advertise/getcomplexunititem?advertise_type=' + advertise_type + '&index=' + currentChildUnitIndex + '&number=' + number + '&parent_type=' + parent_type + '&advertise_id=' + advertise_id, null, function () {
+        if ($('#' + parent_id).children('.form-step').length > 1) {
+            if (parseInt($("#unit_" + currentChildUnitIndex).find('.js-advertise-id').first().val()) < 1) {
+                copyFormElements($('#' + parent_id).children('.form-step').first()[0],
+                    $("#unit_" + currentChildUnitIndex)[0]);
+            }
+        }
+        if (onComplexUnitCountUpdated != null) {
+            onComplexUnitCountUpdated();
+        }
+    });
+}
+
+function removeLastComplexUnit(advertise_type) {
+    var parent_id = advertise_type + "_units";
+    if ($('#' + parent_id).length == 0) {
+        return;
+    }
+    $('#' + parent_id).children('.form-step').last().remove();
+    currentChildUnitIndex--;
+    switch (advertise_type) {
+        case 82:
+            currentApartmentIndex--;
+            break;
+        case 1:
+            currentSuitIndex--;
+            break;
+        case 2:
+            currentHouseIndex--;
+            break;
+        case 83:
+            currentVillaIndex--;
+            break;
+        case 9:
+            currentHutIndex--;
+            break;
+    }
+    if ($('#' + parent_id).children('.form-step').length == 0) {
+        $('#' + parent_id).remove();
+    }
+    if (onComplexUnitCountUpdated != null) {
+        onComplexUnitCountUpdated();
+    }
+}
+
+function validateComplexUnitRange(elem, current_count, new_count) {
+    var min = parseInt($(elem).attr('data-min'));
+    var max = parseInt($(elem).attr('data-max'));
+    if (new_count < min) {
+        $(elem).val(current_count);
+        if (min > 0) {
+            alertify.error('شما نمیتوانید آگهی ثبت شده را حذف کنید. دکمه غیرفعال سازی روی آگهی ها موجود میباشد');
+        }
+        return false;
+    }
+    else if (new_count > max) {
+        alertify.error('شما میتوانید حداکثر ' + max + ' واحد ثبت کنید');
+        $(elem).val(current_count);
+        return false;
+    }
+    return true;
+}
+
+function onChangeComplexUnitCount(elem, parent_type) {
+    if (refreshing_form_elements)
+        return;
+    var advertise_type = parseInt($(elem).attr('data-type-id'));
+    var current_count = parseInt(getComplexChildrenCount(advertise_type));
+    var new_count = parseInt($(elem).val());
+    if (!validateComplexUnitRange(elem, current_count, new_count)) {
+        return;
+    }
+    if (new_count > current_count) {
+        var count = new_count - current_count;
+        for (var i = 0; i < count; i++) {
+            newComplexUnit(advertise_type, parent_type);
+        }
+    }
+    else if (new_count < current_count) {
+        var count = current_count - new_count;
+        for (var i = 0; i < count; i++) {
+            removeLastComplexUnit(advertise_type);
+        }
+    }
+}
+function increaseHotelUnitCount(advertise_type, min, max) {
+    onChangeHotelUnitCount(currentChildUnitIndex + 2, advertise_type, min, max);
+}
+function decreaseHotelUnitCount(advertise_type, min, max) {
+    onChangeHotelUnitCount(currentChildUnitIndex, advertise_type, min, max);
+}
+function onChangeHotelUnitCount(new_count, advertise_type, min, max) {
+    if (refreshing_form_elements)
+        return;
+    var current_count = currentChildUnitIndex + 1;
+    if (new_count < 1) {
+        alertify.error('باید حداقل یک نوع موجود باشد');
+        return;
+    }
+    if (new_count > max) {
+        alertify.error('شما میتوانید حداکثر ' + max + 'نوع اتاق داشته باشید');
+        return;
+    }
+    if (new_count < min) {
+        alertify.error('شما نمیتوانید آگهی ثبت شده را حذف کنید. دکمه غیرفعال سازی روی آگهی ها موجود میباشد');
+        return;
+    }
+    if (new_count > current_count) {
+        var count = new_count - current_count;
+        for (var i = 0; i < count; i++) {
+            newHotelUnit(advertise_type);
+        }
+    }
+    else if (new_count < current_count) {
+        var count = current_count - new_count;
+        for (var i = 0; i < count; i++) {
+            removeLastHotelUnit(advertise_type);
+        }
+    }
+}
+
+function addOldAdvertise(btnElem, parent_type) {
+    var $selectElement = $('#add-old-advertise-select');
+    if ($selectElement.val() == -1) {
+        alertify.error('ابتدا باید از لیست آگهی های ثبت شده یک مورد را انتخاب کنید');
+        $selectElement.focus();
+        return;
+    }
+    var $selectedOptionElement = $selectElement.children('option[value=' + $selectElement.val() + ']');
+    var advertise_type = $selectedOptionElement.attr('data-advertise-type');
+    newComplexUnit(parseInt(advertise_type), parseInt(parent_type), $selectElement.val());
+    $('.unit_count_input[data-type-id=' + advertise_type + ']').val(
+        parseInt($('.unit_count_input[data-type-id=' + advertise_type + ']').val()) + 1);
+    $selectedOptionElement.remove();
+    if ($selectElement.children('option').length == 1) {
+        $selectElement.parent().parent().remove();
+    }
+}
+
+function copyFormElements(from, to) {
+    var fromIndex = parseInt($(from).attr('id').replace('unit_', ''));
+    if ($(from).find('.uploader-container').length > 0) {
+        var $from_image_container = $(from).find('.uploader-container').first();
+        var $to_image_container = $(to).find('.uploader-container').first();
+        $from_image_container.children('.dz-preview').each(function () {
+            $to_image_container.append($(this).clone());
+            $to_image_container.children('.dz-preview').last().find('.dz-remove').attr('onclick', 'RemoveOldPhoto(this, ' + $to_image_container.children('.dz-preview').last().find('.js-id').first().val() + ');');
+        });
+        setupDropZone();
+    }
+    var child_from_string = 'childs[' + fromIndex + '].';
+    var forbidden_properties = ['Floor', 'AdvertiseID', 'Available'];
+    $(from).find('*[name]').each(function () {
+        var from_element = this;
+        var name_to_search = $(this).attr('name').replace(child_from_string, '');
+        if (name_to_search == "Elevator")
+        {
+            debugger;
+        }
+        if (!forbidden_properties.includes(name_to_search))
+        {
+            $(to).find('*[name]').each(function () {
+                if ($(this).attr('name').split('.')[1] == name_to_search) {
+                    if (name_to_search == "Elevator") {
+                        debugger;
+                    }
+                    $(this).val($(from_element).val());
+                    if ($(this).attr('type') == 'checkbox') {
+                        debugger;
+                        if ($(from_element).is(':checked')) {
+                            $(this)[0].setAttribute("checked", "checked");
+                        }
+                        else {
+                            $(this)[0].setAttribute("checked", ""); // For IE
+                            $(this)[0].removeAttribute("checked"); // For other browsers
+                        }
+                    }
+                }
+            });
+        }
+    });
+}
+
+$('.js-form-boolean').change(function () {
+    onChangeFormBoolean(this);
+});
+function onChangeFormBoolean(elem) {
+    $(elem).val($(elem).is(':checked') ? 'true' : 'false');
+}
+/******end advertise form******/
+
+/******confirm helper******/
+function confirmCheckbox(elem) {
+    var $input = $(elem);
+    $input.prop('checked', !$input.prop('checked'));
+    if (!$input.prop('checked')) {
+        showConfirmAlert('تایید', $input.attr('data-check-confirm-msg'), function () {
+            $input.prop("checked", true);
+            $input.val('true');
+        }, function () {
+            $input.prop("checked", false);
+            $input.val('false');
+        });
+    }
+    else {
+        showConfirmAlert('تایید', $input.attr('data-uncheck-confirm-msg'), function () {
+            $input.prop("checked", false);
+            $input.val('false');
+        }, function () {
+            $input.prop("checked", true);
+            $input.val('true');
+        });
+    }
+}
+/******end confirm helper******/
+
+/*****form step*****/
+var form_step_elements = [];
+var form_child_step_dict = {};
+var form_selected_index = 0;
+var form_child_selected_index = 0;
+var disableFormButtons;
+
+function unlockFormButton(elem) {
+    $(elem).removeClass('disabled-button');
+}
+
+function initializeFormSteps(disableButtons) {
+    //disableFormButtons = false;
+    disableFormButtons = disableButtons == undefined || disableButtons == null ?
+    false : disableButtons;
+    updateStepsFormElements();
+    $('#prev_step_button').addClass('hidden-button');
+    $('#form-submit-button').addClass('hidden-button');
+}
+function updateStepsFormElements(onDone) {
+    form_step_elements = [];
+    form_child_step_dict = {};
+    form_child_selected_index = 0;
+    var index = 0;
+    $('#form-container').children('.form-step').each(function () {
+        if (index != form_selected_index) {
+            $(this).hide();
+        }
+        form_step_elements.push(this);
+        var child_index = 0;
+        $(this).children('.form-step').each(function () {
+            if (child_index != 0) {
+                $(this).hide();
+            }
+            else {
+                form_child_step_dict[index] = [];
+            }
+            form_child_step_dict[index].push(this);
+            child_index++;
+        });
+        index++;
+    });
+    $('.form-step-button-container').empty();
+    for (var i = 0; i < index; i++) {
+        var select_text = i == form_selected_index ? ' form-step-button-selected' : '';
+        var disabled_text = disableFormButtons && i != form_selected_index ? ' disabled-button' : '';
+        $('#form-step-button-container').append(
+            '<div class="form-step-button' + select_text + disabled_text + '" data-index="' + i + '">' +
+            $(form_step_elements[i]).attr('data-title') + '</div>');
+        if ((i in form_child_step_dict)) {
+            for (var j = 0; j < form_child_step_dict[i].length; j++) {
+                select_text = j == 0 ? ' form-step-button-selected' : '';
+                disabled_text = disableFormButtons ? ' disabled-button' : '';
+                $(form_step_elements[i]).find('.form-step-button-container').append(
+                    '<div class="form-step-button' + select_text + disabled_text + '" data-index="' + j +
+                    '" data-parent-index="'+ i + '">' +
+                    $(form_child_step_dict[i][j]).attr('data-title') + '</div>');
+            }
+        }
+    }
+    $('.form-step-button').click(function () {
+        if ($(this).hasClass('disabled-button')) {
+            return;
+        }
+        var index = parseInt($(this).attr('data-index'));
+        var $form_container = $(this).attr('data-parent-index') == undefined ?
+            $('#form-container') :
+            $(this).parent().parent();
+        $form_container.children('.form-step').hide();
+        if ($form_container.hasClass('form-step')) {
+            var parent_index = parseInt($(this).attr('data-parent-index'));
+            $(form_child_step_dict[parent_index][index]).fadeIn(1000);
+            form_child_selected_index = index;
+        }
+        else {
+            $(form_step_elements[index]).fadeIn(1000);
+            form_selected_index = index;
+            if ($(form_step_elements[index]).children('.form-step').length == 0) {
+                form_child_selected_index = 0;
+            }
+        }
+        $(this).parent().children('.form-step-button').removeClass('form-step-button-selected');
+        $(this).addClass('form-step-button-selected');
+        if (form_selected_index <= 0 && form_child_selected_index <= 0) {
+            $('#next_step_button').removeClass('hidden-button');
+            $('#prev_step_button').addClass('hidden-button');
+            $('#form-submit-button').addClass('hidden-button');
+        }
+        else if (form_selected_index >= form_step_elements.length - 1 &&
+            (form_child_step_dict[form_selected_index] == undefined ||
+            form_child_step_dict[form_selected_index] == null ||
+            form_child_selected_index >= form_child_step_dict[form_selected_index].length - 1)) {
+            $('#prev_step_button').removeClass('hidden-button');
+            $('#next_step_button').addClass('hidden-button');
+            $('#form-submit-button').removeClass('hidden-button');
+        }
+        else {
+            $('#next_step_button').removeClass('hidden-button');
+            $('#prev_step_button').removeClass('hidden-button');
+            $('#form-submit-button').addClass('hidden-button');
+        }
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $(this).offset().top
+        }, 200);
+    });
+    for (var i = 0; i < index; i++) {
+        if ((i in form_child_step_dict)) {
+            $(form_step_elements[i]).find('.form-step-button-container').children().last().click();
+        }
+    }
+    if (onDone != undefined && onDone != null) {
+        onDone();
+    }
+}
+
+function nextFormSubStep(btn, is_admin) {
+    if ($(btn).hasClass('hidden-button')) {
+        return;
+    }
+    seekFormSubStep(true, is_admin);
+}
+
+function prevFormSubStep(btn, is_admin) {
+    if ($(btn).hasClass('hidden-button')) {
+        return;
+    }
+    seekFormSubStep(false, is_admin);
+}
+
+var coppied_steps = [];
+
+function seekFormSubStep(forward, is_admin) {
+    var step_element = form_step_elements[form_selected_index];
+    //validate current form
+    var validate_element = step_element;
+    if ($(step_element).children('.form-step').length > 0) {
+        validate_element = form_child_step_dict[form_selected_index][form_child_selected_index];
+    }
+    if (forward && !validateAdvertiseForm(false, validate_element)) {
+        if (!is_admin)
+        {
+            return;
+        }
+    }
+    if (form_child_selected_index == 0 &&
+            disableFormButtons &&
+            !coppied_steps.includes(form_selected_index)) {
+        coppied_steps.push(form_selected_index);
+        if ($(step_element).children('.form-step').length > 1) {
+            $(step_element).children('.form-step:not(:first)').each(function () {
+                if (parseInt($(this).find('.js-advertise-id').first().val()) < 1) {
+                    copyFormElements(form_child_step_dict[form_selected_index][0], $(this));
+                }
+            });
+        }
+    }
+    //change form
+    if ($(step_element).children('.form-step').length == 0) {
+        SeekFormStep(forward, is_admin);
+    }
+    else {
+        if (forward && form_child_selected_index >=
+            form_child_step_dict[form_selected_index].length - 1) {
+            SeekFormStep(forward, is_admin);
+        }
+        else if (!forward && form_child_selected_index <= 0) {
+            SeekFormStep(forward, is_admin);
+        }
+        else {
+            var target_child_index = forward ? form_child_selected_index + 1 :
+                form_child_selected_index - 1;
+            var $buttons_root = $(step_element).children('.form-step-button-container').first();
+            if (forward && is_admin && target_child_index > 0) {
+                var $current_button = $buttons_root.children('.form-step-button:eq(' + (target_child_index - 1).toString() + ')');
+                $current_button.css('background-color', '#73C362');
+            }
+            var $target_button = $buttons_root.children('.form-step-button:eq(' + target_child_index + ')');
+            unlockFormButton($target_button[0]);
+            $target_button.click();
+        }
+    }
+}
+
+function SeekFormStep(forward, is_admin) {
+    is_admin = is_admin == undefined || is_admin == null ? false : is_admin;
+    var target_index = forward ? form_selected_index + 1 : form_selected_index - 1;
+    var $buttons_root = $('#form-container').parent().parent().children('.form-step-button-container').first();
+    if (forward && is_admin && target_index > 0) {
+        var $current_button = $buttons_root.children('.form-step-button:eq(' + (target_index - 1).toString() + ')');
+        $current_button.css('background-color', '#73C362');
+    }
+    var $target_button = $buttons_root.children('.form-step-button:eq(' + target_index + ')');
+    var target_element = form_step_elements[target_index];
+    unlockFormButton($target_button[0]);
+    $target_button.click();
+    form_selected_index = target_index;
+    if ($(target_element).children('.form-step-button-container').length > 0) {
+        var $step_buttons = $(target_element).children('.form-step-button-container')
+            .first().children('.form-step-button');
+        if (forward) {
+            unlockFormButton($step_buttons.first()[0]);
+            $step_buttons.first().click();
+        }
+        else {
+            unlockFormButton($step_buttons.last()[0]);
+            $step_buttons.last().click();
+        }
+        if ($step_buttons.length == 1) {
+        }
+    }
+}
+
+function onRefreshFormElements(onDone) {
+    $('.advertise-form__hotel-unit-container').remove();
+    var myData = $('#ManageForm').serialize();
+    myData += '&partial_view=_AdvertiseMultiform';
+    $.ajax({
+        type: "POST",
+        url: "/advertise/getadvertiseformpartialview",
+        data: myData,
+        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+        success: function (data) {
+            $('#form-container').append(data);
+            updateStepsFormElements(onDone);
+        }
+    });
+}
+
+function onComplexUnitCountUpdated() {
+    updateStepsFormElements();
+}
+
+function onHotelUnitCountUpdated() {
+    updateStepsFormElements();
+}
+
+/*****end form step*****/
+
+/******detail button******/
+$(".js-detail-button").each(function(){
+    registerDetailButton(this);
+});
+function registerDetailButton(btn){
+    $(btn).click(function () {
+        var current_state = $(this).attr('data-state') == '1';
+        if (!current_state) {
+            $('.js-detail-button').each(function () {
+                detailButtonChangeState(this, false);
+            });
+        }
+        detailButtonChangeState(this, !current_state);
+    });
+}
+function detailButtonChangeState(elem, target_state) {
+    $(elem).attr('data-state', target_state ? '1' : '0');
+    var $target_elem = $('#' + $(elem).attr('data-target-id'));
+    var change_text = $(this).attr('data-change-text') == '1';
+    if (change_text)
+    {
+        $(elem).children('span').html(target_state ? 'جزئیات کمتر' : 'جزئیات بیشتر');
+    }
+    $(elem).children('i').attr('class', target_state ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down');
+    if (target_state) {
+        $target_elem.slideDown();
+    }
+    else {
+        $target_elem.slideUp();
+    }
+}
+/******end detail button******/
+
+/******more text button******/
+$(".show-more-container").each(function () {
+    var max_height = $(this).attr("data-max-height");
+    if ($(this).height() > max_height) {
+        $(this).css("max-height", max_height + "px");
+        $(this).css("overflow", "hidden");
+        $(this).attr("data-current-state", false);
+        $(this).after("<div class='show-more__button' onclick='toggleShowMoreText(this)'>نمایش کل متن <i class='fa fa-angle-down'></i></div>");
+    }
+});
+
+function toggleShowMoreText(button) {
+    var $elem = $(button).prev();
+    var currnet_state = $elem.attr("data-current-state");
+    if (currnet_state == "true") {
+        $(button).html("نمایش کل متن <i class='fa fa-angle-down'></i>");
+        $elem.animate({
+            "max-height": $elem.attr("data-max-height") + "px",
+        }, 1000, function () {
+            // Animation complete.
+        });
+        $elem.attr("data-current-state", false);
+    }
+    else {
+        $(button).html("کوتاه کردن متن <i class='fa fa-angle-up'></i>");
+        $elem.animate({
+            "max-height": "2000px",
+        }, 1000, function () {
+            // Animation complete.
+        });
+        $elem.attr("data-current-state", true);
+    }
+}
+
+/******end more text button******/
+
+/******increase and decrease button******/
+function onClickIncDecButton(elem) {
+    var $button = $(elem);
+    var $inputElement;
+    if ($button.attr("data-action") === "plus") {
+        $inputElement = $button.next();
+    }
+    else {
+        $inputElement = $button.prev();
+    }
+    var min = $inputElement.attr("min");
+    var max = $inputElement.attr("max");
+    var oldValue = $inputElement.val();
+
+    if ($button.attr("data-action") === "plus") {
+        if (max == null || parseInt(max) >= parseInt(oldValue) + 1) {
+            $inputElement.val(parseInt(oldValue) + 1);
+        }
+    } else {
+        if (min == null || parseInt(min) <= parseInt(oldValue) - 1) {
+            $inputElement.val(parseInt(oldValue) - 1);
+        }
+    }
+}
+
+function clampNumberInput(elem) {
+    if ($(elem).attr('min') != null) {
+        if ($(elem).val() < parseInt($(elem).attr('min'))) {
+            $(elem).val($(elem).attr('min'));
+        }
+        if ($(elem).val() > parseInt($(elem).attr('max'))) {
+            $(elem).val($(elem).attr('max'));
+        }
+    }
+}
+/******end increase and decrease button******/
+
+/******alert and confirm******/
+function showSuccessAlert(title, message, onClose) {
+    $.confirm({
+        title: title,
+        content: message,
+        type: 'green',
+        typeAnimated: true,
+        rtl: true,
+        buttons: {
+            بستن: function () {
+            }
+        },
+        onClose: function () {
+            if (typeof onClose !== 'undefined' && onClose != null) {
+                onClose();
+            }
+        }
+    });
+}
+function showNormalAlert(title, message, onClose) {
+    $.confirm({
+        title: title,
+        content: message,
+        type: 'blue',
+        typeAnimated: true,
+        rtl: true,
+        buttons: {
+            بستن: function () {
+            }
+        },
+        onClose: function () {
+            if (typeof onClose !== 'undefined' && onClose != null) {
+                onClose();
+            }
+        }
+    });
+}
+function showWarningAlert(title, message, onClose) {
+    $.confirm({
+        title: title,
+        content: message,
+        type: 'yellow',
+        typeAnimated: true,
+        rtl: true,
+        buttons: {
+            بستن: function () {
+            }
+        },
+        onClose: function () {
+            if (typeof onClose !== 'undefined' && onClose != null) {
+                onClose();
+            }
+        }
+    });
+}
+function showErrorAlert(title, message, onClose) {
+    $.confirm({
+        title: title,
+        content: message,
+        type: 'red',
+        typeAnimated: true,
+        rtl: true,
+        buttons: {
+            بستن: function () {
+            }
+        },
+        onClose: function () {
+            if (typeof onClose !== 'undefined' && onClose != null) {
+                onClose();
+            }
+        }
+    });
+}
+function showConfirmAlert(title, message, onYes, onNo, onClose, yesText, noText) {
+    if (yesText === 'undefined' || yesText == null)
+    {
+        yesText = "بله";
+    }
+    if (noText === 'undefined' || noText == null)
+    {
+        noText = "خیر";
+    }
+    $.confirm({
+        title: title,
+        content: message,
+        type: 'blue',
+        typeAnimated: true,
+        rtl: true,
+        buttons: {
+            yes: {
+                text: yesText,
+                btnClass: 'btn-green',
+                action: function () {
+                    if (typeof onYes !== 'undefined' && onYes != null) {
+                        onYes();
+                    }
+                }
+            },
+            no: {
+                text: noText,
+                btnClass: 'btn-red',
+                action: function () {
+                    if (typeof onNo !== 'undefined' && onNo != null) {
+                        onNo();
+                    }
+                }
+            }
+        },
+        onClose: function () {
+            if (typeof onClose !== 'undefined' && onClose != null) {
+                onClose();
+            }
+        }
+    });
+}
+/******end alert and confirm******/
+
+
+String.prototype.replaceAll = function (search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
+function mygetCookie(name) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+    }
+    return "";
+}
+
+//, attr, order
+
+var sortSelect = function (select, attr, order) {
+    if (attr === 'text') {
+        if (order === 'asc') {
+            $(select).html($(select).children('option').sort(function (x, y) {
+                return $(x).text().toUpperCase() < $(y).text().toUpperCase() ? -1 : 1;
+            }));
+            $(select).get(0).selectedIndex = 0;
+            e.preventDefault();
+        }// end asc
+        if (order === 'desc') {
+            $(select).html($(select).children('option').sort(function (y, x) {
+                return $(x).text().toUpperCase() < $(y).text().toUpperCase() ? -1 : 1;
+            }));
+            $(select).get(0).selectedIndex = 0;
+            e.preventDefault();
+        }// end desc
+    }
+
+};
+
+function toggle_search_box() {
+    if ($(".searchbox").hasClass("shide")) {
+        $(".searchbox").removeClass("shide");
+    }
+    else {
+        $(".searchbox").addClass("shide");
+    }
+}
+
+function elementInViewport(el) {
+    var top = el.offsetTop;
+    var left = el.offsetLeft;
+    var width = el.offsetWidth;
+    var height = el.offsetHeight;
+
+    while (el.offsetParent) {
+        el = el.offsetParent;
+        top += el.offsetTop;
+        left += el.offsetLeft;
+    }
+
+    return (
+      top < (window.pageYOffset + window.innerHeight) &&
+      left < (window.pageXOffset + window.innerWidth) &&
+      (top + height) > window.pageYOffset &&
+      (left + width) > window.pageXOffset
+    );
+}
+
+/******login popup*******/
+var can_send_login_message = true;
+
+function toggle_login() {
+    if ($(".login__container").css("display") == "none")
+    {
+        restart_login();
+        $(".login__bg").show();
+        toggle_login_container(true, function () {
+            $(".login__container").css("display", "flex");
+        });
+    }
+    else {
+        $(".login__bg").fadeOut(500);
+        toggle_login_container(false);
+    }
+}
+
+$(document).keypress(function (event) {
+
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if ($(".login__container").css("display") == "none") {
+        return;
+    }
+    if (keycode == '13') {
+        if ($("#login_form").css("display") != "none")
+        {
+            login();
+        }
+        else if ($("#login_form_email").css("display") != "none")
+        {
+            login("email");
+        }
+        else if ($("#verification_form").css("display") != "none")
+        {
+            login_verification();
+        }
+    }
+
+});
+
+function toggle_login_container(direction, onDone) {
+    if (direction) {
+        $(".login__container").css("opacity", 0);
+        $(".login__container").css("display", "flex");
+        $(".login__container").animate({
+            opacity: 1
+        }, 500, onDone);
+    }
+    else {
+        $(".login__container").animate({
+            opacity: 0
+        }, 500, function () {
+            $(".login__container").css("display", "none");
+            if (onDone != undefined && onDone != null) {
+                onDone();
+            }
+        });
+    }
+}
+
+function login(step) {
+    if (!check_login_mobile())
+        return;
+    step = step !== "email" ? "mobile" : "email";
+    toggle_login_container(false);
+    var mobile = $('#mobile').val();
+    var email = $('#email').val();
+    myajax("user/popuplogin", "mobile=" + mobile + "&email=" + email + "&step=" + step + "&send_verification=" + can_send_login_message, function (ret) {
+        if (ret.status == 0)
+        {
+            $("#login-error-container").html(ret.msg);
+        }
+        else if (ret.status == 1)
+        {
+            login_success(ret.fname, ret.lname, ret.mobile);
+        }
+        else if (ret.status == 2)
+        {
+            toggle_login_container(false);
+            $.confirm({
+                title: 'مسدود',
+                content: 'امکان ورود به سایت برای شما مسدود شده است, جهت فعالسازی با پشتیبانی تماس بگیرید: ' +
+                    '<a href="/contact">تماس با پشتیبانی</a>',
+                type: 'red',
+                typeAnimated: true,
+                buttons: {
+                    بستن: function () {
+                    }
+                }
+            });
+        }
+        else if (ret.status == 3)
+        {
+            login_success_email(ret.email);
+        }
+        else if (ret.status == 4)
+        {
+            $(".login_form").hide(500, function () {
+                $("#login_form_email").show(500);
+            });
+        }
+        toggle_login_container(true, function () {
+            $(".login__container").css("display", "flex");
+            if (ret.status == 0) {
+                $('#login-error-container').show();
+            }
+        });
+    });
+}
+
+function login_verification() {
+    var mobile = $('#mobile').val();
+    var code = $('#code').val();
+    var fname = $("#fname").val();
+    var lname = $("#lname").val();
+    myajax("user/popuploginverification", "mobile=" + mobile + "&code=" + code + "&fname=" + fname + "&lname=" + lname , function (ret) {
+        if (ret.status == 1)
+        {
+            toggle_login();
+            verification_success();
+        }
+        else
+        {
+            alertify.error(ret.msg);
+        }
+    });
+}
+
+function resend_login_sms() {
+    myajax("user/popupresendsms", "", function (ret) {
+        if (ret.status == 1)
+        {
+            restart_login();
+            $("#resend_button").removeAttr("onclick");
+            $("#resend_button").append('<span id="count_down_timer"></span>');
+            if (can_send_login_message) {
+                can_send_login_message = false;
+                $("#count_down_timer").countdowntimer({
+                    timeUp: function () {
+                        can_send_login_message = true;
+                        $("#count_down_timer").html("");
+                        $("#resend_button").attr("onclick", "resend_login_sms()");
+                        $("#resend_button").html("دریافت مجدد کد فعال سازی");
+                    }, minutes: 2,
+                });
+            }
+        }
+    });
+}
+
+function resend_login_email(email) {
+    debugger;
+    myajax("user/popupresendemail", "email=" + email, function (ret) {
+        debugger;
+        showSuccessAlert('ایمیل ارسال شد', 'ایمیل تایید دوباره ارسال شد. لطفا مجددا ایمیل خود را بررسی کنید', function () {
+            $("#resend_button").removeAttr("onclick");
+            $("#resend_button").append('<span id="count_down_timer"></span>');
+            if (can_send_login_message) {
+                can_send_login_message = false;
+                $("#count_down_timer").countdowntimer({
+                    timeUp: function () {
+                        can_send_login_message = true;
+                        $("#count_down_timer").html("");
+                        $("#resend_button").attr("onclick", "resend_login_email('" + email + "')");
+                        $("#resend_button").html("دریافت مجدد ایمیل فعال سازی");
+                    }, minutes: 2,
+                });
+            }
+        });
+    });
+}
+
+function restart_login() {
+    verification_form_shown = false;
+    //$("#login_form").css("display", "unset");
+    $(".login_form").hide();
+    $("#login_form").show();
+    //$("#verification_form").css("display", "none");
+    $("#mobile_label").html("");
+}
+
+function login_success(fname, lname, mobile) {
+    show_verification_form(fname, lname, mobile);
+}
+
+function login_success_email(email, onDone) {
+    show_email_verification_form(email, onDone);
+}
+
+var verification_form_shown = false;
+
+function show_verification_form(fname, lname, mobile, onDone) {
+    verification_form_shown = true;
+    //$("#login_form").css("display", "none");
+    //$("#verification_form").css("display", "unset");
+    $(".login_form").hide();
+    $("#verification_form").show();
+    $("#resend_form").show();
+    $("#mobile_label").html(mobile);
+    $("#fname").val(fname == null ? "" : fname);
+    $("#lname").val(lname == null ? "" : lname);
+    if (fname != null && fname != "") {
+        $("#fname").hide();
+    }
+    if (lname != null && lname != "") {
+        $("#lname").hide();
+    }
+    if (can_send_login_message) {
+        can_send_login_message = false;
+        $("#count_down_timer").countdowntimer({
+            timeUp: function () {
+                can_send_login_message = true;
+                $("#count_down_timer").html("");
+                $("#resend_button").attr("onclick", "resend_login_sms()");
+                $("#resend_button").html("دریافت مجدد کد فعال سازی");
+            }, minutes: 2,
+        });
+    }
+    if (onDone != undefined && onDone != null) {
+        onDone();
+    }
+}
+
+function show_email_verification_form(email, onDone) {
+    verification_form_shown = true;
+    //$("#login_form").css("display", "none");
+    //$("#verification_form").css("display", "unset");
+    $(".login_form").hide(500, function () {
+        $("#email_verification_form").show(500);
+        $("#resend_form").show(500);
+    });
+    $("#email_label").html(email);
+    if (can_send_login_message) {
+        can_send_login_message = false;
+        $("#count_down_timer").countdowntimer({
+            timeUp: function () {
+                can_send_login_message = true;
+                $("#count_down_timer").html("");
+                $("#resend_button").attr("onclick", "resend_login_email('" + email + "')");
+                $("#resend_button").html("دریافت مجدد ایمیل فعال سازی");
+            }, minutes: 2,
+        });
+    }
+    if (onDone != undefined && onDone != null) {
+        onDone();
+    }
+}
+
+function verification_success(){
+    alertify.success("با موفقیت وارد حساب خود شدید");
+    $("#dashboard_button").attr("href", "/dashboard");
+    $("#dashboard_button").removeAttr("onclick");
+    $("#dashboard_button").find("span").html("حساب من");
+    if (typeof on_login !== "undefined") {
+        on_login();
+    }
+}
+
+if ($("#MobileLoginVerification").length) {
+    alertify.success("کد فعال سازی 4 رقمی به تلفن همراه شما پیامک شد");
+}
+
+function refreshCaptcha() {
+    $("#captchaimage").attr('src', $("#captchaimage").attr('src') + '?' + Math.random());
+}
+//function checkValidation() {
+//    var mobile = $('#mobile').val();
+
+//    return validateMobile(mobile);
+
+    //if (/^\d+$/.test(mobile) == false)
+    //    return false;
+
+    //if (!mobile.match(/([ ]|-|[()]){0,2}09[0|1|2|3|4|5|6|7|8|9]([ ]|-|[()]){0,2}(?:[0-9]([ ]|-|[()]){0,2}){8}/)
+    //    && !mobile.match(/[0][0][0-9]{12}/)
+    //    ) {
+
+    //    return false
+    //}
+    //else {
+    //    return true;
+
+    //}
+//}
+$(function () {
+    $('#mobile').on('keypress', function (e) {
+        if (e.which == 32)
+            return false;
+    });
+});
+function check_login_mobile () {
+    debugger;
+    if ($("#mobile").val() == "") {
+        alertify.error("لطفا تلفن همراه خود را وارد کنید");
+        $("#mobile").focus();
+        return false;
+    }
+    if (!validateMobile($('#mobile').val().toString())) {
+
+        alertify.error("لطفا تلفن همراه خود را درست و با اعداد انگلیسی وارد نمایید");
+        $("#mobile").focus();
+        return false;
+    }
+    return true;
+}
+setTimeout(function () {
+
+    $("#resendCode").css("color", "black");
+    $("#resendCode").css("cursor", "pointer");
+
+
+}, 1 * 5 * 1000);
+
+/******end login popup*******/

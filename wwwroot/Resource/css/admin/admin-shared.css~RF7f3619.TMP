@@ -1,0 +1,106 @@
+﻿.admin-shared__root {
+    font:12px Liransans;
+}
+
+.admin-shared__filter-parent {
+    border: 1px solid #ccc;
+    display:flex;
+    flex-flow:column;
+    padding:10px;
+    align-content:space-between;
+}
+
+.admin-shared__filter-container {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+}
+
+.admin-shared__filter-item {
+    display:flex;
+    align-items:center;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+.admin-shared__filter-label {
+    width:unset;
+    margin-left:10px;
+}
+
+.admin-shared__filter-input {
+    max-width:150px !important;
+}
+
+.admin-shared__filter-input * {
+    max-width:150px !important;
+}
+
+.admin-shared__filter-button-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.admin-shared__button {
+    border:1px solid #242424;
+    cursor:pointer;
+    border-radius: 5px;
+    padding: 5px;
+    min-width:95px;
+    background-color:white;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.admin-shared__button i {
+    margin-left:10px;
+}
+
+.admin-shared__button span {
+    font: 13px Miransans;
+    margin:auto;
+}
+
+.admin-shared__action-container {
+    display:flex;
+    flex-wrap: wrap;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    padding-top:20px;
+}
+
+.admin-shared__status-toggle-container {
+    display:flex;
+    width:350px;
+    flex-flow:row;
+    justify-content:space-between;
+    border:1px solid #ccc;
+    padding:10px;
+}
+
+.admin-shared__status-toggle-item {
+    border:1px solid #242424;
+    cursor:pointer;
+    border-radius: 5px;
+    padding: 5px;
+    background-color:white;
+}
+.admin-shared__status-toggle-item:hover:not(.selected-toggle) {
+    background-color:#fff3c6;
+}
+
+
+.selected-toggle {
+    background-color:#fdd835;
+}
+
+.admin-shared__table-parent {
+    overflow: auto;
+    border-top: 1px solid #242424;
+    border-right: 1px solid #242424;
+    border-left: 1px solid #242424;
+}

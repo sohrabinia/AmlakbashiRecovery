@@ -1,0 +1,65 @@
+﻿.main-date-picker {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    border: none;
+    padding: 0;
+    z-index: 3;
+}
+
+.acc-set-date__input-container {
+    display:flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.acc-set-date__input-container * {
+    margin: 0 5px;
+}
+
+.acc-set-date__price-input {
+    width: 25%;
+    max-width: 400px;
+}
+
+.acc-set-date__date-string {
+    position:absolute;
+    text-align:center;
+    right: 33%;
+    top:84%;
+    width:50%;
+    max-width: 300px;
+    margin-top: 10px;
+    color:rgb(68, 133, 242);
+}
+
+.acc-set-date__button {
+    background-color:#fdd835;
+    color:#242424;
+    padding:5px;
+    border:none;
+    border-radius:5px;
+    margin-right:5px;
+    cursor:pointer;
+    max-width: 160px;
+    text-align:center;
+}
+
+.acc-set-date__occ-btn {
+}
+
+.acc-set-date__empty-btn {
+}
+
+.acc-set-date__disabled-button {
+    cursor: not-allowed;
+    background-color:#f4f4f4;
+    color:#c9c9c9;
+}
+@media (max-width:780px) {
+    .acc-set-date__date-string {
+        top:unset;
+        right: 25%;
+    }
+}

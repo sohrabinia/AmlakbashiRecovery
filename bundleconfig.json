@@ -1,0 +1,422 @@
+[
+  // ####################################################### Styles
+  {
+    "outputFileName": "wwwroot/css/dashboard.min.css",
+    "inputFiles": [
+      "wwwroot/resource/dailyrent.css",
+      "wwwroot/resource/tmmegamenu/css/tmmegamenu.css",
+      "wwwroot/resource/bootstrap/css/bootstrap-rtl.min.css",
+      "wwwroot/resource/ticker/ticker-style.css",
+      "wwwroot/resource/chosen_v1.4.2/chosen.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.default.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.core.css",
+      "wwwroot/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css",
+      "wwwroot/resource/css/general/login/intlTelInput.css",
+      "wwwroot/resource/css/general/login/login-Popup.css",
+      "wwwroot/resource/dashboard.css",
+      "wwwroot/resource/css/general/chat-popup.css",
+      "wwwroot/resource/css/general/message-popup.css",
+      "wwwroot/resource/loader.min.css",
+      "wwwroot/resource/jquery-confirm/jquery-confirm.min.css",
+      "wwwroot/resource/rating/themes/fontawesome-stars.css",
+      "wwwroot/resource/star-rating/star-rating.css",
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/general/dashboardAccount.css",
+      "wwwroot/resource/css/general/popup-calendar.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/home-page.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/portal/home-page.css",
+      "wwwroot/resource/css/general/home-page-search.css",
+      "wwwroot/resource/css/general/search-by-region.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/acc-item.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/lightbox/lightbox.css",
+      "wwwroot/resource/slick/slick.css",
+      "wwwroot/resource/slick/slick-theme.css",
+      "wwwroot/resource/css/portal/advertise-item.css",
+      "wwwroot/resource/css/portal/reserve-dialog.css",
+      "wwwroot/resource/css/portal/acc-blog-news.css",
+      "wwwroot/resource/css/general/master-search.css",
+      "wwwroot/resource/css/general/search-by-region.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/cat-item.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/portal/advertise-list.css",
+      "wwwroot/resource/css/portal/post-list.css",
+      "wwwroot/resource/css/general/master-search.css",
+      "wwwroot/resource/css/general/search-by-region.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/master-critical.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/portal/portal-shared.css",
+      "wwwroot/resource/css/portal/portal-header.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/master.min.css",
+    "inputFiles": [
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.default.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.core.css",
+      "wwwroot/resource/css/fa-icons.css",
+      "wwwroot/resource/rating/themes/fontawesome-stars.css",
+      "wwwroot/resource/star-rating/star-rating.css",
+      "wwwroot/resource/css/general/chat-popup.css",
+      "wwwroot/resource/css/portal/portal-footer.css",
+      "wwwroot/resource/css/general/message-popup.css",
+      "wwwroot/resource/css/general/login/intlTelInput.css",
+      "wwwroot/resource/css/general/login/login-Popup.css",
+      "wwwroot/resource/css/general/footer.css",
+      "wwwroot/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/search.min.css",
+    "inputFiles": [
+      "wwwroot/Resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/general/home-page-search.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/acc-manager.min.css",
+    "inputFiles": [
+      "wwwroot/resource/css/dashboard/host-panel.css",
+      "wwwroot/resource/css/dashboard/numberinput.css",
+      "wwwroot/resource/css/general/popup-calendar.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/master-admin.min.css",
+    "inputFiles": [
+      "wwwroot/resource/admin.css",
+      "wwwroot/resource/chosen_v1.4.2/chosen.css",
+      "wwwroot/resource/fontawesome-free-5.0.8/web-fonts-with-css/css/fontawesome-all.min.css",
+      "wwwroot/resource/resource/fontawesome-free-5.6.3-web/css/all.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.default.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.core.css",
+      "wwwroot/resource/resource/loader.min.css",
+      "wwwroot/resource/persian-date-picker/persian-datepicker.min.css",
+      "wwwroot/resource/jquery-confirm/jquery-confirm.min.css",
+      "wwwroot/resource/css/general/message-popup.css&v=2",
+      "wwwroot/resource/star-rating/star-rating.css",
+      "wwwroot/resource/rating/themes/fontawesome-stars.css",
+      "wwwroot/resource/tmmegamenu/css/tmmegamenu.css",
+      "wwwroot/resource/css/general/acc-comment.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/min/admin.min.css",
+    "inputFiles": [
+      "wwwroot/css/admin/admin.css",
+      "wwwroot/css/admin/admin-popup.css",
+      "wwwroot/css/admin/admin-filter.css",
+      "wwwroot/css/admin/admin-table.css",
+      "wwwroot/resource/fontawesome-free-5.6.3-web/css/all.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.default.css",
+      "wwwroot/resource/alertify.js-0.3.11/themes/alertify.core.css",
+      "wwwroot/resource/loader.min.css",
+      "wwwroot/resource/persian-date-picker/persian-datepicker.min.css",
+      "wwwroot/resource/jquery-confirm/jquery-confirm.min.css",
+      "wwwroot/resource/css/general/message-popup.css",
+      "wwwroot/resource/star-rating/star-rating.css",
+      "wwwroot/resource/rating/themes/fontawesome-stars.css",
+      "wwwroot/resource/tmmegamenu/css/tmmegamenu.css",
+      "wwwroot/resource/css/general/acc-comment.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/min/admin-reserve.min.css",
+    "inputFiles": [
+      "wwwroot/css/admin/reserve/admin-reserve-index.css",
+      "wwwroot/resource/star-rating/star-rating.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/min/admin-advertise.min.css",
+    "inputFiles": [
+      "wwwroot/css/admin/advertise/admin-advertise-index.css",
+      "wwwroot/css/admin/advertise/admin-residence-index-popup.css",
+      "wwwroot/resource/css/general/jalali-date-picker.css",
+      "wwwroot/resource/css/general/popup-calendar.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/min/admin-tag.min.css",
+    "inputFiles": [
+      "wwwroot/css/admin/tag/list.css",
+      "wwwroot/css/admin/tag/popup.css"
+    ]
+  },
+  // ####################################################### Scripts
+  {
+    "outputFileName": "wwwroot/js/dashboard.min.js",
+    "inputFiles": [
+      "wwwroot/lib/jquery/dist/jquery.min.js",
+      "wwwroot/lib/dropzone/dropzone.js",
+      "wwwroot/resource/scripts/jquery.maskedinput.min.js",
+      "wwwroot/resource/scripts/jquery.nicescroll.min.js",
+      "wwwroot/resource/ticker/jquery.ticker.js",
+      "wwwroot/resource/chosen_v1.4.2/chosen.jquery.min.js",
+      "wwwroot/resource/alertify.js-0.3.11/src/alertify.js",
+      "wwwroot/resource/scripts/general/lazy-loading.js",
+      "wwwroot/resource/jquery-confirm/jquery-confirm.min.js",
+      "wwwroot/resource/persian-date-picker/persian-datepicker.js",
+      "wwwroot/resource/Scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/Scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/Scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.js",
+      "wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.plus.js",
+      "wwwroot/resource/Scripts/jquery.plugin.min.js",
+      "wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.all.js",
+      "wwwroot/resource/jquery.calendars.package-2.1.0/js/jquery.calendars.persian.js",
+      "wwwroot/resource/Scripts/jquery.onmutate.min.js",
+      "wwwroot/resource/rating/jquery.barrating.min.js",
+      "wwwroot/resource/scripts/general/ajax-helper.js",
+      "wwwroot/resource/scripts/general/client-helper.js",
+      "wwwroot/resource/scripts/general/detail-button.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/scripts/general/input-validation-helper.js",
+      "wwwroot/resource/scripts/general/loading-indicator.js",
+      "wwwroot/resource/Scripts/general/login/intlTelInput.min.js",
+      "wwwroot/resource/scripts/general/login/login-popup.js",
+      "wwwroot/resource/scripts/general/more-text-button.js",
+      "wwwroot/resource/scripts/general/price-string-generator.js",
+      "wwwroot/resource/scripts/general/rating-detail.js",
+      "wwwroot/resource/scripts/general/string-replace-all.js",
+      "wwwroot/resource/scripts/general/textarea-autoexpand.js",
+      "wwwroot/resource/scripts/general/user-rating.js",
+      "wwwroot/resource/scripts/general/message-popup.js",
+      "wwwroot/resource/scripts/general/confirm-alert-helper.js",
+      "wwwroot/scripts/jquery.unobtrusive-ajax.min.js",
+      "wwwroot/resource/Scripts/dashboard/dashboard-navigation.js",
+      "wwwroot/resource/Scripts/dashboard/registerEmail.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/home-page.min.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/scripts/page/home-page.js",
+      "wwwroot/resource/scripts/general/home-page-search.js",
+      "wwwroot/resource/scripts/general/search-by-region.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/scripts/general/slider-scroll.js",
+      "wwwroot/resource/scripts/home-page-banner.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/acc-item.min.js",
+    "inputFiles": [
+      "wwwroot/resource/Scripts/jquery.plugin.min.js",
+      "wwwroot/resource/slick/slick.js",
+      "wwwroot/resource/jquery-sticky-kit/jquery-sticky-kit.js",
+      "wwwroot/resource/lightbox/lightbox.js",
+      "wwwroot/resource/scripts/general/search-by-region.js",
+      "wwwroot/resource/scripts/general/master-search.js",
+      "wwwroot/resource/Scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/Scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/Scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/scripts/general/rating-detail.js",
+      "wwwroot/resource/scripts/general/price-string-generator.js",
+      "wwwroot/resource/scripts/page/accommodation-item-page.js",
+      "wwwroot/resource/scripts/general/detail-button.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/Scripts/dashboard/registerEmail.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/cat-item.min.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/jquery.plugin.min.js",
+      "wwwroot/resource/scripts/general/detail-button.js",
+      "wwwroot/resource/scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/scripts/general/master-search.js",
+      "wwwroot/resource/scripts/general/search-by-region.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/scripts/general/price-slider.js",
+      "wwwroot/resource/scripts/general/price-string-generator.js",
+      "wwwroot/resource/scripts/page/accommodation-list-page.js",
+      "wwwroot/resource/scripts/page/custom-filter-elements.js",
+      "wwwroot/resource/scripts/page/filter-subject.js",
+      "wwwroot/resource/scripts/page/filter-ui-manager.js",
+      "wwwroot/resource/scripts/page/filter-data-manager.js",
+      "wwwroot/resource/scripts/page/filter-submit-manager.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/master-defer.min.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/general/message-popup.js",
+      "wwwroot/resource/alertify.js-0.3.11/src/alertify.js",
+      "wwwroot/Resource/rating/jquery.barrating.min.js",
+      "wwwroot/Resource/Scripts/jquery.scrollTo.min.js",
+      "wwwroot/resource/scripts/general/string-replace-all.js",
+      "wwwroot/resource/scripts/general/ajax-helper.js",
+      "wwwroot/resource/scripts/general/client-helper.js",
+      "wwwroot/resource/scripts/general/loading-indicator.js",
+      "wwwroot/resource/scripts/general/user-rating.js",
+      "wwwroot/resource/scripts/general/input-validation-helper.js",
+      "wwwroot/resource/scripts/general/master.js",
+      "wwwroot/resource/scripts/general/lazy-loading.js",
+      "wwwroot/resource/Scripts/general/login/intlTelInput.min.js",
+      "wwwroot/resource/scripts/general/login/login-popup.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/master.min.js",
+    "inputFiles": [
+      "wwwroot/lib/jquery/dist/jquery.min.js",
+      "wwwroot/resource/scripts/firebase-5.9.4/firebase-app.js",
+      "wwwroot/resource/scripts/firebase-5.9.4/firebase-messaging.js",
+      "wwwroot/resource/scripts/firebase/firebase-initialization.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/search.min.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/scripts/general/home-page-search.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/acc-manager.min.js",
+    "inputFiles": [
+      "wwwroot/resource/Scripts/dashboard/host-panel.js",
+      "wwwroot/resource/Scripts/dashboard/accDatePicker.js",
+      "wwwroot/resource/Scripts/dashboard/ajax-accomodation.js",
+      "wwwroot/resource/Scripts/dashboard/numberInput.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/min/admin.min.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/jquery-2.1.1.min.js",
+      "wwwroot/scripts/jquery.unobtrusive-ajax.min.js",
+      "wwwroot/resource/highcharts/highcharts.js",
+      "wwwroot/resource/alertify.js-0.3.11/src/alertify.js",
+      "wwwroot/resource/jquery-confirm/jquery-confirm.min.js",
+      "wwwroot/resource/persian-date-picker/persian-datepicker.js",
+      "wwwroot/resource/persian-date-picker/persian-date.min.js",
+      "wwwroot/resource/rating/jquery.barrating.min.js",
+      "wwwroot/resource/scripts/general/accommodation-edit-form.js",
+      "wwwroot/resource/scripts/general/ajax-helper.js",
+      "wwwroot/resource/scripts/general/client-helper.js",
+      "wwwroot/resource/scripts/general/date-time-helper.js",
+      "wwwroot/resource/scripts/general/detail-button.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/scripts/general/input-validation-helper.js",
+      "wwwroot/resource/scripts/general/lazy-loading.js",
+      "wwwroot/resource/scripts/general/loading-indicator.js",
+      "wwwroot/resource/scripts/general/more-text-button.js",
+      "wwwroot/resource/scripts/general/price-string-generator.js",
+      "wwwroot/resource/scripts/general/rating-detail.js",
+      "wwwroot/resource/scripts/general/string-replace-all.js",
+      "wwwroot/resource/scripts/general/textarea-autoexpand.js",
+      "wwwroot/resource/scripts/admin/user-rating-admin.js",
+      "wwwroot/resource/scripts/general/message-popup.js",
+      "wwwroot/resource/scripts/general/confirm-alert-helper.js",
+      "wwwroot/resource/Scripts/jquery.onmutate.min.js",
+      "wwwroot/js/admin/admin.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/min/admin-reserve.min.js",
+    "inputFiles": [
+      "wwwroot/js/signalr/dist/browser/signalr.min.js",
+      "wwwroot/js/admin/reserve/admin-reserve-index.js",
+      "wwwroot/js/admin/reserve/admin-reserve-index-filter.js",
+      "wwwroot/js/admin/reserve/admin-reserve-index-signalr.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/min/admin-advertise.min.js",
+    "inputFiles": [
+      "wwwroot/js/admin/advertise/admin-advertise-index.js",
+      "wwwroot/resource/Scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/Scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/Scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/Scripts/general/price-string-generator.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/min/admin-tag.min.js",
+    "inputFiles": [
+      "wwwroot/js/admin/tag/list.js"
+    ]
+  },
+  // App
+  {
+    "outputFileName": "wwwroot/js/min/app-category-item.min.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/jquery.plugin.min.js",
+      "wwwroot/resource/scripts/general/detail-button.js",
+      "wwwroot/resource/scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/scripts/general/jalali-date-picker.js",
+      "wwwroot/js/app/master-search.js",
+      "wwwroot/js/app/search-by-region.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/scripts/general/price-slider.js",
+      "wwwroot/resource/scripts/general/price-string-generator.js",
+      "wwwroot/js/app/category/accommodation-list-page.js",
+      "wwwroot/js/app/category/custom-filter-elements.js",
+      "wwwroot/js/app/category/filter-subject.js",
+      "wwwroot/js/app/category/filter-ui-manager.js",
+      "wwwroot/js/app/category/filter-data-manager.js",
+      "wwwroot/js/app/category/filter-submit-manager.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/min/app-advertise-item.min.js",
+    "inputFiles": [
+      "wwwroot/resource/Scripts/jquery.plugin.min.js",
+      "wwwroot/resource/slick/slick.js",
+      "wwwroot/resource/jquery-sticky-kit/jquery-sticky-kit.js",
+      "wwwroot/resource/lightbox/lightbox.js",
+      "wwwroot/js/app/search-by-region.js",
+      "wwwroot/js/app/master-search.js",
+      "wwwroot/resource/Scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/Scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/Scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/scripts/general/rating-detail.js",
+      "wwwroot/resource/scripts/general/price-string-generator.js",
+      "wwwroot/js/app/advertise/item.js",
+      "wwwroot/resource/scripts/general/detail-button.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/Scripts/dashboard/registerEmail.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/min/app-main.min.js",
+    "inputFiles": [
+      "wwwroot/resource/scripts/general/jalali-date-converter.js",
+      "wwwroot/resource/scripts/general/jalali-date-handler.js",
+      "wwwroot/resource/scripts/general/jalali-date-picker.js",
+      "wwwroot/resource/scripts/page/home-page.js",
+      "wwwroot/js/app/home-page-search.js",
+      "wwwroot/js/app/search-by-region.js",
+      "wwwroot/resource/scripts/general/increase-decrease-button.js",
+      "wwwroot/resource/scripts/general/slider-scroll.js",
+      "wwwroot/resource/scripts/home-page-banner.js"
+    ]
+  }
+]
