@@ -1,0 +1,15 @@
+# Logs
+Logs/
+*.log
+
+# Dependencies
+libs/
+
+# Build artifacts
+bin/
+obj/
+
+# Local databases
+*.bak
+*.mdf
+*.ldf
