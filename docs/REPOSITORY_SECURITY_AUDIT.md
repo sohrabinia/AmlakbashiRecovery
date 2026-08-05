@@ -42,27 +42,27 @@ This security audit report provides an in-depth analysis of the `AmlakbashiRecov
 - **Files:** `appsettings.json` (Development/Default) and `appsettings.production.json` (Production)
 - **Detected Strings:**
   - *Development:*
-    - `AmlakbashiDB`: `Server=.;Database=amlakbas_db;Trusted_Connection=True;User Id=sa;Password=Omid@123;`
-    - `JobDb`: `Server=.;Database=Amlakbashi_jdb;Trusted_Connection=True;User Id=sa;Password=Omid@123;`
-    - `IdentityDB`: `Server=.;Database=Amlakbashi.Identity;Trusted_Connection=True;User Id=sa;Password=Omid@123;`
+    - `AmlakbashiDB`: `Server=.;Database=amlakbas_db;Trusted_Connection=True;User Id=sa;Password=[REDACTED_DEFAULT_PASSWORD];`
+    - `JobDb`: `Server=.;Database=Amlakbashi_jdb;Trusted_Connection=True;User Id=sa;Password=[REDACTED_DEFAULT_PASSWORD];`
+    - `IdentityDB`: `Server=.;Database=Amlakbashi.Identity;Trusted_Connection=True;User Id=sa;Password=[REDACTED_DEFAULT_PASSWORD];`
   - *Production:*
-    - `AmlakbashiDB`: `Server=.;Database=amlakbas_db;Trusted_Connection=True;User Id=sa;Password=Yq2KtJs7z9LxAfnB;`
-    - `JobDb`: `Server=.;Database=Amlakbashi_jdb;Trusted_Connection=True;User Id=sa;Password=Yq2KtJs7z9LxAfnB;`
-    - `IdentityDB`: `Server=.;Database=Amlakbashi.Identity;Trusted_Connection=True;User Id=sa;Password=Yq2KtJs7z9LxAfnB;`
+    - `AmlakbashiDB`: `Server=.;Database=amlakbas_db;Trusted_Connection=True;User Id=sa;Password=[REDACTED_PRODUCTION_PASSWORD];`
+    - `JobDb`: `Server=.;Database=Amlakbashi_jdb;Trusted_Connection=True;User Id=sa;Password=[REDACTED_PRODUCTION_PASSWORD];`
+    - `IdentityDB`: `Server=.;Database=Amlakbashi.Identity;Trusted_Connection=True;User Id=sa;Password=[REDACTED_PRODUCTION_PASSWORD];`
 - **Assessment:** These connection strings target `Server=.` (localhost) with standard passwords. They do not expose external, publicly-facing servers. However, keeping default or hardcoded SQL Server credentials in configuration files is a security concern.
 - **Risk Level:** **Low to Medium** (as it targets localhost, but passwords must be changed prior to a real deployment).
 
 ### 2.3. JWT Configuration Secrets
 - **Files:** `appsettings.json` and `appsettings.production.json`
 - **Secrets:**
-  - *Development:* Static long base64/JWT token string.
-  - *Production:* UUID key `cb64801c-0ca2-496a-803d-d19e77de5c1f`.
+  - *Development:* `[REDACTED_JWT_DEVELOPMENT_KEY]` (Static base64/JWT token string)
+  - *Production:* `[REDACTED_JWT_PRODUCTION_KEY]` (UUID key)
 - **Assessment:** JWT signature keys are hardcoded in tracked files, which is vulnerable if deployed as-is.
 - **Risk Level:** **Medium** (requires rotation before hosting).
 
 ### 2.4. Public Configurations (Google Services API Key)
 - **File:** `wwwroot/google-services.json`
-- **Key:** `AIzaSyDMgu7O_X8LcXsq5BwAmXU-U1EBkEc8AQ0`
+- **Key:** `[REDACTED_PUBLIC_API_KEY]`
 - **Assessment:** This is a public API key used by the Android client to identify Google services (like FCM/Firebase Messaging). By design, public API keys are compiled into client applications and do not pose a sensitive administrative access leak.
 - **Risk Level:** **None** (safe to retain, but should be documented).
 
