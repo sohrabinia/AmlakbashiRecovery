@@ -1,8 +1,8 @@
-# AmlakBashi — Recovered Core Engine & AI Intelligence Platform (V9.0)
+# AmlakBashi — Recovered Core Engine & AI Operating System (V10.0)
 
 Welcome to the unified core codebase of **AmlakBashi**, a premier localized real estate and accommodation marketplace with over 12 years of operational heritage.
 
-This repository represents the fully audited and clean recovered core solution compiled for **.NET 5.0** alongside the blueprint for the **AmlakBashi AI Autonomous Intelligence Platform (Version 9.0)**.
+This repository represents the fully audited and clean recovered core solution compiled for **.NET 5.0** alongside the blueprint and database migrations for the **AmlakBashi AI Operating System & Stable Session Persistence Platform (Version 10.0)**.
 
 ---
 
@@ -19,13 +19,13 @@ Due to historical hosting changes and system recovery steps, the application's c
 
 ---
 
-## 2. PRODUCTION DOCUMENTATION & AUDITS
+## 2. PRODUCTION DOCUMENTATION, SCHEMAS & MIGRATIONS (V10.0)
 
-All validation findings, security metrics, SRE configurations, and implementation parameters are thoroughly documented in:
+All validation findings, security metrics, SRE configurations, session persistence blueprints, and migration scripts are thoroughly documented in:
 
-*   **[`docs/AMLAKBASHI_V9_0_COMPLETION_AUDIT_REPORT.md`](docs/AMLAKBASHI_V9_0_COMPLETION_AUDIT_REPORT.md)**: Exhaustive implementation status report and detailed verification metrics.
-*   **[`docs/AI_AUTONOMOUS_INTELLIGENCE_PLATFORM.md`](docs/AI_AUTONOMOUS_INTELLIGENCE_PLATFORM.md)**: Core specifications and stubs for all 18 AI agents, Google API connectors, and HITL governance.
-*   **[`docs/V9.0_AI_Platform_Migration.sql`](docs/V9.0_AI_Platform_Migration.sql)**: Complete, ready-to-run T-SQL database migration script.
+*   **[`docs/AMLAKBASHI_V10_MASTER_BLUEPRINT.md`](docs/AMLAKBASHI_V10_MASTER_BLUEPRINT.md)**: Master architectural design, operational statuses, and security boundaries of Version 10.0.
+*   **[`docs/V10_Enterprise_Platform_Migration.sql`](docs/V10_Enterprise_Platform_Migration.sql)**: Production-ready T-SQL migration script to set up all 18 AI agents, GSC/GA4 cache tables, and session stability schemas (`DataProtectionKeys` and `UserRefreshTokens`).
+*   **[`docs/AI_AUTONOMOUS_INTELLIGENCE_PLATFORM.md`](docs/AI_AUTONOMOUS_INTELLIGENCE_PLATFORM.md)**: Core specifications and stubs for AI agents and Google API connectors.
 *   **[`docs/FINAL_REPOSITORY_CLEANUP_REPORT.md`](docs/FINAL_REPOSITORY_CLEANUP_REPORT.md)**: Details on C# file cleanup, repository size analysis, and key security hygiene boundaries.
 *   **[`docs/REPOSITORY_SECURITY_AUDIT.md`](docs/REPOSITORY_SECURITY_AUDIT.md)**: Proof of deactivation/revocation of legacy service account keys and connection safety.
 *   **[`RECOVERY_VALIDATION_REPORT.md`](RECOVERY_VALIDATION_REPORT.md)**: Solution acceptance, and build parameters summary.
@@ -33,7 +33,15 @@ All validation findings, security metrics, SRE configurations, and implementatio
 
 ---
 
-## 3. ENVIRONMENTAL STABILIZATION FIXES
+## 3. USER SESSION & AUTHENTICATION STABILITY (NO FORCED LOGOUT)
+
+Under Version 10.0 specifications, users are guaranteed a stable, persistent session that persists across application updates, server restarts, and IIS AppPool recycles.
+1.  **Data Protection Keys:** Encrypted and persisted directly in the SQL database (`DataProtectionKeys` table), bypassing random in-memory regeneration.
+2.  **JWT Refresh Token Rotation:** Managed in SQL storage (`UserRefreshTokens` table), dynamically exchanging expired tokens without requiring user re-authentication.
+
+---
+
+## 4. ENVIRONMENTAL STABILIZATION FIXES
 
 To execute or analyze this solution inside Linux/DevBox environments without encountering path violations, we have established the following baseline parameters:
 
@@ -43,11 +51,11 @@ To execute or analyze this solution inside Linux/DevBox environments without enc
 
 ---
 
-## 4. DEPLOYMENT & OPERATION
+## 5. DEPLOYMENT & OPERATION
 
 Once migrated to a live production host (IIS/Kestrel with T-SQL SQL Server engine):
 1.  Restore `amlakbas_db.bak` database backup.
-2.  Execute T-SQL migrations from **[`docs/V9.0_AI_Platform_Migration.sql`](docs/V9.0_AI_Platform_Migration.sql)**.
+2.  Execute T-SQL migrations from **[`docs/V10_Enterprise_Platform_Migration.sql`](docs/V10_Enterprise_Platform_Migration.sql)**.
 3.  Deploy the hosting bundle and run:
     ```bash
     dotnet Amlakbashi.Host.dll
