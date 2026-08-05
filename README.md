@@ -19,12 +19,15 @@ Due to historical hosting changes and system recovery steps, the application's c
 
 ---
 
-## 2. PRODUCTION DOCUMENTATION, SCHEMAS & MIGRATIONS (V10.0)
+## 2. PRODUCTION DOCUMENTATION, SCHEMAS & DISCOVERY REPORTS (V10.0)
 
-All validation findings, security metrics, SRE configurations, session persistence blueprints, and migration scripts are thoroughly documented in:
+All validation findings, security metrics, SRE configurations, session persistence blueprints, and discovery reports are thoroughly documented in:
 
 *   **[`docs/AMLAKBASHI_V10_MASTER_BLUEPRINT.md`](docs/AMLAKBASHI_V10_MASTER_BLUEPRINT.md)**: Master architectural design, operational statuses, and security boundaries of Version 10.0.
 *   **[`docs/V10_Enterprise_Platform_Migration.sql`](docs/V10_Enterprise_Platform_Migration.sql)**: Production-ready T-SQL migration script to set up all 18 AI agents, GSC/GA4 cache tables, and session stability schemas (`DataProtectionKeys` and `UserRefreshTokens`).
+*   **[`docs/AMLAKBASHI_FINANCIAL_DISCOVERY_REPORT.md`](docs/AMLAKBASHI_FINANCIAL_DISCOVERY_REPORT.md)**: Ground-truth financial architecture audit, database entity mappings, and payout settlement pipelines.
+*   **[`docs/AMLAKBASHI_MOBILE_DISCOVERY_REPORT.md`](docs/AMLAKBASHI_MOBILE_DISCOVERY_REPORT.md)**: Discovery report on the mobile WebView hybrid container and route layouts.
+*   **[`docs/AMLAKBASHI_V10_MOBILE_COMPATIBILITY_REPORT.md`](docs/AMLAKBASHI_V10_MOBILE_COMPATIBILITY_REPORT.md)**: API endpoint mapping and mobile integration strategy.
 *   **[`docs/AI_AUTONOMOUS_INTELLIGENCE_PLATFORM.md`](docs/AI_AUTONOMOUS_INTELLIGENCE_PLATFORM.md)**: Core specifications and stubs for AI agents and Google API connectors.
 *   **[`docs/FINAL_REPOSITORY_CLEANUP_REPORT.md`](docs/FINAL_REPOSITORY_CLEANUP_REPORT.md)**: Details on C# file cleanup, repository size analysis, and key security hygiene boundaries.
 *   **[`docs/REPOSITORY_SECURITY_AUDIT.md`](docs/REPOSITORY_SECURITY_AUDIT.md)**: Proof of deactivation/revocation of legacy service account keys and connection safety.
