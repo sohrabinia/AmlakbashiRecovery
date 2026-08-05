@@ -1,15 +1,29 @@
-# Logs
+# Logs and temporary files
 Logs/
 *.log
+*.tmp
+*.temp
 
 # Dependencies
 libs/
 
-# Build artifacts
+# Build and IDE artifacts
 bin/
 obj/
+.vs/
+.idea/
 
-# Local databases
+# Local databases and backups
 *.bak
 *.mdf
 *.ldf
+
+# Specific clean security and repo hygiene rules
+# Untracked credentials
+amlakbashi-7e6b2-firebase-adminsdk-h6gkp-0159f2aab7.json
+
+# Exclude compiled binaries from being tracked in the future
+*.dll
+*.pdb
+*.exe
+*.zip
