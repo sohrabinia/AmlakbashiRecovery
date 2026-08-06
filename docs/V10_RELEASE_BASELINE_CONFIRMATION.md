@@ -7,7 +7,7 @@ This document confirms the exact release baseline parameters, QA status, and bui
 ## 1. Release Baseline Parameters
 
 * **Release Candidate Version:** `v10.0.0-RC1`
-* **Frozen Commit SHA:** `3e75036d40ef706f0f0f07f459398f821df62103`
+* **Latest Commit SHA:** `3e75036d40ef706f0f0f07f459398f821df62103`
 * **Git Repository Branch:** `jules-6503145563334930312-70e3de4d`
 * **Git Working Directory Status:** **CLEAN** (All assets are perfectly locked, with no uncommitted files or work-in-progress modifications).
 
