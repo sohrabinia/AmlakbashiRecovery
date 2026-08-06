@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="h-full bg-gray-50">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>املاک‌باشی V10 — سامانه هوشمند رزرو اقامتگاه و lead-generation</title>
+
+    <!-- Meta SEO -->
+    <meta name="description" content="املاک‌باشی V10 - سامانه لوکس و ممتاز رزرو اقامتگاه و بازار بی‌واسطه ارتباط با میزبان در سراسر ایران" />
+    <meta name="keywords" content="املاک باشی, اجاره ویلا, رزرو اقامتگاه, ویلا شمال, بومگردی, اجاره سوئیت" />
+    <meta name="author" content="AmlakBashi Enterprise" />
+
+    <!-- CDN Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Tailwind Config for V10 Design System -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#0F5132',
+                            dark: '#0a3a24',
+                            light: '#146c43',
+                            100: '#e7f0ec',
+                        },
+                        secondary: {
+                            DEFAULT: '#F5EFE6',
+                            dark: '#e8dcce',
+                        },
+                        accent: {
+                            DEFAULT: '#C59D5F',
+                            dark: '#ae8346',
+                            light: '#ebd7ba',
+                        },
+                        neutralDark: '#111827'
+                    },
+                    fontFamily: {
+                        sans: ['IRANSans', 'Vazirmatn', 'Tahoma', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS & Font face -->
+    <style>
+        @font-face {
+            font-family: "IRANSans";
+            src: url("/Resource/fonts/IRANSans-web.woff2") format("woff2"),
+                 url("/Resource/fonts/IRANSans-web.woff") format("woff"),
+                 url("/Resource/fonts/IRANSans-web.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: "IRANSans";
+            src: url("/Resource/fonts/IRANSans-Bold-web.woff2") format("woff2"),
+                 url("/Resource/fonts/IRANSans-Bold-web.woff") format("woff"),
+                 url("/Resource/fonts/IRANSans-Bold-web.ttf") format("truetype");
+            font-weight: bold;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: "IRANSans";
+            src: url("/Resource/fonts/IRANSans-Medium-web.woff2") format("woff2"),
+                 url("/Resource/fonts/IRANSans-Medium-web.woff") format("woff"),
+                 url("/Resource/fonts/IRANSans-Medium-web.ttf") format("truetype");
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        body {
+            font-family: "IRANSans", "Vazirmatn", Tahoma, sans-serif;
+            background-color: #fcfbfa;
+        }
+
+        /* Glassmorphism scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F5EFE6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C59D5F;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0F5132;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Shimmer effect for LoadingState */
+        .shimmer {
+            background: linear-gradient(90deg, #f3f3f3 25%, #e1e1e1 50%, #f3f3f3 75%);
+            background-size: 200% 100%;
+            animation: loading-shimmer 1.5s infinite;
+        }
+        @keyframes loading-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col text-gray-900 overflow-x-hidden antialiased">
+
+    <!-- TOP FLOATING SUPER-ADMIN PORTAL SWAPPER (For ease of review) -->
+    <div class="bg-neutralDark text-white py-2 px-4 sticky top-0 z-50 shadow-md border-b border-accent flex flex-wrap justify-between items-center gap-2">
+        <div class="flex items-center gap-2 text-xs md:text-sm">
+            <span class="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="font-bold text-accent">نسخه لوکس V10 Enterprise</span>
+            <span class="hidden md:inline text-gray-400">| ابزار جابجایی بین سامانه‌ها (ویژه ارزیابی سریع):</span>
+        </div>
+        <div class="flex flex-wrap gap-1 md:gap-2">
+            <button onclick="switchPortal('public')" id="btn-portal-public" class="px-3 py-1 rounded text-xs transition font-semibold bg-primary text-white ring-1 ring-accent">
+                <i class="fa-solid fa-globe ml-1"></i> وب‌سایت عمومی
+            </button>
+            <button onclick="switchPortal('guest')" id="btn-portal-guest" class="px-3 py-1 rounded text-xs transition font-semibold bg-gray-800 text-gray-300 hover:text-white">
+                <i class="fa-solid fa-user-shield ml-1"></i> پنل مهمان
+            </button>
+            <button onclick="switchPortal('host')" id="btn-portal-host" class="px-3 py-1 rounded text-xs transition font-semibold bg-gray-800 text-gray-300 hover:text-white">
+                <i class="fa-solid fa-house-chimney-user ml-1"></i> پنل میزبان
+            </button>
+            <button onclick="switchPortal('admin')" id="btn-portal-admin" class="px-3 py-1 rounded text-xs transition font-semibold bg-gray-800 text-gray-300 hover:text-white">
+                <i class="fa-solid fa-gauge-high ml-1"></i> پنل مدیریت (ادمین)
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN HEADER COMPONENT (Reusable Component #1) -->
+    <header class="bg-white border-b border-gray-100 shadow-sm sticky top-[49px] z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <!-- Brand Logo & Slogan -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="navigateHome()">
+                    <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-secondary shadow-md border border-accent">
+                        <i class="fa-solid fa-hotel text-xl text-accent"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold text-primary tracking-tight">املاک‌باشی</span>
+                        <span class="text-accent text-xs block font-semibold leading-none">مهمان‌نوازی برتر ایرانی</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Links for SEO -->
+                <nav class="hidden md:flex space-x-reverse space-x-8 text-sm font-semibold text-gray-700">
+                    <a href="#" onclick="navigateHome()" class="hover:text-primary transition text-primary">صفحه اصلی</a>
+                    <a href="#" onclick="triggerSearchWithRegion('مازندران')" class="hover:text-primary transition">اجاره ویلا شمال</a>
+                    <a href="#" onclick="triggerSearchWithRegion('کیش')" class="hover:text-primary transition">آپارتمان کیش</a>
+                    <a href="#" onclick="triggerSearchWithRegion('کردستان')" class="hover:text-primary transition">بوم‌گردی</a>
+                    <a href="#" onclick="showSEOPage('travel-guides')" class="hover:text-primary transition">راهنمای سفر</a>
+                    <a href="#" onclick="showSEOPage('about-us')" class="hover:text-primary transition">درباره ما</a>
+                </nav>
+
+                <!-- Auth/User Menu Trigger -->
+                <div class="flex items-center gap-3">
+                    <div id="auth-unlogged" class="flex gap-2">
+                        <button onclick="openAuthModal('login')" class="bg-primary text-white hover:bg-primary-dark transition px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-sign-in-alt"></i>
+                            <span>ورود / ثبت‌نام</span>
+                        </button>
+                    </div>
+                    <div id="auth-logged" class="hidden flex items-center gap-3 border-r pr-3 border-gray-200">
+                        <div class="text-left hidden lg:block text-right">
+                            <span id="user-display-name" class="text-sm font-bold text-gray-900 block">پشتیبان املاک‌باشی</span>
+                            <span class="text-xs text-accent font-semibold block">موجودی کیف پول: <span id="header-wallet-balance" class="font-bold">۰</span> ریال</span>
+                        </div>
+                        <button onclick="toggleUserDropdown()" class="w-10 h-10 rounded-full bg-accent text-primary font-bold flex items-center justify-center shadow focus:outline-none border-2 border-primary" id="user-avatar-btn">
+                            <i class="fa-solid fa-user"></i>
+                        </button>
+
+                        <!-- User Quick Dropdown Menu -->
+                        <div id="user-dropdown" class="hidden absolute left-4 md:left-24 top-20 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 text-right">
+                            <a href="#" onclick="switchPortal('guest'); toggleUserDropdown()" class="px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"><i class="fa-solid fa-user ml-1 text-gray-400"></i> پنل مهمان من</a>
+                            <a href="#" onclick="switchPortal('host'); toggleUserDropdown()" class="px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"><i class="fa-solid fa-house-user ml-1 text-gray-400"></i> پنل میزبان من</a>
+                            <a href="#" onclick="switchPortal('admin'); toggleUserDropdown()" class="px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"><i class="fa-solid fa-gauge ml-1 text-gray-400"></i> پنل مدیریت</a>
+                            <hr class="my-1 border-gray-100">
+                            <button onclick="logoutUser()" class="w-full text-right px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-sign-out-alt ml-1"></i> خروج از حساب</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT PORTALS -->
+    <main class="flex-grow">
+
+        <!-- 1. PUBLIC WEBSITE PORTAL -->
+        <div id="portal-public" class="fade-in">
+            <!-- Dynamic Public Page Insertion Spot (Home, Search, Details, SEO) -->
+            <div id="public-content-container"></div>
+        </div>
+
+        <!-- 2. GUEST PANEL PORTAL -->
+        <div id="portal-guest" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Guest Sidebar -->
+                <div class="lg:col-span-1 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                    <div class="text-center pb-6 border-b border-gray-100">
+                        <div class="w-20 h-20 bg-primary-100 rounded-full mx-auto flex items-center justify-center text-primary border-2 border-accent mb-4">
+                            <i class="fa-solid fa-user-astronaut text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-900">حساب کاربری مهمان</h3>
+                        <p class="text-xs text-gray-400 mt-1">تلفن: ۰۹۱۲۳۴۵۶۷۸۹</p>
+                    </div>
+                    <nav class="mt-6 flex flex-col gap-1 text-sm font-semibold">
+                        <button onclick="switchGuestTab('profile')" id="guest-tab-profile" class="text-right px-4 py-3 rounded-xl transition bg-primary-100 text-primary flex items-center gap-3"><i class="fa-solid fa-id-card"></i> ویرایش پروفایل</button>
+                        <button onclick="switchGuestTab('favorites')" id="guest-tab-favorites" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-heart"></i> علاقمندی‌ها</button>
+                        <button onclick="switchGuestTab('history')" id="guest-tab-history" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-clock-rotate-left"></i> تاریخچه تماس با میزبانان</button>
+                        <button onclick="switchGuestTab('reviews')" id="guest-tab-reviews" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-star"></i> نظرات من</button>
+                        <button onclick="switchGuestTab('wallet')" id="guest-tab-wallet" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-wallet"></i> کیف پول و تراکنش‌ها</button>
+                    </nav>
+                </div>
+                <!-- Guest Main Panel Area -->
+                <div class="lg:col-span-3 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm min-h-[500px]" id="guest-panel-main"></div>
+            </div>
+        </div>
+
+        <!-- 3. HOST PANEL PORTAL -->
+        <div id="portal-host" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Host Sidebar -->
+                <div class="lg:col-span-1 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                    <div class="text-center pb-6 border-b border-gray-100">
+                        <div class="w-20 h-20 bg-accent rounded-full mx-auto flex items-center justify-center text-primary border-2 border-primary mb-4">
+                            <i class="fa-solid fa-house-laptop text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-900">پنل طلایی میزبان</h3>
+                        <p class="text-xs text-accent font-semibold mt-1">سطح میزبانی: سوپرهوست لوکس</p>
+                    </div>
+                    <nav class="mt-6 flex flex-col gap-1 text-sm font-semibold">
+                        <button onclick="switchHostTab('dashboard')" id="host-tab-dashboard" class="text-right px-4 py-3 rounded-xl transition bg-primary-100 text-primary flex items-center gap-3"><i class="fa-solid fa-chart-line"></i> داشبورد و آمار عملکرد</button>
+                        <button onclick="switchHostTab('my-ads')" id="host-tab-my-ads" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-folder-open"></i> مدیریت آگهی‌ها</button>
+                        <button onclick="openAdsWizard()" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-emerald-700 flex items-center gap-3 font-bold bg-emerald-50"><i class="fa-solid fa-circle-plus"></i> ثبت آگهی جدید (ویزارد)</button>
+                        <button onclick="switchHostTab('promotions')" id="host-tab-promotions" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-rocket"></i> مرکز ارتقاء و نردبان آگهی</button>
+                        <button onclick="switchHostTab('wallet')" id="host-tab-wallet" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-wallet"></i> امور مالی و تسویه حساب</button>
+                    </nav>
+                </div>
+                <!-- Host Main Panel Area -->
+                <div class="lg:col-span-3 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm min-h-[500px]" id="host-panel-main"></div>
+            </div>
+        </div>
+
+        <!-- 4. ADMIN PANEL PORTAL -->
+        <div id="portal-admin" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Admin Sidebar -->
+                <div class="lg:col-span-1 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                    <div class="text-center pb-6 border-b border-gray-100">
+                        <div class="w-20 h-20 bg-red-100 rounded-full mx-auto flex items-center justify-center text-red-700 border-2 border-red-200 mb-4">
+                            <i class="fa-solid fa-user-shield text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-900">پنل مدیریت عالی</h3>
+                        <p class="text-xs text-red-500 font-semibold mt-1">مدیریت کل سیستم V10</p>
+                    </div>
+                    <nav class="mt-6 flex flex-col gap-1 text-sm font-semibold">
+                        <button onclick="switchAdminTab('moderation')" id="admin-tab-moderation" class="text-right px-4 py-3 rounded-xl transition bg-red-50 text-red-700 flex items-center gap-3"><i class="fa-solid fa-gavel"></i> تایید و تعدیل آگهی‌ها</button>
+                        <button onclick="switchAdminTab('users')" id="admin-tab-users" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-users"></i> مدیریت کاربران و میزبانان</button>
+                        <button onclick="switchAdminTab('listings')" id="admin-tab-listings" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-map-location-dot"></i> مدیریت اقامتگاه‌های فعال</button>
+                        <button onclick="switchAdminTab('reservations')" id="admin-tab-reservations" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-receipt"></i> رزروهای سیستمی (تاریخی)</button>
+                        <button onclick="switchAdminTab('finance')" id="admin-tab-finance" class="text-right px-4 py-3 rounded-xl transition hover:bg-gray-50 text-gray-600 flex items-center gap-3"><i class="fa-solid fa-scale-balanced"></i> دفتر کل مالی و تسویه‌ها</button>
+                    </nav>
+                </div>
+                <!-- Admin Main Panel Area -->
+                <div class="lg:col-span-3 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm min-h-[500px]" id="admin-panel-main"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MAIN FOOTER COMPONENT (Reusable Component #2) -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8 border-t-4 border-accent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12 border-b border-gray-800">
+                <!-- Branding column -->
+                <div class="md:col-span-1 space-y-4 text-right">
+                    <div class="flex items-center gap-3 flex-row justify-end">
+                        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-accent border border-accent">
+                            <i class="fa-solid fa-hotel text-lg"></i>
+                        </div>
+                        <span class="text-lg font-bold text-accent">املاک‌باشی</span>
+                    </div>
+                    <p class="text-xs text-gray-400 leading-relaxed text-justify">
+                        سامانه پیشتاز و ممتاز مهمان‌نوازی و بازارگاه هوشمند ارتباط بدون واسطه با بهترین میزبانان ایران. بستری امن و مجلل برای معرفی زیباترین اقامتگاه‌های بوم‌گردی، ویلاهای ساحلی و کوهستانی و سوئیت‌های مجلل شهری.
+                    </p>
+                </div>
+
+                <!-- Fast Links -->
+                <div class="text-right">
+                    <h4 class="text-sm font-bold text-accent mb-4 border-r-4 border-primary pr-3 text-right">اقامتگاه‌های محبوب</h4>
+                    <ul class="text-xs text-gray-400 space-y-3 font-medium text-right">
+                        <li><a href="#" onclick="triggerSearchWithRegion('مازندران')" class="hover:text-white transition">اجاره ویلا لوکس رامسر</a></li>
+                        <li><a href="#" onclick="triggerSearchWithRegion('کردستان')" class="hover:text-white transition">بوم‌گردی کردستان</a></li>
+                        <li><a href="#" onclick="triggerSearchWithRegion('کیش')" class="hover:text-white transition">سوئیت ساحلی کیش</a></li>
+                        <li><a href="#" onclick="triggerSearchWithRegion('شیراز')" class="hover:text-white transition">خانه تاریخی شیراز</a></li>
+                    </ul>
+                </div>
+
+                <!-- Laws & SEO -->
+                <div class="text-right">
+                    <h4 class="text-sm font-bold text-accent mb-4 border-r-4 border-primary pr-3 text-right">قوانین و پشتیبانی</h4>
+                    <ul class="text-xs text-gray-400 space-y-3 font-medium text-right">
+                        <li><a href="#" onclick="showSEOPage('faq')" class="hover:text-white transition">سوالات متداول کاربران</a></li>
+                        <li><a href="#" onclick="showSEOPage('rules')" class="hover:text-white transition">قوانین و مقررات فعالیت</a></li>
+                        <li><a href="#" onclick="showSEOPage('contact-us')" class="hover:text-white transition">تماس با پشتیبانی ۲۴ ساعته</a></li>
+                        <li><a href="#" onclick="showSEOPage('privacy')" class="hover:text-white transition">حفظ حریم خصوصی</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact & Trust symbols -->
+                <div class="text-right">
+                    <h4 class="text-sm font-bold text-accent mb-4 border-r-4 border-primary pr-3 text-right">ارتباط با شرکت</h4>
+                    <p class="text-xs text-gray-400 leading-6 text-right">
+                        تلفن پشتیبانی: ۰۲۱-۹۱۰۰۱۲۳۴<br>
+                        آدرس دفتر مرکزی: تهران، جردن، کوچه آفتاب، ساختمان املاک‌باشی<br>
+                        ایمیل: support@amlakbashi.com
+                    </p>
+                    <div class="flex gap-3 mt-4 text-gray-400 flex-row justify-end">
+                        <a href="#" class="hover:text-accent transition"><i class="fa-brands fa-instagram text-lg"></i></a>
+                        <a href="#" class="hover:text-accent transition"><i class="fa-brands fa-telegram text-lg"></i></a>
+                        <a href="#" class="hover:text-accent transition"><i class="fa-brands fa-whatsapp text-lg"></i></a>
+                        <a href="#" class="hover:text-accent transition"><i class="fa-brands fa-linkedin text-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 text-right">
+                <p>© ۱۴۰۲ - ۱۴۰۳ سامانه املاک‌باشی - نسخه لوکس V10 Enterprise. تمامی حقوق برای هولدینگ فناوری گردشگری محفوظ است.</p>
+                <div class="flex gap-4">
+                    <img src="https://trustseal.enamad.ir/Images/Sign/110.png" class="w-10 h-10 bg-white p-1 rounded filter grayscale hover:grayscale-0 transition cursor-pointer" alt="نماد اعتماد">
+                    <img src="https://logo.samandehi.ir/Images/Sign/120.png" class="w-10 h-10 bg-white p-1 rounded filter grayscale hover:grayscale-0 transition cursor-pointer" alt="نماد ساماندهی">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- AUTHENTICATION DIALOG (Authentication pages Component) -->
+    <div id="auth-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md border border-gray-100 shadow-2xl overflow-hidden fade-in relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-900 transition">
+                <i class="fa-solid fa-times text-lg"></i>
+            </button>
+            <div class="p-8 text-center">
+                <div class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center text-primary border border-accent mx-auto mb-4">
+                    <i class="fa-solid fa-user-lock text-2xl text-accent"></i>
+                </div>
+                <h3 id="auth-title" class="font-extrabold text-2xl text-gray-900">ورود به املاک‌باشی</h3>
+                <p id="auth-subtitle" class="text-xs text-gray-400 mt-2">برای دسترسی به پنل ویژه و اطلاعات تماس با میزبانان وارد شوید</p>
+
+                <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="mt-6 space-y-4 text-right">
+                    <div class="text-right">
+                        <label class="block text-xs font-bold text-gray-700 mb-2">شماره موبایل</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3.5 text-gray-400 text-xs font-semibold">+98</span>
+                            <input required type="tel" id="auth-phone" placeholder="۰۹۱۲۳۴۵۶۷۸۹" class="w-full text-left pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm font-semibold tracking-widest outline-none">
+                        </div>
+                    </div>
+
+                    <div id="auth-otp-section" class="hidden text-right">
+                        <label class="block text-xs font-bold text-gray-700 mb-2">کد تایید پیامکی (۴ رقمی)</label>
+                        <input type="text" id="auth-otp" placeholder="۱۲۳۴" class="w-full text-center py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm font-bold tracking-[1em] outline-none">
+                        <span class="text-[10px] text-accent font-semibold block mt-1.5"><i class="fa-solid fa-info-circle ml-1"></i> کد تایید شبیه‌سازی‌شده: ۱۲۳۴</span>
+                    </div>
+
+                    <button type="submit" id="auth-submit-btn" class="w-full py-3.5 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold transition text-sm shadow-md shadow-primary/20">
+                        ادامه و دریافت کد تایید
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-6 border-t border-gray-100 flex justify-between items-center text-xs">
+                    <span class="text-gray-400">حساب کاربری ندارید؟</span>
+                    <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-accent font-bold hover:text-accent-dark transition">ثبت‌نام در سامانه</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- HOST CONTACT MODAL (HostContactCard Action) -->
+    <div id="contact-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg border border-gray-100 shadow-2xl overflow-hidden fade-in relative p-6">
+            <button onclick="closeContactModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-900 transition">
+                <i class="fa-solid fa-times text-lg"></i>
+            </button>
+
+            <div class="text-right">
+                <div class="flex items-center gap-4 pb-4 border-b border-gray-100 mb-4 flex-row justify-end">
+                    <div class="text-right">
+                        <h4 class="font-bold text-lg text-gray-900 text-right">ارتباط مستقیم با میزبان اقامتگاه</h4>
+                        <p class="text-xs text-gray-400 mt-1 text-right">مدل مستقیم Lead-Generation برتر املاک‌باشی V10</p>
+                    </div>
+                    <div class="w-14 h-14 bg-accent-light rounded-full flex items-center justify-center border-2 border-accent text-primary">
+                        <i class="fa-solid fa-house-chimney-user text-2xl text-accent"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-4 text-right">
+                    <div class="p-4 bg-primary-100 border border-primary/20 rounded-2xl flex items-start gap-3">
+                        <i class="fa-solid fa-shield-halved text-primary text-lg mt-0.5"></i>
+                        <p class="text-xs text-primary font-medium leading-5 text-right">
+                            مهمان گرامی، به منظور ایجاد بستری مطمئن و بی‌واسطه، املاک‌باشی هزینه‌ای بابت پورسانت دریافت نمی‌کند. شما می‌توانید مستقیماً با میزبان هماهنگ شده و رزرو خود را قطعی نمایید.
+                        </p>
+                    </div>
+
+                    <!-- Host details inside modal -->
+                    <div id="contact-host-info" class="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex justify-between items-center text-right">
+                        <div class="text-right">
+                            <span class="text-xs text-gray-400 font-semibold block text-right">نام میزبان</span>
+                            <span id="contact-host-name" class="font-bold text-sm text-gray-900 mt-1 block text-right">میزبان نمونه</span>
+                        </div>
+                        <div class="text-left text-right">
+                            <span class="text-xs text-gray-400 font-semibold block text-right">نرخ پاسخگویی</span>
+                            <span class="font-bold text-sm text-emerald-600 mt-1 block text-right"><i class="fa-solid fa-check-double ml-1"></i> ۱۰۰٪ (سریع)</span>
+                        </div>
+                    </div>
+
+                    <!-- Host Mobile contact detail (Hidden until requested or logged) -->
+                    <div class="space-y-3 pt-2 text-right">
+                        <div id="contact-details-hidden" class="text-center p-6 bg-[#F5EFE6]/60 border border-accent/20 rounded-2xl">
+                            <i class="fa-solid fa-lock text-accent text-2xl mb-2 block"></i>
+                            <p class="text-xs text-gray-700 font-semibold mb-4 text-center">برای مشاهده شماره تماس مستقیم میزبان لطفا وارد حساب کاربری خود شوید</p>
+                            <button onclick="closeContactModal(); openAuthModal('login')" class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-bold transition shadow mx-auto">ورود به حساب کاربری</button>
+                        </div>
+
+                        <div id="contact-details-revealed" class="hidden space-y-3 text-right">
+                            <div class="flex justify-between items-center p-4 bg-emerald-50 border border-emerald-100 rounded-2xl text-right">
+                                <div class="text-right">
+                                    <span class="text-[10px] text-gray-400 font-semibold block text-right">تلفن همراه میزبان</span>
+                                    <span id="contact-revealed-mobile" class="font-extrabold text-lg text-primary tracking-widest mt-1 block text-right">۰۹۱۲۳۴۵۶۷۸۹</span>
+                                </div>
+                                <a id="contact-call-btn" href="tel:09123456789" class="px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5"><i class="fa-solid fa-phone"></i> تماس تلفنی مستقیم</a>
+                            </div>
+
+                            <div class="flex justify-between items-center p-4 bg-amber-50 border border-amber-100 rounded-2xl text-right">
+                                <div class="text-right">
+                                    <span class="text-[10px] text-gray-400 font-semibold block text-right">ارتباط آنلاین</span>
+                                    <span class="font-bold text-xs text-amber-800 mt-1 block text-right">ارسال پیام مستقیم در واتس‌اپ</span>
+                                </div>
+                                <a id="contact-wa-btn" href="https://wa.me/989123456789" target="_blank" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow"><i class="fa-brands fa-whatsapp text-sm"></i> ارسال پیام در واتس‌اپ</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- HOST ADVERTISEMENT CREATION WIZARD (Wizard Component) -->
+    <div id="wizard-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-2xl border border-gray-100 shadow-2xl overflow-hidden fade-in relative">
+            <button onclick="closeAdsWizard()" class="absolute top-5 left-5 text-gray-400 hover:text-gray-900 transition z-10">
+                <i class="fa-solid fa-times text-xl"></i>
+            </button>
+
+            <!-- Wizard Header and Step Indicators -->
+            <div class="bg-primary p-6 text-white border-b border-accent relative text-right">
+                <h3 class="font-extrabold text-xl text-secondary text-right">ثبت اقامتگاه جدید (V10 Wizard)</h3>
+                <p class="text-xs text-accent-light mt-1 text-right">آگهی شما پس از تایید مدیریت فعال خواهد شد</p>
+
+                <!-- Steps Progress Bar -->
+                <div class="flex justify-between mt-6 text-xs relative">
+                    <div class="absolute top-2 left-0 right-0 h-0.5 bg-gray-600 -z-10"></div>
+                    <div id="progress-line" class="absolute top-2 right-0 h-0.5 bg-accent transition-all duration-300" style="width: 0%;"></div>
+
+                    <div class="flex flex-col items-center gap-1.5">
+                        <span id="wizard-step-indicator-1" class="w-5 h-5 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-[10px]">۱</span>
+                        <span class="font-semibold text-[10px] text-accent">مشخصات اصلی</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5">
+                        <span id="wizard-step-indicator-2" class="w-5 h-5 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold text-[10px]">۲</span>
+                        <span class="font-semibold text-[10px] text-gray-400">موقعیت نقشه</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5">
+                        <span id="wizard-step-indicator-3" class="w-5 h-5 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold text-[10px]">۳</span>
+                        <span class="font-semibold text-[10px] text-gray-400">تصاویر گالری</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5">
+                        <span id="wizard-step-indicator-4" class="w-5 h-5 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold text-[10px]">۴</span>
+                        <span class="font-semibold text-[10px] text-gray-400">قیمت‌گذاری</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 text-right">
+                <form id="wizard-form" onsubmit="handleWizardSubmit(event)" class="space-y-6 text-right">
+
+                    <!-- STEP 1: Main Details -->
+                    <div id="wizard-step-content-1" class="space-y-4 text-right">
+                        <h4 class="font-bold text-gray-900 border-r-4 border-accent pr-2 text-sm text-right">مرحله ۱: نوع و مشخصات اقامتگاه</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
+                            <div class="text-right">
+                                <label class="block text-xs font-bold text-gray-700 mb-2">عنوان آگهی</label>
+                                <input required type="text" id="wizard-title" placeholder="مثال: ویلا جنگلی استخردار رویال" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm font-semibold outline-none">
+                            </div>
+                            <div class="text-right">
+                                <label class="block text-xs font-bold text-gray-700 mb-2">دسته‌بندی اقامتگاه</label>
+                                <select id="wizard-category" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm font-semibold outline-none">
+                                    <option value="ویلا">ویلا لوکس</option>
+                                    <option value="آپارتمان">آپارتمان مبله شهری</option>
+                                    <option value="بوم‌گردی">بوم‌گردی سنتی</option>
+                                    <option value="سوئیت">سوئیت مدرن</option>
+                                </select>
+                            </div>
+                            <div class="text-right">
+                                <label class="block text-xs font-bold text-gray-700 mb-2">تعداد اتاق خواب</label>
+                                <input required type="number" id="wizard-rooms" value="2" min="0" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm font-semibold outline-none">
+                            </div>
+                            <div class="text-right">
+                                <label class="block text-xs font-bold text-gray-700 mb-2">حداکثر ظرفیت مهمان</label>
+                                <input required type="number" id="wizard-capacity" value="4" min="1" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm font-semibold outline-none">
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <label class="block text-xs font-bold text-gray-700 mb-2">توضیحات تکمیلی برای مهمانان</label>
+                            <textarea id="wizard-desc" placeholder="توضیحات کامل درباره دسترسی، چشم‌انداز و قوانین اقامتگاه بنویسید..." rows="3" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm font-semibold outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: Location Map -->
+                    <div id="wizard-step-content-2" class="hidden space-y-4 text-right">
+                        <h4 class="font-bold text-gray-900 border-r-4 border-accent pr-2 text-sm text-right">مرحله ۲: آدرس و موقعیت جغرافیایی</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
+                            <div class="text-right">
+                                <label class="block text-xs font-bold text-gray-700 mb-2">استان</label>
+                                <select id="wizard-province" onchange="updateWizardCities()" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm font-semibold outline-none">
+                                    <option value="تهران">تهران</option>
+                                    <option value="مازندران">مازندران</option>
+                                    <option value="هرمزگان">هرمزگان</option>
+                                    <option value="فارس">فارس</option>
+                                </select>
+                            </div>
+                            <div class="text-right">
+                                <label class="block text-xs font-bold text-gray-700 mb-2">شهر / منطقه</label>
+                                <select id="wizard-city" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm font-semibold outline-none">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <label class="block text-xs font-bold text-gray-700 mb-2">آدرس دقیق پستی</label>
+                            <input required type="text" id="wizard-address" placeholder="خیابان، کوچه، پلاک..." class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm font-semibold outline-none">
+                        </div>
+                        <div class="bg-gray-100 rounded-2xl h-44 flex items-center justify-center text-gray-400 relative border border-gray-200 overflow-hidden text-right">
+                            <!-- Visual placeholder representing Map component -->
+                            <div class="absolute inset-0 bg-cover bg-center filter opacity-40" style="background-image: url('https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/49.5,37.2,10,0,0/600x300?access_token=mock'); background-color: #e5e7eb;"></div>
+                            <span class="z-10 font-bold text-xs text-gray-700 bg-white/90 px-3 py-1.5 rounded-lg border flex items-center gap-1.5"><i class="fa-solid fa-map-pin text-red-500"></i> موقعیت نقشه شبیه‌سازی‌شده (برای تایید کلیک کنید)</span>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Images Uploader -->
+                    <div id="wizard-step-content-3" class="hidden space-y-4 text-right">
+                        <h4 class="font-bold text-gray-900 border-r-4 border-accent pr-2 text-sm text-right">مرحله ۳: گالری تصاویر لوکس اقامتگاه</h4>
+
+                        <!-- ImageUploader Component -->
+                        <div class="border-2 border-dashed border-accent hover:border-primary transition rounded-2xl p-8 text-center cursor-pointer bg-gray-50/50" onclick="triggerFileSelect()">
+                            <i class="fa-solid fa-cloud-arrow-up text-accent text-3xl mb-3"></i>
+                            <h5 class="font-bold text-sm text-gray-800">تصاویر اقامتگاه را بکشید و رها کنید</h5>
+                            <p class="text-[10px] text-gray-400 mt-1">فرمت‌های مجاز: JPG, PNG | حداکثر ۵ مگابایت برای هر عکس</p>
+                            <input type="file" id="wizard-file-input" class="hidden" accept="image/*" multiple onchange="handleWizardFileSelect(event)">
+                        </div>
+
+                        <!-- Image Previews Container -->
+                        <div id="image-previews-container" class="grid grid-cols-4 gap-3">
+                            <!-- Static previews of beautiful residences by default to save effort -->
+                            <div class="relative rounded-xl border border-gray-100 overflow-hidden h-20 shadow-sm group">
+                                <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=150&q=80" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash text-white text-xs"></i></div>
+                            </div>
+                            <div class="relative rounded-xl border border-gray-100 overflow-hidden h-20 shadow-sm group">
+                                <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=150&q=80" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash text-white text-xs"></i></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: Pricing and Amenities -->
+                    <div id="wizard-step-content-4" class="hidden space-y-4 text-right">
+                        <h4 class="font-bold text-gray-900 border-r-4 border-accent pr-2 text-sm text-right">مرحله ۴: قیمت‌گذاری و امکانات رفاهی</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
+                            <div class="text-right">
+                                <label class="block text-xs font-bold text-gray-700 mb-2">قیمت به ازای هر شب (ریال)</label>
+                                <input required type="text" id="wizard-price" oninput="formatPriceInput(this)" placeholder="مثال: ۱۵,۰۰۰,۰۰۰" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm font-extrabold outline-none tracking-wider text-center">
+                                <span class="text-[10px] text-gray-400 mt-1 block text-right" id="wizard-price-text">یا معادل ۱۵۰ هزار تومان</span>
+                            </div>
+                            <div class="text-right">
+                                <label class="block text-xs font-bold text-gray-700 mb-2">حداقل مدت اقامت (شب)</label>
+                                <input required type="number" id="wizard-min-stay" value="1" min="1" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm font-semibold outline-none">
+                            </div>
+                        </div>
+
+                        <div class="text-right">
+                            <label class="block text-xs font-bold text-gray-700 mb-3 text-right">امکانات ویژه اقامتگاه</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-semibold text-gray-700 text-right">
+                                <label class="flex items-center gap-2 cursor-pointer bg-gray-50 p-2.5 rounded-lg border border-gray-100 hover:border-primary/20"><input type="checkbox" id="wizard-wifi" checked class="rounded text-primary focus:ring-primary"> اینترنت بی‌سیم (WiFi)</label>
+                                <label class="flex items-center gap-2 cursor-pointer bg-gray-50 p-2.5 rounded-lg border border-gray-100 hover:border-primary/20"><input type="checkbox" id="wizard-pool" class="rounded text-primary focus:ring-primary"> استخر اختصاصی</label>
+                                <label class="flex items-center gap-2 cursor-pointer bg-gray-50 p-2.5 rounded-lg border border-gray-100 hover:border-primary/20"><input type="checkbox" id="wizard-parking" checked class="rounded text-primary focus:ring-primary"> پارکینگ خودرو</label>
+                                <label class="flex items-center gap-2 cursor-pointer bg-gray-50 p-2.5 rounded-lg border border-gray-100 hover:border-primary/20"><input type="checkbox" id="wizard-ac" checked class="rounded text-primary focus:ring-primary"> کولر و اسپلیت</label>
+                                <label class="flex items-center gap-2 cursor-pointer bg-gray-50 p-2.5 rounded-lg border border-gray-100 hover:border-primary/20"><input type="checkbox" id="wizard-bbq" class="rounded text-primary focus:ring-primary"> باربیکیو و تراس</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Action Bar -->
+                    <div class="pt-6 border-t border-gray-100 flex justify-between items-center">
+                        <button type="button" id="wizard-prev-btn" onclick="wizardPrev()" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition disabled:opacity-50" disabled>
+                            مرحله قبل
+                        </button>
+
+                        <button type="button" id="wizard-next-btn" onclick="wizardNext()" class="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-bold transition flex items-center gap-1">
+                            <span>مرحله بعد</span> <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- CORE JAVASCRIPT CONTROLLERS -->
+    <script src="/v10-app.js"></script>
+</body>
+</html>
