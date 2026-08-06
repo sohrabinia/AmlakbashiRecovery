@@ -48,11 +48,12 @@ namespace AntiXssMiddleware.Middleware
             await _next(context).ConfigureAwait(false);
         }
 
-        private async Task RespondWithAnError(HttpContext context)
+        private Task RespondWithAnError(HttpContext context)
         {
             context.Response.Clear();
             context.Response.Headers.AddHeaders();
             context.Response.Redirect("/errors/http404");
+            return Task.CompletedTask;
         }
     }
 
