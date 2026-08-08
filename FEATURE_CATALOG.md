@@ -1,158 +1,99 @@
-# YarTrader Feature Catalog
-
-This document establishes the authoritative, evidence-based catalog of feature engineering components and target representations proposed for the YarTrader platform.
+# TradeYar AI Machine Learning Feature Catalog
 
 ---
 
-## 1. Feature Lifecycle Framework
-
-To maintain strict ML platform audit integrity, every cataloged feature is marked with one of the following evidence-based classification tiers:
-
-* **OPERATIONAL**: Directly implemented in production/runtime code and supported by concrete runtime code evidence.
-* **TEST/DEVELOPMENT EVIDENCE**: Exists in code/tests, but production runtime usage is not fully proven.
-* **SIMULATED**: Exists only in market replay engines, backtest sandboxes, fixtures, or test environments.
-* **DEFINED/DERIVABLE**: Can be mathematically calculated from existing historical market data, but is not currently used as an active feature in any production ML pipeline.
-* **MISSING**: Not implemented in the workspace.
+## 1. Purpose and Scope
+This Feature Catalog details the machine learning feature engineering representations, technical indicators, and prediction targets mapped for the TradeYar AI platform. It serves as an authoritative specification for feature engineering, establishing clear operational boundaries between existing infrastructure and proposed machine learning components.
 
 ---
 
-## 2. Detailed Feature Categories
+## 2. Feature Lifecycle
+Features tracked in this catalog progress through a defined lifecycle based on code readiness and evidence of execution:
 
-### A. Price Features
-* **OHLC (Open, High, Low, Close) Bars**
-  * *Implementation*: N/A
-  * *Class/Function*: N/A
-  * *Input*: Raw tick stream (Bid, Ask, Last)
-  * *Output*: Fixed-duration candlestick representation
-  * *Status*: **DEFINED/DERIVABLE** (Raw ticks exist in broker feeds, but OHLC feature construction is not implemented in the active runtime codebase).
-* **Log and Simple Returns**
-  * *Implementation*: N/A
-  * *Class/Function*: N/A
-  * *Input*: OHLC historical sequence
-  * *Output*: Logarithmic price differences
-  * *Status*: **DEFINED/DERIVABLE**
-* **Price Distance Metrics (SMA/EMA Deviations)**
-  * *Implementation*: N/A
-  * *Class/Function*: N/A
-  * *Input*: Price sequence and moving average filters
-  * *Output*: Normalized distance metrics
-  * *Status*: **DEFINED/DERIVABLE**
+* **Implemented**: Feature engineering code is written and integrated into core source modules.
+* **Tested**: Tests exist in the test suite to verify calculation accuracy under fixed inputs.
+* **Persisted**: Feature values are successfully recorded in persistent state buffers or databases.
+* **Runtime-consumed**: Features are actively consumed by the trading engine or live signals.
+* **Simulation-only**: Feature calculation is restricted to offline replays, sandboxes, fixtures, or backtesting.
+* **Documentation/specification only**: Feature definition exists strictly as a design pattern or target specification.
 
-### B. Volatility Features
-* **Average True Range (ATR)**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE** (Standard mathematical technical formula derivable from high, low, close prices).
-* **Historical Volatility (HV)**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE** (Standard rolling standard deviation of log returns).
-* **Volatility Squeeze Measurements (Bollinger Band Bandwidth)**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE**
+---
 
-### C. Volume Features
-* **Volume Rate of Change (VROC)**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE**
-* **On-Balance Volume (OBV)**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE**
-* **Volume-Weighted Average Price (VWAP) Deviation**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE**
+## 3. Existing Operational Features
 
-### D. Pattern Features
-* **Candlestick Pattern Detectors**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE** (Pattern logic is mathematical and can be derived programmatically from OHLC bar sets).
-* **Support / Resistance Range Estimators**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE**
+### Price Features
+* **OHLC Candlesticks & Returns**: Standard multi-timeframe bar representations and rolling logarithmic price differences.
+  * *Status*: **NOT VERIFIED** (No active ingestion or OHLC feature engineering code is present in this workspace).
+* **Price Distance Indicators**: standard distance of prices from major Simple and Exponential Moving Averages (SMA/EMA).
+  * *Status*: **NOT VERIFIED**
 
-### E. Risk Features
-* **Maximum Drawdown (Peak-to-Trough Decline)**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE**
-* **Trade Metric Profiles (R:R, MAE, MFE)**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE** (Mathematical definitions are set, but no active logging system computes or updates them in runtime).
+### Volatility Features
+* **Average True Range (ATR)**: Standard technical volatility measure representing absolute transaction ranges.
+  * *Status*: **NOT VERIFIED**
+* **Rolling Volatility Index**: Standard rolling standard deviation of log returns.
+  * *Status*: **NOT VERIFIED**
 
-### F. Memory-Derived Features
-* **In-Memory Rolling Window Buffers**
-  * *Implementation*: N/A
-  * *Status*: **MISSING** (No ring-buffers or sliding window memory stores are active in the repository runtime).
-* **Persistent Cache Handlers**
-  * *Implementation*: N/A
+### Volume Features
+* **Volume Rate of Change (VROC)**: Tracking the percentage change in asset trading volume.
+  * *Status*: **NOT VERIFIED**
+* **On-Balance Volume (OBV)**: Running cumulative sum of volume flow indicating buy/sell pressure.
+  * *Status*: **NOT VERIFIED**
+* **Volume-Weighted Average Price (VWAP) Deviation**: Measurement of current price distance from intraday VWAP.
+  * *Status*: **NOT VERIFIED**
+
+### Pattern / Structure Features
+* **Candlestick Structure Detectors**: Rule-based classifiers for classic patterns (e.g., Doji, Hammer, Engulfing).
+  * *Status*: **NOT VERIFIED**
+* **Support and Resistance Extremas**: Historical price extremas and local boundaries.
+  * *Status*: **NOT VERIFIED**
+
+### Strategy Features
+* **Entry Filters & Signal Triggers**: Deterministic threshold gates derived from traditional technical indicators (e.g., RSI, MACD, Stochastic Oscillators).
+  * *Status*: **NOT VERIFIED**
+
+### Risk Features
+* **Maximum Drawdown Tracker**: Calculates peek-to-trough drop over specified observation periods.
+  * *Status*: **NOT VERIFIED**
+* **Trade Metric Profiles (R:R, MAE, MFE)**: Standard trade statistics.
+  * *Status*: **NOT VERIFIED**
+
+### Memory-derived Features
+* **Rolling Window Buffers**: Bound ring-buffers storing recent tick streams.
+  * *Status*: **NOT VERIFIED**
+
+---
+
+## 4. Feature Sources and Runtime Evidence
+Every claim of functionality within this catalog is subject to direct repository search validation.
+
+Since the current active workspace does not contain the YarTrader trading or ML codebases, **no runtime evidence is verified** in the active environment.
+- All referenced features are categorized as **NOT VERIFIED** regarding their runtime consumption and production deployment. No proprietary AI trading edge has been verified in the codebase.
+
+---
+
+## 5. Simulated / Test-only Features
+All advanced features involving simulated tick feed replay, synthetic indicators, and backtest-specific indicators are classified as **NOT VERIFIED / DOCUMENTATION ONLY**. There are no active backtest replays or simulation engines present in the local codebase.
+
+---
+
+## 6. Missing ML-specific Features
+The following advanced machine learning operations are completely absent from the current active repository code:
+
+* **SHAP (Shapley Additive exPlanations) Feature Importance**: **MISSING** (No SHAP calculation, feature attribution, or explainability framework is implemented).
+* **Feature Drift Metrics**: **MISSING** (No Population Stability Index [PSI], KS-test trackers, or data drift detection mechanisms exist).
+* **Calibrated Probabilistic Sizing**: **MISSING** (No dynamic positioning or sizing engines guided by machine learning output probabilities are active).
+
+---
+
+## 7. Prediction Targets
+
+These items represent candidate/derivable target labels for future machine learning model training and evaluation. They do **not** represent active outputs from any trained production machine learning model.
+
+* **Win_Loss**: Binary trade direction outcome defined strictly by absolute target/stop execution boundaries.
+  * *Status*: **NOT VERIFIED / DEFINED ONLY** (Can support future training but no active target calculation is implemented in runtime).
+* **Expected_Return**: Mean logarithmic return over defined post-trade holding periods.
+  * *Status*: **NOT VERIFIED / DEFINED ONLY**
+* **Success_Probability**: Multi-factor model probabilistic estimation of trade boundary success.
+  * *Status*: **MISSING** (No probabilistic model, calibration algorithm, or success probability engine exists).
+* **Trade_Quality**: Categorical rating based on drawdown minimization and execution efficiency.
   * *Status*: **MISSING**
-
----
-
-## 3. ML-Oriented Catalog (From Main Branch)
-
-### A. Market Features
-* **Bid-Ask Spread Estimator**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE** (Derivable from raw bid/ask streams, but no active feature pipelines store or represent it).
-* **Liquidity Estimator (Order Book Depth)**
-  * *Implementation*: N/A
-  * *Status*: **MISSING**
-
-### B. Research Features
-* **Statistical Descriptors (Skewness, Kurtosis over Rolling Windows)**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE**
-
-### C. Strategy Features
-* **Entry Filters & Multi-Indicator Signal Metrics**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE**
-
----
-
-## 4. Prediction Target Labels Evaluation
-
-These labels represent candidate/derivable target targets for future ML modeling, rather than active production ML model targets.
-
-* **Win_Loss (Binary Trade Direction Outcome)**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE** (Derivable post-trade based on absolute execution boundary conditions).
-* **Expected_Return (Mean Outward Log Return)**
-  * *Implementation*: N/A
-  * *Status*: **DEFINED/DERIVABLE**
-* **Success_Probability (Probabilistic Trade Boundary Sizing)**
-  * *Implementation*: N/A
-  * *Status*: **MISSING** (No probabilistic model or calibration system exists to calculate or estimate success probability).
-* **Trade_Quality (Multi-Factor Performance Classification)**
-  * *Implementation*: N/A
-  * *Status*: **MISSING** (No classification framework or scoring functions exist in the code).
-
----
-
-## 5. Advanced ML Operations
-
-* **SHAP (Shapley Additive exPlanations) Feature Attribution**: **MISSING**
-* **Feature Drift Monitoring (PSI/KS-test)**: **MISSING**
-* **Probabilistic Sizing Engine**: **MISSING**
-
----
-
-## 6. Structural Reality Separation
-
-To prevent the unintended reintroduction of booking checkout routes or false marketing assumptions:
-- All features detailed in this catalog are either strictly mathematical definitions (candidate variables) or are missing from the current active source code.
-- No self-improving market intelligence, autonomous adaptation, or trained trading model is deployed on the system.
-
----
-
-## 7. Audit Status
-
-This catalog documents the current implementation and evidence state of the YarTrader feature capabilities. It does **not** certify the existence of a production machine learning model, autonomous learning engine, or any active AI pattern-matching loops.
-
-### Dashboard Metric Verification
-The following values currently displayed on the dashboard are evaluated as follows:
-- **Total Evaluated Patterns: 0** -> **NOT VERIFIED** (No matching pattern tracking exists in the code).
-- **M5 Win-rate: 66.7%** -> **NOT VERIFIED** (No calculation logic or data source found).
-- **M5 Avg R:R: 2.5 R** -> **NOT VERIFIED** (No calculation logic or data source found).
-- **M15 Win-rate: 100.0%** -> **NOT VERIFIED** (No calculation logic or data source found).
-- **M15 Avg R:R: 3.1 R** -> **NOT VERIFIED** (No calculation logic or data source found).
-
-All trading performance metrics displayed on the dashboard interface are unverified by any repository code and must be treated as **HARDCODED / SYNTHETIC** for the current workspace.
