@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Amlakbashi.Core.Identity;
 using Amlakbashi.Core.Common.Caching;
+using Amlakbashi.Data;
 
 namespace Portal.Controllers
 {
@@ -44,6 +45,61 @@ namespace Portal.Controllers
         public ActionResult Home()
         {
             return View();
+        }
+
+        [Authorize(Policy = Policies.Statistics_View)]
+        public ActionResult LeadIntelligenceReport([FromServices] AmlakbashiDB db)
+        {
+            try
+            {
+                var totalLeads = db.LeadEvents.Count();
+                var showMobileLeads = db.LeadEvents.Count(e => e.EventType == "ShowMobile");
+                var topListings = db.LeadEvents
+                    .GroupBy(e => e.ResidenceId)
+                    .Select(g => new Amlakbashi.Core.DTOs.TopListingLeadDto { ResidenceId = g.Key, Count = g.Count() })
+                    .OrderByDescending(x => x.Count)
+                    .Take(10)
+                    .ToList();
+
+                ViewBag.TotalLeads = totalLeads;
+                ViewBag.ShowMobileLeads = showMobileLeads;
+                ViewBag.TopListings = topListings;
+                return View();
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Admin.LeadIntelligenceReport", exc);
+                return View("AdminStatistic");
+            }
+        }
+
+        [Authorize(Policy = Policies.Statistics_View)]
+        public JsonResult GetLeadIntelligenceStatistics([FromServices] AmlakbashiDB db)
+        {
+            try
+            {
+                var totalLeads = db.LeadEvents.Count();
+                var showMobileLeads = db.LeadEvents.Count(e => e.EventType == "ShowMobile");
+                var topListings = db.LeadEvents
+                    .GroupBy(e => e.ResidenceId)
+                    .Select(g => new Amlakbashi.Core.DTOs.TopListingLeadDto { ResidenceId = g.Key, Count = g.Count() })
+                    .OrderByDescending(x => x.Count)
+                    .Take(10)
+                    .ToList();
+
+                return GenerateJsonResult(new
+                {
+                    status = 1,
+                    totalLeads = totalLeads,
+                    showMobileLeads = showMobileLeads,
+                    topListings = topListings
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Admin.GetLeadIntelligenceStatistics", exc);
+                return GenerateJsonResult(new { status = 0, msg = exc.Message });
+            }
         }
 
         [Authorize(Policy = Policies.Statistics_View)]

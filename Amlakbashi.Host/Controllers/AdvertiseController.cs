@@ -38,6 +38,7 @@ namespace Amlakbashi.Host.Controllers
         private readonly IUserContactFacade userContact;
         private readonly IUserAccessor userAccessor;
         private readonly ILog logger;
+        private readonly Data.AmlakbashiDB dbContext;
         public AdvertiseController(ILog logger,
             IAdvertiseAppService advertiseService,
             IReportItemAppService reportItemService,
@@ -47,7 +48,8 @@ namespace Amlakbashi.Host.Controllers
             IDiscountTableAppService discountTableService,
             IReserveAppService reserveService,
             IUserContactFacade userContact,
-            IUserAccessor userAccessor
+            IUserAccessor userAccessor,
+            Data.AmlakbashiDB dbContext
             )
         {
             this.advertiseService = advertiseService;
@@ -60,6 +62,54 @@ namespace Amlakbashi.Host.Controllers
             this.userContact = userContact;
             this.logger = logger;
             this.userAccessor = userAccessor;
+            this.dbContext = dbContext;
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> TrackLeadEvent(long residenceId, string eventType = "ShowMobile", string deduplicationKey = null)
+        {
+            try
+            {
+                var ad = advertiseService.Find(residenceId);
+                if (ad == null)
+                {
+                    return GenerateJsonResult(new { status = 0, msg = "Not Found" });
+                }
+
+                int? currentUserId = userAccessor.CurrentUser?.Id > 0 ? (int?)userAccessor.CurrentUser.Id : null;
+                string ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+                string userAgent = Request.Headers["User-Agent"].ToString();
+
+                string key = string.IsNullOrEmpty(deduplicationKey)
+                    ? $"{residenceId}_{currentUserId?.ToString() ?? ip}_{DateTime.UtcNow:yyyyMMddHH}"
+                    : deduplicationKey;
+
+                bool exists = dbContext.LeadEvents.Any(e => e.DeduplicationKey == key);
+                if (!exists)
+                {
+                    var leadEvent = new LeadEvent
+                    {
+                        ResidenceId = residenceId,
+                        HostUserId = ad.UserId,
+                        GuestUserId = currentUserId,
+                        EventType = string.IsNullOrEmpty(eventType) ? "ShowMobile" : eventType,
+                        DeduplicationKey = key,
+                        ClientIp = ip,
+                        UserAgent = userAgent,
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    dbContext.LeadEvents.Add(leadEvent);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                return GenerateJsonResult(new { status = 1, msg = "Tracked successfully" });
+            }
+            catch (Exception exc)
+            {
+                logger.Error("Advertise.TrackLeadEvent", exc);
+                return GenerateJsonResult(new { status = 0, msg = "Error tracking lead event" });
+            }
         }
 
         [Authorize(Policy = Policies.Advertise_View)]

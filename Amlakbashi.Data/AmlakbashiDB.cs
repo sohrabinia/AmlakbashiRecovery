@@ -48,6 +48,7 @@ namespace Amlakbashi.Data
         public DbSet<InstantReserveAutoCancel> InstantReserveAutoCancels{ get; set; }
         public DbSet<ReserveSendSms> ReserveSendSms{ get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<LeadEvent> LeadEvents { get; set; }
 
         private readonly IConfiguration configuration;
 
