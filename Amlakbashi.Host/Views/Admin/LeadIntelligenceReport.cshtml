@@ -1,0 +1,23 @@
+@{
+    ViewBag.Title = "گزارش لیدهای تماس و تقاضا";
+    Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+}
+
+<div class="adminmain" style="padding: 20px;">
+    <h2>گزارش هوش لید و تقاضا (Lead Intelligence)</h2>
+    <div style="display: flex; gap: 20px; margin-top: 20px;">
+        <div style="background: #ffffff; border: 1px solid #ddd; padding: 20px; border-radius: 8px; flex: 1;">
+            <h3>کل لیدهای ثبت شده</h3>
+            <p style="font-size: 24px; font-weight: bold; color: #0F5132;">@ViewBag.TotalLeads</p>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #ddd; padding: 20px; border-radius: 8px; flex: 1;">
+            <h3>لیدهای نمایش مستقیم تماس (ShowMobile)</h3>
+            <p style="font-size: 24px; font-weight: bold; color: #10b981;">@ViewBag.ShowMobileLeads</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; background: #ffffff; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+        <h3>اقامتگاه‌های دارای بیشترین تقاضا</h3>
+        <p style="color: #666;">بر اساس تعداد نمایش مستقیم شماره تماس میزبان</p>
+    </div>
+</div>

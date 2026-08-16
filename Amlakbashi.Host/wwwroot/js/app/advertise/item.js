@@ -419,6 +419,18 @@ function updateReserveLabels() {
     $("#from_date_label").show();
     //$("#to_date_label").show();
 }
+function show_contact(elem, id) {
+    show_contact_id = id || advertise_id;
+    show_contact_element = elem;
+    if (show_contact_id) {
+        $.ajax({
+            type: "POST",
+            url: "/advertise/trackleadevent",
+            data: { residenceId: show_contact_id, eventType: "ShowMobile" }
+        });
+    }
+}
+
 function on_login_action() {
     //$("#write_comment_root").css("display", "unset");
     //$(".comment__login").css("display", "none");

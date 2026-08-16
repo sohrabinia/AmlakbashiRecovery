@@ -142,6 +142,18 @@
         <div class="advertise-page__main-elements-parent">
             <div class="advertise-page__property-box advertise-page__info-box">
 
+                @if (owner != null && User.Identity.IsAuthenticated)
+                {
+                    <div class="advertise-page__host-demand-insights" style="background: #eef9f1; border: 1px solid #10b981; padding: 12px 16px; border-radius: 8px; margin-bottom: 15px;">
+                        <h4 style="color: #065f46; font-size: 15px; margin: 0 0 6px 0; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa fa-chart-line"></i> عملکرد آگهی و سیگنال تقاضای اقامتگاه
+                        </h4>
+                        <p style="font-size: 13px; color: #047857; margin: 0;">
+                            کد اقامتگاه: <strong>@Model.Id</strong> | وضعیت لید تماس: <span style="color: #059669; font-weight: bold;">فعال و آماده دریافت تماس مشتری</span>
+                        </p>
+                    </div>
+                }
+
                 @* Title and Acc Code *@
                 <div class="advertise-page_title_item">
                     <h1>@Model.TitleDesc.Title</h1>
