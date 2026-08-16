@@ -1125,6 +1125,48 @@ namespace Amlakbashi.Data.Migrations
                     b.ToTable("InstantReserveDate");
                 });
 
+            modelBuilder.Entity("Amlakbashi.Core.Entities.LeadEvent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("ClientIp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeduplicationKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EventType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("GuestUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HostUserId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("ResidenceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuestUserId");
+
+                    b.HasIndex("HostUserId");
+
+                    b.HasIndex("ResidenceId");
+
+                    b.ToTable("LeadEvents");
+                });
+
             modelBuilder.Entity("Amlakbashi.Core.Entities.OccupiedTable", b =>
                 {
                     b.Property<long>("Id")
@@ -2381,6 +2423,31 @@ namespace Amlakbashi.Data.Migrations
                         .HasForeignKey("ResidenceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Residence");
+                });
+
+            modelBuilder.Entity("Amlakbashi.Core.Entities.LeadEvent", b =>
+                {
+                    b.HasOne("Amlakbashi.Core.Entities.User", "GuestUser")
+                        .WithMany()
+                        .HasForeignKey("GuestUserId");
+
+                    b.HasOne("Amlakbashi.Core.Entities.User", "HostUser")
+                        .WithMany()
+                        .HasForeignKey("HostUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Amlakbashi.Core.Entities.Advertise", "Residence")
+                        .WithMany()
+                        .HasForeignKey("ResidenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GuestUser");
+
+                    b.Navigation("HostUser");
 
                     b.Navigation("Residence");
                 });
