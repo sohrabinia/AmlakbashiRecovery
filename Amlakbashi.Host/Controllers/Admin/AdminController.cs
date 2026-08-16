@@ -56,7 +56,7 @@ namespace Portal.Controllers
                 var showMobileLeads = db.LeadEvents.Count(e => e.EventType == "ShowMobile");
                 var topListings = db.LeadEvents
                     .GroupBy(e => e.ResidenceId)
-                    .Select(g => new { ResidenceId = g.Key, Count = g.Count() })
+                    .Select(g => new Amlakbashi.Core.DTOs.TopListingLeadDto { ResidenceId = g.Key, Count = g.Count() })
                     .OrderByDescending(x => x.Count)
                     .Take(10)
                     .ToList();
@@ -82,7 +82,7 @@ namespace Portal.Controllers
                 var showMobileLeads = db.LeadEvents.Count(e => e.EventType == "ShowMobile");
                 var topListings = db.LeadEvents
                     .GroupBy(e => e.ResidenceId)
-                    .Select(g => new { ResidenceId = g.Key, Count = g.Count() })
+                    .Select(g => new Amlakbashi.Core.DTOs.TopListingLeadDto { ResidenceId = g.Key, Count = g.Count() })
                     .OrderByDescending(x => x.Count)
                     .Take(10)
                     .ToList();

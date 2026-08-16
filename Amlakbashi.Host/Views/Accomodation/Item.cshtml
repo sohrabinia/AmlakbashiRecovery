@@ -142,7 +142,7 @@
         <div class="advertise-page__main-elements-parent">
             <div class="advertise-page__property-box advertise-page__info-box">
 
-                @if (owner != null && User.Identity.IsAuthenticated)
+                @if (owner != null && User.Identity.IsAuthenticated && User.Identity.Name == owner.PhoneNumber)
                 {
                     <div class="advertise-page__host-demand-insights" style="background: #eef9f1; border: 1px solid #10b981; padding: 12px 16px; border-radius: 8px; margin-bottom: 15px;">
                         <h4 style="color: #065f46; font-size: 15px; margin: 0 0 6px 0; display: flex; align-items: center; gap: 8px;">

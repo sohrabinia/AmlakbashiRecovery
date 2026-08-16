@@ -1,53 +1,41 @@
 # AmlakBashi V10 Master Evolution Implementation Plan
 
 ## Executive Overview
-This implementation plan governs the evolution of AmlakBashi V10 from a certified Contact Display Marketplace into a scalable Lead Intelligence Marketplace, Host Growth Platform, Monetization Platform, and SEO Growth Engine.
+This implementation plan governs the post-production evolution of AmlakBashi V10 from a certified Contact Display Marketplace into a scalable Lead Intelligence Marketplace, Host Growth Platform, Monetization Engine, and SEO Growth Engine while establishing an automated Staging-first DevOps lifecycle and AI-assisted validation pipeline.
 
 ## Baseline Certification & Red Lines
-- **Baseline Git Tag**: `v10-production-baseline`
-- **Contact Mode Status**: Active (`ShowMobile` enabled, public reservation disabled, historical admin reservations preserved).
+- **Baseline Git Tag**: `v10-production-baseline` (Rollback/Reference Baseline)
+- **CRITICAL OPERATING RULE**: **PRODUCTION MUST NOT BE MODIFIED DURING THIS TASK**.
+- All implementation and database schema changes run exclusively against isolated TEST/STAGING environments.
 - **Business Protection (Immutable)**:
   - Existing Persian SEO URLs and category/city routing
-  - Historical reservation database tables and financial ledgers (`CreditTransaction`, `Payment`, etc.)
+  - Historical reservation database tables and financial ledgers (`CreditTransactions`, `Payments`, `WalletTransactions`)
   - Host listing data and core `Advertise` business logic
   - Production database schema stability
 
 ## Evolution Phases & Roadmap
 
-### Phase 1: Lead Intelligence Foundation
-- Introduce `LeadEvent` entity and `LeadEventDto` in `Amlakbashi.Core` for contact reveal tracking (`ShowMobile`), host/listing attribution, timestamping, and client deduplication keys.
-- Map `LeadEvents` DbSet in `Amlakbashi.Data/AmlakbashiDB.cs`.
-- Implement lead tracking endpoint in `Amlakbashi.Host/Controllers/AdvertiseController.cs`.
+### Phase 1: Baseline Lock & Repository Forensic Check
+- Branch strategy: `v10-product-evolution` development branch.
+- Baseline tag `v10-production-baseline` preserved untouched.
 
-### Phase 2: Host Growth Platform
-- Expose contact leads, listing demand metrics, and demand signals in `Amlakbashi.Host/Controllers/AccomodationController.cs` and `Amlakbashi.Host/Views/Accomodation/Item.cshtml`.
-- Enable hosts to analyze listing demand and lead performance in real-time.
+### Phase 2: Lead Intelligence Foundation & Host Growth
+- `LeadEvent` entity, `LeadEventDto`, `LeadEvents` DbSet, and `TrackLeadEvent` API endpoint with client `item.js` tracking.
+- Host demand signals and real-time contact lead analytics on listing items.
 
-### Phase 3: Monetization Platform
-- Enhance Nardeban (listing bump) and Featured Listings visibility logic in `Amlakbashi.Application/Services/AdvertiseServices/AdvertiseAppService.cs`.
-- Document revenue systems and score preservation in `docs/V10_MONETIZATION_ARCHITECTURE.md`.
+### Phase 3: Monetization & SEO Engines
+- Nardeban (listing bump) and Featured Listings score preservation (`ResidenceScore`, `AmlakbashiScore`).
+- JSON-LD Structured Data (`RentAction`/`Hotel`, `BreadcrumbList`, `RealEstateAgent`) across property detail and homepage views.
 
-### Phase 4: SEO Growth Engine
-- Embed JSON-LD Structured Data schemas (`Residence`, `LocalBusiness`, `Breadcrumb`) in `Amlakbashi.Host/Views/Accomodation/Item.cshtml` and `Amlakbashi.Host/Views/Home/Index.cshtml`.
-- Author `docs/V10_SEO_GROWTH_IMPLEMENTATION.md`.
+### Phase 4: Business Intelligence & Technical Hardening
+- Admin reporting endpoints (`GetLeadIntelligenceStatistics`) and view (`LeadIntelligenceReport.cshtml`).
+- System hardening across EF Core queries, Redis distributed cache, and Hangfire background jobs.
 
-### Phase 5: Notification & Engagement Layer
-- Integrate lead notification mechanisms (SMS alerts, dashboard notifications) across `Amlakbashi.Host/Controllers/AdvertiseController.cs` and `Amlakbashi.Application/Services/UserServices/UserAppService.cs`.
+### Phase 5: Database Safety, Staging & Ollama AI Pipeline
+- Staging environment isolation (separate IIS app pool, separate Staging DB).
+- Local Ollama AI analysis framework for code diffs, test logs, and schema migrations.
 
-### Phase 6: Business Intelligence Layer
-- Expand admin reporting in `Amlakbashi.Host/Controllers/Admin/AdminController.cs` and `Amlakbashi.Host/Views/Admin/AdminStatistic.cshtml` for lead volume, conversion trends, and top listing metrics.
-
-### Phase 7: Technical Hardening
-- Optimize EF Core query performance, background jobs, memory caching, and safety boundaries in `Amlakbashi.Data/AmlakbashiDB.cs` and `Amlakbashi.Host/Startup.cs`.
-- Document technical findings in `docs/V10_TECHNICAL_HARDENING_REPORT.md`.
-
-### Phase 8 & 9: Delivery Pipeline & Regression Validation
-- Validate build integrity with `dotnet build Amlakbashi.sln` across Public, Guest, Host, and Admin portals.
-
-### Phase 10: Final Certification
-- Execute `dotnet build` and `dotnet test` suites.
-- Author `docs/V10_MASTER_PRODUCT_EVOLUTION_CERTIFICATION.md`.
-
-## Risk Management & Rollback Strategy
-- **Rollback Point**: Git tag `v10-production-baseline`.
-- **Database Safety**: All new lead structures are additive-only; zero destructive schema changes.
+### Phase 6: Complete Regression & Release Gate Validation
+- `dotnet build` and `dotnet test` suite execution.
+- Security boundary verification (Public user reservation blocked, admin historical reservation preserved).
+- Final release gate status set to `READY FOR HUMAN ACCEPTANCE TEST`.

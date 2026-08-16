@@ -1,6 +1,8 @@
+@using Amlakbashi.Core.DTOs
 @{
     ViewBag.Title = "گزارش لیدهای تماس و تقاضا";
     Layout = "~/Views/Shared/_MasterAdmin.cshtml";
+    var topListings = ViewBag.TopListings as List<TopListingLeadDto> ?? new List<TopListingLeadDto>();
 }
 
 <div class="adminmain" style="padding: 20px;">
@@ -18,6 +20,31 @@
 
     <div style="margin-top: 30px; background: #ffffff; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
         <h3>اقامتگاه‌های دارای بیشترین تقاضا</h3>
-        <p style="color: #666;">بر اساس تعداد نمایش مستقیم شماره تماس میزبان</p>
+        <p style="color: #666; margin-bottom: 15px;">بر اساس تعداد نمایش مستقیم شماره تماس میزبان</p>
+
+        @if (topListings.Any())
+        {
+            <table class="table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #ddd; text-align: right;">
+                        <th style="padding: 10px;">کد اقامتگاه</th>
+                        <th style="padding: 10px;">تعداد دریافت لید تماس</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in topListings)
+                    {
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 10px;">@item.ResidenceId</td>
+                            <td style="padding: 10px;">@item.Count</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p style="color: #888;">هنوز درخواستی ثبت نشده است.</p>
+        }
     </div>
 </div>
