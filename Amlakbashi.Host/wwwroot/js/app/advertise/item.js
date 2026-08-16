@@ -426,7 +426,14 @@ function show_contact(elem, id) {
         $.ajax({
             type: "POST",
             url: "/advertise/trackleadevent",
-            data: { residenceId: show_contact_id, eventType: "ShowMobile" }
+            data: { residenceId: show_contact_id, eventType: "ShowMobile" },
+            success: function (ret) {
+                if (ret && ret.phoneNumber) {
+                    $('#host-phone-text').html(ret.phoneNumber);
+                    $('#host-phone-number-container').slideDown(200);
+                    $('#contact-btn-text').html('زنگ بزن و بگو شماره رو از املاک باشی برداشتم!');
+                }
+            }
         });
     }
 }

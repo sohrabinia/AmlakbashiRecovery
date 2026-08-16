@@ -103,7 +103,11 @@ namespace Amlakbashi.Host.Controllers
                     await dbContext.SaveChangesAsync();
                 }
 
-                return GenerateJsonResult(new { status = 1, msg = "Tracked successfully" });
+                string phoneNumber = !string.IsNullOrEmpty(ad.OwnerPhoneNumber)
+                    ? ad.OwnerPhoneNumber
+                    : (ad.User != null ? ad.User.PhoneNumber : "اطلاعات تماس موجود نیست");
+
+                return GenerateJsonResult(new { status = 1, msg = "Tracked successfully", phoneNumber = phoneNumber });
             }
             catch (Exception exc)
             {

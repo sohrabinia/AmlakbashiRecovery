@@ -95,10 +95,9 @@
 <div class="advertise-page__bottom-pin" style="@(Model.AdvertiseMode == Advertise.AdvertiseMode.Parent || !Model.CanPublish ? "background-color:transparent;border:none;" : "")">
     @if (Model.AdvertiseMode != Advertise.AdvertiseMode.Parent && Model.CanPublish)
     {
-        <div onclick="showReserveContainer()" class="advertise-page__bottom-pin-button">
-            <p class="js-reserve-req-title">رزرو<i class="js-reserve-req-icon fa fa-calendar-check"></i></p>
+        <div onclick="show_contact(this)" class="advertise-page__bottom-pin-button" style="background: #10b981;">
+            <p class="js-reserve-req-title">تماس با میزبان<i class="js-reserve-req-icon fa fa-phone-alt" style="margin-right: 6px;"></i></p>
         </div>
-        <p class="advertise-page__reserve-free-ribbon">رایگان</p>
     }
 </div>
 
