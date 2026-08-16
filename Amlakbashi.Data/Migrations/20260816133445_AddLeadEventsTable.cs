@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Amlakbashi.Data.Migrations
 {
-    public partial class addleadeventstable : Migration
+    public partial class AddLeadEventsTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -32,17 +32,17 @@ namespace Amlakbashi.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_LeadEvents_Users_HostUserId",
-                        column: x => x.HostUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_LeadEvents_Users_GuestUserId",
                         column: x => x.GuestUserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_LeadEvents_Users_HostUserId",
+                        column: x => x.HostUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
