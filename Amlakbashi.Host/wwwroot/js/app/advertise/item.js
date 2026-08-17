@@ -429,6 +429,7 @@ function show_contact(elem, id) {
             data: { residenceId: show_contact_id, eventType: "ShowMobile" },
             success: function (ret) {
                 if (ret && ret.phoneNumber) {
+                    $('.advertise-page__reserve-container').slideDown(200);
                     $('#host-phone-text').html(ret.phoneNumber);
                     $('#host-phone-number-container').slideDown(200);
                     $('#contact-btn-text').html('زنگ بزن و بگو شماره رو از املاک باشی برداشتم!');
