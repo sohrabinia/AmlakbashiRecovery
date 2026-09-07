@@ -75,12 +75,13 @@
     </div>
     @await Html.PartialAsync("_DatePicker", null, new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { { "id", "main-date-picker" }, { "class", "main-date-picker" } })
     <div class="item-content__reserve-bottom">
-        <div class="item-content__reserve-btn" id="reserve-request-button" onclick="show_contact(this, advertise_id)" style="background-color: #0F5132; color: #ffffff;">
-            <p class="js-reserve-req-title"><i class="js-reserve-req-icon fa fa-phone-alt"></i> نمایش شماره تماس میزبان</p>
+        <div class="item-content__reserve-btn" id="reserve-request-button" onclick="checkReserve(true)">
+
+            <p class="js-reserve-req-title"><i class="js-reserve-req-icon fa fa-calendar-check"></i>درخواست رزرو</p>
         </div>
         @if (ViewBag.forceHeaderShown == null || !ViewBag.forceHeaderShown)
         {
-            <div class="advertise-page__reserve-free-ribbon advertise-page__reserve-free-ribon-desktop">مستقیم</div>
+            <div class="advertise-page__reserve-free-ribbon advertise-page__reserve-free-ribon-desktop">رایگان</div>
         }
     </div>
 </div>
