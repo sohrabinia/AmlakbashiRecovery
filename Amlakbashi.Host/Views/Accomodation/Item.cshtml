@@ -372,29 +372,29 @@
     </div>
 }
 
-@*@if (can_publish && ViewBag.contact_available)
-    {
-        <div class="advertise-page__contact-stick">
-            <div class="advertise-page__profile-container">
-                @if (owner != null && owner.PhotoID > 0 && owner.PhotoStatus == (int)UserDepend.UserPhotoState.publish)
-                {
-                    <img src='@(string.Format("/عکس-پروفایل_کوچک-{0}", owner.PhotoID))' alt='@(string.Format("عکس پروفایل {0}", owner.FullName))' width="40" height="40" style="object-fit: cover;border-radius: 45px;margin: auto;" />
-                }
-                else
-                {
-                    <i class="fa fa-user-circle" style="font-size: 40px;"></i>
-                }
-                @if (owner != null && !string.IsNullOrEmpty(full_name))
-                    {
-                    <span title="@full_name">@full_name</span>
-                }
-                else
-                {
-                    <span>مالک اقامتگاه</span>
-                }
-            </div>
+@if (Model.CanPublish)
+{
+    <div class="advertise-page__contact-stick">
+        <div class="advertise-page__profile-container" onclick="show_contact(this, @Model.Id)" style="cursor: pointer;">
+            @if (owner != null && owner.PhotoID > 0 && owner.PhotoStatus == (int)Entities.User.UserPhotoState.publish)
+            {
+                <img src='@(string.Format("/عکس-پروفایل_کوچک-{0}", owner.PhotoID))' alt='@(string.Format("عکس پروفایل {0}", owner.FullName))' width="40" height="40" style="object-fit: cover;border-radius: 45px;margin: auto;" />
+            }
+            else
+            {
+                <i class="fa fa-user-circle" style="font-size: 40px;"></i>
+            }
+            @if (owner != null && !string.IsNullOrEmpty(full_name))
+            {
+                <span title="@full_name">تماس با @full_name <i class="fa fa-phone-alt" style="margin-right: 5px;"></i></span>
+            }
+            else
+            {
+                <span>نمایش شماره تماس میزبان <i class="fa fa-phone-alt" style="margin-right: 5px;"></i></span>
+            }
         </div>
-    }*@
+    </div>
+}
 
 @section ScriptLink {
     <script defer="defer" src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
