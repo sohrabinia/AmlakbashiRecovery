@@ -96,7 +96,7 @@
     @if (Model.AdvertiseMode != Advertise.AdvertiseMode.Parent && Model.CanPublish)
     {
         <div onclick="showReserveContainer()" class="advertise-page__bottom-pin-button">
-            <p class="js-reserve-req-title">رزرو<i class="js-reserve-req-icon fa fa-calendar-check"></i></p>
+            <p class="js-reserve-req-title">نمایش شماره تماس میزبان<i class="js-reserve-req-icon fa fa-phone"></i></p>
         </div>
         <p class="advertise-page__reserve-free-ribbon">رایگان</p>
     }
@@ -578,20 +578,8 @@
 });
 
 function updateReserveRequestButton() {
-    if (instantReserveAvailable && instantReserveActivated) {
-            $('#js-instant-reserve-info').css('display', 'flex');
-            $('.js-reserve-req-title').html('رزرو آنی');
-            $('.js-reserve-req-icon').removeClass("fa-calendar-check");
-            $('.js-reserve-req-icon').addClass("fa-bolt");
-            $('#js-mxrsrvstart-label').html(maxReserveStartDate);
-    }
-    else {
-            $('#js-normal-reserve-info').show();
-        $('.js-reserve-req-title').html(' <i class="js-reserve-req-icon fa fa-calendar-check"></i>درخواست رزرو');
-            $('.js-reserve-req-icon').removeClass("fa-bolt");
-            $('.js-reserve-req-icon').addClass("fa-calendar-check");
-    }
-        }
+    $('.js-reserve-req-title').html(' <i class="js-reserve-req-icon fa fa-phone"></i>نمایش شماره تماس میزبان');
+}
 
         function showVideo(residenceId) {
             showInfoMessage('ویدیو اقامتگاه ' + residenceId, '', { contentUrl: '/accomodation/ShowVideo?residenceId=' + residenceId, fullScreen: screen.width < 781 });
